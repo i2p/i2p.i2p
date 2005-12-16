@@ -22,10 +22,12 @@ package org.klomp.snark;
 
 import java.io.IOException;
 
+import net.i2p.util.I2PThread;
+
 /**
  * Makes sure everything ends correctly when shutting down.
  */
-public class SnarkShutdown extends Thread
+public class SnarkShutdown extends I2PThread
 {
   private final Storage storage;
   private final PeerCoordinator coordinator;

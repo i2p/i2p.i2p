@@ -23,6 +23,7 @@ package org.klomp.snark;
 import java.util.*;
 import java.io.IOException;
 
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -249,7 +250,7 @@ public class PeerCoordinator implements PeerListener
             }
           };
         String threadName = peer.toString();
-        new Thread(r, threadName).start();
+        new I2PThread(r, threadName).start();
       }
     else
       if (Snark.debug >= Snark.INFO)

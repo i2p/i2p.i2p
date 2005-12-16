@@ -25,6 +25,7 @@ import java.net.*;
 import java.util.*;
 
 import org.klomp.snark.bencode.*;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -33,7 +34,7 @@ import net.i2p.util.Log;
  *
  * @author Mark Wielaard (mark@klomp.org)
  */
-public class TrackerClient extends Thread
+public class TrackerClient extends I2PThread
 {
   private static final Log _log = new Log(TrackerClient.class);
   private static final String NO_EVENT = "";
@@ -84,6 +85,16 @@ public class TrackerClient extends Thread
     this.interrupt();
   }
 
+  private boolean verifyConnected() {
+    while (!stop && !I2PSnarkUtil.instance().connected()) {
+        boolean ok = I2PSnarkUtil.instance().connect();
+        if (!ok) {
+            try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
+        }
+    }
+    return !stop && I2PSnarkUtil.instance().connected();
+  }
+  
   public void run()
   {
     // XXX - Support other IPs
@@ -102,6 +113,7 @@ public class TrackerClient extends Thread
 
     try
       {
+        if (!verifyConnected()) return;
         boolean started = false;
         while (!started)
           {
@@ -164,6 +176,8 @@ public class TrackerClient extends Thread
 
             if (stop)
               break;
+       
+            if (!verifyConnected()) return;
             
             uploaded = coordinator.getUploaded();
             downloaded = coordinator.getDownloaded();
@@ -224,6 +238,7 @@ public class TrackerClient extends Thread
       {
         try
           {
+            if (!verifyConnected()) return;
             TrackerInfo info = doRequest(announce, infoHash, peerID, uploaded,
                                          downloaded, left, STOPPED_EVENT);
           }

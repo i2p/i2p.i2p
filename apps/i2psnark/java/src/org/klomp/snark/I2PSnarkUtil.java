@@ -3,9 +3,8 @@ package org.klomp.snark;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.util.EepGet;
-import net.i2p.data.Base64;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.Destination;
+import net.i2p.client.I2PSession;
+import net.i2p.data.*;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -149,7 +148,13 @@ public class I2PSnarkUtil {
     }
     
     String getOurIPString() {
-        return _manager.getSession().getMyDestination().toBase64();
+        I2PSession sess = _manager.getSession();
+        if (sess != null) {
+            Destination dest = sess.getMyDestination();
+            if (dest != null)
+                return dest.toBase64();
+        }
+        return "unknown";
     }
     Destination getDestination(String ip) {
         if (ip == null) return null;

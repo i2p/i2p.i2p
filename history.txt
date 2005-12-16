@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.358 2005/12/16 03:24:22 jrandom Exp $
+$Id: history.txt,v 1.359 2005/12/16 06:01:20 jrandom Exp $
+
+2005-12-16  jrandom
+    * Moved I2PSnark from using Threads to I2PThreads, so we handle OOMs
+      properly (thanks Complication!)
+    * More guards in I2PSnark for zany behavior (I2PSession recon w/ skew,
+      b0rking in the DirMonitor, etc)
 
 2005-12-16  jrandom
     * Try to run a torrent in readonly mode if we can't write to the file, and

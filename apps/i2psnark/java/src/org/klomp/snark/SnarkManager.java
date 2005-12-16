@@ -372,7 +372,11 @@ public class SnarkManager implements Snark.CompleteListener {
             while (true) {
                 File dir = getDataDir();
                 _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
-                monitorTorrents(dir);
+                try {
+                    monitorTorrents(dir);
+                } catch (Exception e) {
+                    _log.error("Error in the DirectoryMonitor", e);
+                }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
         }

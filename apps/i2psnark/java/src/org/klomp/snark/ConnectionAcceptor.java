@@ -26,6 +26,7 @@ import java.net.*;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.util.I2PThread;
 
 /**
  * Accepts connections on a TCP port and routes them to sub-acceptors.
@@ -47,7 +48,7 @@ public class ConnectionAcceptor implements Runnable
     
     socketChanged = false;
     stop = false;
-    thread = new Thread(this, "I2PSnark acceptor");
+    thread = new I2PThread(this, "I2PSnark acceptor");
     thread.setDaemon(true);
     thread.start();
   }
@@ -105,7 +106,7 @@ public class ConnectionAcceptor implements Runnable
                     Snark.debug("Null socket accepted, but socket wasn't changed?", Snark.ERROR);
                 }
             } else {
-                Thread t = new Thread(new Handler(socket), "Connection-" + socket);
+                Thread t = new I2PThread(new Handler(socket), "Connection-" + socket);
                 t.start();
             }
           }

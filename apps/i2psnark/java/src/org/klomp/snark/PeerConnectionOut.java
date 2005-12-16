@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 class PeerConnectionOut implements Runnable
@@ -48,7 +49,7 @@ class PeerConnectionOut implements Runnable
     _id = ++__id;
 
     quit = false;
-    thread = new Thread(this, "Snark sender " + _id);
+    thread = new I2PThread(this, "Snark sender " + _id);
     thread.start();
   }
 
