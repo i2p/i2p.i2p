@@ -53,14 +53,18 @@ public class I2PSnarkServlet extends HttpServlet {
         // we want it to go to the base URI so we don't refresh with some funky action= value
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + "\">\n");
         out.write(HEADER);
-        out.write("<a href=\"" + req.getRequestURI() + "\">Refresh</a>\n");
-        out.write("<textarea class=\"snarkMessages\" rows=\"2\" cols=\"100\" wrap=\"off\" >");
+        
+        out.write("<table border=\"0\" width=\"100%\">\n");
+        out.write("<tr><td width=\"5%\" class=\"snarkTitle\" valign=\"top\" align=\"left\">");
+        out.write("I2PSnark<br />\n");
+        out.write("<a href=\"" + req.getRequestURI() + "\" class=\"snarkRefresh\">Refresh</a>\n");
+        out.write("</td><td width=\"95%\" class=\"snarkMessages\" valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
             out.write(msg + "\n");
         }
-        out.write("</textarea>\n");
+        out.write("</pre></td></tr></table>\n");
 
         out.write(TABLE_HEADER);
 
@@ -302,6 +306,7 @@ public class I2PSnarkServlet extends HttpServlet {
         
         boolean isRunning = !snark.stopped;
         boolean isValid = snark.meta != null;
+        boolean singleFile = snark.meta.getFiles() == null;
         
         String err = snark.coordinator.trackerProblems;
         int curPeers = snark.coordinator.getPeerCount();
@@ -330,7 +335,15 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
         out.write(statusString + "</td>\n\t");
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
-        out.write(filename + "</td>\n\t");
+        
+        if (remaining == 0)
+            out.write("<a href=\"file:///" + _manager.getDataDir().getAbsolutePath() + File.separatorChar + snark.meta.getName() 
+                      + "\" title=\"Download the completed file\">");
+        out.write(filename);
+        if (remaining == 0)
+            out.write("</a>");
+        out.write("</td>\n\t");
+        
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0) {
             out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
@@ -380,7 +393,8 @@ public class I2PSnarkServlet extends HttpServlet {
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
         out.write("<input type=\"submit\" value=\"Add torrent\" name=\"action\" /><br />\n");
-        out.write("Alternately, you can copy .torrent files to " + _manager.getDataDir().getAbsolutePath() + "<br />\n");
+        out.write("<span class=\"snarkAddInfo\">Alternately, you can copy .torrent files to " + _manager.getDataDir().getAbsolutePath() + "<br />\n");
+        out.write("Removing that .torrent file will cause the torrent to stop.<br /></span>\n");
         out.write("</form>\n</span>\n");
     }
     
@@ -466,12 +480,22 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "	font-size: 16pt;\n" +
                                          "	font-weight: bold;\n" +
                                          "}\n" +
+                                         ".snarkRefresh {\n" +
+                                         "                  font-size: 10pt;\n" +
+                                         "}\n" +
                                          ".snarkMessages {\n" +
                                          "	border: none;\n" +
                                          "                  background-color: #CECFC6;\n" +
                                          "                  font-family: monospace;\n" +
                                          "                  font-size: 10pt;\n" +
                                          "                  font-weight: 100;\n" +
+                                         "                  width: 100%;\n" +
+                                         "                  text-align: left;\n" +
+                                         "                  margin: 0px 0px 0px 0px;\n" +
+                                         "                  border: 0px;\n" +
+                                         "                  padding: 5px;\n" +
+                                         "                  border-width: 0px;\n" +
+                                         "                  border-spacing: 0px;\n" +
                                          "}\n" +
                                          "table {\n" +
                                          "	margin: 0px 0px 0px 0px;\n" +
@@ -495,14 +519,16 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "	font-family: monospace;\n" +
                                          "	background-color: #ADAE9;\n" +
                                          "}\n" +
+                                         ".snarkAddInfo {\n" +
+                                         "	font-size: 10pt;\n" +
+                                         "}\n" +
                                          ".snarkConfigTitle {\n" +
                                          "	font-size: 16pt;\n" +
                                          "                  font-weight: bold;\n" +
                                          "}\n" +
                                          "</style>\n" +
                                          "</head>\n" +
-                                         "<body>\n" +
-                                         "<p class=\"snarkTitle\">I2PSnark&nbsp;</p>\n";
+                                         "<body>\n";
 
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\">\n" +

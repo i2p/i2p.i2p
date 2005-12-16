@@ -404,10 +404,15 @@ public class Storage
   {
     for (int i = 0; i < rafs.length; i++)
       {
-        synchronized(rafs[i])
-          {
-            rafs[i].close();
-          }
+        try {
+            synchronized(rafs[i])
+              {
+                rafs[i].close();
+              }
+        } catch (IOException ioe) {
+            I2PSnarkUtil.instance().debug("Error closing " + rafs[i], Snark.ERROR, ioe);
+            // gobble gobble
+        }
       }
   }
 

@@ -333,7 +333,7 @@ public class Snark
       }
     
     debug(meta.toString(), INFO);
-
+    
     // When the metainfo torrent was created from an existing file/dir
     // it already exists.
     if (storage == null)
@@ -346,12 +346,15 @@ public class Snark
           }
         catch (IOException ioe)
           {
+            try { storage.close(); } catch (IOException ioee) {
+                ioee.printStackTrace();
+            }
             fatal("Could not create storage", ioe);
           }
       }
 
     activity = "Collecting pieces";
-    coordinator = new PeerCoordinator(id, meta, storage, clistener);
+    coordinator = new PeerCoordinator(id, meta, storage, clistener, this);
     PeerCoordinatorSet set = PeerCoordinatorSet.instance();
     set.add(coordinator);
     PeerAcceptor peeracceptor = new PeerAcceptor(set); //coordinator);
@@ -374,7 +377,7 @@ public class Snark
         PeerCoordinatorSet set = PeerCoordinatorSet.instance();
         set.remove(coordinator);
         PeerCoordinator newCoord = new PeerCoordinator(coordinator.getID(), coordinator.getMetaInfo(), 
-                                                       coordinator.getStorage(), coordinator.getListener());
+                                                       coordinator.getStorage(), coordinator.getListener(), this);
         set.add(newCoord);
         coordinator = newCoord;
         coordinatorChanged = true;
@@ -569,7 +572,7 @@ public class Snark
   /**
    * Aborts program abnormally.
    */
-  public static void fatal(String s)
+  public void fatal(String s)
   {
     fatal(s, null);
   }
@@ -577,12 +580,13 @@ public class Snark
   /**
    * Aborts program abnormally.
    */
-  public static void fatal(String s, Throwable t)
+  public void fatal(String s, Throwable t)
   {
     I2PSnarkUtil.instance().debug(s, ERROR, t);
     //System.err.println("snark: " + s + ((t == null) ? "" : (": " + t)));
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
+    stopTorrent();
     throw new RuntimeException("die bart die");
   }
 

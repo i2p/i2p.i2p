@@ -42,7 +42,7 @@ public class SnarkManager implements Snark.CompleteListener {
         monitor.start();
     }
     
-    private static final int MAX_MESSAGES = 10;
+    private static final int MAX_MESSAGES = 5;
     public void addMessage(String message) {
         synchronized (_messages) {
             _messages.add(message);
@@ -243,6 +243,9 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public Properties getConfig() { return _config; }
     
+    /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
+    private static final int MAX_FILES_PER_TORRENT = 128;
+    
     /** set of filenames that we are dealing with */
     public Set listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
     /**
@@ -250,6 +253,14 @@ public class SnarkManager implements Snark.CompleteListener {
      */
     public Snark getTorrent(String filename) { synchronized (_snarks) { return (Snark)_snarks.get(filename); } }
     public void addTorrent(String filename) {
+        if (!I2PSnarkUtil.instance().connected()) {
+            addMessage("Connecting to I2P");
+            boolean ok = I2PSnarkUtil.instance().connect();
+            if (!ok) {
+                addMessage("Error connecting to I2P - check your I2CP settings");
+                return;
+            }
+        }
         File sfile = new File(filename);
         try {
             filename = sfile.getCanonicalPath();
@@ -263,9 +274,31 @@ public class SnarkManager implements Snark.CompleteListener {
         synchronized (_snarks) {
             torrent = (Snark)_snarks.get(filename);
             if (torrent == null) {
-                torrent = new Snark(filename, null, -1, null, null, false, dataDir.getPath());
-                torrent.completeListener = this;
-                _snarks.put(filename, torrent);
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(sfile);
+                    MetaInfo info = new MetaInfo(fis);
+                    fis.close();
+                    fis = null;
+                    
+                    List files = info.getFiles();
+                    if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
+                        sfile.delete();
+                        addMessage("Too many files in " + sfile.getName() + " (" + files.size() + "), deleting it");
+                        return;
+                    } else {
+                        torrent = new Snark(filename, null, -1, null, null, false, dataDir.getPath());
+                        torrent.completeListener = this;
+                        _snarks.put(filename, torrent);
+                    }
+                } catch (IOException ioe) {
+                    addMessage("Torrent in " + sfile.getName() + " is invalid: " + ioe.getMessage());
+                    if (sfile.exists())
+                        sfile.delete();
+                    return;
+                } finally {
+                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+                }
             } else {
                 return;
             }
@@ -330,6 +363,12 @@ public class SnarkManager implements Snark.CompleteListener {
     private class DirMonitor implements Runnable {
         public void run() {
             try { Thread.sleep(60*1000*getStartupDelayMinutes()); } catch (InterruptedException ie) {}
+            // the first message was a "We are starting up in 1m" 
+            synchronized (_messages) { 
+                if (_messages.size() == 1)
+                    _messages.remove(0);
+            }
+
             while (true) {
                 File dir = getDataDir();
                 _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());

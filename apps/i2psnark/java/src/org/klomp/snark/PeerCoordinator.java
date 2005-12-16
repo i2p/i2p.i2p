@@ -33,6 +33,7 @@ public class PeerCoordinator implements PeerListener
   private final Log _log = new Log(PeerCoordinator.class);
   final MetaInfo metainfo;
   final Storage storage;
+  final Snark snark;
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 20*1000; // 20 seconds
@@ -70,12 +71,13 @@ public class PeerCoordinator implements PeerListener
   public int trackerSeenPeers = 0;
 
   public PeerCoordinator(byte[] id, MetaInfo metainfo, Storage storage,
-                         CoordinatorListener listener)
+                         CoordinatorListener listener, Snark torrent)
   {
     this.id = id;
     this.metainfo = metainfo;
     this.storage = storage;
     this.listener = listener;
+    this.snark = torrent;
 
     // Make a list of pieces
     wantedPieces = new ArrayList();
@@ -400,8 +402,9 @@ public class PeerCoordinator implements PeerListener
       }
     catch (IOException ioe)
       {
-        Snark.fatal("Error reading storage", ioe);
-        return null; // Never reached.
+        snark.stopTorrent();
+        _log.error("Error reading the storage for " + metainfo.getName(), ioe);
+        throw new RuntimeException("B0rked");
       }
   }
 
@@ -476,7 +479,9 @@ public class PeerCoordinator implements PeerListener
           }
         catch (IOException ioe)
           {
-            Snark.fatal("Error writing storage", ioe);
+            snark.stopTorrent();
+            _log.error("Error writing storage for " + metainfo.getName(), ioe);
+            throw new RuntimeException("B0rked");
           }
         wantedPieces.remove(p);
       }

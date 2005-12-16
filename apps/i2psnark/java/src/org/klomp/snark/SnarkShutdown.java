@@ -72,7 +72,8 @@ public class SnarkShutdown extends Thread
           }
         catch(IOException ioe)
           {
-            Snark.fatal("Couldn't properly close storage", ioe);
+            I2PSnarkUtil.instance().debug("Couldn't properly close storage", Snark.ERROR, ioe);
+            throw new RuntimeException("b0rking");
           }
       }
 

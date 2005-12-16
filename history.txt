@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.356 2005/12/15 03:58:31 jrandom Exp $
+$Id: history.txt,v 1.357 2005/12/15 22:00:48 jrandom Exp $
+
+2005-12-16  jrandom
+    * Refuse torrents with too many files (128), avoiding ulimit errors.
+    * Remove an fd leak in I2PSnark
+    * Further I2PSnark web UI cleanup
 
 2005-12-15  jrandom
     * Added a first pass to the I2PSnark web UI (see /i2psnark/)

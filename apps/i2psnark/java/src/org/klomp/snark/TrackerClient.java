@@ -254,8 +254,9 @@ public class TrackerClient extends Thread
         throw new IOException("Error fetching " + s);
     }
     
+    InputStream in = null;
     try {
-        InputStream in = new FileInputStream(fetched);
+        in = new FileInputStream(fetched);
 
         TrackerInfo info = new TrackerInfo(in, coordinator.getID(),
                                            coordinator.getMetaInfo());
@@ -270,6 +271,7 @@ public class TrackerClient extends Thread
         interval = info.getInterval() * 1000;
         return info;
     } finally {
+        if (in != null) try { in.close(); } catch (IOException ioe) {}
         fetched.delete();
     }
   }
