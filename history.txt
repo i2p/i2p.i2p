@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.357 2005/12/15 22:00:48 jrandom Exp $
+$Id: history.txt,v 1.358 2005/12/16 03:24:22 jrandom Exp $
+
+2005-12-16  jrandom
+    * Try to run a torrent in readonly mode if we can't write to the file, and
+      handle failures a little more gracefully (thanks polecat!)
 
 2005-12-16  jrandom
     * Refuse torrents with too many files (128), avoiding ulimit errors.

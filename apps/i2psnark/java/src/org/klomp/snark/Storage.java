@@ -256,7 +256,10 @@ public class Storage
         rafs = new RandomAccessFile[1];
         names = new String[1];
         lengths[0] = metainfo.getTotalLength();
-        rafs[0] = new RandomAccessFile(base, "rw");
+        if (base.exists() && !base.canWrite())  // hope we can get away with this, if we are only seeding...
+            rafs[0] = new RandomAccessFile(base, "r");
+        else
+            rafs[0] = new RandomAccessFile(base, "rw");
         names[0] = base.getName();
       }
     else
@@ -277,7 +280,10 @@ public class Storage
             File f = createFileFromNames(base, (List)files.get(i));
             lengths[i] = ((Long)ls.get(i)).longValue();
             total += lengths[i];
-            rafs[i] = new RandomAccessFile(f, "rw");
+            if (f.exists() && !f.canWrite()) // see above re: only seeding
+                rafs[i] = new RandomAccessFile(f, "r");
+            else
+                rafs[i] = new RandomAccessFile(f, "rw");
             names[i] = f.getName();
           }
 
@@ -402,6 +408,7 @@ public class Storage
    */
   public void close() throws IOException
   {
+    if (rafs == null) return;
     for (int i = 0; i < rafs.length; i++)
       {
         try {
