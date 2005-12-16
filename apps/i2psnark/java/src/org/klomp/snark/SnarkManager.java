@@ -343,7 +343,7 @@ public class SnarkManager implements Snark.CompleteListener {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
         addMessage("Download complete of " + f.getName() 
-                   + (len < 5*1024*1024 ? " (size: " + (len/1024) + "KB)" : " (size: " + (len/1024*1024) + "MB)"));
+                   + (len < 5*1024*1024 ? " (size: " + (len/1024) + "KB)" : " (size: " + (len/(1024*1024l)) + "MB)"));
     }
     
     private void monitorTorrents(File dir) {

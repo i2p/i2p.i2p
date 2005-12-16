@@ -53,6 +53,7 @@ public class I2PSnarkServlet extends HttpServlet {
         // we want it to go to the base URI so we don't refresh with some funky action= value
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + "\">\n");
         out.write(HEADER);
+        out.write("<a href=\"" + req.getRequestURI() + "\">Refresh</a>\n");
         out.write("<textarea class=\"snarkMessages\" rows=\"2\" cols=\"100\" wrap=\"off\" >");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
