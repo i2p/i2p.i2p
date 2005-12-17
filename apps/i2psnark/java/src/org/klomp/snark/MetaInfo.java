@@ -35,6 +35,7 @@ import java.util.HashMap;
 import org.klomp.snark.bencode.*;
 import net.i2p.data.Base64;
 import net.i2p.util.Log;
+import net.i2p.crypto.SHA1;
 
 /**
  * Note: this class is buggy, as it doesn't propogate custom meta fields into the bencoded
@@ -298,6 +299,12 @@ public class MetaInfo
    */
   public boolean checkPiece(int piece, byte[] bs, int off, int length)
   {
+    if (true)
+        return fast_checkPiece(piece, bs, off, length);
+    else
+        return orig_checkPiece(piece, bs, off, length);
+  }
+  private boolean orig_checkPiece(int piece, byte[] bs, int off, int length) {
     // Check digest
     MessageDigest sha1;
     try
@@ -308,6 +315,17 @@ public class MetaInfo
       {
         throw new InternalError("No SHA digest available: " + nsae);
       }
+
+    sha1.update(bs, off, length);
+    byte[] hash = sha1.digest();
+    for (int i = 0; i < 20; i++)
+      if (hash[i] != piece_hashes[20 * piece + i])
+        return false;
+    return true;
+  }
+  
+  private boolean fast_checkPiece(int piece, byte[] bs, int off, int length) {
+    SHA1 sha1 = new SHA1();
 
     sha1.update(bs, off, length);
     byte[] hash = sha1.digest();

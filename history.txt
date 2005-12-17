@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.360 2005/12/16 18:18:56 jrandom Exp $
+$Id: history.txt,v 1.361 2005/12/16 22:47:04 jrandom Exp $
+
+2005-12-17  jrandom
+    * Use our faster SHA1, rather than the JVM's within I2PSnark, and let
+      'piece' sizes grow larger than before.
 
 2005-12-16  jrandom
     * Added some I2PSnark sanity checks, an OOMListener when running

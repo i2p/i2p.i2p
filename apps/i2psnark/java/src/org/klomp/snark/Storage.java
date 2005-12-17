@@ -25,6 +25,8 @@ import java.util.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import net.i2p.crypto.SHA1;
+
 /**
  * Maintains pieces on disk. Can be used to store and retrieve pieces.
  */
@@ -129,6 +131,14 @@ public class Storage
   // Creates piece hases for a new storage.
   private void create() throws IOException
   {
+    if (true) {
+        fast_digestCreate();
+    } else {
+        orig_digestCreate();
+    }
+  }
+  
+  private void orig_digestCreate() throws IOException {
     // Calculate piece_hashes
     MessageDigest digest = null;
     try
@@ -139,6 +149,34 @@ public class Storage
       {
         throw new InternalError(nsa.toString());
       }
+
+    byte[] piece_hashes = metainfo.getPieceHashes();
+
+    byte[] piece = new byte[piece_size];
+    for (int i = 0; i < pieces; i++)
+      {
+        int length = getUncheckedPiece(i, piece, 0);
+        digest.update(piece, 0, length);
+        byte[] hash = digest.digest();
+        for (int j = 0; j < 20; j++)
+          piece_hashes[20 * i + j] = hash[j];
+
+        bitfield.set(i);
+
+        if (listener != null)
+          listener.storageChecked(this, i, true);
+      }
+
+    if (listener != null)
+      listener.storageAllChecked(this);
+
+    // Reannounce to force recalculating the info_hash.
+    metainfo = metainfo.reannounce(metainfo.getAnnounce());
+  }
+
+  private void fast_digestCreate() throws IOException {
+    // Calculate piece_hashes
+    SHA1 digest = new SHA1();
 
     byte[] piece_hashes = metainfo.getPieceHashes();
 
