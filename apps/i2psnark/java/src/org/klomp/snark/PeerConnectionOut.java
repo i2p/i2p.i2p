@@ -26,6 +26,7 @@ import java.util.*;
 
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
 {
@@ -94,6 +95,8 @@ class PeerConnectionOut implements Runnable
                     // being send even if we get unchoked a little later.
                     // (Since we will resent them anyway in that case.)
                     // And remove piece messages if we are choking.
+                    
+                    // this should get fixed for starvation
                     Iterator it = sendQueue.iterator();
                     while (m == null && it.hasNext())
                       {
@@ -177,10 +180,30 @@ class PeerConnectionOut implements Runnable
    */
   private void addMessage(Message m)
   {
+    SimpleTimer.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     synchronized(sendQueue)
       {
         sendQueue.add(m);
-        sendQueue.notify();
+        sendQueue.notifyAll();
+      }
+  }
+  
+  /** remove messages not sent in 30s */
+  private static final int SEND_TIMEOUT = 30*1000;
+  private class RemoveTooSlow implements SimpleTimer.TimedEvent {
+      private Message _m;
+      public RemoveTooSlow(Message m) {
+          _m = m;
+      }
+      
+      public void timeReached() {
+          boolean removed = false;
+          synchronized (sendQueue) {
+              removed = sendQueue.remove(_m);
+              sendQueue.notifyAll();
+          }
+          if (removed)
+              _log.info("Took too long to send " + _m + " to " + peer);
       }
   }
 
@@ -206,6 +229,7 @@ class PeerConnectionOut implements Runnable
                 removed = true;
               }
           }
+        sendQueue.notifyAll();
       }
     return removed;
   }

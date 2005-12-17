@@ -172,6 +172,10 @@ public class I2PSnarkServlet extends HttpServlet {
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
                             _manager.stopTorrent(name, true);
                             // should we delete the torrent file?
+                            // yeah, need to, otherwise it'll get autoadded again (at the moment
+                            File f = new File(name);
+                            f.delete();
+                            _manager.addMessage("Torrent file deleted: " + f.getAbsolutePath());
                             break;
                         }
                     }

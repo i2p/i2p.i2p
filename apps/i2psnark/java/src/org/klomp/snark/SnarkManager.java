@@ -281,10 +281,10 @@ public class SnarkManager implements Snark.CompleteListener {
                     fis.close();
                     fis = null;
                     
-                    List files = info.getFiles();
-                    if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
+                    String rejectMessage = locked_validateTorrent(info);
+                    if (rejectMessage != null) {
                         sfile.delete();
-                        addMessage("Too many files in " + sfile.getName() + " (" + files.size() + "), deleting it");
+                        addMessage(rejectMessage);
                         return;
                     } else {
                         torrent = new Snark(filename, null, -1, null, null, false, dataDir.getPath());
@@ -310,6 +310,28 @@ public class SnarkManager implements Snark.CompleteListener {
             addMessage("Torrent added and started: '" + f.getName() + "'");
         } else {
             addMessage("Torrent added: '" + f.getName() + "'");
+        }
+    }
+    
+    private String locked_validateTorrent(MetaInfo info) throws IOException {
+        List files = info.getFiles();
+        if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
+            return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it";
+        } else if (info.getPieces() <= 0) {
+            return "No pieces in " + info.getName() + "?  deleting it";
+        } else if (info.getPieceLength(0) > 1024*1024) {
+            return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB, deleting it";
+        } else if (info.getTotalLength() > 10*1024*1024*1024l) {
+            System.out.println("torrent info: " + info.toString());
+            List lengths = info.getLengths();
+            if (lengths != null)
+                for (int i = 0; i < lengths.size(); i++)
+                    System.out.println("File " + i + " is " + lengths.get(i) + " long");
+            
+            return "Torrents larger than 10GB are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
+        } else {
+            // ok
+            return null;
         }
     }
     

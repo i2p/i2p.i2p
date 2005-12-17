@@ -386,6 +386,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     } else {
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");
+                        if (pos < 0) {
+                            l.log("Invalid request url [" + request + "]");
+                            if (out != null) {
+                                out.write(ERR_REQUEST_DENIED);
+                                out.write("<p /><i>Generated on: ".getBytes());
+                                out.write(new Date().toString().getBytes());
+                                out.write("</i></body></html>\n".getBytes());
+                                out.flush();
+                            }
+                            s.close();
+                            return;
+                        }
                         destination = request.substring(0, pos);
                         line = method + " " + request.substring(pos);
                     }

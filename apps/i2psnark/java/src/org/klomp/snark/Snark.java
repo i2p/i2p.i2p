@@ -28,6 +28,7 @@ import org.klomp.snark.bencode.*;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PServerSocket;
+import net.i2p.util.I2PThread;
 
 /**
  * Main Snark program startup class.
@@ -87,12 +88,26 @@ public class Snark
   // String indicating main activity
   String activity = "Not started";
   
+  private static class OOMListener implements I2PThread.OOMEventListener {
+      public void outOfMemory(OutOfMemoryError err) {
+          try {
+              err.printStackTrace();
+              I2PSnarkUtil.instance().debug("OOM in the snark", Snark.ERROR, err);
+          } catch (Throwable t) {
+              System.out.println("OOM in the OOM");
+          }
+          System.exit(0);
+      }
+      
+  }
+  
   public static void main(String[] args)
   {
     System.out.println(copyright);
     System.out.println();
 
     if ( (args.length > 0) && ("--config".equals(args[0])) ) {
+        I2PThread.addOOMEventListener(new OOMListener());
         SnarkManager sm = SnarkManager.instance();
         if (args.length > 1)
             sm.loadConfig(args[1]);

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.359 2005/12/16 06:01:20 jrandom Exp $
+$Id: history.txt,v 1.360 2005/12/16 18:18:56 jrandom Exp $
+
+2005-12-16  jrandom
+    * Added some I2PSnark sanity checks, an OOMListener when running
+      standalone, and a guard against keeping memory tied up indefinitely.
+    * Sanity check on the watchdog (thanks zzz!)
+    * Handle invalid HTTP requests in I2PTunnel a little better
 
 2005-12-16  jrandom
     * Moved I2PSnark from using Threads to I2PThreads, so we handle OOMs
