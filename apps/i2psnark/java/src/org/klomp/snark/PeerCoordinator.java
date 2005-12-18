@@ -536,8 +536,8 @@ public class PeerCoordinator implements PeerListener
 
   public void disconnected(Peer peer)
   {
-    if (Snark.debug >= Snark.INFO)
-      Snark.debug("Disconnected " + peer, Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+        _log.info("Disconnected " + peer);
     
     synchronized(peers)
       {

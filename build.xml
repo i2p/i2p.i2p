@@ -9,6 +9,7 @@
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
+        <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
     </target>
     <target name="dist" depends="pkg, javadoc">
@@ -152,6 +153,7 @@
         <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
         <delete file="i2p.exe" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
+        <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
     </target>
     <target name="distclean" depends="clean">
         <ant dir="core/java/" target="distclean" />
@@ -452,5 +454,9 @@
     <target name="syndie" >
         <ant dir="apps/syndie/java/" target="standalone" />
         <copy file="apps/syndie/java/syndie-standalone.zip" todir="." />
+    </target>
+    <target name="i2psnark">
+        <ant dir="apps/i2psnark/java" target="standalone" />
+        <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>
 </project>

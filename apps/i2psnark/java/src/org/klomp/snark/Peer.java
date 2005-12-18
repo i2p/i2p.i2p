@@ -283,6 +283,9 @@ public class Peer implements Comparable
         PeerConnectionOut out = s.out;
         if (out != null)
           out.disconnect();
+        PeerListener pl = s.listener;
+        if (pl != null)
+          pl.disconnected(this);
       }
   }
 

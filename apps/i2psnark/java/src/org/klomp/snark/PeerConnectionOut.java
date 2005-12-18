@@ -62,13 +62,13 @@ class PeerConnectionOut implements Runnable
   {
     try
       {
-        while (!quit)
+        while (!quit && peer.isConnected())
           {
             Message m = null;
             PeerState state = null;
             synchronized(sendQueue)
               {
-                while (!quit && sendQueue.isEmpty())
+                while (!quit && peer.isConnected() && sendQueue.isEmpty())
                   {
                     try
                       {
@@ -86,7 +86,7 @@ class PeerConnectionOut implements Runnable
                       }
                   }
                 state = peer.state;
-                if (!quit && state != null)
+                if (!quit && state != null && peer.isConnected())
                   {
                     // Piece messages are big. So if there are other
                     // (control) messages make sure they are send first.
@@ -149,8 +149,9 @@ class PeerConnectionOut implements Runnable
       }
     catch (Throwable t)
       {
-        Snark.debug(peer + ": "  + t, Snark.ERROR);
-        t.printStackTrace();
+        I2PSnarkUtil.instance().debug(peer.toString(), Snark.ERROR, t);
+        if (t instanceof OutOfMemoryError)
+            throw (OutOfMemoryError)t;
       }
     finally
       {

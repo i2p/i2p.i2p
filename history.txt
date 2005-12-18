@@ -1,4 +1,19 @@
-$Id: history.txt,v 1.361 2005/12/16 22:47:04 jrandom Exp $
+$Id: history.txt,v 1.362 2005/12/17 04:22:07 jrandom Exp $
+
+2005-12-18  jrandom
+    * Added a standalone runner for the I2PSnark web ui (build with the
+      command "ant i2psnark", unzip i2psnark-standalone.zip somewhere, run
+      with "java -jar launch-i2psnark.jar", and go to http://localhost:8002/).
+    * Further I2PSnark error handling
+
+2005-12-17  jrandom
+    * Let multiuser accounts authorize themselves to access the remote
+      functionality again (thanks Ch0Hag!)
+    * Adjust the JVM heap size to 128MB for new installs (existing users can
+      accomplish this by editing wrapper.config, adding the line
+      "wrapper.java.maxmemory=128", and then doing a full shutdown and startup
+      of the router).  This is relevent for heavy usage of I2PSnark in the
+      router console.
 
 2005-12-17  jrandom
     * Use our faster SHA1, rather than the JVM's within I2PSnark, and let

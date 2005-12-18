@@ -231,8 +231,9 @@ public class TrackerClient extends I2PThread
       }
     catch (Throwable t)
       {
-        Snark.debug("TrackerClient: " + t, Snark.ERROR);
-        t.printStackTrace();
+        I2PSnarkUtil.instance().debug("TrackerClient: " + t, Snark.ERROR, t);
+        if (t instanceof OutOfMemoryError)
+            throw (OutOfMemoryError)t;
       }
     finally
       {

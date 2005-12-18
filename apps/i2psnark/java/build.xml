@@ -4,8 +4,8 @@
     <target name="build" depends="builddep, jar, war" />
     <target name="builddep">
         <ant dir="../../jetty/" target="build" />
-        <ant dir="../../ministreaming/java/" target="build" />
-	<!-- ministreaming will build core -->
+        <ant dir="../../streaming/java/" target="build" />
+	<!-- streaming will build ministreaming and core -->
     </target>
     <target name="compile">
         <mkdir dir="./build" />
@@ -29,9 +29,59 @@
           <classes dir="./build/obj" includes="**/*" />
         </war>
     </target>
+    
+    <target name="standalone" depends="standalone_prep">
+        <zip destfile="i2psnark-standalone.zip">
+          <zipfileset dir="./dist/" prefix="i2psnark/" />
+        </zip>
+    </target>
+    <target name="standalone_prep" depends="war">
+        <javac debug="true" deprecation="on" source="1.3" target="1.3" 
+               destdir="./build" srcdir="src/" includes="org/klomp/snark/web/RunStandalone.java" >
+            <classpath>
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
+                <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
+            </classpath>
+        </javac>
+    
+        <jar destfile="./build/launch-i2psnark.jar" basedir="./build/" includes="org/klomp/snark/web/RunStandalone.class">
+            <manifest>
+                <attribute name="Main-Class" value="org.klomp.snark.web.RunStandalone" />
+                <attribute name="Class-Path" value="lib/i2p.jar lib/mstreaming.jar lib/streaming.jar lib/commons-el.jar lib/commons-logging.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/javax.servlet.jar lib/org.mortbay.jetty.jar" />
+            </manifest>
+        </jar>
+
+        <delete dir="./dist" />
+        <mkdir dir="./dist" />
+        <copy file="./build/launch-i2psnark.jar" tofile="./dist/launch-i2psnark.jar" />
+        <copy file="../i2psnark.war" tofile="./dist/i2psnark.war" />
+        <mkdir dir="./dist/lib" />
+        <copy file="../../../core/java/build/i2p.jar" tofile="./dist/lib/i2p.jar" />
+        <copy file="../../jetty/jettylib/commons-el.jar" tofile="./dist/lib/commons-el.jar" />
+        <copy file="../../jetty/jettylib/commons-logging.jar" tofile="./dist/lib/commons-logging.jar" />
+        <copy file="../../jetty/jettylib/javax.servlet.jar" tofile="./dist/lib/javax.servlet.jar" />
+        <copy file="../../jetty/jettylib/org.mortbay.jetty.jar" tofile="./dist/lib/org.mortbay.jetty.jar" />
+        <copy file="../../jetty/jettylib/jasper-compiler.jar" tofile="./dist/lib/jasper-compiler.jar" />
+        <copy file="../../jetty/jettylib/jasper-runtime.jar" tofile="./dist/lib/jasper-runtime.jar" />
+        <copy file="../../ministreaming/java/build/mstreaming.jar" tofile="./dist/lib/mstreaming.jar" />
+        <copy file="../../streaming/java/build/streaming.jar" tofile="./dist/lib/streaming.jar" />
+        <copy file="../jetty-i2psnark.xml" tofile="./dist/jetty-i2psnark.xml" />
+        <copy file="../readme-standalone.txt" tofile="./dist/readme.txt" />
+        <mkdir dir="./dist/work" />
+        <mkdir dir="./dist/logs" />
+
+        <zip destfile="i2psnark-standalone.zip">
+         <zipfileset dir="./dist/" prefix="i2psnark/" />
+        </zip>
+    </target>
+
     <target name="clean">
         <delete dir="./build" />
         <delete file="../i2psnark.war" />
+        <delete file="./i2psnark-standalone.zip" />
     </target>
     <target name="cleandep" depends="clean">
         <ant dir="../../ministreaming/java/" target="distclean" />

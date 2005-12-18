@@ -192,6 +192,15 @@ public class I2PSnarkUtil {
     
     /** hook between snark's logger and an i2p log */
     void debug(String msg, int snarkDebugLevel, Throwable t) {
+        if (t instanceof OutOfMemoryError) {
+            try { Thread.sleep(100); } catch (InterruptedException ie) {}
+            try {
+                t.printStackTrace();
+            } catch (Throwable tt) {}
+            try {
+                System.out.println("OOM thread: " + Thread.currentThread().getName());
+            } catch (Throwable tt) {}
+        }
         switch (snarkDebugLevel) {
             case 0:
             case 1:

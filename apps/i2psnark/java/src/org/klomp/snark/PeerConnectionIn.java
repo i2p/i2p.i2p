@@ -172,8 +172,9 @@ class PeerConnectionIn implements Runnable
       }
     catch (Throwable t)
       {
-        Snark.debug(peer + ": " + t, Snark.ERROR);
-        t.printStackTrace();
+        I2PSnarkUtil.instance().debug(peer.toString(), Snark.ERROR, t);
+        if (t instanceof OutOfMemoryError)
+            throw (OutOfMemoryError)t;
       }
     finally
       {

@@ -1,4 +1,4 @@
-package net.i2p.syndie.web;
+package org.klomp.snark.web;
 
 import java.io.File;
 
@@ -11,10 +11,6 @@ public class RunStandalone {
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
         System.setProperty("org.mortbay.xml.XmlParser.NotValidating", "true");
-        System.setProperty("syndie.rootDir", ".");
-        System.setProperty("syndie.defaultSingleUserArchives", "http://syndiemedia.i2p.net:8000/archive/archive.txt");
-        System.setProperty("syndie.defaultProxyHost", "");
-        System.setProperty("syndie.defaultProxyPort", "");
     }
     
     private RunStandalone(String args[]) {}
@@ -34,7 +30,7 @@ public class RunStandalone {
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
         try {
-            _server = new Server("jetty-syndie.xml");
+            _server = new Server("jetty-i2psnark.xml");
             _server.start();
         } catch (Exception e) {
             e.printStackTrace();
