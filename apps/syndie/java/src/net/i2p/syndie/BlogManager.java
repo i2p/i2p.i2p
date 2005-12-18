@@ -563,11 +563,17 @@ public class BlogManager {
     }
     public boolean authorizeRemote(String pass) {
         if (isSingleUser()) return true;
-        String rem = getRemotePasswordHash();
-        if ( (rem == null) || (rem.trim().length() <= 0) )
-            return false;
         String hash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass.trim())).getData());
-        return (hash.equals(rem));
+        String rem = getRemotePasswordHash();
+        boolean ok = false;
+        if ( (rem != null) && (rem.trim().length() > 0) )
+            ok = hash.equals(rem);
+        if (!ok) {
+            rem = getAdminPasswordHash();
+            if ( (rem != null) && (rem.trim().length() > 0) )
+                ok = hash.equals(rem);
+        }
+        return ok;
     }
     public boolean authorizeRemote(User user) {
         if (isSingleUser()) return true;

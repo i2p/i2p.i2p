@@ -467,7 +467,18 @@ public abstract class BaseServlet extends HttpServlet {
         if ( (pass0 != null) && (pass1 != null) && (pass0.equals(pass1)) ) {
             BlogManager.instance().changePasswrd(user, oldPass, pass0, pass1);
         }
-        
+            
+        if (user.getAuthenticated() && !BlogManager.instance().authorizeRemote(user)) {
+            String adminPass = req.getParameter("adminPass");
+            if (adminPass != null) {
+                boolean authorized = BlogManager.instance().authorizeRemote(adminPass);
+                if (authorized) {
+                    user.setAllowAccessRemote(authorized);
+                    BlogManager.instance().saveUser(user);
+                }
+            }
+        }
+
         boolean updated = BlogManager.instance().updateMetadata(user, user.getBlog(), opts);
     }
     

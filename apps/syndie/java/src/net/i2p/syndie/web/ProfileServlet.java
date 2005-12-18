@@ -96,6 +96,10 @@ public class ProfileServlet extends BaseServlet {
                 out.write("<tr><td colspan=\"3\">Password: <input type=\"password\" name=\"password\" /></td></tr>\n");
                 out.write("<tr><td colspan=\"3\">Password again: <input type=\"password\" name=\"passwordConfirm\" /></td></tr>\n");
             }
+            if (!BlogManager.instance().authorizeRemote(user)) {
+                out.write("<tr><td colspan=\"3\">To access the remote functionality, please specify the administrative password: <br />\n" +
+                          "<input type=\"password\" name=\"adminPass\" /></td></tr>\n");
+            }
         }
         
         out.write("<tr><td colspan=\"3\"><input type=\"submit\" name=\"action\" value=\"Update profile\" /></td></tr>\n");
