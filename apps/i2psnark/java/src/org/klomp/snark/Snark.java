@@ -372,10 +372,9 @@ public class Snark
     coordinator = new PeerCoordinator(id, meta, storage, clistener, this);
     PeerCoordinatorSet set = PeerCoordinatorSet.instance();
     set.add(coordinator);
-    PeerAcceptor peeracceptor = new PeerAcceptor(set); //coordinator);
-    ConnectionAcceptor acceptor = new ConnectionAcceptor(serversocket,
-                                                         peeracceptor);
-
+    ConnectionAcceptor acceptor = ConnectionAcceptor.instance();
+    acceptor.startAccepting(set, serversocket);
+    
     trackerclient = new TrackerClient(meta, coordinator);
     if (start)
         startTorrent();

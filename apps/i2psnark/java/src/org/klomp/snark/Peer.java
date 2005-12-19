@@ -28,6 +28,7 @@ import java.util.Map;
 import org.klomp.snark.bencode.*;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class Peer implements Comparable
@@ -48,7 +49,11 @@ public class Peer implements Comparable
   // was successful, the connection setup and runs
   PeerState state;
 
+  private I2PSocket sock;
+  
   private boolean deregister = true;
+  private static long __id;
+  private long _id;
 
   /**
    * Creates a disconnected peer given a PeerID, your own id and the
@@ -60,7 +65,8 @@ public class Peer implements Comparable
     this.peerID = peerID;
     this.my_id = my_id;
     this.metainfo = metainfo;
-    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
+    _id = ++__id;
+    //_log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
   }
 
   /**
@@ -72,16 +78,17 @@ public class Peer implements Comparable
    *
    * @exception IOException when an error occurred during the handshake.
    */
-  public Peer(final I2PSocket sock, BufferedInputStream bis,
-              BufferedOutputStream bos, byte[] my_id, MetaInfo metainfo)
+  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
     this.my_id = my_id;
     this.metainfo = metainfo;
+    this.sock = sock;
 
-    byte[] id  = handshake(bis, bos);
+    byte[] id  = handshake(in, out);
     this.peerID = new PeerID(id, sock.getPeerDestination());
-    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
+    _id = ++__id;
+    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating " + _id));
   }
 
   /**
@@ -97,7 +104,7 @@ public class Peer implements Comparable
    */
   public String toString()
   {
-    return peerID.toString();
+    return peerID.toString() + _id;
   }
 
   /**
@@ -155,12 +162,19 @@ public class Peer implements Comparable
         // Do we need to handshake?
         if (din == null)
           {
-            I2PSocket sock = I2PSnarkUtil.instance().connect(peerID);
-            BufferedInputStream bis
-              = new BufferedInputStream(sock.getInputStream());
-            BufferedOutputStream bos
-              = new BufferedOutputStream(sock.getOutputStream());
-            byte [] id = handshake(bis, bos);
+            sock = I2PSnarkUtil.instance().connect(peerID);
+            if ((sock == null) || (sock.isClosed())) {
+                throw new IOException("Unable to reach " + peerID);
+            }
+            InputStream in = new BufferedInputStream(sock.getInputStream());
+            OutputStream out = sock.getOutputStream(); //new BufferedOutputStream(sock.getOutputStream());
+            if (true)
+                out = new BufferedOutputStream(out);
+            //BufferedInputStream bis
+            //  = new BufferedInputStream(sock.getInputStream());
+            //BufferedOutputStream bos
+            //  = new BufferedOutputStream(sock.getOutputStream());
+            byte [] id = handshake(in, out); //handshake(bis, bos);
             byte [] expected_id = peerID.getID();
             if (!Arrays.equals(expected_id, id))
               throw new IOException("Unexpected peerID '"
@@ -189,11 +203,14 @@ public class Peer implements Comparable
       {
         // Ignore, probably just the other side closing the connection.
         // Or refusing the connection, timing out, etc.
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(this.toString(), eofe);
       }
     catch(Throwable t)
       {
-        Snark.debug(this + ": " + t, Snark.ERROR);
-        t.printStackTrace();
+        _log.error(this + ": " + t.getMessage(), t);
+        if (t instanceof OutOfMemoryError)
+            throw (OutOfMemoryError)t;
       }
     finally
       {
@@ -205,11 +222,11 @@ public class Peer implements Comparable
    * Sets DataIn/OutputStreams, does the handshake and returns the id
    * reported by the other side.
    */
-  private byte[] handshake(BufferedInputStream bis, BufferedOutputStream bos)
+  private byte[] handshake(InputStream in, OutputStream out) //BufferedInputStream bis, BufferedOutputStream bos)
     throws IOException
   {
-    din = new DataInputStream(bis);
-    dout = new DataOutputStream(bos);
+    din = new DataInputStream(in);
+    dout = new DataOutputStream(out);
     
     // Handshake write - header
     dout.write(19);
@@ -228,7 +245,7 @@ public class Peer implements Comparable
     byte b = din.readByte();
     if (b != 19)
       throw new IOException("Handshake failure, expected 19, got "
-                            + (b & 0xff));
+                            + (b & 0xff) + " on " + sock);
     
     byte[] bs = new byte[19];
     din.readFully(bs);
@@ -287,6 +304,15 @@ public class Peer implements Comparable
         if (pl != null)
           pl.disconnected(this);
       }
+    I2PSocket csock = sock;
+    sock = null;
+    if ( (csock != null) && (!csock.isClosed()) ) {
+        try {
+            csock.close(); 
+        } catch (IOException ioe) { 
+            _log.warn("Error disconnecting " + toString(), ioe);
+        }
+    }
   }
 
   /**
@@ -391,6 +417,19 @@ public class Peer implements Comparable
       {
         s.downloaded = 0;
         s.uploaded = 0;
+      }
+  }
+  
+  public long getInactiveTime() {
+      PeerState s = state;
+      if (s != null) {
+          PeerConnectionOut out = s.out;
+          if (out != null)
+            return System.currentTimeMillis() - out.lastSent;
+          else
+            return -1; //"state, no out";
+      } else {
+          return -1; //"no state";
       }
   }
 }

@@ -186,20 +186,27 @@ public class PeerCoordinator implements PeerListener
         return;
       }
 
+    Peer toDisconnect = null;
     synchronized(peers)
       {
-        if (peerIDInList(peer.getPeerID(), peers))
+        Peer old = peerIDInList(peer.getPeerID(), peers);
+        if ( (old != null) && (old.getInactiveTime() > 2*60*1000) ) {
+            // idle for 2 minutes, kill the old con
+            peers.remove(old);
+            toDisconnect = old;
+            old = null;
+        }
+        if (old != null)
           {
-            if (Snark.debug >= Snark.INFO)
-              Snark.debug("Already connected to: " + peer, Snark.INFO);
+            if (_log.shouldLog(Log.WARN))
+              _log.warn("Already connected to: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
             peer.disconnect(false); // Don't deregister this connection/peer.
           }
         else
           {
-            if (Snark.debug >= Snark.INFO)
-              Snark.debug("New connection to peer: " + peer, Snark.INFO);
+            if (_log.shouldLog(Log.INFO))
+              _log.info("New connection to peer: " + peer + " for " + metainfo.getName());
 
-            _log.info("New connection to peer " + peer + " for " + metainfo.getName());
             // Add it to the beginning of the list.
             // And try to optimistically make it a uploader.
             peers.add(0, peer);
@@ -210,15 +217,21 @@ public class PeerCoordinator implements PeerListener
               listener.peerChange(this, peer);
           }
       }
+    if (toDisconnect != null) {
+        toDisconnect.disconnect(false);
+        removePeerFromPieces(toDisconnect);
+    }
   }
 
-  private static boolean peerIDInList(PeerID pid, List peers)
+  private static Peer peerIDInList(PeerID pid, List peers)
   {
     Iterator it = peers.iterator();
-    while (it.hasNext())
-      if (pid.sameID(((Peer)it.next()).getPeerID()))
-        return true;
-    return false;
+    while (it.hasNext()) {
+      Peer cur = (Peer)it.next();
+      if (pid.sameID(cur.getPeerID()))
+        return cur;
+    }
+    return null;
   }
 
   public void addPeer(final Peer peer)
@@ -253,12 +266,13 @@ public class PeerCoordinator implements PeerListener
         new I2PThread(r, threadName).start();
       }
     else
-      if (Snark.debug >= Snark.INFO)
+      if (_log.shouldLog(Log.DEBUG)) {
         if (peer.isConnected())
-          Snark.debug("Add peer already connected: " + peer, Snark.INFO);
+          _log.info("Add peer already connected: " + peer);
         else
-          Snark.debug("MAX_CONNECTIONS = " + MAX_CONNECTIONS
-                      + " not accepting extra peer: " + peer, Snark.INFO);
+          _log.info("MAX_CONNECTIONS = " + MAX_CONNECTIONS
+                    + " not accepting extra peer: " + peer);
+      }
   }
 
 
@@ -288,8 +302,8 @@ public class PeerCoordinator implements PeerListener
     while (uploaders < MAX_UPLOADERS && interested.size() > 0)
       {
         Peer peer = (Peer)interested.remove(0);
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Unchoke: " + peer, Snark.INFO);
+        if (_log.shouldLog(Log.DEBUG))
+          _log.debug("Unchoke: " + peer);
         peer.setChoking(false);
         uploaders++;
         // Put peer back at the end of the list.
@@ -448,10 +462,6 @@ public class PeerCoordinator implements PeerListener
         Piece p = new Piece(piece);
         if (!wantedPieces.contains(p))
           {
-            if (Snark.debug >= Snark.INFO)
-              Snark.debug(peer + " piece " + piece + " no longer needed",
-                          Snark.INFO);
-
             _log.info("Got unwanted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
             
             // No need to announce have piece to peers.
@@ -463,17 +473,12 @@ public class PeerCoordinator implements PeerListener
           {
             if (storage.putPiece(piece, bs))
               {
-                if (Snark.debug >= Snark.INFO)
-                  Snark.debug("Recv p" + piece + " " + peer, Snark.INFO);
                 _log.info("Got valid piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
               }
             else
               {
                 // Oops. We didn't actually download this then... :(
                 downloaded -= metainfo.getPieceLength(piece);
-                if (Snark.debug >= Snark.NOTICE)
-                  Snark.debug("Got BAD piece " + piece + " from " + peer,
-                              Snark.NOTICE);
                 _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
                 return false; // No need to announce BAD piece to peers.
               }
@@ -504,8 +509,8 @@ public class PeerCoordinator implements PeerListener
 
   public void gotChoke(Peer peer, boolean choke)
   {
-    if (Snark.debug >= Snark.INFO)
-      Snark.debug("Got choke(" + choke + "): " + peer, Snark.INFO);
+    if (_log.shouldLog(Log.INFO))
+      _log.info("Got choke(" + choke + "): " + peer);
 
     if (listener != null)
       listener.peerChange(this, peer);
@@ -523,8 +528,8 @@ public class PeerCoordinator implements PeerListener
                   {
                     uploaders++;
                     peer.setChoking(false);
-                    if (Snark.debug >= Snark.INFO)
-                      Snark.debug("Unchoke: " + peer, Snark.INFO);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Unchoke: " + peer);
                   }
               }
           }
@@ -537,7 +542,7 @@ public class PeerCoordinator implements PeerListener
   public void disconnected(Peer peer)
   {
     if (_log.shouldLog(Log.INFO))
-        _log.info("Disconnected " + peer);
+        _log.info("Disconnected " + peer, new Exception("Disconnected by"));
     
     synchronized(peers)
       {

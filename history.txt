@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.362 2005/12/17 04:22:07 jrandom Exp $
+$Id: history.txt,v 1.363 2005/12/18 00:39:54 jrandom Exp $
+
+2005-12-19  jrandom
+    * I2PSnark logging, disconnect old inactive peers rather than new ones,
+      memory usage reduction, better OOM handling, and a shared connection
+      acceptor.
+    * Cleaned up the Syndie blog page and the resulting filters (viewing a
+      blog from the blog page shows threads started by the selected author,
+      not those that they merely participate in)
 
 2005-12-18  jrandom
     * Added a standalone runner for the I2PSnark web ui (build with the

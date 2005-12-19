@@ -679,7 +679,7 @@ public abstract class BaseServlet extends HttpServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
             PetName pn = db.getByName(name);
-            if ("syndieblog".equals(pn.getProtocol())) {
+            if ("syndieblog".equals(pn.getProtocol()) && pn.isMember(FilteredThreadIndex.GROUP_FAVORITE)) {
                 if ( (author != null) && (author.equals(pn.getLocation())) )
                     out.write("<option value=\"" + pn.getLocation() + "\" selected=\"true\">Threads " + name + " posted in</option>\n");
                 else
@@ -1151,6 +1151,16 @@ public abstract class BaseServlet extends HttpServlet {
 "}\n" +
 ".postReplyOptions {\n" +
 "	background-color: #BBBBFF;\n" +
+"}\n" +
+".syndieBlogFavorites {\n" +
+"                   float: left;\n" +
+"                   margin: 5px 0px 0 0;\n" +
+"	display: inline;\n" +
+"}\n" +
+".syndieBlogList {\n" +
+"                   float: right;\n" +
+"                   margin: 5px 0px 0 0;\n" +
+"	display: inline;\n" +
 "}\n";
 
     

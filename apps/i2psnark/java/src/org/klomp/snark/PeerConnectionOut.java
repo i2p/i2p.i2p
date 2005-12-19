@@ -42,6 +42,8 @@ class PeerConnectionOut implements Runnable
   
   private static long __id = 0;
   private long _id;
+  
+  long lastSent;
 
   public PeerConnectionOut(Peer peer, DataOutputStream dout)
   {
@@ -49,6 +51,7 @@ class PeerConnectionOut implements Runnable
     this.dout = dout;
     _id = ++__id;
 
+    lastSent = System.currentTimeMillis();
     quit = false;
     thread = new I2PThread(this, "Snark sender " + _id);
     thread.start();
@@ -73,8 +76,6 @@ class PeerConnectionOut implements Runnable
                     try
                       {
                         // Make sure everything will reach the other side.
-                        // i2p flushes passively, no need to force it
-                        // ... maybe not though
                         dout.flush();
                         
                         // Wait till more data arrives.
@@ -103,33 +104,38 @@ class PeerConnectionOut implements Runnable
                         Message nm = (Message)it.next();
                         if (nm.type == Message.PIECE)
                           {
-                            if (state.choking)
+                            if (state.choking) {
                               it.remove();
+                              SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                            }
                             nm = null;
                           }
                         else if (nm.type == Message.REQUEST && state.choked)
                           {
                             it.remove();
+                            SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             nm = null;
                           }
                           
                         if (m == null && nm != null)
                           {
                             m = nm;
+                            SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             it.remove();
                           }
                       }
-                    if (m == null && sendQueue.size() > 0)
+                    if (m == null && sendQueue.size() > 0) {
                       m = (Message)sendQueue.remove(0);
+                      SimpleTimer.getInstance().removeEvent(m.expireEvent);
+                    }
                   }
               }
             if (m != null)
               {
-                if (Snark.debug >= Snark.ALL)
-                  Snark.debug("Send " + peer + ": " + m, Snark.ALL);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send " + peer + ": " + m + " on " + peer.metainfo.getName());
                 m.sendMessage(dout);
+                lastSent = System.currentTimeMillis();
 
                 // Remove all piece messages after sending a choke message.
                 if (m.type == Message.CHOKE)
@@ -146,10 +152,12 @@ class PeerConnectionOut implements Runnable
     catch (IOException ioe)
       {
         // Ignore, probably other side closed connection.
+        if (_log.shouldLog(Log.INFO))
+            _log.info("IOError sending to " + peer, ioe);
       }
     catch (Throwable t)
       {
-        I2PSnarkUtil.instance().debug(peer.toString(), Snark.ERROR, t);
+        _log.error("Error sending to " + peer, t);
         if (t instanceof OutOfMemoryError)
             throw (OutOfMemoryError)t;
       }
@@ -164,8 +172,8 @@ class PeerConnectionOut implements Runnable
   {
     synchronized(sendQueue)
       {
-        if (quit == true)
-          return;
+        //if (quit == true)
+        //  return;
         
         quit = true;
         thread.interrupt();
@@ -189,12 +197,13 @@ class PeerConnectionOut implements Runnable
       }
   }
   
-  /** remove messages not sent in 30s */
-  private static final int SEND_TIMEOUT = 30*1000;
+  /** remove messages not sent in 2m */
+  private static final int SEND_TIMEOUT = 120*1000;
   private class RemoveTooSlow implements SimpleTimer.TimedEvent {
       private Message _m;
       public RemoveTooSlow(Message m) {
           _m = m;
+          m.expireEvent = RemoveTooSlow.this;
       }
       
       public void timeReached() {

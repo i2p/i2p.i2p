@@ -27,19 +27,40 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Accepts connections on a TCP port and routes them to sub-acceptors.
  */
 public class ConnectionAcceptor implements Runnable
 {
+  private static final ConnectionAcceptor _instance = new ConnectionAcceptor();
+  public static final ConnectionAcceptor instance() { return _instance; }
+  private Log _log = new Log(ConnectionAcceptor.class);
   private I2PServerSocket serverSocket;
-  private final PeerAcceptor peeracceptor;
+  private PeerAcceptor peeracceptor;
   private Thread thread;
 
   private boolean stop;
   private boolean socketChanged;
 
+  private ConnectionAcceptor() {}
+  
+  public synchronized void startAccepting(PeerCoordinatorSet set, I2PServerSocket socket) {
+    if (serverSocket != socket) {
+      if ( (peeracceptor == null) || (peeracceptor.coordinators != set) )
+        peeracceptor = new PeerAcceptor(set);
+      serverSocket = socket;
+      stop = false;
+      socketChanged = true;
+      if (thread == null) {
+          thread = new I2PThread(this, "I2PSnark acceptor");
+          thread.setDaemon(true);
+          thread.start();
+      }
+    }
+  }
+  
   public ConnectionAcceptor(I2PServerSocket serverSocket,
                             PeerAcceptor peeracceptor)
   {
@@ -55,6 +76,7 @@ public class ConnectionAcceptor implements Runnable
 
   public void halt()
   {
+    if (true) throw new RuntimeException("wtf");
     stop = true;
 
     I2PServerSocket ss = serverSocket;
@@ -129,6 +151,8 @@ public class ConnectionAcceptor implements Runnable
         serverSocket.close();
       }
     catch (I2PException ignored) { }
+    
+    throw new RuntimeException("wtf");
   }
   
   private class Handler implements Runnable {
@@ -140,11 +164,17 @@ public class ConnectionAcceptor implements Runnable
           try {
               InputStream in = _socket.getInputStream();
               OutputStream out = _socket.getOutputStream();
-              BufferedInputStream bis = new BufferedInputStream(in);
-              BufferedOutputStream bos = new BufferedOutputStream(out);
 
-              peeracceptor.connection(_socket, bis, bos);
+              if (true) {
+                  in = new BufferedInputStream(in);
+                  out = new BufferedOutputStream(out);
+              }
+              if (_log.shouldLog(Log.DEBUG))
+                  _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash().toBase64());
+              peeracceptor.connection(_socket, in, out);
           } catch (IOException ioe) {
+              if (_log.shouldLog(Log.DEBUG))
+                  _log.debug("Error handling connection from " + _socket.getPeerDestination().calculateHash().toBase64(), ioe);
               try { _socket.close(); } catch (IOException ignored) { }
           }
       }

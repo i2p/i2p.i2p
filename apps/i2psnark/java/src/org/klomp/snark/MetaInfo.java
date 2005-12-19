@@ -443,7 +443,7 @@ public class MetaInfo
     }
     _log.debug(buf.toString());
     byte[] infoBytes = BEncoder.bencode(info);
-    _log.debug("info bencoded: [" + Base64.encode(infoBytes, true) + "]");
+    //_log.debug("info bencoded: [" + Base64.encode(infoBytes, true) + "]");
     try
       {
         MessageDigest digest = MessageDigest.getInstance("SHA");

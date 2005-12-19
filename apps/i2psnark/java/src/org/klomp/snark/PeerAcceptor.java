@@ -27,6 +27,7 @@ import java.util.Iterator;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 
 /**
  * Accepts incomming connections from peers. The ConnectionAcceptor
@@ -36,8 +37,9 @@ import net.i2p.data.DataHelper;
  */
 public class PeerAcceptor
 {
+  private static final Log _log = new Log(PeerAcceptor.class);
   private final PeerCoordinator coordinator;
-  private final PeerCoordinatorSet coordinators;
+  final PeerCoordinatorSet coordinators;
 
   public PeerAcceptor(PeerCoordinator coordinator)
   {
@@ -51,13 +53,8 @@ public class PeerAcceptor
     this.coordinator = null;
   }
 
-  private static final int LOOKAHEAD_SIZE = "19".length() +
-                                            "BitTorrent protocol".length() +
-                                            8 + // blank, reserved
-                                            20; // infohash
-
   public void connection(I2PSocket socket,
-                         BufferedInputStream bis, BufferedOutputStream bos)
+                         InputStream in, OutputStream out)
     throws IOException
   {
     // inside this Peer constructor's handshake is where you'd deal with the other
@@ -65,16 +62,23 @@ public class PeerAcceptor
     // support, but because of how the protocol works, we can get away with just reading
     // ahead the first $LOOKAHEAD_SIZE bytes to figure out which infohash they want to
     // talk about, and we can just look for that in our list of active torrents.
-    bis.mark(LOOKAHEAD_SIZE);
-    byte peerInfoHash[] = readHash(bis);
-    bis.reset();
+    byte peerInfoHash[] = null;
+    try {
+      peerInfoHash = readHash(in);
+      _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase64() 
+                + ": " + Base64.encode(peerInfoHash));
+    } catch (IOException ioe) {
+        _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase64());
+        throw ioe;
+    }
+    in = new SequenceInputStream(new ByteArrayInputStream(peerInfoHash), in);
     if (coordinator != null) {
         // single torrent capability
         MetaInfo meta = coordinator.getMetaInfo();
         if (DataHelper.eq(meta.getInfoHash(), peerInfoHash)) {
             if (coordinator.needPeers())
               {
-                Peer peer = new Peer(socket, bis, bos, coordinator.getID(),
+                Peer peer = new Peer(socket, in, out, coordinator.getID(),
                                      coordinator.getMetaInfo());
                 coordinator.addPeer(peer);
               }
@@ -94,13 +98,15 @@ public class PeerAcceptor
             if (DataHelper.eq(meta.getInfoHash(), peerInfoHash)) {
                 if (cur.needPeers())
                   {
-                    Peer peer = new Peer(socket, bis, bos, cur.getID(),
+                    Peer peer = new Peer(socket, in, out, cur.getID(),
                                          cur.getMetaInfo());
                     cur.addPeer(peer);
                     return;
                   }
                 else 
                   {
+                    if (_log.shouldLog(Log.DEBUG))
+                      _log.debug("Rejecting new peer for " + cur.snark.torrent);
                     socket.close();
                     return;
                   }
@@ -111,6 +117,11 @@ public class PeerAcceptor
                               + ") while we don't support that hash");
     }
   }
+
+  private static final int LOOKAHEAD_SIZE = "19".length() +
+                                            "BitTorrent protocol".length() +
+                                            8 + // blank, reserved
+                                            20; // infohash
 
   /** 
    * Read ahead to the infohash, throwing an exception if there isn't enough data

@@ -291,6 +291,7 @@ public class ArchiveIndex {
                 if (!blog.equals(summary.blog))
                     continue;
             }
+            
             if ( (tag != null) && (tag.trim().length() > 0) ) {
                 if (!tag.equals(summary.tag)) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -315,17 +316,21 @@ public class ArchiveIndex {
             
             for (int j = 0; j < summary.entries.size(); j++) {
                 EntrySummary entry = (EntrySummary)summary.entries.get(j);
-                if (entry.entry.getEntryId() < lowestEntryId)
+                if (entry.entry.getEntryId() < lowestEntryId) {
+                    long daysAgo1 = entry.entry.getEntryId() / (24*60*60*1000l);
+                    long daysAgo2 = lowestEntryId / (24*60*60*1000l);
                     continue;
-                String k = (Long.MAX_VALUE-entry.entry.getEntryId()) + "-" + entry.entry.getKeyHash().toBase64();
-                ordered.put(k, entry.entry);
-                //System.err.println("Including match: " + k);
+                } else {                    
+                  String k = (Long.MAX_VALUE-entry.entry.getEntryId()) + "-" + entry.entry.getKeyHash().toBase64();
+                  ordered.put(k, entry.entry);
+                }
             }
         }
         for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
             BlogURI entry = (BlogURI)iter.next();
-            if (entry.getEntryId() < lowestEntryId)
+            if (entry.getEntryId() < lowestEntryId) {
                 continue;
+            }
             if (!out.contains(entry))
                 out.add(entry);
         }

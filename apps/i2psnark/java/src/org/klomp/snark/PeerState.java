@@ -26,8 +26,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
+import net.i2p.util.Log;
+
 class PeerState
 {
+  private Log _log = new Log(PeerState.class);
   final Peer peer;
   final PeerListener listener;
   final MetaInfo metainfo;
@@ -59,7 +62,7 @@ class PeerState
   // If we have te resend outstanding requests (true after we got choked).
   private boolean resend = false;
 
-  private final static int MAX_PIPELINE = 5;
+  private final static int MAX_PIPELINE = 1;
   private final static int PARTSIZE = 64*1024; // default was 16K, i2p-bt uses 64KB
 
   PeerState(Peer peer, PeerListener listener, MetaInfo metainfo,
@@ -77,16 +80,15 @@ class PeerState
 
   void keepAliveMessage()
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " rcv alive", Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug(peer + " rcv alive");
     /* XXX - ignored */
   }
 
   void chokeMessage(boolean choke)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " rcv " + (choke ? "" : "un") + "choked",
-                  Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug(peer + " rcv " + (choke ? "" : "un") + "choked");
 
     choked = choke;
     if (choked)
@@ -100,24 +102,23 @@ class PeerState
 
   void interestedMessage(boolean interest)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " rcv " + (interest ? "" : "un")
-                  + "interested", Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug(peer + " rcv " + (interest ? "" : "un")
+                 + "interested");
     interested = interest;
     listener.gotInterest(peer, interest);
   }
 
   void haveMessage(int piece)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " rcv have(" + piece + ")", Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug(peer + " rcv have(" + piece + ")");
     // Sanity check
     if (piece < 0 || piece >= metainfo.getPieces())
       {
         // XXX disconnect?
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Got strange 'have: " + piece + "' message from " + peer,
-                      + Snark.INFO);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Got strange 'have: " + piece + "' message from " + peer);
         return;
       }
 
@@ -138,14 +139,13 @@ class PeerState
   {
     synchronized(this)
       {
-        if (Snark.debug >= Snark.DEBUG)
-          Snark.debug(peer + " rcv bitfield", Snark.DEBUG);
+        if (_log.shouldLog(Log.DEBUG))
+          _log.debug(peer + " rcv bitfield");
         if (bitfield != null)
           {
             // XXX - Be liberal in what you except?
-            if (Snark.debug >= Snark.INFO)
-              Snark.debug("Got unexpected bitfield message from " + peer,
-                          Snark.INFO);
+            if (_log.shouldLog(Log.WARN))
+              _log.warn("Got unexpected bitfield message from " + peer);
             return;
           }
         
@@ -157,14 +157,13 @@ class PeerState
 
   void requestMessage(int piece, int begin, int length)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " rcv request("
-                  + piece + ", " + begin + ", " + length + ") ",
-                  Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug(peer + " rcv request("
+                  + piece + ", " + begin + ", " + length + ") ");
     if (choking)
       {
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Request received, but choking " + peer, Snark.INFO);
+        if (_log.shouldLog(Log.INFO))
+          _log.info("Request received, but choking " + peer);
         return;
       }
 
@@ -177,12 +176,11 @@ class PeerState
         || length > 4*PARTSIZE)
       {
         // XXX - Protocol error -> disconnect?
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Got strange 'request: " + piece
+        if (_log.shouldLog(Log.WARN))
+          _log.warn("Got strange 'request: " + piece
                       + ", " + begin
                       + ", " + length
-                      + "' message from " + peer,
-                      Snark.INFO);
+                      + "' message from " + peer);
         return;
       }
 
@@ -190,8 +188,8 @@ class PeerState
     if (pieceBytes == null)
       {
         // XXX - Protocol error-> diconnect?
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Got request for unknown piece: " + piece, Snark.INFO);
+        if (_log.shouldLog(Log.WARN))
+          _log.warn("Got request for unknown piece: " + piece);
         return;
       }
 
@@ -199,25 +197,18 @@ class PeerState
     if (begin >= pieceBytes.length || begin + length > pieceBytes.length)
       {
         // XXX - Protocol error-> disconnect?
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Got out of range 'request: " + piece
+        if (_log.shouldLog(Log.WARN))
+          _log.warn("Got out of range 'request: " + piece
                       + ", " + begin
                       + ", " + length
-                      + "' message from " + peer,
-                      Snark.INFO);
+                      + "' message from " + peer);
         return;
       }
 
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug("Sending (" + piece + ", " + begin + ", "
-                  + length + ")" + " to " + peer, Snark.DEBUG);
+    if (_log.shouldLog(Log.INFO))
+      _log.info("Sending (" + piece + ", " + begin + ", "
+                + length + ")" + " to " + peer);
     out.sendPiece(piece, begin, length, pieceBytes);
-
-    // Tell about last subpiece delivery.
-    if (begin + length == pieceBytes.length)
-      if (Snark.debug >= Snark.DEBUG)
-        Snark.debug("Send p" + piece + " " + peer,
-                    Snark.DEBUG);
   }
 
   /**
@@ -245,14 +236,13 @@ class PeerState
       {
         if (listener.gotPiece(peer, req.piece, req.bs))
           {
-            if (Snark.debug >= Snark.DEBUG)
-              Snark.debug("Got " + req.piece + ": " + peer, Snark.DEBUG);
+            if (_log.shouldLog(Log.DEBUG))
+              _log.debug("Got " + req.piece + ": " + peer);
           }
         else
           {
-            if (Snark.debug >= Snark.DEBUG)
-              Snark.debug("Got BAD " + req.piece + " from " + peer,
-                          Snark.DEBUG);
+            if (_log.shouldLog(Log.WARN))
+              _log.warn("Got BAD " + req.piece + " from " + peer);
             // XXX ARGH What now !?!
             downloaded = 0;
           }
@@ -275,21 +265,20 @@ class PeerState
    */
   Request getOutstandingRequest(int piece, int begin, int length)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug("getChunk("
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug("getChunk("
                   + piece + "," + begin + "," + length + ") "
-                  + peer, Snark.DEBUG);
+                  + peer);
 
     int r = getFirstOutstandingRequest(piece);
 
     // Unrequested piece number?
     if (r == -1)
       {
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("Unrequested 'piece: " + piece + ", "
+        if (_log.shouldLog(Log.INFO))
+          _log.info("Unrequested 'piece: " + piece + ", "
                       + begin + ", " + length + "' received from "
-                      + peer,
-                      Snark.INFO);
+                      + peer);
         downloaded = 0; // XXX - punishment?
         return null;
       }
@@ -309,13 +298,12 @@ class PeerState
         // Something wrong?
         if (req.piece != piece || req.off != begin || req.len != length)
           {
-            if (Snark.debug >= Snark.INFO)
-              Snark.debug("Unrequested or unneeded 'piece: "
+            if (_log.shouldLog(Log.INFO))
+              _log.info("Unrequested or unneeded 'piece: "
                           + piece + ", "
                           + begin + ", "
                           + length + "' received from "
-                          + peer,
-                          Snark.INFO);
+                          + peer);
             downloaded = 0; // XXX - punishment?
             return null;
           }
@@ -323,9 +311,9 @@ class PeerState
         // Report missing requests.
         if (r != 0)
           {
-            if (Snark.debug >= Snark.INFO)
-              System.err.print("Some requests dropped, got " + req
-                               + ", wanted:");
+            if (_log.shouldLog(Log.WARN))
+              _log.warn("Some requests dropped, got " + req
+                               + ", wanted for peer: " + peer);
             for (int i = 0; i < r; i++)
               {
                 Request dropReq = (Request)outstandingRequests.remove(0);
@@ -338,11 +326,9 @@ class PeerState
                   if (!choked)
                   out.sendRequest(dropReq);
                 */
-                if (Snark.debug >= Snark.INFO)
-                  System.err.print(" " + dropReq);
+                if (_log.shouldLog(Log.WARN))
+                  _log.warn("dropped " + dropReq + " with peer " + peer);
               }
-            if (Snark.debug >= Snark.INFO)
-              System.err.println(" " + peer);
           }
         outstandingRequests.remove(0);
       }
@@ -356,24 +342,23 @@ class PeerState
 
   void cancelMessage(int piece, int begin, int length)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug("Got cancel message ("
-                  + piece + ", " + begin + ", " + length + ")",
-                  Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug("Got cancel message ("
+                  + piece + ", " + begin + ", " + length + ")");
     out.cancelRequest(piece, begin, length);
   }
 
   void unknownMessage(int type, byte[] bs)
   {
-    if (Snark.debug >= Snark.WARNING)
-      Snark.debug("Warning: Ignoring unknown message type: " + type
-                  + " length: " + bs.length, Snark.WARNING);
+    if (_log.shouldLog(Log.WARN))
+      _log.warn("Warning: Ignoring unknown message type: " + type
+                  + " length: " + bs.length);
   }
 
   void havePiece(int piece)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug("Tell " + peer + " havePiece(" + piece + ")", Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug("Tell " + peer + " havePiece(" + piece + ")");
 
     synchronized(this)
       {
@@ -474,8 +459,8 @@ class PeerState
           }
       }
 
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " requests " + outstandingRequests, Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug(peer + " requests " + outstandingRequests);
   }
 
   // Starts requesting first chunk of next piece. Returns true if
@@ -486,8 +471,8 @@ class PeerState
     if (bitfield != null)
       {
         int nextPiece = listener.wantPiece(peer, bitfield);
-        if (Snark.debug >= Snark.DEBUG)
-          Snark.debug(peer + " want piece " + nextPiece, Snark.DEBUG);
+        if (_log.shouldLog(Log.DEBUG))
+          _log.debug(peer + " want piece " + nextPiece);
         synchronized(this)
           {
             if (nextPiece != -1
@@ -512,8 +497,8 @@ class PeerState
 
   synchronized void setInteresting(boolean interest)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " setInteresting(" + interest + ")", Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug(peer + " setInteresting(" + interest + ")");
 
     if (interest != interesting)
       {
@@ -527,8 +512,8 @@ class PeerState
 
   synchronized void setChoking(boolean choke)
   {
-    if (Snark.debug >= Snark.DEBUG)
-      Snark.debug(peer + " setChoking(" + choke + ")", Snark.DEBUG);
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug(peer + " setChoking(" + choke + ")");
 
     if (choking != choke)
       {

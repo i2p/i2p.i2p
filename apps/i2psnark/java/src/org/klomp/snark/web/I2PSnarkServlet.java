@@ -462,7 +462,7 @@ public class I2PSnarkServlet extends HttpServlet {
             return bytes + "B";
         else if (bytes < 5*1024*1024)
             return (bytes/1024) + "KB";
-        else if (bytes < 5*1024*1024*1024)
+        else if (bytes < 5*1024*1024*1024l)
             return (bytes/(1024*1024)) + "MB";
         else
             return (bytes/(1024*1024*1024)) + "GB";

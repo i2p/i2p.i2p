@@ -169,10 +169,12 @@ class PeerConnectionIn implements Runnable
     catch (IOException ioe)
       {
         // Ignore, probably the other side closed connection.
+        if (_log.shouldLog(Log.INFO))
+            _log.info("IOError talking with " + peer, ioe);
       }
     catch (Throwable t)
       {
-        I2PSnarkUtil.instance().debug(peer.toString(), Snark.ERROR, t);
+        _log.error("Error talking with " + peer, t);
         if (t instanceof OutOfMemoryError)
             throw (OutOfMemoryError)t;
       }

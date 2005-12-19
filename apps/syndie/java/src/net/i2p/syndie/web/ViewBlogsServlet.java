@@ -19,8 +19,34 @@ import net.i2p.syndie.sml.*;
  *
  */
 public class ViewBlogsServlet extends BaseServlet {
-    private static final int MAX_AUTHORS_AT_ONCE = 100;
+    private static final int MAX_AUTHORS_AT_ONCE = 20;
     private static final int MAX_TAGS = 50;
+    
+    /** renders the posts from the last 3 days */
+    private String getViewBlogLink(Hash blog, long lastPost) {
+        long dayBegin = BlogManager.instance().getDayBegin();
+        int daysAgo = 2;
+        if ( (lastPost > 0) && (dayBegin - 3*24*60*6081000 > lastPost) ) // last post was old 3 days ago
+            daysAgo = (int)((dayBegin - lastPost + 24*60*60*1000-1)/(24*60*60*1000));
+        daysAgo++;
+        return getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' + blog.toBase64()
+               + '&' + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&daysBack=" + daysAgo;
+    }
+    
+    private String getPostDate(long when) {
+        String age = null;
+        long dayBegin = BlogManager.instance().getDayBegin();
+        long postId = when;
+        if (postId >= dayBegin) {
+            age = "today";
+        } else if (postId >= dayBegin - 24*60*60*1000) {
+            age = "yesterday";
+        } else {
+            int daysAgo = (int)((dayBegin - postId + 24*60*60*1000-1)/(24*60*60*1000));
+            age = daysAgo + " days ago";
+        }
+        return age;
+    }
     
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
@@ -35,8 +61,45 @@ public class ViewBlogsServlet extends BaseServlet {
         
         TreeSet tags = new TreeSet();
         List writtenAuthors = new ArrayList();
-        out.write("<tr><td colspan=\"3\"><b>Blogs:</b></td></tr>\n");
-        out.write("<tr><td colspan=\"3\">");
+        
+        
+        out.write("<tr><td colspan=\"3\" valign=\"top\" align=\"left\"><span class=\"syndieBlogFavorites\">");
+        if ( (user != null) && (user.getAuthenticated()) ) {
+            out.write("<b>Favorite blogs:</b><br />\n");
+            out.write("<a href=\"" + getViewBlogLink(user.getBlog(), user.getLastMetaEntry()) 
+                      + "\" title=\"View your blog\">Your blog</a><br />\n");
+            
+            PetNameDB db = user.getPetNameDB();
+            for (Iterator iter = orderedRoots.iterator(); iter.hasNext() && writtenAuthors.size() < MAX_AUTHORS_AT_ONCE; ) {
+                BlogURI uri= (BlogURI)iter.next();
+                if (writtenAuthors.contains(uri.getKeyHash())) {
+                    // skip
+                } else {
+                    PetName pn = db.getByLocation(uri.getKeyHash().toBase64());
+                    if (pn != null) {
+                        if (pn.isMember(FilteredThreadIndex.GROUP_FAVORITE)) {
+                            out.write("<a href=\"" + getViewBlogLink(uri.getKeyHash(), uri.getEntryId()) 
+                                      + "\" title=\"View " + HTMLRenderer.sanitizeTagParam(pn.getName()) +"'s blog\">");
+                            out.write(HTMLRenderer.sanitizeString(pn.getName(), 32));
+                            out.write("</a> (" + getPostDate(uri.getEntryId()) + ")<br />\n");
+                            writtenAuthors.add(uri.getKeyHash());
+                        } else if (pn.isMember(FilteredThreadIndex.GROUP_IGNORE)) {
+                            // ignore 'em
+                            writtenAuthors.add(uri.getKeyHash());
+                        } else {
+                            // bookmarked, but not a favorite... leave them for later
+                        }
+                    } else {
+                        // not bookmarked, leave them for later
+                    }
+                }
+            }
+        }
+        out.write("</span>\n");
+    
+        // now for the non-bookmarked people
+        out.write("<span class=\"syndieBlogList\">");
+        out.write("<b>Most recently updated blogs:</b><br />\n");
         for (Iterator iter = orderedRoots.iterator(); iter.hasNext() && writtenAuthors.size() < MAX_AUTHORS_AT_ONCE; ) {
             BlogURI uri= (BlogURI)iter.next();
             String curTags[] = archive.getEntry(uri).getTags();
@@ -67,18 +130,17 @@ public class ViewBlogsServlet extends BaseServlet {
                     age = daysAgo + " days ago";
                 }
                 
-                out.write("<a href=\"" + getControlTarget() + "?" 
-                          + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' + uri.getKeyHash().toBase64()
-                          + "&" + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&"
-                          + "\" title=\"Posts by " + trim(HTMLRenderer.sanitizeTagParam(name), 32)
-                          + ", last post " + age + "\">");
+                out.write("<a href=\"" + getViewBlogLink(uri.getKeyHash(), uri.getEntryId())
+                          + "\" title=\"View " + trim(HTMLRenderer.sanitizeTagParam(name), 32)
+                          + "'s blog\">");
                 out.write(HTMLRenderer.sanitizeString(desc, 32));
-                out.write("</a> \n");
+                out.write("</a> (" + getPostDate(uri.getEntryId()) + ")<br />\n");
                 writtenAuthors.add(uri.getKeyHash());
             }
         }
-        out.write("</td></tr>\n");
         
+        out.write("</span>\n");
+        /*
         out.write("<tr><td colspan=\"3\"><b>Topics:</b></td></tr>\n");
         out.write("<tr><td colspan=\"3\">");
         for (Iterator iter = tags.iterator(); iter.hasNext(); ) {
@@ -88,6 +150,7 @@ public class ViewBlogsServlet extends BaseServlet {
             out.write(HTMLRenderer.sanitizeString(tag, 32));
             out.write("</a> ");
         }
+         */
         out.write("</td></tr>\n");
     }
     

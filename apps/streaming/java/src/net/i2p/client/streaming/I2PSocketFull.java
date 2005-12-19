@@ -109,4 +109,11 @@ public class I2PSocketFull implements I2PSocket {
         _connection = null; 
         _listener = null;
     }
+    public String toString() {
+        Connection c = _connection;
+        if (c == null)
+            return super.toString();
+        else
+            return c.toString();
+    }
 }

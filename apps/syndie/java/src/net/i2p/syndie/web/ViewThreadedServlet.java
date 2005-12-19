@@ -54,19 +54,20 @@ public class ViewThreadedServlet extends BaseServlet {
         String tags = req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS);
         String post = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST);
         String thread = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD);
+        boolean threadAuthorOnly = Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR) + "").booleanValue();
         
+        long dayBegin = BlogManager.instance().getDayBegin();
+        String daysStr = req.getParameter(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
+        int days = 1;
+        try {
+            if (daysStr != null)
+                days = Integer.parseInt(daysStr);
+        } catch (NumberFormatException nfe) {
+            days = 1;
+        }
+        dayBegin -= (days-1) * 24*60*60*1000l;
+
         if ( (author != null) && empty(post) && empty(thread) ) {
-            long dayBegin = BlogManager.instance().getDayBegin();
-            String daysStr = req.getParameter(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
-            int days = 1;
-            try {
-                if (daysStr != null)
-                    days = Integer.parseInt(daysStr);
-            } catch (NumberFormatException nfe) {
-                days = 1;
-            }
-            dayBegin -= (days-1) * 24*60*60*1000;
-            
             ArchiveIndex aindex = archive.getIndex();
             PetNameDB db = user.getPetNameDB();
             if ("favorites".equals(author)) {
@@ -91,6 +92,22 @@ public class ViewThreadedServlet extends BaseServlet {
                 if ( (key != null) && (key.length == Hash.HASH_LENGTH) ) {
                     loc.setData(key);
                     aindex.selectMatchesOrderByEntryId(rv, loc, tags, dayBegin);
+                } else {
+                }
+            }
+            
+            // how inefficient can we get?
+            if (threadAuthorOnly && (rv.size() > 0)) {
+                // lets filter out any posts that are not roots
+                for (int i = 0; i < rv.size(); i++) {
+                    BlogURI curURI = (BlogURI)rv.get(i);
+                    ThreadNode node = index.getNode(curURI);
+                    if ( (node != null) && (node.getParent() == null) ) {
+                        // ok, its a root
+                    } else {
+                        rv.remove(i);
+                        i--;
+                    }
                 }
             }
         }
@@ -135,6 +152,7 @@ public class ViewThreadedServlet extends BaseServlet {
                 }
             }
         }
+        
         return rv;
     }
     
