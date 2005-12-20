@@ -66,7 +66,6 @@ class PeerConnectionOut implements Runnable
    */
   public void run()
   {
-    try { Thread.sleep(1000); } catch (InterruptedException ie) {}
     try
       {
         while (!quit && peer.isConnected())
@@ -180,7 +179,8 @@ class PeerConnectionOut implements Runnable
         //  return;
         
         quit = true;
-        thread.interrupt();
+        if (thread != null)
+            thread.interrupt();
         
         sendQueue.clear();
         sendQueue.notify();
