@@ -104,7 +104,10 @@ public class Peer implements Comparable
    */
   public String toString()
   {
-    return peerID.toString() + _id;
+    if (peerID != null)
+      return peerID.toString() + _id;
+    else
+      return "[unknown id]" + _id;
   }
 
   /**
@@ -163,13 +166,16 @@ public class Peer implements Comparable
         if (din == null)
           {
             sock = I2PSnarkUtil.instance().connect(peerID);
+            _log.debug("Connected to " + peerID + ": " + sock);
             if ((sock == null) || (sock.isClosed())) {
                 throw new IOException("Unable to reach " + peerID);
             }
-            InputStream in = new BufferedInputStream(sock.getInputStream());
+            InputStream in = sock.getInputStream();
             OutputStream out = sock.getOutputStream(); //new BufferedOutputStream(sock.getOutputStream());
-            if (true)
+            if (true) {
                 out = new BufferedOutputStream(out);
+                in = new BufferedInputStream(sock.getInputStream());
+            }
             //BufferedInputStream bis
             //  = new BufferedInputStream(sock.getInputStream());
             //BufferedOutputStream bos
@@ -181,6 +187,9 @@ public class Peer implements Comparable
                                     + PeerID.idencode(id)
                                     + "' expected '"
                                     + PeerID.idencode(expected_id) + "'");
+            _log.debug("Handshake got matching IDs with " + toString());
+          } else {
+            _log.debug("Already have din [" + sock + "] with " + toString());
           }
         
         PeerConnectionIn in = new PeerConnectionIn(this, din);
@@ -195,8 +204,10 @@ public class Peer implements Comparable
         state = s;
         listener.connected(this);
   
+        _log.debug("Start running the reader with " + toString());
         // Use this thread for running the incomming connection.
-        // The outgoing connection has created its own Thread.
+        // The outgoing connection creates its own Thread.
+        out.startup();
         s.in.run();
       }
     catch(IOException eofe)
@@ -241,6 +252,8 @@ public class Peer implements Comparable
     dout.write(my_id);
     dout.flush();
     
+    _log.debug("Wrote my shared hash and ID to " + toString());
+    
     // Handshake read - header
     byte b = din.readByte();
     if (b != 19)
@@ -266,6 +279,7 @@ public class Peer implements Comparable
 
     // Handshake read - peer id
     din.readFully(bs);
+    _log.debug("Read the remote side's hash and peerID fully from " + toString());
     return bs;
   }
 

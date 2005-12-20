@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.363 2005/12/18 00:39:54 jrandom Exp $
+$Id: history.txt,v 1.364 2005/12/19 08:34:56 jrandom Exp $
+
+2005-12-19  jrandom
+    * Fix for old Syndie blog bookmarks (thanks Complication!)
+    * Fix for I2PSnark to accept incoming connections again (oops)
+    * Randomize the order that peers from the tracker are contacted
 
 2005-12-19  jrandom
     * I2PSnark logging, disconnect old inactive peers rather than new ones,

@@ -63,15 +63,22 @@ public class PeerAcceptor
     // ahead the first $LOOKAHEAD_SIZE bytes to figure out which infohash they want to
     // talk about, and we can just look for that in our list of active torrents.
     byte peerInfoHash[] = null;
-    try {
-      peerInfoHash = readHash(in);
-      _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase64() 
-                + ": " + Base64.encode(peerInfoHash));
-    } catch (IOException ioe) {
-        _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase64());
-        throw ioe;
+    if (in instanceof BufferedInputStream) {
+        in.mark(LOOKAHEAD_SIZE);
+        peerInfoHash = readHash(in);
+        in.reset();
+    } else {
+        // is this working right?
+        try {
+          peerInfoHash = readHash(in);
+          _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase64() 
+                    + ": " + Base64.encode(peerInfoHash));
+        } catch (IOException ioe) {
+            _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase64());
+            throw ioe;
+        }
+        in = new SequenceInputStream(new ByteArrayInputStream(peerInfoHash), in);
     }
-    in = new SequenceInputStream(new ByteArrayInputStream(peerInfoHash), in);
     if (coordinator != null) {
         // single torrent capability
         MetaInfo meta = coordinator.getMetaInfo();

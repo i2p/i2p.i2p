@@ -26,8 +26,8 @@ public class ViewBlogsServlet extends BaseServlet {
     private String getViewBlogLink(Hash blog, long lastPost) {
         long dayBegin = BlogManager.instance().getDayBegin();
         int daysAgo = 2;
-        if ( (lastPost > 0) && (dayBegin - 3*24*60*6081000 > lastPost) ) // last post was old 3 days ago
-            daysAgo = (int)((dayBegin - lastPost + 24*60*60*1000-1)/(24*60*60*1000));
+        if ( (lastPost > 0) && (dayBegin - 3*24*60*60*1000l >= lastPost) ) // last post was old 3 days ago
+            daysAgo = (int)((dayBegin - lastPost + 24*60*60*1000l-1)/(24*60*60*1000l));
         daysAgo++;
         return getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' + blog.toBase64()
                + '&' + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&daysBack=" + daysAgo;
@@ -65,7 +65,7 @@ public class ViewBlogsServlet extends BaseServlet {
         
         out.write("<tr><td colspan=\"3\" valign=\"top\" align=\"left\"><span class=\"syndieBlogFavorites\">");
         if ( (user != null) && (user.getAuthenticated()) ) {
-            out.write("<b>Favorite blogs:</b><br />\n");
+            out.write("<b>Favorite blogs:</b> <a href=\"" + getControlTarget() + "?author=favorites&daysBack=3\" title=\"View all posts by your favorite authors in the last 3 days\">view all</a><br />\n");
             out.write("<a href=\"" + getViewBlogLink(user.getBlog(), user.getLastMetaEntry()) 
                       + "\" title=\"View your blog\">Your blog</a><br />\n");
             

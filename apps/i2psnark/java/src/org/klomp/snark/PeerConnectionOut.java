@@ -53,6 +53,9 @@ class PeerConnectionOut implements Runnable
 
     lastSent = System.currentTimeMillis();
     quit = false;
+  }
+  
+  public void startup() {
     thread = new I2PThread(this, "Snark sender " + _id);
     thread.start();
   }
@@ -63,6 +66,7 @@ class PeerConnectionOut implements Runnable
    */
   public void run()
   {
+    try { Thread.sleep(1000); } catch (InterruptedException ie) {}
     try
       {
         while (!quit && peer.isConnected())

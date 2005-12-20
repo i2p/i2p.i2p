@@ -209,7 +209,9 @@ public class TrackerClient extends I2PThread
                     if ( (left > 0) && (!completed) ) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
-                        Iterator it = peers.iterator();
+                        List ordered = new ArrayList(peers);
+                        Collections.shuffle(ordered);
+                        Iterator it = ordered.iterator();
                         while (it.hasNext()) {
                           Peer cur = (Peer)it.next();
                           coordinator.addPeer(cur);

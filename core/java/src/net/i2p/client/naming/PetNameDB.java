@@ -33,7 +33,7 @@ public class PetNameDB {
     public boolean isEmpty() { return _names.isEmpty(); }
     public Iterator iterator() { return new ArrayList(_names.values()).iterator(); }
     public void remove(PetName pn) { 
-        if (pn != null) _names.remove(pn.getName());
+        if (pn != null) _names.remove(pn.getName().toLowerCase());
     }
     public void removeName(String name) { 
         if (name != null) _names.remove(name.toLowerCase()); 

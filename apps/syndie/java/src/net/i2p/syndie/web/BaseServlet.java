@@ -330,7 +330,8 @@ public abstract class BaseServlet extends HttpServlet {
              (AddressesServlet.ACTION_DELETE_OTHER.equals(action)) ||
              (AddressesServlet.ACTION_DELETE_TAG.equals(action)) ||
              (AddressesServlet.ACTION_DELETE_PEER.equals(action)) ) {
-            PetName pn = user.getPetNameDB().getByName(req.getParameter(AddressesServlet.PARAM_NAME));
+            String name = req.getParameter(AddressesServlet.PARAM_NAME);
+            PetName pn = user.getPetNameDB().getByName(name);
             if (pn != null) {
                 user.getPetNameDB().remove(pn);
                 BlogManager.instance().saveUser(user);
@@ -580,7 +581,7 @@ public abstract class BaseServlet extends HttpServlet {
         //out.write("<tr class=\"topNav\"><td class=\"topNav_user\" colspan=\"2\" nowrap=\"true\">\n");
         out.write("<tr class=\"topNav\"><td colspan=\"3\" nowrap=\"true\"><span class=\"topNav_user\">\n");
         out.write("<!-- nav bar begin -->\n");
-        out.write("<a href=\"threads.jsp\" title=\"Syndie home\">Home</a> <a href=\"blogs.jsp\" title=\"Blog summary\">Blogs</a> ");
+        out.write("<a href=\"threads.jsp\" title=\"Syndie home\">Threads</a> <a href=\"blogs.jsp\" title=\"Blog summary\">Blogs</a> ");
         if (user.getAuthenticated() && (user.getBlog() != null) ) {
             out.write("Logged in as <a href=\"" + getProfileLink(req, user.getBlog()) + "\" title=\"Edit your profile\">");
             out.write(user.getUsername());

@@ -129,7 +129,7 @@ public class Storage
   }
 
   // Creates piece hases for a new storage.
-  private void create() throws IOException
+  public void create() throws IOException
   {
     if (true) {
         fast_digestCreate();

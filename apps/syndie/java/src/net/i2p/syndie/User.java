@@ -49,7 +49,8 @@ public class User {
     
     private static final String DEFAULT_FAVORITE_TAGS[] = {
       "syndie", "syndie.tech", "syndie.intro", "syndie.bugs", "syndie.featurerequest", "syndie.announce", 
-      "i2p", "i2p.tech", "i2p.bugs", "i2p.i2phex", "i2p.susimail", "i2p.irc",
+      "i2p", "i2p.tech", "i2p.bugs", "i2p.i2phex", "i2p.susimail", "i2p.irc", 
+      "bt.i2psnark", "bt.i2prufus", "bt.i2p-bt", "bt.azureus", "bt.misc",
       "security.misc",
       "chat",
       "test"
