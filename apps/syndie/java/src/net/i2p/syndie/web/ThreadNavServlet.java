@@ -79,19 +79,22 @@ public class ThreadNavServlet extends BaseServlet {
             out.write("<threadTree>");
         } else {
             out.write("<rdf:rdf xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
-                      "         xmlns:syndie=\"http://syndie.i2p.net/syndie.ns\">\n");
+                      "         xmlns:syndie=\"http://syndie.i2p.net/syndie.ns#\">\n");
+            out.write("<rdf:Seq rdf:about=\"http://syndie.i2p.net/threads\">\n");
         }
     }
     private void renderEnd(PrintWriter out, String format) throws IOException {
         if (FORMAT_XML.equals(format)) {
             out.write("</threadTree>");
         } else {
+            out.write("</rdf:Seq>\n");
             out.write("</rdf:rdf>\n");
         }
     }
     private void render(User user, ThreadNode node, PrintWriter out) throws IOException {
         Archive archive = BlogManager.instance().getArchive();
         String blog = node.getEntry().getKeyHash().toBase64();
+        out.write("<rdf:li rdf:resource=\"entry://" + blog + "/" + node.getEntry().getEntryId() + "\">\n");
         out.write("<rdf:Description rdf:about=\"entry://" + blog + "/" + node.getEntry().getEntryId() + "\">");
         PetName pn = user.getPetNameDB().getByLocation(blog);
         String name = null;
@@ -108,7 +111,7 @@ public class ThreadNavServlet extends BaseServlet {
             if ( (name == null) || (name.trim().length() <= 0) )
                 name = node.getEntry().getKeyHash().toBase64().substring(0,6);
         }
-        out.write("<syndie:author syndie:blog=\"" + blog + "\" syndie:name=\"" + HTMLRenderer.sanitizeStrippedXML(name) + "\" />\n");
+        out.write("<syndie:author syndie:blog=\"" + blog + "\">" + HTMLRenderer.sanitizeStrippedXML(name) + "</syndie:author>\n");
         if ( (user.getBlog() != null) && (node.containsAuthor(user.getBlog())) )
             out.write("<syndie:threadself />\n");
         
@@ -126,15 +129,18 @@ public class ThreadNavServlet extends BaseServlet {
         
         long dayBegin = BlogManager.instance().getDayBegin();
         long postId = node.getEntry().getEntryId();
-        int daysAgo = (int)((dayBegin - postId + 24*60*60*1000-1)/(24*60*60*1000));
+        int daysAgo = (int)((dayBegin - postId + 24*60*60*1000l-1l)/(24*60*60*1000l));
         out.write("<syndie:age>" + daysAgo + "</syndie:age>\n");
         
         out.write("<syndie:children>");
+        out.write("<rdf:Seq rdf:about=\"entry://" + blog + "/" + node.getEntry().getEntryId() + "\">");
         for (int i = 0; i < node.getChildCount(); i++)
             render(user, node.getChild(i), out);
+        out.write("</rdf:Seq>\n");
         out.write("</syndie:children>\n");
         
         out.write("</rdf:Description>\n");
+        out.write("</rdf:li>\n");
     }
     
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
