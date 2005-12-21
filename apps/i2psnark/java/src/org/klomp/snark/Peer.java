@@ -105,9 +105,9 @@ public class Peer implements Comparable
   public String toString()
   {
     if (peerID != null)
-      return peerID.toString() + _id;
+      return peerID.toString() + ' ' + _id;
     else
-      return "[unknown id]" + _id;
+      return "[unknown id] " + _id;
   }
 
   /**
@@ -115,7 +115,7 @@ public class Peer implements Comparable
    */
   public int hashCode()
   {
-    return peerID.hashCode();
+    return peerID.hashCode() ^ (2 << _id);
   }
 
   /**
@@ -127,7 +127,7 @@ public class Peer implements Comparable
     if (o instanceof Peer)
       {
         Peer p = (Peer)o;
-        return peerID.equals(p.peerID);
+        return _id == p._id && peerID.equals(p.peerID);
       }
     else
       return false;
@@ -139,7 +139,14 @@ public class Peer implements Comparable
   public int compareTo(Object o)
   {
     Peer p = (Peer)o;
-    return peerID.compareTo(p.peerID);
+    int rv = peerID.compareTo(p.peerID);
+    if (rv == 0) {
+        if (_id > p._id) return 1;
+        else if (_id < p._id) return -1;
+        else return 0;
+    } else {
+        return rv;
+    }
   }
 
   /**
@@ -208,6 +215,7 @@ public class Peer implements Comparable
         // Use this thread for running the incomming connection.
         // The outgoing connection creates its own Thread.
         out.startup();
+        Thread.currentThread().setName("Snark reader from " + peerID);
         s.in.run();
       }
     catch(IOException eofe)
@@ -226,6 +234,7 @@ public class Peer implements Comparable
     finally
       {
         if (deregister) listener.disconnected(this);
+        disconnect();
       }
   }
 

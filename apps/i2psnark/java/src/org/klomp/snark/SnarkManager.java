@@ -28,6 +28,9 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_EEP_HOST = "i2psnark.eepHost";
     public static final String PROP_EEP_PORT = "i2psnark.eepPort";
     public static final String PROP_DIR = "i2psnark.dir";
+
+    public static final String PROP_AUTO_START = "i2snark.autoStart";
+    public static final String DEFAULT_AUTO_START = "true";
     
     private SnarkManager() {
         _snarks = new HashMap();
@@ -59,7 +62,9 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
     
-    public boolean shouldAutoStart() { return true; }
+    public boolean shouldAutoStart() {
+        return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START+"")).booleanValue();
+    }
     private int getStartupDelayMinutes() { return 1; }
     public File getDataDir() { 
         String dir = _config.getProperty(PROP_DIR);
@@ -91,6 +96,8 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_EEP_PORT, "4444");
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");
+        if (!_config.containsKey(PROP_AUTO_START))
+            _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
         updateConfig();
     }
     
@@ -225,6 +232,11 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
                 changed = true;
             }
+        }
+        if (shouldAutoStart() != autoStart) {
+            _config.setProperty(PROP_AUTO_START, autoStart + "");
+            addMessage("Adjusted autostart to " + autoStart);
+            changed = true;
         }
         if (changed) {
             saveConfig();

@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.364 2005/12/19 08:34:56 jrandom Exp $
+$Id: history.txt,v 1.365 2005/12/19 21:01:37 jrandom Exp $
+
+2005-12-21  jrandom
+    * Adjusted I2PSnark's usage of the streaming lib (tweaking it for BT's
+      behavior)
+    * Fixed the I2PSnark bug that would lose track of live peers
+
+2005-12-20  jrandom
+    * Enabled the control in I2PSnark to toggle whether torrents should be
+      started automatically or not
+    * Hopefully finished the last hook to close down torrents completely when
+      they're stopped.
 
 2005-12-19  jrandom
     * Fix for old Syndie blog bookmarks (thanks Complication!)

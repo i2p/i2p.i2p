@@ -90,6 +90,10 @@ public class I2PSnarkUtil {
             }
             if (opts.getProperty("inbound.nickname") == null)
                 opts.setProperty("inbound.nickname", "I2PSnark");
+            if (opts.getProperty("i2p.streaming.inactivityTimeout") == null)
+                opts.setProperty("i2p.streaming.inactivityTimeout", "90000");
+            if (opts.getProperty("i2p.streaming.inactivityAction") == null)
+                opts.setProperty("i2p.streaming.inactivityAction", "1");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         return (_manager != null);

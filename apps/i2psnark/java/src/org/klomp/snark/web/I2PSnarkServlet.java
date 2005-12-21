@@ -469,15 +469,15 @@ public class I2PSnarkServlet extends HttpServlet {
         boolean autoStart = _manager.shouldAutoStart();
         int seedPct = 0;
        
-        out.write("<span class=\"snarkConfig\">\n");
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
+        out.write("<span class=\"snarkConfig\"><hr />\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("<hr /><span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
+        out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
         out.write("Data directory: <input type=\"text\" size=\"40\" name=\"dataDir\" value=\"" + dataDir + "\" ");
         out.write("title=\"Directory to store torrents and data\" disabled=\"true\" /><br />\n");
         out.write("Auto start: <input type=\"checkbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
-                  + "title=\"If true, automatically start torrents that are added\" disabled=\"true\" />");
+                  + "title=\"If true, automatically start torrents that are added\" />");
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
         //Auto stop: <input type="checkbox" name="autoStop" value="true" title="If true, automatically stop torrents that are removed from the data directory" />
         //out.write("<br />\n");
@@ -496,14 +496,14 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<option value=\"150\">150%</option>\n\t");
         out.write("</select><br />\n");
         
-        out.write("<hr />\n");
+        //out.write("<hr />\n");
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
                   + I2PSnarkUtil.instance().getEepProxyHost() + "\" size=\"15\" /> ");
-        out.write("EepProxy port: <input type=\"text\" name=\"eepPort\" value=\""
-                  + I2PSnarkUtil.instance().getEepProxyPort() + "\" size=\"5\" /> <br />\n");
+        out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
+                  + I2PSnarkUtil.instance().getEepProxyPort() + "\" size=\"5\" /><br />\n");
         out.write("I2CP host: <input type=\"text\" name=\"i2cpHost\" value=\"" 
                   + I2PSnarkUtil.instance().getI2CPHost() + "\" size=\"15\" /> ");
-        out.write("I2CP port: <input type=\"text\" name=\"i2cpPort\" value=\"" +
+        out.write("port: <input type=\"text\" name=\"i2cpPort\" value=\"" +
                   + I2PSnarkUtil.instance().getI2CPPort() + "\" size=\"5\" /> <br />\n");
         StringBuffer opts = new StringBuffer(64);
         Map options = new TreeMap(I2PSnarkUtil.instance().getI2CPOptions());
@@ -512,10 +512,11 @@ public class I2PSnarkServlet extends HttpServlet {
             String val = (String)options.get(key);
             opts.append(key).append('=').append(val).append(' ');
         }
-        out.write("I2CP options: <input type=\"text\" name=\"i2cpOpts\" size=\"80\" value=\""
+        out.write("I2CP opts: <input type=\"text\" name=\"i2cpOpts\" size=\"40\" value=\""
                   + opts.toString() + "\" /><br />\n");
         out.write("<input type=\"submit\" value=\"Save configuration\" name=\"action\" />\n");
-        out.write("</form>\n</span>\n");
+        out.write("</span>\n");
+        out.write("</form>\n");
     }
     
     private String formatSize(long bytes) {
@@ -588,8 +589,11 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "	font-size: 10pt;\n" +
                                          "}\n" +
                                          ".snarkConfigTitle {\n" +
-                                         "	font-size: 16pt;\n" +
+                                         "	font-size: 12pt;\n" +
                                          "                  font-weight: bold;\n" +
+                                         "}\n" +
+                                         ".snarkConfig {\n" +
+                                         "                  font-size: 10pt;\n" +
                                          "}\n" +
                                          "</style>\n" +
                                          "</head>\n" +

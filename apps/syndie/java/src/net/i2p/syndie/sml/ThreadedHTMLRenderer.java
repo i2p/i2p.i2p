@@ -190,6 +190,11 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                        String offset, String requestTags, String filteredAuthor, boolean authorOnly) throws IOException {
         EntryContainer entry = archive.getEntry(post);
         if (entry == null) return;
+        ThreadNode node = index.getNode(post);
+        if (node == null) {
+            _log.error("Post is not in the index: " + post.toString());
+            return;
+        }
         _entry = entry;
    
         _baseURI = baseURI;
@@ -235,8 +240,6 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         }
         if ( (author == null) || (author.trim().length() <= 0) )
             author = post.getKeyHash().toBase64().substring(0,6);
-        
-        ThreadNode node = index.getNode(post);
         
         out.write(author);
         out.write("</a> @ ");

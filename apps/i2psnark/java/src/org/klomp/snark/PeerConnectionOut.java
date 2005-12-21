@@ -56,7 +56,7 @@ class PeerConnectionOut implements Runnable
   }
   
   public void startup() {
-    thread = new I2PThread(this, "Snark sender " + _id);
+    thread = new I2PThread(this, "Snark sender " + _id + ": " + peer);
     thread.start();
   }
 
@@ -82,7 +82,7 @@ class PeerConnectionOut implements Runnable
                         dout.flush();
                         
                         // Wait till more data arrives.
-                        sendQueue.wait();
+                        sendQueue.wait(60*1000);
                       }
                     catch (InterruptedException ie)
                       {
@@ -185,6 +185,13 @@ class PeerConnectionOut implements Runnable
         sendQueue.clear();
         sendQueue.notify();
       }
+    if (dout != null) {
+        try {
+            dout.close();
+        } catch (IOException ioe) {
+            _log.warn("Error closing the stream to " + peer, ioe);
+        }
+    }
   }
 
   /**
