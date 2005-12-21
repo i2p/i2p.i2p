@@ -78,7 +78,7 @@ public class ThreadNavServlet extends BaseServlet {
         if (FORMAT_XML.equals(format)) {
             out.write("<threadTree>");
         } else {
-            out.write("<rdf:rdf xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
+            out.write("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
                       "         xmlns:syndie=\"http://syndie.i2p.net/syndie.ns#\">\n");
             out.write("<rdf:Seq rdf:about=\"http://syndie.i2p.net/threads\">\n");
         }
@@ -88,7 +88,7 @@ public class ThreadNavServlet extends BaseServlet {
             out.write("</threadTree>");
         } else {
             out.write("</rdf:Seq>\n");
-            out.write("</rdf:rdf>\n");
+            out.write("</rdf:RDF>\n");
         }
     }
     private void render(User user, ThreadNode node, PrintWriter out) throws IOException {
@@ -145,6 +145,6 @@ public class ThreadNavServlet extends BaseServlet {
     
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
-        throw new UnsupportedOperationException("Not relvent...");
+        throw new UnsupportedOperationException("Not relevant...");
     }
 }
