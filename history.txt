@@ -1,8 +1,8 @@
-$Id: history.txt,v 1.366 2005/12/21 07:04:56 jrandom Exp $
+$Id: history.txt,v 1.367 2005/12/22 05:04:15 jrandom Exp $
 
 2005-12-22  jrandom
     * Cleaned up some buffer synchronization issues in I2PSnark that could
-       cause blockage.
+      cause blockage.
 
 2005-12-21  jrandom
     * Adjusted I2PSnark's usage of the streaming lib (tweaking it for BT's
