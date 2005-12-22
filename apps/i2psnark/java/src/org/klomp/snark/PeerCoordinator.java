@@ -160,22 +160,23 @@ public class PeerCoordinator implements PeerListener
   public void halt()
   {
     halted = true;
+    List removed = new ArrayList();
     synchronized(peers)
       {
         // Stop peer checker task.
         timer.cancel();
 
         // Stop peers.
-        Iterator it = peers.iterator();
-        while(it.hasNext())
-          {
-            Peer peer = (Peer)it.next();
-            peer.disconnect();
-            it.remove();
-            removePeerFromPieces(peer);
-          }
-        peerCount = peers.size();
+        removed.addAll(peers);
+        peers.clear();
+        peerCount = 0;
       }
+
+    while (removed.size() > 0) {
+        Peer peer = (Peer)removed.remove(0);
+        peer.disconnect();
+        removePeerFromPieces(peer);
+    }
   }
 
   public void connected(Peer peer)

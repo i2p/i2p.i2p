@@ -180,7 +180,10 @@ public class Peer implements Comparable
             InputStream in = sock.getInputStream();
             OutputStream out = sock.getOutputStream(); //new BufferedOutputStream(sock.getOutputStream());
             if (true) {
-                out = new BufferedOutputStream(out);
+                // buffered output streams are internally synchronized, so we can't get through to the underlying
+                // I2PSocket's MessageOutputStream to close() it if we are blocking on a write(...).  Oh, and the
+                // buffer is unnecessary anyway, as unbuffered access lets the streaming lib do the 'right thing'.
+                //out = new BufferedOutputStream(out);
                 in = new BufferedInputStream(sock.getInputStream());
             }
             //BufferedInputStream bis

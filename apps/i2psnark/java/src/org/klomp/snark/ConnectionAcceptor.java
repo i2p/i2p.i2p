@@ -167,7 +167,7 @@ public class ConnectionAcceptor implements Runnable
 
               if (true) {
                   in = new BufferedInputStream(in);
-                  out = new BufferedOutputStream(out);
+                  //out = new BufferedOutputStream(out);
               }
               if (_log.shouldLog(Log.DEBUG))
                   _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash().toBase64());

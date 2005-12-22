@@ -208,8 +208,8 @@ class PeerConnectionOut implements Runnable
       }
   }
   
-  /** remove messages not sent in 2m */
-  private static final int SEND_TIMEOUT = 120*1000;
+  /** remove messages not sent in 3m */
+  private static final int SEND_TIMEOUT = 3*60*1000;
   private class RemoveTooSlow implements SimpleTimer.TimedEvent {
       private Message _m;
       public RemoveTooSlow(Message m) {

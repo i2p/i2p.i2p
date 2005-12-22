@@ -162,12 +162,14 @@ public class TrackerClient extends I2PThread
               }
           }
 
+        Random r = new Random();
         while(!stop)
           {
             try
               {
                 // Sleep some minutes...
-                Thread.sleep(SLEEP*60*1000);
+                int delay = SLEEP*60*1000 + r.nextInt(120*1000);
+                Thread.sleep(delay);
               }
             catch(InterruptedException interrupt)
               {
