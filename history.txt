@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.367 2005/12/22 05:04:15 jrandom Exp $
+$Id: history.txt,v 1.368 2005/12/22 05:10:39 jrandom Exp $
+
+* 2005-12-22  0.6.1.8 released
+
+2005-12-22  jrandom
+    * Bundle the standalone I2PSnark launcher in the installer and update
+      process (launch as "java -jar launch-i2psnark.jar", viewing the 
+      interface on http://localhost:8002/)
+    * Don't autostart swarming torrents by default so that you can run a
+      standalone I2PSnark from the I2P install dir and not have the embedded
+      I2PSnark autolaunch the torrents that the standalone instance is running
+    * Fixed a rare streaming lib bug that could let a blocking call wait
+      forever.
 
 2005-12-22  jrandom
     * Cleaned up some buffer synchronization issues in I2PSnark that could

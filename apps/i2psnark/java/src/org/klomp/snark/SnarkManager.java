@@ -30,7 +30,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_DIR = "i2psnark.dir";
 
     public static final String PROP_AUTO_START = "i2snark.autoStart";
-    public static final String DEFAULT_AUTO_START = "true";
+    public static final String DEFAULT_AUTO_START = "false";
     
     private SnarkManager() {
         _snarks = new HashMap();

@@ -256,8 +256,12 @@ public class MessageOutputStream extends OutputStream {
         long begin = _context.clock().now();
         WriteStatus ws = null;
         synchronized (_dataLock) {
-            if (_buf == null) throw new IOException("closed (buffer went away)");
+            if (_buf == null) {
+                _dataLock.notifyAll();
+                throw new IOException("closed (buffer went away)");
+            }
             if (_dataReceiver == null) {
+                _dataLock.notifyAll();
                 throwAnyError();
                 return;
             }
@@ -293,7 +297,10 @@ public class MessageOutputStream extends OutputStream {
     }
     
     public void close() throws IOException {
-        if (_closed) return;
+        if (_closed) {
+            synchronized (_dataLock) { _dataLock.notifyAll(); }
+            return;
+        }
         _closed = true;
         flush();
         _log.debug("Output stream closed after writing " + _written);
@@ -305,6 +312,7 @@ public class MessageOutputStream extends OutputStream {
                 _valid = 0;
                 locked_updateBufferSize();
             }
+            _dataLock.notifyAll();
         }
         if (ba != null) {
             _dataCache.release(ba);

@@ -89,6 +89,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setInboundBufferSize(opts.getInboundBufferSize());
             setCongestionAvoidanceGrowthRateFactor(opts.getCongestionAvoidanceGrowthRateFactor());
             setSlowStartGrowthRateFactor(opts.getSlowStartGrowthRateFactor());
+            setWriteTimeout(opts.getWriteTimeout());
+            setReadTimeout(opts.getReadTimeout());
         }
     }
     

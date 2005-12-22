@@ -197,5 +197,8 @@ class PeerCheckerTask extends TimerTask
         coordinator.peers.addAll(removed);
         coordinator.peerCount = coordinator.peers.size();
       }
+    if (coordinator.halted()) {
+        cancel();
+    }
   }
 }

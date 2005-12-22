@@ -32,7 +32,7 @@
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
         <ant dir="apps/syndie/java/" target="jar" />
-        <ant dir="apps/i2psnark/java/" target="war" />
+        <ant dir="apps/i2psnark/java/" target="standalone" />
     </target>
     <target name="buildrouter">
         <ant dir="core/java/" target="distclean" />
@@ -253,6 +253,8 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
+        <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
@@ -363,6 +365,8 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
+        <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />

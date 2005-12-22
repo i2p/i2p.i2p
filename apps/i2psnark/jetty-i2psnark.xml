@@ -19,7 +19,7 @@
       <New class="org.mortbay.http.SocketListener">
         <Arg>
           <New class="org.mortbay.util.InetAddrPort">
-            <Set name="host">0.0.0.0</Set>
+            <Set name="host">127.0.0.1</Set>
             <Set name="port">8002</Set>
           </New>
         </Arg>
@@ -88,7 +88,7 @@
   <Set name="rootWebApp">i2psnark</Set>
   <Call name="addWebApplication">
     <Arg>/</Arg>
-    <Arg>i2psnark.war</Arg>
+    <Arg>webapps/i2psnark.war</Arg>
   </Call>
 
   <!-- =============================================================== -->

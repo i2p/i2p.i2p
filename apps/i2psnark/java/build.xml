@@ -57,7 +57,8 @@
         <delete dir="./dist" />
         <mkdir dir="./dist" />
         <copy file="./build/launch-i2psnark.jar" tofile="./dist/launch-i2psnark.jar" />
-        <copy file="../i2psnark.war" tofile="./dist/i2psnark.war" />
+        <mkdir dir="./dist/webapps" />
+        <copy file="../i2psnark.war" tofile="./dist/webapps/i2psnark.war" />
         <mkdir dir="./dist/lib" />
         <copy file="../../../core/java/build/i2p.jar" tofile="./dist/lib/i2p.jar" />
         <copy file="../../jetty/jettylib/commons-el.jar" tofile="./dist/lib/commons-el.jar" />
