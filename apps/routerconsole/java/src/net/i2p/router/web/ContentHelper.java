@@ -51,7 +51,19 @@ public class ContentHelper {
         String str = FileUtil.readTextFile(_page, _maxLines, _startAtBeginning);
         if (str == null) 
             return "";
-        else 
-            return "<pre>" + str + "</pre>";
+        else {
+            StringBuffer sb = new StringBuffer(str.length()+11);
+            sb.append("<pre>");
+            for (int i=0; i < str.length(); i++) {
+                char c = str.charAt(i);
+                switch (str.charAt(i)) {
+                    case '<': sb.append("&lt;"); break;
+                    case '>': sb.append("&gt;"); break;
+                    case '&': sb.append("&amp;"); break;
+                    default: sb.append(c); break;
+                }
+            }
+            return sb.append("</pre>").toString();
+	}
     }
 }
