@@ -1161,7 +1161,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(dupRecv); //formatPct(recvDupPct));
             buf.append("</code></td>");
 
-            buf.append("</tr>");
+            buf.append("</tr>\n");
             out.write(buf.toString());
             buf.setLength(0);
             

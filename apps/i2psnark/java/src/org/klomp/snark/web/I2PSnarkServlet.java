@@ -333,7 +333,8 @@ public class I2PSnarkServlet extends HttpServlet {
         if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH)
             filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "...";
         long total = snark.meta.getTotalLength();
-        long remaining = snark.storage.needed() * snark.meta.getPieceLength(0); 
+        // Early typecast, avoid possibly overflowing a temp integer
+        long remaining = (long) snark.storage.needed() * (long) snark.meta.getPieceLength(0); 
         if (remaining > total)
             remaining = total;
         int totalBps = 4096; // should probably grab this from the snark...

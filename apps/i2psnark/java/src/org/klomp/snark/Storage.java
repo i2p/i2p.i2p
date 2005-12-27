@@ -39,8 +39,8 @@ public class Storage
 
   private final StorageListener listener;
 
-  private final BitField bitfield;
-  private int needed;
+  private final BitField bitfield; // BitField to represent the pieces
+  private int needed; // Number of pieces needed
 
   // XXX - Not always set correctly
   int piece_size;
@@ -506,7 +506,8 @@ public class Storage
           }
       }
 
-    long start = piece * metainfo.getPieceLength(0);
+    // Early typecast, avoid possibly overflowing a temp integer
+    long start = (long) piece * (long) metainfo.getPieceLength(0);
     int i = 0;
     long raflen = lengths[i];
     while (start > raflen)
@@ -549,7 +550,10 @@ public class Storage
     throws IOException
   {
     // XXX - copy/paste code from putPiece().
-    long start = piece * metainfo.getPieceLength(0);
+
+    // Early typecast, avoid possibly overflowing a temp integer
+    long start = (long) piece * (long) metainfo.getPieceLength(0);
+
     int length = metainfo.getPieceLength(piece);
     int i = 0;
     long raflen = lengths[i];

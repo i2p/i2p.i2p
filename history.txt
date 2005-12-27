@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.368 2005/12/22 05:10:39 jrandom Exp $
+$Id: history.txt,v 1.369 2005/12/22 07:49:09 jrandom Exp $
+
+2005-12-26  Complication
+    * Fix some integer typecasting in I2PSnark (caused >2GB torrents to fail)
+    * HTML readability cosmetics on "Peers" page
 
 * 2005-12-22  0.6.1.8 released
 
