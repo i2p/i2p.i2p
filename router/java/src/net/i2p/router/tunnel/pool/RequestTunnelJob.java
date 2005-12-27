@@ -252,15 +252,17 @@ public class RequestTunnelJob extends JobImpl {
                 default:
                     // ignore
             }
-            
-            // penalize peer based on their bitchiness level
-            getContext().profileManager().tunnelRejected(_currentPeer.getIdentity().calculateHash(), 
-                                                         getContext().clock().now() - _lastSendTime,
-                                                         howBad);
+
+            if (_currentPeer != null)
+                // penalize peer based on their bitchiness level
+                getContext().profileManager().tunnelRejected(_currentPeer.getIdentity().calculateHash(), 
+                                                             getContext().clock().now() - _lastSendTime,
+                                                             howBad);
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Tunnel request failed w/ cause=" + howBad + " for peer " 
-                      + _currentPeer.getIdentity().calculateHash().toBase64().substring(0,4));
+                      + (_currentPeer == null ? "[unknown]" : 
+                         _currentPeer.getIdentity().calculateHash().toBase64().substring(0,4)));
         tunnelFail();
     }
     

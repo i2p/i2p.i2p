@@ -405,6 +405,10 @@ public class MessageOutputStream extends OutputStream {
     
     void destroy() {
         _dataReceiver = null;
+        synchronized (_dataLock) {
+            _closed = true;
+            _dataLock.notifyAll();
+        }
     }
     
     /** Define a component to receive data flushed from this stream */

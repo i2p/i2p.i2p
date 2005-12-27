@@ -95,6 +95,8 @@ public class Connection {
         _outboundQueue = queue;
         _handler = handler;
         _options = (opts != null ? opts : new ConnectionOptions());
+        _outputStream.setWriteTimeout((int)_options.getWriteTimeout());
+        _inputStream.setReadTimeout((int)_options.getReadTimeout());
         _lastSendId = -1;
         _nextSendTime = -1;
         _ackedPackets = 0;
@@ -145,8 +147,8 @@ public class Connection {
      */
     boolean packetSendChoke(long timeoutMs) {
         if (false) return true;
-        long writeExpire = timeoutMs;
         long start = _context.clock().now();
+        long writeExpire = start + timeoutMs;
         boolean started = false;
         while (true) {
             long timeLeft = writeExpire - _context.clock().now();

@@ -90,6 +90,7 @@ public class I2PSocketFull implements I2PSocket {
         Connection c = _connection;
         if (c == null) return;
         
+        c.getInputStream().setReadTimeout((int)ms);
         c.getOptions().setReadTimeout(ms);
     }
     
@@ -106,8 +107,11 @@ public class I2PSocketFull implements I2PSocket {
     }
     
     void destroy() { 
+        Connection c = _connection;
         _connection = null; 
         _listener = null;
+        if (c != null)
+            c.disconnectComplete();
     }
     public String toString() {
         Connection c = _connection;

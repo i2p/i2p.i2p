@@ -199,7 +199,9 @@ public class I2PSnarkServlet extends HttpServlet {
                             List files = snark.meta.getFiles();
                             String dataFile = snark.meta.getName();
                             for (int i = 0; files != null && i < files.size(); i++) {
-                                File df = new File(_manager.getDataDir(), (String)files.get(i));
+                                // multifile torrents have the getFiles() return lists of lists of filenames, but
+                                // each of those lists just contain a single file afaict...
+                                File df = new File(_manager.getDataDir(), files.get(i).toString());
                                 boolean deleted = FileUtil.rmdir(df, false);
                                 if (deleted)
                                     _manager.addMessage("Data dir deleted: " + df.getAbsolutePath());

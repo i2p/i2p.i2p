@@ -96,8 +96,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.inactivityAction", "1");
             if (opts.getProperty("i2p.streaming.writeTimeout") == null)
                 opts.setProperty("i2p.streaming.writeTimeout", "90000");
-            if (opts.getProperty("i2p.streaming.readTimeout") == null)
-                opts.setProperty("i2p.streaming.readTimeout", "90000");
+            //if (opts.getProperty("i2p.streaming.readTimeout") == null)
+            //    opts.setProperty("i2p.streaming.readTimeout", "120000");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         return (_manager != null);

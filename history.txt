@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.369 2005/12/22 07:49:09 jrandom Exp $
+$Id: history.txt,v 1.370 2005/12/26 23:20:29 complication Exp $
+
+2005-12-27  jrandom
+    * Add a new Status: line on the router console - "ERR-ClockSkew", in case
+      the clock is too skewed to do anything useful (check the year and month,
+      not just the hour and minute).
+    * Fixed the read/write timeouts in the streaming lib (so that it actually
+      honors them now)
+    * Minor I2PSnark cleanups (no read timeout, more careful shutdown and
+      torrent closing)
+    * Handle an oddball tunnel creation failure (thanks Xunk)
 
 2005-12-26  Complication
     * Fix some integer typecasting in I2PSnark (caused >2GB torrents to fail)

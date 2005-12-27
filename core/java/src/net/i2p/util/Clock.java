@@ -82,7 +82,11 @@ public class Clock implements Timestamper.UpdateListener {
             }
         }
         if (_alreadyChanged) {
-            getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            if (delta > 15*1000)
+                getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            else if (getLog().shouldLog(Log.INFO))
+                getLog().info("Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            
             if (!_statCreated)
                 _context.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
@@ -98,6 +102,8 @@ public class Clock implements Timestamper.UpdateListener {
     public long getOffset() {
         return _offset;
     }
+    
+    public boolean getUpdatedSuccessfully() { return _alreadyChanged; }
 
     public void setNow(long realTime) {
         long diff = realTime - System.currentTimeMillis();

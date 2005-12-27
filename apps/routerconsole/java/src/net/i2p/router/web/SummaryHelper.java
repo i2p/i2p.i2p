@@ -110,6 +110,9 @@ public class SummaryHelper {
     public int getAllPeers() { return _context.netDb().getKnownRouters(); }
     
     public String getReachability() {
+        if (!_context.clock().getUpdatedSuccessfully())
+            return "ERR-ClockSkew";
+        
         int status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:

@@ -411,15 +411,23 @@ public class Snark
    */
   public void stopTorrent() {
     stopped = true;
-    trackerclient.halt();
-    coordinator.halt();
-    try { 
-        storage.close(); 
-    } catch (IOException ioe) {
-        System.out.println("Error closing " + torrent);
-        ioe.printStackTrace();
+    TrackerClient tc = trackerclient;
+    if (tc != null)
+        tc.halt();
+    PeerCoordinator pc = coordinator;
+    if (pc != null)
+        pc.halt();
+    Storage st = storage;
+    if (st != null) {
+        try { 
+            storage.close(); 
+        } catch (IOException ioe) {
+            System.out.println("Error closing " + torrent);
+            ioe.printStackTrace();
+        }
     }
-    PeerCoordinatorSet.instance().remove(coordinator);
+    if (pc != null)
+        PeerCoordinatorSet.instance().remove(pc);
   }
 
   static Snark parseArguments(String[] args)
