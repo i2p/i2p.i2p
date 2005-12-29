@@ -78,6 +78,7 @@ public class Clock implements Timestamper.UpdateListener {
             
             if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {
                 getLog().debug("Not changing offset since it is only " + delta + "ms");
+                _alreadyChanged = true;
                 return;
             }
         }
