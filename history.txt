@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.371 2005/12/27 08:20:55 jrandom Exp $
+$Id: history.txt,v 1.372 2005/12/29 08:07:22 jrandom Exp $
+
+2005-12-30  jrandom
+    * Replaced the bundled linux jcpuid (written in C++) with scintilla's
+      jcpuid (written in C), removing the libg++.so.5 dependency that has bit
+      some distros (e.g. mandriva)
 
 2005-12-29  jrandom
     * Minor fix to the new ERR-ClockSkew to deal with people whose clocks are

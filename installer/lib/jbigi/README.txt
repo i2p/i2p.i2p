@@ -12,3 +12,7 @@ with GMP-4.1.4.
 
 On Nov 29, 2005, the libjbigi-osx-none.jnilib was added back to
 jbigi.jar after being mistakenly removed in the Sep 18 update (d'oh!)
+
+On Dec 30, 2005, the libjcpuid-x86-linux.so was updated to use the 
+(year old) C version of jcpuid, rather than the C++ version.  This removes
+the libg++.so.5 dependency that has been a problem for a few linux distros.
