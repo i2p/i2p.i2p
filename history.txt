@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.373 2005/12/30 13:16:46 jrandom Exp $
+$Id: history.txt,v 1.374 2005/12/30 15:57:53 jrandom Exp $
+
+2005-12-30  jrandom
+    * Close streams more gracefully
 
 2005-12-30  jrandom
     * Small streaming lib bugfixes for the modified timeouts

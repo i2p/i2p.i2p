@@ -35,4 +35,8 @@ public class Piece implements Comparable {
     public boolean removePeer(Peer peer) { return this.peers.remove(peer.getPeerID()); }
     public boolean isRequested() { return this.requested; }
     public void setRequested(boolean requested) { this.requested = requested; } 
+    
+    public String toString() {
+        return String.valueOf(id);
+    }
 }

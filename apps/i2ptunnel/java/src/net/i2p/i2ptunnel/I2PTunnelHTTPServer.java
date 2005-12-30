@@ -107,7 +107,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 useGZIP = true;
             
             if (allowGZIP && useGZIP) {
-                I2PThread req = new I2PThread(new CompressedRequestor(s, socket, modifiedHeader), "http compressor");
+                I2PThread req = new I2PThread(new CompressedRequestor(s, socket, modifiedHeader), Thread.currentThread().getName()+".hc");
                 req.start();
             } else {
                 new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
@@ -154,7 +154,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.info("request headers: " + _headers);
                 serverout.write(_headers.getBytes());
                 browserin = _browser.getInputStream();
-                I2PThread sender = new I2PThread(new Sender(serverout, browserin, "server: browser to server"), "http compressed sender");
+                I2PThread sender = new I2PThread(new Sender(serverout, browserin, "server: browser to server"), Thread.currentThread().getName() + "hcs");
                 sender.start();
                 
                 browserout = _browser.getOutputStream();

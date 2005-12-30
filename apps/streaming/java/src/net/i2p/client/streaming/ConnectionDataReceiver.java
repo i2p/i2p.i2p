@@ -184,8 +184,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Closed is set for a new packet on " + con + ": " + packet);
         } else {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Closed is not set for a new packet on " + _connection + ": " + packet);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Closed is not set for a new packet on " + _connection + ": " + packet);
         }
         return packet;
     }
@@ -202,6 +202,6 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     }    
     
     void destroy() {
-        _connection = null;
+        //_connection = null;
     }
 }

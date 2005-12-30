@@ -116,7 +116,7 @@ class PeerConnectionIn implements Runnable
                 din.readFully(bitmap);
                 ps.bitfieldMessage(bitmap);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received bitmap from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received bitmap from " + peer + " on " + peer.metainfo.getName() + ": size=" + (i-1) + ": " + ps.bitfield);
                 break;
               case 6:
                 piece = din.readInt();

@@ -610,7 +610,7 @@ public class EepGet {
             _log.debug("Request flushed");
     }
     
-    private String getRequest() {
+    private String getRequest() throws IOException {
         StringBuffer buf = new StringBuffer(512);
         boolean post = false;
         if ( (_postData != null) && (_postData.length() > 0) )
@@ -620,12 +620,8 @@ public class EepGet {
         } else {
             buf.append("GET ").append(_url).append(" HTTP/1.1\r\n");
         }
-        try {
-            URL url = new URL(_url);
-            buf.append("Host: ").append(url.getHost()).append("\r\n");
-        } catch (MalformedURLException mue) {
-            mue.printStackTrace();
-        }
+        URL url = new URL(_url);
+        buf.append("Host: ").append(url.getHost()).append("\r\n");
         if (_alreadyTransferred > 0) {
             buf.append("Range: bytes=");
             buf.append(_alreadyTransferred);

@@ -26,6 +26,7 @@ import java.util.*;
 
 import org.klomp.snark.bencode.*;
 
+import net.i2p.data.Destination;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.util.I2PThread;
@@ -287,8 +288,10 @@ public class Snark
     I2PServerSocket serversocket = I2PSnarkUtil.instance().getServerSocket();
     if (serversocket == null)
         fatal("Unable to listen for I2P connections");
-    else
-        debug("Listening on I2P destination " + serversocket.getManager().getSession().getMyDestination().toBase64(), NOTICE);
+    else {
+        Destination d = serversocket.getManager().getSession().getMyDestination();
+        debug("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64(), NOTICE);
+    }
 
     // Figure out what the torrent argument represents.
     meta = null;

@@ -365,8 +365,11 @@ public class PeerCoordinator implements PeerListener
    */
   public int wantPiece(Peer peer, BitField havePieces)
   {
-    if (halted)
+    if (halted) {
+      if (_log.shouldLog(Log.WARN))
+          _log.warn("We don't want anything from the peer, as we are halted!  peer=" + peer);
       return -1;
+    }
 
     synchronized(wantedPieces)
       {
@@ -398,7 +401,12 @@ public class PeerCoordinator implements PeerListener
                     piece = p;
                   }
               }
-            if (piece == null) return -1; //If we still can't find a piece we want, so be it.
+            if (piece == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested 
+                              + " wanted = " + wantedPieces + " peerHas = " + havePieces);
+                return -1; //If we still can't find a piece we want, so be it.
+            }
         }
         piece.setRequested(true);
         return piece.getId();

@@ -183,10 +183,14 @@ public class ConnectionPacketHandler {
                 // we've already scheduled an ack above, so there is no need to schedule 
                 // a fast ack (we can wait a few ms)
             } else {
-                if (con.getLastSendTime() + 2000 < _context.clock().now()) {
+                long timeSinceSend = _context.clock().now() - con.getLastSendTime();
+                if (timeSinceSend >= 2000) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Fast ack for dup " + packet);
                     con.ackImmediately();
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Not fast acking dup " + packet + " since we last sent " + timeSinceSend + "ms ago");
                 }
             }
         }
@@ -440,7 +444,8 @@ public class ConnectionPacketHandler {
         }
         public void timeReached() {
             if (_con.getLastSendTime() <= _created) {
-                if (!_con.getIsConnected()) return;
+                if (_con.getResetReceived() || _con.getResetSent() || (_con.getUnackedPacketsReceived() <= 0) )
+                    return;
                 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Last sent was a while ago, and we want to ack a dup");

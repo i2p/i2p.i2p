@@ -211,14 +211,20 @@ public class Connection {
             if (evt != null) {
                 boolean sent = evt.retransmit(false);
                 if (sent) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Retransmitting " + packet + " as an ack");
                     return;
                 } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Not retransmitting " + packet + " as an ack");
                     //SimpleTimer.getInstance().addEvent(evt, evt.getNextSendTime());
                 }
             }
         }
         // if we don't have anything to retransmit, send a small ack
         packet = _receiver.send(null, 0, 0);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("sending new ack: " + packet);
         //packet.releasePayload();
     }
 
@@ -286,6 +292,8 @@ public class Connection {
             if (packet.isFlagSet(Packet.FLAG_CLOSE) || (remaining < 2)) {
                 packet.setOptionalDelay(0);
                 packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Requesting no ack delay for packet " + packet);
             } else {
                 int delay = _options.getRTO() / 2;
                 packet.setOptionalDelay(delay);
@@ -1031,9 +1039,8 @@ public class Connection {
                                   + newWindowSize + " lifetime " 
                                   + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
                     _outboundQueue.enqueue(_packet);
+                    _lastSendTime = _context.clock().now();
                 }
-                
-                _lastSendTime = _context.clock().now();
                 
                 // acked during resending (... or somethin')
                 if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {

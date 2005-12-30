@@ -117,7 +117,8 @@ public class BitField
   public String toString()
   {
     // Not very efficient
-    StringBuffer sb = new StringBuffer("BitField[");
+    StringBuffer sb = new StringBuffer("BitField(");
+    sb.append(size).append(")[");
     for (int i = 0; i < size; i++)
       if (get(i))
         {
