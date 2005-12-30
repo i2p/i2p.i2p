@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.372 2005/12/29 08:07:22 jrandom Exp $
+$Id: history.txt,v 1.373 2005/12/30 13:16:46 jrandom Exp $
+
+2005-12-30  jrandom
+    * Small streaming lib bugfixes for the modified timeouts
+    * Minor Syndie/Sucker RSS html fix
+    * Small synchronization fix in I2PSnark (thanks fsm!)
 
 2005-12-30  jrandom
     * Replaced the bundled linux jcpuid (written in C++) with scintilla's

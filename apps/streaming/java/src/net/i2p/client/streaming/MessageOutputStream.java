@@ -68,7 +68,12 @@ public class MessageOutputStream extends OutputStream {
             _log.debug("MessageOutputStream created");
     }
     
-    public void setWriteTimeout(int ms) { _writeTimeout = ms; }
+    public void setWriteTimeout(int ms) { 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Changing write timeout from " + _writeTimeout + " to " + ms);
+
+        _writeTimeout = ms; 
+    }
     public int getWriteTimeout() { return _writeTimeout; }
     public void setBufferSize(int size) { _nextBufferSize = size; }
     

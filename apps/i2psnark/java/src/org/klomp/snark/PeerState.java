@@ -401,7 +401,9 @@ class PeerState
     // Are there outstanding requests that have to be resend?
     if (resend)
       {
-        out.sendRequests(outstandingRequests);
+        synchronized (this) {
+            out.sendRequests(outstandingRequests);
+        }
         resend = false;
       }
 

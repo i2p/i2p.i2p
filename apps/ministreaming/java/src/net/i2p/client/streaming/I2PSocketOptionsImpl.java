@@ -13,7 +13,7 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
     private int _maxBufferSize;
     
     public static final int DEFAULT_BUFFER_SIZE = 1024*64;
-    public static final int DEFAULT_WRITE_TIMEOUT = 60*1000;
+    public static final int DEFAULT_WRITE_TIMEOUT = -1;
     public static final int DEFAULT_CONNECT_TIMEOUT = 60*1000;
     
     public I2PSocketOptionsImpl() {

@@ -158,7 +158,11 @@ public class MessageInputStream extends InputStream {
      * but if it is 0, do not block at all)
      */
     public int getReadTimeout() { return _readTimeout; }
-    public void setReadTimeout(int timeout) { _readTimeout = timeout; }
+    public void setReadTimeout(int timeout) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Changing read timeout from " + _readTimeout + " to " + timeout);
+        _readTimeout = timeout; 
+    }
     
     public void closeReceived() {
         synchronized (_dataLock) {
@@ -302,8 +306,8 @@ public class MessageInputStream extends InputStream {
                                 throwAnyError();
                             } else { // readTimeout == 0
                                 // noop, don't block
-                                if (_log.shouldLog(Log.INFO))
-                                    _log.info("read(...," + offset+", " + length+ ")[" + i 
+                                if (_log.shouldLog(Log.DEBUG))
+                                    _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                                + ") with nonblocking setup: " + toString());
                                 return i;
                             }
@@ -320,8 +324,8 @@ public class MessageInputStream extends InputStream {
                     // we looped a few times then got data, so this pass doesnt count
                     i--;
                 } else if (_readyDataBlocks.size() <= 0) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("read(...," + offset+", " + length+ ")[" + i 
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                    + "] no more ready blocks, returning");
                     return i;
                 } else {
@@ -351,7 +355,7 @@ public class MessageInputStream extends InputStream {
         }  // synchronized (_dataLock)
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.info("read(...," + offset+", " + length+ ") read fully total read: " +_readTotal);
+            _log.debug("read(...," + offset+", " + length+ ") read fully total read: " +_readTotal);
 
         return length;
     }
@@ -370,7 +374,7 @@ public class MessageInputStream extends InputStream {
             }
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.info("available(): " + numBytes + " " + toString());
+            _log.debug("available(): " + numBytes + " " + toString());
         
         return numBytes;
     }

@@ -355,6 +355,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         buf.append(" cwin=").append(_windowSize);
         buf.append(" maxResends=").append(_maxResends);
         buf.append(" writeTimeout=").append(getWriteTimeout());
+        buf.append(" readTimeout=").append(getReadTimeout());
         buf.append(" inactivityTimeout=").append(_inactivityTimeout);
         buf.append(" inboundBuffer=").append(_inboundBufferSize);
         buf.append(" maxWindowSize=").append(_maxWindowSize);

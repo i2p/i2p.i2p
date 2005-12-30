@@ -581,8 +581,10 @@ public class Sucker {
             
             a=htmlTagLowerCase.indexOf("href=\"")+6;
             b=a+1;
-            while(htmlTagLowerCase.charAt(b)!='\"')
+            while ( (b < htmlTagLowerCase.length()) && (htmlTagLowerCase.charAt(b)!='\"') )
                 b++;
+            if (b >= htmlTagLowerCase.length())
+                return null; // abort the b0rked tag
             String link=htmlTag.substring(a,b);
             if(link.indexOf("http")<0)
                 link=baseUrl+"/"+link;

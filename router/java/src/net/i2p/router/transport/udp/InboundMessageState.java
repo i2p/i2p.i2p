@@ -53,7 +53,7 @@ public class InboundMessageState {
     public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
         if ( (fragmentNum < 0) || (fragmentNum > _fragments.length)) {
-            _log.error("Invalid fragment " + fragmentNum + "/" + _fragments.length);
+            _log.warn("Invalid fragment " + fragmentNum + "/" + _fragments.length);
             return false;
         }
         if (_fragments[fragmentNum] == null) {
@@ -73,7 +73,7 @@ public class InboundMessageState {
                                + ", isLast=" + isLast
                                + ", data=" + Base64.encode(message.getData(), 0, size));
             } catch (ArrayIndexOutOfBoundsException aioobe) {
-                _log.error("Corrupt SSU fragment " + fragmentNum, aioobe);
+                _log.warn("Corrupt SSU fragment " + fragmentNum, aioobe);
                 return false;
             }
         } else {

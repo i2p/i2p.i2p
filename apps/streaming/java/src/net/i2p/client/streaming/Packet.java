@@ -516,7 +516,8 @@ public class Packet {
         boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
         if (!ok) {
             Log l = ctx.logManager().getLog(Packet.class);
-            l.error("Signature failed on " + toString(), new Exception("moo"));
+            if (l.shouldLog(Log.WARN))
+                l.warn("Signature failed on " + toString(), new Exception("moo"));
             if (false) {
                 l.error(Base64.encode(buffer, 0, size));
                 l.error("Signature: " + Base64.encode(_optionSignature.getData()));

@@ -123,8 +123,8 @@ public class Connection {
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("New connection created with options: " + _options);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("New connection created with options: " + _options);
     }
     
     public long getNextOutboundPacketNum() { 
@@ -164,11 +164,13 @@ public class Connection {
                 started = true;
                 if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ||
                      (_lastSendId - _highestAckedThrough > _options.getWindowSize()) ) {
-                    if (writeExpire > 0) {
+                    if (timeoutMs > 0) {
                         if (timeLeft <= 0) {
-                            _log.error("Outbound window is full of " + _outboundPackets.size() 
-                                       + " with " + _activeResends + " active resends"
-                                       + " and we've waited too long (" + writeExpire + "ms)");
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Outbound window is full of " + _outboundPackets.size() 
+                                          + " with " + _activeResends + " active resends"
+                                          + " and we've waited too long (" + (0-(timeLeft - timeoutMs)) + "ms): " 
+                                          + toString());
                             return false;
                         }
                         if (_log.shouldLog(Log.DEBUG))
@@ -387,8 +389,8 @@ public class Connection {
                     _ackedPackets++;
                     if (p.getNumSends() > 1) {
                         _activeResends--;
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Active resend of " + p + " successful, # active left: " + _activeResends);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Active resend of " + p + " successful, # active left: " + _activeResends);
                     }
                 }
             }
