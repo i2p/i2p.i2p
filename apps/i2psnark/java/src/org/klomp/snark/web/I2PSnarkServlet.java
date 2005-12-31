@@ -80,7 +80,7 @@ public class I2PSnarkServlet extends HttpServlet {
         
         out.write(TABLE_FOOTER);
         writeAddForm(out, req);
-        if (false) // seeding needs to register the torrent first (boo, hiss)
+        if (true) // seeding needs to register the torrent first, so we can't start it automatically (boo, hiss)
             writeSeedForm(out, req);
         writeConfigForm(out, req);
         out.write(FOOTER);
@@ -252,8 +252,9 @@ public class I2PSnarkServlet extends HttpServlet {
                         out.write(info.getTorrentData());
                         out.close();
                         _manager.addMessage("Torrent created for " + baseFile.getName() + ": " + torrentFile.getAbsolutePath());
-                        // now fire it up and seed away!
-                        _manager.addTorrent(torrentFile.getCanonicalPath());                    
+                        // now fire it up, but don't automatically seed it
+                        _manager.addTorrent(torrentFile.getCanonicalPath(), false);
+                        _manager.addMessage("Many I2P trackers require you to register new torrents before seeding - please do so before starting " + baseFile.getName());
                     } catch (IOException ioe) {
                         _manager.addMessage("Error creating a torrent for " + baseFile.getAbsolutePath() + ": " + ioe.getMessage());
                     }
@@ -437,11 +438,6 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("</form>\n</span>\n");  
     }
     
-    private static final String DEFAULT_TRACKERS[] = { 
-       "Postman's tracker", "http://YRgrgTLGnbTq2aZOZDJQ~o6Uk5k6TK-OZtx0St9pb0G-5EGYURZioxqYG8AQt~LgyyI~NCj6aYWpPO-150RcEvsfgXLR~CxkkZcVpgt6pns8SRc3Bi-QSAkXpJtloapRGcQfzTtwllokbdC-aMGpeDOjYLd8b5V9Im8wdCHYy7LRFxhEtGb~RL55DA8aYOgEXcTpr6RPPywbV~Qf3q5UK55el6Kex-6VCxreUnPEe4hmTAbqZNR7Fm0hpCiHKGoToRcygafpFqDw5frLXToYiqs9d4liyVB-BcOb0ihORbo0nS3CLmAwZGvdAP8BZ7cIYE3Z9IU9D1G8JCMxWarfKX1pix~6pIA-sp1gKlL1HhYhPMxwyxvuSqx34o3BqU7vdTYwWiLpGM~zU1~j9rHL7x60pVuYaXcFQDR4-QVy26b6Pt6BlAZoFmHhPcAuWfu-SFhjyZYsqzmEmHeYdAwa~HojSbofg0TMUgESRXMw6YThK1KXWeeJVeztGTz25sL8AAAA.i2p/announce.php",
-       "Orion's tracker", "http://gKik1lMlRmuroXVGTZ~7v4Vez3L3ZSpddrGZBrxVriosCQf7iHu6CIk8t15BKsj~P0JJpxrofeuxtm7SCUAJEr0AIYSYw8XOmp35UfcRPQWyb1LsxUkMT4WqxAT3s1ClIICWlBu5An~q-Mm0VFlrYLIPBWlUFnfPR7jZ9uP5ZMSzTKSMYUWao3ejiykr~mtEmyls6g-ZbgKZawa9II4zjOy-hdxHgP-eXMDseFsrym4Gpxvy~3Fv9TuiSqhpgm~UeTo5YBfxn6~TahKtE~~sdCiSydqmKBhxAQ7uT9lda7xt96SS09OYMsIWxLeQUWhns-C~FjJPp1D~IuTrUpAFcVEGVL-BRMmdWbfOJEcWPZ~CBCQSO~VkuN1ebvIOr9JBerFMZSxZtFl8JwcrjCIBxeKPBmfh~xYh16BJm1BBBmN1fp2DKmZ2jBNkAmnUbjQOqWvUcehrykWk5lZbE7bjJMDFH48v3SXwRuDBiHZmSbsTY6zhGY~GkMQHNGxPMMSIAAAA.i2p/bt",
-       "The freak's tracker", "http://mHKva9x24E5Ygfey2llR1KyQHv5f8hhMpDMwJDg1U-hABpJ2NrQJd6azirdfaR0OKt4jDlmP2o4Qx0H598~AteyD~RJU~xcWYdcOE0dmJ2e9Y8-HY51ie0B1yD9FtIV72ZI-V3TzFDcs6nkdX9b81DwrAwwFzx0EfNvK1GLVWl59Ow85muoRTBA1q8SsZImxdyZ-TApTVlMYIQbdI4iQRwU9OmmtefrCe~ZOf4UBS9-KvNIqUL0XeBSqm0OU1jq-D10Ykg6KfqvuPnBYT1BYHFDQJXW5DdPKwcaQE4MtAdSGmj1epDoaEBUa9btQlFsM2l9Cyn1hzxqNWXELmx8dRlomQLlV4b586dRzW~fLlOPIGC13ntPXogvYvHVyEyptXkv890jC7DZNHyxZd5cyrKC36r9huKvhQAmNABT2Y~pOGwVrb~RpPwT0tBuPZ3lHYhBFYmD8y~AOhhNHKMLzea1rfwTvovBMByDdFps54gMN1mX4MbCGT4w70vIopS9yAAAA.i2p/bytemonsoon/announce.php"
-    };
     private void writeSeedForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String uri = req.getRequestURI();
         String baseFile = req.getParameter("baseFile");
@@ -453,17 +449,34 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
-        out.write("Data to seed: <input type=\"text\" name=\"baseFile\" size=\"50\" value=\"" + baseFile 
-                  + "\" title=\"File within " + _manager.getDataDir().getAbsolutePath() + " to seed\" /><br />\n");
+        out.write("Data to seed: " + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
+                  + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
+                  + "\" title=\"File to seed (must be within the specified path)\" /><br />\n");
         out.write("Tracker: <select name=\"announceURL\"><option value=\"\">Select a tracker</option>\n");
-        for (int i = 0; i + 1 < DEFAULT_TRACKERS.length; i += 2) 
-            out.write("\t<option value=\"" + DEFAULT_TRACKERS[i+1] + "\">" + DEFAULT_TRACKERS[i] + "</option>\n");
-        out.write("</select><br />\n");
-        out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or: ");
-        out.write("<input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
-                  "title=\"Custom tracker URL\" /><br />\n");
+        Map trackers = sort(_manager.getTrackers());
+        for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            String announceURL = (String)trackers.get(name);
+            // we inject whitespace in sort(...) to guarantee uniqueness, but we can strip it off here
+            out.write("\t<option value=\"" + announceURL + "\">" + name.trim() + "</option>\n");
+        }
+        out.write("</select>\n");
+        out.write("or <input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
+                  "title=\"Custom tracker URL\" /> ");
         out.write("<input type=\"submit\" value=\"Create torrent\" name=\"action\" />\n");
         out.write("</form>\n</span>\n");        
+    }
+    
+    private Map sort(Map trackers) {
+        TreeMap rv = new TreeMap();
+        for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
+            String url = (String)iter.next();
+            String name = (String)trackers.get(url);
+            while (rv.containsKey(name))
+                name = name + " ";
+            rv.put(name, url);
+        }
+        return rv;
     }
     
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -584,7 +597,7 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "	background-color: #DDDDCC;\n" +
                                          "}\n" +
                                          ".snarkNewTorrent {\n" +
-                                         "	font-size: 12pt;\n" +
+                                         "	font-size: 10pt;\n" +
                                          "	font-family: monospace;\n" +
                                          "	background-color: #ADAE9;\n" +
                                          "}\n" +

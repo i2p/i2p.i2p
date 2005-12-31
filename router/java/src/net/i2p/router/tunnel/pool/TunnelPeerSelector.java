@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel.pool;
 
 import java.util.*;
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
@@ -62,9 +63,12 @@ abstract class TunnelPeerSelector {
     }
     
     protected boolean shouldSelectExplicit(TunnelPoolSettings settings) {
+        if (settings.isExploratory()) return false;
         Properties opts = settings.getUnknownOptions();
         if (opts != null) {
             String peers = opts.getProperty("explicitPeers");
+            if (peers == null)
+                peers = I2PAppContext.getGlobalContext().getProperty("explicitPeers");
             if (peers != null)
                 return true;
         }
@@ -76,6 +80,9 @@ abstract class TunnelPeerSelector {
         Properties opts = settings.getUnknownOptions();
         if (opts != null)
             peers = opts.getProperty("explicitPeers");
+        
+        if (peers == null)
+            peers = I2PAppContext.getGlobalContext().getProperty("explicitPeers");
         
         Log log = ctx.logManager().getLog(ClientPeerSelector.class);
         List rv = new ArrayList();
@@ -90,8 +97,8 @@ abstract class TunnelPeerSelector {
                 if (ctx.profileOrganizer().isSelectable(peer)) {
                     rv.add(peer);
                 } else {
-                    if (log.shouldLog(Log.WARN))
-                        log.warn("Explicit peer is not selectable: " + peerStr);
+                    if (log.shouldLog(Log.DEBUG))
+                        log.debug("Explicit peer is not selectable: " + peerStr);
                 }
             } catch (DataFormatException dfe) {
                 if (log.shouldLog(Log.ERROR))
@@ -99,19 +106,34 @@ abstract class TunnelPeerSelector {
             }
         }
         
+        int sz = rv.size();
         Collections.shuffle(rv, ctx.random());
-        
         
         while (rv.size() > length)
             rv.remove(0);
+        
+        if (log.shouldLog(Log.INFO)) {
+            StringBuffer buf = new StringBuffer();
+            if (settings.getDestinationNickname() != null)
+                buf.append("peers for ").append(settings.getDestinationNickname());
+            else if (settings.getDestination() != null)
+                buf.append("peers for ").append(settings.getDestination().toBase64());
+            else
+                buf.append("peers for exploratory ");
+            if (settings.isInbound())
+                buf.append(" inbound");
+            else
+                buf.append(" outbound");
+            buf.append(" peers: ").append(rv);
+            buf.append(", out of ").append(sz).append(" (not including self)");
+            log.info(buf.toString());
+        }
         
         if (settings.isInbound())
             rv.add(0, ctx.routerHash());
         else
             rv.add(ctx.routerHash());
         
-        if (log.shouldLog(Log.INFO))
-            log.info(toString() + ": Selecting peers explicitly: " + rv);
         return rv;
     }
     

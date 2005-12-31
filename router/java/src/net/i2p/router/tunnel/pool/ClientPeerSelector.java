@@ -15,9 +15,11 @@ class ClientPeerSelector extends TunnelPeerSelector {
         if (length < 0)
             return null;
         HashSet matches = new HashSet(length);
-        
-        if (shouldSelectExplicit(settings))
-            return selectExplicit(ctx, settings, length);
+    
+        if (length > 0) {
+            if (shouldSelectExplicit(settings))
+                return selectExplicit(ctx, settings, length);
+        }
         
         Set exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
         ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
@@ -31,5 +33,4 @@ class ClientPeerSelector extends TunnelPeerSelector {
             rv.add(ctx.routerHash());
         return rv;
     }
-    
 }

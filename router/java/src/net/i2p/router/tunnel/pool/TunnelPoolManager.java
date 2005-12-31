@@ -17,11 +17,13 @@ import net.i2p.stat.RateStat;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.JobImpl;
+import net.i2p.router.LoadTestManager;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
 /**
@@ -40,6 +42,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private int _outstandingBuilds;
     /** max # of concurrent build requests */
     private int _maxOutstandingBuilds;
+    private LoadTestManager _loadTestManager;
     
     private static final String PROP_MAX_OUTSTANDING_BUILDS = "router.tunnel.maxConcurrentBuilds";
     private static final int DEFAULT_MAX_OUTSTANDING_BUILDS = 20;
@@ -69,6 +72,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 _maxOutstandingBuilds = DEFAULT_MAX_OUTSTANDING_BUILDS;
             }
         }
+        
+        _loadTestManager = new LoadTestManager(_context);
         
         ctx.statManager().createRateStat("tunnel.testSuccessTime", 
                                          "How long do successful tunnel tests take?", "Tunnels", 
@@ -139,6 +144,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                     return info;
             }
         }
+        info = _inboundExploratory.getTunnel(id);
+        if (info != null) return info;
+        info = _outboundExploratory.getTunnel(id);
+        if (info != null) return info;
         return null;
     }
     
@@ -332,12 +341,19 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return rv.booleanValue();
     }
 
+    void buildComplete(TunnelCreatorConfig cfg) {
+        buildComplete();
+        _loadTestManager.addTunnelTestCandidate(cfg);
+    }
     void buildComplete() {
         synchronized (this) {
             if (_outstandingBuilds > 0)
                 _outstandingBuilds--;
         }
     }
+    
+    
+    private static final String PROP_LOAD_TEST = "router.loadTest";
     
     public void startup() { 
         TunnelBuilder builder = new TunnelBuilder();
@@ -359,6 +375,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         // try to build up longer tunnels
         _context.jobQueue().addJob(new BootstrapPool(_context, _inboundExploratory));
         _context.jobQueue().addJob(new BootstrapPool(_context, _outboundExploratory));
+        
+        if (Boolean.valueOf(_context.getProperty(PROP_LOAD_TEST, "true")).booleanValue()) {
+            _context.jobQueue().addJob(_loadTestManager.getTestJob());
+        }
     }
     
     private class BootstrapPool extends JobImpl {

@@ -226,13 +226,8 @@ public class JobQueue {
         return false;
     }
     
-    private static final String PROP_LOAD_TEST = "router.loadTest";
     public void allowParallelOperation() { 
         _allowParallelOperation = true; 
-        if (Boolean.valueOf(_context.getProperty(PROP_LOAD_TEST, "false")).booleanValue()) {
-            LoadTestManager t = new LoadTestManager(_context);
-            addJob(t.getTestJob());
-        }
     }
     
     public void restart() {

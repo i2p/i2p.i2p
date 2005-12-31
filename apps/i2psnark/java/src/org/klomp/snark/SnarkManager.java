@@ -264,7 +264,8 @@ public class SnarkManager implements Snark.CompleteListener {
      * Grab the torrent given the (canonical) filename
      */
     public Snark getTorrent(String filename) { synchronized (_snarks) { return (Snark)_snarks.get(filename); } }
-    public void addTorrent(String filename) {
+    public void addTorrent(String filename) { addTorrent(filename, false); }
+    public void addTorrent(String filename, boolean dontAutoStart) {
         if (!I2PSnarkUtil.instance().connected()) {
             addMessage("Connecting to I2P");
             boolean ok = I2PSnarkUtil.instance().connect();
@@ -317,7 +318,7 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         // ok, snark created, now lets start it up or configure it further
         File f = new File(filename);
-        if (shouldAutoStart()) {
+        if (!dontAutoStart && shouldAutoStart()) {
             torrent.startTorrent();
             addMessage("Torrent added and started: '" + f.getName() + "'");
         } else {
@@ -458,6 +459,40 @@ public class SnarkManager implements Snark.CompleteListener {
                 stopTorrent(name, true);
             }
         }
+    }
+
+    private static final String DEFAULT_TRACKERS[] = { 
+       "Postman's tracker", "http://YRgrgTLGnbTq2aZOZDJQ~o6Uk5k6TK-OZtx0St9pb0G-5EGYURZioxqYG8AQt~LgyyI~NCj6aYWpPO-150RcEvsfgXLR~CxkkZcVpgt6pns8SRc3Bi-QSAkXpJtloapRGcQfzTtwllokbdC-aMGpeDOjYLd8b5V9Im8wdCHYy7LRFxhEtGb~RL55DA8aYOgEXcTpr6RPPywbV~Qf3q5UK55el6Kex-6VCxreUnPEe4hmTAbqZNR7Fm0hpCiHKGoToRcygafpFqDw5frLXToYiqs9d4liyVB-BcOb0ihORbo0nS3CLmAwZGvdAP8BZ7cIYE3Z9IU9D1G8JCMxWarfKX1pix~6pIA-sp1gKlL1HhYhPMxwyxvuSqx34o3BqU7vdTYwWiLpGM~zU1~j9rHL7x60pVuYaXcFQDR4-QVy26b6Pt6BlAZoFmHhPcAuWfu-SFhjyZYsqzmEmHeYdAwa~HojSbofg0TMUgESRXMw6YThK1KXWeeJVeztGTz25sL8AAAA.i2p/announce.php"
+       , "Orion's tracker", "http://gKik1lMlRmuroXVGTZ~7v4Vez3L3ZSpddrGZBrxVriosCQf7iHu6CIk8t15BKsj~P0JJpxrofeuxtm7SCUAJEr0AIYSYw8XOmp35UfcRPQWyb1LsxUkMT4WqxAT3s1ClIICWlBu5An~q-Mm0VFlrYLIPBWlUFnfPR7jZ9uP5ZMSzTKSMYUWao3ejiykr~mtEmyls6g-ZbgKZawa9II4zjOy-hdxHgP-eXMDseFsrym4Gpxvy~3Fv9TuiSqhpgm~UeTo5YBfxn6~TahKtE~~sdCiSydqmKBhxAQ7uT9lda7xt96SS09OYMsIWxLeQUWhns-C~FjJPp1D~IuTrUpAFcVEGVL-BRMmdWbfOJEcWPZ~CBCQSO~VkuN1ebvIOr9JBerFMZSxZtFl8JwcrjCIBxeKPBmfh~xYh16BJm1BBBmN1fp2DKmZ2jBNkAmnUbjQOqWvUcehrykWk5lZbE7bjJMDFH48v3SXwRuDBiHZmSbsTY6zhGY~GkMQHNGxPMMSIAAAA.i2p/bt"
+//       , "The freak's tracker", "http://mHKva9x24E5Ygfey2llR1KyQHv5f8hhMpDMwJDg1U-hABpJ2NrQJd6azirdfaR0OKt4jDlmP2o4Qx0H598~AteyD~RJU~xcWYdcOE0dmJ2e9Y8-HY51ie0B1yD9FtIV72ZI-V3TzFDcs6nkdX9b81DwrAwwFzx0EfNvK1GLVWl59Ow85muoRTBA1q8SsZImxdyZ-TApTVlMYIQbdI4iQRwU9OmmtefrCe~ZOf4UBS9-KvNIqUL0XeBSqm0OU1jq-D10Ykg6KfqvuPnBYT1BYHFDQJXW5DdPKwcaQE4MtAdSGmj1epDoaEBUa9btQlFsM2l9Cyn1hzxqNWXELmx8dRlomQLlV4b586dRzW~fLlOPIGC13ntPXogvYvHVyEyptXkv890jC7DZNHyxZd5cyrKC36r9huKvhQAmNABT2Y~pOGwVrb~RpPwT0tBuPZ3lHYhBFYmD8y~AOhhNHKMLzea1rfwTvovBMByDdFps54gMN1mX4MbCGT4w70vIopS9yAAAA.i2p/bytemonsoon/announce.php"
+    };
+    
+    /** comma delimited list of name=announceURL for the trackers to be displayed */
+    public static final String PROP_TRACKERS = "i2psnark.trackers";
+    /** unordered map of announceURL to name */
+    public Map getTrackers() { 
+        HashMap rv = new HashMap();
+        String trackers = _config.getProperty(PROP_TRACKERS);
+        if ( (trackers == null) || (trackers.trim().length() <= 0) )
+            trackers = _context.getProperty(PROP_TRACKERS);
+        if ( (trackers == null) || (trackers.trim().length() <= 0) ) {
+            for (int i = 0; i < DEFAULT_TRACKERS.length; i += 2)
+                rv.put(DEFAULT_TRACKERS[i+1], DEFAULT_TRACKERS[i]);
+        } else {
+            StringTokenizer tok = new StringTokenizer(trackers, ",");
+            while (tok.hasMoreTokens()) {
+                String pair = tok.nextToken();
+                int split = pair.indexOf('=');
+                if (split <= 0)
+                    continue;
+                String name = pair.substring(0, split).trim();
+                String url = pair.substring(split+1).trim();
+                if ( (name.length() > 0) && (url.length() > 0) )
+                    rv.put(url, name);
+            }
+        }
+        
+        return rv;
     }
     
     private static class TorrentFilenameFilter implements FilenameFilter {

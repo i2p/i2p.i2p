@@ -34,6 +34,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         _log = ctx.logManager().getLog(InboundMessageDistributor.class);
         _receiver = new GarlicMessageReceiver(ctx, this, client);
         _context.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void distribute(I2NPMessage msg, Hash target) {
@@ -65,6 +66,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             // targetting us either implicitly (no target) or explicitly (no tunnel)
             // make sure we don't honor any remote requests directly (garlic instructions, etc)
             if (msg.getType() == GarlicMessage.MESSAGE_TYPE) {
+                // in case we're looking for replies to a garlic message (cough load tests cough)
+                _context.inNetMessagePool().handleReplies(msg);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("received garlic message in the tunnel, parse it out");
                 _receiver.receive((GarlicMessage)msg);
@@ -149,6 +152,11 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Bad store attempt", iae);
                         }
+                    } else if (data instanceof DataMessage) {
+                        // a data message targetting the local router is how we send load tests (real
+                        // data messages target destinations)
+                        _context.statManager().addRateData("tunnel.handleLoadClove", 1, 0);
+                        _context.inNetMessagePool().add(data, null, null);
                     } else {
                         if ( (_client != null) && (data.getType() != DeliveryStatusMessage.MESSAGE_TYPE) ) {
                             // drop it, since the data we receive shouldn't include other stuff, 

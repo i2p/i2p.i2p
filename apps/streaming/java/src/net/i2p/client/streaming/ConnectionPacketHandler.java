@@ -444,14 +444,20 @@ public class ConnectionPacketHandler {
         }
         public void timeReached() {
             if (_con.getLastSendTime() <= _created) {
-                if (_con.getResetReceived() || _con.getResetSent() || (_con.getUnackedPacketsReceived() <= 0) )
+                if (_con.getResetReceived() || _con.getResetSent()) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Ack dup on " + _con + ", but we have been reset");
                     return;
+                }
                 
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Last sent was a while ago, and we want to ack a dup");
+                    _log.debug("Last sent was a while ago, and we want to ack a dup on " + _con);
                 // we haven't done anything since receiving the dup, send an
                 // ack now
                 _con.ackImmediately();
+            } else {                
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Ack dup on " + _con + ", but we have sent (" + (_con.getLastSendTime()-_created) + ")");
             }
         }
     }

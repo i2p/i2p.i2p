@@ -768,7 +768,7 @@ public class Connection {
         long howLong = _options.getInactivityTimeout();
         howLong += _context.random().nextInt(30*1000); // randomize it a bit, so both sides don't do it at once
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Resetting the inactivity timer to " + howLong, new Exception("Reset by"));
+            _log.debug("Resetting the inactivity timer to " + howLong, new Exception(toString()));
         // this will get rescheduled, and rescheduled, and rescheduled...
         RetransmissionTimer.getInstance().removeEvent(_activityTimer);
         RetransmissionTimer.getInstance().addEvent(_activityTimer, howLong);

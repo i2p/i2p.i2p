@@ -20,7 +20,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             return null;
         }
         
-        if (shouldSelectExplicit(settings)) {
+        if (false && shouldSelectExplicit(settings)) {
             List rv = selectExplicit(ctx, settings, length);
             if (l.shouldLog(Log.DEBUG))
                 l.debug("Explicit peers selected: " + rv);

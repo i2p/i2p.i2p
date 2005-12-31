@@ -178,29 +178,9 @@ public class InNetMessagePool implements Service {
         }
 
         if (allowMatches) {
-            List origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Original messages for inbound message: " + origMessages.size());
-            if (origMessages.size() > 1) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Orig: " + origMessages + " \nthe above are replies for: " + messageBody, 
-                               new Exception("Multiple matches"));
-            }
+            int replies = handleReplies(messageBody);
 
-            for (int i = 0; i < origMessages.size(); i++) {
-                OutNetMessage omsg = (OutNetMessage)origMessages.get(i);
-                ReplyJob job = omsg.getOnReplyJob();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Original message [" + i + "] " + omsg.getReplySelector() 
-                               + " : " + omsg + ": reply job: " + job);
-
-                if (job != null) {
-                    job.setMessage(messageBody);
-                    _context.jobQueue().addJob(job);
-                }
-            }
-
-            if (origMessages.size() <= 0) {
+            if (replies <= 0) {
                 // not handled as a reply
                 if (!jobFound) { 
                     // was not handled via HandlerJobBuilder
@@ -245,6 +225,31 @@ public class InNetMessagePool implements Service {
                                                  messageBody.getMessageExpiration(), 
                                                  fromRouterHash, true);	
         return 0; // no queue
+    }
+    
+    public int handleReplies(I2NPMessage messageBody) {
+        List origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Original messages for inbound message: " + origMessages.size());
+        if (origMessages.size() > 1) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Orig: " + origMessages + " \nthe above are replies for: " + messageBody, 
+                           new Exception("Multiple matches"));
+        }
+
+        for (int i = 0; i < origMessages.size(); i++) {
+            OutNetMessage omsg = (OutNetMessage)origMessages.get(i);
+            ReplyJob job = omsg.getOnReplyJob();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Original message [" + i + "] " + omsg.getReplySelector() 
+                           + " : " + omsg + ": reply job: " + job);
+
+            if (job != null) {
+                job.setMessage(messageBody);
+                _context.jobQueue().addJob(job);
+            }
+        }
+        return origMessages.size();
     }
     
     // the following short circuits the tunnel dispatching - i'm not sure whether
