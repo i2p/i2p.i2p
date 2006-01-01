@@ -233,6 +233,13 @@ public class PeerProfile {
             _log.info("Updating tunnel test time for " + _peer.toBase64().substring(0,6) 
                       + " to " + _tunnelTestResponseTimeAvg + " via " + ms);
     }
+
+    /** bytes per minute */
+    private volatile double _peakThroughput;
+    private volatile long _peakThroughputCurrentTotal;
+    public double getPeakThroughputKBps() { return _peakThroughput / (60d*1024d); }
+    public void setPeakThroughputKBps(double kBps) { _peakThroughput = kBps*60; }
+    void dataPushed(int size) { _peakThroughputCurrentTotal += size; }
     
     /**
      * when the given peer is performing so poorly that we don't want to bother keeping
@@ -301,6 +308,22 @@ public class PeerProfile {
         _expanded = true;
     }
     
+    private long _lastCoalesceDate = System.currentTimeMillis();
+    private void coalesceThroughput() {
+        long now = System.currentTimeMillis();
+        long measuredPeriod = now - _lastCoalesceDate;
+        if (measuredPeriod >= 60*1000) {
+            long tot = _peakThroughputCurrentTotal;
+            double peak = _peakThroughput;
+            if (tot >= peak) 
+                _peakThroughput = tot;
+            _peakThroughputCurrentTotal = 0;
+            if ( (tot > 0) && _log.shouldLog(Log.WARN) )
+                _log.warn("updating throughput after " + tot + " to " + (_peakThroughput/60d) + " for " + _peer.toBase64());
+            _lastCoalesceDate = now;
+        }
+    }
+    
     /** update the stats and rates (this should be called once a minute) */
     public void coalesceStats() {
         if (!_expanded) return;
@@ -315,6 +338,8 @@ public class PeerProfile {
         _tunnelTestResponseTimeSlow.coalesceStats();
         _dbHistory.coalesceStats();
         _tunnelHistory.coalesceStats();
+        
+        coalesceThroughput();
         
         _speedValue = calculateSpeed();
         _oldSpeedValue = calculateOldSpeed();

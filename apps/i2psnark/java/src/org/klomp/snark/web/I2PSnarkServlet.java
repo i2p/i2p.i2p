@@ -240,7 +240,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
                     announceURL = announceURLOther;
 
-                if (baseFile.exists()) {
+                if (baseFile.exists() && baseFile.isFile()) {
                     try {
                         Storage s = new Storage(baseFile, announceURL, null);
                         s.create();
@@ -258,6 +258,8 @@ public class I2PSnarkServlet extends HttpServlet {
                     } catch (IOException ioe) {
                         _manager.addMessage("Error creating a torrent for " + baseFile.getAbsolutePath() + ": " + ioe.getMessage());
                     }
+                } else if (baseFile.exists()) {
+                    _manager.addMessage("I2PSnark doesn't yet support creating multifile torrents");
                 } else {
                     _manager.addMessage("Cannot create a torrent for the nonexistant data: " + baseFile.getAbsolutePath());
                 }

@@ -38,6 +38,7 @@ public class SpeedCalculator extends Calculator {
     }
     
     public double calc(PeerProfile profile) {
+        if (true) return profile.getPeakThroughputKBps()*1024d;
         if (true) return calcAverage(profile);
         long threshold = getEventThreshold();
         boolean tunnelTestOnly = getUseTunnelTestOnly();

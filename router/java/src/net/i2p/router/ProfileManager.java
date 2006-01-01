@@ -60,6 +60,13 @@ public interface ProfileManager {
      *
      */
     void tunnelTestSucceeded(Hash peer, long responseTimeMs);
+
+    /**
+     * Note that we were able to push some data through a tunnel that the peer
+     * is participating in (detected after rtt).
+     *
+     */
+    void tunnelDataPushed(Hash peer, long rtt, int size);
     
     /**
      * Note that the peer participated in a tunnel that failed.  Its failure may not have

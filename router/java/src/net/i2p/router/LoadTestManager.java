@@ -399,7 +399,7 @@ public class LoadTestManager {
                 else
                     buf.append("[unknown_peer]");
                 buf.append(" ");
-                TunnelId id = tunnel.getReceiveTunnelId(i);
+                TunnelId id = info.getReceiveTunnelId(i);
                 if (id != null)
                     buf.append(id.getTunnelId());
                 else
@@ -418,7 +418,7 @@ public class LoadTestManager {
                 else
                     buf.append("[unknown_peer]");
                 buf.append(" ");
-                TunnelId id = tunnel.getReceiveTunnelId(i);
+                TunnelId id = info.getReceiveTunnelId(i);
                 if (id != null)
                     buf.append(id.getTunnelId());
                 else

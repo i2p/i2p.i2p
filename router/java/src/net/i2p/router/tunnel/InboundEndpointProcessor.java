@@ -5,6 +5,7 @@ import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Receive the inbound tunnel message, removing all of the layers
@@ -71,6 +72,19 @@ public class InboundEndpointProcessor {
             decrypt(_context, _config, iv, orig, offset, length);
         
         _cache.release(ba);
+        
+        // now for a little bookkeeping
+        RouterContext ctx = null;
+        if (_context instanceof RouterContext)
+            ctx = (RouterContext)_context;
+        if ( (ctx != null) && (_config != null) && (_config.getLength() > 0) ) {
+            int rtt = 0; // dunno... may not be related to an rtt
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received a " + length + "byte message through tunnel " + _config);
+            for (int i = 0; i < _config.getLength(); i++)
+                ctx.profileManager().tunnelDataPushed(_config.getPeer(i), rtt, length);
+        }
+        
         return true;
     }
     

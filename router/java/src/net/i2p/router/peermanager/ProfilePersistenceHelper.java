@@ -122,6 +122,7 @@ class ProfilePersistenceHelper {
         buf.append("lastHeardFrom=").append(profile.getLastHeardFrom()).append(NL);
         buf.append("# moving average as to how fast the peer replies").append(NL);
         buf.append("tunnelTestTimeAverage=").append(profile.getTunnelTestTimeAverage()).append(NL);
+        buf.append("tunnelPeakThroughput=").append(profile.getPeakThroughputKBps()).append(NL);
         buf.append(NL);
         
         out.write(buf.toString().getBytes());
@@ -207,6 +208,7 @@ class ProfilePersistenceHelper {
             profile.setLastSendFailed(getLong(props, "lastFailedSend"));
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));
             profile.setTunnelTestTimeAverage(getDouble(props, "tunnelTestTimeAverage"));
+            profile.setPeakThroughputKBps(getDouble(props, "tunnelPeakThroughput"));
             
             profile.getTunnelHistory().load(props);
             profile.getDBHistory().load(props);

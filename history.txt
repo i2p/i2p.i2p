@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.375 2005/12/30 18:33:54 jrandom Exp $
+$Id: history.txt,v 1.376 2005/12/31 18:40:23 jrandom Exp $
+
+2006-01-01  jrandom
+    * Disable multifile torrent creation in I2PSnark's web UI for the moment
+      (though it can still seed and participate in multifile swarms)
+    * Enable a new speed calculation for profiling peers, using their peak 
+      1 minute average tunnel throughput as their speed.
 
 2005-12-31  jrandom
     * Include a simple torrent creator in the I2PSnark web UI

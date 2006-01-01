@@ -562,12 +562,20 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             getContext().messageHistory().sendPayloadMessage(dataMsgId, true, sendTime);
             getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, true);
             _lease.setNumSuccess(_lease.getNumSuccess()+1);
+        
+            int size = _clientMessageSize;
             
             getContext().statManager().addRateData("client.sendAckTime", sendTime, 0);
             getContext().statManager().addRateData("client.sendMessageSize", _clientMessageSize, sendTime);
-            if (_outTunnel != null)
-                for (int i = 0; i < _outTunnel.getLength(); i++)
+            if (_outTunnel != null) {
+                if (_outTunnel.getLength() > 0)
+                    size = ((size + 1023) / 1024) * 1024; // messages are in ~1KB blocks
+                
+                for (int i = 0; i < _outTunnel.getLength(); i++) {
                     getContext().profileManager().tunnelTestSucceeded(_outTunnel.getPeer(i), sendTime);
+                    getContext().profileManager().tunnelDataPushed(_outTunnel.getPeer(i), sendTime, size);
+                }
+            }
             if (_inTunnel != null)
                 for (int i = 0; i < _inTunnel.getLength(); i++)
                     getContext().profileManager().tunnelTestSucceeded(_inTunnel.getPeer(i), sendTime);

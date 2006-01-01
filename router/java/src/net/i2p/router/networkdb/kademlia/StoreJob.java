@@ -136,12 +136,12 @@ class StoreJob extends JobImpl {
         List closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
         if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
             if (_state.getPending().size() <= 0) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": No more peers left and none pending");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": No more peers left and none pending");
                 fail();
             } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": No more peers left but some are pending, so keep waiting");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": No more peers left but some are pending, so keep waiting");
                 return;
             }
         } else {
@@ -152,8 +152,8 @@ class StoreJob extends JobImpl {
                 Hash peer = (Hash)iter.next();
                 DataStructure ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds instanceof RouterInfo) ) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
@@ -295,10 +295,6 @@ class StoreJob extends JobImpl {
         
         _state.addPending(peer.getIdentity().getHash());
         
-        SendSuccessJob onReply = new SendSuccessJob(getContext(), peer);
-        FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
-        StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
-        
         TunnelInfo outTunnel = selectOutboundTunnel();
         if (outTunnel != null) {
             //if (_log.shouldLog(Log.DEBUG))
@@ -306,7 +302,11 @@ class StoreJob extends JobImpl {
             //               + peer.getIdentity().getHash().toBase64());
             TunnelId targetTunnelId = null; // not needed
             Job onSend = null; // not wanted
-            
+        
+            SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, msg.getMessageSize());
+            FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
+            StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
+    
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
             getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
@@ -333,10 +333,20 @@ class StoreJob extends JobImpl {
      */
     private class SendSuccessJob extends JobImpl implements ReplyJob {
         private RouterInfo _peer;
+        private TunnelInfo _sendThrough;
+        private int _msgSize;
         
         public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer) {
+            this(enclosingContext, peer, null, 0);
+        }
+        public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer, TunnelInfo sendThrough, int size) {
             super(enclosingContext);
             _peer = peer;
+            _sendThrough = sendThrough;
+            if (size <= 0)
+                _msgSize = 0;
+            else
+                _msgSize = ((size + 1023) / 1024) * 1024;
         }
 
         public String getName() { return "Kademlia Store Send Success"; }
@@ -348,6 +358,13 @@ class StoreJob extends JobImpl {
             getContext().profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
             getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
+            if ( (_sendThrough != null) && (_msgSize > 0) ) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("sent a " + _msgSize + "byte netDb message through tunnel " + _sendThrough + " after " + howLong);
+                for (int i = 0; i < _sendThrough.getLength(); i++)
+                    getContext().profileManager().tunnelDataPushed(_sendThrough.getPeer(i), howLong, _msgSize);
+            }
+            
             if (_state.getCompleteCount() >= getRedundancy()) {
                 succeed();
             } else {
@@ -375,8 +392,8 @@ class StoreJob extends JobImpl {
             _sendOn = sendOn;
         }
         public void runJob() {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(StoreJob.this.getJobId() + ": Peer " + _peer.getIdentity().getHash().toBase64() 
+            if (_log.shouldLog(Log.INFO))
+                _log.info(StoreJob.this.getJobId() + ": Peer " + _peer.getIdentity().getHash().toBase64() 
                           + " timed out sending " + _state.getTarget());
             _state.replyTimeout(_peer.getIdentity().getHash());
             getContext().profileManager().dbStoreFailed(_peer.getIdentity().getHash());
@@ -406,8 +423,8 @@ class StoreJob extends JobImpl {
      * Send totally failed
      */
     protected void fail() {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(getJobId() + ": Failed sending key " + _state.getTarget());
+        if (_log.shouldLog(Log.INFO))
+            _log.info(getJobId() + ": Failed sending key " + _state.getTarget());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": State of failed send: " + _state, new Exception("Who failed me?"));
         if (_onFailure != null)
