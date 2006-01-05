@@ -5,6 +5,7 @@ import java.util.*;
 import net.i2p.util.*;
 import net.i2p.data.*;
 import net.i2p.data.i2np.*;
+import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.*;
 import net.i2p.router.tunnel.*;
 import net.i2p.router.tunnel.pool.*;
@@ -80,8 +81,8 @@ public class LoadTestManager {
         }
     }
     
-    /** 10 peers at a time */
-    private static final int CONCURRENT_PEERS = 0;
+    /** 1 peer at a time */
+    private static final int CONCURRENT_PEERS = 1;
     /** 4 messages per peer at a time */
     private static final int CONCURRENT_MESSAGES = 4;
     
@@ -360,6 +361,11 @@ public class LoadTestManager {
                 _context.statManager().addRateData("test.rtt", period, count);
                 if (period > 2000)
                     _context.statManager().addRateData("test.rttHigh", period, count);
+                TunnelInfo info = _cfg.getOutbound();
+                if (info != null) 
+                    info.incrementVerifiedBytesTransferred(5*1024);
+                // the inbound tunnel is incremented by the tunnel management system itself,
+                // so don't double count it here
                 return true;
             }
             return false;
@@ -390,7 +396,7 @@ public class LoadTestManager {
         } else {
             int hop = 0;
             TunnelInfo info = tunnel.getOutbound();
-            for (int i = 0; (info != null) && (i < info.getLength()-1); i++) {
+            for (int i = 0; (info != null) && (i < info.getLength()); i++) {
                 Hash peer = info.getPeer(i);
                 if ( (peer != null) && (peer.equals(_context.routerHash())) )
                     continue;
@@ -409,7 +415,7 @@ public class LoadTestManager {
                 hop++;
             }
             info = tunnel.getInbound();
-            for (int i = 0; (info != null) && (i < info.getLength()-1); i++) {
+            for (int i = 0; (info != null) && (i < info.getLength()); i++) {
                 Hash peer = info.getPeer(i);
                 if ( (peer != null) && (peer.equals(_context.routerHash())) )
                     continue;
@@ -585,19 +591,35 @@ public class LoadTestManager {
     private boolean wantToTest(LoadTestTunnelConfig cfg) {
         // wait 10 minutes before testing anything
         if (_context.router().getUptime() <= 10*60*1000) return false;
+        if (bandwidthOverloaded()) return false;
         
         if (TEST_LIVE_TUNNELS && _active.size() < getConcurrency()) {
             // length == #hops+1 (as it includes the creator)
             if (cfg.getLength() < 2)
                 return false;
             // only load test the client tunnels
-            if (cfg.getTunnel().getDestination() == null)
-                return false;
+            // XXX why?
+            ////if (cfg.getTunnel().getDestination() == null)
+            ////    return false;
             _active.add(cfg);
             return true;
         } else {
             return false;
         }
+    }
+    
+    private boolean bandwidthOverloaded() {
+        int msgLoadBps = CONCURRENT_MESSAGES
+                         * 5 // message size
+                         / 10; // 10 seconds before timeout & retransmission
+        msgLoadBps *= 2; // buffer
+        if (_context.bandwidthLimiter().getSendBps()/1024d + (double)msgLoadBps >= _context.bandwidthLimiter().getOutboundKBytesPerSecond())
+            return true;
+        if (_context.bandwidthLimiter().getReceiveBps()/1024d + (double)msgLoadBps >= _context.bandwidthLimiter().getInboundKBytesPerSecond())
+            return true;
+        if (_context.throttle().getMessageDelay() > 1000)
+            return true;
+        return false;
     }
     
     private class CreatedJob extends JobImpl {
@@ -619,6 +641,9 @@ public class LoadTestManager {
             runTest(_cfg);
         }
     }
+    private long TEST_PERIOD_MAX = 10*60*1000;
+    private long TEST_PERIOD_MIN = 90*1000;
+    
     private class Expire extends JobImpl {
         private LoadTestTunnelConfig _cfg;
         private boolean _removeFromDispatcher;
@@ -629,13 +654,22 @@ public class LoadTestManager {
             super(ctx);
             _cfg = cfg;
             _removeFromDispatcher = removeFromDispatcher;
-            getTiming().setStartAfter(cfg.getExpiration()+60*1000);
+            long duration = ctx.random().nextLong(TEST_PERIOD_MAX);
+            if (duration < TEST_PERIOD_MIN)
+                duration += TEST_PERIOD_MIN;
+            long expiration = duration + ctx.clock().now();
+            if (expiration > cfg.getExpiration()+60*1000)
+                expiration = cfg.getExpiration()+60*1000;
+            getTiming().setStartAfter(expiration);
         }
         public String getName() { return "expire test tunnel"; } 
         public void runJob() { 
             if (_removeFromDispatcher)
                 getContext().tunnelDispatcher().remove(_cfg.getTunnel());
             _cfg.logComplete();
+            TunnelInfo info = _cfg.getOutbound();
+            if (info != null) 
+                info.incrementVerifiedBytesTransferred(0); // just to wrap up the test data
             _active.remove(_cfg);
         } 
     }

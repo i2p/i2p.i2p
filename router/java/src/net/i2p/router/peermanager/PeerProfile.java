@@ -234,12 +234,94 @@ public class PeerProfile {
                       + " to " + _tunnelTestResponseTimeAvg + " via " + ms);
     }
 
-    /** bytes per minute */
-    private volatile double _peakThroughput;
+    /** keep track of the fastest 3 throughputs */
+    private static final int THROUGHPUT_COUNT = 3;
+    /** 
+     * fastest 1 minute throughput, in bytes per minute, ordered with fastest
+     * first.  this is not synchronized, as we don't *need* perfection, and we only
+     * reorder/insert values on coallesce
+     */
+    private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
     private volatile long _peakThroughputCurrentTotal;
-    public double getPeakThroughputKBps() { return _peakThroughput / (60d*1024d); }
-    public void setPeakThroughputKBps(double kBps) { _peakThroughput = kBps*60; }
+    public double getPeakThroughputKBps() { 
+        double rv = 0;
+        for (int i = 0; i < THROUGHPUT_COUNT; i++)
+            rv += _peakThroughput[i];
+        rv /= (60d*1024d*(double)THROUGHPUT_COUNT);
+        return rv;
+    }
+    public void setPeakThroughputKBps(double kBps) {
+        _peakThroughput[0] = kBps*60*1024;
+        //for (int i = 0; i < THROUGHPUT_COUNT; i++)
+        //    _peakThroughput[i] = kBps*60;
+    }
     void dataPushed(int size) { _peakThroughputCurrentTotal += size; }
+    
+    private final double _peakTunnelThroughput[] = new double[THROUGHPUT_COUNT];
+    /** the tunnel pushed that much data in its lifetime */
+    void tunnelDataTransferred(long tunnelByteLifetime) {
+        double lowPeak = _peakTunnelThroughput[THROUGHPUT_COUNT-1];
+        if (tunnelByteLifetime > lowPeak) {
+            synchronized (_peakTunnelThroughput) {
+                for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+                    if (tunnelByteLifetime > _peakTunnelThroughput[i]) {
+                        for (int j = THROUGHPUT_COUNT-1; j > i; j--)
+                           _peakTunnelThroughput[j] = _peakTunnelThroughput[j-1];
+                        _peakTunnelThroughput[i] = tunnelByteLifetime;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    public double getPeakTunnelThroughputKBps() { 
+        double rv = 0;
+        for (int i = 0; i < THROUGHPUT_COUNT; i++)
+            rv += _peakTunnelThroughput[i];
+        rv /= (10d*60d*1024d*(double)THROUGHPUT_COUNT);
+        return rv;
+    }
+    public void setPeakTunnelThroughputKBps(double kBps) {
+        _peakTunnelThroughput[0] = kBps*60d*10d*1024d;
+    }
+    
+    /** total number of bytes pushed through a single tunnel in a 1 minute period */
+    private final double _peakTunnel1mThroughput[] = new double[THROUGHPUT_COUNT];
+    /** the tunnel pushed that much data in a 1 minute period */
+    void dataPushed1m(int size) {
+        double lowPeak = _peakTunnel1mThroughput[THROUGHPUT_COUNT-1];
+        if (size > lowPeak) {
+            synchronized (_peakTunnel1mThroughput) {
+                for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+                    if (size > _peakTunnel1mThroughput[i]) {
+                        for (int j = THROUGHPUT_COUNT-1; j > i; j--)
+                           _peakTunnel1mThroughput[j] = _peakTunnel1mThroughput[j-1];
+                        _peakTunnel1mThroughput[i] = size;
+                        break;
+                    }
+                }
+            }
+            
+            if (_log.shouldLog(Log.WARN) ) {
+                StringBuffer buf = new StringBuffer(128);
+                buf.append("Updating 1m throughput after ").append(size).append(" to ");
+                for (int i = 0; i < THROUGHPUT_COUNT; i++)
+                    buf.append(_peakTunnel1mThroughput[i]).append(',');
+                buf.append(" for ").append(_peer.toBase64());
+                _log.warn(buf.toString());
+            }
+        }
+    }
+    public double getPeakTunnel1mThroughputKBps() { 
+        double rv = 0;
+        for (int i = 0; i < THROUGHPUT_COUNT; i++)
+            rv += _peakTunnel1mThroughput[i];
+        rv /= (60d*1024d*(double)THROUGHPUT_COUNT);
+        return rv;
+    }
+    public void setPeakTunnel1mThroughputKBps(double kBps) {
+        _peakTunnel1mThroughput[0] = kBps*60*1024;
+    }
     
     /**
      * when the given peer is performing so poorly that we don't want to bother keeping
@@ -307,19 +389,67 @@ public class PeerProfile {
         _dbIntroduction.setStatLog(_context.statManager().getStatLog());
         _expanded = true;
     }
-    
+    /** once a day, on average, cut the measured throughtput values in half */
+    private static final long DROP_PERIOD_MINUTES = 24*60;
     private long _lastCoalesceDate = System.currentTimeMillis();
     private void coalesceThroughput() {
         long now = System.currentTimeMillis();
         long measuredPeriod = now - _lastCoalesceDate;
         if (measuredPeriod >= 60*1000) {
             long tot = _peakThroughputCurrentTotal;
-            double peak = _peakThroughput;
-            if (tot >= peak) 
-                _peakThroughput = tot;
+            double lowPeak = _peakThroughput[THROUGHPUT_COUNT-1];
+            if (tot > lowPeak) {
+                for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+                    if (tot > _peakThroughput[i]) {
+                        for (int j = THROUGHPUT_COUNT-1; j > i; j--)
+                            _peakThroughput[j] = _peakThroughput[j-1];
+                        _peakThroughput[i] = tot;
+                        break;
+                    }
+                }
+                
+                if (false && _log.shouldLog(Log.WARN) ) {
+                    StringBuffer buf = new StringBuffer(128);
+                    buf.append("Updating throughput after ").append(tot).append(" to ");
+                    for (int i = 0; i < THROUGHPUT_COUNT; i++)
+                        buf.append(_peakThroughput[i]).append(',');
+                    buf.append(" for ").append(_peer.toBase64());
+                    _log.warn(buf.toString());
+                }
+            } else {
+                if (_context.random().nextLong(DROP_PERIOD_MINUTES*2) <= 0) {
+                    for (int i = 0; i < THROUGHPUT_COUNT; i++) 
+                        _peakThroughput[i] /= 2;
+
+                    if (false && _log.shouldLog(Log.WARN) ) {
+                        StringBuffer buf = new StringBuffer(128);
+                        buf.append("Degrading the throughput measurements to ");
+                        for (int i = 0; i < THROUGHPUT_COUNT; i++)
+                            buf.append(_peakThroughput[i]).append(',');
+                        buf.append(" for ").append(_peer.toBase64());
+                        _log.warn(buf.toString());
+                    }
+                }
+            }
+            
+            // we degrade the tunnel throughput here too, regardless of the current
+            // activity
+            if (_context.random().nextLong(DROP_PERIOD_MINUTES*2) <= 0) {
+                for (int i = 0; i < THROUGHPUT_COUNT; i++) {
+                    _peakTunnelThroughput[i] /= 2;
+                    _peakTunnel1mThroughput[i] /= 2;
+                }
+
+                if (_log.shouldLog(Log.WARN) ) {
+                    StringBuffer buf = new StringBuffer(128);
+                    buf.append("Degrading the tunnel throughput measurements to ");
+                    for (int i = 0; i < THROUGHPUT_COUNT; i++)
+                        buf.append(_peakTunnel1mThroughput[i]).append(',');
+                    buf.append(" for ").append(_peer.toBase64());
+                    _log.warn(buf.toString());
+                }
+            }
             _peakThroughputCurrentTotal = 0;
-            if ( (tot > 0) && _log.shouldLog(Log.WARN) )
-                _log.warn("updating throughput after " + tot + " to " + (_peakThroughput/60d) + " for " + _peer.toBase64());
             _lastCoalesceDate = now;
         }
     }

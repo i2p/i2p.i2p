@@ -69,6 +69,18 @@ public interface ProfileManager {
     void tunnelDataPushed(Hash peer, long rtt, int size);
     
     /**
+     * Note that the peer is participating in a tunnel that pushed the given amount of data
+     * over the last minute.
+     */
+    void tunnelDataPushed1m(Hash peer, int size);
+    
+    /**
+     * Note that we were able to push the given amount of data through a tunnel
+     * that the peer is participating in
+     */
+    void tunnelLifetimePushed(Hash peer, long lifetime, long size);
+    
+    /**
      * Note that the peer participated in a tunnel that failed.  Its failure may not have
      * been the peer's fault however.
      *

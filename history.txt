@@ -1,4 +1,28 @@
-$Id: history.txt,v 1.376 2005/12/31 18:40:23 jrandom Exp $
+$Id: history.txt,v 1.377 2006/01/01 12:23:29 jrandom Exp $
+
+2006-01-04  jrandom
+    * Rather than profile individual tunnels for throughput over their
+      lifetime, do so at 1 minute intervals (allowing less frequently active
+      tunnels to be more fairly measured).
+    * Run the live tunnel load test across two tunnels at a time, by default.
+      The load test runs for a random period from 90s to the tunnel lifetime,
+      self paced.  This should help gathering data for profiling peers that
+      are in exploratory tunnels.
+
+2006-01-03  jrandom
+    * Calculate the overall peer throughput across the 3 fastest one minute
+      tunnel throughput values, rather than the single fastest throughput.
+    * Degrade the profiled throughput data over time (cutting the profiled
+      peaks in half once a day, on average)
+    * Enable yet another new speed calculation for profiling peers, using the
+      peak throughput from individual tunnels that a peer is participating in,
+      rather than across all tunnels they are participating in.  This helps
+      gather a fairer peer throughput measurement, since it won't allow a slow
+      high capacity peer seem to have a higher throughput (pushing a little
+      data across many tunnels at once, as opposed to lots of data across a
+      single tunnel).  This degrades over time like the other.
+    * Add basic OS/2 support to the jbigi code (though we do not bundle a
+      precompiled OS/2 library)
 
 2006-01-01  jrandom
     * Disable multifile torrent creation in I2PSnark's web UI for the moment

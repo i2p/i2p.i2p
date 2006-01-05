@@ -363,6 +363,7 @@ class StoreJob extends JobImpl {
                     _log.warn("sent a " + _msgSize + "byte netDb message through tunnel " + _sendThrough + " after " + howLong);
                 for (int i = 0; i < _sendThrough.getLength(); i++)
                     getContext().profileManager().tunnelDataPushed(_sendThrough.getPeer(i), howLong, _msgSize);
+                _sendThrough.incrementVerifiedBytesTransferred(_msgSize);
             }
             
             if (_state.getCompleteCount() >= getRedundancy()) {

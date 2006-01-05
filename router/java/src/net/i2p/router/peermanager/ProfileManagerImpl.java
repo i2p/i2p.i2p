@@ -124,6 +124,23 @@ public class ProfileManagerImpl implements ProfileManager {
         if (data != null)
             data.dataPushed(size); // ignore rtt, as we are averaging over a minute
     }
+    public void tunnelDataPushed1m(Hash peer, int size) {
+        if (_context.routerHash().equals(peer))
+            return;
+        PeerProfile data = getProfile(peer);
+        if (data != null)
+            data.dataPushed1m(size);
+    }
+
+    
+    public void tunnelLifetimePushed(Hash peer, long lifetime, long size) {
+        if (_context.routerHash().equals(peer))
+            return;
+        PeerProfile data = getProfile(peer);
+        if (data != null)
+            data.tunnelDataTransferred(size);
+    }
+    
     
     private int getSlowThreshold() {
         // perhaps we should have this compare vs. tunnel.testSuccessTime?

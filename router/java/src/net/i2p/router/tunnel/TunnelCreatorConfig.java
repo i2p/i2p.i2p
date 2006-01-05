@@ -9,6 +9,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.RouterContext;
 
 /**
  * Coordinate the info that the tunnel creator keeps track of, including what 
@@ -16,6 +17,7 @@ import net.i2p.router.TunnelInfo;
  *
  */
 public class TunnelCreatorConfig implements TunnelInfo {
+    protected RouterContext _context;
     /** only necessary for client tunnels */
     private Hash _destination;
     /** gateway first */
@@ -25,11 +27,13 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private long _expiration;
     private boolean _isInbound;
     private long _messagesProcessed;
+    private volatile long _verifiedBytesTransferred;
     
-    public TunnelCreatorConfig(int length, boolean isInbound) {
-        this(length, isInbound, null);
+    public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
+        this(ctx, length, isInbound, null);
     }
-    public TunnelCreatorConfig(int length, boolean isInbound, Hash destination) {
+    public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
+        _context = ctx;
         if (length <= 0)
             throw new IllegalArgumentException("0 length?  0 hop tunnels are 1 length!");
         _config = new HopConfig[length];
@@ -40,6 +44,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
         _isInbound = isInbound;
         _destination = destination;
         _messagesProcessed = 0;
+        _verifiedBytesTransferred = 0;
     }
     
     /** how many hops are there in the tunnel? */
@@ -83,6 +88,45 @@ public class TunnelCreatorConfig implements TunnelInfo {
     /** take note of a message being pumped through this tunnel */
     public void incrementProcessedMessages() { _messagesProcessed++; }
     public long getProcessedMessagesCount() { return _messagesProcessed; }
+
+    public void incrementVerifiedBytesTransferred(int bytes) { 
+        _verifiedBytesTransferred += bytes; 
+        _peakThroughputCurrentTotal += bytes;
+        long now = System.currentTimeMillis();
+        long timeSince = now - _peakThroughputLastCoallesce;
+        if (timeSince >= 60*1000) {
+            long tot = _peakThroughputCurrentTotal;
+            double normalized = (double)tot * 60d*1000d / (double)timeSince;
+            _peakThroughputLastCoallesce = now;
+            _peakThroughputCurrentTotal = 0;
+            for (int i = 0; i < _peers.length; i++)
+                _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
+        }
+    }
+    public long getVerifiedBytesTransferred() { return _verifiedBytesTransferred; }
+
+    private static final int THROUGHPUT_COUNT = 3;
+    /** 
+     * fastest 1 minute throughput, in bytes per minute, ordered with fastest
+     * first.
+     */
+    private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
+    private volatile long _peakThroughputCurrentTotal;
+    private volatile long _peakThroughputLastCoallesce = System.currentTimeMillis();
+    public double getPeakThroughputKBps() { 
+        double rv = 0;
+        for (int i = 0; i < THROUGHPUT_COUNT; i++)
+            rv += _peakThroughput[i];
+        rv /= (60d*1024d*(double)THROUGHPUT_COUNT);
+        return rv;
+    }
+    public void setPeakThroughputKBps(double kBps) {
+        _peakThroughput[0] = kBps*60*1024;
+        //for (int i = 0; i < THROUGHPUT_COUNT; i++)
+        //    _peakThroughput[i] = kBps*60;
+    }
+    
+    
     
     public String toString() {
         // H0:1235-->H1:2345-->H2:2345

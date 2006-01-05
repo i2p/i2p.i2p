@@ -124,7 +124,7 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
         buf.append("<i>Definitions:<ul>");
-        buf.append("<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained</li>");
+        buf.append("<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>");
         buf.append("<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>");
         buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
         buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");

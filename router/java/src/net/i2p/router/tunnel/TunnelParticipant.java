@@ -84,6 +84,8 @@ public class TunnelParticipant {
                               + " for " + msg);
                 _config.incrementProcessedMessages();
                 send(_config, msg, ri);
+                if (_config != null)
+                    incrementThroughput(_config.getReceiveFrom());
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Lookup the nextHop (" + _config.getSendTo().toBase64().substring(0,4) 
@@ -95,6 +97,30 @@ public class TunnelParticipant {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive fragment: on " + _config + ": " + msg);
             _handler.receiveTunnelMessage(msg.getData(), 0, msg.getData().length);
+        }
+    }
+    
+    private int _periodMessagesTransferred;
+    private long _lastCoallesced = System.currentTimeMillis();
+    /** 
+     * take note that the peers specified were able to push us data.  hmm, is this safe?
+     * this could be easily gamed to get us to rank some peer of their choosing as quite
+     * fast.  That peer would have to actually be quite fast, but having a remote peer
+     * influence who we spend our time profiling is dangerous, so this will be disabled for
+     * now.
+     */
+    private void incrementThroughput(Hash prev) {
+        if (true) return;
+        long now = System.currentTimeMillis();
+        long timeSince = now - _lastCoallesced;
+        if (timeSince >= 60*1000) {
+            int amount = 1024 * _periodMessagesTransferred;
+            int normalized = (int)((double)amount * 60d*1000d / (double)timeSince);
+            _periodMessagesTransferred = 0;
+            _lastCoallesced = now;
+            _context.profileManager().tunnelDataPushed1m(prev, normalized);
+        } else {
+            _periodMessagesTransferred++;
         }
     }
     

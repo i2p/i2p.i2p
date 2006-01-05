@@ -83,6 +83,7 @@ public class InboundEndpointProcessor {
                 _log.debug("Received a " + length + "byte message through tunnel " + _config);
             for (int i = 0; i < _config.getLength(); i++)
                 ctx.profileManager().tunnelDataPushed(_config.getPeer(i), rtt, length);
+            _config.incrementVerifiedBytesTransferred(length);
         }
         
         return true;

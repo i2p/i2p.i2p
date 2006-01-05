@@ -38,8 +38,14 @@ public class SpeedCalculator extends Calculator {
     }
     
     public double calc(PeerProfile profile) {
-        if (true) return profile.getPeakThroughputKBps()*1024d;
-        if (true) return calcAverage(profile);
+        if (true) // measures 1 minute throughput of individual tunnels
+            return profile.getPeakTunnel1mThroughputKBps()*1024d; 
+        if (true) // measures throughput of individual tunnels
+            return profile.getPeakTunnelThroughputKBps()*1024d; 
+        if (true) // measures throughput across all tunnels
+            return profile.getPeakThroughputKBps()*1024d; 
+        if (true) 
+            return calcAverage(profile);
         long threshold = getEventThreshold();
         boolean tunnelTestOnly = getUseTunnelTestOnly();
         

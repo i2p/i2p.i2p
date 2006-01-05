@@ -10,7 +10,6 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
  *
  */
 public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
-    private RouterContext _context;
     private TunnelPool _pool;
     private boolean _failed;
     private TestJob _testJob;
@@ -23,8 +22,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         this(ctx, length, isInbound, null);
     }
     public PooledTunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
-        super(length, isInbound, destination);
-        _context = ctx;
+        super(ctx, length, isInbound, destination);
         _failed = false;
         _pool = null;
     }

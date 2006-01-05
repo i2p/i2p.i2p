@@ -575,6 +575,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     getContext().profileManager().tunnelTestSucceeded(_outTunnel.getPeer(i), sendTime);
                     getContext().profileManager().tunnelDataPushed(_outTunnel.getPeer(i), sendTime, size);
                 }
+                _outTunnel.incrementVerifiedBytesTransferred(size);
             }
             if (_inTunnel != null)
                 for (int i = 0; i < _inTunnel.getLength(); i++)

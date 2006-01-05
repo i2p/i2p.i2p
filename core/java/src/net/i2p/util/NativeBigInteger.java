@@ -105,13 +105,14 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
+    private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().indexOf("linux") != -1;
     private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().indexOf("freebsd") != -1;
-    private static final boolean _isNix = !(_isWin || _isMac);
+    private static final boolean _isNix = !(_isWin || _isMac || _isOS2);
     /* libjbigi.so vs jbigi.dll */
-    private static final String _libPrefix = (_isWin ? "" : "lib");
-    private static final String _libSuffix = (_isWin ? ".dll" : _isMac ? ".jnilib" : ".so");
+    private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
+    private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
 
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
@@ -254,7 +255,8 @@ public class NativeBigInteger extends BigInteger {
      */
     public static void main(String args[]) {
         runModPowTest(100);
-        runDoubleValueTest(100);
+        // i2p doesn't care about the double values
+        //runDoubleValueTest(100);
     }
 
     /* the sample numbers are elG generator/prime so we can test with reasonable numbers */
@@ -440,8 +442,10 @@ public class NativeBigInteger extends BigInteger {
         if (_doLog && !_nativeOk)
             System.err.println("INFO: Native BigInteger library jbigi not loaded - using pure java");
         }catch(Exception e){
-            if (_doLog)
+            if (_doLog) {
                 System.err.println("INFO: Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
+                e.printStackTrace();
+            }
         }
     }
     
@@ -489,7 +493,8 @@ public class NativeBigInteger extends BigInteger {
     }
     private static final boolean loadFromResource(String resourceName) {
         if (resourceName == null) return false;
-        URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
+        //URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
+        URL resource = ClassLoader.getSystemResource(resourceName);
         if (resource == null) {
             if (_doLog)
                 System.err.println("NOTICE: Resource name [" + resourceName + "] was not found");
@@ -561,6 +566,8 @@ public class NativeBigInteger extends BigInteger {
             return "jbigi-freebsd"+sAppend; // The convention on freebsd...
         if(_isMac)
             return "jbigi-osx"+sAppend;
+        if(_isOS2)
+            return "jbigi-os2"+sAppend;
         throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
     }
 }

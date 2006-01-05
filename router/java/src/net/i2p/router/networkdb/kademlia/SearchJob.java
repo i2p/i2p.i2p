@@ -376,7 +376,8 @@ class SearchJob extends JobImpl {
                        + msg.getReplyTunnel() + "]");
 
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
-        SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
+        SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, 
+                                                                        this, outTunnel, inTunnel);
         
         getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), timeout);
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, router.getIdentity().getHash());

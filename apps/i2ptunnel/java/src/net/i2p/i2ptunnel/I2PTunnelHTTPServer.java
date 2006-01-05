@@ -295,7 +295,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             buf.setLength(0);
             ok = DataHelper.readLine(in, buf);
             if (!ok) throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
-            if ( (buf.length() <= 1) && ( (buf.charAt(0) == '\n') || (buf.charAt(0) == '\r') ) ) {
+            if ( (buf.length() == 0) || 
+                 ((buf.charAt(0) == '\n') || (buf.charAt(0) == '\r')) ) {
                 // end of headers reached
                 return headers;
             } else {

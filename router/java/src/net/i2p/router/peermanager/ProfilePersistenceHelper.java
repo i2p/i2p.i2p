@@ -123,6 +123,8 @@ class ProfilePersistenceHelper {
         buf.append("# moving average as to how fast the peer replies").append(NL);
         buf.append("tunnelTestTimeAverage=").append(profile.getTunnelTestTimeAverage()).append(NL);
         buf.append("tunnelPeakThroughput=").append(profile.getPeakThroughputKBps()).append(NL);
+        buf.append("tunnelPeakTunnelThroughput=").append(profile.getPeakTunnelThroughputKBps()).append(NL);
+        buf.append("tunnelPeakTunnel1mThroughput=").append(profile.getPeakTunnel1mThroughputKBps()).append(NL);
         buf.append(NL);
         
         out.write(buf.toString().getBytes());
@@ -209,6 +211,8 @@ class ProfilePersistenceHelper {
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));
             profile.setTunnelTestTimeAverage(getDouble(props, "tunnelTestTimeAverage"));
             profile.setPeakThroughputKBps(getDouble(props, "tunnelPeakThroughput"));
+            profile.setPeakTunnelThroughputKBps(getDouble(props, "tunnelPeakTunnelThroughput"));
+            profile.setPeakTunnel1mThroughputKBps(getDouble(props, "tunnelPeakTunnel1mThroughput"));
             
             profile.getTunnelHistory().load(props);
             profile.getDBHistory().load(props);

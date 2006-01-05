@@ -339,6 +339,11 @@ public class TunnelPool {
         
         _lifetimeProcessed += info.getProcessedMessagesCount();
         
+        long lifetimeConfirmed = info.getVerifiedBytesTransferred();
+        long lifetime = 10*60*1000;
+        for (int i = 0; i < info.getLength(); i++)
+            _context.profileManager().tunnelLifetimePushed(info.getPeer(i), lifetime, lifetimeConfirmed);
+        
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
