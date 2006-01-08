@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.377 2006/01/01 12:23:29 jrandom Exp $
+$Id: history.txt,v 1.378 2006/01/04 21:48:17 jrandom Exp $
+
+2006-01-08  jrandom
+    * First pass of the new blog interface, though without much of the useful
+      customization features (coming soon)
 
 2006-01-04  jrandom
     * Rather than profile individual tunnels for throughput over their

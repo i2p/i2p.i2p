@@ -16,40 +16,42 @@ import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
 
 /**
- * Render the requested profile
+ * Display our blog config, and let us edit it through several screens
  *
  */
-public class ProfileServlet extends BaseServlet {
+public class BlogConfigServlet extends BaseServlet {
+    private static final String ATTR_CONFIG_BEAN = "__blogConfigBean";
+    public static final String PARAM_CONFIG_SCREEN = "screen";
+    public static final String SCREEN_GENERAL = "general";
+    public static final String SCREEN_REFERENCES = "references";
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
-        Hash author = null;
-        String str = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
-        if (str != null) {
-            try {
-                author = new Hash();
-                author.fromBase64(str);
-            } catch (DataFormatException dfe) {
-                author = null;
-            }
-        } else {
-            author = user.getBlog();
+        if ( (user == null) || (!user.getAuthenticated() && !BlogManager.instance().isSingleUser())) {
+            out.write("You must be logged in to edit your profile");
+            return;
+        }
+        BlogConfigBean bean = (BlogConfigBean)req.getSession().getAttribute(ATTR_CONFIG_BEAN);
+        if (bean == null) {
+            bean = new BlogConfigBean();
+            bean.setUser(user);
         }
         
-        String uri = req.getRequestURI();
+        // handle actions here...
+        // on done handling
         
-        if (author == null) {
-            renderInvalidProfile(out);
-        } else if ( (user.getBlog() != null) && (user.getBlog().equals(author)) ) {
-            renderMyProfile(user, uri, out, archive);
+        String screen = req.getParameter(PARAM_CONFIG_SCREEN);
+        if (screen == null)
+            screen = SCREEN_GENERAL;
+        out.write("todo: Display screen " + screen);
+        /*
+        if (SCREEN_REFERENCES.equals(screen)) {
+            displayReferencesScreen(req, out, bean);
         } else {
-            renderProfile(user, uri, out, author, archive);
+            displayGeneralScreen(req, out, bean);
         }
+         */
     }   
-    
-    private void renderInvalidProfile(PrintWriter out) throws IOException {
-        out.write(INVALID_PROFILE);
-    }
-    
+    /*
     private void renderMyProfile(User user, String baseURI, PrintWriter out, Archive archive) throws IOException {
         BlogInfo info = archive.getBlogInfo(user.getBlog());
         if (info == null)
@@ -59,7 +61,7 @@ public class ProfileServlet extends BaseServlet {
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">\n");
         writeAuthActionFields(out);
         // now add the form to update
-        out.write("<tr><td colspan=\"3\">Your profile (<a href=\"configblog.jsp\">configure your blog</a>)</td></tr>\n");
+        out.write("<tr><td colspan=\"3\">Your profile</td></tr>\n");
         out.write("<tr><td colspan=\"3\">Name: <input type=\"text\" name=\"" 
                   + ThreadedHTMLRenderer.PARAM_PROFILE_NAME + "\" value=\"" 
                   + HTMLRenderer.sanitizeTagParam(info.getProperty(BlogInfo.NAME)) + "\"></td></tr>\n");
@@ -223,8 +225,7 @@ public class ProfileServlet extends BaseServlet {
             }
         }
     }
+     */
 
-    protected String getTitle() { return "Syndie :: View profile"; }
-    
-    private static final String INVALID_PROFILE = "<tr><td colspan=\"3\">The profile requested is invalid</td></tr>\n";
+    protected String getTitle() { return "Syndie :: Configure blog"; }
 }

@@ -70,6 +70,16 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.BlogConfigServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.BlogConfigServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
+     <servlet-name>net.i2p.syndie.web.ViewBlogServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ViewBlogServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
@@ -134,6 +144,14 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ViewBlogsServlet</servlet-name>
       <url-pattern>/blogs.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.BlogConfigServlet</servlet-name>
+      <url-pattern>/configblog.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ViewBlogServlet</servlet-name>
+      <url-pattern>/blog.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>

@@ -596,9 +596,11 @@ public class ArchiveViewerBean {
     }
     
     public static void renderAttachment(Map parameters, OutputStream out) throws IOException {
-        Attachment a = getAttachment(parameters);
+        renderAttachment(getAttachment(parameters), out);
+    }
+    public static void renderAttachment(Attachment a, OutputStream out) throws IOException {
         if (a == null) {
-            renderInvalidAttachment(parameters, out);
+            renderInvalidAttachment(out);
         } else {
             InputStream data = a.getDataStream();
             byte buf[] = new byte[1024];
@@ -610,17 +612,21 @@ public class ArchiveViewerBean {
     }
     
     public static final String getAttachmentContentType(Map parameters) {
-        Attachment a = getAttachment(parameters);
-        if (a == null) 
+        return getAttachmentContentType(getAttachment(parameters));
+    }
+    public static final String getAttachmentContentType(Attachment attachment) {
+        if (attachment == null) 
             return "text/html";
-        String mime = a.getMimeType();
+        String mime = attachment.getMimeType();
         if ( (mime != null) && ((mime.startsWith("image/") || mime.startsWith("text/plain"))) )
             return mime;
         return "application/octet-stream";
     }
     
     public static final boolean getAttachmentShouldShowInline(Map parameters) {
-        Attachment a = getAttachment(parameters);
+        return getAttachmentShouldShowInline(getAttachment(parameters));
+    }
+    public static final boolean getAttachmentShouldShowInline(Attachment a) {
         if (a == null) 
             return true;
         String mime = a.getMimeType();
@@ -631,7 +637,9 @@ public class ArchiveViewerBean {
     }
     
     public static final int getAttachmentContentLength(Map parameters) {
-        Attachment a = getAttachment(parameters);
+        return getAttachmentContentLength(getAttachment(parameters));
+    }
+    public static final int getAttachmentContentLength(Attachment a) {
         if (a != null)
             return a.getDataLength();
         else
@@ -639,7 +647,9 @@ public class ArchiveViewerBean {
     }
     
     public static final String getAttachmentFilename(Map parameters) {
-        Attachment a = getAttachment(parameters);
+        return getAttachmentFilename(getAttachment(parameters));
+    }
+    public static final String getAttachmentFilename(Attachment a) {
         if (a != null)
             return a.getName();
         else
@@ -667,7 +677,7 @@ public class ArchiveViewerBean {
         return null;
     }
     
-    private static void renderInvalidAttachment(Map parameters, OutputStream out) throws IOException {
+    private static void renderInvalidAttachment(OutputStream out) throws IOException {
         out.write(DataHelper.getUTF8("<span class=\"b_msgErr\">No such entry, or no such attachment</span>"));
     }
     

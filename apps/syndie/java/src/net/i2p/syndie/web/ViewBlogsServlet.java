@@ -29,8 +29,9 @@ public class ViewBlogsServlet extends BaseServlet {
         if ( (lastPost > 0) && (dayBegin - 3*24*60*60*1000l >= lastPost) ) // last post was old 3 days ago
             daysAgo = (int)((dayBegin - lastPost + 24*60*60*1000l-1)/(24*60*60*1000l));
         daysAgo++;
-        return getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' + blog.toBase64()
-               + '&' + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&daysBack=" + daysAgo;
+        return "blog.jsp?" + ViewBlogServlet.PARAM_BLOG + "=" + blog.toBase64();
+        //return getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' + blog.toBase64()
+        //       + '&' + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&daysBack=" + daysAgo;
     }
     
     private String getPostDate(long when) {

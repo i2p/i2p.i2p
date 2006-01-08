@@ -57,6 +57,7 @@ public class BlogInfo {
     public static final String DESCRIPTION = "Description";
     public static final String CONTACT_URL = "ContactURL";
     public static final String EDITION = "Edition";
+    public static final String SUMMARY_ENTRY_ID = "SummaryEntryId";
     
     public void load(InputStream in) throws IOException {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());

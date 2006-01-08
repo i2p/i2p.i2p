@@ -1017,10 +1017,10 @@ public class HTMLRenderer extends EventReceiverImpl {
                _entry.getURI().getEntryId();
     }
 
-    protected String getAttachmentURLBase() { return "viewattachment.jsp"; }
+    protected String getAttachmentURLBase() { return "viewattachment.jsp?"; }
     protected String getAttachmentURL(int id) {
         if (_entry == null) return "unknown";
-        return getAttachmentURLBase() + "?" + 
+        return getAttachmentURLBase() +
                ArchiveViewerBean.PARAM_BLOG + "=" +
                Base64.encode(_entry.getURI().getKeyHash().getData()) +
                "&" + ArchiveViewerBean.PARAM_ENTRY + "=" + _entry.getURI().getEntryId() +

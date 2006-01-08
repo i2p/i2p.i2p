@@ -59,7 +59,10 @@ public class EntryContainer {
     public EntryContainer(BlogURI uri, String tags[], byte smlData[]) {
         this();
         _entryURI = uri;
-        _entryData = new Entry(DataHelper.getUTF8(smlData));
+        if ( (smlData == null) || (smlData.length <= 0) )
+            _entryData = new Entry(null);
+        else
+            _entryData = new Entry(DataHelper.getUTF8(smlData));
         setHeader(HEADER_BLOGKEY, Base64.encode(uri.getKeyHash().getData()));
         StringBuffer buf = new StringBuffer();
         for (int i = 0; tags != null && i < tags.length; i++)
@@ -203,10 +206,13 @@ public class EntryContainer {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream out = new ZipOutputStream(baos);
         ZipEntry ze = new ZipEntry(ZIP_ENTRY);
-        byte data[] = DataHelper.getUTF8(_entryData.getText());
+        byte data[] = null;
+        if (_entryData.getText() != null)
+            data = DataHelper.getUTF8(_entryData.getText());
         ze.setTime(0);
         out.putNextEntry(ze);
-        out.write(data);
+        if (data != null)
+            out.write(data);
         out.closeEntry();
         for (int i = 0; (_attachments != null) && (i < _attachments.length); i++) {
             ze = new ZipEntry(ZIP_ATTACHMENT_PREFIX + i + ZIP_ATTACHMENT_SUFFIX);
@@ -269,6 +275,9 @@ public class EntryContainer {
             
             //System.out.println("Read entry [" + name + "] with size=" + entryData.length);
         }
+        
+        if (_entryData == null)
+            _entryData = new Entry(null);
         
         _attachments = new Attachment[attachments.size()];
         

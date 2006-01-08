@@ -8,7 +8,7 @@ import net.i2p.util.Log;
  *
  */
 public class EventReceiverImpl implements SMLParser.EventReceiver {
-    private I2PAppContext _context;
+    protected I2PAppContext _context;
     private Log _log;
     
     public EventReceiverImpl(I2PAppContext ctx) {
