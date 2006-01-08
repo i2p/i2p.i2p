@@ -133,9 +133,8 @@ public class ProfileServlet extends BaseServlet {
         if (info != null)
             out.write(" [edition " + info.getEdition() + "]");
         out.write("<br />\n");
-        out.write("<a href=\"" + getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR 
-                  + '=' + author.toBase64() + "&" + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&\""
-                  + " title=\"View '" + HTMLRenderer.sanitizeTagParam(name) + "'s blog\">View their blog</a> or ");
+        out.write("<a href=\"blog.jsp" + "?" + ViewBlogServlet.PARAM_BLOG + '=' + author.toBase64()
+                  + "\" title=\"View '" + HTMLRenderer.sanitizeTagParam(name) + "'s blog\">View their blog</a> or ");
         out.write("<a href=\"" + getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR
                   + '=' + author.toBase64() + "&\">threads they have participated in</a>\n");
         out.write("</td></tr>\n");

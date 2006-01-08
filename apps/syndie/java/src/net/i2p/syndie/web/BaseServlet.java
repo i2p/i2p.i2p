@@ -24,7 +24,7 @@ import net.i2p.util.Log;
 public abstract class BaseServlet extends HttpServlet {
     protected static final String PARAM_AUTH_ACTION = "syndie.auth";
     private static long _authNonce;
-    private I2PAppContext _context;
+    protected I2PAppContext _context;
     protected Log _log;
     
     public void init() throws ServletException { 
@@ -546,7 +546,7 @@ public abstract class BaseServlet extends HttpServlet {
         }
         
         renderBegin(user, req, out, index);
-        renderNavBar(user, req, out, index);
+        renderNavBar(user, req, out);
         renderControlBar(user, req, out, index);
         renderServletDetails(user, req, out, index, threadOffset, visibleEntry, archive);
         renderEnd(user, req, out, index);
@@ -577,6 +577,34 @@ public abstract class BaseServlet extends HttpServlet {
         out.write("</style>");
         out.write(BEGIN_HTML);
     }
+    
+    protected void renderNavBar(User user, HttpServletRequest req, PrintWriter out) throws IOException {
+        out.write("<div class=\"syndieBlogTopNav\">\n");
+        out.write("<span class=\"syndieBlogTopNavUser\">\n");
+        out.write("<!-- nav bar begin -->\n");
+        out.write("<a href=\"threads.jsp\" title=\"Syndie home\">Threads</a> <a href=\"blogs.jsp\" title=\"Blog summary\">Blogs</a> ");
+        if (user.getAuthenticated() && (user.getBlog() != null) ) {
+            out.write("Logged in as <a href=\"" + getProfileLink(req, user.getBlog()) + "\" title=\"Edit your profile\">");
+            out.write(user.getUsername());
+            out.write("</a>\n");
+            out.write("(<a href=\"switchuser.jsp\" title=\"Log in as another user\">switch</a>)\n");
+            out.write("<a href=\"" + getPostURI() + "\" title=\"Post a new thread\">Post</a>\n");
+            out.write("<a href=\"addresses.jsp\" title=\"View your addressbook\">Addressbook</a>\n");
+        } else {
+            out.write("<a href=\"switchuser.jsp\">Log in</a>\n");
+        }
+        out.write("</span><span class=\"syndieBlogTopNavAdmin\">\n");
+        out.write("<a href=\"about.html\" title=\"Basic Syndie info\">About</a> ");
+        if (BlogManager.instance().authorizeRemote(user)) {
+            out.write("<a href=\"" + getSyndicateLink(user, null) + "\" title=\"Syndicate data between other Syndie nodes\">Syndicate</a>\n");
+            out.write("<a href=\"importfeed.jsp\" title=\"Import RSS/Atom data\">Import RSS/Atom</a>\n");
+            out.write("<a href=\"admin.jsp\" title=\"Configure this Syndie node\">Admin</a>\n");
+        }
+        out.write("</span><!-- nav bar end -->\n</div>\n");
+    }
+    
+    /*
+    
     protected void renderNavBar(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
         //out.write("<tr class=\"topNav\"><td class=\"topNav_user\" colspan=\"2\" nowrap=\"true\">\n");
         out.write("<tr class=\"topNav\"><td colspan=\"3\" nowrap=\"true\"><span class=\"topNav_user\">\n");
@@ -606,6 +634,7 @@ public abstract class BaseServlet extends HttpServlet {
         }
         out.write("</span><!-- nav bar end -->\n</td></tr>\n");
     }
+     */
     
     protected String getSyndicateLink(User user, String location) { 
         if (location != null)
@@ -1152,6 +1181,22 @@ public abstract class BaseServlet extends HttpServlet {
 "}\n" +
 ".postReplyOptions {\n" +
 "	background-color: #BBBBFF;\n" +
+"}\n" +
+".syndieBlogTopNav {\n" +
+"                   width: 100%;\n" +
+"                   height: 20px;\n" +
+"                   background-color: #BBBBBB;\n" +
+"                   font-size: 100%;\n" +
+"}\n" +
+".syndieBlogTopNavUser {\n" +
+"                   text-align: left;\n" +
+"                   float: left;\n" +
+"                   display: inline;\n" +
+"}\n" +
+".syndieBlogTopNavAdmin {\n" +
+"                   text-align: left;\n" +
+"                   float: right;\n" +
+"                   display: inline;\n" +
 "}\n" +
 ".syndieBlogFavorites {\n" +
 "                   float: left;\n" +
