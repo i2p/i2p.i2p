@@ -4,7 +4,7 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 	background-color : #EEEEEE;
 	color: #000000;
-	font-size: 12px;
+	//font-size: 12px;
 }
 .b_topnavUser {
 	text-align: right;
@@ -45,7 +45,7 @@ body {
         margin: 0px;
 }
 .s_detail_subject {
-	font-size: 10px;
+	font-size: 80%;
 	text-align: left;
 	background-color: #BBBBFF;
 	border-spacing: 0px;
@@ -74,7 +74,7 @@ body {
        text-decoration: underline;
 }
 .s_detail_meta {
-	font-size: 10px;
+	font-size: 80%;
 	text-align: right;
 	background-color: #BBBBFF;
 	border-spacing: 0px;
@@ -86,7 +86,7 @@ body {
 }
 
 .s_summary_subject {
-	font-size: 10px;
+	font-size: 80%;
 	text-align: left;
 	background-color: #BBBBFF;
 	border-spacing: 0px;
@@ -97,7 +97,7 @@ body {
 	border-style: none;
 }
 .s_summary_meta {
-	font-size: 10px;
+	font-size: 80%;
 	text-align: right;
 	background-color: #BBBBFF;
 	border-spacing: 0px;
@@ -127,7 +127,7 @@ body {
 }
 
 .s_summary_summDetail {
-	font-size: 10px;
+	font-size: 80%;
 }
 .s_detail_summDetail {
 }
@@ -139,6 +139,6 @@ td.s_detail_summDetail {
 	background-color: #DDDDFF;
 }
 td.s_summary_summ {
-	font-size: 10px;
+	font-size: 80%;
 	background-color: #DDDDFF;
 }
