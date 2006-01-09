@@ -33,6 +33,8 @@ public class BlogConfigBean {
         _styleOverrides = new Properties();
     }
     
+    public boolean isUpdated() { return _updated; }
+    
     public User getUser() { return _user; }
     public void setUser(User user) { 
         _user = user;
@@ -74,6 +76,8 @@ public class BlogConfigBean {
                 PetName pn = (PetName)grp.get(0);
                 if ( (pn.getGroupCount() == 0) && ( (name == null) || (name.length() <= 0) ) )
                     return grp;
+                if (pn.getGroupCount() == 0)
+                    continue;
                 String curGroup = pn.getGroup(0);
                 if (curGroup.equals(name))
                     return grp;
@@ -94,6 +98,7 @@ public class BlogConfigBean {
         } else {
             group.add(pn);
         }
+        _updated = true;
     }
     public void remove(PetName pn) {
         String groupName = null;
@@ -105,6 +110,7 @@ public class BlogConfigBean {
             if (group.size() <= 0)
                 _groups.remove(group);
         }
+        _updated = true;
     }
     public void remove(String name) {
         for (int i = 0; i < getGroupCount(); i++) {
@@ -115,6 +121,7 @@ public class BlogConfigBean {
                     group.remove(j);
                     if (group.size() <= 0)
                         _groups.remove(group);
+                    _updated = true;
                     return;
                 }
             }
@@ -140,7 +147,7 @@ public class BlogConfigBean {
         _logo = logo; 
         _updated = true; 
     }
-    public boolean hasPendingChanges() { return _updated; }
+    public boolean hasPendingChanges() { return _loaded && _updated; }
     
     private void load() {
         Archive archive = BlogManager.instance().getArchive();
@@ -175,7 +182,9 @@ public class BlogConfigBean {
                                 add(pn);
                             }
                         }
-                        _styleOverrides.putAll(data.getStyleOverrides());
+                        Properties overrides = data.getStyleOverrides();
+                        if (overrides != null)
+                            _styleOverrides.putAll(overrides);
                     } catch (IOException ioe) {
                         _log.warn("Unable to load the blog info data from " + uri, ioe);
                     }
@@ -183,9 +192,10 @@ public class BlogConfigBean {
             }
         }
         _loaded = true;
+        _updated = false;
     }
     
-    public boolean publishChanges() throws IOException {
+    public boolean publishChanges() {
         FileInputStream logo = null;
         try {
             if (_logo != null)
@@ -229,6 +239,7 @@ public class BlogConfigBean {
                     if (updated) {
                         // ok great, published locally, though should we push it to others?
                         _log.info("Blog summary updated for " + _user + " in " + uri.toString());
+                        setUser(_user);
                         return true;
                     }
                 } else {
@@ -239,6 +250,8 @@ public class BlogConfigBean {
                 _log.error("Error creating the summary entry");
                 return false;
             }
+        } catch (IOException ioe) {
+            _log.error("Error publishing", ioe);
         } finally {
             if (logo != null) try { logo.close(); } catch (IOException ioe) {}
             // the other streams are in-memory, drop with the scope

@@ -79,6 +79,20 @@ public class ViewBlogServlet extends BaseServlet {
     private List getPosts(User user, Archive archive, BlogInfo info, HttpServletRequest req, ThreadIndex index) {
         List rv = new ArrayList(1);
         if (info == null) return rv;
+    
+        String entrySelected = req.getParameter(PARAM_ENTRY);
+        if (entrySelected != null) {
+            // $blogKey/$entryId
+            BlogURI uri = null;
+            if (entrySelected.startsWith("blog://"))
+                uri = new BlogURI(entrySelected);
+            else
+                uri = new BlogURI("blog://" + entrySelected.trim());
+            if (uri.getEntryId() >= 0) {
+                rv.add(uri);
+                return rv;
+            }
+        }
         
         ArchiveIndex aindex = archive.getIndex();
         
@@ -188,7 +202,7 @@ public class ViewBlogServlet extends BaseServlet {
         out.write("</div>\n");
     }
     
-    private static final String DEFAULT_GROUP_NAME = "References";
+    public static final String DEFAULT_GROUP_NAME = "References";
     private void renderReferences(PrintWriter out, BlogInfo info, BlogInfoData data) throws IOException {
         out.write("<div class=\"syndieBlogLinks\">\n");
         if (data != null) {
@@ -207,23 +221,118 @@ public class ViewBlogServlet extends BaseServlet {
                 out.write("<ul>\n");
                 for (int j = 0; j < group.size(); j++) {
                     pn = (PetName)group.get(j);
-                    out.write("<li>" + renderLink(pn) + "</li>\n");
+                    out.write("<li>" + renderLink(info.getKey().calculateHash(), pn) + "</li>\n");
                 }
                 out.write("</ul>\n</div>\n<!-- end " + name + " -->\n");
             }
         }
-        out.write("<div class=\"syndieBlogLinkGroup\">\n");
-        out.write("<span class=\"syndieBlogLinkGroupName\">Custom links</span>\n");
-        out.write("<ul><li><a href=\"\">are not yet implemented</a></li><li><a href=\"\">but are coming soon</a></li></ul>\n");
-        out.write("</div><!-- end fake group -->");
+        //out.write("<div class=\"syndieBlogLinkGroup\">\n");
+        //out.write("<span class=\"syndieBlogLinkGroupName\">Custom links</span>\n");
+        //out.write("<ul><li><a href=\"\">are not yet implemented</a></li><li><a href=\"\">but are coming soon</a></li></ul>\n");
+        //out.write("</div><!-- end fake group -->");
         out.write("<div class=\"syndieBlogMeta\">");
         out.write("Secured by <a href=\"http://syndie.i2p.net/\">Syndie</a>");
         out.write("</div>\n");
         out.write("</div><!-- end syndieBlogLinks -->\n\n");
     }
     
-    private String renderLink(PetName pn) {
-        return "<a href=\"\" title=\"go somewhere\">" + HTMLRenderer.sanitizeString(pn.getName()) + "</a>";
+    /** generate a link for the given petname within the scope of the given blog */
+    public static String renderLink(Hash blogFrom, PetName pn) {
+        StringBuffer buf = new StringBuffer(64);
+        String type = pn.getProtocol();
+        if ("syndieblog".equals(type)) {
+            String loc = pn.getLocation();
+            if (loc != null) {
+                buf.append("<a href=\"blog.jsp?").append(PARAM_BLOG).append("=");
+                buf.append(HTMLRenderer.sanitizeTagParam(pn.getLocation()));
+                buf.append("\" title=\"View ").append(HTMLRenderer.sanitizeTagParam(pn.getName())).append("\">");
+            }
+            buf.append(HTMLRenderer.sanitizeString(pn.getName()));
+            if (loc != null) {
+                buf.append("</a>");
+                //buf.append(" <a href=\"").append(HTMLRenderer.getBookmarkURL(pn.getName(), pn.getLocation(), "syndie", "syndieblog"));
+                //buf.append("\" title=\"Bookmark ").append(HTMLRenderer.sanitizeTagParam(pn.getName())).append("\"><image src=\"images/addToFavorites.png\" alt=\"\" /></a>\n");
+            }
+        } else if ("syndieblogpost".equals(type)) {
+            String loc = pn.getLocation();
+            if (loc != null) {
+                buf.append("<a href=\"blog.jsp?").append(PARAM_BLOG).append("=");
+                buf.append(blogFrom.toBase64()).append("&amp;");
+                buf.append(PARAM_ENTRY).append("=").append(HTMLRenderer.sanitizeTagParam(pn.getLocation()));
+                buf.append("\" title=\"View the specified post\">");
+            }
+            buf.append(HTMLRenderer.sanitizeString(pn.getName()));
+            if (loc != null) {
+                buf.append("</a>");
+            }
+        } else if ("syndieblogattachment".equals(type)) {
+            String loc = pn.getLocation();
+            if (loc != null) {
+                int split = loc.lastIndexOf('/');
+                try {
+                    int attachmentId = -1;
+                    if (split > 0)
+                        attachmentId = Integer.parseInt(loc.substring(split+1));
+                    
+                    if (attachmentId < 0) {
+                        loc = null;
+                    } else {
+                        BlogURI post = null;
+                        if (loc.startsWith("blog://"))
+                            post = new BlogURI(loc.substring(0, split));
+                        else
+                            post = new BlogURI("blog://" + loc.substring(0, split));
+
+                        EntryContainer entry = BlogManager.instance().getArchive().getEntry(post);
+                        if (entry != null) {
+                            Attachment attachments[] = entry.getAttachments();
+                            if (attachmentId < attachments.length) {
+                                buf.append("<a href=\"blog.jsp?").append(PARAM_BLOG).append("=");
+                                buf.append(blogFrom.toBase64()).append("&amp;");
+                                buf.append(PARAM_ATTACHMENT).append("=").append(HTMLRenderer.sanitizeTagParam(loc));
+                                buf.append("\" title=\"");
+                                buf.append("'");
+                                buf.append(HTMLRenderer.sanitizeTagParam(attachments[attachmentId].getName()));
+                                buf.append("', ");
+                                buf.append(attachments[attachmentId].getDataLength()/1024).append("KB, ");
+                                buf.append("of type ").append(HTMLRenderer.sanitizeTagParam(attachments[attachmentId].getMimeType()));
+                                buf.append("\">");
+                                buf.append(HTMLRenderer.sanitizeString(pn.getName()));
+                                buf.append("</a>");
+                            } else {
+                                loc = null;
+                            }
+                        } else {
+                            loc = null;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    loc = null;
+                }
+            }
+            if (loc == null)
+                buf.append(HTMLRenderer.sanitizeString(pn.getName()));
+        } else if ( ("eepsite".equals(type)) || ("i2p".equals(type)) ||
+                   ("website".equals(type)) || ("http".equals(type)) || ("web".equals(type)) ) {
+            String loc = pn.getLocation();
+            if (loc != null) {
+                buf.append("<a href=\"externallink.jsp?");
+                if (pn.getNetwork() != null)
+                    buf.append("schema=").append(Base64.encode(pn.getNetwork())).append("&amp;");
+                if (pn.getLocation() != null)
+                    buf.append("location=").append(Base64.encode(pn.getLocation())).append("&amp;");
+                buf.append("\" title=\"View ").append(HTMLRenderer.sanitizeTagParam(pn.getLocation())).append("\">");
+            }
+            buf.append(HTMLRenderer.sanitizeString(pn.getName()));
+            if (loc != null) {
+                buf.append("</a>");
+            }
+        } else {
+            buf.append("<a href=\"\" title=\"go somewhere? ").append(HTMLRenderer.sanitizeString(pn.toString())).append("\">");
+            buf.append(HTMLRenderer.sanitizeString(pn.getName())).append("</a>");
+        }
+        return buf.toString();
     }
 
     private static final int POSTS_PER_PAGE = 5;
@@ -410,7 +519,7 @@ public class ViewBlogServlet extends BaseServlet {
 "}\n" +
 ".syndieBlogLinkGroup li a {\n" +
 "	display: block;\n" +
-"	width: 100%;\n" +
+//"	width: 100%;\n" +
 "}\n" +
 ".syndieBlogLinkGroupName {\n" +
 "	font-size: 80%;\n" +

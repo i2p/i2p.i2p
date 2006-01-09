@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.378 2006/01/04 21:48:17 jrandom Exp $
+$Id: history.txt,v 1.379 2006/01/08 15:54:39 jrandom Exp $
+
+2005-01-09  jrandom
+    * Bugfix for a rare SSU error (thanks cervantes!)
+    * More progress on the blog interface, allowing customizable blog-wide
+      links.
 
 2006-01-08  jrandom
     * First pass of the new blog interface, though without much of the useful

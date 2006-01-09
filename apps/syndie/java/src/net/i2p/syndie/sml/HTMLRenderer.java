@@ -1102,7 +1102,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                + "&" + SyndicateServlet.PARAM_SCHEMA + "=" + sanitizeTagParam(archiveLocation.getSchema()) 
                + "&" + SyndicateServlet.PARAM_LOCATION + "=" + sanitizeTagParam(archiveLocation.getLocation());
     }
-    public String getBookmarkURL(String name, String location, String schema, String protocol) {
+    public static String getBookmarkURL(String name, String location, String schema, String protocol) {
         return "addresses.jsp?" + AddressesServlet.PARAM_NAME + '=' + sanitizeTagParam(name)
                + "&" + AddressesServlet.PARAM_NET + '=' + sanitizeTagParam(schema)
                + "&" + AddressesServlet.PARAM_PROTO + '=' + sanitizeTagParam(protocol)

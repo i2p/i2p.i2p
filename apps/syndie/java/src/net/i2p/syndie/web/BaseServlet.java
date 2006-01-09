@@ -23,7 +23,7 @@ import net.i2p.util.Log;
  */
 public abstract class BaseServlet extends HttpServlet {
     protected static final String PARAM_AUTH_ACTION = "syndie.auth";
-    private static long _authNonce;
+    protected static long _authNonce;
     protected I2PAppContext _context;
     protected Log _log;
     
@@ -141,6 +141,7 @@ public abstract class BaseServlet extends HttpServlet {
             forceNewIndex = handleBookmarking(user, req) || forceNewIndex;
             forceNewIndex = handleManageTags(user, req) || forceNewIndex;
             handleUpdateProfile(user, req);
+            req.setAttribute(BaseServlet.class.getName() + ".auth", "true");
         }
         
         // the 'dataImported' flag is set by successful fetches in the SyndicateServlet/RemoteArchiveBean
@@ -175,6 +176,10 @@ public abstract class BaseServlet extends HttpServlet {
     }
     protected void render(User user, HttpServletRequest req, HttpServletResponse resp, ThreadIndex index) throws IOException, ServletException {
         render(user, req, resp.getWriter(), index);
+    }
+    protected boolean isAuthed(HttpServletRequest req) {
+        String auth = (String)req.getAttribute(BaseServlet.class.getName() + ".auth");
+        return (auth != null) && (Boolean.valueOf(auth).booleanValue());
     }
     
     private boolean handleBookmarking(User user, HttpServletRequest req) {

@@ -104,6 +104,7 @@ public class ProfileServlet extends BaseServlet {
         
         out.write("<tr><td colspan=\"3\"><input type=\"submit\" name=\"action\" value=\"Update profile\" /></td></tr>\n");
         out.write("</form>\n");
+        out.write("<tr><td colspan=\"3\"><a href=\"configblog.jsp\">Configure your blog</a></td></tr>\n");
     }
     
     private void renderProfile(User user, String baseURI, PrintWriter out, Hash author, Archive archive) throws IOException {

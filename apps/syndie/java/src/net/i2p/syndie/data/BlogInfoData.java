@@ -102,6 +102,7 @@ public class BlogInfoData {
                         prevGroup = pn.getGroup(0);
                     }
                 }
+                line.setLength(0);
                 if (!ok)
                     break;
             }

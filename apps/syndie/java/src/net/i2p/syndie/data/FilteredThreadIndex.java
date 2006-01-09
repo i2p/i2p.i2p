@@ -61,6 +61,8 @@ public class FilteredThreadIndex extends ThreadIndex {
     }
     
     private boolean isIgnored(ThreadNode node, List ignoredAuthors, Collection requestedTags, Collection filteredAuthors, boolean filterAuthorsByRoot) {
+        if (node.getTags().contains(BlogInfoData.TAG))
+            return true; // its a fake post, containing some updated metadata for the blog
         if (filteredAuthors.size() <= 0) {
             boolean allAuthorsIgnored = true;
             for (Iterator iter = node.getRecursiveAuthorIterator(); iter.hasNext(); ) {

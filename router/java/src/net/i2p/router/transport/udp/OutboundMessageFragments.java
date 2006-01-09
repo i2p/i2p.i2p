@@ -473,6 +473,7 @@ public class OutboundMessageFragments {
             
             // ok, simplest possible thing is to always tack on the bitfields if
             List msgIds = peer.getCurrentFullACKs();
+            if (msgIds == null) msgIds = new ArrayList();
             List partialACKBitfields = new ArrayList();
             peer.fetchPartialACKs(partialACKBitfields);
             int piggybackedPartialACK = partialACKBitfields.size();
@@ -482,6 +483,10 @@ public class OutboundMessageFragments {
             for (int i = 0; i < fragments; i++) {
                 if (state.needsSending(i)) {
                     rv[i] = _builder.buildPacket(state, i, peer, remaining, partialACKBitfields);
+                    if (rv[i] == null) {
+                        sparseCount++;
+                        continue;
+                    }
                     rv[i].setFragmentCount(fragments);
                     OutNetMessage msg = state.getMessage();
                     if (msg != null)
