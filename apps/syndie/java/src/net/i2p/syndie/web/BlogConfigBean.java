@@ -140,10 +140,13 @@ public class BlogConfigBean {
     }
     public File getLogo() { return _logo; }
     public void setLogo(File logo) { 
-        if ( (logo != null) && (logo.length() > 128*1024) ) {
-            _log.error("Refusing a logo more than 128KB");
+        if ( (logo != null) && (logo.length() > BlogInfoData.MAX_LOGO_SIZE) ) {
+            _log.error("Refusing a logo of size " + logo.length());
+            logo.delete();
             return;
         }
+        if (_logo != null)
+            _logo.delete();
         _logo = logo; 
         _updated = true; 
     }
@@ -198,8 +201,10 @@ public class BlogConfigBean {
     public boolean publishChanges() {
         FileInputStream logo = null;
         try {
-            if (_logo != null)
+            if (_logo != null) {
                 logo = new FileInputStream(_logo);
+                _log.debug("Logo file is: " + _logo.length() + "bytes @ " + _logo.getAbsolutePath());
+            }
             InputStream styleStream = createStyleStream();
             InputStream groupStream = createGroupStream();
             
@@ -240,6 +245,7 @@ public class BlogConfigBean {
                         // ok great, published locally, though should we push it to others?
                         _log.info("Blog summary updated for " + _user + " in " + uri.toString());
                         setUser(_user);
+                        _log.debug("Updated? " + _updated);
                         return true;
                     }
                 } else {
@@ -255,6 +261,7 @@ public class BlogConfigBean {
         } finally {
             if (logo != null) try { logo.close(); } catch (IOException ioe) {}
             // the other streams are in-memory, drop with the scope
+            if (_logo != null) _logo.delete();
         }
         return false;
     }
@@ -279,5 +286,9 @@ public class BlogConfigBean {
             }
         }
         return new ByteArrayInputStream(DataHelper.getUTF8(buf));
+    }
+    
+    protected void finalize() {
+        if (_logo != null) _logo.delete();
     }
 }

@@ -1026,7 +1026,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                "&" + ArchiveViewerBean.PARAM_ENTRY + "=" + _entry.getURI().getEntryId() +
                "&" + ArchiveViewerBean.PARAM_ATTACHMENT + "=" + id;
     }
-
+    
     public String getMetadataURL() { 
         if (_entry == null) return "unknown";
         return getMetadataURL(_entry.getURI().getKeyHash()); 

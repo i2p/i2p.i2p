@@ -5,8 +5,7 @@ import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetName;
 import net.i2p.syndie.*;
-import net.i2p.syndie.data.BlogURI;
-import net.i2p.syndie.data.EntryContainer;
+import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.HTMLPreviewRenderer;
 import net.i2p.syndie.sml.HTMLRenderer;
 import net.i2p.util.Log;
@@ -112,7 +111,19 @@ public class PostBean {
             if ( (pn != null) && ("syndiearchive".equals(pn.getProtocol())) ) {
                 RemoteArchiveBean r = new RemoteArchiveBean();
                 Map params = new HashMap();
-                params.put("localentry", new String[] { uri.toString() });
+                
+                String entries[] = null;
+                BlogInfo info = BlogManager.instance().getArchive().getBlogInfo(uri);
+                if (info != null) {
+                    String str = info.getProperty(BlogInfo.SUMMARY_ENTRY_ID);
+                    if (str != null) {
+                        entries = new String[] { uri.toString(), str };
+                    }
+                }
+                if (entries == null)
+                    entries = new String[] { uri.toString() };
+                
+                params.put("localentry", entries);
                 String proxyHost = BlogManager.instance().getDefaultProxyHost();
                 String port = BlogManager.instance().getDefaultProxyPort();
                 int proxyPort = 4444;

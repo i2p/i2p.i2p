@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.379 2006/01/08 15:54:39 jrandom Exp $
+$Id: history.txt,v 1.380 2006/01/09 01:33:29 jrandom Exp $
+
+2005-01-09  jrandom
+    * Removed a longstanding bug that had caused unnecessary router identity
+      churn due to clock skew
+    * Temporarily sanity check within the streaming lib for long pending
+      writes
+    * Added support for a blog-wide logo to Syndie, and automated the pushing
+      of updated extended blog info data along side the metadata.
 
 2005-01-09  jrandom
     * Bugfix for a rare SSU error (thanks cervantes!)

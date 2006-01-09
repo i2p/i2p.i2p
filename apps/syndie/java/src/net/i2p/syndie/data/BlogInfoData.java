@@ -25,6 +25,8 @@ public class BlogInfoData {
     /** identifies a post as being a blog info data, not a content bearing post */
     public static final String TAG = "BlogInfoData";
 
+    public static final int MAX_LOGO_SIZE = 128*1024;
+    
     public BlogInfoData() {}
     
     public BlogURI getEntryId() { return _dataEntryId; }

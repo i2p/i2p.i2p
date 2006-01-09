@@ -24,21 +24,28 @@ public class BlogConfigServlet extends BaseServlet {
     public static final String PARAM_CONFIG_SCREEN = "screen";
     public static final String SCREEN_REFERENCES = "references";
     public static final String SCREEN_IMAGES = "images";
-    protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
-                                        int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
-        if ( (user == null) || (!user.getAuthenticated() && !BlogManager.instance().isSingleUser())) {
-            out.write("You must be logged in to edit your profile");
-            return;
-        }
+    
+    public static BlogConfigBean getConfigBean(HttpServletRequest req, User user) {
         BlogConfigBean bean = (BlogConfigBean)req.getSession().getAttribute(ATTR_CONFIG_BEAN);
         if (bean == null) {
             bean = new BlogConfigBean();
             bean.setUser(user);
             req.getSession().setAttribute(ATTR_CONFIG_BEAN, bean);
         }
+        return bean;
+    }
+    public static BlogConfigBean getConfigBean(HttpServletRequest req) {
+        return (BlogConfigBean)req.getSession().getAttribute(ATTR_CONFIG_BEAN);
+    }
+    
+    protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
+                                        int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
+        if ( (user == null) || (!user.getAuthenticated() && !BlogManager.instance().isSingleUser())) {
+            out.write("You must be logged in to edit your profile");
+            return;
+        }
         
-        // handle actions here...
-        // on done handling
+        BlogConfigBean bean = getConfigBean(req, user);
         
         String screen = req.getParameter(PARAM_CONFIG_SCREEN);
         if (screen == null)
@@ -50,16 +57,69 @@ public class BlogConfigServlet extends BaseServlet {
             StringBuffer buf = handleOtherAuthedActions(user, req, bean);
             if (buf != null) out.write(buf.toString());
         } else {
+            String contentType = req.getContentType();
+            if (!empty(contentType) && (contentType.indexOf("boundary=") != -1)) {
+                StringBuffer buf = handlePost(user, req, bean);
+                if (buf != null) out.write(buf.toString());
+            }
         }
         if (bean.isUpdated())
             showCommitForm(req, out);
         
         if (SCREEN_REFERENCES.equals(screen)) {
             displayReferencesScreen(req, out, user, bean);
+        } else if (SCREEN_IMAGES.equals(screen)) {
+            displayImagesScreen(req, out, user, bean);
         } else {
             displayUnknownScreen(out, screen);
         }
         out.write("</td></tr>\n");
+    }
+    private StringBuffer handlePost(User user, HttpServletRequest rawRequest, BlogConfigBean bean) throws IOException {
+        StringBuffer rv = new StringBuffer(64);
+        MultiPartRequest req = new MultiPartRequest(rawRequest);
+        if (authAction(req.getString(PARAM_AUTH_ACTION))) {
+            // read in the logo if specified
+            String filename = req.getFilename("newLogo");
+            if ( (filename != null) && (filename.trim().length() > 0) ) {
+                Hashtable params = req.getParams("newLogo");
+                String type = "image/png";
+                for (Iterator iter = params.keySet().iterator(); iter.hasNext(); ) {
+                  String cur = (String)iter.next();
+                  if ("content-type".equalsIgnoreCase(cur)) {
+                    type = (String)params.get(cur);
+                    break;
+                  }
+                }
+                InputStream logoSrc = req.getInputStream("newLogo");
+                
+                File tmpLogo = File.createTempFile("blogLogo", ".png", BlogManager.instance().getTempDir());
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(tmpLogo);
+                    byte buf[] = new byte[4096];
+                    int read = 0;
+                    while ( (read = logoSrc.read(buf)) != -1)
+                        out.write(buf, 0, read);
+                } finally {
+                    if (out != null) try { out.close(); } catch (IOException ioe) {}
+                }
+
+                long len = tmpLogo.length();
+                if (len > BlogInfoData.MAX_LOGO_SIZE) {
+                    tmpLogo.delete();
+                    rv.append("Proposed logo is too large (" + len + ", max of " + BlogInfoData.MAX_LOGO_SIZE + ")<br />\n");
+                } else {
+                    bean.setLogo(tmpLogo);
+                    rv.append("Logo updated<br />");
+                }
+            } else {
+                // logo not specified
+            }
+        } else {
+            // noop
+        }
+        return rv;
     }
     
     private void showCommitForm(HttpServletRequest req, PrintWriter out) throws IOException {
@@ -184,6 +244,18 @@ public class BlogConfigServlet extends BaseServlet {
                 out.write(HTMLRenderer.sanitizeString(proto) + ": ");
             out.write(HTMLRenderer.sanitizeString(pn.getName()) + "</option>\n");
         }
+    }
+    
+    private void displayImagesScreen(HttpServletRequest req, PrintWriter out, User user, BlogConfigBean bean) throws IOException {
+        out.write("<form action=\"" + getScreenURL(req, SCREEN_IMAGES, false) + "\" method=\"POST\" enctype=\"multipart/form-data\">\n");
+        writeAuthActionFields(out);
+
+        File logo = bean.getLogo();
+        if (logo != null)
+            out.write("Blog logo: <img src=\"" + ViewBlogServlet.getLogoURL(user.getBlog()) + "\" alt=\"Your blog's logo\" /><br />\n");
+        out.write("New logo: <input type=\"file\" name=\"newLogo\" title=\"PNG or JPG format logo\" /><br />\n");
+        out.write("<input type=\"submit\" name=\"action\" value=\"Save changes\">\n");
+        out.write("</form>\n");        
     }
     
     protected StringBuffer handleOtherAuthedActions(User user, HttpServletRequest req, BlogConfigBean bean) {

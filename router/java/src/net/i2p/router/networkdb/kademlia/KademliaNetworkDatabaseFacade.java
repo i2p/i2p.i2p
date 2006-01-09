@@ -303,8 +303,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         try {
             publish(ri);
         } catch (IllegalArgumentException iae) {
-            _log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
-            _context.router().rebuildNewIdentity();
+            _context.router().rebuildRouterInfo(true);
+            //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
+            //_context.router().rebuildNewIdentity();
         }
     }
     

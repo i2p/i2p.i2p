@@ -31,6 +31,8 @@ public class ViewBlogServlet extends BaseServlet {
     public static final String PARAM_TAG = "tag";
     /** $blogHash/$entryId/$attachmentId */
     public static final String PARAM_ATTACHMENT = "attachment";
+    /** image within the BlogInfoData to load (e.g. logo.png, icon_$tagHash.png, etc) */
+    public static final String PARAM_IMAGE = "image";
     
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
@@ -40,7 +42,15 @@ public class ViewBlogServlet extends BaseServlet {
             if (renderAttachment(req, resp, attachment))
                 return;
         }
-        //todo: take care of logo requests, etc
+        String img = req.getParameter(PARAM_IMAGE);
+        if (img != null) {
+            boolean rendered = renderUpdatedImage(img, req, resp);
+            if (!rendered)
+                rendered = renderPublishedImage(img, req, resp);
+            if (!rendered)
+                rendered = renderDefaultImage(img, req, resp);
+            if (rendered) return;
+        }
         super.service(req, resp);
     }
     
@@ -179,16 +189,17 @@ public class ViewBlogServlet extends BaseServlet {
         if (content != null) out.write(content);
     }
     
+    public static String getLogoURL(Hash blog) {
+        return "blog.jsp?" + PARAM_BLOG + "=" + blog.toBase64() + "&amp;" 
+               + PARAM_IMAGE + "=" + BlogInfoData.ATTACHMENT_LOGO;
+    }
+    
     private void renderHeader(User user, HttpServletRequest req, PrintWriter out, BlogInfo info, BlogInfoData data, String title, String desc) throws IOException {
         out.write("<body class=\"syndieBlog\">\n<span style=\"display: none\">" +
                   "<a href=\"#content\" title=\"Skip to the blog content\">Content</a></span>\n");
         renderNavBar(user, req, out);
         out.write("<div class=\"syndieBlogHeader\">\n");
-        if (data != null) {
-            if (data.isLogoSpecified()) {
-                out.write("<img src=\"logo.png\" alt=\"\" />\n");
-            }
-        }
+        out.write("<img class=\"syndieBlogLogo\" src=\"" + getLogoURL(info.getKey().calculateHash()) + "\" alt=\"\" />\n");
         String name = desc;
         if ( (name == null) || (name.trim().length() <= 0) )
             name = title;
@@ -454,6 +465,135 @@ public class ViewBlogServlet extends BaseServlet {
         } catch (NumberFormatException nfe) {}
         return false;
     }
+
+    
+    private boolean renderUpdatedImage(String requestedImage, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BlogConfigBean bean = BlogConfigServlet.getConfigBean(req);
+        if ( (bean != null) && (bean.isUpdated()) && (bean.getLogo() != null) ) {
+            // the updated image only affects *our* blog...
+            User u = bean.getUser();
+            if (u != null) {
+                String reqBlog = req.getParameter(PARAM_BLOG);
+                if ( (reqBlog == null) || (u.getBlog().toBase64().equals(reqBlog)) ) {
+                    if (BlogInfoData.ATTACHMENT_LOGO.equals(requestedImage)) {
+                        File logo = bean.getLogo();
+                        if (logo != null) {
+                            byte buf[] = new byte[4096];
+                            resp.setContentType("image/png");
+                            resp.setContentLength((int)logo.length());
+                            OutputStream out = resp.getOutputStream();
+                            FileInputStream in = null;
+                            try {
+                                in = new FileInputStream(logo);
+                                int read = 0;
+                                while ( (read = in.read(buf)) != -1) 
+                                    out.write(buf, 0, read);
+                                _log.debug("Done writing the updated full length logo");
+                            } finally {
+                                if (in != null) try { in.close(); } catch (IOException ioe) {}
+                                if (out != null) try { out.close(); } catch (IOException ioe) {}
+                            }
+                            _log.debug("Returning from writing the updated full length logo");
+                            return true;
+                        }
+                    } else {
+                        // ok, the blogConfigBean doesn't let people configure other things yet... fall through
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean renderPublishedImage(String requestedImage, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // nothing matched in the updated config, lets look at the current published info
+        String blog = req.getParameter(PARAM_BLOG);
+        if (blog != null) {
+            Archive archive = BlogManager.instance().getArchive();
+            byte h[] = Base64.decode(blog);
+            if ( (h != null) && (h.length == Hash.HASH_LENGTH) ) {
+                Hash blogHash = new Hash(h);
+                BlogInfo info = archive.getBlogInfo(blogHash);
+                String entryId = info.getProperty(BlogInfo.SUMMARY_ENTRY_ID);
+                _log.debug("Author's entryId: " + entryId);
+                if (entryId != null) {
+                    BlogURI dataURI = new BlogURI(entryId);
+                    EntryContainer entry = archive.getEntry(dataURI);
+                    if (entry != null) {
+                        BlogInfoData data = new BlogInfoData();
+                        try {
+                            data.load(entry);
+
+                            _log.debug("Blog info data loaded from: " + entryId);
+                            Attachment toWrite = null;
+                            if (BlogInfoData.ATTACHMENT_LOGO.equals(requestedImage)) {
+                                toWrite = data.getLogo();
+                            } else {
+                                toWrite = data.getOtherAttachment(requestedImage);
+                            }
+                            if (toWrite != null) {
+                                resp.setContentType("image/png");
+                                resp.setContentLength(toWrite.getDataLength());
+                                InputStream in = null;
+                                OutputStream out = null;
+                                try {
+                                    in = toWrite.getDataStream();
+                                    out = resp.getOutputStream();
+                                    byte buf[] = new byte[4096];
+                                    int read = -1;
+                                    while ( (read = in.read(buf)) != -1)
+                                        out.write(buf, 0, read);
+                                    
+                                    _log.debug("Write image from: " + entryId);
+                                    return true;
+                                } finally { 
+                                    if (in != null) try { in.close(); } catch (IOException ioe) {}
+                                    if (out != null) try { out.close(); } catch (IOException ioe) {}
+                                }
+                            }
+                        } catch (IOException ioe) {
+                            _log.debug("Error reading/writing: " + entryId, ioe);
+                            data = null;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /** 1px png, base64 encoded, used if they asked for an image that we dont know of */
+    private static final byte BLANK_IMAGE[] = Base64.decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=");    
+    private boolean renderDefaultImage(String requestedImage, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (requestedImage.equals("logo.png")) {
+            InputStream in = req.getSession().getServletContext().getResourceAsStream("/images/default_blog_logo.png");
+            if (in != null) {
+                resp.setContentType("image/png");
+                OutputStream out = resp.getOutputStream();
+                try {
+                    byte buf[] = new byte[4096];
+                    int read = -1;
+                    while ( (read = in.read(buf)) != -1) 
+                        out.write(buf, 0, read);
+                    _log.debug("Done writing default logo");
+                } finally {
+                    try { in.close(); } catch (IOException ioe) {}
+                    try { out.close(); } catch (IOException ioe) {}
+                    return true;
+                }
+            }
+        }
+        resp.setContentType("img.png");
+        resp.setContentLength(BLANK_IMAGE.length);
+        OutputStream out = resp.getOutputStream();
+        try {
+            out.write(BLANK_IMAGE);
+        } finally {
+            try { out.close(); } catch (IOException ioe) {}
+        }
+        _log.debug("Done writing default image");
+        return true;
+    }
     
     private static final String CSS = 
 "<style>\n" +
@@ -491,6 +631,10 @@ public class ViewBlogServlet extends BaseServlet {
 "	font-size: 120%;\n" +
 "	background-color: black;\n" +
 "	color: white;\n" +
+"}\n" +
+".syndieBlogLogo {\n" +
+"	float: left;\n" +
+"	display: inline;\n" +
 "}\n" +
 ".syndieBlogLinks {\n" +
 "	width: 200px;\n" +
