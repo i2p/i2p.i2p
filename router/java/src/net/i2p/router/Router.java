@@ -308,7 +308,8 @@ public class Router {
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
      */
-    public void rebuildRouterInfo() {
+    public void rebuildRouterInfo() { rebuildRouterInfo(false); }
+    public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Rebuilding new routerInfo");
         
@@ -338,7 +339,11 @@ public class Router {
             }
             ri.sign(key);
             setRouterInfo(ri);
-            SimpleTimer.getInstance().addEvent(new Republish(), 0);
+            Republish r = new Republish();
+            if (blockingRebuild)
+                r.timeReached();
+            else
+                SimpleTimer.getInstance().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
