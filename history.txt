@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.380 2006/01/09 01:33:29 jrandom Exp $
+$Id: history.txt,v 1.381 2006/01/09 17:22:43 jrandom Exp $
+
+2005-01-10  jrandom
+    * Added the per-post list of attachments/blogs/etc to the blog view in
+      Syndie (though this does not yet include comments or some further
+      refinements)
+    * Have the I2P shortcut launch i2p.exe instead of i2psvc.exe on windows,
+      removing the dox box (though also removes the restart functionality...)
+    * Give the i2p.exe the correct java.library.path to support the systray
+      dll (thanks Bobcat, Sugadude, anon!)
 
 2005-01-09  jrandom
     * Removed a longstanding bug that had caused unnecessary router identity

@@ -164,7 +164,7 @@ public class ViewBlogServlet extends BaseServlet {
         renderStyle(out, info, data, req);
         out.write("</style></head>");
         renderHeader(user, req, out, info, data, title, desc);
-        renderReferences(out, info, data);
+        renderReferences(user, out, info, data, req, posts);
         renderBody(user, out, info, data, posts, offset, archive, req);
         out.write("</body></html>\n");
     }
@@ -209,12 +209,15 @@ public class ViewBlogServlet extends BaseServlet {
             String url = "blog.jsp?" + (info != null ? PARAM_BLOG + "=" + info.getKey().calculateHash().toBase64() : "");
             out.write("<b><a href=\"" + url + "\" title=\"Go to the blog root\">" 
                       + HTMLRenderer.sanitizeString(name) + "</a></b>");
+            out.write("<br /><a href=\"profile.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + "=" + info.getKey().calculateHash().toBase64() 
+                      + "\" title=\"View their profile\">profile</a> <a href=\"threads.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + "=" 
+                      + info.getKey().calculateHash().toBase64() + "\" title=\"View threads they have participated in\">threads</a>");
         }
         out.write("</div>\n");
     }
     
     public static final String DEFAULT_GROUP_NAME = "References";
-    private void renderReferences(PrintWriter out, BlogInfo info, BlogInfoData data) throws IOException {
+    private void renderReferences(User user, PrintWriter out, BlogInfo info, BlogInfoData data, HttpServletRequest req, List posts) throws IOException {
         out.write("<div class=\"syndieBlogLinks\">\n");
         if (data != null) {
             for (int i = 0; i < data.getReferenceGroupCount(); i++) {
@@ -241,10 +244,29 @@ public class ViewBlogServlet extends BaseServlet {
         //out.write("<span class=\"syndieBlogLinkGroupName\">Custom links</span>\n");
         //out.write("<ul><li><a href=\"\">are not yet implemented</a></li><li><a href=\"\">but are coming soon</a></li></ul>\n");
         //out.write("</div><!-- end fake group -->");
+        
+        renderPostReferences(user, req, out, posts);
+        
         out.write("<div class=\"syndieBlogMeta\">");
         out.write("Secured by <a href=\"http://syndie.i2p.net/\">Syndie</a>");
         out.write("</div>\n");
         out.write("</div><!-- end syndieBlogLinks -->\n\n");
+    }
+    
+    private void renderPostReferences(User user, HttpServletRequest req, PrintWriter out, List posts) throws IOException {
+        if (!empty(req, PARAM_ENTRY) && (posts.size() == 1)) {
+            BlogURI uri = (BlogURI)posts.get(0);
+            Archive archive = BlogManager.instance().getArchive();
+            EntryContainer entry = archive.getEntry(uri);
+            if (entry != null) {
+                out.write("<div class=\"syndieBlogPostInfo\"><!-- foo -->\n");
+
+                BlogPostInfoRenderer renderer = new BlogPostInfoRenderer(_context);
+                renderer.render(user, archive, entry, out);
+                
+                out.write("</div><!-- end syndieBlogPostInfo -->\n");   
+            }
+        }
     }
     
     /** generate a link for the given petname within the scope of the given blog */
@@ -666,6 +688,33 @@ public class ViewBlogServlet extends BaseServlet {
 //"	width: 100%;\n" +
 "}\n" +
 ".syndieBlogLinkGroupName {\n" +
+"	font-size: 80%;\n" +
+"	font-weight: bold;\n" +
+"}\n" +
+".syndieBlogPostInfoGroup {\n" +
+"	text-align: left;\n" +
+"	font-size: 80%;\n" +
+"	background-color: #FFEA9F;\n" +
+"	border: solid;\n" +
+"	border-width: 1px 1px 1px 1px;\n" +
+"	border-color: #000;\n" +
+"	margin-top: 5px;\n" +
+"	margin-right: 5px;\n" +
+"}\n" +
+".syndieBlogPostInfoGroup ol {\n" +
+"	list-style: none;\n" +
+"	margin-left: 0;\n" +
+"	margin-top: 0;\n" +
+"	margin-bottom: 0;\n" +
+"	padding-left: 0;\n" +
+"}\n" +
+".syndieBlogPostInfoGroup li {\n" +
+"	margin: 0;\n" +
+"}\n" +
+".syndieBlogPostInfoGroup li a {\n" +
+"	display: block;\n" +
+"}\n" +
+".syndieBlogPostInfoGroupName {\n" +
 "	font-size: 80%;\n" +
 "	font-weight: bold;\n" +
 "}\n" +

@@ -9,6 +9,7 @@
     </target>
     <target name="compile">
         <mkdir dir="./build" />
+        <delete dir="./build/obj" />
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src"
@@ -32,6 +33,8 @@
         <ant target="war" />
     </target>
     <target name="war" depends="builddep, compile, precompilejsp"> 
+	<delete file="../syndie.war" />
+	<delete dir="./tmpwar" />
         <mkdir dir="./tmpwar" />
         <copy file="../../jdom/jdom.jar" tofile="./tmpwar/jdom.jar" />
         <copy file="../../rome/rome-0.7.jar" tofile="./tmpwar/rome-0.7.jar" />
@@ -157,6 +160,7 @@
     <target name="clean">
         <delete dir="./build" />
         <delete dir="./dist" />
+        <delete dir="../jsp/WEB-INF/classes" />
         <delete file="./syndie-standalone.zip" />
     </target>
     <target name="cleandep" depends="clean">

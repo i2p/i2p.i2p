@@ -12,7 +12,7 @@
     <minHeapSize>64</minHeapSize>
     <maxHeapSize>64</maxHeapSize>
     -->
-    <args>-Djava.library.path=. -DloggerFilenameOverride=logs/log-router-@.txt -Dorg.mortbay.http.Version.paranoid=true -Dorg.mortbay.util.FileResource.checkAliases=false</args>
+    <args>-Djava.library.path=.;lib -DloggerFilenameOverride=logs/log-router-@.txt -Dorg.mortbay.http.Version.paranoid=true -Dorg.mortbay.util.FileResource.checkAliases=false</args>
   </jre>
   <splash>
     <file>resources/i2plogo.bmp</file>

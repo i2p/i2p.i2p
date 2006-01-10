@@ -2,8 +2,8 @@
 <shortcuts>
  <programGroup defaultName="I2P" location="startMenu" />
  <shortcut name="Start I2P" 
-           target="$INSTALL_PATH\I2Psvc.exe" 
-           commandLine="-c wrapper.config"
+           target="$INSTALL_PATH\I2P.exe" 
+           commandLine=""
            workingDirectory="$INSTALL_PATH"
            iconFile="$INSTALL_PATH\docs\start.ico"
            initialState="noShow"

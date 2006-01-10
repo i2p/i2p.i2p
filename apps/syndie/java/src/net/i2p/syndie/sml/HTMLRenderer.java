@@ -1096,7 +1096,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(pageNum*numPerPage).append('&');
         return buf.toString();
     }
-    public String getArchiveURL(Hash blog, SafeURL archiveLocation) {
+    public static String getArchiveURL(Hash blog, SafeURL archiveLocation) {
         return "syndicate.jsp?" 
                //+ "action=Continue..." // should this be the case?
                + "&" + SyndicateServlet.PARAM_SCHEMA + "=" + sanitizeTagParam(archiveLocation.getSchema()) 
