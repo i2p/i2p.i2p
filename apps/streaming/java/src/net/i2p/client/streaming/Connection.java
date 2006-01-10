@@ -155,6 +155,8 @@ public class Connection {
             synchronized (_outboundPackets) {
                 if (!started)
                     _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size(), timeoutMs);
+                if (start + 5*60*1000 < _context.clock().now()) // ok, 5 minutes blocking?  I dont think so
+                    return false;
                 
                 // no need to wait until the other side has ACKed us before sending the first few wsize
                 // packets through
@@ -181,7 +183,7 @@ public class Connection {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
                                        + "), waiting indefinitely");
-                        try { _outboundPackets.wait(); } catch (InterruptedException ie) {}
+                        try { _outboundPackets.wait(10*1000); } catch (InterruptedException ie) {}
                     }
                 } else {
                     _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
