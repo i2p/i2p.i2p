@@ -558,7 +558,9 @@ public abstract class BaseServlet extends HttpServlet {
     }
     
     protected void renderBegin(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
-        out.write("<html>\n<head><title>" + getTitle() + "</title>\n");
+        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        out.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
+        out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head>\n<title>" + getTitle() + "</title>\n");
         out.write("<meta http-equiv=\"cache-control\" content=\"no-cache\" />");
         out.write("<meta http-equiv=\"pragma\" content=\"no-cache\" />");
         out.write("<style>");
@@ -1110,6 +1112,10 @@ public abstract class BaseServlet extends HttpServlet {
 "	border: 0px;\n" +
 "	margin: 0px;\n" +
 "	padding: 0px;\n" +
+"}\n" +
+"* {\n" +
+"                   margin: 0px;\n" +
+"                   padding: 0px;\n" +
 "}\n" +
 ".topNav {\n" +
 "	background-color: #BBBBBB;\n" +

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.381 2006/01/09 17:22:43 jrandom Exp $
+$Id: history.txt,v 1.382 2006/01/10 01:59:08 jrandom Exp $
+
+2005-01-11  jrandom
+    * Include the attachments/blogs/etc for comments on the blog view
+    * Syndie HTML fixes (thanks cervantes!)
+    * Make sure we fully reset the objects going into our cache before we
+      reuse them (thanks zzz!)
 
 2005-01-10  jrandom
     * Added the per-post list of attachments/blogs/etc to the blog view in

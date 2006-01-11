@@ -7,6 +7,7 @@ import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.web.*;
+import net.i2p.syndie.*;
 
 /**
  * Renders posts for display within the blog view
@@ -15,10 +16,21 @@ import net.i2p.syndie.web.*;
 public class BlogRenderer extends HTMLRenderer {
     private BlogInfo _blog;
     private BlogInfoData _data;
+    private boolean _isComment;
     public BlogRenderer(I2PAppContext ctx, BlogInfo info, BlogInfoData data) {
         super(ctx);
         _blog = info;
         _data = data;
+        _isComment = false;
+    }
+
+    public void renderPost(User user, Archive archive, EntryContainer entry, Writer out, boolean cutBody, boolean showImages) throws IOException {
+        _isComment = false;
+        render(user, archive, entry, out, cutBody, showImages);
+    }
+    public void renderComment(User user, Archive archive, EntryContainer entry, Writer out) throws IOException {
+        _isComment = true;
+        render(user, archive, entry, out, false, true);
     }
     
     public void receiveHeaderEnd() {
@@ -64,9 +76,26 @@ public class BlogRenderer extends HTMLRenderer {
         }
         _postBodyBuffer.append("<a href=\"");
         _postBodyBuffer.append(getReplyURL()).append("\" title=\"Reply to this post\">Leave a comment</a>\n");
+        if (_isComment)
+            renderCommentMeta();
         _postBodyBuffer.append("</div><!-- end syndieBlogPostDetails -->\n");
         _postBodyBuffer.append("</div><!-- end syndieBlogPost -->\n\n");
     }
+    
+    private void renderCommentMeta() {
+        BlogURI postURI = null;
+        Attachment attachments[] = null;
+        if (_entry != null) {
+            postURI = _entry.getURI();
+            attachments = _entry.getAttachments();
+        }
+        BlogPostInfoRenderer.renderAttachments(postURI, "syndieBlogCommentInfo", attachments, _postBodyBuffer);
+        BlogPostInfoRenderer.renderBlogs(postURI, _user, "syndieBlogCommentInfo", _blogs, _postBodyBuffer);
+        BlogPostInfoRenderer.renderLinks(postURI, _user, "syndieBlogCommentInfo", _links, _postBodyBuffer);
+        BlogPostInfoRenderer.renderAddresses(postURI, _user, "syndieBlogCommentInfo", _addresses, _postBodyBuffer);
+        BlogPostInfoRenderer.renderArchives(postURI, _user, "syndieBlogCommentInfo", _archives, _postBodyBuffer);
+    }
+    
     private int getChildCount(ThreadNode node) {
         int nodes = 0;
         for (int i = 0; i < node.getChildCount(); i++) {

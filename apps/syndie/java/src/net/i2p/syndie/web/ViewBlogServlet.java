@@ -159,7 +159,9 @@ public class ViewBlogServlet extends BaseServlet {
         String pageTitle = "Syndie :: Blogs" + (desc != null ? " :: " + desc : "");
         if (title != null) pageTitle = pageTitle + " (" + title + ")";
         pageTitle = HTMLRenderer.sanitizeString(pageTitle);
-        out.write("<html>\n<head>\n<title>" + pageTitle + "</title>\n");
+        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        out.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
+        out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head>\n<title>" + pageTitle + "</title>\n");
         out.write("<style>");
         renderStyle(out, info, data, req);
         out.write("</style></head>");
@@ -381,13 +383,13 @@ public class ViewBlogServlet extends BaseServlet {
         if ( (posts.size() == 1) && (req.getParameter(PARAM_ENTRY) != null) ) {
             BlogURI uri = (BlogURI)posts.get(0);
             EntryContainer entry = archive.getEntry(uri);
-            renderer.render(user, archive, entry, out, false, true);
+            renderer.renderPost(user, archive, entry, out, false, true);
             renderComments(user, out, info, data, entry, archive, renderer);
         } else {
             for (int i = offset; i < posts.size() && i < offset + POSTS_PER_PAGE; i++) {
                 BlogURI uri = (BlogURI)posts.get(i);
                 EntryContainer entry = archive.getEntry(uri);
-                renderer.render(user, archive, entry, out, true, true);
+                renderer.renderPost(user, archive, entry, out, true, true);
             }
 
             renderNav(out, info, data, posts, offset, archive, req);
@@ -412,7 +414,7 @@ public class ViewBlogServlet extends BaseServlet {
                 out.write("<li>");
                 if (!shouldIgnore(user, uri)) {
                     EntryContainer cur = archive.getEntry(uri);
-                    renderer.render(user, archive, cur, out, false, true);
+                    renderer.renderComment(user, archive, cur, out);
                     // recurse
                     renderComments(user, out, uri, archive, index, renderer);
                 }
@@ -618,11 +620,17 @@ public class ViewBlogServlet extends BaseServlet {
     }
     
     private static final String CSS = 
-"<style>\n" +
 "body {\n" +
 "	margin: 0px;\n" +
 "	padding: 0px;\n" +
 "	font-family: Arial, Helvetica, sans-serif;\n" +
+"}\n" +
+"* {\n" +
+"                   margin: 0px;\n" +
+"                   padding: 0px;\n" +
+"}\n" +
+"select {\n" +
+"                   min-width: 1.5em;\n" +
 "}\n" +
 ".syndieBlog {\n" +
 "	font-size: 100%;\n" +
@@ -683,10 +691,10 @@ public class ViewBlogServlet extends BaseServlet {
 ".syndieBlogLinkGroup li {\n" +
 "	margin: 0;\n" +
 "}\n" +
-".syndieBlogLinkGroup li a {\n" +
-"	display: block;\n" +
+//".syndieBlogLinkGroup li a {\n" +
+//"	display: block;\n" +
 //"	width: 100%;\n" +
-"}\n" +
+//"}\n" +
 ".syndieBlogLinkGroupName {\n" +
 "	font-size: 80%;\n" +
 "	font-weight: bold;\n" +
@@ -740,7 +748,7 @@ public class ViewBlogServlet extends BaseServlet {
 "	border-width: 1px 1px 1px 1px;\n" +
 "	border-color: #000;\n" +
 "	margin-top: 5px;\n" +
-"	width: 100%;\n" +
+"	width: 99%;\n" +
 "}\n" +
 ".syndieBlogPostHeader {\n" +
 "	background-color: #BBB;\n" +
@@ -768,8 +776,35 @@ public class ViewBlogServlet extends BaseServlet {
 "}\n" +
 ".syndieBlogComments ul {\n" +
 "                   list-style: none;\n" +
-"                   margin-left: 10;\n" +
+"                   margin-left: 10px;\n" +
 "                   padding-left: 0;\n" +
+"}\n" +
+".syndieBlogCommentInfoGroup {\n" +
+"	text-align: left;\n" +
+"	font-size: 80%;\n" +
+//"	background-color: #FFEA9F;\n" +
+//"	border: solid;\n" +
+//"	border-width: 1px 1px 1px 1px;\n" +
+//"	border-color: #000;\n" +
+//"	margin-top: 5px;\n" +
+"	margin-right: 5px;\n" +
+"}\n" +
+".syndieBlogCommentInfoGroup ol {\n" +
+"	list-style: none;\n" +
+"	margin-left: 0;\n" +
+"	margin-top: 0;\n" +
+"	margin-bottom: 0;\n" +
+"	padding-left: 0;\n" +
+"}\n" +
+".syndieBlogCommentInfoGroup li {\n" +
+"	margin: 0;\n" +
+"}\n" +
+".syndieBlogCommentInfoGroup li a {\n" +
+"	display: block;\n" +
+"}\n" +
+".syndieBlogCommentInfoGroupName {\n" +
+"	font-size: 80%;\n" +
+"	font-weight: bold;\n" +
 "}\n";
 
     protected String getTitle() { return "unused"; }

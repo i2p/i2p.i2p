@@ -77,7 +77,10 @@ public final class ByteCache {
         }
         _lastOverflow = System.currentTimeMillis();
         byte data[] = new byte[_entrySize];
-        return new ByteArray(data);
+        ByteArray rv = new ByteArray(data);
+        rv.setValid(0);
+        rv.setOffset(0);
+        return rv;
     }
     
     /**
@@ -91,6 +94,9 @@ public final class ByteCache {
         if (_cache) {
             if ( (entry == null) || (entry.getData() == null) )
                 return;
+            
+            entry.setValid(0);
+            entry.setOffset(0);
             
             if (shouldZero)
                 Arrays.fill(entry.getData(), (byte)0x0);

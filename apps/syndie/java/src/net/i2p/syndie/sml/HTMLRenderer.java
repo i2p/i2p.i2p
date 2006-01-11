@@ -274,19 +274,6 @@ public class HTMLRenderer extends EventReceiverImpl {
         _bodyBuffer.append(getSpan("rb")).append("]</span>");
     }
     
-    protected static class Blog {
-        public String name;
-        public String hash;
-        public String tag;
-        public long entryId;
-        public List locations;
-        public int hashCode() { return -1; }
-        public boolean equals(Object o) {
-            Blog b = (Blog)o;
-            return DataHelper.eq(hash, b.hash) && DataHelper.eq(tag, b.tag) && DataHelper.eq(name, b.name) 
-                   && DataHelper.eq(entryId, b.entryId) && DataHelper.eq(locations, b.locations);
-        }
-    }
     /**
      * when we see a link to a blog, we may want to:
      * = view the blog entry
@@ -370,19 +357,6 @@ public class HTMLRenderer extends EventReceiverImpl {
         _bodyBuffer.append("]</span> ");
     }
     
-    protected static class ArchiveRef {
-        public String name;
-        public String description;
-        public String locationSchema;
-        public String location;
-        public int hashCode() { return -1; }
-        public boolean equals(Object o) {
-            ArchiveRef a = (ArchiveRef)o;
-            return DataHelper.eq(name, a.name) && DataHelper.eq(description, a.description) 
-                   && DataHelper.eq(locationSchema, a.locationSchema) 
-                   && DataHelper.eq(location, a.location);
-        }
-    }
     public void receiveArchive(String name, String description, String locationSchema, String location, 
                                String postingKey, String anchorText) {        
         ArchiveRef a = new ArchiveRef();
@@ -419,15 +393,6 @@ public class HTMLRenderer extends EventReceiverImpl {
         _bodyBuffer.append("]</span>");
     }
     
-    protected static class Link {
-        public String schema;
-        public String location;
-        public int hashCode() { return -1; }
-        public boolean equals(Object o) {
-            Link l = (Link)o;
-            return DataHelper.eq(schema, l.schema) && DataHelper.eq(location, l.location);
-        }
-    }
     public void receiveLink(String schema, String location, String text) {
         Link l = new Link();
         l.schema = schema;
@@ -446,39 +411,8 @@ public class HTMLRenderer extends EventReceiverImpl {
                     append("</a>");
     }
 
-    protected static class Address {
-        public String name;
-        public String schema;
-        public String location;
-        public String protocol;
-        public int hashCode() { return -1; }
-        public boolean equals(Object o) {
-            Address a = (Address)o;
-            return DataHelper.eq(schema, a.schema) && DataHelper.eq(location, a.location) && DataHelper.eq(protocol, a.protocol) && DataHelper.eq(name, a.name);
-        }
-    }
-    
     public void importAddress(Address a) {
-        if (_user != null && _user.getImportAddresses() && !_user.getPetNameDB().containsName(a.name)) {
-            PetName pn = new PetName(a.name, a.schema, a.protocol, a.location);
-            _user.getPetNameDB().add(pn);
-            try {
-                _user.getPetNameDB().store(_user.getAddressbookLocation());
-            } catch (IOException ioe) {
-                //ignore
-            }
-        }
-        if (BlogManager.instance().getImportAddresses() 
-                && I2PAppContext.getGlobalContext().namingService().lookup(a.name) == null 
-                && a.schema.equalsIgnoreCase("i2p")) {
-            PetName pn = new PetName(a.name, a.schema, a.protocol, a.location);
-            I2PAppContext.getGlobalContext().petnameDb().add(pn);
-            try {
-                I2PAppContext.getGlobalContext().petnameDb().store();
-            } catch (IOException ioe) {
-                //ignore
-            }
-        }
+        BlogPostInfoRenderer.importAddress(a, _user);
     }
     
     public void receiveAddress(String name, String schema, String protocol, String location, String anchorText) {
