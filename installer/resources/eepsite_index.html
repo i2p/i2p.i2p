@@ -20,5 +20,67 @@
  <a href="http://localhost:7658/">http://localhost:7658/</a>.  If you 
  want to change the port number, edit the file ./eepsite/jetty.xml and 
  update the I2PTunnel configuration accordingly.</p>
+
+ <h2>Step-by-step instructions for announcing your new eepsite to the I2P community</h2>
+ Your eepsite is up and running but it will be hard for other people to find because it
+ doesn't have a name and they don't have your really long Base64 key.
+ You could just tell people that really long key but thankfully i2p has an address book
+ and several easy ways to tell peple about your eepsite. Here's detailed instructions.
+ <ul>
+ <li>Pick a name for your eepsite (<i>something</i>.i2p). Use all lower-case.
+     You may wish to check first in your own router's address book
+     <a href="http://localhost:7657/susidns/addressbook.jsp?book=router&filter=none">here</a>,
+     or the file i2p/hosts.txt to see if your name is already taken.
+     Enter the new name for your eepsite on the eepsite i2ptunnel configuration page
+     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">here</a>
+     where it says "Website name". This will replace the default "mysite.i2p".
+     Be sure and click "Save".
+ <li>Highlight the entire "Local destination" key on the
+     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
+     and copy it for
+     later pasting. Make sure you get the whole thing - it's over 500 characters and it must end in "AAAA".
+ <li>Enter the name and paste in the destination key into your master address book
+     <a href="http://localhost:7657/susidns/addressbook.jsp?book=master">here</a>.
+     Click "Add" to add the destination to your address book.
+ <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
+     be right back here. Hopefully it worked.
+ <li>Before you tell the world about your new eepsite, you should add some content.
+     Go to i2p/eepsite/docroot and copy this document (index.html) to help.html so you can refer to it later.
+     Now edit index.html and add content, pictures, and whatever you would like to share.
+ <li>Now it's time to add your eepsite to I2P's most popular address book.
+     To do that, you must to tell <a href="http://orion.i2p/">orion.i2p</a>
+     what your eepsite name and key are. Orion has a web interface where you can add a key to the address book.
+     The key entry form is <a href="http://orion.i2p/list/">here</a>.
+     Again, your key is the entire "Local destination" key on the
+     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
+     Be sure you get the whole thing, ending with "AAAA".
+     Don't forget to click "add a key".
+     Check to see if it reports the key was added.
+     Since most routers periodically get address book updates from orion, within several hours others will be able to find your
+     website by simply typing <i>something</i>.i2p into their browser.
+ <li>If you are in a hurry and can't wait a few hours, you can tell people to use orion's "jump" address helper redirection service.
+     This will work within a few minutes of your entering the key to orion.i2p.
+     Test it yourself first by entering http://orion.i2p/jump/<i>something</i>.i2p into your browser.
+     Once it's working, then you can tell others to use it.
+ <li>Some people check <a href="http://orion.i2p/list/">orion.i2p/list/</a> for new eepsites, so you may start getting
+     a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:
+     <ul>
+     <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
+         on <a href="http://forum.i2p/">forum.i2p</a>.
+     <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.
+     <li>Put it in <a href="http://localhost:7657/syndie/post.jsp">new post</a> on
+                   <a href="http://localhost:7657/syndie/">Syndie</a>.
+     <li>Put it in <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
+     </ul>
+     Note that some sites recommend pasting in that really long destination key.
+     You can if you want - but
+     if you have successfully posted your key on the <a href="http://orion.i2p/list/">orion page here</a>,
+     tested it using http://orion.i2p/jump/<i>something</i>.i2p, and waited 24 hours for orion's
+     address book to propagate to others, that shouldn't be necessary.
+ <li>If you have any questions try IRC #i2p or the
+     <a href="http://forum.i2p/viewforum.php?f=10">technical problems section</a> on
+     <a href="http://forum.i2p/">forum.i2p</a>.
+     Good luck and welcome to I2P!
+ </ul>
  </body>
 </html>
