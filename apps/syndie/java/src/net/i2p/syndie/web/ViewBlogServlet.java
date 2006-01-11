@@ -674,8 +674,8 @@ public class ViewBlogServlet extends BaseServlet {
 "	font-size: 80%;\n" +
 "	background-color: #DDD;\n" +
 "	border: solid;\n" +
-"	//border-width: 5px 5px 0px 5px;\n" +
-"	//border-color: #FFFFFF;\n" +
+//"	border-width: 5px 5px 0px 5px;\n" +
+//"	border-color: #FFFFFF;\n" +
 "	border-width: 1px 1px 1px 1px;\n" +
 "	border-color: #000;\n" +
 "	margin-top: 5px;\n" +
