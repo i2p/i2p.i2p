@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.384 2006/01/11 18:19:38 jrandom Exp $
+$Id: history.txt,v 1.385 2006/01/12 04:59:57 cervantes Exp $
+
+2005-01-12  jrandom
+    * Only create the loadtest.log if requested to do so (thanks zzz!)
+    * Make sure we cleanly take into consideration the appropriate data
+      points when filtering out duplicate messages in the message validator,
+      and report the right bloom filter false positives rate (not used for
+      anything except debugging)
 
 2005-01-12  cervantes
     * Syndie CSS tweaks to removed some redundant declarations, improve font

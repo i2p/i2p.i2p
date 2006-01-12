@@ -45,15 +45,21 @@ public class LoadTestManager {
     private Writer _out;
     private List _untestedPeers;
     private List _active;
+    
+    private static final String PROP_LOG_DATA = "router.loadTestLog";
+    private static final String DEFAULT_LOG_DATA = "false";
+    
     public LoadTestManager(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(LoadTestManager.class);
         _active = Collections.synchronizedList(new ArrayList());
-        try {
-            _out = new BufferedWriter(new FileWriter("loadtest.log", true));
-            _out.write("startup at " + ctx.clock().now() + "\n");
-        } catch (IOException ioe) {
-            _log.log(Log.CRIT, "error creating log", ioe);
+        if (Boolean.valueOf(ctx.getProperty(PROP_LOG_DATA, DEFAULT_LOG_DATA)).booleanValue()) {
+            try {
+                _out = new BufferedWriter(new FileWriter("loadtest.log", true));
+                _out.write("startup at " + ctx.clock().now() + "\n");
+            } catch (IOException ioe) {
+                _log.log(Log.CRIT, "error creating log", ioe);
+            }
         }
         _context.statManager().createRateStat("test.lifetimeSuccessful", "How many messages we can pump through a load test during a tunnel's lifetime", "test", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("test.lifetimeFailed", "How many messages we fail to pump through (period == successful)", "test", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
@@ -373,7 +379,7 @@ public class LoadTestManager {
     }
     
     private void log(LoadTestTunnelConfig tunnel, String msg) {
-        //if (!_log.shouldLog(Log.INFO)) return;
+        if (_out == null) return;
         StringBuffer buf = new StringBuffer(128);
         if (tunnel.getInbound() == null) {
             for (int i = 0; i < tunnel.getLength()-1; i++) {

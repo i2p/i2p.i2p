@@ -112,6 +112,7 @@ public class BloomSHA1 {
         for (int i = 0; i < filterWords; i++) {
             filter[i] = 0;
         }
+        count = 0;
     }
     /** Synchronized version */
     public void clear() {
@@ -198,7 +199,7 @@ public class BloomSHA1 {
     public final double falsePositives(int n) {
         // (1 - e(-kN/M))^k
         return java.lang.Math.pow ( 
-                (1l - java.lang.Math.exp( ((double)k) * (long)n / (long)filterBits)), (long)k);
+                (1l - java.lang.Math.exp(0d- ((double)k) * (long)n / (long)filterBits)), (long)k);
     }
 
     public final double falsePositives() {

@@ -40,8 +40,8 @@ public class MessageValidator {
         
         boolean isDuplicate = noteReception(messageId, expiration);
         if (isDuplicate) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting message " + messageId + " because it is a duplicate", new Exception("Duplicate origin"));
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Rejecting message " + messageId + " because it is a duplicate", new Exception("Duplicate origin"));
             _context.statManager().addRateData("router.duplicateMessageId", 1, 0);
             return "duplicate";
         } else {
@@ -56,13 +56,13 @@ public class MessageValidator {
     public String validateMessage(long expiration) {
         long now = _context.clock().now();
         if (now - Router.CLOCK_FUDGE_FACTOR >= expiration) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting message because it expired " + (now-expiration) + "ms ago");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Rejecting message because it expired " + (now-expiration) + "ms ago");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
             return "expired " + (now-expiration) + "ms ago";
         } else if (now + 4*Router.CLOCK_FUDGE_FACTOR < expiration) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting message because it will expire too far in the future (" + (expiration-now) + "ms)");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Rejecting message because it will expire too far in the future (" + (expiration-now) + "ms)");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
             return "expire too far in the future (" + (expiration-now) + "ms)";
         }
@@ -82,7 +82,8 @@ public class MessageValidator {
     private boolean noteReception(long messageId, long messageExpiration) {
         long val = messageId;
         // tweak the high order bits with the message expiration /seconds/
-        val ^= (messageExpiration & TIME_MASK) << 16;
+        ////val ^= (messageExpiration & TIME_MASK) << 16;
+        val ^= (messageExpiration & TIME_MASK);
         boolean dup = _filter.add(val);
         if (dup && _log.shouldLog(Log.WARN)) {
             _log.warn("Duplicate with " + _filter.getCurrentDuplicateCount() 
