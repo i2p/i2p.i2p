@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.383 2006/01/11 15:32:36 jrandom Exp $
+$Id: history.txt,v 1.384 2006/01/11 18:19:38 jrandom Exp $
+
+2005-01-12  cervantes
+    * Syndie CSS tweaks to removed some redundant declarations, improve font
+      scaling and layout robustness. Improved cross browser compatibility
+      (in other words "kicked IE"). Tightened the look of the blog template
+      a little.
 
 2005-01-11  Complication
     * CSS comment fixes

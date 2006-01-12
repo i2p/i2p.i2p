@@ -619,194 +619,163 @@ public class ViewBlogServlet extends BaseServlet {
         return true;
     }
     
-    private static final String CSS = 
-"body {\n" +
-"	margin: 0px;\n" +
-"	padding: 0px;\n" +
-"	font-family: Arial, Helvetica, sans-serif;\n" +
+    private static final String CSS = "* {\n" +
+"    margin: 0px;\n" +
+"    padding: 0px;\n" +
 "}\n" +
-"* {\n" +
-"                   margin: 0px;\n" +
-"                   padding: 0px;\n" +
+"body {\n" +
+"    font-family: Arial, Helvetica, sans-serif;\n" +
+"    font-size: 100%;\n" +
+"    background-color : #EEEEEE;\n" +
+"}\n" +
+"a {\n" +
+"    text-decoration: none;\n" +
+"}\n" +
+"a:hover {\n" +
+"    color: red;\n" +
 "}\n" +
 "select {\n" +
-"                   min-width: 1.5em;\n" +
+"    min-width: 1.5em;\n" +
 "}\n" +
 ".syndieBlog {\n" +
-"	font-size: 100%;\n" +
-"	margin: 0px;\n" +
-"	border: 0px;\n" +
-"	padding: 0px;\n" +
-"	border-width: 0px;\n" +
-"	border-spacing: 0px;\n" +
 "}\n" +
 ".syndieBlogTopNav {\n" +
-"	width: 100%;\n" +
-"	height: 20px;\n" +
-"	background-color: #BBBBBB;\n" +
+"    float:left;\n" +
+"    width: 100%;\n" +
+"    background-color: #BBBBBB;\n" +
 "}\n" +
 ".syndieBlogTopNavUser {\n" +
-"	text-align: left;\n" +
-"	float: left;\n" +
-"	display: inline;\n" +
+"    text-align: left;\n" +
+"    float: left;\n" +
+"    margin: 2px;\n" +
 "}\n" +
 ".syndieBlogTopNavAdmin {\n" +
-"	text-align: left;\n" +
-"	float: right;\n" +
-"	display: inline;\n" +
+"    text-align: left;\n" +
+"    float: right;\n" +
+"    margin: 2px;\n" +
 "}\n" +
 ".syndieBlogHeader {\n" +
-"	width: 100%;\n" +
-"	height: 50px;\n" +
-"	font-size: 120%;\n" +
-"	background-color: black;\n" +
-"	color: white;\n" +
+"    width: 100%;\n" +
+"    font-size: 1.2em;\n" +
+"    background-color: black;\n" +
+"    color: white;\n" +
+"    float:left;\n" +
+"}\n" +
+".syndieBlogHeader a {\n" +
+"    color: white;\n" +
+"    padding: 4px;\n" +
 "}\n" +
 ".syndieBlogLogo {\n" +
-"	float: left;\n" +
-"	display: inline;\n" +
+"    float: left;\n" +
+"    display: inline;\n" +
 "}\n" +
 ".syndieBlogLinks {\n" +
-"	width: 200px;\n" +
+"    width: 20%;\n" +
+"    float: left;\n" +
 "}\n" +
 ".syndieBlogLinkGroup {\n" +
-"	text-align: left;\n" +
-"	font-size: 80%;\n" +
-"	background-color: #DDD;\n" +
-"	border: solid;\n" +
-//"	border-width: 5px 5px 0px 5px;\n" +
-//"	border-color: #FFFFFF;\n" +
-"	border-width: 1px 1px 1px 1px;\n" +
-"	border-color: #000;\n" +
-"	margin-top: 5px;\n" +
-"	margin-right: 5px;\n" +
+"    font-size: 0.8em;\n" +
+"    background-color: #DDD;\n" +
+"    border: 1px solid black;\n" +
+"    margin: 5px;\n" +
+"    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogLinkGroup ul {\n" +
-"	list-style: none;\n" +
-"	margin-left: 0;\n" +
-"	margin-top: 0;\n" +
-"	margin-bottom: 0;\n" +
-"	padding-left: 0;\n" +
+"    list-style: none;\n" +
 "}\n" +
 ".syndieBlogLinkGroup li {\n" +
-"	margin: 0;\n" +
 "}\n" +
-//".syndieBlogLinkGroup li a {\n" +
-//"	display: block;\n" +
-//"	width: 100%;\n" +
-//"}\n" +
 ".syndieBlogLinkGroupName {\n" +
-"	font-size: 80%;\n" +
-"	font-weight: bold;\n" +
+"    font-weight: bold;\n" +
+"    width: 100%;\n" +
+"    border-bottom: 1px dashed black;\n" +
+"    display: block;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup {\n" +
-"	text-align: left;\n" +
-"	font-size: 80%;\n" +
-"	background-color: #FFEA9F;\n" +
-"	border: solid;\n" +
-"	border-width: 1px 1px 1px 1px;\n" +
-"	border-color: #000;\n" +
-"	margin-top: 5px;\n" +
-"	margin-right: 5px;\n" +
+"    font-size: 0.8em;\n" +
+"    background-color: #FFEA9F;\n" +
+"    border: 1px solid black;\n" +
+"    margin: 5px;\n" +
+"    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup ol {\n" +
-"	list-style: none;\n" +
-"	margin-left: 0;\n" +
-"	margin-top: 0;\n" +
-"	margin-bottom: 0;\n" +
-"	padding-left: 0;\n" +
+"   list-style: none;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup li {\n" +
-"	margin: 0;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup li a {\n" +
-"	display: block;\n" +
+"    display: block;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroupName {\n" +
-"	font-size: 80%;\n" +
-"	font-weight: bold;\n" +
+"    font-weight: bold;\n" +
+"    width: 100%;\n" +
+"    border-bottom: 1px dashed black;\n" +
+"    display: block;\n" +
 "}\n" +
 ".syndieBlogMeta {\n" +
-"	text-align: left;\n" +
-"	font-size: 80%;\n" +
-"	background-color: #DDD;\n" +
-"	border: solid;\n" +
-"	border-width: 1px 1px 1px 1px;\n" +
-"	border-color: #000;\n" +
-"                   width: 90%;\n" +
-"	margin-top: 5px;\n" +
-"	margin-right: 5px;\n" +
+"    text-align: left;\n" +
+"    font-size: 0.8em;\n" +
+"    background-color: #DDD;\n" +
+"    border: 1px solid black;\n" +
+"    margin: 5px;\n" +
+"    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogBody {\n" +
-"	position: absolute;\n" +
-"	top: 70px;\n" +
-"	left: 200px;\n" +
-"	float: left;\n" +
+"    width: 80%;\n" +
+"    float: left;\n" +
 "}\n" +
 ".syndieBlogPost {\n" +
-"	border: solid;\n" +
-"	border-width: 1px 1px 1px 1px;\n" +
-"	border-color: #000;\n" +
-"	margin-top: 5px;\n" +
-"	width: 99%;\n" +
+"    border: 1px solid black;\n" +
+"    margin-top: 5px;\n" +
+"    margin-right: 5px;\n" +
 "}\n" +
 ".syndieBlogPostHeader {\n" +
-"	background-color: #BBB;\n" +
+"    background-color: #BBB;\n" +
+"    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogPostSubject {\n" +
-"	text-align: left;\n" +
+"    font-weight: bold;\n" +
 "}\n" +
 ".syndieBlogPostFrom {\n" +
-"	text-align: right;\n" +
+"    text-align: right;\n" +
 "}\n" +
 ".syndieBlogPostSummary {\n" +
-"	background-color: #FFFFFF;\n" +
+"    background-color: #FFFFFF;\n" +
+"    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogPostDetails {\n" +
-"	background-color: #DDD;\n" +
+"    background-color: #DDD;\n" +
+"    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogNav {\n" +
-"	text-align: center;\n" +
+"    text-align: center;\n" +
 "}\n" +
 ".syndieBlogComments {\n" +
-"                   border: none;\n" +
-"                   margin-top: 5px;\n" +
-"                   margin-left: 0px;\n" +
-"                   float: left;\n" +
+"    border: none;\n" +
+"    margin-top: 5px;\n" +
+"    margin-left: 0px;\n" +
+"    float: left;\n" +
 "}\n" +
 ".syndieBlogComments ul {\n" +
-"                   list-style: none;\n" +
-"                   margin-left: 10px;\n" +
-"                   padding-left: 0;\n" +
+"    list-style: none;\n" +
+"    margin-left: 10px;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroup {\n" +
-"	text-align: left;\n" +
-"	font-size: 80%;\n" +
-//"	background-color: #FFEA9F;\n" +
-//"	border: solid;\n" +
-//"	border-width: 1px 1px 1px 1px;\n" +
-//"	border-color: #000;\n" +
-//"	margin-top: 5px;\n" +
-"	margin-right: 5px;\n" +
+"    font-size: 0.8em;\n" +
+"    margin-right: 5px;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroup ol {\n" +
-"	list-style: none;\n" +
-"	margin-left: 0;\n" +
-"	margin-top: 0;\n" +
-"	margin-bottom: 0;\n" +
-"	padding-left: 0;\n" +
+"    list-style: none;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroup li {\n" +
-"	margin: 0;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroup li a {\n" +
-"	display: block;\n" +
+"    display: block;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroupName {\n" +
-"	font-size: 80%;\n" +
-"	font-weight: bold;\n" +
+"    font-size: 0.8em;\n" +
+"    font-weight: bold;\n" +
 "}\n";
-
     protected String getTitle() { return "unused"; }
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {

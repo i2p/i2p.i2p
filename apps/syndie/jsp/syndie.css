@@ -1,132 +1,77 @@
-body {
-	margin : 0px;
-	padding : 0px;
-	font-family: Arial, Helvetica, sans-serif;
-	background-color : #EEEEEE;
-	color: #000000;
-}
 .b_topnavUser {
-	text-align: right;
-	background-color: #CCCCDD;
-	border-spacing: 0px;
-	margin: 0px;
-	padding: 0px;
-	border-width: 0px;
-	border: 0px;
+   text-align: right;
+   background-color: #CCCCDD;
 }
 .b_topnavHome {
-	background-color: #CCCCDD;
-	color: #000000;
-	width: 50px;
-	text-align: left;
+   background-color: #CCCCDD;
+   color: #000000;
+   width: 50px;
+   text-align: left;
 }
 .b_topnav {
-	background-color: #CCCCDD;
-	border-spacing: 0px;
-	margin: 0px;
-	padding: 0px;
-	border-width: 0px;
-	border: 0px;
+   background-color: #CCCCDD;
 }
 .b_content {
-        border: 0px;
-        border-spacing: 0px;
-        margin: 0px;
 }
 .s_summary_overall {
-        border: 0px;
-        border-spacing: 0px;
-        margin: 0px;
 }
 .s_detail_overall {
-        border: 0px;
-        border-spacing: 0px;
-        margin: 0px;
 }
 .s_detail_subject {
-	font-size: 80%;
-	text-align: left;
-	background-color: #BBBBFF;
-	border-spacing: 0px;
-	margin: 0px;
-	padding: 0px;
-	border-width: 0px;
-	border: 0px;
-	border-style: none;
+    font-size: 0.8em;
+    text-align: left;
+    background-color: #BBBBFF;
 }
 .s_detail_quote {
-       margin-left: 1em;
-       border-width: 1px;
-       border-color: #DBDBDB;
-       border-style: solid;
-       background-color: #E0E0E0;
+    margin-left: 1em;
+    border: 1px solid #DBDBDB;
+    background-color: #E0E0E0;
 }
 .s_detail_italic {
-       font-style: italic;
+    font-style: italic;
 }
 .s_detail_bold {
-       font-style: normal;
-       font-weight: bold;
+    font-style: normal;
+    font-weight: bold;
 }
 .s_detail_underline {
-       font-style: normal;
-       text-decoration: underline;
+    font-style: normal;
+    text-decoration: underline;
 }
 .s_detail_meta {
-	font-size: 80%;
-	text-align: right;
-	background-color: #BBBBFF;
-	border-spacing: 0px;
-	margin: 0px;
-	padding: 0px;
-	border-width: 0px;
-	border: 0px;
-	border-style: none;
+   font-size: 0.8em;
+   text-align: right;
+   background-color: #BBBBFF;
 }
 
 .s_summary_subject {
-	font-size: 80%;
-	text-align: left;
-	background-color: #BBBBFF;
-	border-spacing: 0px;
-	margin: 0px;
-	padding: 0px;
-	border-width: 0px;
-	border: 0px;
-	border-style: none;
+   font-size: 0.8em;
+   text-align: left;
+   background-color: #BBBBFF;
 }
 .s_summary_meta {
-	font-size: 80%;
-	text-align: right;
-	background-color: #BBBBFF;
-	border-spacing: 0px;
-	margin: 0px;
-	padding: 0px;
-	border-width: 0px;
-	border: 0px;
-	border-style: none;
+   font-size: 0.8em;
+   text-align: right;
+   background-color: #BBBBFF;
 }
 .s_summary_quote {
-       margin-left: 1em;
-       border-width: 1px;
-       border-color: #DBDBDB;
-       border-style: solid;
-       background-color: #E0E0E0;
+    margin-left: 1em;
+    border-width: 1px solid #DBDBDB;
+    background-color: #E0E0E0;
 }
 .s_summary_italic {
-       font-style: italic;
+    font-style: italic;
 }
 .s_summary_bold {
-       font-style: normal;
-       font-weight: bold;
+    font-style: normal;
+    font-weight: bold;
 }
 .s_summary_underline {
-       font-style: normal;
-       text-decoration: underline;
+    font-style: normal;
+    text-decoration: underline;
 }
-
 .s_summary_summDetail {
-	font-size: 80%;
+   font-size: 0.8em;
 }
 .s_detail_summDetail {
 }
@@ -135,9 +80,9 @@ body {
 .s_detail_summDetailBlogLink {
 }
 td.s_detail_summDetail {
-	background-color: #DDDDFF;
+   background-color: #DDDDFF;
 }
 td.s_summary_summ {
-	font-size: 80%;
-	background-color: #DDDDFF;
+   font-size: 0.8em;
+   background-color: #DDDDFF;
 }

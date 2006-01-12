@@ -561,9 +561,9 @@ public abstract class BaseServlet extends HttpServlet {
         out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         out.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
         out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head>\n<title>" + getTitle() + "</title>\n");
-        out.write("<meta http-equiv=\"cache-control\" content=\"no-cache\" />");
-        out.write("<meta http-equiv=\"pragma\" content=\"no-cache\" />");
-        out.write("<style>");
+        out.write("<meta http-equiv=\"cache-control\" content=\"no-cache\" />\n");
+        out.write("<meta http-equiv=\"pragma\" content=\"no-cache\" />\n");
+        out.write("<style>\n");
         out.write(STYLE_HTML);
         Reader css = null;
         try {
@@ -581,7 +581,7 @@ public abstract class BaseServlet extends HttpServlet {
         }
         String content = FileUtil.readTextFile("./docs/syndie_standard.css", -1, true); 
         if (content != null) out.write(content);
-        out.write("</style>");
+        out.write("</style>\n");
         out.write(BEGIN_HTML);
     }
     
@@ -1106,120 +1106,123 @@ public abstract class BaseServlet extends HttpServlet {
 "<span style=\"display: none\"><a href=\"#bodySubject\">Jump to the beginning of the first post rendered, if any</a>\n" +
 "<a href=\"#threads\">Jump to the thread navigation</a>\n</span>\n" +
 "<table border=\"0\" width=\"100%\" class=\"overallTable\">\n";
-    private static final String STYLE_HTML = ".overallTable {\n" +
-"	border-spacing: 0px;\n" +
-"	border-width: 0px;\n" +
-"	border: 0px;\n" +
-"	margin: 0px;\n" +
-"	padding: 0px;\n" +
+    private static final String STYLE_HTML = "* {\n" +
+"    margin: 0;\n" +
+"    padding: 0;\n" +
 "}\n" +
-"* {\n" +
-"                   margin: 0px;\n" +
-"                   padding: 0px;\n" +
+"body {\n" +
+"   font-family: Arial, Helvetica, sans-serif;\n" +
+"    font-size: 100%;\n" +
+"   background-color : #EEEEEE;\n" +
+"   color: #000000;\n" +
+"}\n" +
+"select {\n" +
+"    min-width: 1.5em;\n" +
+"}\n" +
+".overallTable {\n" +
+"    border-spacing: 0px;\n" +
+"    border-collapse:collapse;\n" +
+"    float:left;\n" +
 "}\n" +
 ".topNav {\n" +
-"	background-color: #BBBBBB;\n" +
+"   background-color: #BBBBBB;\n" +
 "}\n" +
 ".topNav_user {\n" +
-"	text-align: left;\n" +
-"	float: left;\n" +
-"	display: inline;\n" +
+"   text-align: left;\n" +
+"   float: left;\n" +
+"   display: inline;\n" +
 "}\n" +
 ".topNav_admin {\n" +
-"	text-align: right;\n" +
-"	float: right;\n" +
-"	margin: 0 5px 0 0;\n" +
-"	display: inline;\n" +
+"   text-align: right;\n" +
+"   float: right;\n" +
+"   margin: 0 5px 0 0;\n" +
+"   display: inline;\n" +
 "}\n" +
 ".controlBar {\n" +
-"	background-color: #BBBBBB;\n" +
+"   background-color: #BBBBBB;\n" +
 "}\n" +
 ".controlBarRight {\n" +
-"	text-align: right;\n" +
+"   text-align: right;\n" +
 "}\n" +
 ".threadEven {\n" +
-"	background-color: #FFFFFF;\n" +
-"	white-space: nowrap;\n" +
+"   background-color: #FFFFFF;\n" +
+"   white-space: nowrap;\n" +
 "}\n" +
 ".threadOdd {\n" +
-"	background-color: #EEEEEE;\n" +
-"	white-space: nowrap;\n" +
+"   background-color: #EEEEEE;\n" +
+"   white-space: nowrap;\n" +
 "}\n" +
 ".threadLeft {\n" +
-"	text-align: left;\n" +
-"	align: left;\n" +
+"   text-align: left;\n" +
+"   align: left;\n" +
 "}\n" +
 ".threadNav {\n" +
-"	background-color: #BBBBBB;\n" +
+"   background-color: #BBBBBB;\n" +
 "}\n" +
 ".threadNavRight {\n" +
-"	text-align: right;\n" +
-"	float: right;\n" +
-"	background-color: #BBBBBB;\n" +
+"   text-align: right;\n" +
+"   float: right;\n" +
+"   background-color: #BBBBBB;\n" +
 "}\n" +
 ".rightOffset {\n" +
-"                   float: right;\n" +
-"                   margin: 0 5px 0 0;\n" +
-"	display: inline;\n" +
-"}\n" +    
+"    float: right;\n" +
+"    margin: 0 5px 0 0;\n" +
+"   display: inline;\n" +
+"}\n" +
 ".threadInfoLeft {\n" +
-"                   float: left;\n" +
-"                   margin: 5px 0px 0 0;\n" +
-"	display: inline;\n" +
-"}\n" +    
+"    float: left;\n" +
+"    margin: 5px 0px 0 0;\n" +
+"   display: inline;\n" +
+"}\n" +
 ".threadInfoRight {\n" +
-"                   float: right;\n" +
-"                   margin: 0 5px 0 0;\n" +
-"	display: inline;\n" +
-"}\n" +    
+"    float: right;\n" +
+"    margin: 0 5px 0 0;\n" +
+"   display: inline;\n" +
+"}\n" +
 ".postMeta {\n" +
-"	background-color: #BBBBFF;\n" +
+"   background-color: #BBBBFF;\n" +
 "}\n" +
 ".postMetaSubject {\n" +
-"	text-align: left;\n" +
+"   text-align: left;\n" +
 "}\n" +
 ".postMetaLink {\n" +
-"	text-align: right;\n" +
+"   text-align: right;\n" +
 "}\n" +
 ".postDetails {\n" +
-"	background-color: #DDDDFF;\n" +
+"   background-color: #DDDDFF;\n" +
 "}\n" +
 ".postReply {\n" +
-"	background-color: #BBBBFF;\n" +
+"   background-color: #BBBBFF;\n" +
 "}\n" +
 ".postReplyText {\n" +
-"	background-color: #BBBBFF;\n" +
+"   background-color: #BBBBFF;\n" +
 "}\n" +
 ".postReplyOptions {\n" +
-"	background-color: #BBBBFF;\n" +
+"   background-color: #BBBBFF;\n" +
 "}\n" +
 ".syndieBlogTopNav {\n" +
-"                   width: 100%;\n" +
-"                   height: 20px;\n" +
-"                   background-color: #BBBBBB;\n" +
-"                   font-size: 100%;\n" +
+"    float:left;\n" +
+"    width: 100%;\n" +
+"    background-color: #BBBBBB;\n" +
 "}\n" +
 ".syndieBlogTopNavUser {\n" +
-"                   text-align: left;\n" +
-"                   float: left;\n" +
-"                   display: inline;\n" +
+"    text-align: left;\n" +
+"    float: left;\n" +
 "}\n" +
 ".syndieBlogTopNavAdmin {\n" +
-"                   text-align: left;\n" +
-"                   float: right;\n" +
-"                   display: inline;\n" +
+"    text-align: left;\n" +
+"    float: right;\n" +
 "}\n" +
 ".syndieBlogFavorites {\n" +
-"                   float: left;\n" +
-"                   margin: 5px 0px 0 0;\n" +
-"	display: inline;\n" +
+"    float: left;\n" +
+"    margin: 5px 0px 0 0;\n" +
+"   display: inline;\n" +
 "}\n" +
 ".syndieBlogList {\n" +
-"                   float: right;\n" +
-"                   margin: 5px 0px 0 0;\n" +
-"	display: inline;\n" +
+"    float: right;\n" +
+"    margin: 5px 0px 0 0;\n" +
+"   display: inline;\n" +
 "}\n";
-
     
     private static final String END_HTML = "</table>\n" +
 "</body>\n";
