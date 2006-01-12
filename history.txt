@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.385 2006/01/12 04:59:57 cervantes Exp $
+$Id: history.txt,v 1.386 2006/01/12 14:35:55 jrandom Exp $
+
+* 2005-01-12  0.6.1.9 released
 
 2005-01-12  jrandom
     * Only create the loadtest.log if requested to do so (thanks zzz!)
