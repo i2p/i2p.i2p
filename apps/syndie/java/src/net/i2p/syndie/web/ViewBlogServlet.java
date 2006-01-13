@@ -619,7 +619,8 @@ public class ViewBlogServlet extends BaseServlet {
         return true;
     }
     
-    private static final String CSS = "* {\n" +
+    private static final String CSS = "\n" +
+"* {\n" +
 "    margin: 0px;\n" +
 "    padding: 0px;\n" +
 "}\n" +
@@ -656,18 +657,18 @@ public class ViewBlogServlet extends BaseServlet {
 "}\n" +
 ".syndieBlogHeader {\n" +
 "    width: 100%;\n" +
-"    font-size: 1.2em;\n" +
 "    background-color: black;\n" +
-"    color: white;\n" +
 "    float:left;\n" +
 "}\n" +
 ".syndieBlogHeader a {\n" +
 "    color: white;\n" +
 "    padding: 4px;\n" +
 "}\n" +
+".syndieBlogHeader b {\n" +
+"    font-size: 1.2em;\n" +
+"}\n" +
 ".syndieBlogLogo {\n" +
 "    float: left;\n" +
-"    display: inline;\n" +
 "}\n" +
 ".syndieBlogLinks {\n" +
 "    width: 20%;\n" +
@@ -684,12 +685,17 @@ public class ViewBlogServlet extends BaseServlet {
 "    list-style: none;\n" +
 "}\n" +
 ".syndieBlogLinkGroup li {\n" +
+"    width: 100%;\n" +
+"    overflow: hidden;\n" +
+"    white-space: nowrap;\n" +
 "}\n" +
 ".syndieBlogLinkGroupName {\n" +
 "    font-weight: bold;\n" +
 "    width: 100%;\n" +
 "    border-bottom: 1px dashed black;\n" +
 "    display: block;\n" +
+"    overflow: hidden;\n" +
+"    white-space: nowrap;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup {\n" +
 "    font-size: 0.8em;\n" +
@@ -699,18 +705,20 @@ public class ViewBlogServlet extends BaseServlet {
 "    padding: 2px;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup ol {\n" +
-"   list-style: none;\n" +
+"    list-style: none;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroup li {\n" +
-"}\n" +
-".syndieBlogPostInfoGroup li a {\n" +
-"    display: block;\n" +
+"    white-space: nowrap;\n" +
+"    width: 100%;\n" +
+"    overflow: hidden;\n" +
 "}\n" +
 ".syndieBlogPostInfoGroupName {\n" +
 "    font-weight: bold;\n" +
 "    width: 100%;\n" +
 "    border-bottom: 1px dashed black;\n" +
 "    display: block;\n" +
+"    overflow: hidden;\n" +
+"    white-space: nowrap;\n" +
 "}\n" +
 ".syndieBlogMeta {\n" +
 "    text-align: left;\n" +
@@ -728,6 +736,7 @@ public class ViewBlogServlet extends BaseServlet {
 "    border: 1px solid black;\n" +
 "    margin-top: 5px;\n" +
 "    margin-right: 5px;\n" +
+"    word-wrap: break-word;\n" +
 "}\n" +
 ".syndieBlogPostHeader {\n" +
 "    background-color: #BBB;\n" +
@@ -768,9 +777,6 @@ public class ViewBlogServlet extends BaseServlet {
 "    list-style: none;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroup li {\n" +
-"}\n" +
-".syndieBlogCommentInfoGroup li a {\n" +
-"    display: block;\n" +
 "}\n" +
 ".syndieBlogCommentInfoGroupName {\n" +
 "    font-size: 0.8em;\n" +
