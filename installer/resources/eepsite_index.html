@@ -7,8 +7,8 @@
 
  <p>This is your eepsite - simply edit the files under ./eepsite/docroot/ 
  and they'll be reachable.  The 'key' to your eepsite that you need to
- give to other people is shown on the I2PTunnel configuration
- <a href="http://localhost:7657/i2ptunnel/">configuration page</a>). </p>
+ give to other people is shown on the eepsite's I2PTunnel
+ <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">configuration page</a>). </p>
  <p>
  If you have any standard java web applications (.war files) such as 
  <a href="http://wiki.blojsom.com/wiki/display/blojsom/About%2Bblojsom">blojsom</a>
@@ -25,22 +25,22 @@
  Your eepsite is up and running but it will be hard for other people to find because it
  doesn't have a name and they don't have your really long Base64 key.
  You could just tell people that really long key but thankfully i2p has an address book
- and several easy ways to tell peple about your eepsite. Here's detailed instructions.
+ and several easy ways to tell people about your eepsite. Here's detailed instructions.
  <ul>
  <li>Pick a name for your eepsite (<i>something</i>.i2p). Use all lower-case.
      You may wish to check first in your own router's address book
      <a href="http://localhost:7657/susidns/addressbook.jsp?book=router&filter=none">here</a>,
      or the file i2p/hosts.txt to see if your name is already taken.
-     Enter the new name for your eepsite on the eepsite i2ptunnel configuration page
-     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">here</a>
+     Enter the new name for your eepsite on the
+     <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
      where it says "Website name". This will replace the default "mysite.i2p".
      Be sure and click "Save".
  <li>Highlight the entire "Local destination" key on the
      <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
      and copy it for
      later pasting. Make sure you get the whole thing - it's over 500 characters and it must end in "AAAA".
- <li>Enter the name and paste in the destination key into your master address book
-     <a href="http://localhost:7657/susidns/addressbook.jsp?book=master">here</a>.
+ <li>Enter the name and paste in the destination key into your
+     <a href="http://localhost:7657/susidns/addressbook.jsp?book=master">master address book</a>.
      Click "Add" to add the destination to your address book.
  <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
      be right back here. Hopefully it worked.
