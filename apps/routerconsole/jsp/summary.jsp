@@ -14,7 +14,6 @@
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br />
  <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><br /><%
     if (helper.updateAvailable()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {

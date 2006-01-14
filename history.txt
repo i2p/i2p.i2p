@@ -1,5 +1,8 @@
-$Id: history.txt,v 1.387 2006/01/12 16:18:40 jrandom Exp $
+$Id: history.txt,v 1.388 2006/01/13 01:27:45 cervantes Exp $
 
+2005-01-14  cervantes
+	* Removed entirely misleading memory status from the console summary.
+	
 2005-01-13  cervantes
 	* Further Syndie layout hardening and typeface balancing.
 
