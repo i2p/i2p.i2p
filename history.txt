@@ -1,36 +1,39 @@
-$Id: history.txt,v 1.388 2006/01/13 01:27:45 cervantes Exp $
+$Id: history.txt,v 1.389 2006/01/14 15:14:47 cervantes Exp $
 
-2005-01-14  cervantes
+2006-01-16  cervantes
+	* Dragged I2P kicking and screaming into 2006 (Oops)
+
+2006-01-14  cervantes
 	* Removed entirely misleading memory status from the console summary.
 	
-2005-01-13  cervantes
+2006-01-13  cervantes
 	* Further Syndie layout hardening and typeface balancing.
 
-* 2005-01-12  0.6.1.9 released
+* 2006-01-12  0.6.1.9 released
 
-2005-01-12  jrandom
+2006-01-12  jrandom
     * Only create the loadtest.log if requested to do so (thanks zzz!)
     * Make sure we cleanly take into consideration the appropriate data
       points when filtering out duplicate messages in the message validator,
       and report the right bloom filter false positives rate (not used for
       anything except debugging)
 
-2005-01-12  cervantes
+2006-01-12  cervantes
     * Syndie CSS tweaks to removed some redundant declarations, improve font
       scaling and layout robustness. Improved cross browser compatibility
       (in other words "kicked IE"). Tightened the look of the blog template
       a little.
 
-2005-01-11  Complication
+2006-01-11  Complication
     * CSS comment fixes
 
-2005-01-11  jrandom
+2006-01-11  jrandom
     * Include the attachments/blogs/etc for comments on the blog view
     * Syndie HTML fixes (thanks cervantes!)
     * Make sure we fully reset the objects going into our cache before we
       reuse them (thanks zzz!)
 
-2005-01-10  jrandom
+2006-01-10  jrandom
     * Added the per-post list of attachments/blogs/etc to the blog view in
       Syndie (though this does not yet include comments or some further
       refinements)
@@ -39,7 +42,7 @@ $Id: history.txt,v 1.388 2006/01/13 01:27:45 cervantes Exp $
     * Give the i2p.exe the correct java.library.path to support the systray
       dll (thanks Bobcat, Sugadude, anon!)
 
-2005-01-09  jrandom
+2006-01-09  jrandom
     * Removed a longstanding bug that had caused unnecessary router identity
       churn due to clock skew
     * Temporarily sanity check within the streaming lib for long pending
@@ -47,7 +50,7 @@ $Id: history.txt,v 1.388 2006/01/13 01:27:45 cervantes Exp $
     * Added support for a blog-wide logo to Syndie, and automated the pushing
       of updated extended blog info data along side the metadata.
 
-2005-01-09  jrandom
+2006-01-09  jrandom
     * Bugfix for a rare SSU error (thanks cervantes!)
     * More progress on the blog interface, allowing customizable blog-wide
       links.
