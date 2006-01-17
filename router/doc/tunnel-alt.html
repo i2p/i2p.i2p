@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.8 2005/07/07 16:16:57 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.9 2005/07/27 14:04:07 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -329,11 +329,11 @@ tunnel to be scrapped and the profiles for peers within it to be adjusted.</p>
 <h2>3) <a name="tunnel.building">Tunnel building</a></h2>
 
 <p>When building a tunnel, the creator must send a request with the necessary
-configuration data to each of the hops in turn, starting with the endpoint, 
-waiting for their reply, then moving on to the next earlier hop.  These tunnel request
-messages and their replies are garlic wrapped so that only the router who knows
-the key can decrypt it, and the path taken in both directions is tunnel routed
-as well.  There are three important dimensions to keep in mind when producing
+configuration data to each of the hops and wait for all of them to agree before
+enabling the tunnel.  The requests are encrypted so that only the peers who need
+to know a piece of information (such as the tunnel layer or IV key) has that
+data.  In addition, only the tunnel creator will have access to the peer's
+reply.  There are three important dimensions to keep in mind when producing
 the tunnels: what peers are used (and where), how the requests are sent (and 
 replies received), and how they are maintained.</p>
 
@@ -376,30 +376,12 @@ as controls for the user to select which strategy to use for individual clients.
 
 <h3>3.2) <a name="tunnel.request">Request delivery</a></h3>
 
-<p>As mentioned above, once the tunnel creator knows what peers should go into
-a tunnel and in what order, the creator builds a series of tunnel request 
-messages, each containing the necessary information for that peer.  For instance,
-participating tunnels will be given the 4 byte nonce with which to reply with, 
-the 4 byte tunnel ID on which they are to send out the messages,
-the 32 byte hash of the next hop's identity, the 32 byte layer key used to
-remove a layer from the tunnel, and a 32 byte IV key used to encrypt the IV.  
-Of course, outbound tunnel endpoints are not 
-given any "next hop" or "next tunnel ID" information.  To allow 
-replies, the request contains a random session tag and a random session key with 
-which the peer should garlic encrypt their decision, as well as the tunnel to which
-that garlic should be sent.  In addition to the above information, various client
-specific options may be included, such as what throttling to place on the tunnel,
-what padding or batch strategies to use, etc.</p>
-
-<p>After building all of the request messages, they are garlic wrapped for the
-target router and sent out an exploratory tunnel.  Upon receipt, that peer 
-determines whether they can or will participate, and if it will, it selects the
-tunnel ID on which it will receive messages.  It then garlic wraps and tunnel
-routes that agreement, tunnel ID, and the nonce provided in the request using the 
-supplied information (session tag, garlic session key, tunnel ID to reply to, and
-router on which that tunnel listens). Upon receipt of the reply at the tunnel 
-creator, the tunnel is considered valid on that hop (if accepted).  Once all 
-peers have accepted, the tunnel is active.</p>
+<p>A new tunnel request preparation, delivery, and response method has been
+<a href="tunnel-alt-creation.html">devised</a>, which reduces the number of
+predecessors exposed, cuts the number of messages transmitted, verifies proper
+connectivity, and avoids the message counting attack of traditional telescopic
+tunnel creation.  The old technique is listed below as an <a
+href="#tunnel.building.exploratory">alternative</a>.</p>
 
 <p>Peers may reject tunnel creation requests for a variety of reasons, though
 a series of four increasingly severe rejections are known: probabalistic rejection
@@ -438,10 +420,9 @@ including the tunnel creator in that set), another alternative is to use the
 tunnel pathways themselves to pass along the request and response, as is done
 in <a href="http://tor.eff.org/">TOR</a>.  This, however, may lead to leaks 
 during tunnel creation, allowing peers to discover how many hops there are later
-on in the tunnel by monitoring the timing or packet count as the tunnel is
-built.  Techniques could be used to minimize this issue, such as using each of 
-the hops as endpoints (per <a href="#tunnel.reroute">2.7.2</a>) for a random
-number of messages before continuing on to build the next hop.</p>
+on in the tunnel by monitoring the timing or <a
+href="http://dev.i2p.net/pipermail/2005-October/001057.html">packet count</a> as
+the tunnel is built.</p>
 
 <h4>3.4.2) <a name="tunnel.building.nonexploratory">Non-exploratory tunnels for management</a></h4>
 
@@ -451,6 +432,14 @@ the tunnel request and response.  Assuming the router has a well integrated view
 of the network, this should not be necessary, but if the router was partitioned
 in some way, using non-exploratory pools for tunnel management would reduce the
 leakage of information about what peers are in the router's partition.</p>
+
+<h4>3.4.3) <a name="tunnel.building.exploratory">Exploratory request delivery</a></h4>
+
+<p>A third alternative, used until I2P 0.6.2, garlic encrypts individual tunnel
+request messages and delivers them to the hops individually, transmitting them
+through exploratory tunnels with their reply coming back in a separate
+exploratory tunnel.  This strategy has been dropped in favor of the one outlined
+above.</p>
 
 <h2>4) <a name="tunnel.throttling">Tunnel throttling</a></h2>
 

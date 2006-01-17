@@ -2,6 +2,7 @@ package net.i2p.router.tunnel;
 
 import java.util.Map;
 
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -20,9 +21,14 @@ public class HopConfig {
     private Hash _sendTo;
     private SessionKey _layerKey;
     private SessionKey _ivKey;
+    private SessionKey _replyKey;
+    private ByteArray _replyIV;
     private long _expiration;
     private Map _options;
     private long _messagesProcessed;
+    
+    /** IV length for {@link #getReplyIV} */
+    public static final int REPLY_IV_LENGTH = 16;
     
     public HopConfig() {
         _receiveTunnelId = null;
@@ -76,6 +82,14 @@ public class HopConfig {
     /** what key should we use to encrypt the preIV before passing it on? */
     public SessionKey getIVKey() { return _ivKey; }
     public void setIVKey(SessionKey key) { _ivKey = key; }
+    
+    /** key to encrypt the reply sent for the new tunnel creation crypto */
+    public SessionKey getReplyKey() { return _replyKey; }
+    public void setReplyKey(SessionKey key) { _replyKey = key; }
+    
+    /** iv used to encrypt the reply sent for the new tunnel creation crypto */
+    public ByteArray getReplyIV() { return _replyIV; }
+    public void setReplyIV(ByteArray iv) { _replyIV = iv; }
     
     /** when does this tunnel expire (in ms since the epoch)? */
     public long getExpiration() { return _expiration; }

@@ -99,8 +99,9 @@ public class TunnelCreatorConfig implements TunnelInfo {
             double normalized = (double)tot * 60d*1000d / (double)timeSince;
             _peakThroughputLastCoallesce = now;
             _peakThroughputCurrentTotal = 0;
-            for (int i = 0; i < _peers.length; i++)
-                _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
+            if (_context != null)
+                for (int i = 0; i < _peers.length; i++)
+                    _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
         }
     }
     public long getVerifiedBytesTransferred() { return _verifiedBytesTransferred; }

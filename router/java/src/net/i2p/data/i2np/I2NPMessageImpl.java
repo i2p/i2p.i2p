@@ -345,6 +345,10 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 return new TunnelCreateMessage(context);
             case TunnelCreateStatusMessage.MESSAGE_TYPE:
                 return new TunnelCreateStatusMessage(context);
+            case TunnelBuildMessage.MESSAGE_TYPE:
+                return new TunnelBuildMessage(context);
+            case TunnelBuildReplyMessage.MESSAGE_TYPE:
+                return new TunnelBuildReplyMessage(context);
             default:
                 Builder builder = (Builder)_builders.get(new Integer(type));
                 if (builder == null)

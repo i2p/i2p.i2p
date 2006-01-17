@@ -1,13 +1,20 @@
-$Id: history.txt,v 1.389 2006/01/14 15:14:47 cervantes Exp $
+$Id: history.txt,v 1.390 2006/01/16 17:00:04 cervantes Exp $
+
+2006-01-17  jrandom
+    * First pass of the new tunnel creation crypto, specified in the new 
+      router/doc/tunnel-alt-creation.html (referenced in the current
+      router/doc/tunnel-alt.html).  It isn't actually used anywhere yet, other
+      than in the test code, but the code verifies the technical viability, so
+      further scrutiny would be warranted.
 
 2006-01-16  cervantes
-	* Dragged I2P kicking and screaming into 2006 (Oops)
+    * Dragged I2P kicking and screaming into 2006 (Oops)
 
 2006-01-14  cervantes
-	* Removed entirely misleading memory status from the console summary.
+    * Removed entirely misleading memory status from the console summary.
 	
 2006-01-13  cervantes
-	* Further Syndie layout hardening and typeface balancing.
+    * Further Syndie layout hardening and typeface balancing.
 
 * 2006-01-12  0.6.1.9 released
 
