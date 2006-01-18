@@ -406,6 +406,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         _bodyBuffer.append(sanitizeURL(schema)).append("&location=");
         _bodyBuffer.append(sanitizeURL(location)).append("&description=");
         _bodyBuffer.append(sanitizeURL(text));
+        _bodyBuffer.append("\" title=\"Goto ").append(sanitizeTagParam(location));
         _bodyBuffer.append("\">").
                     append(sanitizeString(text)).
                     append("</a>");
@@ -593,6 +594,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                             _postBodyBuffer.append("schema=").append(sanitizeURL(l.schema)).append('&');
                     if (l.location != null)
                             _postBodyBuffer.append("location=").append(sanitizeURL(l.location)).append('&');
+                    _postBodyBuffer.append("\" title=\"Goto ").append(sanitizeTagParam(l.location));
                     _postBodyBuffer.append("\">").append(sanitizeString(l.location, 30));
                     _postBodyBuffer.append(getSpan("summDetailExternalNet")).append(" (").append(sanitizeString(l.schema)).append(")</span></a> ");
                 }

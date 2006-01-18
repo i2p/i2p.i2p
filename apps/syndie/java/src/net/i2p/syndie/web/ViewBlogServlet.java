@@ -603,8 +603,8 @@ public class ViewBlogServlet extends BaseServlet {
                 } finally {
                     try { in.close(); } catch (IOException ioe) {}
                     try { out.close(); } catch (IOException ioe) {}
-                    return true;
                 }
+                return true;
             }
         }
         resp.setContentType("img.png");

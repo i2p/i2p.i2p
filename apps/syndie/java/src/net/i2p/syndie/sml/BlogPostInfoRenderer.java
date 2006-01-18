@@ -232,7 +232,8 @@ public class BlogPostInfoRenderer extends EventReceiverImpl {
                     out.append("schema=").append(HTMLRenderer.sanitizeURL(l.schema)).append("&amp;");
                 if (l.location != null)
                     out.append("location=").append(HTMLRenderer.sanitizeURL(l.location)).append("&amp;");
-                out.append("\">").append(HTMLRenderer.sanitizeString(l.location, 30)).append(" (");
+                out.append("\" title=\"Goto ").append(HTMLRenderer.sanitizeTagParam(l.location)).append("\">");
+                out.append(HTMLRenderer.sanitizeString(l.location, 30)).append(" (");
                 out.append(HTMLRenderer.sanitizeString(l.schema, 6)).append(")</a>");
                 
                 out.append("</li>\n");
