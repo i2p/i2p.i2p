@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.391 2006/01/17 17:56:15 jrandom Exp $
+$Id: history.txt,v 1.392 2006/01/18 01:37:53 cervantes Exp $
+
+2006-01-19  Complication
+    * Explain better where eepsite's destkey can be found
 
 2006-01-18  cervantes
     * Add title attributes to all external links in Syndie, so we can rollover
