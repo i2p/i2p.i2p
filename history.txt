@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.392 2006/01/18 01:37:53 cervantes Exp $
+$Id: history.txt,v 1.393 2006/01/19 23:40:24 complication Exp $
+
+2006-01-22  jrandom
+    * New tunnel build process - does not use the new crypto or new peer
+      selection strategies.  However, it does drop the fallback tunnel
+      procedure, except for tunnels who are configured to allow them, or for
+      the exploratory pool during bootstrapping or after a catastrophic
+      failure.  This new process prefers to fail rather than use too-short
+      tunnels, so while it can do some pretty aggressive tunnel rebuilding,
+      it may expose more tunnel failures to the user.
+    * Always prefer normal tunnels to fallback tunnels.
+    * Potential fix for a bug while changing i2cp settings on I2PSnark (thanks
+      bar!)
+    * Do all of the netDb entry writing in a separate thread, avoiding
+      duplicates and batching them up.
 
 2006-01-19  Complication
     * Explain better where eepsite's destkey can be found

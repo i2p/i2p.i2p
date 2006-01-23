@@ -14,6 +14,8 @@ class ClientPeerSelector extends TunnelPeerSelector {
         int length = getLength(ctx, settings);
         if (length < 0)
             return null;
+        if ( (length == 0) && (settings.getLength()+settings.getLengthVariance() > 0) )
+            return null;
         HashSet matches = new HashSet(length);
     
         if (length > 0) {

@@ -125,7 +125,13 @@ public class ConnectionAcceptor implements Runnable
                 if (socketChanged) {
                     continue;
                 } else {
-                    Snark.debug("Null socket accepted, but socket wasn't changed?", Snark.ERROR);
+                    I2PServerSocket ss = I2PSnarkUtil.instance().getServerSocket();
+                    if (ss != serverSocket) {
+                        serverSocket = ss;
+                    } else {
+                        Snark.debug("Null socket accepted, but socket wasn't changed?", Snark.ERROR);
+                        try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                    }
                 }
             } else {
                 Thread t = new I2PThread(new Handler(socket), "Connection-" + socket);

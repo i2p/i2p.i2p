@@ -128,11 +128,16 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info("join as inbound tunnel gateway pointing at " 
                            + _request.getNextRouter().toBase64().substring(0,4) + ":" 
-                           + _request.getNextTunnelId().getTunnelId()
+                           + _request.getNextTunnelId()
                            + " (nonce=" + _request.getNonce() + ")");
             // serve as the inbound tunnel gateway
             cfg.setSendTo(_request.getNextRouter());
-            cfg.setSendTunnelId(DataHelper.toLong(4, _request.getNextTunnelId().getTunnelId()));
+            TunnelId id = _request.getNextTunnelId();
+            if (id == null) {
+                sendRejection(TunnelHistory.TUNNEL_REJECT_CRIT);
+                return;
+            }
+            cfg.setSendTunnelId(DataHelper.toLong(4, id.getTunnelId()));
             getContext().tunnelDispatcher().joinInboundGateway(cfg);
         } else if (_request.getNextRouter() == null) {
             if (_log.shouldLog(Log.INFO))
@@ -143,11 +148,16 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info("join as tunnel participant pointing at " 
                            + _request.getNextRouter().toBase64().substring(0,4) + ":" 
-                           + _request.getNextTunnelId().getTunnelId()
+                           + _request.getNextTunnelId()
                            + " (nonce=" + _request.getNonce() + ")");
             // serve as a general participant
             cfg.setSendTo(_request.getNextRouter());
-            cfg.setSendTunnelId(DataHelper.toLong(4, _request.getNextTunnelId().getTunnelId()));
+            TunnelId id = _request.getNextTunnelId();
+            if (id == null) {
+                sendRejection(TunnelHistory.TUNNEL_REJECT_CRIT);
+                return;
+            }
+            cfg.setSendTunnelId(DataHelper.toLong(4, id.getTunnelId()));
             getContext().tunnelDispatcher().joinParticipant(cfg);
         }
         

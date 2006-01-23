@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.*;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -22,6 +23,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -33,6 +35,7 @@ class PersistentDataStore extends TransientDataStore {
     private Log _log;
     private String _dbDir;
     private KademliaNetworkDatabaseFacade _facade;
+    private Writer _writer;
     
     private final static int READ_DELAY = 60*1000;
     
@@ -42,6 +45,12 @@ class PersistentDataStore extends TransientDataStore {
         _dbDir = dbDir;
         _facade = facade;
         _context.jobQueue().addJob(new ReadJob());
+        ctx.statManager().createRateStat("netDb.writeClobber", "How often we clobber a pending netDb write", "Network Database", new long[] { 60*1000, 10*60*1000 });
+        ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "Network Database", new long[] { 60*1000, 10*60*1000 });
+        _writer = new Writer();
+        I2PThread writer = new I2PThread(_writer, "DBWriter");
+        writer.setDaemon(true);
+        writer.start();
     }
     
     public void restart() {
@@ -56,7 +65,7 @@ class PersistentDataStore extends TransientDataStore {
     public void put(Hash key, DataStructure data) {
         if ( (data == null) || (key == null) ) return;
         super.put(key, data);
-        _context.jobQueue().addJob(new WriteJob(key, data));
+        _writer.queue(key, data);
     }
     
     public int countLeaseSets() {
@@ -103,61 +112,99 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
-    private class WriteJob extends JobImpl {
-        private Hash _key;
-        private DataStructure _data;
-        public WriteJob(Hash key, DataStructure data) {
-            super(PersistentDataStore.this._context);
-            _key = key;
-            _data = data;
+    private class Writer implements Runnable {
+        private Map _keys;
+        private List _keyOrder;
+        public Writer() { 
+            _keys = new HashMap(64);
+            _keyOrder = new ArrayList(64);
         }
-        public String getName() { return "DB Writer Job"; }
-        public void runJob() {
-            _log.info("Writing key " + _key);
-            FileOutputStream fos = null;
-            File dbFile = null;
-            try {
-                String filename = null;
-                File dbDir = getDbDir();
-                
-                if (_data instanceof LeaseSet)
-                    filename = getLeaseSetName(_key);
-                else if (_data instanceof RouterInfo)
-                    filename = getRouterInfoName(_key);
-                else
-                    throw new IOException("We don't know how to write objects of type " + _data.getClass().getName());
-                
-                dbFile = new File(dbDir, filename);
-                long dataPublishDate = getPublishDate();
-                if (dbFile.lastModified() < dataPublishDate) {
-                    // our filesystem is out of date, lets replace it
-                    fos = new FileOutputStream(dbFile);
-                    try {
-                        _data.writeBytes(fos);
-                        fos.close();
-                        dbFile.setLastModified(dataPublishDate);
-                    } catch (DataFormatException dfe) {
-                        _log.error("Error writing out malformed object as " + _key + ": " 
-                                   + _data, dfe);
-                        dbFile.delete();
+        public void queue(Hash key, DataStructure data) {
+            boolean exists = false;
+            int pending = 0;
+            synchronized (_keys) {
+                pending = _keys.size();
+                exists = (null != _keys.put(key, data));
+                if (!exists)
+                    _keyOrder.add(key);
+                _keys.notifyAll();
+            }
+            if (exists)
+                _context.statManager().addRateData("netDb.writeClobber", pending, 0);
+            _context.statManager().addRateData("netDb.writePending", pending, 0);
+        }
+        public void run() {
+            Hash key = null;
+            DataStructure data = null;
+            while (true) { // hmm, probably want a shutdown handle... though this is a daemon thread
+                try {
+                    synchronized (_keys) {
+                        if (_keyOrder.size() <= 0) {
+                            _keys.wait();
+                        } else {
+                            key = (Hash)_keyOrder.remove(0);
+                            data = (DataStructure)_keys.remove(key);
+                        }
                     }
-                } else {
-                    // we've already written the file, no need to waste our time
-                }
-            } catch (IOException ioe) {
-                _log.error("Error writing out the object", ioe);
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+                } catch (InterruptedException ie) {}
+                
+                if ( (key != null) && (data != null) )
+                    write(key, data);
+                key = null;
+                data = null;
+                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
             }
         }
-        private long getPublishDate() {
-            if (_data instanceof RouterInfo) {
-                return ((RouterInfo)_data).getPublished();
-            } else if (_data instanceof LeaseSet) {
-                return ((LeaseSet)_data).getEarliestLeaseDate();
+    }
+    
+    private void write(Hash key, DataStructure data) {
+        _log.info("Writing key " + key);
+        FileOutputStream fos = null;
+        File dbFile = null;
+        try {
+            String filename = null;
+            File dbDir = getDbDir();
+
+            if (data instanceof LeaseSet)
+                filename = getLeaseSetName(key);
+            else if (data instanceof RouterInfo)
+                filename = getRouterInfoName(key);
+            else
+                throw new IOException("We don't know how to write objects of type " + data.getClass().getName());
+
+            dbFile = new File(dbDir, filename);
+            long dataPublishDate = getPublishDate(data);
+            if (dbFile.lastModified() < dataPublishDate) {
+                // our filesystem is out of date, lets replace it
+                fos = new FileOutputStream(dbFile);
+                try {
+                    data.writeBytes(fos);
+                    fos.close();
+                    dbFile.setLastModified(dataPublishDate);
+                } catch (DataFormatException dfe) {
+                    _log.error("Error writing out malformed object as " + key + ": " 
+                               + data, dfe);
+                    dbFile.delete();
+                }
             } else {
-                return -1;
+                // we've already written the file, no need to waste our time
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Not writing " + key.toBase64() + ", as its up to date on disk (file mod-publish=" +
+                               (dbFile.lastModified()-dataPublishDate) + ")");
             }
+        } catch (IOException ioe) {
+            _log.error("Error writing out the object", ioe);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+    }
+    private long getPublishDate(DataStructure data) {
+        if (data instanceof RouterInfo) {
+            return ((RouterInfo)data).getPublished();
+        } else if (data instanceof LeaseSet) {
+            return ((LeaseSet)data).getEarliestLeaseDate();
+        } else {
+            return -1;
         }
     }
     

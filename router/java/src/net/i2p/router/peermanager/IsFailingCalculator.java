@@ -30,6 +30,7 @@ public class IsFailingCalculator extends Calculator {
     
     public boolean calcBoolean(PeerProfile profile) {
         // have we failed in the last 119 seconds?
+        /*
         if ( (profile.getCommError().getRate(60*1000).getCurrentEventCount() > 0) ||
              (profile.getCommError().getRate(60*1000).getLastEventCount() > 0) || 
              (profile.getCommError().getRate(10*60*1000).getCurrentEventCount() > 0) ) {
@@ -38,7 +39,7 @@ public class IsFailingCalculator extends Calculator {
                            + " is failing because it had a comm error recently ");
             return true;
         } else {
-            
+        */  
             //if ( (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0) ||
             //     (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() > 0) ) {
             //    // are they overloaded (or disconnected)?
@@ -76,6 +77,6 @@ public class IsFailingCalculator extends Calculator {
                 return true;
             
             return false;
-        }
+        //}
     }
 }

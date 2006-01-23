@@ -30,7 +30,11 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         Set exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
         exclude.add(ctx.routerHash());
         HashSet matches = new HashSet(length);
-        ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
+        boolean exploreHighCap = Boolean.valueOf(ctx.getProperty("router.exploreHighCapacity", "false")).booleanValue();
+        if (exploreHighCap) 
+            ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
+        else
+            ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
         
         if (l.shouldLog(Log.DEBUG))
             l.debug("profileOrganizer.selectNotFailing(" + length + ") found " + matches);

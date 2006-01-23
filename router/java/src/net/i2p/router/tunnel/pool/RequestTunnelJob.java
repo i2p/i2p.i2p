@@ -45,8 +45,9 @@ public class RequestTunnelJob extends JobImpl {
     private boolean _isFake;
     private boolean _isExploratory;
     
-    static final int HOP_REQUEST_TIMEOUT = 20*1000;
-    private static final int LOOKUP_TIMEOUT = 10*1000;
+    static final int HOP_REQUEST_TIMEOUT_CLIENT = 15*1000;
+    static final int HOP_REQUEST_TIMEOUT_EXPLORATORY = 10*1000;
+    private static final int LOOKUP_TIMEOUT = 5*1000;
     
     public RequestTunnelJob(RouterContext ctx, TunnelCreatorConfig cfg, Job onCreated, Job onFailed, int hop, boolean isFake, boolean isExploratory) {
         super(ctx);
@@ -58,7 +59,7 @@ public class RequestTunnelJob extends JobImpl {
         _currentPeer = null;
         _lookups = 0;
         _lastSendTime = 0;
-        _isFake = isFake;
+        _isFake = isFake || (cfg.getLength() <= 1);
         _isExploratory = isExploratory;
         
         ctx.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -77,6 +78,8 @@ public class RequestTunnelJob extends JobImpl {
         ctx.statManager().createRateStat("tunnel.buildExploratorySuccess3Hop", "How often we succeed building a 3 hop exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildPartialTime", "How long a non-exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildExploratoryPartialTime", "How long an exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryTimeout", "How often a request for an exploratory peer times out?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildClientTimeout", "How often a request for an exploratory peer times out?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting hop " + hop + " in " + cfg);
@@ -136,7 +139,7 @@ public class RequestTunnelJob extends JobImpl {
                     else
                         getContext().jobQueue().addJob(_onCreated);
                 }
-                getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
+                //getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
             }
         } else {
             // outbound tunnel, we're the gateway and hence the last person asked
@@ -176,7 +179,8 @@ public class RequestTunnelJob extends JobImpl {
                     _onCreated.runJob();
                 else
                     getContext().jobQueue().addJob(_onCreated);
-                getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
+                if (_config.getLength() > 1)
+                    getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
             }
         }
     }
@@ -301,15 +305,18 @@ public class RequestTunnelJob extends JobImpl {
                 getContext().jobQueue().addJob(_onCreated);
             if (_isExploratory) {
                 int i = _config.getLength();
-                getContext().statManager().addRateData("tunnel.buildExploratorySuccess", 1, 0);
+                if (i > 1)
+                    getContext().statManager().addRateData("tunnel.buildExploratorySuccess", 1, 0);
                 if (i == 2)
                     getContext().statManager().addRateData("tunnel.buildExploratorySuccess1Hop", 1, 0);
                 else if (i == 3)
                     getContext().statManager().addRateData("tunnel.buildExploratorySuccess2Hop", 1, 0);
                 else if (i == 4)
                     getContext().statManager().addRateData("tunnel.buildExploratorySuccess3Hop", 1, 0);
-            } else
-                getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
+            } else {
+                if (_config.getLength() > 1)
+                    getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
+            }
         }
     }
     
@@ -357,6 +364,10 @@ public class RequestTunnelJob extends JobImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("request timeout: " + _config + " at hop " + _currentHop 
                           + " with nonce " + _nonce);
+            if (_isExploratory)
+                getContext().statManager().addRateData("tunnel.buildExploratoryTimeout", 1, 0);
+            else
+                getContext().statManager().addRateData("tunnel.buildClientTimeout", 1, 0);
             peerFail(0);
         }
     }
@@ -369,7 +380,7 @@ public class RequestTunnelJob extends JobImpl {
         public ReplySelector(long nonce) {
             _nonce = nonce;
             _nonceFound = false;
-            _expiration = getContext().clock().now() + HOP_REQUEST_TIMEOUT;
+            _expiration = getContext().clock().now() + (_isExploratory ? HOP_REQUEST_TIMEOUT_EXPLORATORY : HOP_REQUEST_TIMEOUT_CLIENT);
         }
         public boolean continueMatching() { 
             return (!_nonceFound) && (getContext().clock().now() < _expiration);

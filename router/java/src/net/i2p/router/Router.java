@@ -364,7 +364,12 @@ public class Router {
     public static final char CAPABILITY_UNREACHABLE = 'U';
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
+    public static final char CAPABILITY_NEW_TUNNEL = 'T';
+    
     public void addReachabilityCapability(RouterInfo ri) {
+        // routers who can understand TunnelBuildMessages 
+        ////ri.addCapability(CAPABILITY_NEW_TUNNEL);
+        
         String forceUnreachable = _context.getProperty(PROP_FORCE_UNREACHABLE);
         if ( (forceUnreachable != null) && ("true".equalsIgnoreCase(forceUnreachable)) ) {
             ri.addCapability(CAPABILITY_UNREACHABLE);

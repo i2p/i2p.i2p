@@ -52,7 +52,8 @@ public class SnarkManager implements Snark.CompleteListener {
             while (_messages.size() > MAX_MESSAGES)
                 _messages.remove(0);
         }
-        _log.info("MSG: " + message);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("MSG: " + message);
     }
     
     /** newest last */

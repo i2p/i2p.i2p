@@ -24,6 +24,7 @@ import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -38,17 +39,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private Map _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
-    /** how many build requests are in process */
-    private int _outstandingBuilds;
-    /** max # of concurrent build requests */
-    private int _maxOutstandingBuilds;
     private LoadTestManager _loadTestManager;
-    
-    private static final String PROP_MAX_OUTSTANDING_BUILDS = "router.tunnel.maxConcurrentBuilds";
-    private static final int DEFAULT_MAX_OUTSTANDING_BUILDS = 20;
-
-    private static final String PROP_THROTTLE_CONCURRENT_TUNNELS = "router.tunnel.shouldThrottle";
-    private static final boolean DEFAULT_THROTTLE_CONCURRENT_TUNNELS = false;
+    private BuildExecutor _executor;
+    private boolean _isShutdown;
     
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
@@ -62,18 +55,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
         _clientInboundPools = new HashMap(4);
         _clientOutboundPools = new HashMap(4);
-        _outstandingBuilds = 0;
-        _maxOutstandingBuilds = DEFAULT_MAX_OUTSTANDING_BUILDS;
-        String max = ctx.getProperty(PROP_MAX_OUTSTANDING_BUILDS, String.valueOf(DEFAULT_MAX_OUTSTANDING_BUILDS));
-        if (max != null) {
-            try {
-                _maxOutstandingBuilds = Integer.parseInt(max);
-            } catch (NumberFormatException nfe) {
-                _maxOutstandingBuilds = DEFAULT_MAX_OUTSTANDING_BUILDS;
-            }
-        }
-        
         _loadTestManager = new LoadTestManager(_context);
+        
+        _isShutdown = false;
+        _executor = new BuildExecutor(ctx, this);
+        I2PThread execThread = new I2PThread(_executor, "BuildExecutor");
+        execThread.setDaemon(true);
+        execThread.start();
         
         ctx.statManager().createRateStat("tunnel.testSuccessTime", 
                                          "How long do successful tunnel tests take?", "Tunnels", 
@@ -254,6 +242,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
         
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Building tunnels for the client " + client.calculateHash().toBase64() + ": " + settings);
         Hash dest = client.calculateHash();
         settings.getInboundSettings().setDestination(dest);
         settings.getOutboundSettings().setDestination(dest);
@@ -264,7 +254,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             inbound = (TunnelPool)_clientInboundPools.get(dest);
             if (inbound == null) {
                 inbound = new TunnelPool(_context, this, settings.getInboundSettings(), 
-                                         new ClientPeerSelector(), new TunnelBuilder());
+                                         new ClientPeerSelector());
                 _clientInboundPools.put(dest, inbound);
             } else {
                 inbound.setSettings(settings.getInboundSettings());
@@ -274,7 +264,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             outbound = (TunnelPool)_clientOutboundPools.get(dest);
             if (outbound == null) {
                 outbound = new TunnelPool(_context, this, settings.getOutboundSettings(), 
-                                          new ClientPeerSelector(), new TunnelBuilder());
+                                          new ClientPeerSelector());
                 _clientOutboundPools.put(dest, outbound);
             } else {
                 outbound.setSettings(settings.getOutboundSettings());
@@ -306,70 +296,34 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             outbound.shutdown();
     }
     
-    /** 
-     * Check to make sure we can build this many new tunnels (throttled so
-     * we don't build too many at a time across all pools).
-     *
-     * @param wanted how many tunnels the pool wants to build
-     * @return how many are allowed to be built
-     */
-    int allocateBuilds(int wanted) {
-        boolean shouldThrottle = shouldThrottleTunnels();
-        if (!shouldThrottle) return wanted;
-        
-        synchronized (this) {
-            if (_outstandingBuilds >= _maxOutstandingBuilds) {
-                // ok, as a failsafe, always let one through
-                // nah, its failsafe for a reason.  fix the cause.
-                //_outstandingBuilds++;
-                //return 1;
-                return 0;
-            }
-            if (_outstandingBuilds + wanted < _maxOutstandingBuilds) {
-                _outstandingBuilds += wanted;
-                return wanted;
-            } else {
-                int allowed = _maxOutstandingBuilds - _outstandingBuilds;
-                _outstandingBuilds = _maxOutstandingBuilds;
-                return allowed;
-            }
-        }
-    }
-    
-    private boolean shouldThrottleTunnels() {
-        Boolean rv = Boolean.valueOf(_context.getProperty(PROP_THROTTLE_CONCURRENT_TUNNELS, ""+DEFAULT_THROTTLE_CONCURRENT_TUNNELS));
-        return rv.booleanValue();
-    }
-
     void buildComplete(TunnelCreatorConfig cfg) {
         buildComplete();
         _loadTestManager.addTunnelTestCandidate(cfg);
     }
-    void buildComplete() {
-        synchronized (this) {
-            if (_outstandingBuilds > 0)
-                _outstandingBuilds--;
-        }
-    }
-    
+    void buildComplete() {}
     
     private static final String PROP_LOAD_TEST = "router.loadTest";
     
     public void startup() { 
-        TunnelBuilder builder = new TunnelBuilder();
+        _isShutdown = false;
+        if (!_executor.isRunning()) {
+            I2PThread t = new I2PThread(_executor, "BuildExecutor");
+            t.setDaemon(true);
+            t.start();
+        }
         ExploratoryPeerSelector selector = new ExploratoryPeerSelector();
         
         TunnelPoolSettings inboundSettings = new TunnelPoolSettings();
         inboundSettings.setIsExploratory(true);
         inboundSettings.setIsInbound(true);
-        _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector, builder);
+        _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector);
         _inboundExploratory.startup();
         
         try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
         TunnelPoolSettings outboundSettings = new TunnelPoolSettings();
         outboundSettings.setIsExploratory(true);
         outboundSettings.setIsInbound(false);
-        _outboundExploratory = new TunnelPool(_context, this, outboundSettings, selector, builder);
+        _outboundExploratory = new TunnelPool(_context, this, outboundSettings, selector);
         _outboundExploratory.startup();
         
         // try to build up longer tunnels
@@ -399,7 +353,25 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             _inboundExploratory.shutdown();
         if (_outboundExploratory != null)
             _outboundExploratory.shutdown();
+        _isShutdown = true;
     }
+    
+    /** list of TunnelPool instances currently in play */
+    void listPools(List out) {
+        synchronized (_clientInboundPools) {
+            out.addAll(_clientInboundPools.values());
+        }
+        synchronized (_clientOutboundPools) {
+            out.addAll(_clientOutboundPools.values());
+        }
+        if (_inboundExploratory != null)
+            out.add(_inboundExploratory);
+        if (_outboundExploratory != null)
+            out.add(_outboundExploratory);
+    }
+    void tunnelFailed() { _executor.repoll(); }
+    BuildExecutor getExecutor() { return _executor; }
+    boolean isShutdown() { return _isShutdown; }
     
     public void renderStatusHTML(Writer out) throws IOException {
         out.write("<h2><a name=\"exploratory\">Exploratory tunnels</a> (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
@@ -439,8 +411,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");
         if (rs != null)
             processed = (long)rs.getRate(10*60*1000).getLifetimeTotalValue();
+        int inactive = 0;
         for (int i = 0; i < participating.size(); i++) {
             HopConfig cfg = (HopConfig)participating.get(i);
+            if (cfg.getProcessedMessagesCount() <= 0) {
+                inactive++;
+                continue;
+            }
             out.write("<tr>");
             if (cfg.getReceiveTunnel() != null)
                 out.write("<td>" + cfg.getReceiveTunnel().getTunnelId() +"</td>");
@@ -468,6 +445,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             processed += cfg.getProcessedMessagesCount();
         }
         out.write("</table>\n");
+        out.write("Inactive participating tunnels: " + inactive + "<br />\n");
         out.write("Lifetime bandwidth usage: " + processed + "KB<br />\n");
     }
     
@@ -512,9 +490,22 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             else
                 processedOut += info.getProcessedMessagesCount();
         }
-        if (live <= 0)
-            out.write("<tr><td colspan=\"3\">No tunnels, waiting for the grace period to end</td></tr>\n");
         out.write("</table>\n");
+        List pending = in.listPending();
+        for (int i = 0; i < pending.size(); i++) {
+            TunnelInfo info = (TunnelInfo)pending.get(i);
+            out.write("In progress: <code>" + info.toString() + "</code><br />\n");
+        }
+        live += pending.size();
+        pending = outPool.listPending();
+        for (int i = 0; i < pending.size(); i++) {
+            TunnelInfo info = (TunnelInfo)pending.get(i);
+            out.write("In progress: <code>" + info.toString() + "</code><br />\n");
+        }
+        live += pending.size();
+        
+        if (live <= 0)
+            out.write("<b>No tunnels, waiting for the grace period to end</b><br />\n");
         out.write("Lifetime bandwidth usage: " + processedIn + "KB in, " + processedOut + "KB out<br />");
     }
 }

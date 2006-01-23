@@ -35,8 +35,6 @@ class SendGarlicMessageJob extends JobImpl {
     private SessionKey _sentKey;
     private Set _sentTags;
     
-    private static final int TIMEOUT = RequestTunnelJob.HOP_REQUEST_TIMEOUT;
-    
     public SendGarlicMessageJob(RouterContext ctx, I2NPMessage payload, RouterInfo target, MessageSelector selector, ReplyJob onReply, Job onTimeout, SessionKey sentKey, Set sentTags) {
         super(ctx);
         _log = ctx.logManager().getLog(SendGarlicMessageJob.class);
@@ -61,14 +59,15 @@ class SendGarlicMessageJob extends JobImpl {
         payload.setRecipient(_target);
         payload.setDeliveryInstructions(instructions);
         payload.setRequestAck(false);
-        payload.setExpiration(getContext().clock().now() + RequestTunnelJob.HOP_REQUEST_TIMEOUT);
+        payload.setExpiration(_payload.getMessageExpiration());
+        int timeout = (int)(payload.getExpiration() - getContext().clock().now());
         
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, _sentKey, _sentTags);
 
         // so we will look for the reply
-        OutNetMessage dummyMessage = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, TIMEOUT);
+        OutNetMessage dummyMessage = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, timeout);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Scheduling timeout job (" + _onTimeout + ") to be run in " + TIMEOUT + "ms");
+            _log.debug("Scheduling timeout job (" + _onTimeout + ") to be run in " + timeout + "ms");
   
         // now find an outbound tunnel and send 'er off
         TunnelInfo out = getContext().tunnelManager().selectOutboundTunnel();

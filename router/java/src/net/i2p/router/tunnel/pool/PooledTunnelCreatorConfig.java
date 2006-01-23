@@ -13,7 +13,6 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
     private boolean _failed;
     private TestJob _testJob;
-    private RebuildJob _rebuildJob;
     private Job _expireJob;
     
     /** Creates a new instance of PooledTunnelCreatorConfig */
@@ -48,11 +47,6 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         // selected again.  _expireJob is left to do its thing, in case there
         // are any straggling messages coming down the tunnel
         _pool.tunnelFailed(this);
-        if (_rebuildJob != null) {
-            // rebuild asap (_rebuildJob will be null if we were just a stopgap)
-            _rebuildJob.getTiming().setStartAfter(_context.clock().now() + 10*1000);
-            _context.jobQueue().addJob(_rebuildJob);
-        }
         if (_testJob != null) // just in case...
             _context.jobQueue().removeJob(_testJob);
     }
@@ -61,6 +55,5 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public TunnelPool getTunnelPool() { return _pool; }
     
     public void setTestJob(TestJob job) { _testJob = job; }
-    public void setRebuildJob(RebuildJob job) { _rebuildJob = job; }
     public void setExpireJob(Job job) { _expireJob = job; }
 }
