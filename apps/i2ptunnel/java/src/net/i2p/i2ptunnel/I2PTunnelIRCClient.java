@@ -125,10 +125,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         }
 
         public void run() {
-            InputStream input;
+            BufferedReader in;
             OutputStream output;
             try {
-                input=remote.getInputStream();
+                in = new BufferedReader(new InputStreamReader(remote.getInputStream(), "ISO-8859-1"));
                 output=local.getOutputStream();
             } catch (IOException e) {
                 if (_log.shouldLog(Log.ERROR))
@@ -141,7 +141,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 while(true)
                 {
                     try {
-                        String inmsg = DataHelper.readLine(input);
+                        String inmsg = in.readLine();
                         if(inmsg==null)
                             break;
                         if(inmsg.endsWith("\r"))
@@ -159,7 +159,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                                     _log.info("inbound: "+outmsg);
                             }
                             outmsg=outmsg+"\n";
-                            output.write(outmsg.getBytes());
+                            output.write(outmsg.getBytes("ISO-8859-1"));
                         } else {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("inbound BLOCKED: "+inmsg);
@@ -195,10 +195,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             }
                 
             public void run() {
-                InputStream input;
+                BufferedReader in;
                 OutputStream output;
                 try {
-                    input=local.getInputStream();
+                    in = new BufferedReader(new InputStreamReader(local.getInputStream(), "ISO-8859-1"));
                     output=remote.getOutputStream();
                 } catch (IOException e) {
                     if (_log.shouldLog(Log.ERROR))
@@ -211,7 +211,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                     while(true)
                     {
                         try {
-                            String inmsg = DataHelper.readLine(input);
+                            String inmsg = in.readLine();
                             if(inmsg==null)
                                 break;
                             if(inmsg.endsWith("\r"))
@@ -229,7 +229,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                                         _log.info("outbound: "+outmsg);
                                 }
                                 outmsg=outmsg+"\n";
-                                output.write(outmsg.getBytes());
+                                output.write(outmsg.getBytes("ISO-8859-1"));
                             } else {
                                 if (_log.shouldLog(Log.WARN))
                                     _log.warn("outbound BLOCKED: "+"\""+inmsg+"\"");

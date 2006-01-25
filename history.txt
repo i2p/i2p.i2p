@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.393 2006/01/19 23:40:24 complication Exp $
+$Id: history.txt,v 1.394 2006/01/22 19:51:57 jrandom Exp $
+
+2006-01-25  dust
+    * Fix IRC client proxy to use ISO-8859-1.
 
 2006-01-22  jrandom
     * New tunnel build process - does not use the new crypto or new peer
