@@ -81,6 +81,9 @@ public class SummaryHelper {
             now = _fmt.format(new Date(_context.clock().now()));
         }
         
+        if (!_context.clock().getUpdatedSuccessfully())
+            return now + " (nknown skew)";
+        
         long ms = _context.clock().getOffset();
         
         long diff = ms;
