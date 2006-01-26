@@ -176,8 +176,8 @@ public class Rate {
     }
 
     public void coalesce() {
+        long now = now();
         synchronized (_lock) {
-            long now = now();
             long measuredPeriod = now - _lastCoalesceDate;
             if (measuredPeriod < _period) {
                 // no need to coalesce

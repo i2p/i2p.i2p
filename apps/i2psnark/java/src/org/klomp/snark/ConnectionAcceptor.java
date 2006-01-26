@@ -113,10 +113,10 @@ public class ConnectionAcceptor implements Runnable
             // ok, already updated
             socketChanged = false;
         }
-        if (serverSocket == null) {
-            Snark.debug("Server socket went away.. boo hiss", Snark.ERROR);
-            stop = true;
-            return;
+        while ( (serverSocket == null) && (!stop)) {
+            serverSocket = I2PSnarkUtil.instance().getServerSocket();
+            if (serverSocket == null)
+                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
         }
         try
           {
@@ -128,9 +128,7 @@ public class ConnectionAcceptor implements Runnable
                     I2PServerSocket ss = I2PSnarkUtil.instance().getServerSocket();
                     if (ss != serverSocket) {
                         serverSocket = ss;
-                    } else {
-                        Snark.debug("Null socket accepted, but socket wasn't changed?", Snark.ERROR);
-                        try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                        socketChanged = true;
                     }
                 }
             } else {
@@ -154,7 +152,8 @@ public class ConnectionAcceptor implements Runnable
 
     try
       {
-        serverSocket.close();
+        if (serverSocket != null)
+          serverSocket.close();
       }
     catch (I2PException ignored) { }
     

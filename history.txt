@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.394 2006/01/22 19:51:57 jrandom Exp $
+$Id: history.txt,v 1.395 2006/01/25 10:34:28 dust Exp $
+
+2006-01-25  jrandom
+    * Run the peer profile coalescing/reorganization outside the job queue
+      (on one of the timers), to cut down on some job queue congestion.  Also,
+      trim old profiles while running, not just when starting up.
+    * Slightly more sane intra-floodfill-node netDb activity (only flood new
+      entries)
+    * Workaround in the I2PTunnelHTTPServer for some bad requests (though the
+      source of the bug is not yet addressed)
+    * Better I2PSnark reconnection handling
+    * Further cleanup in the new tunnel build process
+    * Make sure we expire old participants properly
+    * Remove much of the transient overload throttling (it wasn't using a good
+      metric)
 
 2006-01-25  dust
     * Fix IRC client proxy to use ISO-8859-1.

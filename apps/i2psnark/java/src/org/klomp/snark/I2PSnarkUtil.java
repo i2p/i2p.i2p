@@ -152,7 +152,11 @@ public class I2PSnarkUtil {
     }
     
     public I2PServerSocket getServerSocket() { 
-        return _manager.getServerSocket();
+        I2PSocketManager mgr = _manager;
+        if (mgr != null)
+            return mgr.getServerSocket();
+        else
+            return null;
     }
     
     String getOurIPString() {

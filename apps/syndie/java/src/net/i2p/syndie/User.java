@@ -115,7 +115,9 @@ public class User {
         for (Iterator iter = _petnames.getNames().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             PetName pn = _petnames.getByName(name);
-            if (AddressesServlet.PROTO_TAG.equals(pn.getProtocol()))
+            if (pn == null) continue;
+            String proto = pn.getProtocol();
+            if ( (proto != null) && (AddressesServlet.PROTO_TAG.equals(proto)) )
                 rv.add(pn.getLocation());
         }
         if (rv.size() <= 0) {
