@@ -113,6 +113,7 @@ class HarvesterJob extends JobImpl {
         msg.setSearchKey(peer);
         msg.setReplyTunnel(null);
         SendMessageDirectJob job = new SendMessageDirectJob(getContext(), msg, peer, 10*1000, PRIORITY);
-        getContext().jobQueue().addJob(job);
+        job.runJob();
+        //getContext().jobQueue().addJob(job);
     }
 }

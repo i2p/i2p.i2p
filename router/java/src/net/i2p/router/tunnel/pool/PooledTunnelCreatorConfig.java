@@ -14,6 +14,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private boolean _failed;
     private TestJob _testJob;
     private Job _expireJob;
+    private int _failures;
     
     /** Creates a new instance of PooledTunnelCreatorConfig */
     
@@ -24,6 +25,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         super(ctx, length, isInbound, destination);
         _failed = false;
         _pool = null;
+        _failures = 0;
     }
     
     
@@ -31,6 +33,11 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         if (_testJob != null) {
             _testJob.testSuccessful(ms);
         }
+        int failures = _failures - 1;
+        if (failures < 0)
+            _failures = 0;
+        else
+            _failures = failures;
     }
     
     public Properties getOptions() {
@@ -38,17 +45,25 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         return _pool.getSettings().getUnknownOptions();
     }
     
+    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 2;
+    
     /**
      * The tunnel failed, so stop using it
      */
-    public void tunnelFailed() {
-        _failed = true;
-        // remove us from the pool (but not the dispatcher) so that we aren't 
-        // selected again.  _expireJob is left to do its thing, in case there
-        // are any straggling messages coming down the tunnel
-        _pool.tunnelFailed(this);
-        if (_testJob != null) // just in case...
-            _context.jobQueue().removeJob(_testJob);
+    public boolean tunnelFailed() {
+        _failures++;
+        if (_failures > MAX_CONSECUTIVE_TEST_FAILURES) {
+            _failed = true;
+            // remove us from the pool (but not the dispatcher) so that we aren't 
+            // selected again.  _expireJob is left to do its thing, in case there
+            // are any straggling messages coming down the tunnel
+            _pool.tunnelFailed(this);
+            if (_testJob != null) // just in case...
+                _context.jobQueue().removeJob(_testJob);
+            return false;
+        } else {
+            return true;
+        }
     }
     public boolean getTunnelFailed() { return _failed; }
     public void setTunnelPool(TunnelPool pool) { _pool = pool; }

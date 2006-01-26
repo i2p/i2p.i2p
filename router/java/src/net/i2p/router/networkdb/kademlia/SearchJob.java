@@ -339,7 +339,7 @@ class SearchJob extends JobImpl {
     protected void sendLeaseSearch(RouterInfo router) {
         TunnelInfo inTunnel = getInboundTunnelId(); 
         if (inTunnel == null) {
-            _log.error("No tunnels to get search replies through!  wtf!");
+            _log.warn("No tunnels to get search replies through!  wtf!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
@@ -362,7 +362,7 @@ class SearchJob extends JobImpl {
 	
         TunnelInfo outTunnel = getOutboundTunnelId();
         if (outTunnel == null) {
-            _log.error("No tunnels to send search out through!  wtf!");
+            _log.warn("No tunnels to send search out through!  wtf!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }        
@@ -398,7 +398,8 @@ class SearchJob extends JobImpl {
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
                                                           reply, new FailedJob(getContext(), router), sel, timeout, SEARCH_PRIORITY);
-        getContext().jobQueue().addJob(j);
+        j.runJob();
+        //getContext().jobQueue().addJob(j);
     }
     
     /** 

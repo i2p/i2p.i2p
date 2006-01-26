@@ -41,6 +41,10 @@ class TestJob extends JobImpl {
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.testExploratoryFailedTime", "How long did the failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.testFailedCompletelyTime", "How long did the complete failure take (max of 60s for full timeout)?", "Tunnels", 
+                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.testExploratoryFailedCompletelyTime", "How long did the complete failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
+                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.testSuccessLength", "How long were the tunnels that passed the test?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.testSuccessTime", "How long did tunnel testing take?", "Tunnels", 
@@ -72,8 +76,8 @@ class TestJob extends JobImpl {
         }
         
         if ( (_replyTunnel == null) || (_outTunnel == null) ) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Insufficient tunnels to test " + _cfg + " with: " + _replyTunnel + " / " + _outTunnel);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Insufficient tunnels to test " + _cfg + " with: " + _replyTunnel + " / " + _outTunnel);
             getContext().statManager().addRateData("tunnel.testAborted", _cfg.getLength(), 0);
             scheduleRetest();
         } else {
@@ -161,9 +165,17 @@ class TestJob extends JobImpl {
             getContext().statManager().addRateData("tunnel.testExploratoryFailedTime", timeToFail, timeToFail);
         else
             getContext().statManager().addRateData("tunnel.testFailedTime", timeToFail, timeToFail);
-        _cfg.tunnelFailed();
         if (_log.shouldLog(Log.WARN))
             _log.warn("Tunnel test failed in " + timeToFail + "ms: " + _cfg);
+        boolean keepGoing = _cfg.tunnelFailed();
+        if (keepGoing) {
+            scheduleRetest();
+        } else {
+            if (_pool.getSettings().isExploratory())
+                getContext().statManager().addRateData("tunnel.testExploratoryFailedCompletelyTime", timeToFail, timeToFail);
+            else
+                getContext().statManager().addRateData("tunnel.testFailedCompletelyTime", timeToFail, timeToFail);
+        }
     }
     
     /** randomized time we should wait before testing */

@@ -78,8 +78,8 @@ public class RequestTunnelJob extends JobImpl {
         ctx.statManager().createRateStat("tunnel.buildExploratorySuccess3Hop", "How often we succeed building a 3 hop exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildPartialTime", "How long a non-exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildExploratoryPartialTime", "How long an exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildExploratoryTimeout", "How often a request for an exploratory peer times out?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildClientTimeout", "How often a request for an exploratory peer times out?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryTimeout", "How often a request for an exploratory tunnel's peer times out?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildClientTimeout", "How often a request for a client tunnel's peer times out?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting hop " + hop + " in " + cfg);
@@ -192,9 +192,10 @@ public class RequestTunnelJob extends JobImpl {
         
         TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel();
         if (replyTunnel == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("No inbound tunnels to build tunnels with!");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No inbound tunnels to build tunnels with!");
             tunnelFail();
+            return;
         }
         Hash replyGateway = replyTunnel.getPeer(0);
         
@@ -214,6 +215,11 @@ public class RequestTunnelJob extends JobImpl {
         msg.setReplyTag(replyTag);
         int duration = 10*60; // (int)((_config.getExpiration() - getContext().clock().now())/1000);
         msg.setDurationSeconds(duration);
+        long now = getContext().clock().now();
+        if (_isExploratory)
+            msg.setMessageExpiration(now + HOP_REQUEST_TIMEOUT_EXPLORATORY);
+        else
+            msg.setMessageExpiration(now + HOP_REQUEST_TIMEOUT_CLIENT);
         if (_currentHop == 0)
             msg.setIsGateway(true);
         else

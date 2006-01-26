@@ -322,7 +322,8 @@ public class ClientConnectionRunner {
      */ 
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
         if (_dead) return;
-        _context.jobQueue().addJob(new MessageReceivedJob(_context, this, toDest, fromDest, payload));
+        MessageReceivedJob j = new MessageReceivedJob(_context, this, toDest, fromDest, payload);
+        j.runJob();
     }
     
     /**

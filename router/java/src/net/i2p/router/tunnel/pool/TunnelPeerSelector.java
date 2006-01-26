@@ -45,6 +45,7 @@ abstract class TunnelPeerSelector {
             if (length < 0)
                 length = 0;
         }
+        /*
         if ( (ctx.tunnelManager().getOutboundTunnelCount() <= 0) || 
              (ctx.tunnelManager().getFreeTunnelCount() <= 0) ) {
             Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
@@ -59,6 +60,7 @@ abstract class TunnelPeerSelector {
                 return -1;
             }
         }
+        */
         return length;
     }
     

@@ -193,8 +193,11 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             _log.debug("sending (" + status + ") to the tunnel " 
                        + _request.getReplyGateway().toBase64().substring(0,4) + ":"
                        + _request.getReplyTunnel() + " wrt " + _request);
-        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), gw, _request.getReplyGateway(), 
-                                                                REPLY_TIMEOUT, REPLY_PRIORITY));
+        SendMessageDirectJob job = new SendMessageDirectJob(getContext(), gw, _request.getReplyGateway(), 
+                                                            REPLY_TIMEOUT, REPLY_PRIORITY);
+        // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
+        job.runJob(); 
+        //getContext().jobQueue().addJob(job);
     }
     
     private GarlicMessage createReply(TunnelCreateStatusMessage reply) {

@@ -4,6 +4,7 @@ import java.util.*;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
@@ -73,7 +74,7 @@ class BuildExecutor implements Runnable {
         List wanted = new ArrayList(8);
         List pools = new ArrayList(8);
         
-        while (!_manager.isShutdown()) {
+        while (!_manager.isShutdown()){
             try {
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
@@ -91,38 +92,51 @@ class BuildExecutor implements Runnable {
                 // zero hop ones can run inline
                 allowed = buildZeroHopTunnels(wanted, allowed);
                 
-                if ( (allowed > 0) && (wanted.size() > 0) ) {
-                    Collections.shuffle(wanted, _context.random());
-                    for (int i = 0; (i < allowed) && (wanted.size() > 0); i++) {
-                        TunnelPool pool = (TunnelPool)wanted.remove(0);
-                        //if (pool.countWantedTunnels() <= 0)
-                        //    continue;
-                        PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
-                        if (cfg != null) {
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
-                            synchronized (_currentlyBuilding) {
-                                _currentlyBuilding.add(cfg);
-                            }
-                            buildTunnel(pool, cfg);
-                            if (cfg.getLength() <= 1)
-                                i--; //0hop, we can keep going, as there's no worry about throttling
-                        } else {
-                            i--;
-                        }
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
+
+                TunnelManagerFacade mgr = _context.tunnelManager();
+                if ( (mgr == null) || (mgr.selectInboundTunnel() == null) || (mgr.selectOutboundTunnel() == null) ) {
+                    // we don't have either inbound or outbound tunnels, so don't bother trying to build
+                    // non-zero-hop tunnels
+                    synchronized (_currentlyBuilding) {
+                        _currentlyBuilding.wait(5*1000+_context.random().nextInt(5*1000));
                     }
                 } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Nothin' doin, wait for a while");
-                    try {
-                        synchronized (_currentlyBuilding) {
-                            if (allowed <= 0)
-                                _currentlyBuilding.wait(_context.random().nextInt(5*1000));
-                            else // wanted <= 0
-                                _currentlyBuilding.wait(_context.random().nextInt(30*1000));
+                    if ( (allowed > 0) && (wanted.size() > 0) ) {
+                        Collections.shuffle(wanted, _context.random());
+                        for (int i = 0; (i < allowed) && (wanted.size() > 0); i++) {
+                            TunnelPool pool = (TunnelPool)wanted.remove(0);
+                            //if (pool.countWantedTunnels() <= 0)
+                            //    continue;
+                            PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
+                            if (cfg != null) {
+                                if (_log.shouldLog(Log.DEBUG))
+                                    _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
+                                synchronized (_currentlyBuilding) {
+                                    _currentlyBuilding.add(cfg);
+                                }
+                                buildTunnel(pool, cfg);
+                                // 0hops are taken care of above, these are nonstandard 0hops
+                                //if (cfg.getLength() <= 1)
+                                //    i--; //0hop, we can keep going, as there's no worry about throttling
+                            } else {
+                                i--;
+                            }
                         }
-                    } catch (InterruptedException ie) {
-                        // someone wanted to build something
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Nothin' doin, wait for a while");
+                        try {
+                            synchronized (_currentlyBuilding) {
+                                if (allowed <= 0)
+                                    _currentlyBuilding.wait(_context.random().nextInt(5*1000));
+                                else // wanted <= 0
+                                    _currentlyBuilding.wait(_context.random().nextInt(30*1000));
+                            }
+                        } catch (InterruptedException ie) {
+                            // someone wanted to build something
+                        }
                     }
                 }
 

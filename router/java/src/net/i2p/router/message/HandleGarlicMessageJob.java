@@ -82,7 +82,9 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
                     SendMessageDirectJob j = new SendMessageDirectJob(getContext(), data, 
                                                                       instructions.getRouter(), 
                                                                       10*1000, 100);
-                    getContext().jobQueue().addJob(j);
+                    // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
+                    j.runJob(); 
+                    //getContext().jobQueue().addJob(j);
                 }
                 return;
             case DeliveryInstructions.DELIVERY_MODE_TUNNEL:
@@ -90,9 +92,12 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
                 gw.setMessage(data);
                 gw.setTunnelId(instructions.getTunnelId());
                 gw.setMessageExpiration(data.getMessageExpiration());
-                getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), gw, 
-                                                                        instructions.getRouter(), 
-                                                                        10*1000, 100));
+                SendMessageDirectJob job = new SendMessageDirectJob(getContext(), gw, 
+                                                                    instructions.getRouter(), 
+                                                                    10*1000, 100);
+                // run it inline (adds to the outNetPool if it has the router info, otherwise queue a lookup)
+                job.runJob(); 
+                // getContext().jobQueue().addJob(job);
                 return;
             default:
                 _log.error("Unknown instruction " + instructions.getDeliveryMode() + ": " + instructions);

@@ -75,6 +75,7 @@ class SendGarlicMessageJob extends JobImpl {
             if (_onTimeout != null) 
                 getContext().jobQueue().addJob(_onTimeout);
             getContext().messageRegistry().unregisterPending(dummyMessage);
+            return;
         }
         TunnelId outId = out.getSendTunnelId(0);
         if (_log.shouldLog(Log.DEBUG))

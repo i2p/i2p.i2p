@@ -532,6 +532,7 @@ public class TunnelDispatcher implements Service {
         
         public LeaveTunnel(RouterContext ctx) {
             super(ctx);
+            getTiming().setStartAfter(ctx.clock().now());
             _configs = new ArrayList(128);
             _times = new ArrayList(128);
         }
@@ -543,12 +544,15 @@ public class TunnelDispatcher implements Service {
                 _times.add(dropTime);
             }
             
+            if (_log.shouldLog(Log.INFO)) {
+                long now = getContext().clock().now();
+                _log.info("Scheduling leave in " + DataHelper.formatDuration(dropTime.longValue()-now) +": " + cfg);
+            }
+            
             long oldAfter = getTiming().getStartAfter();
-            if (oldAfter < getContext().clock().now()) {
+            if ( (oldAfter <= 0) || (oldAfter < getContext().clock().now()) || (oldAfter >= dropTime.longValue()) ) {
                 getTiming().setStartAfter(dropTime.longValue());
                 getContext().jobQueue().addJob(LeaveTunnel.this);
-            } else if (oldAfter >= dropTime.longValue()) {
-                getTiming().setStartAfter(dropTime.longValue());
             } else {
                 // already scheduled for the future, and before this expiration
             }
@@ -559,22 +563,28 @@ public class TunnelDispatcher implements Service {
             HopConfig cur = null;
             Long nextTime = null;
             long now = getContext().clock().now();
-            synchronized (LeaveTunnel.this) {
-                if (_configs.size() <= 0)
-                    return;
-                nextTime = (Long)_times.get(0);
-                if (nextTime.longValue() <= now) {
-                    cur = (HopConfig)_configs.remove(0);
-                    _times.remove(0);
-                    if (_times.size() > 0)
-                        nextTime = (Long)_times.get(0);
-                    else
-                        nextTime = null;
+            while (true) {
+                synchronized (LeaveTunnel.this) {
+                    if (_configs.size() <= 0)
+                        return;
+                    nextTime = (Long)_times.get(0);
+                    if (nextTime.longValue() <= now) {
+                        cur = (HopConfig)_configs.remove(0);
+                        _times.remove(0);
+                        if (_times.size() > 0)
+                            nextTime = (Long)_times.get(0);
+                        else
+                            nextTime = null;
+                    } else {
+                        cur = null;
+                    }
                 }
+
+                if (cur != null) 
+                    remove(cur);
+                else
+                    break;
             }
-            
-            if (cur != null) 
-                remove(cur);
             
             if (nextTime != null) {
                 getTiming().setStartAfter(nextTime.longValue());

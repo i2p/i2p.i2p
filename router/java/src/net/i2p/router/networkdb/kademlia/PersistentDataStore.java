@@ -225,12 +225,14 @@ class PersistentDataStore extends TransientDataStore {
             int routerCount = 0;
             try {
                 File dbDir = getDbDir();
-                File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
-                if (leaseSetFiles != null) {
-                    for (int i = 0; i < leaseSetFiles.length; i++) {
-                        Hash key = getLeaseSetHash(leaseSetFiles[i].getName());
-                        if ( (key != null) && (!isKnown(key)) )
-                            PersistentDataStore.this._context.jobQueue().addJob(new ReadLeaseJob(leaseSetFiles[i], key));
+                if (getContext().router().getUptime() < 10*60*1000) {
+                    File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
+                    if (leaseSetFiles != null) {
+                        for (int i = 0; i < leaseSetFiles.length; i++) {
+                            Hash key = getLeaseSetHash(leaseSetFiles[i].getName());
+                            if ( (key != null) && (!isKnown(key)) )
+                                PersistentDataStore.this._context.jobQueue().addJob(new ReadLeaseJob(leaseSetFiles[i], key));
+                        }
                     }
                 }
                 File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());

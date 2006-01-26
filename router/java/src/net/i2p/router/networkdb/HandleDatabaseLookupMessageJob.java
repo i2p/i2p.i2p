@@ -236,7 +236,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending reply directly to " + toPeer);
             Job send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
-            getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
+            send.runJob();
+            //getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
         }
     }
     
@@ -255,7 +256,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             m.setMessageExpiration(message.getMessageExpiration());
             m.setTunnelId(replyTunnel);
             SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, 100);
-            getContext().jobQueue().addJob(j);
+            j.runJob();
+            //getContext().jobQueue().addJob(j);
         }
     }
     

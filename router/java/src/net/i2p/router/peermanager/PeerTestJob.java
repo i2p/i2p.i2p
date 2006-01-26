@@ -115,7 +115,7 @@ public class PeerTestJob extends JobImpl {
     private void testPeer(RouterInfo peer) {
         TunnelInfo inTunnel = getInboundTunnelId(); 
         if (inTunnel == null) {
-            _log.error("No tunnels to get peer test replies through!  wtf!");
+            _log.warn("No tunnels to get peer test replies through!  wtf!");
             return;
         }
         TunnelId inTunnelId = inTunnel.getReceiveTunnelId(0);
@@ -135,7 +135,7 @@ public class PeerTestJob extends JobImpl {
 	
         TunnelInfo outTunnel = getOutboundTunnelId();
         if (outTunnel == null) {
-            _log.error("No tunnels to send search out through!  wtf!");
+            _log.warn("No tunnels to send search out through!  wtf!");
             return;
         }
         

@@ -278,12 +278,12 @@ class StoreJob extends JobImpl {
         
         TunnelInfo replyTunnel = selectInboundTunnel();
         if (replyTunnel == null) {
-            _log.error("No reply inbound tunnels available!");
+            _log.warn("No reply inbound tunnels available!");
             return;
         }
         TunnelId replyTunnelId = replyTunnel.getReceiveTunnelId(0);
         if (replyTunnel == null) {
-            _log.error("No reply inbound tunnels available!");
+            _log.warn("No reply inbound tunnels available!");
             return;
         }
         msg.setReplyToken(token);
@@ -312,8 +312,8 @@ class StoreJob extends JobImpl {
             getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, peer.getIdentity().getHash());
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("No outbound tunnels to send a dbStore out!");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No outbound tunnels to send a dbStore out!");
             fail();
         }
     }

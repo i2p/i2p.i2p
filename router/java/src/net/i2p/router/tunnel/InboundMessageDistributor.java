@@ -92,8 +92,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             // so we send it out a tunnel first
             TunnelInfo out = _context.tunnelManager().selectOutboundTunnel(_client);
             if (out == null) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("no outbound tunnel to send the client message for " + _client + ": " + msg);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("no outbound tunnel to send the client message for " + _client + ": " + msg);
                 return;
             }
             if (_log.shouldLog(Log.INFO))

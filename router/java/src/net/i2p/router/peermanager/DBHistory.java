@@ -156,7 +156,8 @@ public class DBHistory {
     public void setUnpromptedDbStoreOld(long num) { _unpromptedDbStoreOld = num; }
     
     public void coalesceStats() {
-        _log.debug("Coallescing stats");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Coallescing stats");
         _failedLookupRate.coalesceStats();
         _invalidReplyRate.coalesceStats();
     }

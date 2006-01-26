@@ -240,7 +240,9 @@ public class TunnelPool {
                 _lastSelectionPeriod = 0;
             }
         }
-        
+
+        _manager.getExecutor().repoll();
+            
         _lifetimeProcessed += info.getProcessedMessagesCount();
         
         long lifetimeConfirmed = info.getVerifiedBytesTransferred();
@@ -259,9 +261,7 @@ public class TunnelPool {
                     buildFallback();
             }
         }
-
-        _manager.getExecutor().repoll();
-        
+    
         boolean connected = true;
         if ( (_settings.getDestination() != null) && (!_context.clientManager().isLocal(_settings.getDestination())) )
             connected = false;
@@ -410,33 +410,40 @@ public class TunnelPool {
         
         boolean allowZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) <= 0);
           
-        long expireAfter = _context.clock().now() + (2 * _settings.getRebuildPeriod());
-        expireAfter += _expireSkew;
+        long expireAfter = _context.clock().now() + _expireSkew; // + _settings.getRebuildPeriod() + _expireSkew;
+        int expire30s = 0;
+        int expire90s = 0;
+        int expire150s = 0;
+        int expire210s = 0;
+        int expire270s = 0;
+        int expireLater = 0;
         
-        long earliestExpire = -1;
-        int live = 0;
         int fallback = 0;
-        int usable = 0;
         synchronized (_tunnels) {
             boolean enough = _tunnels.size() > wanted;
             for (int i = 0; i < _tunnels.size(); i++) {
                 TunnelInfo info = (TunnelInfo)_tunnels.get(i);
-                if (info.getExpiration() > expireAfter) {
-                    if (allowZeroHop || (info.getLength() > 1)) {
-                        usable++;
-                        if ( (info.getExpiration() < earliestExpire) || (earliestExpire < 0) )
-                            earliestExpire = info.getExpiration();
+                if (allowZeroHop || (info.getLength() > 1)) {
+                    long timeToExpire = info.getExpiration() - expireAfter;
+                    if (timeToExpire <= 0) {
+                        // consider it unusable
+                    } else if (timeToExpire <= 30*1000) {
+                        expire30s++;
+                    } else if (timeToExpire <= 90*1000) {
+                        expire90s++;
+                    } else if (timeToExpire <= 150*1000) {
+                        expire150s++;
+                    } else if (timeToExpire <= 210*1000) {
+                        expire210s++;
+                    } else if (timeToExpire <= 270*1000) {
+                        expire270s++;
+                    } else {
+                        expireLater++;
                     }
-                }
-                live++;
-                if ( (info.getLength() <= 1) && (info.getExpiration() > expireAfter) )
+                } else if (info.getExpiration() > expireAfter) {
                     fallback++;
+                }
             }
-        }
-        
-        if (usable < wanted) { 
-            // if we are short on tunnels, build fast
-            earliestExpire = 0;
         }
         
         int inProgress = 0;
@@ -448,8 +455,9 @@ public class TunnelPool {
                     fallback++;
             }
         }
-      
-        return countHowManyToBuild(allowZeroHop, earliestExpire, usable, wanted, inProgress, fallback);
+        
+        return countHowManyToBuild(allowZeroHop, expire30s, expire90s, expire150s, expire210s, expire270s, 
+                                   expireLater, wanted, inProgress, fallback);
     }
     
     /**
@@ -459,45 +467,94 @@ public class TunnelPool {
      * @param allowZeroHop do we normally allow zero hop tunnels?  If true, treat fallback tunnels like normal ones
      * @param earliestExpire how soon do some of our usable tunnels expire, or, if we are missing tunnels, -1
      * @param usable how many tunnels will be around for a while (may include fallback tunnels)
+     * @param wantToReplace how many tunnels are still usable, but approaching unusability
      * @param standardAmount how many tunnels we want to have, in general
      * @param inProgress how many tunnels are being built for this pool right now (may include fallback tunnels)
      * @param fallback how many zero hop tunnels do we have, or are being built
      */
-    private int countHowManyToBuild(boolean allowZeroHop, long earliestExpire, int usable, int standardAmount, 
-                                    int inProgress, int fallback) {
-        int howMany = 0;
+    private int countHowManyToBuild(boolean allowZeroHop, int expire30s, int expire90s, int expire150s, int expire210s,
+                                    int expire270s, int expireLater, int standardAmount, int inProgress, int fallback) {
+        int rv = 0;
+        int remainingWanted = standardAmount - expireLater;
         if (allowZeroHop)
-            howMany = standardAmount - usable;
-        else
-            howMany = standardAmount - (usable - fallback);
-        
-        int concurrentBuildWeight = 1;
-        if (howMany > 0) {
-            long now = _context.clock().now();
-            if (earliestExpire - now < 60*1000)
-                concurrentBuildWeight = 4; // right before expiration, allow up to 4x quantity tunnels to be pending
-            else if (earliestExpire - now < 120*1000)
-                concurrentBuildWeight = 3; // allow up to 3x quantity tunnels to be pending from 1-2m
-            else if (earliestExpire - now < 180*1000)
-                concurrentBuildWeight = 2; // allow up to 2x quantity tunnels to be pending from 2-3m
+            remainingWanted -= fallback;
 
-            // e.g. we want 3 tunnels, but only have 1 usable, we'd want 2 more.  however, if the tunnels
-            // expire in 90 seconds, we'd act like we wanted 6 (and assume 4 would fail building).
-            howMany = (howMany * concurrentBuildWeight) - inProgress;
+        for (int i = 0; i < expire270s && remainingWanted > 0; i++)
+            remainingWanted--;
+        if (remainingWanted > 0) {
+            // 1x the tunnels expiring between 3.5 and 2.5 minutes from now
+            for (int i = 0; i < expire210s && remainingWanted > 0; i++) {
+                remainingWanted--;
+            }
+            if (remainingWanted > 0) {
+                // 2x the tunnels expiring between 2.5 and 1.5 minutes from now
+                for (int i = 0; i < expire150s && remainingWanted > 0; i++) {
+                    remainingWanted--;
+                }
+                if (remainingWanted > 0) {
+                    for (int i = 0; i < expire90s && remainingWanted > 0; i++) {
+                        remainingWanted--;
+                    }
+                    if (remainingWanted > 0) {
+                        for (int i = 0; i < expire30s && remainingWanted > 0; i++) {
+                            remainingWanted--;
+                        }
+                        if (remainingWanted > 0) {
+                            rv = (((expire270s > 0) && _context.random().nextBoolean()) ? 1 : 0);
+                            rv += expire210s;
+                            rv += 2*expire150s;
+                            rv += 4*expire90s;
+                            rv += 6*expire30s;
+                            rv += 6*remainingWanted;
+                            rv -= inProgress;
+                            rv -= expireLater;
+                        } else {
+                            rv = (((expire270s > 0) && _context.random().nextBoolean()) ? 1 : 0);
+                            rv += expire210s;
+                            rv += 2*expire150s;
+                            rv += 4*expire90s;
+                            rv += 6*expire30s;
+                            rv -= inProgress;
+                            rv -= expireLater;
+                        }
+                    } else {
+                        rv = (((expire270s > 0) && _context.random().nextBoolean()) ? 1 : 0);
+                        rv += expire210s;
+                        rv += 2*expire150s;
+                        rv += 4*expire90s;
+                        rv -= inProgress;
+                        rv -= expireLater;
+                    }
+                } else {
+                    rv = (((expire270s > 0) && _context.random().nextBoolean()) ? 1 : 0);
+                    rv += expire210s;
+                    rv += 2*expire150s;
+                    rv -= inProgress;
+                    rv -= expireLater;
+                }
+            } else {
+                rv = (((expire270s > 0) && _context.random().nextBoolean()) ? 1 : 0);
+                rv += expire210s;
+                rv -= inProgress;
+                rv -= expireLater;
+            }
+        } else {
+            rv = (((expire270s > 0) && _context.random().nextBoolean()) ? 1 : 0);
+            rv -= inProgress;
+            rv -= expireLater;
         }
-        
-        int rv = howMany;
-        // ok, we're actually swamped with tunnels, so lets hold off on replacing the
-        // fallback ones for a bit
-        if ( (usable + inProgress + fallback > 2*standardAmount) && (howMany > 0) )
-            rv = 0;
+        // yes, the above numbers and periods are completely arbitrary.  suggestions welcome
         
         if (allowZeroHop && (rv > standardAmount))
             rv = standardAmount;
         
+        if (rv + inProgress + expireLater + fallback > 4*standardAmount)
+            rv = 4*standardAmount - inProgress - expireLater - fallback;
+        
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Count: rv: " + rv + " howMany " + howMany + " concurrentWeight " + concurrentBuildWeight 
-                       + " allow? " + allowZeroHop + " usable " + usable 
+            _log.debug("Count: rv: " + rv + " allow? " + allowZeroHop
+                       + " 30s " + expire30s + " 90s " + expire90s + " 150s " + expire150s + " 210s " + expire210s
+                       + " 270s " + expire270s + " later " + expireLater
                        + " std " + standardAmount + " inProgress " + inProgress + " fallback " + fallback 
                        + " for " + toString());
         
@@ -518,11 +575,11 @@ public class TunnelPool {
                 // no inbound or outbound tunnels to send the request through, and 
                 // the pool is refusing 0 hop tunnels
                 if (peers == null) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("No peers to put in the new tunnel! selectPeers returned null!  boo, hiss!");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No peers to put in the new tunnel! selectPeers returned null!  boo, hiss!");
                 } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("No peers to put in the new tunnel! selectPeers returned an empty list?!");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No peers to put in the new tunnel! selectPeers returned an empty list?!");
                 }
                 return null;
             }

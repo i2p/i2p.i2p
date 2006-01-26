@@ -117,6 +117,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
@@ -335,8 +336,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             // set to null if there are no tunnels to ack the reply back through
             // (should we always fail for this? or should we send it anyway, even if
             // we dont receive the reply? hmm...)
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": Unable to create the garlic message (no tunnels left) to " + _toString);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getJobId() + ": Unable to create the garlic message (no tunnels left) to " + _toString);
+            getContext().statManager().addRateData("client.dispatchNoTunnels", getContext().clock().now() - _start, 0);            
             dieFatal();
             return;
         }
@@ -368,8 +370,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             else
                 dispatchJob.runJob();
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": Could not find any outbound tunnels to send the payload through... wtf?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getJobId() + ": Could not find any outbound tunnels to send the payload through... this might take a while");
+            getContext().statManager().addRateData("client.dispatchNoTunnels", getContext().clock().now() - _start, 0);
             dieFatal();
         }
         _clientMessage = null;

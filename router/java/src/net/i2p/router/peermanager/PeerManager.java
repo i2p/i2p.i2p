@@ -15,6 +15,7 @@ import java.util.*;
 import net.i2p.data.Hash;
 import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
+import net.i2p.util.SimpleTimer;
 import net.i2p.util.Log;
 
 /**
@@ -40,8 +41,21 @@ class PeerManager {
         for (int i = 0; i < _peersByCapability.length; i++)
             _peersByCapability[i] = new ArrayList(64);
         loadProfiles();
-        _context.jobQueue().addJob(new EvaluateProfilesJob(_context));
+        ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
+        SimpleTimer.getInstance().addEvent(new Reorg(), 0);
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
+    }
+    
+    private class Reorg implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            try {
+                _organizer.reorganize(true);
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error evaluating profiles", t);
+            } finally {
+                SimpleTimer.getInstance().addEvent(Reorg.this, 30*1000);
+            }
+        }
     }
     
     void storeProfiles() {

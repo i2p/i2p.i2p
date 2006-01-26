@@ -98,6 +98,12 @@ public class ProfileOrganizer {
         _thresholdCapacityValue = 0.0d;
         _thresholdIntegrationValue = 0.0d;
         _persistenceHelper = new ProfilePersistenceHelper(_context);
+        
+        _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileCoalesceTime", "How long the reorg takes coalescing peer stats", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileThresholdTime", "How long the reorg takes determining the tier thresholds", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void setUs(Hash us) { _us = us; }
@@ -411,6 +417,20 @@ public class ProfileOrganizer {
      */
     public void reorganize() { reorganize(false); }
     public void reorganize(boolean shouldCoalesce) {
+        long sortTime = 0;
+        int coalesceTime = 0;
+        long thresholdTime = 0;
+        long placeTime = 0;
+        int profileCount = 0;
+        
+        long uptime = _context.router().getUptime();
+        long expireOlderThan = -1;
+        if (uptime > 60*60*1000) {
+            // drop profiles that we haven't spoken with in 6 hours
+            expireOlderThan = _context.clock().now() - 6*60*60*1000;
+        }
+            
+        long start = System.currentTimeMillis();
         synchronized (_reorganizeLock) {
             Set allPeers = _strictCapacityOrder; //new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             //allPeers.addAll(_failingPeers.values());
@@ -419,15 +439,26 @@ public class ProfileOrganizer {
             //allPeers.addAll(_fastPeers.values());
 
             Set reordered = new TreeSet(_comp);
+            long sortStart = System.currentTimeMillis();
             for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile prof = (PeerProfile)iter.next();
-                if (shouldCoalesce)
+                if ( (expireOlderThan > 0) && (prof.getLastSendSuccessful() <= expireOlderThan) )
+                    continue; // drop, but no need to delete, since we don't periodically reread
+                
+                if (shouldCoalesce) {
+                    long coalesceStart = System.currentTimeMillis();
                     prof.coalesceStats();
+                    coalesceTime += (int)(System.currentTimeMillis()-coalesceStart);
+                }
                 reordered.add(prof);
+                profileCount++;
             }
+            sortTime = System.currentTimeMillis() - sortStart;
             _strictCapacityOrder = reordered;
             
+            long thresholdStart = System.currentTimeMillis();
             locked_calculateThresholds(allPeers);
+            thresholdTime = System.currentTimeMillis()-thresholdStart;
             
             _failingPeers.clear();
             _fastPeers.clear();
@@ -435,6 +466,8 @@ public class ProfileOrganizer {
             _notFailingPeers.clear();
             _notFailingPeersList.clear();
             _wellIntegratedPeers.clear();
+            
+            long placeStart = System.currentTimeMillis();
             
             for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
                 PeerProfile profile = (PeerProfile)iter.next();
@@ -445,6 +478,8 @@ public class ProfileOrganizer {
             locked_promoteFastAsNecessary();
 
             Collections.shuffle(_notFailingPeersList, _context.random());
+            
+            placeTime = System.currentTimeMillis()-placeStart;
 
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
@@ -458,6 +493,13 @@ public class ProfileOrganizer {
                 _log.debug("fast: " + _fastPeers.values());
             }
         }
+        
+        long total = System.currentTimeMillis()-start;
+        _context.statManager().addRateData("peer.profileSortTime", sortTime, profileCount);
+        _context.statManager().addRateData("peer.profileCoalesceTime", coalesceTime, profileCount);
+        _context.statManager().addRateData("peer.profileThresholdTime", thresholdTime, profileCount);
+        _context.statManager().addRateData("peer.profilePlaceTime", placeTime, profileCount);
+        _context.statManager().addRateData("peer.profileReorgTime", total, profileCount);
     }
     
     /**

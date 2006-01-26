@@ -73,7 +73,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     /** pick an inbound tunnel not bound to a particular destination */
     public TunnelInfo selectInboundTunnel() { 
-        TunnelInfo info = _inboundExploratory.selectTunnel(); 
+        TunnelPool pool = _inboundExploratory;
+        if (pool == null) return null;
+        TunnelInfo info = pool.selectTunnel(); 
         if (info == null) {
             _inboundExploratory.buildFallback();
             // still can be null, but probably not
@@ -100,11 +102,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     /** pick an outbound tunnel not bound to a particular destination */
     public TunnelInfo selectOutboundTunnel() { 
-        TunnelInfo info = _outboundExploratory.selectTunnel();
+        TunnelPool pool = _outboundExploratory;
+        if (pool == null) return null;
+        TunnelInfo info = pool.selectTunnel();
         if (info == null) {
-            _outboundExploratory.buildFallback();
+            pool.buildFallback();
             // still can be null, but probably not
-            info = _outboundExploratory.selectTunnel();
+            info = pool.selectTunnel();
         }
         return info;
     }

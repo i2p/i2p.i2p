@@ -17,11 +17,11 @@ class RouterThrottleImpl implements RouterThrottle {
     private Log _log;
     
     /** 
-     * arbitrary hard limit of 2 seconds - if its taking this long to get 
+     * arbitrary hard limit of 10 seconds - if its taking this long to get 
      * to a job, we're congested.
      *
      */
-    private static int JOB_LAG_LIMIT = 2000;
+    private static int JOB_LAG_LIMIT = 10*1000;
     /**
      * Arbitrary hard limit - if we throttle our network connection this many
      * times in the previous 2 minute period, don't accept requests to 
@@ -56,6 +56,7 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     
     public boolean acceptNetworkMessage() {
+        //if (true) return true;
         long lag = _context.jobQueue().getMaxLag();
         if ( (lag > JOB_LAG_LIMIT) && (_context.router().getUptime() > 60*1000) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -87,6 +88,7 @@ class RouterThrottleImpl implements RouterThrottle {
         }
         
         long lag = _context.jobQueue().getMaxLag();
+        /*
         RateStat rs = _context.statManager().getRate("router.throttleNetworkCause");
         Rate r = null;
         if (rs != null)
@@ -100,11 +102,13 @@ class RouterThrottleImpl implements RouterThrottle {
             _context.statManager().addRateData("router.throttleTunnelCause", lag, lag);
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
+        */
         
-        rs = _context.statManager().getRate("transport.sendProcessingTime");
-        r = null;
+        RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
+        Rate r = null;
+        /*
         if (rs != null)
-            r = rs.getRate(10*60*1000);
+            r = rs.getRate(1*60*1000);
         double processTime = (r != null ? r.getAverageValue() : 0);
         if (processTime > 2000) {
             if (_log.shouldLog(Log.DEBUG))
@@ -113,9 +117,10 @@ class RouterThrottleImpl implements RouterThrottle {
             _context.statManager().addRateData("router.throttleTunnelProcessingTime10m", (long)processTime, (long)processTime);
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
+        */
         if (rs != null)
             r = rs.getRate(60*1000);
-        processTime = (r != null ? r.getAverageValue() : 0);
+        double processTime = (r != null ? r.getAverageValue() : 0);
         if (processTime > 2000) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Refusing tunnel request with the job lag of " + lag 
@@ -124,6 +129,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
         
+        /*
         rs = _context.statManager().getRate("transport.sendMessageFailureLifetime");
         r = null;
         if (rs != null)
@@ -142,6 +148,7 @@ class RouterThrottleImpl implements RouterThrottle {
                 }
             }
         }
+         */
         
         int numTunnels = _context.tunnelManager().getParticipatingCount();
 
@@ -251,7 +258,7 @@ class RouterThrottleImpl implements RouterThrottle {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Accepting a new tunnel request (now allocating " + bytesAllocated + " bytes across " + numTunnels 
-                       + " tunnels with lag of " + lag + " and " + throttleEvents + " throttle events)");
+                       + " tunnels with lag of " + lag + ")");
         return TUNNEL_ACCEPT;
     }
     
