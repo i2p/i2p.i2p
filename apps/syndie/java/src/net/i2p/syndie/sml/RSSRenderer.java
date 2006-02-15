@@ -31,7 +31,7 @@ public class RSSRenderer extends HTMLRenderer {
         if ( (subject == null) || (subject.length() <= 0) )
             subject = "not specified";
         out.write("    <title>" + subject + "</title>\n");
-        out.write("    <link>" + urlPrefix + sanitizeXML(BlogRenderer.getEntryURL(entry, info, true)) + "</link>\n");
+        out.write("    <link>" + urlPrefix + BlogRenderer.getEntryURL(entry, info, true) + "</link>\n");
         out.write("    <guid isPermalink=\"false\">syndie://" + entry.getURI().toString() + "</guid>\n");
         out.write("    <pubDate>" + getRFC822Date(entry.getURI().getEntryId()) + "</pubDate>\n");
         PetName pn = user.getPetNameDB().getByLocation(entry.getURI().getKeyHash().toBase64());
@@ -229,7 +229,9 @@ public class RSSRenderer extends HTMLRenderer {
         if (entry.getAttachments() != null) {
             for (int i = 0; i < _entry.getAttachments().length; i++) {
                 Attachment a = _entry.getAttachments()[i];
-                out.write("    <media:content url=\"" + urlPrefix + sanitizeXML(getAttachmentURL(i))
+                String url = urlPrefix + sanitizeXML(getAttachmentURL(i)) 
+                             + "#" + sanitizeTagParam(a.getName()); // tacked on for readability
+                out.write("    <media:content url=\"" + url
                                + "\" fileSize=\"" + a.getDataLength()
                                + "\" type=\"" + sanitizeTagParam(a.getMimeType()) 
                                + "\">");
@@ -238,7 +240,7 @@ public class RSSRenderer extends HTMLRenderer {
                 out.write("    </media:content>\n");
 
                 if (included == 0) // plain RSS enclosures can only have one enclosure per entry, unlike Media RSS
-                    out.write("    <enclosure url=\"" + urlPrefix + sanitizeXML(getAttachmentURL(i))
+                    out.write("    <enclosure url=\"" + url
                                    + "\" length=\"" + a.getDataLength() 
                                    + "\" type=\"" + sanitizeTagParam(a.getMimeType()) + "\" syndietype=\"attachment\" />\n");
                 included++;
