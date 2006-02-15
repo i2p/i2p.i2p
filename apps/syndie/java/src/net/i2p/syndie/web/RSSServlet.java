@@ -60,7 +60,14 @@ public class RSSServlet extends HttpServlet {
         if (count > 100) count = 100;
         
         Archive archive = BlogManager.instance().getArchive();
-        FilteredThreadIndex index = new FilteredThreadIndex(user, archive, tagSet, null, false);
+        Set authors = new HashSet();
+        String reqAuth = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
+        if (reqAuth != null) {
+            byte v[] = Base64.decode(reqAuth);
+            if ( (v != null) && (v.length == Hash.HASH_LENGTH) )
+                authors.add(new Hash(v));
+        }
+        FilteredThreadIndex index = new FilteredThreadIndex(user, archive, tagSet, authors, false);
         List entries = new ArrayList();
         // depth first search of the most recent threads
         for (int i = 0; i < count && i < index.getRootCount(); i++) {
@@ -80,7 +87,7 @@ public class RSSServlet extends HttpServlet {
         
         Writer out = resp.getWriter();
         out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-        out.write("<rss version=\"2.0\">\n");
+        out.write("<rss version=\"2.0\" xmlns:media=\"http://search.yahoo.com/mrss/\">\n");
         out.write(" <channel>\n");
         out.write("  <title>Syndie feed</title>\n");
         String page = urlPrefix;

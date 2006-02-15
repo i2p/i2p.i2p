@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.396.2.19 2006/02/15 00:16:31 jrandom Exp $
+$Id: history.txt,v 1.397 2006/02/15 00:33:17 jrandom Exp $
+
+2006-02-15  jrandom
+    * Add in per-blog RSS feeds to Syndie
+    * Upgraded sucker's ROME dependency to 0.8, bundling sucked enclosures
+      with the posts, marking additional attachments as Media RSS enclosures
+      (http://search.yahoo.com/mrss/), since RSS only supports one enclosure
+      per item.
+    * Don't allow the default syndie user to be set to something invalid if
+      its in single user mode.
 
 2006-02-15  jrandom
     * Merged in the i2p_0_6_1_10_PRE branch to the trunk, so CVS HEAD is no

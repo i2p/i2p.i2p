@@ -18,6 +18,7 @@ import java.util.List;
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEnclosure;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
@@ -396,7 +397,27 @@ public class Sucker {
                                   sml += "\n";
                 }
             }
-            String source=e.getUri();
+            
+            List enclosures = e.getEnclosures();
+            debugLog("Enclosures: " + enclosures.size());
+            for (int i = 0; i < enclosures.size(); i++) {
+                SyndEnclosure enc = (SyndEnclosure)enclosures.get(i);
+                String enclosureURL = enc.getUrl();
+                if (enclosureURL != null) {
+                    if (!enclosureURL.startsWith("http://")) {
+                        // e.g. postman's rss feed @ http://tracker.postman.i2p/rss.jsp has
+                        // baseUrl = http://tracker.postman.i2p
+                        // and enclosure URLs are /download.php?id=123&file=blah
+                        if (enclosureURL.startsWith("/") || baseUrl.endsWith("/"))
+                            enclosureURL = baseUrl + enclosureURL;
+                        else
+                            enclosureURL = baseUrl + '/' + enclosureURL;
+                    }   
+                    fetchAttachment(enclosureURL, enc.getType()); // fetches and adds to our streams
+                }
+            }
+            
+            String source=e.getLink(); //Uri();
             if(source.indexOf("http")<0)
             source=baseUrl+source;
             sml += "[link schema=\"web\" location=\""+source+"\"]source[/link]\n";
@@ -654,7 +675,8 @@ public class Sucker {
         return null;
     }
 
-    private void fetchAttachment(String link) {
+    private void fetchAttachment(String link) { fetchAttachment(link, null); }
+    private void fetchAttachment(String link, String suggestedMimeType) {
         
         link=link.replaceAll("&amp;","&");
         
@@ -684,16 +706,19 @@ public class Sucker {
         get.fetch();
         boolean ok = lsnr.waitForSuccess();
         if (!ok) {
-            System.err.println("Unable to retrieve the url after " + numRetries + " tries.");
+            debugLog("Unable to retrieve the url [" + link + "] after " + numRetries + " tries.");
             fetched.delete();
             return;
         }
         tempFiles.add(fetched);
         String filename=EepGet.suggestName(link);
-        String contentType = get.getContentType();
+        String contentType = suggestedMimeType;
+        if (contentType == null)
+            contentType = get.getContentType();
         if(contentType==null)
             contentType="text/plain";
-        debugLog("successful fetch of filename "+filename);
+        debugLog("successful fetch of filename "+filename + " suggested mime type [" + suggestedMimeType 
+                 + "], fetched mime type [" + get.getContentType() + "], final type [" + contentType + "]");
         if(fileNames==null) fileNames = new ArrayList();
         if(fileTypes==null) fileTypes = new ArrayList();
         if(fileStreams==null) fileStreams = new ArrayList();

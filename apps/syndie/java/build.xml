@@ -15,7 +15,7 @@
             srcdir="./src"
             debug="true" deprecation="on" source="1.3" target="1.3" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jdom/jdom.jar:../../rome/rome-0.7.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jdom/jdom.jar:../../rome/rome-0.8.jar" />
     </target>
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/syndie.jar" basedir="./build/obj" includes="**/*.class">
@@ -27,7 +27,7 @@
         <jar destfile="./build/sucker.jar" basedir="./build/obj" includes="net/i2p/syndie/Sucker.class, net/i2p/syndie/SuckerFetchListener.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.syndie.Sucker" />
-                <attribute name="Class-Path" value="i2p.jar jdom.jar rome-0.7.jar" />
+                <attribute name="Class-Path" value="i2p.jar jdom.jar rome-0.8.jar" />
             </manifest>
         </jar>
         <ant target="war" />
@@ -37,7 +37,7 @@
 	<delete dir="./tmpwar" />
         <mkdir dir="./tmpwar" />
         <copy file="../../jdom/jdom.jar" tofile="./tmpwar/jdom.jar" />
-        <copy file="../../rome/rome-0.7.jar" tofile="./tmpwar/rome-0.7.jar" />
+        <copy file="../../rome/rome-0.8.jar" tofile="./tmpwar/rome-0.8.jar" />
 
         <war destfile="../syndie.war" webxml="../jsp/web-out.xml">
           <fileset dir="../jsp/" includes="**/*" excludes=".nbintdb, web.xml, web-out.xml, web-fragment.xml, **/*.java, **/*.jsp" />
@@ -113,7 +113,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="../../jdom/jdom.jar" />
-                <pathelement location="../../rome/rome-0.7.jar" />
+                <pathelement location="../../rome/rome-0.8.jar" />
                 <pathelement location="build/obj" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
@@ -136,7 +136,7 @@
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jdom/jdom.jar" />
-                <pathelement location="../../rome/rome-0.7.jar" />
+                <pathelement location="../../rome/rome-0.8.jar" />
                 <pathelement location="build/obj" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>

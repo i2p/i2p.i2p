@@ -580,9 +580,42 @@ public class BlogManager {
         return (user.getAuthenticated() && user.getAllowAccessRemote());
     }
     
+    private boolean isOkDefaultUser(String defaultUser, String defaultPass) {
+        User t = new User(_context);
+        Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(defaultUser));
+        File userFile = new File(_userDir, Base64.encode(userHash.getData()));
+        if (userFile.exists()) {
+            Properties props = loadUserProps(userFile);
+            if (props == null) {
+                _log.error("Error reading the default user file: " + userFile);
+                return false;
+            }
+            String ok = t.login(defaultUser, defaultPass, props);
+            if (User.LOGIN_OK.equals(ok)) {
+                // ok, good enough
+                return true;
+            } else {
+                _log.error("Error logging into the default user, so configuration change rejected: " + ok);
+                return false;
+            }
+        } else {
+            _log.error("Not setting the default user to a nonexistant user [" + defaultUser + "]");
+            return false;
+        }
+    }
+    
     public void configure(String registrationPassword, String remotePassword, String adminPass, String defaultSelector, 
                           String defaultProxyHost, int defaultProxyPort, boolean isSingleUser, Properties opts,
                           String defaultUser, String defaultPass) {
+        if ( (defaultUser == null) || (defaultUser.length() <= 0) )
+            defaultUser = getDefaultLogin();
+        if (defaultPass == null)
+            defaultPass = getDefaultPass();
+        // first make sure the default user is valid, if its single user
+        if (isSingleUser) {
+            if (!isOkDefaultUser(defaultUser, defaultPass))
+                return;
+        }
         File cfg = getConfigFile();
         Writer out = null;
         try {
@@ -600,10 +633,6 @@ public class BlogManager {
             if (defaultProxyPort > 0)
                 out.write("syndie.defaultProxyPort="+defaultProxyPort + "\n");
             
-            if ( (defaultUser == null) || (defaultUser.length() <= 0) )
-                defaultUser = getDefaultLogin();
-            if (defaultPass == null)
-                defaultPass = getDefaultPass();
             out.write("syndie.defaultSingleUserLogin="+defaultUser+"\n");
             out.write("syndie.defaultSingleUserPass="+defaultPass+"\n");
             

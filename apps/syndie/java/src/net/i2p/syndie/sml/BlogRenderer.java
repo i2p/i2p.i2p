@@ -158,11 +158,14 @@ public class BlogRenderer extends HTMLRenderer {
     
     protected String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : true); }
     protected String getEntryURL(boolean showImages) {
-        if (_entry == null) return "unknown";
+        return getEntryURL(_entry, _blog, showImages);
+    }
+    static String getEntryURL(EntryContainer entry, BlogInfo blog, boolean showImages) {
+        if (entry == null) return "unknown";
         return "blog.jsp?" 
-               + ViewBlogServlet.PARAM_BLOG + "=" + _blog.getKey().calculateHash().toBase64() + "&amp;"
+               + ViewBlogServlet.PARAM_BLOG + "=" + (blog != null ? blog.getKey().calculateHash().toBase64() : "") + "&amp;"
                + ViewBlogServlet.PARAM_ENTRY + "="
-               + Base64.encode(_entry.getURI().getKeyHash().getData()) + '/' + _entry.getURI().getEntryId();
+               + Base64.encode(entry.getURI().getKeyHash().getData()) + '/' + entry.getURI().getEntryId();
     }
     
     protected String getAttachmentURLBase() { 

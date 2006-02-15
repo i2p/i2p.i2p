@@ -162,6 +162,10 @@ public class ViewBlogServlet extends BaseServlet {
         out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         out.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
         out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head>\n<title>" + pageTitle + "</title>\n");
+        if (info != null)
+            out.write("<link href=\"rss.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + "=" 
+                      + info.getKey().calculateHash().toBase64() 
+                      + "\" rel=\"alternate\" type=\"application/rss+xml\" >\n");
         out.write("<style>");
         renderStyle(out, info, data, req);
         out.write("</style></head>");
@@ -192,6 +196,7 @@ public class ViewBlogServlet extends BaseServlet {
     }
     
     public static String getLogoURL(Hash blog) {
+        if (blog == null) return "";
         return "blog.jsp?" + PARAM_BLOG + "=" + blog.toBase64() + "&amp;" 
                + PARAM_IMAGE + "=" + BlogInfoData.ATTACHMENT_LOGO;
     }
@@ -201,12 +206,15 @@ public class ViewBlogServlet extends BaseServlet {
                   "<a href=\"#content\" title=\"Skip to the blog content\">Content</a></span>\n");
         renderNavBar(user, req, out);
         out.write("<div class=\"syndieBlogHeader\">\n");
-        out.write("<img class=\"syndieBlogLogo\" src=\"" + getLogoURL(info.getKey().calculateHash()) + "\" alt=\"\" />\n");
+        Hash kh = null;
+        if ( (info != null) && (info.getKey() != null) )
+            kh = info.getKey().calculateHash();
+        out.write("<img class=\"syndieBlogLogo\" src=\"" + getLogoURL(kh) + "\" alt=\"\" />\n");
         String name = desc;
         if ( (name == null) || (name.trim().length() <= 0) )
             name = title;
-        if ( ( (name == null) || (name.trim().length() <= 0) ) && (info != null) )
-            name = info.getKey().calculateHash().toBase64();
+        if ( ( (name == null) || (name.trim().length() <= 0) ) && (info != null) && (kh != null) )
+            name = kh.toBase64();
         if (name != null) {
             String url = "blog.jsp?" + (info != null ? PARAM_BLOG + "=" + info.getKey().calculateHash().toBase64() : "");
             out.write("<b><a href=\"" + url + "\" title=\"Go to the blog root\">" 

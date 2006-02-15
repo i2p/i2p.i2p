@@ -24,18 +24,18 @@ public class RSSRenderer extends HTMLRenderer {
     public void render(User user, Archive archive, EntryContainer entry, String urlPrefix, Writer out) throws IOException {
         if (entry == null) return;
         prepare(user, archive, entry, entry.getEntry().getText(), out, RSS_EXCERPT_ONLY, false);
+        BlogInfo info = archive.getBlogInfo(entry.getURI());
         
         out.write("   <item>\n");
         out.write("    <title>" + sanitizeXML(sanitizeString((String)_headers.get(HEADER_SUBJECT))) + "</title>\n");
-        out.write("    <link>" + urlPrefix + sanitizeXML(getEntryURL()) + "</link>\n");
-        out.write("    <guid isPermalink=\"false\">" + urlPrefix + entry.getURI().toString() + "</guid>\n");
+        out.write("    <link>" + urlPrefix + sanitizeXML(BlogRenderer.getEntryURL(entry, info, true)) + "</link>\n");
+        out.write("    <guid isPermalink=\"false\">syndie://" + entry.getURI().toString() + "</guid>\n");
         out.write("    <pubDate>" + getRFC822Date(entry.getURI().getEntryId()) + "</pubDate>\n");
         PetName pn = user.getPetNameDB().getByLocation(entry.getURI().getKeyHash().toBase64());
         String author = null;
         if (pn != null)
             author = pn.getName();
         if (author == null) {
-            BlogInfo info = archive.getBlogInfo(entry.getURI());
             if (info != null)
                 author = info.getProperty(BlogInfo.NAME);
         }
@@ -49,7 +49,7 @@ public class RSSRenderer extends HTMLRenderer {
         
         out.write("    <description>" + sanitizeXML(_bodyBuffer.toString()) + "</description>\n");
 
-        //renderEnclosures(user, entry, urlPrefix, out);
+        renderEnclosures(user, entry, urlPrefix, out);
         
         out.write("   </item>\n");
     }
@@ -222,15 +222,27 @@ public class RSSRenderer extends HTMLRenderer {
     }
     
     private void renderEnclosures(User user, EntryContainer entry, String urlPrefix, Writer out) throws IOException {
+        int included = 0;
         if (entry.getAttachments() != null) {
             for (int i = 0; i < _entry.getAttachments().length; i++) {
                 Attachment a = _entry.getAttachments()[i];
-                out.write("    <enclosure url=\"" + urlPrefix + sanitizeXML(getAttachmentURL(i))
-                               + "\" length=\"" + a.getDataLength() 
-                               + "\" type=\"" + sanitizeTagParam(a.getMimeType()) + "\" syndietype=\"attachment\" />\n");
+                out.write("    <media:content url=\"" + urlPrefix + sanitizeXML(getAttachmentURL(i))
+                               + "\" fileSize=\"" + a.getDataLength()
+                               + "\" type=\"" + sanitizeTagParam(a.getMimeType()) 
+                               + "\">");
+                // we can do neat stuff with Media RSS (http://search.yahoo.com/mrss) here, such as
+                // include descriptions, titles, keywords, thumbnails, etc
+                out.write("    </media:content>\n");
+
+                if (included == 0) // plain RSS enclosures can only have one enclosure per entry, unlike Media RSS
+                    out.write("    <enclosure url=\"" + urlPrefix + sanitizeXML(getAttachmentURL(i))
+                                   + "\" length=\"" + a.getDataLength() 
+                                   + "\" type=\"" + sanitizeTagParam(a.getMimeType()) + "\" syndietype=\"attachment\" />\n");
+                included++;
             }
         }
 
+        /*
         if (_blogs.size() > 0) {
             for (int i = 0; i < _blogs.size(); i++) {
                 Blog b = (Blog)_blogs.get(i);
@@ -295,7 +307,8 @@ public class RSSRenderer extends HTMLRenderer {
         if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) ) {
             String url = getPageURL(sanitizeTagParam(inReplyTo));
             out.write("    <enclosure url=\"" + urlPrefix + sanitizeXML(url) + "\" length=\"1\" type=\"text/html\" syndietype=\"parent\" />\n");
-        }   
+        } 
+         */  
     }
     
     public void receiveHeaderEnd() {}
