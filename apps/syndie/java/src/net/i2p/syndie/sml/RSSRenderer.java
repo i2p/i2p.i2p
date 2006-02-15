@@ -27,7 +27,10 @@ public class RSSRenderer extends HTMLRenderer {
         BlogInfo info = archive.getBlogInfo(entry.getURI());
         
         out.write("   <item>\n");
-        out.write("    <title>" + sanitizeXML(sanitizeString((String)_headers.get(HEADER_SUBJECT))) + "</title>\n");
+        String subject = sanitizeXML(sanitizeString((String)_headers.get(HEADER_SUBJECT)));
+        if ( (subject == null) || (subject.length() <= 0) )
+            subject = "not specified";
+        out.write("    <title>" + subject + "</title>\n");
         out.write("    <link>" + urlPrefix + sanitizeXML(BlogRenderer.getEntryURL(entry, info, true)) + "</link>\n");
         out.write("    <guid isPermalink=\"false\">syndie://" + entry.getURI().toString() + "</guid>\n");
         out.write("    <pubDate>" + getRFC822Date(entry.getURI().getEntryId()) + "</pubDate>\n");
