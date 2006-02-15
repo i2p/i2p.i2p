@@ -35,6 +35,9 @@ class SendGarlicMessageJob extends JobImpl {
     private SessionKey _sentKey;
     private Set _sentTags;
     
+    /** only elGamal the message, never use session tags */
+    private static final boolean FORCE_ELGAMAL = false;
+    
     public SendGarlicMessageJob(RouterContext ctx, I2NPMessage payload, RouterInfo target, MessageSelector selector, ReplyJob onReply, Job onTimeout, SessionKey sentKey, Set sentTags) {
         super(ctx);
         _log = ctx.logManager().getLog(SendGarlicMessageJob.class);
@@ -62,7 +65,11 @@ class SendGarlicMessageJob extends JobImpl {
         payload.setExpiration(_payload.getMessageExpiration());
         int timeout = (int)(payload.getExpiration() - getContext().clock().now());
         
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, _sentKey, _sentTags);
+        GarlicMessage msg = null;
+        if (FORCE_ELGAMAL)
+            msg = GarlicMessageBuilder.buildMessage(getContext(), payload, _sentKey, _sentTags, 0, true);
+        else
+            msg = GarlicMessageBuilder.buildMessage(getContext(), payload, _sentKey, _sentTags);
 
         // so we will look for the reply
         OutNetMessage dummyMessage = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, timeout);

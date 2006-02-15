@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.17 2005/09/09 23:30:37 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.18.2.1 2006/02/15 00:16:29 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -44,10 +44,10 @@ capabilities, see <a href="#capabilities">below</a>.</p>
 
 <p>All UDP datagrams begin with a MAC and an IV, followed by a variable
 size payload encrypted with the appropriate key.  The MAC used is 
-HMAC-SHA256, truncated to 16 bytes, while the key is a full AES256 
+HMAC-MD5, truncated to 16 bytes, while the key is a full AES256 
 key.  The specific construct of the MAC is the first 16 bytes from:</p>
 <pre>
-  HMAC-SHA256(payload || IV || payloadLength, macKey)
+  HMAC-MD5(payload || IV || payloadLength, macKey)
 </pre>
 
 <p>The payload itself is AES256/CBC encrypted with the IV and the 

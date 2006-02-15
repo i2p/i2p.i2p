@@ -106,7 +106,8 @@ public class RebuildRouterInfoJob extends JobImpl {
                     SigningPublicKey signingPubKey = new SigningPublicKey();
                     signingPubKey.readBytes(fis);
                     RouterIdentity ident = new RouterIdentity();
-                    ident.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+                    Certificate cert = getContext().router().createCertificate();
+                    ident.setCertificate(cert);
                     ident.setPublicKey(pubkey);
                     ident.setSigningPublicKey(signingPubKey);
                     info.setIdentity(ident);

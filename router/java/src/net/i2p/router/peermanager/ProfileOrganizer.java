@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.stat.Rate;
@@ -791,10 +792,17 @@ public class ProfileOrganizer {
             return false; // never select a shitlisted peer
         }
             
-        if (null != netDb.lookupRouterInfoLocally(peer)) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
-            return true;
+        RouterInfo info = netDb.lookupRouterInfoLocally(peer);
+        if (null != info) {
+            if (info.getIdentity().isHidden()) {
+               if (_log.shouldLog(Log.WARN))
+                    _log.warn("Peer " + peer.toBase64() + " is marked as hidden, disallowing its use");
+                return false;
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
+                return true;
+            }
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer " + peer.toBase64() + " is NOT locally known, disallowing its use");

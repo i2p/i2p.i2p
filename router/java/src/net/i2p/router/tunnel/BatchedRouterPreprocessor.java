@@ -1,6 +1,6 @@
 package net.i2p.router.tunnel;
 
-import java.util.Properties;
+import java.util.*;
 import net.i2p.router.RouterContext;
 
 /** 
@@ -75,10 +75,10 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
         return DEFAULT_BATCH_FREQUENCY;
     }
     
-    protected void notePreprocessing(long messageId, int numFragments) {
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
         if (_config != null)
-            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _config);
+            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _config, msg);
         else
-            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _hopConfig);
+            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _hopConfig, msg);
     }
 }

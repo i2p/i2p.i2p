@@ -18,10 +18,10 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
         _context = ctx;
         _config = cfg;
     }
-    public void receiveEncrypted(byte[] encrypted) {
-        receiveEncrypted(encrypted, false);
+    public long receiveEncrypted(byte[] encrypted) {
+        return receiveEncrypted(encrypted, false);
     }
-    public void receiveEncrypted(byte[] encrypted, boolean alreadySearched) {
+    public long receiveEncrypted(byte[] encrypted, boolean alreadySearched) {
         if (_target == null) {
             _target = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
             if (_target == null) {
@@ -29,7 +29,7 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
                 if (!alreadySearched)
                     j = new ReceiveJob(_context, encrypted);
                 _context.netDb().lookupRouterInfo(_config.getSendTo(), j, j, 5*1000);
-                return;
+                return -1;
             }
         }
         
@@ -43,6 +43,7 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
         out.setExpiration(msg.getMessageExpiration());
         out.setPriority(400);
         _context.outNetMessagePool().add(out);
+        return msg.getUniqueId();
     }
     
     private class ReceiveJob extends JobImpl {

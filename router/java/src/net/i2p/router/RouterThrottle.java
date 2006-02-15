@@ -25,7 +25,7 @@ public interface RouterThrottle {
      * 
      * @return 0 if it should be accepted, higher values for more severe rejection
      */
-    public int acceptTunnelRequest(TunnelCreateMessage msg);
+    public int acceptTunnelRequest();
     /**
      * Should we accept the netDb lookup message, replying either with the 
      * value or some closer peers, or should we simply drop it due to overload?

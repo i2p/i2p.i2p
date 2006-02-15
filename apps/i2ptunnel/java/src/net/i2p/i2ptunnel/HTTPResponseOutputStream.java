@@ -138,31 +138,35 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (lastEnd == -1) {
                     responseLine = new String(_headerBuffer.getData(), 0, i+1); // includes NL
                     responseLine = filterResponseLine(responseLine);
-                    responseLine = (responseLine.trim() + "\n");
+                    responseLine = (responseLine.trim() + "\r\n");
                     out.write(responseLine.getBytes());
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
                         if (_headerBuffer.getData()[j] == ':') {
                             int keyLen = j-(lastEnd+1);
-                            int valLen = i-(j+2);
-                            if ( (keyLen <= 0) || (valLen <= 0) )
+                            int valLen = i-(j+1);
+                            if ( (keyLen <= 0) || (valLen < 0) )
                                 throw new IOException("Invalid header @ " + j);
                             String key = new String(_headerBuffer.getData(), lastEnd+1, keyLen);
-                            String val = new String(_headerBuffer.getData(), j+2, valLen).trim();
+                            String val = null;
+                            if (valLen == 0)
+                                val = "";
+                            else
+                                val = new String(_headerBuffer.getData(), j+2, valLen).trim();
                             
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Response header [" + key + "] = [" + val + "]");
                             
                             if ("Connection".equalsIgnoreCase(key)) {
-                                out.write("Connection: close\n".getBytes());
+                                out.write("Connection: close\r\n".getBytes());
                                 connectionSent = true;
                             } else if ("Proxy-Connection".equalsIgnoreCase(key)) {
-                                out.write("Proxy-Connection: close\n".getBytes());
+                                out.write("Proxy-Connection: close\r\n".getBytes());
                                 proxyConnectionSent = true;
                             } else if ( ("Content-encoding".equalsIgnoreCase(key)) && ("x-i2p-gzip".equalsIgnoreCase(val)) ) {
                                 _gzip = true;
                             } else {
-                                out.write((key.trim() + ": " + val.trim() + "\n").getBytes());
+                                out.write((key.trim() + ": " + val.trim() + "\r\n").getBytes());
                             }
                             break;
                         }
@@ -173,9 +177,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
         
         if (!connectionSent)
-            out.write("Connection: close\n".getBytes());
+            out.write("Connection: close\r\n".getBytes());
         if (!proxyConnectionSent)
-            out.write("Proxy-Connection: close\n".getBytes());
+            out.write("Proxy-Connection: close\r\n".getBytes());
             
         finishHeaders();
 
@@ -196,7 +200,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected boolean shouldCompress() { return _gzip; }
     
     protected void finishHeaders() throws IOException {
-        out.write("\n".getBytes()); // end of the headers
+        out.write("\r\n".getBytes()); // end of the headers
     }
     
     public void close() throws IOException {
@@ -349,6 +353,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                           "Content-length: 32\n" +
                           "\n" +
                           "hi ho, this is the body";
+        String blankval = "HTTP/1.0 200 OK\n" +
+                          "A:\n" +
+                          "\n";
+        
         /* */
         test("Simple", simple, true);
         test("Filtered", filtered, true);
@@ -356,6 +364,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         test("Minimal", minimal, true);
         test("Windows", winmin, true);
         test("Large", large, true);
+        test("Blank whitespace", blankval, true);
         test("Invalid (short headers)", invalid1, true);
         test("Invalid (no headers)", invalid2, true);
         test("Invalid (windows with short headers)", invalid3, true);

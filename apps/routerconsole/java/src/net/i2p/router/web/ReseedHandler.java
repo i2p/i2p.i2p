@@ -58,7 +58,7 @@ public class ReseedHandler {
         }
     }
     
-    private static final String DEFAULT_SEED_URL = "http://dev.i2p.net/i2pdb/";
+    private static final String DEFAULT_SEED_URL = "http://dev.i2p.net/i2pdb2/";
     /**
      * Reseed has been requested, so lets go ahead and do it.  Fetch all of
      * the routerInfo-*.dat files from the specified URL (or the default) and

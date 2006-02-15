@@ -84,7 +84,7 @@ public class VMCommSystem extends CommSystemFacade {
         if (true) {
             I2NPMessage dmsg = msg.getMessage();
             String type = dmsg.getClass().getName();
-            _context.messageHistory().sendMessage(type, dmsg.getUniqueId(), dmsg.getMessageExpiration(), msg.getTarget().getIdentity().getHash(), sendSuccessful);
+            _context.messageHistory().sendMessage(type, dmsg.getUniqueId(), dmsg.getMessageExpiration(), msg.getTarget().getIdentity().getHash(), sendSuccessful, null);
         }
 
         msg.discardData();

@@ -10,6 +10,7 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -54,7 +55,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         
         if ( (_client != null) && 
              (msg.getType() != DeliveryStatusMessage.MESSAGE_TYPE) &&
-             (msg.getType() != GarlicMessage.MESSAGE_TYPE) ) {
+             (msg.getType() != GarlicMessage.MESSAGE_TYPE) &&
+             (msg.getType() != TunnelBuildReplyMessage.MESSAGE_TYPE)) {
             // drop it, since we should only get tunnel test messages and garlic messages down
             // client tunnels
             _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, msg.getType());
@@ -156,7 +158,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                         // a data message targetting the local router is how we send load tests (real
                         // data messages target destinations)
                         _context.statManager().addRateData("tunnel.handleLoadClove", 1, 0);
-                        _context.inNetMessagePool().add(data, null, null);
+                        data = null;
+                        //_context.inNetMessagePool().add(data, null, null);
                     } else {
                         if ( (_client != null) && (data.getType() != DeliveryStatusMessage.MESSAGE_TYPE) ) {
                             // drop it, since the data we receive shouldn't include other stuff, 

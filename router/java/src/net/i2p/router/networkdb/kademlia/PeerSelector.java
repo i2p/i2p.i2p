@@ -18,8 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
+import net.i2p.data.*;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.stat.Rate;
@@ -120,7 +119,10 @@ class PeerSelector {
                 return;
             if (_toIgnore.contains(entry))
                 return;
-            if (_context.netDb().lookupRouterInfoLocally(entry) == null)
+            RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
+            if (info == null)
+                return;
+            if (info.getIdentity().isHidden())
                 return;
             
             BigInteger diff = getDistance(_key, entry);

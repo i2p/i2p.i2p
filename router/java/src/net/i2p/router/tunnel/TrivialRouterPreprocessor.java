@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel;
 
+import java.util.List;
 import net.i2p.router.RouterContext;
 
 /** 
@@ -14,7 +15,7 @@ public class TrivialRouterPreprocessor extends TrivialPreprocessor {
         _routerContext = ctx;
     }
 
-    protected void notePreprocessing(long messageId, int numFragments) {
-        _routerContext.messageHistory().fragmentMessage(messageId, numFragments);
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds) {
+        _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, null);
     }
 }

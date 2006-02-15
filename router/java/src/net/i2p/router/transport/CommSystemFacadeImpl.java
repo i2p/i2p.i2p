@@ -77,6 +77,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     public short getReachabilityStatus() { 
         if (_manager == null) return CommSystemFacade.STATUS_UNKNOWN;
+        if (_context.router().isHidden()) return CommSystemFacade.STATUS_OK;
         return _manager.getReachabilityStatus(); 
     }
     public void recheckReachability() { _manager.recheckReachability(); }
@@ -109,6 +110,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private final static String PROP_I2NP_TCP_DISABLED = "i2np.tcp.disable";
     
     private RouterAddress createTCPAddress() {
+        if (true) return null;
         RouterAddress addr = new RouterAddress();
         addr.setCost(10);
         addr.setExpiration(null);
@@ -117,7 +119,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         String port = _context.router().getConfigSetting(PROP_I2NP_TCP_PORT);
         String disabledStr = _context.router().getConfigSetting(PROP_I2NP_TCP_DISABLED);
         boolean disabled = false;
-        if ( (disabledStr != null) && ("true".equalsIgnoreCase(disabledStr)) )
+        if ( (disabledStr == null) || ("true".equalsIgnoreCase(disabledStr)) )
             return null;
         if ( (name == null) || (port == null) ) {
             //_log.info("TCP Host/Port not specified in config file - skipping TCP transport");

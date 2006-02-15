@@ -160,7 +160,7 @@ public class RSSRenderer extends HTMLRenderer {
         if ( (description != null) && (description.trim().length() > 0) ) {
             _bodyBuffer.append(sanitizeString(description));
         } else if ( (name != null) && (name.trim().length() > 0) ) {
-            _bodyBuffer.append(sanitizeString(name));
+            _bodyBuffer.append(sanitizeTagParam(name));
         } else {
             _bodyBuffer.append("[view entry]");
         }

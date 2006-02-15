@@ -107,8 +107,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.sendAckTime", "How long does it take to get an ACK back from a message?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.sendAckTime", "How long does it take to get an ACK back from a message?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -118,6 +118,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchNoACK", "How often we send a client message without asking for an ACK?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
@@ -312,7 +313,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private void send() {
         if (_finished) return;
-        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        boolean wantACK = true;
+        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
+        if (existingTags > 30)
+            wantACK = false;
+        
+        long token = (wantACK ? getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE) : -1);
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set tags = new HashSet();
@@ -321,7 +327,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             replyLeaseSet = getContext().netDb().lookupLeaseSetLocally(_from.calculateHash());
         }
         
-        _inTunnel = selectInboundTunnel();
+        if (wantACK)
+            _inTunnel = selectInboundTunnel();
 
         buildClove();
         if (_log.shouldLog(Log.DEBUG))
@@ -331,7 +338,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                                                                                _clove, _from.calculateHash(), 
                                                                                _to, _inTunnel,
                                                                                sessKey, tags, 
-                                                                               true, replyLeaseSet);
+                                                                               wantACK, replyLeaseSet);
         if (msg == null) {
             // set to null if there are no tunnels to ack the reply back through
             // (should we always fail for this? or should we send it anyway, even if
@@ -346,9 +353,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": send() - token expected " + token + " to " + _toString);
         
-        SendSuccessJob onReply = new SendSuccessJob(getContext(), sessKey, tags);
-        SendTimeoutJob onFail = new SendTimeoutJob(getContext());
-        ReplySelector selector = new ReplySelector(token);
+        SendSuccessJob onReply = null;
+        SendTimeoutJob onFail = null;
+        ReplySelector selector = null;
+        if (wantACK) {
+            onReply = new SendSuccessJob(getContext(), sessKey, tags);
+            onFail = new SendTimeoutJob(getContext());
+            selector = new ReplySelector(token);
+        }
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Placing GarlicMessage into the new tunnel message bound for " 
@@ -378,6 +390,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _clientMessage = null;
         _clove = null;
         getContext().statManager().addRateData("client.dispatchPrepareTime", getContext().clock().now() - _start, 0);
+        if (!wantACK)
+            getContext().statManager().addRateData("client.dispatchNoACK", 1, 0);
     }
 
     private class DispatchJob extends JobImpl {
@@ -396,7 +410,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         public String getName() { return "Dispatch outbound client message"; }
         public void runJob() {
-            getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
+            if (_selector != null)
+                getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Dispatching message to " + _toString + ": " + _msg);
             long before = getContext().clock().now();

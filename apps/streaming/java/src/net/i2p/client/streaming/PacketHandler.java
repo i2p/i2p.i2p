@@ -111,7 +111,7 @@ public class PacketHandler {
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
     void displayPacket(Packet packet, String prefix, String suffix) {
-        if (!_log.shouldLog(Log.DEBUG)) return;
+        if (!_log.shouldLog(Log.INFO)) return;
         StringBuffer buf = new StringBuffer(256);
         synchronized (_fmt) {
             buf.append(_fmt.format(new Date()));
@@ -120,7 +120,10 @@ public class PacketHandler {
         buf.append(packet.toString());
         if (suffix != null)
             buf.append(" ").append(suffix);
-        System.out.println(buf.toString());
+        String str = buf.toString();
+        System.out.println(str);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(str);
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {
@@ -162,7 +165,7 @@ public class PacketHandler {
             } else {
                 if ( (con.getSendStreamId() <= 0) || 
                      (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ||
-                     (packet.getSequenceNum() <= 5) ) { // its in flight from the first batch
+                     (packet.getSequenceNum() <= ConnectionOptions.MIN_WINDOW_SIZE) ) { // its in flight from the first batch
                     long oldId = con.getSendStreamId();
                     if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                         if (oldId <= 0) {
@@ -259,15 +262,17 @@ public class PacketHandler {
                 _manager.getConnectionHandler().receiveNewSyn(packet);
             } else {
                 if (_log.shouldLog(Log.WARN)) {
+                    _log.warn("Packet belongs to no other cons: " + packet);
+                }
+                if (_log.shouldLog(Log.DEBUG)) {
                     StringBuffer buf = new StringBuffer(128);
                     Set cons = _manager.listConnections();
                     for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
                         Connection con = (Connection)iter.next();
                         buf.append(con.toString()).append(" ");
                     }
-                    _log.warn("Packet belongs to no other cons: " + packet + " connections: " 
-                              + buf.toString() + " sendId: " 
-                              + (sendId > 0 ? Packet.toId(sendId) : " unknown"));
+                    _log.debug("connections: " + buf.toString() + " sendId: " 
+                               + (sendId > 0 ? Packet.toId(sendId) : " unknown"));
                 }
                 packet.releasePayload();
             }

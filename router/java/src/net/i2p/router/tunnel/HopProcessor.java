@@ -74,8 +74,8 @@ public class HopProcessor {
         
         boolean okIV = _validator.receiveIV(orig, offset, orig, offset + IV_LENGTH);
         if (!okIV) {
-            if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Invalid IV received on tunnel " + _config.getReceiveTunnelId());
+            if (_log.shouldLog(Log.ERROR)) 
+                _log.error("Invalid IV received on tunnel " + _config.getReceiveTunnelId());
             return false;
         }
         

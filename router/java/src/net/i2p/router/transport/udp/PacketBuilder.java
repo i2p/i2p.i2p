@@ -57,9 +57,12 @@ public class PacketBuilder {
 
         StringBuffer msg = null;
         boolean acksIncluded = false;
-        if (_log.shouldLog(Log.WARN)) {
+        if (_log.shouldLog(Log.INFO)) {
             msg = new StringBuffer(128);
-            msg.append("building data packet with acks to ").append(peer.getRemotePeer().toBase64().substring(0,6));
+            msg.append("Send to ").append(peer.getRemotePeer().toBase64());
+            msg.append(" msg ").append(state.getMessageId()).append(":").append(fragment);
+            if (fragment == state.getFragmentCount() - 1)
+                msg.append("*");
         }
         
         byte data[] = packet.getPacket().getData();
@@ -136,7 +139,7 @@ public class PacketBuilder {
         }
         
         if ( (msg != null) && (acksIncluded) )
-            _log.warn(msg.toString());
+            _log.debug(msg.toString());
         
         DataHelper.toLong(data, off, 1, 1); // only one fragment in this message
         off++;
@@ -181,6 +184,11 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
+        
+        if (_log.shouldLog(Log.INFO)) {
+            _log.info(msg.toString());
+        }
+        
         return packet;
     }
     
@@ -193,7 +201,7 @@ public class PacketBuilder {
         UDPPacket packet = UDPPacket.acquire(_context);
         
         StringBuffer msg = null;
-        if (_log.shouldLog(Log.WARN)) {
+        if (_log.shouldLog(Log.DEBUG)) {
             msg = new StringBuffer(128);
             msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
         }
@@ -270,7 +278,7 @@ public class PacketBuilder {
         off++;
         
         if (msg != null)
-            _log.warn(msg.toString());
+            _log.debug(msg.toString());
         
         // we can pad here if we want, maybe randomized?
         

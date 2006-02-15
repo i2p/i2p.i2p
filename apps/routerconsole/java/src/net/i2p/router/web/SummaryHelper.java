@@ -82,7 +82,7 @@ public class SummaryHelper {
         }
         
         if (!_context.clock().getUpdatedSuccessfully())
-            return now + " (nknown skew)";
+            return now + " (Unknown skew)";
         
         long ms = _context.clock().getOffset();
         

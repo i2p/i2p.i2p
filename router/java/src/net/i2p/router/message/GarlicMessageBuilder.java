@@ -30,13 +30,23 @@ import net.i2p.util.Log;
  *
  */
 public class GarlicMessageBuilder {
+    public static int estimateAvailableTags(RouterContext ctx, PublicKey key) {
+        SessionKey curKey = ctx.sessionKeyManager().getCurrentKey(key);
+        if (curKey == null)
+            return 0;
+        return ctx.sessionKeyManager().getAvailableTags(key, curKey);
+    }
+    
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
         return buildMessage(ctx, config, new SessionKey(), new HashSet());
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, 50);
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, 100);
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver) {
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, false);
+    }
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver, boolean forceElGamal) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
@@ -54,31 +64,33 @@ public class GarlicMessageBuilder {
             log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
         
         SessionKey curKey = ctx.sessionKeyManager().getCurrentKey(key);
+        SessionTag curTag = null;
         if (curKey == null)
             curKey = ctx.sessionKeyManager().createSession(key);
-        
-        SessionTag curTag = ctx.sessionKeyManager().consumeNextAvailableTag(key, curKey);
+        if (!forceElGamal) {
+            curTag = ctx.sessionKeyManager().consumeNextAvailableTag(key, curKey);
+            
+            int availTags = ctx.sessionKeyManager().getAvailableTags(key, curKey);
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Available tags for encryption to " + key + ": " + availTags);
 
-        int availTags = ctx.sessionKeyManager().getAvailableTags(key, curKey);
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("Available tags for encryption to " + key + ": " + availTags);
-        
-        if (availTags < 10) { // arbitrary threshold
-            for (int i = 0; i < numTagsToDeliver; i++)
-                wrappedTags.add(new SessionTag(true));
-            if (log.shouldLog(Log.INFO))
-                log.info("Less than 10 tags are available (" + availTags + "), so we're including more");
-        } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 60*1000) {
-            // if we have > 10 tags, but they expire in under 30 seconds, we want more
-            for (int i = 0; i < numTagsToDeliver; i++)
-                wrappedTags.add(new SessionTag(true));
-            if (log.shouldLog(Log.INFO))
-                log.info("Tags are almost expired, adding new ones");
-        } else {
-            // always tack on at least one more - not necessary.
-            //wrappedTags.add(new SessionTag(true));
+            if (availTags < 20) { // arbitrary threshold
+                for (int i = 0; i < numTagsToDeliver; i++)
+                    wrappedTags.add(new SessionTag(true));
+                if (log.shouldLog(Log.INFO))
+                    log.info("Less than 20 tags are available (" + availTags + "), so we're including more");
+            } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 60*1000) {
+                // if we have > 20 tags, but they expire in under 30 seconds, we want more
+                for (int i = 0; i < numTagsToDeliver; i++)
+                    wrappedTags.add(new SessionTag(true));
+                if (log.shouldLog(Log.INFO))
+                    log.info("Tags are almost expired, adding new ones");
+            } else {
+                // always tack on at least one more - not necessary.
+                //wrappedTags.add(new SessionTag(true));
+            }
         }
-        
+
         wrappedKey.setData(curKey.getData());
         
         return buildMessage(ctx, config, wrappedKey, wrappedTags, key, curKey, curTag);

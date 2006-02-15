@@ -175,7 +175,7 @@ public class OutboundMessageState {
         // stupid brute force, but the cardinality should be trivial
         short sends[] = _fragmentSends;
         if (sends != null)
-            for (int i = 0; i < bitfield.fragmentCount(); i++)
+            for (int i = 0; i < bitfield.fragmentCount() && i < sends.length; i++)
                 if (bitfield.received(i))
                     sends[i] = (short)-1;
         

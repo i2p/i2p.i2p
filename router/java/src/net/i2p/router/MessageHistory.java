@@ -39,7 +39,7 @@ public class MessageHistory {
         
     /** config property determining whether we want to debug with the message history */
     public final static String PROP_KEEP_MESSAGE_HISTORY = "router.keepHistory";
-    public final static boolean DEFAULT_KEEP_MESSAGE_HISTORY = false;
+    public final static boolean DEFAULT_KEEP_MESSAGE_HISTORY = true;
     /** config property determining where we want to log the message history, if we're keeping one */
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";
@@ -48,6 +48,7 @@ public class MessageHistory {
 
     public MessageHistory(RouterContext context) {
         _context = context;
+        _log = context.logManager().getLog(getClass());
          _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
         _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         _reinitializeJob = new ReinitializeJob();
@@ -270,6 +271,16 @@ public class MessageHistory {
         addEntry(buf.toString());
     }
     
+    public void tunnelParticipantRejected(Hash peer, String msg) {
+        if (!_doLog) return;
+        if (peer == null) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("tunnel participation rejected by [");
+        buf.append(getName(peer)).append("]: ").append(msg);
+        addEntry(buf.toString());
+    }
+    
     /**
      * The peer did not accept the tunnel join for the given reason (this may be because
      * of a timeout or an explicit refusal).
@@ -305,14 +316,35 @@ public class MessageHistory {
     /**
      * We received another message we weren't waiting for and don't know how to handle
      */
-    public void droppedOtherMessage(I2NPMessage message) {
+    public void droppedOtherMessage(I2NPMessage message, Hash from) {
         if (!_doLog) return;
         if (message == null) return;
         StringBuffer buf = new StringBuffer(512);
         buf.append(getPrefix());
         buf.append("dropped [").append(message.getClass().getName()).append("] ").append(message.getUniqueId());
-        buf.append(" [").append(message.toString()).append("]");
+        buf.append(" [").append(message.toString()).append("] from [");
+        if (from != null)
+            buf.append(from.toBase64());
+        else
+            buf.append("unknown");
+        buf.append("] expiring in ").append(message.getMessageExpiration()-_context.clock().now()).append("ms");
         addEntry(buf.toString());
+    }
+    
+    public void droppedInboundMessage(long messageId, Hash from, String info) {
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(512);
+        buf.append(getPrefix());
+        buf.append("dropped inbound message ").append(messageId);
+        buf.append(" from ");
+        if (from != null)
+            buf.append(from.toBase64());
+        else
+            buf.append("unknown");
+        buf.append(": ").append(info);
+        addEntry(buf.toString());
+        //if (_log.shouldLog(Log.ERROR))
+        //    _log.error(buf.toString(), new Exception("source"));
     }
     
     /**
@@ -349,6 +381,24 @@ public class MessageHistory {
     }
     
     /**
+     * We shitlisted the peer
+     */
+    public void shitlist(Hash peer, String reason) {
+        if (!_doLog) return;
+        if (peer == null) return;
+        addEntry("Shitlist " + peer.toBase64() + ": " + reason);
+    }
+       
+    /**
+     * We unshitlisted the peer
+     */
+    public void unshitlist(Hash peer) {
+        if (!_doLog) return;
+        if (peer == null) return;
+        addEntry("Unshitlist " + peer.toBase64());
+    }
+    
+    /**
      * We just sent a message to the peer
      *
      * @param messageType class name for the message object (e.g. DatabaseFindNearestMessage, TunnelMessage, etc)
@@ -358,7 +408,7 @@ public class MessageHistory {
      * @param peer router that the message was sent to
      * @param sentOk whether the message was sent successfully
      */
-    public void sendMessage(String messageType, long messageId, long expiration, Hash peer, boolean sentOk) {
+    public void sendMessage(String messageType, long messageId, long expiration, Hash peer, boolean sentOk, String info) {
         if (!_doLog) return;
         if (false) return;
         StringBuffer buf = new StringBuffer(256);
@@ -370,6 +420,8 @@ public class MessageHistory {
             buf.append("successfully");
         else
             buf.append("failed");
+        if (info != null)
+            buf.append(info);
         addEntry(buf.toString());
     }
 
@@ -469,22 +521,30 @@ public class MessageHistory {
         buf.append(" ").append(status);
         addEntry(buf.toString());
     }
-    public void fragmentMessage(long messageId, int numFragments) {
+    public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
         if (!_doLog) return;
-        if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
+        //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
+        buf.append(" total size ").append(totalLength);
+        buf.append(" contained in ").append(messageIds);
+        if (msg != null)
+            buf.append(": ").append(msg);
         addEntry(buf.toString());
     }
-    public void fragmentMessage(long messageId, int numFragments, Object tunnel) {
+    public void fragmentMessage(long messageId, int numFragments, int totalLength, List messageIds, Object tunnel, String msg) {
         if (!_doLog) return;
-        if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
+        //if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
+        buf.append(" total size ").append(totalLength);
+        buf.append(" contained in ").append(messageIds);
         if (tunnel != null)
             buf.append(" on ").append(tunnel.toString());
+        if (msg != null)
+            buf.append(": ").append(msg);
         addEntry(buf.toString());
     }
     public void droppedTunnelDataMessageUnknown(long msgId, long tunnelId) {

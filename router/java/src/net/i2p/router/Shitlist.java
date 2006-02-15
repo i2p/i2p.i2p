@@ -85,6 +85,8 @@ public class Shitlist {
         _context.netDb().fail(peer);
         //_context.tunnelManager().peerFailed(peer);
         _context.messageRegistry().peerFailed(peer);
+        if (!wasAlready)
+            _context.messageHistory().shitlist(peer, reason);
         return wasAlready;
     }
     
@@ -93,7 +95,8 @@ public class Shitlist {
     }
     private void unshitlistRouter(Hash peer, boolean realUnshitlist) {
         if (peer == null) return;
-        _log.info("Unshitlisting router " + peer.toBase64());
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Unshitlisting router " + peer.toBase64());
         synchronized (_shitlist) {
             _shitlist.remove(peer);
             _shitlistCause.remove(peer);
@@ -103,6 +106,7 @@ public class Shitlist {
             if (prof != null)
                 prof.unshitlist();
         }
+        _context.messageHistory().unshitlist(peer);
     }
     
     public boolean isShitlisted(Hash peer) {

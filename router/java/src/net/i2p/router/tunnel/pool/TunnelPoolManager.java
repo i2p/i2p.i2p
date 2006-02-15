@@ -12,16 +12,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.TunnelCreateMessage;
+import net.i2p.data.i2np.*;
 import net.i2p.stat.RateStat;
-import net.i2p.router.ClientTunnelSettings;
-import net.i2p.router.HandlerJobBuilder;
-import net.i2p.router.JobImpl;
-import net.i2p.router.LoadTestManager;
-import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.*;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.I2PThread;
@@ -47,8 +40,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelPoolManager.class);
         
-        HandlerJobBuilder builder = new HandleTunnelCreateMessageJob.Builder(ctx);
-        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelCreateMessage.MESSAGE_TYPE, builder);
+        //HandlerJobBuilder builder = new HandleTunnelCreateMessageJob.Builder(ctx);
+        //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelCreateMessage.MESSAGE_TYPE, builder);
         //HandlerJobBuilder b = new TunnelMessageHandlerBuilder(ctx);
         //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelGatewayMessage.MESSAGE_TYPE, b);
         //ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelDataMessage.MESSAGE_TYPE, b);
@@ -300,9 +293,34 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             outbound.shutdown();
     }
     
-    void buildComplete(TunnelCreatorConfig cfg) {
+    void buildComplete(PooledTunnelCreatorConfig cfg) {
         buildComplete();
         _loadTestManager.addTunnelTestCandidate(cfg);
+        if (cfg.getLength() > 1) {
+            TunnelPool pool = cfg.getTunnelPool();
+            if (pool == null) {
+                _log.error("How does this not have a pool?  " + cfg, new Exception("baf"));
+                if (cfg.getDestination() != null) {
+                    if (cfg.isInbound()) {
+                        synchronized (_clientInboundPools) {
+                            pool = (TunnelPool)_clientInboundPools.get(cfg.getDestination());
+                        }
+                    } else {
+                        synchronized (_clientOutboundPools) {
+                            pool = (TunnelPool)_clientOutboundPools.get(cfg.getDestination());
+                        }
+                    }
+                } else {
+                    if (cfg.isInbound()) {
+                        pool = _inboundExploratory;
+                    } else {
+                        pool = _outboundExploratory;
+                    }
+                }
+                cfg.setTunnelPool(pool);
+            }
+            _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
+        }
     }
     void buildComplete() {}
     
@@ -333,10 +351,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         // try to build up longer tunnels
         _context.jobQueue().addJob(new BootstrapPool(_context, _inboundExploratory));
         _context.jobQueue().addJob(new BootstrapPool(_context, _outboundExploratory));
-        
-        if (Boolean.valueOf(_context.getProperty(PROP_LOAD_TEST, "true")).booleanValue()) {
-            _context.jobQueue().addJob(_loadTestManager.getTestJob());
-        }
     }
     
     private class BootstrapPool extends JobImpl {

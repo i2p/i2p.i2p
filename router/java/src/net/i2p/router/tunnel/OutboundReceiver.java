@@ -25,7 +25,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
     }
     
-    public void receiveEncrypted(byte encrypted[]) {
+    public long receiveEncrypted(byte encrypted[]) {
         TunnelDataMessage msg = new TunnelDataMessage(_context);
         msg.setData(encrypted);
         msg.setTunnelId(_config.getConfig(0).getSendTunnel());
@@ -38,11 +38,13 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         if (ri != null) {
             _nextHopCache = ri;
             send(msg, ri);
+            return msg.getUniqueId();
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
                            + " required for " + msg);
             _context.netDb().lookupRouterInfo(_config.getPeer(1), new SendJob(_context, msg), new FailedJob(_context), 10*1000);
+            return -1;
         }
     }
 

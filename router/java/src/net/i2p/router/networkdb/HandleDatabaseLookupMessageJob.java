@@ -120,7 +120,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_message.getSearchKey());
             if ( (info != null) && (info.isCurrent(EXPIRE_DELAY)) ) {
-                if (isUnreachable(info) && !publishUnreachable()) {
+                if ( (info.getIdentity().isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Not answering a query for a netDb peer who isn't reachable");
                     Set us = new HashSet(1);

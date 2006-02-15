@@ -716,11 +716,13 @@ public abstract class BaseServlet extends HttpServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
             PetName pn = db.getByName(name);
-            if ("syndieblog".equals(pn.getProtocol()) && pn.isMember(FilteredThreadIndex.GROUP_FAVORITE)) {
+            String proto = pn.getProtocol();
+            String loc = pn.getLocation();
+            if (proto != null && loc != null && "syndieblog".equals(proto) && pn.isMember(FilteredThreadIndex.GROUP_FAVORITE)) {
                 if ( (author != null) && (author.equals(pn.getLocation())) )
-                    out.write("<option value=\"" + pn.getLocation() + "\" selected=\"true\">Threads " + name + " posted in</option>\n");
+                    out.write("<option value=\"" + loc + "\" selected=\"true\">Threads " + name + " posted in</option>\n");
                 else
-                    out.write("<option value=\"" + pn.getLocation() + "\">Threads " + name + " posted in</option>\n");
+                    out.write("<option value=\"" + loc + "\">Threads " + name + " posted in</option>\n");
             }
         }
         out.write("</select>\n");

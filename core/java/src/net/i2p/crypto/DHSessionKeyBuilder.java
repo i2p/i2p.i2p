@@ -228,7 +228,7 @@ public class DHSessionKeyBuilder {
      */
     public BigInteger generateMyValue() {
         long start = System.currentTimeMillis();
-        _myPrivateValue = new NativeBigInteger(2048, RandomSource.getInstance());
+        _myPrivateValue = new NativeBigInteger(KeyGenerator.PUBKEY_EXPONENT_SIZE, RandomSource.getInstance());
         BigInteger myValue = CryptoConstants.elgg.modPow(_myPrivateValue, CryptoConstants.elgp);
         long end = System.currentTimeMillis();
         long diff = end - start;

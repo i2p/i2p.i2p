@@ -21,7 +21,7 @@ class RouterThrottleImpl implements RouterThrottle {
      * to a job, we're congested.
      *
      */
-    private static int JOB_LAG_LIMIT = 10*1000;
+    private static int JOB_LAG_LIMIT = 2*1000;
     /**
      * Arbitrary hard limit - if we throttle our network connection this many
      * times in the previous 2 minute period, don't accept requests to 
@@ -80,7 +80,7 @@ class RouterThrottleImpl implements RouterThrottle {
         } 
     }
     
-    public int acceptTunnelRequest(TunnelCreateMessage msg) { 
+    public int acceptTunnelRequest() { 
         if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are shutting down ASAP");
@@ -253,7 +253,7 @@ class RouterThrottleImpl implements RouterThrottle {
             _context.statManager().addRateData("router.throttleTunnelBandwidthExceeded", (long)bytesAllocated, 0);
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
-        _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, msg.getDurationSeconds()*1000);
+        _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, 60*10*1000);
         
 
         if (_log.shouldLog(Log.DEBUG))

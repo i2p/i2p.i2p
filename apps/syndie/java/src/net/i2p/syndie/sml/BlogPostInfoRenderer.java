@@ -162,7 +162,7 @@ public class BlogPostInfoRenderer extends EventReceiverImpl {
                     if (pn != null)
                         out.append(HTMLRenderer.sanitizeString(pn.getName()));
                     else
-                        out.append(HTMLRenderer.sanitizeString(blog.name));
+                        out.append(HTMLRenderer.sanitizeTagParam(blog.name));
                     out.append(" on ").append(getEntryDate(blog.entryId));
                     out.append("</a>");
                 } else if (blog.hash != null) {
@@ -183,7 +183,7 @@ public class BlogPostInfoRenderer extends EventReceiverImpl {
                         // generate a new nym
                         while ( (pn = db.getByName(blog.name)) != null)
                             blog.name = blog.name + ".";
-                        out.append(HTMLRenderer.sanitizeString(blog.name)).append("</a>");
+                        out.append(HTMLRenderer.sanitizeTagParam(blog.name)).append("</a>");
                         /* <a href=\"profile.jsp?");
                         _bodyBuffer.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append("=");
                         _bodyBuffer.append(HTMLRenderer.sanitizeTagParam(blog.hash)).append("\" title=\"View their profile\">");

@@ -103,6 +103,7 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM2   = "pentium2";
     private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
+    private final static String JBIGI_OPTIMIZATION_VIAC3      = "viac3";
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
@@ -134,6 +135,8 @@ public class NativeBigInteger extends BigInteger {
         
         try {
             CPUInfo c = CPUID.getInfo();
+            if (c.IsC3Compatible())
+                return JBIGI_OPTIMIZATION_VIAC3;
             if (c instanceof AMDCPUInfo) {
                 AMDCPUInfo amdcpu = (AMDCPUInfo) c;
                 if (amdcpu.IsAthlon64Compatible())
@@ -146,20 +149,18 @@ public class NativeBigInteger extends BigInteger {
                     return JBIGI_OPTIMIZATION_K6_2;
                 if (amdcpu.IsK6Compatible())
                     return JBIGI_OPTIMIZATION_K6;
-            } else {
-                if (c instanceof IntelCPUInfo) {
-                    IntelCPUInfo intelcpu = (IntelCPUInfo) c;
-                    if (intelcpu.IsPentium4Compatible())
-                        return JBIGI_OPTIMIZATION_PENTIUM4;
-                    if (intelcpu.IsPentium3Compatible())
-                        return JBIGI_OPTIMIZATION_PENTIUM3;
-                    if (intelcpu.IsPentium2Compatible())
-                        return JBIGI_OPTIMIZATION_PENTIUM2;
-                    if (intelcpu.IsPentiumMMXCompatible())
-                        return JBIGI_OPTIMIZATION_PENTIUMMMX;
-                    if (intelcpu.IsPentiumCompatible())
-                        return JBIGI_OPTIMIZATION_PENTIUM;
-                }
+            } else if (c instanceof IntelCPUInfo) {
+                IntelCPUInfo intelcpu = (IntelCPUInfo) c;
+                if (intelcpu.IsPentium4Compatible())
+                    return JBIGI_OPTIMIZATION_PENTIUM4;
+                if (intelcpu.IsPentium3Compatible())
+                    return JBIGI_OPTIMIZATION_PENTIUM3;
+                if (intelcpu.IsPentium2Compatible())
+                    return JBIGI_OPTIMIZATION_PENTIUM2;
+                if (intelcpu.IsPentiumMMXCompatible())
+                    return JBIGI_OPTIMIZATION_PENTIUMMMX;
+                if (intelcpu.IsPentiumCompatible())
+                    return JBIGI_OPTIMIZATION_PENTIUM;
             }
             return null;
         } catch (UnknownCPUException e) {
@@ -287,7 +288,7 @@ public class NativeBigInteger extends BigInteger {
 
         int runsProcessed = 0;
         for (runsProcessed = 0; runsProcessed < numRuns; runsProcessed++) {
-            BigInteger bi = new BigInteger(2048, rand);
+            BigInteger bi = new BigInteger(226, rand); // 2048, rand); //
             NativeBigInteger g = new NativeBigInteger(_sampleGenerator);
             NativeBigInteger p = new NativeBigInteger(_samplePrime);
             NativeBigInteger k = new NativeBigInteger(1, bi.toByteArray());

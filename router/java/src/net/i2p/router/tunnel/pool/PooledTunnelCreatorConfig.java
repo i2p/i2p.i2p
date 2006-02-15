@@ -1,10 +1,12 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.Properties;
+import java.util.*;
 import net.i2p.data.Hash;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
+import net.i2p.util.Log;
 
 /**
  *
@@ -15,6 +17,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TestJob _testJob;
     private Job _expireJob;
     private int _failures;
+    private TunnelInfo _pairedTunnel;
     
     /** Creates a new instance of PooledTunnelCreatorConfig */
     
@@ -27,7 +30,6 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         _pool = null;
         _failures = 0;
     }
-    
     
     public void testSuccessful(int ms) {
         if (_testJob != null) {
@@ -43,6 +45,10 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public Properties getOptions() {
         if (_pool == null) return null;
         return _pool.getSettings().getUnknownOptions();
+    }
+    
+    public String toString() {
+        return super.toString() + " with " + _failures + " failures";
     }
     
     private static final int MAX_CONSECUTIVE_TEST_FAILURES = 2;
@@ -66,9 +72,19 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         }
     }
     public boolean getTunnelFailed() { return _failed; }
-    public void setTunnelPool(TunnelPool pool) { _pool = pool; }
+    public void setTunnelPool(TunnelPool pool) {
+        if (pool != null) {
+            _pool = pool; 
+        } else {
+            Log log = _context.logManager().getLog(getClass());
+            log.error("Null tunnel pool?", new Exception("foo"));
+        }
+    }
     public TunnelPool getTunnelPool() { return _pool; }
     
     public void setTestJob(TestJob job) { _testJob = job; }
     public void setExpireJob(Job job) { _expireJob = job; }
+    
+    public void setPairedTunnel(TunnelInfo tunnel) { _pairedTunnel = tunnel; }
+    public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
 }

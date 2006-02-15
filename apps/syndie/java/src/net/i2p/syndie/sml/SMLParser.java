@@ -322,7 +322,7 @@ public class SMLParser {
             try {
                 return Integer.parseInt(val.trim());
             } catch (NumberFormatException nfe) {
-                nfe.printStackTrace();
+                //nfe.printStackTrace();
                 return -1;
             }
         } else {
@@ -336,7 +336,7 @@ public class SMLParser {
             try {
                 return Long.parseLong(val.trim());
             } catch (NumberFormatException nfe) {
-                nfe.printStackTrace();
+                //nfe.printStackTrace();
                 return -1;
             }
         } else {
@@ -370,7 +370,7 @@ public class SMLParser {
                 } else if (c == EQ) {
                     if (nameEnd < 0)
                         nameEnd = off;
-                } else if ( (c == QUOTE) || (c == DQUOTE) ) {
+                } else if ( c == DQUOTE ) {
                     if (valStart < 0) {
                         valStart = off;
                     } else {
@@ -450,11 +450,11 @@ public class SMLParser {
         
         test("A: B\nC: D\n\n<a href=\"http://odci.gov\">hi</a>");
         
-        test("A: B\n\n[a b='c']d[/a]");
-        test("A: B\n\n[a b='c' d='e' f='g']h[/a]");
-        test("A: B\n\n[a b='c' d='e' f='g']h[/a][a b='c' d='e' f='g']h[/a][a b='c' d='e' f='g']h[/a]");
+        test("A: B\n\n[a b=\"c\"]d[/a]");
+        test("A: B\n\n[a b=\"c\" d=\"e\" f=\"g\"]h[/a]");
+        test("A: B\n\n[a b=\"c\" d=\"e\" f=\"g\"]h[/a][a b=\"c\" d=\"e\" f=\"g\"]h[/a][a b=\"c\" d=\"e\" f=\"g\"]h[/a]");
         
-        test("A: B\n\n[a   b='c' ]d[/a]");
+        test("A: B\n\n[a   b=\"plural c's\" ]d[/a]");
         test("A: B\n\n[a   b=\"c\" ]d[/a]");
         
         test("A: B\n\n[b]This[/b] is [i]special[/i][cut]why?[/cut][u]because I say so[/u].\neven if you dont care");

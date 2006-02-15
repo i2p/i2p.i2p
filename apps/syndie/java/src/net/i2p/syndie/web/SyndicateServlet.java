@@ -49,9 +49,11 @@ public class SyndicateServlet extends BaseServlet {
                 if (pnval != null) location = pnval.getLocation();
             }
             
+            // dont allow caching if they explicit ask for a fetch
+            boolean allowCaching = false;
             remote.fetchIndex(user, req.getParameter(PARAM_SCHEMA), location, 
                               req.getParameter("proxyhost"), 
-                              req.getParameter("proxyport"));
+                              req.getParameter("proxyport"), allowCaching);
         } else if ("Fetch metadata".equals(action)) {
             remote.fetchMetadata(user, req.getParameterMap());
         } else if ("Fetch selected entries".equals(action)) {

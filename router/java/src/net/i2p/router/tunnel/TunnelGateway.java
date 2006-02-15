@@ -98,6 +98,8 @@ public class TunnelGateway {
         synchronized (_queue) {
             _queue.add(cur);
             afterAdded = _context.clock().now();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Added before direct flush preprocessing: " + _queue);
             delayedFlush = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
             if (delayedFlush)
                 delayAmount = _preprocessor.getDelayAmount();
@@ -107,13 +109,15 @@ public class TunnelGateway {
             for (int i = 0; i < _queue.size(); i++) {
                 Pending m = (Pending)_queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Expire on the queue (size=" + _queue.size() + "): " + m);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);
                     _queue.remove(i);
                     i--;
                 }
             }
             remaining = _queue.size();
+            if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
+                _log.debug("Remaining after preprocessing: " + _queue);
         }
         
         if (delayedFlush) {
@@ -130,8 +134,9 @@ public class TunnelGateway {
          * it, and pass it on to the receiver
          *
          * @param preprocessed IV + (rand padding) + 0x0 + Hash[0:3] + {instruction+fragment}*
+         * @return message ID it was sent in, or -1 if it was deferred
          */
-        public void sendPreprocessed(byte preprocessed[], Receiver receiver);
+        public long sendPreprocessed(byte preprocessed[], Receiver receiver);
     }
         
     public interface QueuePreprocessor {
@@ -150,8 +155,9 @@ public class TunnelGateway {
     public interface Receiver {
         /**
          * Take the encrypted data and send it off to the next hop
+         * @return message ID it was sent in, or -1 if it had to be deferred
          */
-        public void receiveEncrypted(byte encrypted[]);
+        public long receiveEncrypted(byte encrypted[]);
     }
     
     public static class Pending {
@@ -163,6 +169,7 @@ public class TunnelGateway {
         protected int _offset;
         protected int _fragmentNumber;
         protected long _created;
+        private List _messageIds;
         
         public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) { 
             this(message, toRouter, toTunnel, System.currentTimeMillis()); 
@@ -176,6 +183,7 @@ public class TunnelGateway {
             _offset = 0;
             _fragmentNumber = 0;
             _created = now;
+            _messageIds = null;
         }
         /** may be null */
         public Hash getToRouter() { return _toRouter; }
@@ -194,6 +202,21 @@ public class TunnelGateway {
         public int getFragmentNumber() { return _fragmentNumber; }
         /** ok, fragment sent, increment what the next will be */
         public void incrementFragmentNumber() { _fragmentNumber++; }
+        public void addMessageId(long id) { 
+            synchronized (Pending.this) {
+                if (_messageIds == null)
+                    _messageIds = new ArrayList();
+                _messageIds.add(new Long(id));
+            }
+        }
+        public List getMessageIds() { 
+            synchronized (Pending.this) { 
+                if (_messageIds != null)
+                    return new ArrayList(_messageIds); 
+                else
+                    return new ArrayList();
+            } 
+        }
     }
     private class PendingImpl extends Pending {
         public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
@@ -238,9 +261,13 @@ public class TunnelGateway {
                     System.out.println("foo!");
                 afterChecked = _context.clock().now();
                 if (_queue.size() > 0) {
+                    if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
+                        _log.debug("Remaining before delayed flush preprocessing: " + _queue);
                     wantRequeue = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
                     if (wantRequeue)
                         delayAmount = _preprocessor.getDelayAmount();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Remaining after delayed flush preprocessing (requeue? " + wantRequeue + "): " + _queue);
                 }
                 remaining = _queue.size();
             }

@@ -29,10 +29,13 @@ public class UDPReceiver {
     private boolean _keepRunning;
     private Runner _runner;
     private UDPTransport _transport;
+    private static int __id;
+    private int _id;
     
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
+        _id = ++_id;
         _name = name;
         _inboundQueue = new ArrayList(128);
         _socket = socket;
@@ -48,7 +51,7 @@ public class UDPReceiver {
     public void startup() {
         adjustDropProbability();
         _keepRunning = true;
-        I2PThread t = new I2PThread(_runner, _name);
+        I2PThread t = new I2PThread(_runner, _name + "." + _id);
         t.setDaemon(true);
         t.start();
     }
@@ -65,11 +68,11 @@ public class UDPReceiver {
         String p = _context.getProperty("i2np.udp.dropProbability");
         if (p != null) {
             try { 
-                ARTIFICIAL_DROP_PROBABILITY = Float.parseFloat(p);
+                ARTIFICIAL_DROP_PROBABILITY = Integer.parseInt(p);
             } catch (NumberFormatException nfe) {}
             if (ARTIFICIAL_DROP_PROBABILITY < 0) ARTIFICIAL_DROP_PROBABILITY = 0;
         } else {
-            ARTIFICIAL_DROP_PROBABILITY = 0;
+            //ARTIFICIAL_DROP_PROBABILITY = 0;
         }
     }
     
@@ -83,12 +86,12 @@ public class UDPReceiver {
     }
 
     /** if a packet been sitting in the queue for a full second (meaning the handlers are overwhelmed), drop subsequent packets */
-    private static final long MAX_QUEUE_PERIOD = 1*1000;
+    private static final long MAX_QUEUE_PERIOD = 2*1000;
     
-    private static float ARTIFICIAL_DROP_PROBABILITY = 0.0f; // 0.02f; // 0.0f;
+    private static int ARTIFICIAL_DROP_PROBABILITY = 0; // 4
     
-    private static final int ARTIFICIAL_DELAY = 0; // 100;
-    private static final int ARTIFICIAL_DELAY_BASE = 0; //100;
+    private static final int ARTIFICIAL_DELAY = 0; // 200;
+    private static final int ARTIFICIAL_DELAY_BASE = 0; //600;
     
     private int receive(UDPPacket packet) {
         //adjustDropProbability();
@@ -96,10 +99,10 @@ public class UDPReceiver {
         if (ARTIFICIAL_DROP_PROBABILITY > 0) { 
             // the first check is to let the compiler optimize away this 
             // random block on the live system when the probability is == 0
-            int v = _context.random().nextInt(1000);
-            if (v < ARTIFICIAL_DROP_PROBABILITY*1000) {
+            int v = _context.random().nextInt(100);
+            if (v <= ARTIFICIAL_DROP_PROBABILITY) {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Drop with v=" + v + " p=" + ARTIFICIAL_DROP_PROBABILITY + " packet size: " + packet.getPacket().getLength());
+                    _log.error("Drop with v=" + v + " p=" + ARTIFICIAL_DROP_PROBABILITY + " packet size: " + packet.getPacket().getLength() + ": " + packet);
                 _context.statManager().addRateData("udp.droppedInboundProbabalistically", 1, 0);
                 return -1;
             } else {
@@ -108,15 +111,20 @@ public class UDPReceiver {
         }
         
         if ( (ARTIFICIAL_DELAY > 0) || (ARTIFICIAL_DELAY_BASE > 0) ) {
-            SimpleTimer.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), ARTIFICIAL_DELAY_BASE + _context.random().nextInt(ARTIFICIAL_DELAY));
+            long delay = ARTIFICIAL_DELAY_BASE + _context.random().nextInt(ARTIFICIAL_DELAY);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Delay packet " + packet + " for " + delay);
+            SimpleTimer.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
+            return -1;
         }
         
         return doReceive(packet);
     }
     private final int doReceive(UDPPacket packet) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Received: " + packet);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Received: " + packet);
 
+        packet.enqueue();
         boolean rejected = false;
         int queueSize = 0;
         long headPeriod = 0;
@@ -164,17 +172,16 @@ public class UDPReceiver {
      */
     public UDPPacket receiveNext() {
         while (_keepRunning) {
-            try {
-                synchronized (_inboundQueue) {
-                    if (_inboundQueue.size() > 0) {
-                        UDPPacket rv = (UDPPacket)_inboundQueue.remove(0);
+            synchronized (_inboundQueue) {
+                if (_inboundQueue.size() <= 0)
+                    try { _inboundQueue.wait(); } catch (InterruptedException ie) {}
+                if (_inboundQueue.size() > 0) {
+                    UDPPacket rv = (UDPPacket)_inboundQueue.remove(0);
+                    if (_inboundQueue.size() > 0)
                         _inboundQueue.notifyAll();
-                        return rv;
-                    } else {
-                        _inboundQueue.wait(500);
-                    }
+                    return rv;
                 }
-            } catch (InterruptedException ie) {}
+            }
         }
         return null;
     }
@@ -185,7 +192,7 @@ public class UDPReceiver {
             _socketChanged = false;
             while (_keepRunning) {
                 if (_socketChanged) {
-                    Thread.currentThread().setName(_name);
+                    Thread.currentThread().setName(_name + "." + _id);
                     _socketChanged = false;
                 }
                 UDPPacket packet = UDPPacket.acquire(_context);
@@ -197,14 +204,14 @@ public class UDPReceiver {
                     try { Thread.sleep(10); } catch (InterruptedException ie) {}
                 
                 try {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Before blocking socket.receive");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Before blocking socket.receive on " + System.identityHashCode(packet));
                     synchronized (Runner.this) {
                         _socket.receive(packet.getPacket());
                     }
                     int size = packet.getPacket().getLength();
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("After blocking socket.receive: packet is " + size + " bytes!");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("After blocking socket.receive: packet is " + size + " bytes on " + System.identityHashCode(packet));
                     packet.resetBegin();
             
                     // and block after we know how much we read but before

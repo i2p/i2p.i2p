@@ -16,3 +16,6 @@ jbigi.jar after being mistakenly removed in the Sep 18 update (d'oh!)
 On Dec 30, 2005, the libjcpuid-x86-linux.so was updated to use the 
 (year old) C version of jcpuid, rather than the C++ version.  This removes
 the libg++.so.5 dependency that has been a problem for a few linux distros.
+
+On Feb 8, 2006, the libjbigi-linux-viac3.so was added to jbigi.jar after
+being compiled by jrandom on linux/p4 (cross compiled to --host=viac3)

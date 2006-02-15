@@ -34,6 +34,8 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_NULL = 0;
     /** specifies a Hashcash style certificate */
     public final static int CERTIFICATE_TYPE_HASHCASH = 1;
+    /** we should not be used for anything (don't use us in the netDb, in tunnels, or tell others about us) */
+    public final static int CERTIFICATE_TYPE_HIDDEN = 2;
 
     public Certificate() {
         _type = 0;
@@ -76,7 +78,7 @@ public class Certificate extends DataStructureImpl {
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_type < 0) throw new DataFormatException("Invalid certificate type: " + _type);
-        if ((_type != 0) && (_payload == null)) throw new DataFormatException("Payload is required for non null type");
+        //if ((_type != 0) && (_payload == null)) throw new DataFormatException("Payload is required for non null type");
 
         DataHelper.writeLong(out, 1, _type);
         if (_payload != null) {

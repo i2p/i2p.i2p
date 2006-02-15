@@ -32,8 +32,8 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
     private MessageReceiver _messageReceiver;
     private boolean _alive;
     
-    /** decay the recently completed every 2 minutes */
-    private static final int DECAY_PERIOD = 120*1000;
+    /** decay the recently completed every 20 seconds */
+    private static final int DECAY_PERIOD = 10*1000;
         
     public InboundMessageFragments(RouterContext ctx, OutboundMessageFragments outbound, UDPTransport transport) {
         _context = ctx;
@@ -57,7 +57,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         // may want to extend the DecayingBloomFilter so we can use a smaller 
         // array size (currently its tuned for 10 minute rates for the 
         // messageValidator)
-        _recentlyCompletedMessages = new DecayingBloomFilter(_context, DECAY_PERIOD, 8);
+        _recentlyCompletedMessages = new DecayingBloomFilter(_context, DECAY_PERIOD, 4);
         _ackSender.startup();
         _messageReceiver.startup();
     }
@@ -114,6 +114,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                     _log.warn("Message received is a dup: " + mid + " dups: " 
                               + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
                               + _recentlyCompletedMessages.getInsertedCount());
+                _context.messageHistory().droppedInboundMessage(mid, from.getRemotePeer(), "dup");
                 continue;
             }
             
@@ -162,6 +163,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                     state.releaseResources();
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Message expired while only being partially read: " + state);
+                    _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired hile partially read: " + state.toString());
                 } else if (partialACK) {
                     // not expired but not yet complete... lets queue up a partial ACK
                     if (_log.shouldLog(Log.DEBUG))

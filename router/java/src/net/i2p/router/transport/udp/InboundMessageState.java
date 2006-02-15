@@ -165,10 +165,18 @@ public class InboundMessageState {
     public String toString() {
         StringBuffer buf = new StringBuffer(32);
         buf.append("Message: ").append(_messageId);
-        //if (isComplete()) {
-        //    buf.append(" completely received with ");
-        //    buf.append(getCompleteSize()).append(" bytes");
-        //}
+        if (isComplete()) {
+            buf.append(" completely received with ");
+            buf.append(getCompleteSize()).append(" bytes");
+        } else {
+            for (int i = 0; (_fragments != null) && (i < _fragments.length); i++) {
+                buf.append(" fragment ").append(i);
+                if (_fragments[i] != null)
+                    buf.append(": known at size ").append(_fragments[i].getValid());
+                else
+                    buf.append(": unknown");
+            }
+        }
         buf.append(" lifetime: ").append(getLifetime());
         return buf.toString();
     }

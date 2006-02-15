@@ -17,7 +17,8 @@ import net.i2p.data.*;
  *   bytes 168-183: reply IV
  *   byte      184: flags
  *   bytes 185-188: request time (in hours since the epoch)
- *   bytes 189-222: uninterpreted / random padding
+ *   bytes 189-192: next message ID
+ *   bytes 193-222: uninterpreted / random padding
  * </pre>
  *
  */
@@ -57,6 +58,7 @@ public class BuildRequestRecord {
     private static final int OFF_REPLY_IV = OFF_REPLY_KEY + SessionKey.KEYSIZE_BYTES;
     private static final int OFF_FLAG = OFF_REPLY_IV + IV_SIZE;
     private static final int OFF_REQ_TIME = OFF_FLAG + 1;
+    private static final int OFF_SEND_MSG_ID = OFF_REQ_TIME + 4;
     
     /** what tunnel ID should this receive messages on */
     public long readReceiveTunnelId() { 
@@ -135,7 +137,14 @@ public class BuildRequestRecord {
     public long readRequestTime() {
         return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_REQ_TIME, 4) * 60l * 60l * 1000l;
     }
-
+    /**
+     * What message ID should we send the request to the next hop with.  If this is the outbound tunnel endpoint,
+     * this specifies the message ID with which the reply should be sent.
+     */
+    public long readReplyMessageId() {
+        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_SEND_MSG_ID, 4);
+    }
+    
     /**
      * Encrypt the record to the specified peer.  The result is formatted as: <pre>
      *   bytes 0-15: SHA-256-128 of the current hop's identity (the toPeer parameter)
@@ -144,7 +153,7 @@ public class BuildRequestRecord {
      */
     public void encryptRecord(I2PAppContext ctx, PublicKey toKey, Hash toPeer, byte out[], int outOffset) {
         System.arraycopy(toPeer.getData(), 0, out, outOffset, PEER_SIZE);
-        byte preEncr[] = new byte[OFF_REQ_TIME + 4 + PADDING_SIZE];
+        byte preEncr[] = new byte[OFF_SEND_MSG_ID + 4 + PADDING_SIZE];
         System.arraycopy(_data.getData(), _data.getOffset(), preEncr, 0, preEncr.length);
         byte encrypted[] = ctx.elGamalEngine().encrypt(preEncr, toKey);
         // the elg engine formats it kind of weird, giving 257 bytes for each part rather than 256, so
@@ -175,7 +184,7 @@ public class BuildRequestRecord {
         }
     }
 
-    private static final int PADDING_SIZE = 33;
+    private static final int PADDING_SIZE = 29;
     
     /**
      * Populate this instance with data.  A new buffer is created to contain the data, with the 
@@ -185,6 +194,7 @@ public class BuildRequestRecord {
      * @param peer current hop's identity
      * @param nextTunnelId id for the next hop, or where we send the reply (if we are the outbound endpoint)
      * @param nextHop next hop's identity, or where we send the reply (if we are the outbound endpoint)
+     * @param nextMsgId message ID to use when sending on to the next hop (or for the reply)
      * @param layerKey tunnel layer key to be used by the peer
      * @param ivKey tunnel IV key to be used by the peer
      * @param replyKey key to be used when encrypting the reply to this build request
@@ -192,12 +202,12 @@ public class BuildRequestRecord {
      * @param isInGateway are we the gateway of an inbound tunnel?
      * @param isOutEndpoint are we the endpoint of an outbound tunnel?
      */
-    public void createRecord(I2PAppContext ctx, long receiveTunnelId, Hash peer, long nextTunnelId, Hash nextHop,
+    public void createRecord(I2PAppContext ctx, long receiveTunnelId, Hash peer, long nextTunnelId, Hash nextHop, long nextMsgId,
                              SessionKey layerKey, SessionKey ivKey, SessionKey replyKey, byte iv[], boolean isInGateway,
                              boolean isOutEndpoint) {
         if ( (_data == null) || (_data.getData() != null) )
             _data = new ByteArray();
-        byte buf[] = new byte[OFF_REQ_TIME+4+PADDING_SIZE];
+        byte buf[] = new byte[OFF_SEND_MSG_ID+4+PADDING_SIZE];
         _data.setData(buf);
         
        /*   bytes     0-3: tunnel ID to receive messages as
@@ -210,7 +220,8 @@ public class BuildRequestRecord {
         *   bytes 168-183: reply IV
         *   byte      184: flags
         *   bytes 185-188: request time (in hours since the epoch)
-        *   bytes 189-222: uninterpreted / random padding
+        *   bytes 189-192: next message ID
+        *   bytes 193-222: uninterpreted / random padding
         */
         DataHelper.toLong(buf, OFF_RECV_TUNNEL, 4, receiveTunnelId);
         System.arraycopy(peer.getData(), 0, buf, OFF_OUR_IDENT, Hash.HASH_LENGTH);
@@ -227,9 +238,10 @@ public class BuildRequestRecord {
         long truncatedHour = ctx.clock().now();
         truncatedHour /= (60l*60l*1000l);
         DataHelper.toLong(buf, OFF_REQ_TIME, 4, truncatedHour);
+        DataHelper.toLong(buf, OFF_SEND_MSG_ID, 4, nextMsgId);
         byte rnd[] = new byte[PADDING_SIZE];
         ctx.random().nextBytes(rnd);
-        System.arraycopy(rnd, 0, buf, OFF_REQ_TIME+4, rnd.length);
+        System.arraycopy(rnd, 0, buf, OFF_SEND_MSG_ID+4, rnd.length);
         
         byte wroteIV[] = readReplyIV();
         if (!DataHelper.eq(iv, wroteIV))

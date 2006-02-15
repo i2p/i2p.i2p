@@ -148,14 +148,16 @@ public class BloomSHA1 {
      * 
      * @param b byte array representing a key (SHA1 digest)
      */
-    public void insert (byte[]b) {
+    public void insert (byte[]b) { insert(b, 0, b.length); }
+    public void insert (byte[]b, int offset, int len) {
         synchronized(this) {
             locked_insert(b);
         }
     }
 
-    public final void locked_insert(byte[]b) { 
-        ks.getOffsets(b);
+    public final void locked_insert(byte[]b) { locked_insert(b, 0, b.length); }
+    public final void locked_insert(byte[]b, int offset, int len) { 
+        ks.getOffsets(b, offset, len);
         for (int i = 0; i < k; i++) {
             filter[wordOffset[i]] |=  1 << bitOffset[i];
         }
@@ -168,8 +170,9 @@ public class BloomSHA1 {
      * @param b byte array representing a key (SHA1 digest)
      * @return true if b is in the filter 
      */
-    protected final boolean isMember(byte[] b) {
-        ks.getOffsets(b);
+    protected final boolean isMember(byte[] b) { return isMember(b, 0, b.length); }
+    protected final boolean isMember(byte[] b, int offset, int len) {
+        ks.getOffsets(b, offset, len);
         for (int i = 0; i < k; i++) {
             if (! ((filter[wordOffset[i]] & (1 << bitOffset[i])) != 0) ) {
                 return false;
@@ -179,6 +182,7 @@ public class BloomSHA1 {
     }
     
     public final boolean locked_member(byte[]b) { return isMember(b); }
+    public final boolean locked_member(byte[]b, int offset, int len) { return isMember(b, offset, len); }
     
     /**
      * Is a key in the filter.  External interface, internally synchronized.
@@ -186,9 +190,10 @@ public class BloomSHA1 {
      * @param b byte array representing a key (SHA1 digest)
      * @return true if b is in the filter 
      */
-    public final boolean member(byte[]b) {
+    public final boolean member(byte[]b) { return member(b, 0, b.length); }
+    public final boolean member(byte[]b, int offset, int len) {
         synchronized (this) {
-            return isMember(b);
+            return isMember(b, offset, len);
         }
     }
 

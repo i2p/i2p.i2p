@@ -224,7 +224,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
     }
     
     public interface FailedListener {
-        public void failed(OutNetMessage msg);
+        public void failed(OutNetMessage msg, String reason);
     }
     
     /**
@@ -253,7 +253,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
                 for (int i = 0; i < removed.size(); i++) {
                     OutNetMessage m = (OutNetMessage)removed.get(i);
                     m.timestamp("expirer killed it");
-                    _listener.failed(m);
+                    _listener.failed(m, "expired before getting on the active pool");
                 }
                 removed.clear();
                 

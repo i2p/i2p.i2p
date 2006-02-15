@@ -57,8 +57,8 @@ public class BuildMessageTest {
         // now msg is fully encrypted, so lets go through the hops, decrypting and replying
         // as necessary
         
+        BuildMessageProcessor proc = new BuildMessageProcessor(ctx);
         for (int i = 0; i < cfg.getLength(); i++) {
-            BuildMessageProcessor proc = new BuildMessageProcessor();
             // this not only decrypts the current hop's record, but encrypts the other records
             // with the reply key
             BuildRequestRecord req = proc.decrypt(ctx, msg, _peers[i], _privKeys[i]);
@@ -77,7 +77,7 @@ public class BuildMessageTest {
             int ourSlot = -1;
             
             BuildResponseRecord resp = new BuildResponseRecord();
-            byte reply[] = resp.create(ctx, 0, req.readReplyKey(), req.readReplyIV());
+            byte reply[] = resp.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), -1);
             for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
                 if (msg.getRecord(j) == null) {
                     ourSlot = j;

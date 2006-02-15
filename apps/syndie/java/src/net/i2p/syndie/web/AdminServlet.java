@@ -34,14 +34,20 @@ public class AdminServlet extends BaseServlet {
         writeAuthActionFields(out);
         out.write("<tr><td colspan=\"3\">");
 
+        // stop people from shooting themselves in the foot - only geeks can enable multiuser mode
+        // (by adding the single user flag to their syndie.config)
+        if (BlogManager.instance().isSingleUser())
+            out.write("<input type=\"hidden\" name=\"singleuser\" value=\"checked\" />\n");
+        /*
         out.write("<em class=\"b_adminField\">Single user?</em> <input type=\"checkbox\" class=\"b_adminField\" name=\"singleuser\" ");
         if (BlogManager.instance().isSingleUser())
             out.write(" checked=\"true\" ");
         out.write(" /><br />\n");
-        
+
         out.write("<span class=\"b_adminDescr\">If this is checked, the registration, admin, and remote passwords are unnecessary - anyone");
         out.write("can register and administer Syndie, as well as use any remote functionality.  This should not be checked if untrusted");
         out.write("parties can access this web interface.</span><br />\n");
+        */
         out.write("<span class=\"b_adminField\">Default user:</span> <input class=\"b_adminField\" type=\"text\" name=\"defaultUser\" size=\"10\" value=\"");
         out.write(BlogManager.instance().getDefaultLogin());
         out.write("\" />\n");

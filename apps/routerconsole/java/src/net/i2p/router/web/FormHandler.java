@@ -118,6 +118,12 @@ public class FormHandler {
             _valid = false;
             return;
         }
+        
+        String sharedNonce = System.getProperty("router.consoleNonce");
+        if ( (sharedNonce != null) && (sharedNonce.equals(_nonce) ) ) {
+            return;
+        }
+        
         String nonce = System.getProperty(getClass().getName() + ".nonce");
         String noncePrev = System.getProperty(getClass().getName() + ".noncePrev");
         if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&

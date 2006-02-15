@@ -33,7 +33,9 @@ class RequestLeaseSetJob extends JobImpl {
     private long _expiration;
     private Job _onCreate;
     private Job _onFail;
-    public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseSet set, long expiration, Job onCreate, Job onFail) {
+    private LeaseRequestState _requestState;
+    
+    public RequestLeaseSetJob(RouterContext ctx, ClientConnectionRunner runner, LeaseSet set, long expiration, Job onCreate, Job onFail, LeaseRequestState state) {
         super(ctx);
         _log = ctx.logManager().getLog(RequestLeaseSetJob.class);
         _runner = runner;
@@ -41,6 +43,7 @@ class RequestLeaseSetJob extends JobImpl {
         _expiration = expiration;
         _onCreate = onCreate;
         _onFail = onFail;
+        _requestState = state;
         ctx.statManager().createRateStat("client.requestLeaseSetSuccess", "How frequently the router requests successfully a new leaseSet?", "ClientMessages", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         ctx.statManager().createRateStat("client.requestLeaseSetTimeout", "How frequently the router requests a new leaseSet but gets no reply?", "ClientMessages", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         ctx.statManager().createRateStat("client.requestLeaseSetDropped", "How frequently the router requests a new leaseSet but the client drops?", "ClientMessages", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -49,43 +52,31 @@ class RequestLeaseSetJob extends JobImpl {
     public String getName() { return "Request Lease Set"; }
     public void runJob() {
         if (_runner.isDead()) return;
-        LeaseRequestState oldReq = _runner.getLeaseRequest();
-        if (oldReq != null) {
-            if (oldReq.getExpiration() > getContext().clock().now()) {
-                _log.info("request of a leaseSet is still active, wait a little bit before asking again");
-            } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Old *expired* leaseRequest exists!  Why did the old request not get killed? (expiration = " + new Date(oldReq.getExpiration()) + ")", getAddedBy());
-            }
-            return;
-        }
-        
-        LeaseRequestState state = new LeaseRequestState(_onCreate, _onFail, _expiration, _ls);
         
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
         Date end = null;
         // get the earliest end date
-        for (int i = 0; i < state.getRequested().getLeaseCount(); i++) {
-            if ( (end == null) || (end.getTime() > state.getRequested().getLease(i).getEndDate().getTime()) )
-                end = state.getRequested().getLease(i).getEndDate();
+        for (int i = 0; i < _requestState.getRequested().getLeaseCount(); i++) {
+            if ( (end == null) || (end.getTime() > _requestState.getRequested().getLease(i).getEndDate().getTime()) )
+                end = _requestState.getRequested().getLease(i).getEndDate();
         }
         
         msg.setEndDate(end);
         msg.setSessionId(_runner.getSessionId());
         
-        for (int i = 0; i < state.getRequested().getLeaseCount(); i++) {
-            msg.addEndpoint(state.getRequested().getLease(i).getGateway(), state.getRequested().getLease(i).getTunnelId());
+        for (int i = 0; i < _requestState.getRequested().getLeaseCount(); i++) {
+            msg.addEndpoint(_requestState.getRequested().getLease(i).getGateway(), _requestState.getRequested().getLease(i).getTunnelId());
         }
         
         try {
-            _runner.setLeaseRequest(state);
+            //_runner.setLeaseRequest(state);
             _runner.doSend(msg);
-            getContext().jobQueue().addJob(new CheckLeaseRequestStatus(getContext(), state));
+            getContext().jobQueue().addJob(new CheckLeaseRequestStatus(getContext(), _requestState));
             return;
         } catch (I2CPMessageException ime) {
             getContext().statManager().addRateData("client.requestLeaseSetDropped", 1, 0);
             _log.error("Error sending I2CP message requesting the lease set", ime);
-            state.setIsSuccessful(false);
+            _requestState.setIsSuccessful(false);
             _runner.setLeaseRequest(null);
             _runner.disconnectClient("I2CP error requesting leaseSet");
             return;
@@ -100,24 +91,32 @@ class RequestLeaseSetJob extends JobImpl {
      */
     private class CheckLeaseRequestStatus extends JobImpl {
         private LeaseRequestState _req;
+        private long _start;
         
         public CheckLeaseRequestStatus(RouterContext enclosingContext, LeaseRequestState state) {
             super(enclosingContext);
             _req = state;
+            _start = System.currentTimeMillis();
             getTiming().setStartAfter(state.getExpiration());
         }
         
         public void runJob() {
-            if (_runner.isDead()) return;
+            if (_runner.isDead()) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Already dead, dont try to expire the leaseSet lookup");
+                return;
+            }
             if (_req.getIsSuccessful()) {
                 // we didn't fail
                 RequestLeaseSetJob.CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetSuccess", 1, 0);
                 return;
             } else {
                 RequestLeaseSetJob.CheckLeaseRequestStatus.this.getContext().statManager().addRateData("client.requestLeaseSetTimeout", 1, 0);
-                if (_log.shouldLog(Log.CRIT))
-                    _log.log(Log.CRIT, "Failed to receive a leaseSet in the time allotted (" + new Date(_req.getExpiration()) + ") for " 
+                if (_log.shouldLog(Log.CRIT)) {
+                    long waited = System.currentTimeMillis() - _start;
+                    _log.log(Log.CRIT, "Failed to receive a leaseSet in the time allotted (" + waited + "): " + _req + " for " 
                              + _runner.getConfig().getDestination().calculateHash().toBase64());
+                }
                 _runner.disconnectClient("Took too long to request leaseSet");
                 if (_req.getOnFailed() != null)
                     RequestLeaseSetJob.this.getContext().jobQueue().addJob(_req.getOnFailed());

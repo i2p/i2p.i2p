@@ -29,13 +29,17 @@ class TestJob extends JobImpl {
     private TunnelInfo _replyTunnel;
     
     /** base to randomize the test delay on */
-    private static final int TEST_DELAY = 60*1000;
+    private static final int TEST_DELAY = 30*1000;
     
     public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
         _log = ctx.logManager().getLog(TestJob.class);
         _pool = pool;
         _cfg = cfg;
+        if (_pool == null)
+            _pool = cfg.getTunnelPool();
+        if ( (_pool == null) && (_log.shouldLog(Log.ERROR)) )
+            _log.error("Invalid tunnel test configuration: no pool for " + cfg, new Exception("origin"));
         getTiming().setStartAfter(getDelay() + ctx.clock().now());
         ctx.statManager().createRateStat("tunnel.testFailedTime", "How long did the failure take (max of 60s for full timeout)?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
@@ -54,6 +58,8 @@ class TestJob extends JobImpl {
     }
     public String getName() { return "Test tunnel"; }
     public void runJob() {
+        if (_pool == null)
+            return;
         long lag = getContext().jobQueue().getMaxLag();
         if (lag > 3000) {
             if (_log.shouldLog(Log.WARN))
@@ -65,6 +71,8 @@ class TestJob extends JobImpl {
         _found = false;
         // note: testing with exploratory tunnels always, even if the tested tunnel
         // is a client tunnel (per _cfg.getDestination())
+        // should we test with the tunnel that we exposed the creation with?
+        // (accessible as _cfg.getPairedTunnel())
         _replyTunnel = null;
         _outTunnel = null;
         if (_cfg.isInbound()) {
@@ -85,64 +93,61 @@ class TestJob extends JobImpl {
             long testExpiration = getContext().clock().now() + testPeriod;
             DeliveryStatusMessage m = new DeliveryStatusMessage(getContext());
             m.setArrival(getContext().clock().now());
-            m.setMessageExpiration(testExpiration+2*testPeriod);
+            m.setMessageExpiration(testExpiration);
             m.setMessageId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-            // keep an eye out for the message even after we fail the tunnel for another 40s
-            ReplySelector sel = new ReplySelector(getContext(), m.getMessageId(), testExpiration + 2*testPeriod);
+            ReplySelector sel = new ReplySelector(getContext(), m.getMessageId(), testExpiration);
             OnTestReply onReply = new OnTestReply(getContext());
             OnTestTimeout onTimeout = new OnTestTimeout(getContext());
-            OutNetMessage msg = getContext().messageRegistry().registerPending(sel, onReply, onTimeout, 3*testPeriod);
+            OutNetMessage msg = getContext().messageRegistry().registerPending(sel, onReply, onTimeout, testPeriod);
             onReply.setSentMessage(msg);
             sendTest(m);
         }
     }
     
     private void sendTest(I2NPMessage m) {
-        if (false) {
-            getContext().tunnelDispatcher().dispatchOutbound(m, _outTunnel.getSendTunnelId(0), 
-                                                             _replyTunnel.getReceiveTunnelId(0), 
-                                                             _replyTunnel.getPeer(0));
-        } else {
-            // garlic route that DeliveryStatusMessage to ourselves so the endpoints and gateways
-            // can't tell its a test.  to simplify this, we encrypt it with a random key and tag,
-            // remembering that key+tag so that we can decrypt it later.  this means we can do the
-            // garlic encryption without any ElGamal (yay)
-            DeliveryInstructions instructions = new DeliveryInstructions();
-            instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
+        // garlic route that DeliveryStatusMessage to ourselves so the endpoints and gateways
+        // can't tell its a test.  to simplify this, we encrypt it with a random key and tag,
+        // remembering that key+tag so that we can decrypt it later.  this means we can do the
+        // garlic encryption without any ElGamal (yay)
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
 
-            PayloadGarlicConfig payload = new PayloadGarlicConfig();
-            payload.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
-            payload.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-            payload.setPayload(m);
-            payload.setRecipient(getContext().router().getRouterInfo());
-            payload.setDeliveryInstructions(instructions);
-            payload.setRequestAck(false);
-            payload.setExpiration(m.getMessageExpiration());
+        PayloadGarlicConfig payload = new PayloadGarlicConfig();
+        payload.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        payload.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        payload.setPayload(m);
+        payload.setRecipient(getContext().router().getRouterInfo());
+        payload.setDeliveryInstructions(instructions);
+        payload.setRequestAck(false);
+        payload.setExpiration(m.getMessageExpiration());
 
-            SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
-            SessionTag encryptTag = new SessionTag(true);
-            SessionKey sentKey = new SessionKey();
-            Set sentTags = null;
-            GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
-                                                                  getContext().keyManager().getPublicKey(), 
-                                                                  encryptKey, encryptTag);
+        SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
+        SessionTag encryptTag = new SessionTag(true);
+        SessionKey sentKey = new SessionKey();
+        Set sentTags = null;
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
+                                                              getContext().keyManager().getPublicKey(), 
+                                                              encryptKey, encryptTag);
 
-            Set encryptTags = new HashSet(1);
-            encryptTags.add(encryptTag);
-            getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending garlic test of " + _outTunnel + " / " + _replyTunnel);
-            getContext().tunnelDispatcher().dispatchOutbound(msg, _outTunnel.getSendTunnelId(0),
-                                                             _replyTunnel.getReceiveTunnelId(0),
-                                                             _replyTunnel.getPeer(0));
-        }
+        Set encryptTags = new HashSet(1);
+        encryptTags.add(encryptTag);
+        getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending garlic test of " + _outTunnel + " / " + _replyTunnel);
+        getContext().tunnelDispatcher().dispatchOutbound(msg, _outTunnel.getSendTunnelId(0),
+                                                         _replyTunnel.getReceiveTunnelId(0),
+                                                         _replyTunnel.getPeer(0));
     }
     
     public void testSuccessful(int ms) {
         getContext().statManager().addRateData("tunnel.testSuccessLength", _cfg.getLength(), 0);
         getContext().statManager().addRateData("tunnel.testSuccessTime", ms, 0);
     
+        _outTunnel.incrementVerifiedBytesTransferred(1024);
+        // reply tunnel is marked in the inboundEndpointProcessor
+        //_replyTunnel.incrementVerifiedBytesTransferred(1024);
+        
         noteSuccess(ms, _outTunnel);
         noteSuccess(ms, _replyTunnel);
         
@@ -169,7 +174,7 @@ class TestJob extends JobImpl {
             _log.warn("Tunnel test failed in " + timeToFail + "ms: " + _cfg);
         boolean keepGoing = _cfg.tunnelFailed();
         if (keepGoing) {
-            scheduleRetest();
+            scheduleRetest(true);
         } else {
             if (_pool.getSettings().isExploratory())
                 getContext().statManager().addRateData("tunnel.testExploratoryFailedCompletelyTime", timeToFail, timeToFail);
@@ -182,12 +187,17 @@ class TestJob extends JobImpl {
     private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY); }
     /** how long we allow tests to run for before failing them */
     private int getTestPeriod() { return 20*1000; }
-    private void scheduleRetest() {
+    private void scheduleRetest() { scheduleRetest(false); }
+    private void scheduleRetest(boolean asap) {
         _outTunnel = null;
         _replyTunnel = null;
-        int delay = getDelay();
-        if (_cfg.getExpiration() > getContext().clock().now() + delay + (3 * getTestPeriod()) + 30*1000)
-            requeue(delay);
+        if (asap) {
+            requeue(getContext().random().nextInt(TEST_DELAY));
+        } else {
+            int delay = getDelay();
+            if (_cfg.getExpiration() > getContext().clock().now() + delay + (3 * getTestPeriod()))
+                requeue(delay);
+        }
     }
     
     private class ReplySelector implements MessageSelector {

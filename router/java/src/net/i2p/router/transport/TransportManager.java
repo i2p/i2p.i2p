@@ -58,7 +58,7 @@ public class TransportManager implements TransportEventListener {
 
     private void configTransports() {
         String disableTCP = _context.router().getConfigSetting(PROP_DISABLE_TCP);
-        if ( (disableTCP != null) && (Boolean.TRUE.toString().equalsIgnoreCase(disableTCP)) ) {
+        if ( true || (disableTCP == null) || (Boolean.TRUE.toString().equalsIgnoreCase(disableTCP)) ) {
             _log.info("Explicitly disabling the TCP transport!");
         } else {
             Transport t = new TCPTransport(_context);

@@ -68,8 +68,8 @@ public class TunnelParticipant {
             ok = _inboundEndpointProcessor.retrievePreprocessedData(msg.getData(), 0, msg.getData().length, recvFrom);
         
         if (!ok) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Failed to dispatch " + msg + ": processor=" + _processor 
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Failed to dispatch " + msg + ": processor=" + _processor 
                            + " inboundEndpoint=" + _inboundEndpointProcessor);
             return;
         }
@@ -147,7 +147,10 @@ public class TunnelParticipant {
     }
 
     private void send(HopConfig config, TunnelDataMessage msg, RouterInfo ri) {
-        msg.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        long oldId = msg.getUniqueId();
+        long newId = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        _context.messageHistory().wrap("TunnelDataMessage", oldId, "TunnelDataMessage", newId);
+        msg.setUniqueId(newId);
         msg.setMessageExpiration(_context.clock().now() + 10*1000);
         OutNetMessage m = new OutNetMessage(_context);
         msg.setTunnelId(config.getSendTunnel());

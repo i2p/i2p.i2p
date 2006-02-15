@@ -24,15 +24,16 @@ public class OutboundSender implements TunnelGateway.Sender {
         _processor = new OutboundGatewayProcessor(_context, config);
     }
     
-    public void sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
+    public long sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("preprocessed data going out " + _config + ": " + Base64.encode(preprocessed));
         if (USE_ENCRYPTION)
             _processor.process(preprocessed, 0, preprocessed.length);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after wrapping up the preprocessed data on " + _config);
-        receiver.receiveEncrypted(preprocessed);
+        long rv = receiver.receiveEncrypted(preprocessed);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after receiving on " + _config + ": receiver = " + receiver);
+        return rv;
     }
 }

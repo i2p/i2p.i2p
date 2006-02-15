@@ -122,7 +122,12 @@ public class EstablishmentManager {
     public void establish(OutNetMessage msg) {
         RouterAddress ra = msg.getTarget().getTargetAddress(_transport.getStyle());
         if (ra == null) {
-            _transport.failed(msg);
+            _transport.failed(msg, "Remote peer has no address, cannot establish");
+            return;
+        }
+        if (msg.getTarget().getNetworkId() != Router.NETWORK_ID) {
+            _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash());
+            _transport.failed(msg, "Remote peer is on the wrong network, cannot establish");
             return;
         }
         UDPAddress addr = new UDPAddress(ra);
@@ -133,7 +138,7 @@ public class EstablishmentManager {
             to = new RemoteHostId(remAddr.getAddress(), port);
 
             if (!_transport.isValid(to.getIP())) {
-                _transport.failed(msg);
+                _transport.failed(msg, "Remote peer's IP isn't valid");
                 _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address");
                 return;
             }
@@ -294,7 +299,7 @@ public class EstablishmentManager {
         //    _log.log(Log.CRIT, "Admitted " + admitted + " with " + remaining + " remaining queued and " + active + " active");
         
         if (_log.shouldLog(Log.INFO))
-            _log.info("Outbound established completely!  yay");
+            _log.info("Outbound established completely!  yay: " + state);
         PeerState peer = handleCompletelyEstablished(state);
         notifyActivity();
         return peer;
@@ -316,7 +321,7 @@ public class EstablishmentManager {
             RouterAddress ra = msg.getTarget().getTargetAddress(_transport.getStyle());
             if (ra == null) {
                 for (int i = 0; i < queued.size(); i++) 
-                    _transport.failed((OutNetMessage)queued.get(i));
+                    _transport.failed((OutNetMessage)queued.get(i), "Cannot admit to the queue, as it has no address");
                 continue;
             }
             UDPAddress addr = new UDPAddress(ra);
@@ -354,8 +359,6 @@ public class EstablishmentManager {
      *
      */
     private void handleCompletelyEstablished(InboundEstablishState state) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handle completely established (inbound): " + state.getRemoteHostId().toString());
         long now = _context.clock().now();
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer = new PeerState(_context);
@@ -369,6 +372,11 @@ public class EstablishmentManager {
         peer.setRemotePeer(remote.calculateHash());
         peer.setWeRelayToThemAs(state.getSentRelayTag());
         peer.setTheyRelayToUsAs(0);
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handle completely established (inbound): " + state.getRemoteHostId().toString() 
+                       + " - " + peer.getRemotePeer().toBase64());
+        
         //if (true) // for now, only support direct
         //    peer.setRemoteRequiresIntroduction(false);
         
@@ -377,7 +385,7 @@ public class EstablishmentManager {
         _transport.inboundConnectionReceived();
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
-        sendOurInfo(peer);
+        sendOurInfo(peer, true);
     }
     
     /** 
@@ -386,8 +394,6 @@ public class EstablishmentManager {
      *
      */
     private PeerState handleCompletelyEstablished(OutboundEstablishState state) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handle completely established (outbound): " + state.getRemoteHostId().toString());
         long now = _context.clock().now();
         RouterIdentity remote = state.getRemoteIdentity();
         PeerState peer = new PeerState(_context);
@@ -402,10 +408,15 @@ public class EstablishmentManager {
         peer.setTheyRelayToUsAs(state.getReceivedRelayTag());
         peer.setWeRelayToThemAs(0);
         
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handle completely established (outbound): " + state.getRemoteHostId().toString() 
+                       + " - " + peer.getRemotePeer().toBase64());
+        
+        
         _transport.addRemotePeerState(peer);
         
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
-        sendOurInfo(peer);
+        sendOurInfo(peer, false);
         
         int i = 0;
         while (true) {
@@ -414,7 +425,7 @@ public class EstablishmentManager {
                 break;
             if (now - Router.CLOCK_FUDGE_FACTOR > msg.getExpiration()) {
                 msg.timestamp("took too long but established...");
-                _transport.failed(msg);
+                _transport.failed(msg, "Took too long to establish, but it was established");
             } else {
                 msg.timestamp("session fully established and sent " + i);
                 _transport.send(msg);
@@ -424,9 +435,10 @@ public class EstablishmentManager {
         return peer;
     }
     
-    private void sendOurInfo(PeerState peer) {
+    private void sendOurInfo(PeerState peer, boolean isInbound) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Publishing to the peer after confirm: " + peer);
+            _log.info("Publishing to the peer after confirm: " + 
+                      (isInbound ? " inbound con from " + peer : "outbound con to " + peer));
         
         DatabaseStoreMessage m = new DatabaseStoreMessage(_context);
         m.setKey(_context.routerHash());
@@ -765,7 +777,7 @@ public class EstablishmentManager {
                         OutNetMessage msg = outboundState.getNextQueuedMessage();
                         if (msg == null)
                             break;
-                        _transport.failed(msg);
+                        _transport.failed(msg, "Expired during failed establish");
                     }
                     String err = null;
                     switch (outboundState.getState()) {

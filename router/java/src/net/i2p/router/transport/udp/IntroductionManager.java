@@ -82,13 +82,23 @@ public class IntroductionManager {
     }
     
     public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
+        if (_context.router().isHidden())
+            return;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Receive relay intro from " + bob);
         _context.statManager().addRateData("udp.receiveRelayIntro", 1, 0);
         _transport.send(_builder.buildHolePunch(reader));
     }
     
     public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
+        if (_context.router().isHidden())
+            return;
         long tag = reader.getRelayRequestReader().readTag();
         PeerState charlie = _transport.getPeerState(tag);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Receive relay request from " + alice 
+                      + " for tag " + tag
+                      + " and relaying with " + charlie);
         if (charlie == null)
             return;
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];

@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.9 2005/07/27 14:04:07 jrandom Exp $</code>
+<code>$Id: tunnel-alt-creation.html,v 1.1.2.1 2006/02/01 20:28:34 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnelCreate.overview">Tunnel creation</a>
 1.1) <a href="#tunnelCreate.requestRecord">Tunnel creation request record</a>
@@ -35,12 +35,14 @@ the asymmetrically encrypted record only at the appropriate time.</p>
   bytes 168-183: reply IV
   byte      184: flags
   bytes 185-188: request time (in hours since the epoch)
-  bytes 189-222: uninterpreted / random padding</pre>
+  bytes 189-192: next message ID
+  bytes 193-222: uninterpreted / random padding</pre>
 
 <p>The next tunnel ID and next router identity hash fields are used to
 specify the next hop in the tunnel, though for an outbound tunnel
 endpoint, they specify where the rewritten tunnel creation reply
-message should be sent.</p>
+message should be sent.  In addition, the next message ID specifies the
+message ID that the message (or reply) should use.</p>
 
 <p>The flags field currently has two bits defined:</p><pre>
  bit 0: if set, allow messages from anyone

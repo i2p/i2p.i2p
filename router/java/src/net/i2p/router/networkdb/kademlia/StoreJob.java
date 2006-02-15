@@ -158,8 +158,10 @@ class StoreJob extends JobImpl {
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
                     PeerProfile prof = getContext().profileOrganizer().getProfile(peer);
-                    RateStat failing = prof.getDBHistory().getFailedLookupRate();
-                    Rate failed = failing.getRate(60*60*1000);
+                    if (prof != null) {
+                        RateStat failing = prof.getDBHistory().getFailedLookupRate();
+                        Rate failed = failing.getRate(60*60*1000);
+                    }
                     //long failedCount = failed.getCurrentEventCount()+failed.getLastEventCount();
                     //if (failedCount > 10) {
                     //    _state.addSkipped(peer);

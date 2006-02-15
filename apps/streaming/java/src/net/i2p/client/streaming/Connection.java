@@ -123,6 +123,7 @@ public class Connection {
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.fastRetransmit", "How long a packet has been around for if it has been resent per the fast retransmit timer?", "Stream", new long[] { 60*1000, 10*60*1000 });
         if (_log.shouldLog(Log.INFO))
             _log.info("New connection created with options: " + _options);
     }
@@ -377,6 +378,8 @@ public class Connection {
                         for (int i = 0; i < nacks.length; i++) {
                             if (nacks[i] == id.longValue()) {
                                 nacked = true;
+                                PacketLocal nackedPacket = (PacketLocal)_outboundPackets.get(id);
+                                nackedPacket.incrementNACKs();
                                 break; // NACKed
                             }
                         }
@@ -930,6 +933,13 @@ public class Connection {
     }
     
     /**
+     * If we have been explicitly NACKed three times, retransmit the packet even if
+     * there are other packets in flight.
+     *
+     */
+    static final int FAST_RETRANSMIT_THRESHOLD = 3;
+    
+    /**
      * Coordinate the resends of a given packet
      */
     private class ResendPacketEvent implements SimpleTimer.TimedEvent {
@@ -969,8 +979,9 @@ public class Connection {
                 if (_outboundPackets.containsKey(new Long(_packet.getSequenceNum())))
                     resend = true;
             }
-            if ( (resend) && (_packet.getAckTime() < 0) ) {
-                if (!isLowest) {
+            if ( (resend) && (_packet.getAckTime() <= 0) ) {
+                boolean fastRetransmit = ( (_packet.getNACKs() >= FAST_RETRANSMIT_THRESHOLD) && (_packet.getNumSends() == 1));
+                if ( (!isLowest) && (!fastRetransmit) ) {
                     // we want to resend this packet, but there are already active
                     // resends in the air and we dont want to make a bad situation 
                     // worse.  wait another second
@@ -981,6 +992,10 @@ public class Connection {
                     _nextSendTime = 1000 + _context.clock().now();
                     return false;
                 }
+                
+                if (fastRetransmit)
+                    _context.statManager().addRateData("stream.fastRetransmit", _packet.getLifetime(), _packet.getLifetime());
+                
                 // revamp various fields, in case we need to ack more, etc
                 _inputStream.updateAcks(_packet);
                 int choke = getOptions().getChoke();

@@ -95,7 +95,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
                 return STATUS_DEFERRED;
             }
         }
-        return getContext().throttle().acceptTunnelRequest(_request); 
+        return getContext().throttle().acceptTunnelRequest(); 
     }
     
     private class DeferredAccept extends JobImpl {

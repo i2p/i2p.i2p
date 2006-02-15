@@ -36,6 +36,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Bridge the router and the client - managing state for a client.
@@ -149,7 +150,13 @@ public class ClientConnectionRunner {
     void setSessionId(SessionId id) { if (id != null) _sessionId = id; }
     /** data for the current leaseRequest, or null if there is no active leaseSet request */
     LeaseRequestState getLeaseRequest() { return _leaseRequest; }
-    void setLeaseRequest(LeaseRequestState req) { _leaseRequest = req; }
+    void setLeaseRequest(LeaseRequestState req) { 
+        synchronized (this) {
+            if ( (_leaseRequest != null) && (req != _leaseRequest) )
+                _log.error("Changing leaseRequest from " + _leaseRequest + " to " + req);
+            _leaseRequest = req; 
+        }
+    }
     /** already closed? */
     boolean isDead() { return _dead; }
     /** message body */
@@ -214,16 +221,23 @@ public class ClientConnectionRunner {
      * updated.  This takes care of all the LeaseRequestState stuff (including firing any jobs)
      */
     void leaseSetCreated(LeaseSet ls) {
-        if (_leaseRequest == null) {
-            _log.error("LeaseRequest is null and we've received a new lease?! WTF");
-            return;
-        } else {
-            _leaseRequest.setIsSuccessful(true);
-            if (_leaseRequest.getOnGranted() != null) 
-                _context.jobQueue().addJob(_leaseRequest.getOnGranted());
-            _leaseRequest = null;
-            _currentLeaseSet = ls;
+        LeaseRequestState state = null;
+        synchronized (this) {
+            state = _leaseRequest;
+            if (state == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("LeaseRequest is null and we've received a new lease?! perhaps this is odd... " + ls);
+                return;
+            } else {
+                state.setIsSuccessful(true);
+                _currentLeaseSet = ls;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("LeaseSet created fully: " + state + " / " + ls);
+                _leaseRequest = null;
+            }
         }
+        if ( (state != null) && (state.getOnGranted() != null) )
+            _context.jobQueue().addJob(state.getOnGranted());
     }
     
     void disconnectClient(String reason) {
@@ -236,7 +250,7 @@ public class ClientConnectionRunner {
         try {
             doSend(msg);
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the disconnect message", ime);
+            _log.error("Error writing out the disconnect message: " + ime);
         }
         stopRunning();
     }
@@ -288,12 +302,14 @@ public class ClientConnectionRunner {
      *
      */
     void ackSendMessage(MessageId id, long nonce) {
+        SessionId sid = _sessionId;
+        if (sid == null) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Acking message send [accepted]" + id + " / " + nonce + " for sessionId " 
-                       + _sessionId, new Exception("sendAccepted"));
+                       + sid, new Exception("sendAccepted"));
         MessageStatusMessage status = new MessageStatusMessage();
         status.setMessageId(id.getMessageId()); 
-        status.setSessionId(_sessionId.getSessionId());
+        status.setSessionId(sid.getSessionId());
         status.setSize(0L);
         status.setNonce(nonce);
         status.setStatus(MessageStatusMessage.STATUS_SEND_ACCEPTED);
@@ -312,7 +328,7 @@ public class ClientConnectionRunner {
                           + " overall, synchronized took " + (inLock - beforeLock));
             }
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the message status message", ime);
+            _log.error("Error writing out the message status message: " + ime);
         }
     }
     
@@ -323,7 +339,7 @@ public class ClientConnectionRunner {
     void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
         if (_dead) return;
         MessageReceivedJob j = new MessageReceivedJob(_context, this, toDest, fromDest, payload);
-        j.runJob();
+        _context.jobQueue().addJob(j);//j.runJob();
     }
     
     /**
@@ -348,16 +364,65 @@ public class ClientConnectionRunner {
      * @param onFailedJob Job to run after the timeout passes without receiving authorization
      */
     void requestLeaseSet(LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
-        if (_dead) return;
-        if ( (_currentLeaseSet != null) && (_currentLeaseSet.equals(set)) )
+        if (_dead) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Requesting leaseSet from a dead client: " + set);
+            if (onFailedJob != null)
+                _context.jobQueue().addJob(onFailedJob);
+            return;
+        }
+        if ( (_currentLeaseSet != null) && (_currentLeaseSet.equals(set)) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Requested leaseSet hasn't changed");
+            if (onCreateJob != null)
+                _context.jobQueue().addJob(onCreateJob);
             return; // no change
-        if (_leaseRequest != null)
-            return; // already requesting
-        _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, set, _context.clock().now() + expirationTime, onCreateJob, onFailedJob));
+        }
+        LeaseRequestState state = null;
+        synchronized (this) {
+            state = _leaseRequest;
+            if (state != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Already requesting " + state);
+                LeaseSet requested = state.getRequested();
+                LeaseSet granted = state.getGranted();
+                long ours = set.getEarliestLeaseDate();
+                if ( ( (requested != null) && (requested.getEarliestLeaseDate() > ours) ) || 
+                     ( (granted != null) && (granted.getEarliestLeaseDate() > ours) ) ) {
+                    // theirs is newer
+                } else {
+                    // ours is newer, so wait a few secs and retry
+                    SimpleTimer.getInstance().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                }
+                // fire onCreated?
+                return; // already requesting
+            } else {
+                _leaseRequest = state = new LeaseRequestState(onCreateJob, onFailedJob, _context.clock().now() + expirationTime, set);
+                _log.debug("Not already requesting, continue to request " + set);
+            }
+        }
+        _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, set, _context.clock().now() + expirationTime, onCreateJob, onFailedJob, state));
     }
 
+    private class Rerequest implements SimpleTimer.TimedEvent {
+        private LeaseSet _ls;
+        private long _expirationTime;
+        private Job _onCreate;
+        private Job _onFailed;
+        public Rerequest(LeaseSet ls, long expirationTime, Job onCreate, Job onFailed) {
+            _ls = ls;
+            _expirationTime = expirationTime;
+            _onCreate = onCreate;
+            _onFailed = onFailed;
+        }
+        public void timeReached() {
+            requestLeaseSet(_ls, _expirationTime, _onCreate, _onFailed);
+        }
+    }
+    
     void disconnected() {
-        _log.error("Disconnected", new Exception("Disconnected?"));
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Disconnected", new Exception("Disconnected?"));
         stopRunning();
     }
     
@@ -376,10 +441,10 @@ public class ClientConnectionRunner {
                 _log.debug("after writeMessage("+ msg.getClass().getName() + "): " 
                            + (_context.clock().now()-before) + "ms");;
         } catch (I2CPMessageException ime) {
-            _log.error("Message exception sending I2CP message", ime);
+            _log.error("Message exception sending I2CP message: " + ime);
             stopRunning();
         } catch (IOException ioe) {
-            _log.error("IO exception sending I2CP message", ioe);
+            _log.error("IO exception sending I2CP message: " + ioe);
             stopRunning();
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Unhandled exception sending I2CP message", t);

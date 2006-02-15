@@ -217,7 +217,7 @@ public class PostServlet extends BaseServlet {
         out.write("<span class=\"b_postField\">Post subject:</span> ");
         out.write("<input type=\"text\" class=\"b_postSubject\" size=\"80\" name=\"" + PARAM_SUBJECT 
                   + "\" value=\"" + HTMLRenderer.sanitizeTagParam(subject) + "\" title=\"One line summary\" /><br />\n");
-        out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\">SML</a>, no headers):</span><br />\n");
+        out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\" title=\"SML cheatsheet\">SML</a>, no headers):</span><br />\n");
         out.write("<textarea class=\"b_postText\" rows=\"6\" cols=\"80\" name=\"" + PARAM_TEXT + "\">" + getParam(req, PARAM_TEXT) + "</textarea><br />\n");
         out.write("<span class=\"b_postField\">SML post headers:</span><br />\n");
         out.write("<textarea class=\"b_postHeaders\" rows=\"2\" cols=\"80\" name=\"" + PARAM_HEADERS + "\" title=\"Most people can leave this empty\" >" + getParam(req, PARAM_HEADERS) + "</textarea><br />\n");
@@ -273,7 +273,7 @@ public class PostServlet extends BaseServlet {
         out.write("<span class=\"b_postField\">Post subject:</span> ");
         out.write("<input type=\"text\" class=\"b_postSubject\" size=\"80\" name=\"" + PARAM_SUBJECT 
                   + "\" value=\"" + HTMLRenderer.sanitizeTagParam(subject) + "\" /><br />\n");
-        out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\">SML</a>, no headers):</span><br />\n");
+        out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\" title=\"SML cheatsheet\">SML</a>, no headers):</span><br />\n");
         out.write("<textarea class=\"b_postText\" rows=\"6\" cols=\"80\" name=\"" + PARAM_TEXT + "\">" + getParam(req, PARAM_TEXT) + "</textarea><br />\n");
         out.write("<span class=\"b_postField\">SML post headers:</span><br />\n");
         out.write("<textarea class=\"b_postHeaders\" rows=\"3\" cols=\"80\" name=\"" + PARAM_HEADERS + "\">" + getParam(req, PARAM_HEADERS) + "</textarea><br />\n");

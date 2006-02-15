@@ -75,7 +75,7 @@ public class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.sendPiggyback", "How many acks were piggybacked on a data packet (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendPiggybackPartial", "How many partial acks were piggybacked on a data packet (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.activeDelay", "How often we wait blocking on the active queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.packetsRetransmitted", "How many packets have been retransmitted (lifetime) when a burst of packets are retransmitted (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.packetsRetransmitted", "Lifetime of packets during their retransmission (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.peerPacketsRetransmitted", "How many packets have been retransmitted to the peer (lifetime) when a burst of packets are retransmitted (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.blockedRetransmissions", "How packets have been transmitted to the peer when we blocked a retransmission to them?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
@@ -97,7 +97,7 @@ public class OutboundMessageFragments {
     public boolean waitForMoreAllowed() {
         // test without choking.  
         // perhaps this should check the lifetime of the first activeMessage?
-        if (false) return true; 
+        if (true) return true; 
         
         long start = _context.clock().now();
         int numActive = 0;
@@ -173,7 +173,7 @@ public class OutboundMessageFragments {
                 if (state.isComplete()) {
                     _activeMessages.remove(i);
                     locked_removeRetransmitter(state);
-                    _transport.succeeded(state.getMessage());
+                    _transport.succeeded(state);
                     if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
                         _throttle.unchoke(peer.getRemotePeer());
                     state.releaseResources();
@@ -299,8 +299,8 @@ public class OutboundMessageFragments {
                                 if (state.getMessage() != null)
                                     state.getMessage().timestamp("peer disconnected");
                                 _transport.failed(state);
-                                if (_log.shouldLog(Log.WARN))
-                                    _log.warn("Peer disconnected for " + state);
+                                if (_log.shouldLog(Log.ERROR))
+                                    _log.error("Peer disconnected for " + state);
                                 if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
                                     _throttle.unchoke(peer.getRemotePeer());
                                 state.releaseResources();
@@ -403,7 +403,7 @@ public class OutboundMessageFragments {
             }
 
             int size = state.getUnackedSize();
-            if (peer.allocateSendingBytes(size)) {
+            if (peer.allocateSendingBytes(size, state.getPushCount())) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Allocation of " + size + " allowed with " 
                               + peer.getSendWindowBytesRemaining() 
@@ -413,6 +413,7 @@ public class OutboundMessageFragments {
 
                 if (state.getPushCount() > 0) {
                     _retransmitters.put(peer, state);
+                    /*
 
                     int fragments = state.getFragmentCount();
                     int toSend = 0;
@@ -428,6 +429,7 @@ public class OutboundMessageFragments {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Retransmitting " + state + " to " + peer);
                     _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), toSend);
+                    */
                 }
 
                 state.push();
@@ -482,7 +484,14 @@ public class OutboundMessageFragments {
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
             for (int i = 0; i < fragments; i++) {
                 if (state.needsSending(i)) {
-                    rv[i] = _builder.buildPacket(state, i, peer, remaining, partialACKBitfields);
+                    try {
+                        rv[i] = _builder.buildPacket(state, i, peer, remaining, partialACKBitfields);
+                    } catch (ArrayIndexOutOfBoundsException aioobe) {
+                        _log.log(Log.CRIT, "Corrupt trying to build a packet - please tell jrandom: " +
+                                 partialACKBitfields + " / " + remaining + " / " + msgIds);
+                        sparseCount++;
+                        continue;
+                    }
                     if (rv[i] == null) {
                         sparseCount++;
                         continue;
@@ -520,6 +529,16 @@ public class OutboundMessageFragments {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Building packet for " + state + " to " + peer + " with sparse count: " + sparseCount);
             peer.packetsTransmitted(fragments - sparseCount);
+            if (state.getPushCount() > 1) {
+                int toSend = fragments-sparseCount;
+                peer.messageRetransmitted(toSend);
+                _packetsRetransmitted += toSend; // lifetime for the transport
+                _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
+                _context.statManager().addRateData("udp.packetsRetransmitted", state.getLifetime(), peer.getPacketsTransmitted());
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Retransmitting " + state + " to " + peer);
+                _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), toSend);
+            }
             return rv;
         } else {
             // !alive
@@ -595,7 +614,7 @@ public class OutboundMessageFragments {
                 _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
             if (numSends > 1)
                 _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
-            _transport.succeeded(state.getMessage());
+            _transport.succeeded(state);
             int numFragments = state.getFragmentCount();
             PeerState peer = state.getPeer();
             if (peer != null) {
@@ -682,7 +701,7 @@ public class OutboundMessageFragments {
                     _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
                 if (state.getMessage() != null)
                     state.getMessage().timestamp("partial ack to complete after " + numSends);
-                _transport.succeeded(state.getMessage());
+                _transport.succeeded(state);
                 
                 if (state.getPeer() != null) {
                     // this adjusts the rtt/rto/window/etc

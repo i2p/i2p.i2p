@@ -228,6 +228,7 @@ public class JobQueue {
     
     public void allowParallelOperation() { 
         _allowParallelOperation = true; 
+        runQueue(4);
     }
     
     public void restart() {
@@ -579,7 +580,8 @@ public class JobQueue {
                     activeJobs.add(job);
                 } else {
                     job = runner.getLastJob();
-                    justFinishedJobs.add(job);
+                    if (job != null)
+                        justFinishedJobs.add(job);
                 }
             }
             numRunners = _queueRunners.size();

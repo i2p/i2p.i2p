@@ -1,4 +1,126 @@
-$Id: history.txt,v 1.395 2006/01/25 10:34:28 dust Exp $
+$Id: history.txt,v 1.396.2.19 2006/02/15 00:16:31 jrandom Exp $
+
+2006-02-15  jrandom
+    * Merged in the i2p_0_6_1_10_PRE branch to the trunk, so CVS HEAD is no
+      longer backwards compatible (and should not be used until 0.6.1.1 is
+      out)
+
+2006-02-14  jrandom
+    * Syndie ui bugfixes (thanks all!)
+
+2006-02-13  jrandom
+    * Use the current directory for some temporary I2PSnark files, rather than
+      the OS default temp dir (thanks anon!)
+    * Increase the base streaming lib window size (still shrinks to 1 on
+      retransmission though, of course)
+    * Fixed the I2PTunnel newlines to work with lighthttpd (thanks all!)
+    * Implement fast retransmit in the streaming lib (fires at most once per
+      packet), and increased the default ack delay to 2 seconds (from .5s)
+    * Don't ask for garlic level message acks for end to end messages unless
+      they're useful (e.g. to ack session tags)
+
+2006-02-12  cervantes
+    * Use a different santisation method for some SML attributes
+    * Make router console update config save button actually save.
+    * Fix console bandwidth limiter burst rate dropdowns, so the display
+      relates to what is saved in the config.
+    
+2006-02-12  cervantes
+    * SML is now stricter in it's formatting (attributes should only use 
+      double quotes instead of being allowed to mix with singles).
+    * Using apostrophes in SML attributes will no longer invalidate the tag.
+    * Some instances of [blog] tag description were not being displayed
+      correctly.
+
+2006-02-12  jrandom
+    * Further SSU peer test throttling
+    * Put the most common router console features on the main index page too
+
+2006-02-11  jrandom
+    * Be more careful about SSU peer test floods
+
+2006-02-09  jrandom
+    * Adjusted one of the SSU timeouts so we don't drop peers as easily (duh)
+
+2006-02-08  jrandom
+    * Added transparent support for VIA C3 CPUs to jbigi (thanks Nekow42), and
+      bundled a precompiled libjbigi.so in the jbigi.jar
+    * Cleaned up the synchronization for some SSU packet handling code
+    * Allow explicit rejection of more lagged tunnel build requests, rather
+      than dropping them outright
+    * Use lighter load testing
+
+2006-02-07  jrandom
+    * Handle HTTP headers without any values (thanks Sugadude!)
+    * Don't show the option to make Syndie multiuser, since very few people
+      need it, and multiuser mode is a lot more complex to use.  Geeks can
+      enable it by adding "syndie.singleUser=false" to syndie/syndie.config
+      (or in the router's advanced config, for the embedded Syndie)
+    * When a peer rejects participation in a tunnel, they mean it (duh)
+    * Decrease tunnel test timeout period to 20s (a 40s lag is insane)
+    * Remove a throttle on the size of the SSU active outbound pool, since
+      it was essentially arbitrary
+    * Use a more appropriate SSU bloom filter size
+    * Don't "proactively" drop SSU connections if we have partially received
+      inbound messages (duh)
+    * Migrate most of the message state across SSU connection reestablishment
+
+2006-02-06  jrandom
+    * Reduce the SSU retransmit timeout range, and increase the number of ACKs
+      piggybacked
+
+2006-02-05  jrandom
+    * Experiment with short exponents for DH/ElGamal, using a 226bit x instead
+      of a 2048bit x, as reports suggest that size is sufficient for 2048bit
+      DH/ElGamal when using safe primes (see KeyGenerator.java for references)
+    * Enable the messageHistory.txt by default, for debugging
+
+2006-02-05  jrandom
+    * Substantial bugfix for the duplicate message detection in the transport
+      layer
+    * Handle tunnel build responses ASAP, rather than queueing them up to wait
+      in line (processing them is really fast - just a few AES loops)
+    * Don't bother handling build requests that we have queued up for a while
+      locally, as the requestor will have timed it out anyway (perhaps we
+      should reply regardless, but with a backoff instead?)
+
+2006-02-04  jrandom
+    * Further tunnel test cleanup and disabling of the old tunnel creation
+      code
+
+2006-02-04  jrandom
+    * Clean up and reenable the tunnel testing for the new tunnel system.
+
+2006-02-04  jrandom
+    * Don't cache the archive.txt in syndie when fetching it through the web
+      interface.
+    * Logging updates
+
+2006-02-03  jrandom
+    * Added further replay prevention on the tunnel build requests
+    * More aggressive streaming lib closing on reset
+
+2006-02-03  jrandom
+    * More aggressive refusal of peers from the wrong network (oops)
+
+2006-02-01  jrandom
+    * Instruct the router to reseed against a new URL, for migration purposes:
+      http://dev.i2p.net/i2pdb2/
+    * Aggressive error handling during UDP packet creation (thanks cervantes)
+
+2006-02-01  jrandom
+    * Fix the new tunnel creation crypto, including the addition of a 4 byte
+      "next message ID" to the encrypted request structure in the spec.
+    * Backwards incompatible change, using the new tunnel creation crypto, the
+      fixed MD5 HMAC size, and a new network ID (to prevent cross pollination
+      with the old incompatible network).
+    * Reworked the leaseSet request process to handle a race condition
+    * Disable the TCP transport
+    * Run four separate threads on the job queue to cut down on job lag
+
+2006-01-28  jrandom
+    * Removed a race that could show up in leaseSet requesting with the new
+      tunnel building process
 
 2006-01-25  jrandom
     * Run the peer profile coalescing/reorganization outside the job queue

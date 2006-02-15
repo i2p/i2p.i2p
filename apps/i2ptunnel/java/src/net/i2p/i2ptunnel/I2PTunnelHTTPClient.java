@@ -224,6 +224,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(getPrefix(requestId) + "Method is null for [" + line + "]");
                     
+                    line = line.trim();
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
                     method = line.substring(0, pos);
@@ -467,7 +468,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     newRequest.append("Connection: close\r\n\r\n");
                     break;
                 } else {
-                    newRequest.append(line).append("\r\n"); // HTTP spec
+                    newRequest.append(line.trim()).append("\r\n"); // HTTP spec
                 }
             }
             if (_log.shouldLog(Log.DEBUG))
@@ -589,7 +590,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             out.write(errMessage);
             if (targetRequest != null) {
                 int protopos = targetRequest.indexOf(" ");
-                String uri = targetRequest.substring(0, protopos);
+                String uri = null;
+                if (protopos >= 0)
+                    uri = targetRequest.substring(0, protopos);
+                else
+                    uri = targetRequest;
                 out.write("<a href=\"http://".getBytes());
                 out.write(uri.getBytes());
                 out.write("\">http://".getBytes());

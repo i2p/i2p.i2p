@@ -47,13 +47,14 @@ public class ConfigNetHandler extends FormHandler {
     private String _outboundBurst;
     private String _reseedFrom;
     private String _sharePct;
+    private boolean _ratesOnly;
     
     protected void processForm() {
         if (_guessRequested) {
             guessHostname();
         } else if (_reseedRequested) {
             reseed();
-        } else if (_saveRequested) {
+        } else if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
             saveChanges();
         } else if (_recheckReachabilityRequested) {
             recheckReachability();
@@ -70,6 +71,7 @@ public class ConfigNetHandler extends FormHandler {
     public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
     public void setHiddenMode(String moo) { _hiddenMode = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
+    public void setUpdateratesonly(String moo) { _ratesOnly = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -231,88 +233,95 @@ public class ConfigNetHandler extends FormHandler {
     private void saveChanges() {
         boolean restartRequired = false;
         
-        if ( (_hostname != null) && (_hostname.length() > 0) ) {
-            String oldHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_HOSTNAME);
-            if ( (oldHost == null) || (!oldHost.equalsIgnoreCase(_hostname)) ) {
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_HOSTNAME, _hostname);
-                addFormNotice("Updating hostname from " + oldHost + " to " + _hostname);
-                restartRequired = true;
+        if (!_ratesOnly) {
+            if ( (_hostname != null) && (_hostname.length() > 0) ) {
+                String oldHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_HOSTNAME);
+                if ( (oldHost == null) || (!oldHost.equalsIgnoreCase(_hostname)) ) {
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_HOSTNAME, _hostname);
+                    addFormNotice("Updating hostname from " + oldHost + " to " + _hostname);
+                    restartRequired = true;
+                }
             }
-        }
-        if ( (_tcpPort != null) && (_tcpPort.length() > 0) ) {
-            String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT);
-            if ( (oldPort == null) && (_tcpPort.equals("8887")) ) {
-                // still on default.. noop
-            } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_tcpPort)) ) {
-                // its not the default OR it has changed
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _tcpPort);
-                addFormNotice("Updating TCP port from " + oldPort + " to " + _tcpPort);
-                restartRequired = true;
+            if ( (_tcpPort != null) && (_tcpPort.length() > 0) ) {
+                String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT);
+                if ( (oldPort == null) && (_tcpPort.equals("8887")) ) {
+                    // still on default.. noop
+                } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_tcpPort)) ) {
+                    // its not the default OR it has changed
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _tcpPort);
+                    addFormNotice("Updating TCP port from " + oldPort + " to " + _tcpPort);
+                    restartRequired = true;
+                }
             }
-        }
-        if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
-            String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT);
-            if ( (oldPort == null) && (_udpPort.equals("8887")) ) {
-                // still on default.. noop
-            } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_udpPort)) ) {
-                // its not the default OR it has changed
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _udpPort);
-                addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
-                restartRequired = true;
+            if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
+                String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT);
+                if ( (oldPort == null) && (_udpPort.equals("8887")) ) {
+                    // still on default.. noop
+                } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_udpPort)) ) {
+                    // its not the default OR it has changed
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _udpPort);
+                    addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
+                    restartRequired = true;
+                }
             }
+
         }
         
         updateRates();
         
-        if (_sharePct != null) {
-            String old = _context.router().getConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE);
-            if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE, _sharePct);
-                addFormNotice("Updating bandwidth share percentage");
+        if (!_ratesOnly) {
+            if (_sharePct != null) {
+                String old = _context.router().getConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE);
+                if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE, _sharePct);
+                    addFormNotice("Updating bandwidth share percentage");
+                }
             }
-        }
 
-        // If hidden mode value changes, restart is required
-        if (_hiddenMode && "false".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
-            _context.router().setConfigSetting(Router.PROP_HIDDEN, "true");
-            _context.router().getRouterInfo().addCapability(RouterInfo.CAPABILITY_HIDDEN);
-            addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
-                          + "<a href=\"configtunnels.jsp\">tunnels!</a>");
-            hiddenSwitch();
-        }
+            // If hidden mode value changes, restart is required
+            if (_hiddenMode && "false".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
+                _context.router().setConfigSetting(Router.PROP_HIDDEN, "true");
+                _context.router().getRouterInfo().addCapability(RouterInfo.CAPABILITY_HIDDEN);
+                addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
+                              + "<a href=\"configtunnels.jsp\">tunnels!</a>");
+                hiddenSwitch();
+            }
 
-        if (!_hiddenMode && "true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
-            _context.router().removeConfigSetting(Router.PROP_HIDDEN);
-            _context.router().getRouterInfo().delCapability(RouterInfo.CAPABILITY_HIDDEN);
-            addFormNotice("Gracefully restarting to exit Hidden Router Mode");
-            hiddenSwitch();
-        }
+            if (!_hiddenMode && "true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
+                _context.router().removeConfigSetting(Router.PROP_HIDDEN);
+                _context.router().getRouterInfo().delCapability(RouterInfo.CAPABILITY_HIDDEN);
+                addFormNotice("Gracefully restarting to exit Hidden Router Mode");
+                hiddenSwitch();
+            }
 
-        if (_dynamicKeys) {
-            _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "true");
-        } else {
-            _context.router().removeConfigSetting(Router.PROP_DYNAMIC_KEYS);
-        }
-        
-        if (_requireIntroductions) {
-            _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
-            addFormNotice("Requiring SSU introduers");
-        } else {
-            _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
-        }
-        
-        if (true || _timeSyncEnabled) {
-            // Time sync enable, means NOT disabled 
-            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
-        } else {
-            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "true");
+            if (_dynamicKeys) {
+                _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "true");
+            } else {
+                _context.router().removeConfigSetting(Router.PROP_DYNAMIC_KEYS);
+            }
+
+            if (_requireIntroductions) {
+                _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
+                addFormNotice("Requiring SSU introduers");
+            } else {
+                _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
+            }
+
+            if (true || _timeSyncEnabled) {
+                // Time sync enable, means NOT disabled 
+                _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
+            } else {
+                _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "true");
+            }
         }
         
         boolean saved = _context.router().saveConfig();
-        if (saved) 
-            addFormNotice("Configuration saved successfully");
-        else
-            addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+        if ( (_action != null) && ("Save changes".equals(_action)) ) {
+            if (saved) 
+                addFormNotice("Configuration saved successfully");
+            else
+                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+        }
         
         if (restartRequired) {
             addFormNotice("Performing a soft restart");
@@ -382,7 +391,7 @@ public class ConfigNetHandler extends FormHandler {
             }
         }
         
-        if (updated)
+        if (updated && !_ratesOnly)
             addFormNotice("Updated bandwidth limits");
     }
 }

@@ -33,7 +33,8 @@ public class ConnectionPacketHandler {
     void receivePacket(Packet packet, Connection con) throws I2PException {
         boolean ok = verifyPacket(packet, con);
         if (!ok) {
-            if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (_log.shouldLog(Log.ERROR)) )
+            boolean isTooFast = con.getSendStreamId() <= 0;
+            if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (!isTooFast) && (_log.shouldLog(Log.ERROR)) )
                 _log.error("Packet does NOT verify: " + packet + " on " + con);
             packet.releasePayload();
             return;
@@ -45,6 +46,7 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received a data packet after hard disconnect: " + packet + " on " + con);
                 con.sendReset();
+                con.disconnect(false);
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received a packet after hard disconnect, ignoring: " + packet + " on " + con);
@@ -59,6 +61,7 @@ public class ConnectionPacketHandler {
                 _log.warn("Received new data when we've sent them data and all of our data is acked: " 
                           + packet + " on " + con + "");
             con.sendReset();
+            con.disconnect(false);
             packet.releasePayload();
             return;
         }
@@ -365,8 +368,8 @@ public class ConnectionPacketHandler {
                     if (packet.getSequenceNum() < MAX_INITIAL_PACKETS) {
                         return true;
                     } else {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Packet without RST or SYN where we dont know stream ID: " 
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Packet without RST or SYN where we dont know stream ID: " 
                                       + packet);
                         return false;
                     }

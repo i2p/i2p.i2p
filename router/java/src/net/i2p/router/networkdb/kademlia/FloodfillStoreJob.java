@@ -56,7 +56,8 @@ class FloodfillStoreJob extends StoreJob {
      */
     protected void succeed() {
         super.succeed();
-        getContext().jobQueue().addJob(new FloodfillVerifyStoreJob(getContext(), _state.getTarget(), _facade));
+        if (_state != null)
+            getContext().jobQueue().addJob(new FloodfillVerifyStoreJob(getContext(), _state.getTarget(), _facade));
     }
     
     public String getName() { return "Floodfill netDb store"; }

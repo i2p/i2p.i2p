@@ -110,8 +110,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public final static String PROP_DB_DIR = "router.networkDatabase.dbDir";
     public final static String DEFAULT_DB_DIR = "netDb";
     
-    /** if we have less than 20 routers left, don't drop any more, even if they're failing or doing bad shit */
-    private final static int MIN_REMAINING_ROUTERS = 20;
+    /** if we have less than 5 routers left, don't drop any more, even if they're failing or doing bad shit */
+    private final static int MIN_REMAINING_ROUTERS = 5;
     
     /** 
      * dont accept any dbDtore of a router over 24 hours old (unless we dont 
@@ -644,6 +644,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature on " + key.toBase64();
         } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION)) {
+            if (routerInfo.getNetworkId() != Router.NETWORK_ID) {
+                _context.shitlist().shitlistRouter(key, "Peer is not in our network");
+                return "Peer is not in our network (" + routerInfo.getNetworkId() + ", wants " 
+                       + Router.NETWORK_ID + "): " + routerInfo.calculateHash().toBase64();
+            }
             long age = _context.clock().now() - routerInfo.getPublished();
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
@@ -713,18 +718,22 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             isRouterInfo = true;
         
         if (isRouterInfo) {
-            int remaining = _kb.size();
-            if (remaining < MIN_REMAINING_ROUTERS) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Not removing " + dbEntry + " because we have so few routers left ("
-                              + remaining + ") - perhaps a reseed is necessary?");
-                return;
-            }
-            if (System.currentTimeMillis() < _started + DONT_FAIL_PERIOD) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not failing the key " + dbEntry.toBase64()
-                              + " since we've just started up and don't want to drop /everyone/");
-                return;
+            if (((RouterInfo)o).getNetworkId() != Router.NETWORK_ID) {
+                // definitely drop them
+            } else {
+                int remaining = _kb.size();
+                if (remaining < MIN_REMAINING_ROUTERS) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Not removing " + dbEntry + " because we have so few routers left ("
+                                  + remaining + ") - perhaps a reseed is necessary?");
+                    return;
+                }
+                if (System.currentTimeMillis() < _started + DONT_FAIL_PERIOD) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Not failing the key " + dbEntry.toBase64()
+                                  + " since we've just started up and don't want to drop /everyone/");
+                    return;
+                }
             }
             
             _context.peerManager().removeCapabilities(dbEntry);

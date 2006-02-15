@@ -110,7 +110,7 @@ public class StatisticsManager implements Service {
             includeRate("tunnel.fragmentedDropped", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             //includeRate("tunnel.fullFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             //includeRate("tunnel.smallFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
-            includeRate("tunnel.testFailedTime", stats, new long[] { 60*60*1000 });
+            includeRate("tunnel.testFailedTime", stats, new long[] { 10*60*1000 });
             
             includeRate("tunnel.buildFailure", stats, new long[] { 60*60*1000 });
             includeRate("tunnel.buildSuccess", stats, new long[] { 60*60*1000 });
@@ -129,7 +129,7 @@ public class StatisticsManager implements Service {
             includeRate("udp.statusDifferent", stats, new long[] { 20*60*1000 });
             includeRate("udp.statusReject", stats, new long[] { 20*60*1000 });
             includeRate("udp.statusUnknown", stats, new long[] { 20*60*1000 });
-            includeRate("udp.statusKnownharlie", stats, new long[] { 1*60*1000, 10*60*1000 });
+            includeRate("udp.statusKnownCharlie", stats, new long[] { 1*60*1000, 10*60*1000 });
             includeRate("udp.addressUpdated", stats, new long[] { 1*60*1000 });
             includeRate("udp.addressTestInsteadOfUpdate", stats, new long[] { 1*60*1000 });
 
@@ -137,18 +137,33 @@ public class StatisticsManager implements Service {
             
             //includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
             //includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
-            includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
+            includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*1000, 60*60*1000 });
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
-            includeRate("tunnel.testSuccessTime", stats, new long[] { 60*60*1000l, 24*60*60*1000l });
+            includeRate("tunnel.testSuccessTime", stats, new long[] { 10*60*1000l });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
             includeRate("udp.sendConfirmTime", stats, new long[] { 10*60*1000 });
             includeRate("udp.sendVolleyTime", stats, new long[] { 10*60*1000 });
-            includeRate("udp.ignoreRecentDuplicate", stats, new long[] { 10*60*1000 });
+            includeRate("udp.ignoreRecentDuplicate", stats, new long[] { 60*1000 });
             includeRate("udp.congestionOccurred", stats, new long[] { 10*60*1000 });
             //includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
+            
+            includeRate("tunnel.buildRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.decryptRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.buildClientExpire", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.buildClientReject", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.buildClientSuccess", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.buildExploratoryExpire", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.buildExploratoryReject", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.buildExploratorySuccess", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.rejectTimeout", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("udp.packetDequeueTime", stats, new long[] { 60*1000 });
+            includeRate("udp.packetVerifyTime", stats, new long[] { 60*1000 });
+            
+            includeRate("tunnel.rejectOverloaded", stats, new long[] { 60*1000, 10*60*1000 });
+            includeRate("tunnel.acceptLoad", stats, new long[] { 60*1000, 10*60*1000 });
             
             if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
                 stats.setProperty("netdb.knownRouters", ""+_context.netDb().getKnownRouters());
@@ -159,7 +174,7 @@ public class StatisticsManager implements Service {
         } else {
             _log.debug("Not publishing peer rankings");
         }
-	
+
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Building status: " + stats);
         return stats;

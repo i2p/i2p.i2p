@@ -224,7 +224,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         protected void finishHeaders() throws IOException {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Including x-i2p-gzip as the content encoding in the response");
-            out.write("Content-encoding: x-i2p-gzip\n".getBytes());
+            out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
             super.finishHeaders();
         }
 
@@ -274,13 +274,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
     private String formatHeaders(Properties headers, StringBuffer command) {
         StringBuffer buf = new StringBuffer(command.length() + headers.size() * 64);
-        buf.append(command.toString()).append('\n');
+        buf.append(command.toString().trim()).append("\r\n");
         for (Iterator iter = headers.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             String val  = headers.getProperty(name);
-            buf.append(name).append(": ").append(val).append('\n');
+            buf.append(name.trim()).append(": ").append(val.trim()).append("\r\n");
         }
-        buf.append('\n');
+        buf.append("\r\n");
         return buf.toString();
     }
     
@@ -316,10 +316,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 // end of headers reached
                 return headers;
             } else {
-                int split = buf.indexOf(": ");
+                int split = buf.indexOf(":");
                 if (split <= 0) throw new IOException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
-                String name = buf.substring(0, split);
-                String value = buf.substring(split+2); // ": "
+                String name = buf.substring(0, split).trim();
+                String value = null;
+                if (buf.length() > split + 1)
+                    value = buf.substring(split+1).trim(); // ":"
+                else
+                    value = "";
                 if ("Accept-encoding".equalsIgnoreCase(name))
                     name = "Accept-encoding";
                 else if ("X-Accept-encoding".equalsIgnoreCase(name))

@@ -17,7 +17,7 @@ pre { font-size: 10; font-family: sans-serif }
 <center>
 <b class="title">Introducing I2P</b><br />
 <span class="subtitle">a scalable framework for anonymous communication</span><br />
-<i style="font-size: 8">$Id: techintro.html,v 1.7 2005/10/04 20:45:21 jrandom Exp $</i>
+<i style="font-size: 8">$Id: techintro.html,v 1.8.2.1 2006/02/13 07:13:35 jrandom Exp $</i>
 <br />
 <br />
 
@@ -56,15 +56,16 @@ pre { font-size: 10; font-family: sans-serif }
 
 <h1 id="intro">Introduction</h1>
 <p>
-I2P is a scalable, self organizing, resilient message based anonymous network layer, 
+I2P is a scalable, self organizing, resilient packet switched anonymous network layer, 
 upon which any number of different anonymity or security conscious applications
 can operate.  Each of these applications may make their own anonymity, latency, and
 throughput tradeoffs without worrying about the proper implementation of a free
 route mixnet, allowing them to blend their activity with the larger anonymity set of
 users already running on top of I2P.  Applications available already provide the full
 range of typical Internet activities - anonymous web browsing, anonymous web hosting,
-anonymous blogging (with <a href="#app.syndie">Syndie</a>), anonymous chat (via IRC or 
-Jabber), anonymous swarming file transfers (with <a href="#app.i2pbt">i2p-bt</a> and 
+anonymous blogging and content syndication (with <a href="#app.syndie">Syndie</a>),
+anonymous chat (via IRC or Jabber), anonymous swarming file transfers (with <a
+href="#app.i2pbt">i2p-bt</a>, <a href="#app.i2psnark">I2PSnark</a>, and 
 <a href="#app.azneti2p">Azureus</a>), anonymous file sharing (with
 <a href="#app.i2phex">I2Phex</a>), anonymous email (with <a href="#app.i2pmail">I2Pmail</a>
 and <a href="#app.i2pmail">susimail</a>), anonymous newsgroups, as well as several
@@ -85,8 +86,8 @@ to allow I2P's anonymous best-effort messages to transfer as reliable, in-order 
 transparently offering a TCP based congestion control algorithm tuned for the high
 bandwidth delay product of the network.  While there have been several simple SOCKS
 proxies available to tie existing applications into the network, their value has been
-limited as nearly every application routinely exposes what in an anonymity context is
-sensitive information.  The only safe way to go is to fully audit an application to
+limited as nearly every application routinely exposes what, in an anonymous context,
+is sensitive information.  The only safe way to go is to fully audit an application to
 ensure proper operation, and to assist in that we provide a series of APIs in various
 languages which can be used to make the most out of the network.
 </p>
@@ -113,14 +114,14 @@ level of anonymity to those who need it.  It has been in active development sinc
 early 2003 with one full time developer and a dedicated group of part time contributors
 from all over the world.  All of the work done on I2P is open source and 
 freely available on the <a href="http://www.i2p.net/">website</a>, with the majority
-of the code released outright into the public domain but making use of a few 
+of the code released outright into the public domain, though making use of a few 
 cryptographic routines under BSD-style licenses.  The people working on I2P do not
 control what people release client applications under, and there are several GPL'ed
 applications available (<a href="#app.i2ptunnel">I2PTunnel</a>, 
-<a href="#app.i2pmail">susimail</a>, <a href="#app.azneti2p">Azureus</a>, 
+<a href="#app.i2pmail">susimail</a>, <a href="#app.i2psnark">I2PSnark</a>, <a href="#app.azneti2p">Azureus</a>, 
 <a href="#app.i2phex">I2Phex</a>).  <a href="http://www.i2p.net/halloffame">Funding</a>
 for I2P comes entirely from donations, and does not receive any tax breaks in any
-jurisdiction, as many of the developers are themselves anonymous.
+jurisdiction at this time, as many of the developers are themselves anonymous.
 </p>
 
 <h1 id="op">Operation</h1>
@@ -165,16 +166,18 @@ inbound tunnels as well as when that tunnel will expire.  The leaseSet also
 contains a pair of public keys which can be used for layered garlic encryption.
 </p>
 
+<!--
 <p>
 I2P's operation can be understood by putting those three concepts together:
 </p>
 
 <p><img src="net.png"></p>
+!-->
 
 <p>
 When Alice wants to send a message to Bob, she first does a lookup in the 
-netDb to find Bob's leaseSet, giving her his current inbound tunnel gateways 
-(3 and 4).  She then picks one of her outbound tunnels and sends the message
+netDb to find Bob's leaseSet, giving her his current inbound tunnel gateways.
+She then picks one of her outbound tunnels and sends the message
 down it with instructions for the outbound tunnel's endpoint to forward the 
 message on to one of Bob's inbound tunnel gateways.  When the outbound 
 tunnel endpoint receives those instructions, it forwards the message as 
@@ -263,7 +266,7 @@ by measuring their indirect behavior - for instance, when a peer responds to
 a netDb lookup in 1.3 seconds, that round trip latency is recorded in the 
 profiles for all of the routers involved in the two tunnels (inbound and 
 outbound) through which the request and response passed, as well as the queried
-peer's profile.  Direction measurement, such as transport layer latency or
+peer's profile.  Direct measurement, such as transport layer latency or
 congestion, is not used as part of the profile, as it can be manipulated and 
 associated with the measuring router, exposing them to trivial attacks.  While
 gathering these profiles, a series of calculations are run on each to summarize
@@ -438,10 +441,10 @@ addressing network obstacles, like most NATs or firewalls.
 A bare minimum set of cryptographic primitives are combined together to provide I2P's
 layered defenses against a variety of adversaries.  At the lowest level, interrouter
 communication is protected by the transport layer security - SSU
-encrypts each packet with AES256/CBC with both an explicit IV and MAC (HMAC-SHA256-128)
+encrypts each packet with AES256/CBC with both an explicit IV and MAC (HMAC-MD5-128)
 after agreeing upon an ephemeral session key through a 2048bit Diffie-Hellman exchange,
 station-to-station authentication with the other router's DSA key, plus each network
-message has their own SHA256 hash for local integrity checking. 
+message has their own hash for local integrity checking. 
 <a href="#op.tunnels">Tunnel</a> messages passed over the transports have their own
 layered AES256/CBC encryption with an explicit IV and verified at the tunnel endpoint
 with an additional SHA256 hash.  Various other messages are passed along inside
@@ -686,14 +689,10 @@ outbound tunnel along the same routers.</p>
 Another anonymity issue comes up in Tor's use of telescopic tunnel creation, as
 simple packet counting and timing measurements as the cells in a circuit pass
 through an adversary's node exposes statistical information regarding where the 
-adversary is within the circuit.  I2P's use of exploratory tunnels for delivering
-and receiving the tunnel creation requests and responses effectively spreads the
-messages randomly across the network, so that each of the peers who forwards the
-individual tunnel creation messages only see the peer they transmit to or receive
-from, and thanks to the garlic encryption, they are not aware of whether the message
-is part of a tunnel creation process or not.  The participant positional information
-is useful to an adversary for mounting predecessor, intersection, and traffic
-confirmation attacks.
+adversary is within the circuit.  I2P's unidirectional tunnel creation with a
+single message so that this data is not exposed.  Protecting the position in a
+tunnel is important, as an adversary would otherwise be able to mounting a
+series of powerful predecessor, intersection, and traffic confirmation attacks.
 </p>
 
 <p>
@@ -754,13 +753,6 @@ has been said the anonymity and scalability claims seem highly dubious.  In
 particular, the appropriateness for use in hostile regimes against state level
 adversaries has been tremendously overstated, and any analysis on the implications
 of resource scarcity upon the scalability of the network has seemingly been avoided.
-Specifically, while publishing the "anonymous" topology in the darknet does not
-necessarily immediately expose all identities, it is equivalent to publishing an
-organizational chart for a covert group, which can in turn be used by an adversary
-alongside existing knowledge of their target to narrow down or identify different
-participants.  In addition, by using only peers that are locally connected, the
-network's mixnet layer is vulnerable to a class of 
-<a href="http://www.im.pwr.wroc.pl/~klonowsk/LocalViewAttack.ps">local view attacks</a>.
 Further questions regarding susceptibility to traffic analysis, trust, and other topics 
 do exist, but a more in-depth review of this "globally scalable darknet" will have
 to wait until the Freenet team makes more information available.
@@ -939,6 +931,17 @@ In addition to i2p-bt, a port of bytemonsoon has been made to I2P, making a few
 modifications as necessary to strip any anonymity-compromising information from the
 application and to take into consideration the fact that IPs cannot be used for 
 identifying peers.  
+</p>
+
+<h2 id="app.i2psnark">I2PSnark</h2>
+<p><i>I2PSnark developed: jrandom, et al, ported from <a
+href="http://www.klomp.org/mark/">mjw</a>'s <a
+href="http://www.klomp.org/snark/">Snark</a> client</i></p>
+
+<p>
+Bundled with the I2P install, I2PSnark offers a simple anonymous bittorrent
+client with multitorrent capabilities, exposing all of the functionality through
+a plain HTML web interface.
 </p>
 
 <h2 id="app.azneti2p">Azureus/azneti2p</h2>

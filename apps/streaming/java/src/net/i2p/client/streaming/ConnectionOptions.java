@@ -54,10 +54,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     
     private static final int TREND_COUNT = 3;
-    static final int INITIAL_WINDOW_SIZE = 6;
+    static final int INITIAL_WINDOW_SIZE = 12;
     static final int DEFAULT_MAX_SENDS = 8;
     
-    static final int MIN_WINDOW_SIZE = 6;
+    static final int MIN_WINDOW_SIZE = INITIAL_WINDOW_SIZE;
     
     public ConnectionOptions() {
         super();
@@ -105,7 +105,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
-        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
+        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 2000));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
@@ -136,7 +136,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
             setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         if (opts.containsKey(PROP_INITIAL_ACK_DELAY))
-            setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
+            setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 2000));
         if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
             setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         if (opts.containsKey(PROP_MAX_RESENDS))

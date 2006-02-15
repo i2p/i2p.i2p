@@ -427,7 +427,7 @@ public class TunnelDispatcher implements Service {
                            + " messageId " + msg.getUniqueId()
                            + "/" + msg.getMessage().getUniqueId()
                            + " messageType: " + msg.getMessage().getClass().getName()
-                           + " existing = " + _inboundGateways.size());
+                           + " existing = " + _inboundGateways.size(), new Exception("source"));
         }
         
         long dispatchTime = _context.clock().now() - before;
@@ -494,7 +494,7 @@ public class TunnelDispatcher implements Service {
             int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
             if (_log.shouldLog(level))
                 _log.log(level, "no matching outbound tunnel for id=" + outboundTunnel
-                           + ": existing = " + _outboundGateways.size());
+                           + ": existing = " + _outboundGateways.size(), new Exception("src"));
         }
         
         long dispatchTime = _context.clock().now() - before;

@@ -52,13 +52,27 @@ public class KeyGenerator {
         key.setData(data);
         return key;
     }
+    
+    /** standard exponent size */
+    private static final int PUBKEY_EXPONENT_SIZE_FULL = 2048;
+    /** 
+     * short exponent size, which should be safe for use with the Oakley primes,
+     * per "On Diffie-Hellman Key Agreement with Short Exponents" - van Oorschot, Weiner
+     * at EuroCrypt 96, and crypto++'s benchmarks at http://www.eskimo.com/~weidai/benchmarks.html
+     * Also, "Koshiba & Kurosawa: Short Exponent Diffie-Hellman Problems" (PKC 2004, LNCS 2947, pp. 173-186) 
+     * aparently supports this, according to
+     * http://groups.google.com/group/sci.crypt/browse_thread/thread/1855a5efa7416677/339fa2f945cc9ba0#339fa2f945cc9ba0
+     * (damn commercial access to http://www.springerlink.com/(xrkdvv45w0cmnur4aimsxx55)/app/home/contribution.asp?referrer=parent&backto=issue,13,31;journal,893,3280;linkingpublicationresults,1:105633,1 )
+     */
+    private static final int PUBKEY_EXPONENT_SIZE_SHORT = 226;
+    public static final int PUBKEY_EXPONENT_SIZE = PUBKEY_EXPONENT_SIZE_SHORT;
 
     /** Generate a pair of keys, where index 0 is a PublicKey, and
      * index 1 is a PrivateKey
      * @return pair of keys
      */
     public Object[] generatePKIKeypair() {
-        BigInteger a = new NativeBigInteger(2048, _context.random());
+        BigInteger a = new NativeBigInteger(PUBKEY_EXPONENT_SIZE, _context.random());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
 
         Object[] keys = new Object[2];
@@ -130,7 +144,7 @@ public class KeyGenerator {
      * Pad the buffer w/ leading 0s or trim off leading bits so the result is the
      * given length.  
      */
-    private final static byte[] padBuffer(byte src[], int length) {
+    final static byte[] padBuffer(byte src[], int length) {
         byte buf[] = new byte[length];
 
         if (src.length > buf.length) // extra bits, chop leading bits

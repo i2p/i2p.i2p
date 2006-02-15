@@ -130,7 +130,7 @@ public class I2PSnarkUtil {
         _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
-            out = File.createTempFile("i2psnark", "url");
+            out = File.createTempFile("i2psnark", "url", new File("."));
         } catch (IOException ioe) {
             ioe.printStackTrace();
             out.delete();

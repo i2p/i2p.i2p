@@ -350,7 +350,7 @@ public class TunnelPool {
      *
      */
     private LeaseSet locked_buildNewLeaseSet() {
-        long expireAfter = _context.clock().now() + _settings.getRebuildPeriod();
+        long expireAfter = _context.clock().now(); // + _settings.getRebuildPeriod();
         
         LeaseSet ls = new LeaseSet();
         for (int i = 0; i < _tunnels.size(); i++) {
@@ -406,6 +406,10 @@ public class TunnelPool {
      *
      */
     public int countHowManyToBuild() {
+        if (_settings.getDestination() != null) {
+            if (!_context.clientManager().isLocal(_settings.getDestination()))
+                return 0;
+        }
         int wanted = getSettings().getBackupQuantity() + getSettings().getQuantity();
         
         boolean allowZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) <= 0);
@@ -612,6 +616,8 @@ public class TunnelPool {
     private List _inProgress = new ArrayList();
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         synchronized (_inProgress) { _inProgress.remove(cfg); }
+        cfg.setTunnelPool(this);
+        //_manager.buildComplete(cfg);
     }
     
     public String toString() {

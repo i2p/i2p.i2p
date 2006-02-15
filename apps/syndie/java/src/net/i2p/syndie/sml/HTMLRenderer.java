@@ -320,23 +320,24 @@ public class HTMLRenderer extends EventReceiverImpl {
             if ( (description != null) && (description.trim().length() > 0) ) {
                 _bodyBuffer.append(sanitizeString(description));
             } else if ( (name != null) && (name.trim().length() > 0) ) {
-                _bodyBuffer.append(sanitizeString(name));
+                _bodyBuffer.append(sanitizeTagParam(name));
             } else {
                 _bodyBuffer.append("[view entry]");
             }
             _bodyBuffer.append("</a>");
+        } else if ( (description != null) && (description.trim().length() > 0) ) {
+            _bodyBuffer.append(sanitizeString(description));
         }
-        
         
         //String url = getPageURL(blog, null, -1, -1, -1, (_user != null ? _user.getShowExpanded() : false), (_user != null ? _user.getShowImages() : false));
         String url = getMetadataURL(blog);
-        _bodyBuffer.append(getSpan("blogEntrySummary")).append(" [<a ").append(getClass("blogLink")).append(" href=\"").append(url);
-        _bodyBuffer.append("\">");
+        _bodyBuffer.append(getSpan("blogEntrySummary"));
+        _bodyBuffer.append(" [<a ").append(getClass("blogLink")).append(" href=\"").append(url).append("\">");
         if ( (name != null) && (name.trim().length() > 0) )
-            _bodyBuffer.append(sanitizeString(name));
+            _bodyBuffer.append(sanitizeTagParam(name));
         else
             _bodyBuffer.append("view");
-        _bodyBuffer.append("</a> ");
+        _bodyBuffer.append("</a>");
         //_bodyBuffer.append("</a> (<a ").append(getClass("blogMeta")).append(" href=\"").append(getMetadataURL(blog)).append("\">meta</a>)");
         if ( (tag != null) && (tag.trim().length() > 0) ) {
             url = getPageURL(blog, tag, -1, -1, -1, false, false);
@@ -348,7 +349,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             for (int i = 0; i < locations.size(); i++) {
                 SafeURL surl = (SafeURL)locations.get(i);
                 if (_user.getAuthenticated() && BlogManager.instance().authorizeRemote(_user) )
-                    _bodyBuffer.append("<a ").append(getClass("blogArchiveView")).append(" href=\"").append(getArchiveURL(blog, surl)).append("\">").append(sanitizeString(surl.toString())).append("</a> ");
+                    _bodyBuffer.append(" <a ").append(getClass("blogArchiveView")).append(" href=\"").append(getArchiveURL(blog, surl)).append("\">").append(sanitizeString(surl.toString())).append("</a> ");
                 else
                     _bodyBuffer.append(getSpan("blogArchiveURL")).append(sanitizeString(surl.toString())).append("</span> ");
             }
@@ -900,9 +901,13 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (str == null) return "";
         //str = str.replace('&', '_'); // this should be &amp;
         str = str.replaceAll("&", "&amp;");
-        if (str.indexOf('\"') < 0)
+        
+        if (str.indexOf("\"") < 0 && str.indexOf("'") < 0)
             return sanitizeString(str);
-        str = str.replace('\"', '\'');
+        
+        str = str.replaceAll("\"", "&quot;");
+        str = str.replaceAll("'", "&#39;"); // as &apos;, but supported by IE
+        
         return sanitizeString(str);
     }
     

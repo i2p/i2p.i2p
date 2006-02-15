@@ -22,6 +22,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -346,11 +347,18 @@ class PersistentDataStore extends TransientDataStore {
                     fis = new FileInputStream(_routerFile);
                     RouterInfo ri = new RouterInfo();
                     ri.readBytes(fis);
-                    try {
-                        _facade.store(ri.getIdentity().getHash(), ri);
-                    } catch (IllegalArgumentException iae) {
-                        _log.info("Refused locally loaded routerInfo - deleting");
+                    if (ri.getNetworkId() != Router.NETWORK_ID) {
                         corrupt = true;
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("The router is from a different network: " 
+                                      + ri.getIdentity().calculateHash().toBase64());
+                    } else {
+                        try {
+                            _facade.store(ri.getIdentity().getHash(), ri);
+                        } catch (IllegalArgumentException iae) {
+                            _log.info("Refused locally loaded routerInfo - deleting");
+                            corrupt = true;
+                        }
                     }
                 } catch (DataFormatException dfe) {
                     _log.warn("Error reading the routerInfo from " + _routerFile.getAbsolutePath(), dfe);

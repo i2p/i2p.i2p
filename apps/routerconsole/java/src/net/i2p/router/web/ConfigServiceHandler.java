@@ -121,7 +121,7 @@ public class ConfigServiceHandler extends FormHandler {
             browseOnStartup(false);
             addFormNotice("Console is not to be shown on startup");
         } else {
-            addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
+            //addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }
     }
     

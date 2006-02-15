@@ -34,7 +34,7 @@ public class PacketHandler {
     private boolean _keepReading;
     private List _handlers;
     
-    private static final int NUM_HANDLERS = 3;
+    private static final int NUM_HANDLERS = 5;
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     
@@ -60,6 +60,8 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.droppedInvalidEstablish", "How old the packet we dropped due to invalidity (establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidInboundEstablish", "How old the packet we dropped due to invalidity (inbound establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidSkew", "How skewed the packet we dropped due to invalidity (valid except bad skew) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (when its slow)", "udp", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     public void startup() { 
@@ -101,8 +103,9 @@ public class PacketHandler {
                 UDPPacket packet = _endpoint.receive();
                 _state = 3;
                 if (packet == null) continue; // keepReading is probably false...
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Received the packet " + packet);
+                packet.received();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Received the packet " + packet);
                 _state = 4;
                 long queueTime = packet.getLifetime();
                 long handleStart = _context.clock().now();
@@ -116,16 +119,30 @@ public class PacketHandler {
                         _log.error("Crazy error handling a packet: " + packet, e);
                 }
                 long handleTime = _context.clock().now() - handleStart;
+                packet.afterHandling();
                 _context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
                 _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
                 _state = 8;
 
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Done receiving the packet " + packet);
+                
                 if (handleTime > 1000) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Took " + handleTime + " to process the packet " 
                                   + packet + ": " + _reader);
                 }
-
+                
+                long timeToDequeue = packet.getTimeSinceEnqueue() - packet.getTimeSinceReceived();
+                long timeToVerify = 0;
+                long beforeRecv = packet.getTimeSinceReceiveFragments();
+                if (beforeRecv > 0)
+                    timeToVerify = beforeRecv - packet.getTimeSinceReceived();
+                if (timeToDequeue > 50)
+                    _context.statManager().addRateData("udp.packetDequeueTime", timeToDequeue, timeToDequeue);
+                if (timeToVerify > 50)
+                    _context.statManager().addRateData("udp.packetVerifyTime", timeToVerify, timeToVerify);
+                
                 // back to the cache with thee!
                 packet.release();
                 _state = 9;
@@ -396,7 +413,22 @@ public class PacketHandler {
                         state = _establisher.receiveData(outState);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received new DATA packet from " + state + ": " + packet);
-                    _inbound.receiveData(state, reader.getDataReader());
+                    UDPPacketReader.DataReader dr = reader.getDataReader();
+                    if (_log.shouldLog(Log.INFO)) {
+                        StringBuffer msg = new StringBuffer();
+                        msg.append("Receive ").append(System.identityHashCode(packet));
+                        msg.append(" from ").append(state.getRemotePeer().toBase64()).append(" ").append(state.getRemoteHostId());
+                        for (int i = 0; i < dr.readFragmentCount(); i++) {
+                            msg.append(" msg ").append(dr.readMessageId(i));
+                            msg.append(":").append(dr.readMessageFragmentNum(i));
+                            if (dr.readMessageIsLast(i))
+                                msg.append("*");
+                        }
+                        msg.append(": ").append(dr.toString());
+                        _log.info(msg.toString());
+                    }
+                    packet.beforeReceiveFragments();
+                    _inbound.receiveData(state, dr);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
                     _state = 51;

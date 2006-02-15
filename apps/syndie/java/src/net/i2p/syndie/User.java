@@ -117,8 +117,9 @@ public class User {
             PetName pn = _petnames.getByName(name);
             if (pn == null) continue;
             String proto = pn.getProtocol();
-            if ( (proto != null) && (AddressesServlet.PROTO_TAG.equals(proto)) )
-                rv.add(pn.getLocation());
+            String loc = pn.getLocation();
+            if ( (proto != null) && (AddressesServlet.PROTO_TAG.equals(proto)) && (loc != null) )
+                rv.add(loc);
         }
         if (rv.size() <= 0) {
             for (int i = 0; i < DEFAULT_FAVORITE_TAGS.length; i++) {

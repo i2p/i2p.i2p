@@ -36,6 +36,10 @@ public class UDPPacket {
     private volatile boolean _released;
     private volatile Exception _releasedBy;
     private volatile Exception _acquiredBy;
+    private long _enqueueTime;
+    private long _receivedTime;
+    private long _beforeReceiveFragments;
+    private long _afterHandlingTime;
   
     private static final List _packetCache;
     static {
@@ -194,6 +198,24 @@ public class UDPPacket {
         _context.aes().decrypt(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _data, _packet.getOffset() + MAC_SIZE + IV_SIZE, cipherKey, iv.getData(), len - MAC_SIZE - IV_SIZE);
         _ivCache.release(iv);
     }
+
+    /** the UDPReceiver has tossed it onto the inbound queue */
+    void enqueue() { _enqueueTime = _context.clock().now(); }
+    /** a packet handler has pulled it off the inbound queue */
+    void received() { _receivedTime = _context.clock().now(); }
+    /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
+    void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
+    /** a packet handler has finished parsing out the good bits */
+    void afterHandling() { _afterHandlingTime = _context.clock().now(); } 
+      
+    /** the UDPReceiver has tossed it onto the inbound queue */
+    long getTimeSinceEnqueue() { return (_enqueueTime > 0 ? _context.clock().now() - _enqueueTime : 0); }
+    /** a packet handler has pulled it off the inbound queue */
+    long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
+    /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
+    long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
+    /** a packet handler has finished parsing out the good bits */
+    long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
     
     public String toString() {
         verifyNotReleased(); 
@@ -203,7 +225,12 @@ public class UDPPacket {
         buf.append(_packet.getAddress().getHostAddress()).append(":");
         buf.append(_packet.getPort());
         buf.append(" id=").append(System.identityHashCode(this));
-        buf.append("\ndata=").append(Base64.encode(_packet.getData(), _packet.getOffset(), _packet.getLength()));
+
+        buf.append(" sinceEnqueued=").append((_enqueueTime > 0 ? _context.clock().now()-_enqueueTime : -1));
+        buf.append(" sinceReceived=").append((_receivedTime > 0 ? _context.clock().now()-_receivedTime : -1));
+        buf.append(" beforeReceiveFragments=").append((_beforeReceiveFragments > 0 ? _context.clock().now()-_beforeReceiveFragments : -1));
+        buf.append(" sinceHandled=").append((_afterHandlingTime > 0 ? _context.clock().now()-_afterHandlingTime : -1));
+        //buf.append("\ndata=").append(Base64.encode(_packet.getData(), _packet.getOffset(), _packet.getLength()));
         return buf.toString();
     }
     

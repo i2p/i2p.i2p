@@ -25,6 +25,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private long _acceptedOn;
     private long _ackOn;
     private long _cancelledOn;
+    private volatile int _nackCount;
+    private volatile boolean _retransmitted;
     private SimpleTimer.TimedEvent _resendEvent;
     
     public PacketLocal(I2PAppContext ctx, Destination to) {
@@ -38,6 +40,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         _connection = con;
         _lastSend = -1;
         _cancelledOn = -1;
+        _nackCount = 0;
+        _retransmitted = false;
     }
     
     public Destination getTo() { return _to; }
@@ -113,6 +117,16 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public int getNumSends() { return _numSends; }
     public long getLastSend() { return _lastSend; }
     public Connection getConnection() { return _connection; }
+
+    public void incrementNACKs() { 
+        int cnt = ++_nackCount;
+        SimpleTimer.TimedEvent evt = _resendEvent;
+        if ( (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD) && (evt != null) && (!_retransmitted)) {
+            _retransmitted = true;
+            RetransmissionTimer.getInstance().addEvent(evt, 0);
+        }
+    }
+    public int getNACKs() { return _nackCount; }
     
     public void setResendPacketEvent(SimpleTimer.TimedEvent evt) { _resendEvent = evt; }
     

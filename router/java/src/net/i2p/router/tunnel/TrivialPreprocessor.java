@@ -49,14 +49,20 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Preprocessed: fragment " + i + "/" + (preprocessed.length-1) + " in " 
                                + msg.getMessageId() + ": " + Base64.encode(preprocessed[i]));
-                sender.sendPreprocessed(preprocessed[i], rec);
+                long id = sender.sendPreprocessed(preprocessed[i], rec);
+                msg.addMessageId(id);
             }
-            notePreprocessing(msg.getMessageId(), preprocessed.length);
+            notePreprocessing(msg.getMessageId(), msg.getFragmentNumber(), preprocessed.length, msg.getMessageIds(), null);
+            if (preprocessed.length != msg.getFragmentNumber() + 1) {
+                throw new RuntimeException("wtf, preprocessed " + msg.getMessageId() + " into " 
+                                           + msg.getFragmentNumber() + "/" + preprocessed.length + " fragments, size = "
+                                           + msg.getData().length);
+            }
         }
         return false;
     }
     
-    protected void notePreprocessing(long messageId, int numFragments) {}
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds, String msg) {}
     
     private byte[][] preprocess(TunnelGateway.Pending msg) {
         List fragments = new ArrayList(1);

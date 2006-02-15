@@ -40,7 +40,7 @@ public class HMACSHA256Generator {
             _useMD5 = true;
         else
             _useMD5 = false;
-        if ("true".equals(context.getProperty("i2p.HMACBrokenSize", "true")))
+        if ("true".equals(context.getProperty("i2p.HMACBrokenSize", "false")))
             _macSize = 32;
         else
             _macSize = (_useMD5 ? 16 : 32);

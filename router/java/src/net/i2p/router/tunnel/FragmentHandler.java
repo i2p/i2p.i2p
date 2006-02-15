@@ -360,6 +360,8 @@ public class FragmentHandler {
     private void receiveComplete(FragmentedMessage msg) {
         _completed++;
         try {
+            int fragmentCount = msg.getFragmentCount();
+            // toByteArray destroys the contents of the message completely
             byte data[] = msg.toByteArray();
             if (msg == null)
                 return;
@@ -367,6 +369,7 @@ public class FragmentHandler {
                 _log.debug("RECV(" + data.length + "): " + Base64.encode(data)  
                            + " " + _context.sha().calculateHash(data).toBase64());
             I2NPMessage m = new I2NPMessageHandler(_context).readMessage(data);
+            noteReception(m.getUniqueId(), fragmentCount-1, "complete: ");// + msg.toString());
             noteCompletion(m.getUniqueId());
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (IOException ioe) {

@@ -70,38 +70,10 @@ public class LoadTestManager {
     
     public static final boolean TEST_LIVE_TUNNELS = true;
     
-    public Job getTestJob() { return new TestJob(_context); }
-    private class TestJob extends JobImpl {
-        public TestJob(RouterContext ctx) { 
-            super(ctx);
-            // wait 5m to start up
-            getTiming().setStartAfter(3*60*1000 + getContext().clock().now());
-        }
-        public String getName() { return "run load tests"; }
-        public void runJob() { 
-            if (!TEST_LIVE_TUNNELS) {
-                runTest();
-                getTiming().setStartAfter(10*60*1000 + getContext().clock().now());
-                getContext().jobQueue().addJob(TestJob.this);
-            }
-        }
-    }
-    
     /** 1 peer at a time */
     private static final int CONCURRENT_PEERS = 1;
     /** 4 messages per peer at a time */
-    private static final int CONCURRENT_MESSAGES = 4;
-    
-    public void runTest() {
-        if ( (_untestedPeers == null) || (_untestedPeers.size() <= 0) ) {
-            UDPTransport t = UDPTransport._instance();
-            if (t != null)
-                _untestedPeers = t._getActivePeers();
-        }
-        int peers = getConcurrency();
-        for (int i = 0; i < peers && _untestedPeers.size() > 0; i++)
-            buildTestTunnel((Hash)_untestedPeers.remove(0));
-    }
+    private static final int CONCURRENT_MESSAGES = 1;//4;
     
     private int getConcurrency() {
         int rv = CONCURRENT_PEERS;
@@ -118,11 +90,14 @@ public class LoadTestManager {
     }
     
     private int getPeerMessages() {
+        String msgsPerPeer = _context.getProperty("router.loadTestMessagesPerPeer");
         int rv = CONCURRENT_MESSAGES;
-        try {
-            rv = Integer.parseInt(_context.getProperty("router.loadTestMessagesPerPeer", CONCURRENT_MESSAGES+""));
-        } catch (NumberFormatException nfe) {
-            rv = CONCURRENT_MESSAGES;
+        if (msgsPerPeer != null) {
+            try { 
+                rv = Integer.parseInt(msgsPerPeer); 
+            } catch (NumberFormatException nfe) {
+                rv = CONCURRENT_MESSAGES;
+            }
         }
         if (rv < 1) 
             rv = 1;
@@ -449,121 +424,6 @@ public class LoadTestManager {
         }
     }
     
-    
-    private boolean getBuildOneHop() {
-        return Boolean.valueOf(_context.getProperty("router.loadTestOneHop", "false")).booleanValue();        
-    }
-    
-    private void buildTestTunnel(Hash peer) {
-        if (getBuildOneHop()) {
-            buildOneHop(peer);
-        } else {
-            buildLonger(peer);
-        }
-    }
-    private void buildOneHop(Hash peer) {
-        long expiration = _context.clock().now() + 10*60*1000;
-        
-        PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, 2, true);
-        // cfg.getPeer() is ordered gateway first
-        cfg.setPeer(0, peer);
-        HopConfig hop = cfg.getConfig(0);
-        hop.setExpiration(expiration);
-        hop.setIVKey(_context.keyGenerator().generateSessionKey());
-        hop.setLayerKey(_context.keyGenerator().generateSessionKey());
-        // now for ourselves
-        cfg.setPeer(1, _context.routerHash());
-        hop = cfg.getConfig(1);
-        hop.setExpiration(expiration);
-        hop.setIVKey(_context.keyGenerator().generateSessionKey());
-        hop.setLayerKey(_context.keyGenerator().generateSessionKey());
-        
-        cfg.setExpiration(expiration);
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Config for " + peer.toBase64() + ": " + cfg);
-        
-        LoadTestTunnelConfig ltCfg = new LoadTestTunnelConfig(cfg);
-        
-        CreatedJob onCreated = new CreatedJob(_context, ltCfg);
-        FailedJob fail = new FailedJob(_context, ltCfg);
-        RequestTunnelJob req = new RequestTunnelJob(_context, cfg, onCreated, fail, cfg.getLength()-1, false, true);
-        _context.jobQueue().addJob(req);
-    }
-    
-    private Hash pickFastPeer(Hash skipPeer) {
-        String peers = _context.getProperty("router.loadTestFastPeers");
-        if (peers != null) {
-            StringTokenizer tok = new StringTokenizer(peers.trim(), ", \t");
-            List peerList = new ArrayList();
-            while (tok.hasMoreTokens()) {
-                String str = tok.nextToken();
-                try {
-                    Hash h = new Hash();
-                    h.fromBase64(str);
-                    peerList.add(h);
-                } catch (DataFormatException dfe) {
-                    // ignore
-                }
-            }
-            Collections.shuffle(peerList);
-            while (peerList.size() > 0) {
-                Hash cur = (Hash)peerList.remove(0);
-                if (!cur.equals(skipPeer))
-                    return cur;
-            }
-        }
-        return null;
-    }
-    
-    private void buildLonger(Hash peer) {
-        long expiration = _context.clock().now() + 10*60*1000;
-        
-        PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, 3, true);
-        // cfg.getPeer() is ordered gateway first
-        cfg.setPeer(0, peer);
-        HopConfig hop = cfg.getConfig(0);
-        hop.setExpiration(expiration);
-        hop.setIVKey(_context.keyGenerator().generateSessionKey());
-        hop.setLayerKey(_context.keyGenerator().generateSessionKey());
-        // now lets put in a fast peer
-        Hash fastPeer = pickFastPeer(peer);
-        if (fastPeer == null) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Unable to pick a fast peer for the load test of " + peer.toBase64());
-            buildOneHop(peer);
-            return;
-        } else if (fastPeer.equals(peer)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Can't test the peer with themselves, going one hop for " + peer.toBase64());
-            buildOneHop(peer);
-            return;
-        }
-        cfg.setPeer(1, fastPeer);
-        hop = cfg.getConfig(1);
-        hop.setExpiration(expiration);
-        hop.setIVKey(_context.keyGenerator().generateSessionKey());
-        hop.setLayerKey(_context.keyGenerator().generateSessionKey());
-        // now for ourselves
-        cfg.setPeer(2, _context.routerHash());
-        hop = cfg.getConfig(2);
-        hop.setExpiration(expiration);
-        hop.setIVKey(_context.keyGenerator().generateSessionKey());
-        hop.setLayerKey(_context.keyGenerator().generateSessionKey());
-        
-        cfg.setExpiration(expiration);
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Config for " + peer.toBase64() + " with fastPeer: " + fastPeer.toBase64() + ": " + cfg);
-        
-        
-        LoadTestTunnelConfig ltCfg = new LoadTestTunnelConfig(cfg);
-        CreatedJob onCreated = new CreatedJob(_context, ltCfg);
-        FailedJob fail = new FailedJob(_context, ltCfg);
-        RequestTunnelJob req = new RequestTunnelJob(_context, cfg, onCreated, fail, cfg.getLength()-1, false, true);
-        _context.jobQueue().addJob(req);
-    }
-    
     /**
      * If we are testing live tunnels, see if we want to test the one that was just created
      * fully.
@@ -647,8 +507,8 @@ public class LoadTestManager {
             runTest(_cfg);
         }
     }
-    private long TEST_PERIOD_MAX = 10*60*1000;
-    private long TEST_PERIOD_MIN = 90*1000;
+    private long TEST_PERIOD_MAX = 5*60*1000;
+    private long TEST_PERIOD_MIN = 1*60*1000;
     
     private class Expire extends JobImpl {
         private LoadTestTunnelConfig _cfg;

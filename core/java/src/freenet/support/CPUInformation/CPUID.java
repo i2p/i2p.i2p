@@ -135,6 +135,8 @@ public class CPUID {
     {
         if(!_nativeOk)
             throw new UnknownCPUException("Failed to read CPU information from the system. Please verify the existence of the jcpuid dll/so.");
+        if(getCPUVendorID().equals("CentaurHauls"))
+            return new VIAC3Impl();
         if(!isX86)
             throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPU's only");
         if(getCPUVendorID().equals("AuthenticAMD"))
@@ -159,6 +161,11 @@ public class CPUID {
         public boolean hasSSE2(){
             return (getCPUFlags() & 0x4000000) >0; //Bit 26
         }
+        public boolean IsC3Compatible() { return false; }
+    }
+    protected static class VIAC3Impl extends CPUIDCPUInfo implements CPUInfo {
+        public boolean isC3Compatible() { return true; }
+        public String getCPUModelString() { return "VIA C3"; }
     }
     protected static class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     {

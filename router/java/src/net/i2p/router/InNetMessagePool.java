@@ -63,7 +63,7 @@ public class InNetMessagePool implements Service {
     
     public InNetMessagePool(RouterContext context) {
         _context = context;
-        _handlerJobBuilders = new HandlerJobBuilder[20];
+        _handlerJobBuilders = new HandlerJobBuilder[32];
         _pendingDataMessages = new ArrayList(16);
         _pendingDataMessagesFrom = new ArrayList(16);
         _pendingGatewayMessages = new ArrayList(16);
@@ -133,7 +133,7 @@ public class InNetMessagePool implements Service {
                           + ": " + messageBody);
             _context.statManager().addRateData("inNetPool.dropped", 1, 0);
             _context.statManager().addRateData("inNetPool.duplicate", 1, 0);
-            _context.messageHistory().droppedOtherMessage(messageBody);
+            _context.messageHistory().droppedOtherMessage(messageBody, (fromRouter != null ? fromRouter.calculateHash() : fromRouterHash));
             _context.messageHistory().messageProcessingError(messageBody.getUniqueId(), 
                                                                 messageBody.getClass().getName(), 
                                                                 "Duplicate/expired");
@@ -184,7 +184,7 @@ public class InNetMessagePool implements Service {
                 // not handled as a reply
                 if (!jobFound) { 
                     // was not handled via HandlerJobBuilder
-                    _context.messageHistory().droppedOtherMessage(messageBody);
+                    _context.messageHistory().droppedOtherMessage(messageBody, (fromRouter != null ? fromRouter.calculateHash() : fromRouterHash));
                     if (type == DeliveryStatusMessage.MESSAGE_TYPE) {
                         long timeSinceSent = _context.clock().now() - 
                                             ((DeliveryStatusMessage)messageBody).getArrival();

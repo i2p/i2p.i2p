@@ -26,6 +26,7 @@ class PeerTestState {
     private long _receiveAliceTime;
     private long _receiveBobTime;
     private long _receiveCharlieTime;
+    private int _packetsRelayed;
     
     public static final short ALICE = 1;
     public static final short BOB = 2;
@@ -91,6 +92,9 @@ class PeerTestState {
     public synchronized long getReceiveCharlieTime() { return _receiveCharlieTime; }
     public synchronized void setReceiveCharlieTime(long when) { _receiveCharlieTime = when; }
     
+    public int getPacketsRelayed() { return _packetsRelayed; }
+    public void incrementPacketsRelayed() { ++_packetsRelayed; }
+    
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(512);
         buf.append("Role: ");
@@ -113,6 +117,7 @@ class PeerTestState {
             buf.append(" receive from bob after ").append(_receiveBobTime - _beginTime).append("ms");
         if (_receiveCharlieTime > 0)
             buf.append(" receive from charlie after ").append(_receiveCharlieTime - _beginTime).append("ms");
+        buf.append(" packets relayed: ").append(_packetsRelayed);
         return buf.toString();
     }
 }

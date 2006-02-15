@@ -18,6 +18,8 @@ public class KeySelector {
     private int m;
     private int k;
     private byte[] b;
+    private int offset; // index into b to select
+    private int length; // length into b to select
     private int[] bitOffset;
     private int[] wordOffset;
     private BitSelector  bitSel;
@@ -70,7 +72,7 @@ public class KeySelector {
     public class GenericBitSelector implements BitSelector {
         /** Do the extraction */
         public void getBitSelectors() {
-            int curBit = 0; 
+            int curBit = 8 * offset; 
             int curByte;
             for (int j = 0; j < k; j++) {
                 curByte = curBit / 8;
@@ -126,7 +128,7 @@ public class KeySelector {
         public void getWordSelectors() {
             int stride = m - 5;
             //assert true: stride<16;
-            int curBit = k * 5; 
+            int curBit = (k * 5) + (offset * 8); 
             int curByte;
             for (int j = 0; j < k; j++) {
                 curByte = curBit / 8;
@@ -216,15 +218,18 @@ public class KeySelector {
      * 
      * @param key cryptographic key used in populating the arrays
      */
-    public void getOffsets (byte[] key) {
+    public void getOffsets (byte[] key) { getOffsets(key, 0, key.length); }
+    public void getOffsets (byte[] key, int off, int len) {
         if (key == null) {
             throw new IllegalArgumentException("null key");
         }
-        if (key.length < 20) {
+        if (len < 20) {
             throw new IllegalArgumentException(
                 "key must be at least 20 bytes long");
         }
         b = key;
+        offset = off;
+        length = len;
 //      // DEBUG
 //      System.out.println("KeySelector.getOffsets for " 
 //                                          + BloomSHA1.keyToString(b));

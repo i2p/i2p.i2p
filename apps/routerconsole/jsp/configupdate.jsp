@@ -43,7 +43,7 @@ Update through the eepProxy?
  <!-- prompt for the eepproxy -->
  Trusted keys:
  <textarea name="trustedKeys" disabled="true" cols="60" rows="2"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
- <input type="submit" value="Save" />
+ <input type="submit" name="action" value="Save" />
  </form>
 </div>
 

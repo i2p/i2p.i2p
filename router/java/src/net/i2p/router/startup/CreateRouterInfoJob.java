@@ -63,9 +63,7 @@ public class CreateRouterInfoJob extends JobImpl {
             info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
             RouterIdentity ident = new RouterIdentity();
-            Certificate cert = new Certificate();
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
-            cert.setPayload(null);
+            Certificate cert = getContext().router().createCertificate();
             ident.setCertificate(cert);
             PublicKey pubkey = null;
             PrivateKey privkey = null;

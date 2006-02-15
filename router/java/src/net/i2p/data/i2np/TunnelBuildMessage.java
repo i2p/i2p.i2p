@@ -33,14 +33,15 @@ public class TunnelBuildMessage extends I2NPMessageImpl {
         
         for (int i = 0; i < RECORD_COUNT; i++) {
             int off = offset + (i * RECORD_SIZE);
-            int len = RECORD_SIZE;
-            setRecord(i, new ByteArray(data, off, len));
+            byte rec[] = new byte[RECORD_SIZE];
+            System.arraycopy(data, off, rec, 0, RECORD_SIZE);
+            setRecord(i, new ByteArray(rec)); //new ByteArray(data, off, len));
         }
     }
     
     protected int writeMessageBody(byte[] out, int curIndex) throws I2NPMessageException {
         int remaining = out.length - (curIndex + calculateWrittenLength());
-        if (remaining <= 0)
+        if (remaining < 0)
             throw new I2NPMessageException("Not large enough (too short by " + remaining + ")");
         for (int i = 0; i < RECORD_COUNT; i++) {
             System.arraycopy(_records[i].getData(), _records[i].getOffset(), out, curIndex, RECORD_SIZE);

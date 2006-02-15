@@ -21,9 +21,9 @@ public class InboundSender implements TunnelGateway.Sender {
         _processor = new InboundGatewayProcessor(_context, config);
     }
     
-    public void sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
+    public long sendPreprocessed(byte[] preprocessed, TunnelGateway.Receiver receiver) {
         if (USE_ENCRYPTION)
             _processor.process(preprocessed, 0, preprocessed.length);
-        receiver.receiveEncrypted(preprocessed);
+        return receiver.receiveEncrypted(preprocessed);
     }
 }

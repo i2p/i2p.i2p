@@ -137,7 +137,7 @@ public class ConfigNetHelper {
             return "32";
     }
     public String getInboundBurstFactorBox() {
-        String rate = _context.getProperty(PROP_INBOUND_KBPS);
+        String rate = _context.getProperty(PROP_INBOUND_BURST_KBPS);
         String burst = _context.getProperty(PROP_INBOUND_BURST);
         int numSeconds = 1;
         if ( (burst != null) && (rate != null) ) {
@@ -157,7 +157,7 @@ public class ConfigNetHelper {
     }
     
     public String getOutboundBurstFactorBox() {
-        String rate = _context.getProperty(PROP_OUTBOUND_KBPS);
+        String rate = _context.getProperty(PROP_OUTBOUND_BURST_KBPS);
         String burst = _context.getProperty(PROP_OUTBOUND_BURST);
         int numSeconds = 1;
         if ( (burst != null) && (rate != null) ) {

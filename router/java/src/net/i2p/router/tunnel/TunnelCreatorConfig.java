@@ -1,8 +1,6 @@
 package net.i2p.router.tunnel;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 import java.text.SimpleDateFormat;
 
 import net.i2p.data.Base64;
@@ -25,6 +23,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
     /** gateway first */
     private Hash _peers[];
     private long _expiration;
+    private List _order;
+    private long _replyMessageId;
     private boolean _isInbound;
     private long _messagesProcessed;
     private volatile long _verifiedBytesTransferred;
@@ -82,6 +82,13 @@ public class TunnelCreatorConfig implements TunnelInfo {
     
     public long getExpiration() { return _expiration; }
     public void setExpiration(long when) { _expiration = when; }
+    
+    /** component ordering in the new style request */
+    public List getReplyOrder() { return _order; }
+    public void setReplyOrder(List order) { _order = order; }
+    /** new style reply message id */
+    public long getReplyMessageId() { return _replyMessageId; }
+    public void setReplyMessageId(long id) { _replyMessageId = id; }
     
     public void testSuccessful(int ms) {}
     
@@ -158,6 +165,9 @@ public class TunnelCreatorConfig implements TunnelInfo {
         buf.append(" expiring on ").append(getExpirationString());
         if (_destination != null)
             buf.append(" for ").append(Base64.encode(_destination.getData(), 0, 3));
+        if (_replyMessageId > 0)
+            buf.append(" replyMessageId ").append(_replyMessageId);
+        buf.append(" with ").append(_messagesProcessed).append("/").append(_verifiedBytesTransferred).append(" msgs/bytes");
         return buf.toString();
     }
     

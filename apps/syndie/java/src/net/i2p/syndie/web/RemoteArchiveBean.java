@@ -278,7 +278,7 @@ public class RemoteArchiveBean {
         scheduler.fetch(shouldBlock);
     }
     
-    public void fetchIndex(User user, String schema, String location, String proxyHost, String proxyPort) {
+    public void fetchIndex(User user, String schema, String location, String proxyHost, String proxyPort, boolean allowCaching) {
         _fetchIndexInProgress = true;
         _remoteIndex = null;
         _remoteLocation = location;
@@ -330,9 +330,12 @@ public class RemoteArchiveBean {
         } catch (IOException ioe) {
             //ignore
         }
-        
+
+        String tag = null;
+        if (allowCaching)
+            tag = etags.getProperty(location);
         EepGet eep = new EepGet(I2PAppContext.getGlobalContext(), ((_proxyHost != null) && (_proxyPort > 0)),
-                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location, true, etags.getProperty(location));
+                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location, allowCaching, tag);
         eep.addStatusListener(new IndexFetcherStatusListener(archiveFile));
         eep.fetch();
         

@@ -469,15 +469,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     boolean addRemotePeerState(PeerState peer) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Add remote peer state: " + peer);
+        Hash remotePeer = peer.getRemotePeer();
         long oldEstablishedOn = -1;
         PeerState oldPeer = null;
-        if (peer.getRemotePeer() != null) {
+        if (remotePeer != null) {
             synchronized (_peersByIdent) {
-                oldPeer = (PeerState)_peersByIdent.put(peer.getRemotePeer(), peer);
+                oldPeer = (PeerState)_peersByIdent.put(remotePeer, peer);
                 if ( (oldPeer != null) && (oldPeer != peer) ) {
-                    // should we transfer the oldPeer's RTT/RTO/etc? nah
-                    // or perhaps reject the new session?  nah, 
-                    // using the new one allow easier reconnect
+                    // transfer over the old state/inbound message fragments/etc
+                    peer.loadFrom(oldPeer);
                     oldEstablishedOn = oldPeer.getKeyEstablishedTime();
                 }
             }
@@ -491,8 +491,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized (_peersByRemoteHost) {
             oldPeer = (PeerState)_peersByRemoteHost.put(remoteId, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
-                //_peersByRemoteHost.put(remoteString, oldPeer);
-                //return false;
+                // transfer over the old state/inbound message fragments/etc
+                peer.loadFrom(oldPeer);
                 oldEstablishedOn = oldPeer.getKeyEstablishedTime();
             }
         }
@@ -531,13 +531,56 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return super.getCurrentAddress();
     }
     
+    public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
+        if (inMsg.getType() == DatabaseStoreMessage.MESSAGE_TYPE) {
+            DatabaseStoreMessage dsm = (DatabaseStoreMessage)inMsg;
+            if ( (dsm.getRouterInfo() != null) && 
+                 (dsm.getRouterInfo().getNetworkId() != Router.NETWORK_ID) ) {
+                /*
+                if (remoteIdentHash != null) {
+                    _context.shitlist().shitlistRouter(remoteIdentHash, "Sent us a peer from the wrong network");
+                    dropPeer(remoteIdentHash);
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Dropping the peer " + remoteIdentHash
+                                   + " because they are in the wrong net");
+                } else if (remoteIdent != null) {
+                    _context.shitlist().shitlistRouter(remoteIdent.calculateHash(), "Sent us a peer from the wrong network");
+                    dropPeer(remoteIdent.calculateHash());
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Dropping the peer " + remoteIdent.calculateHash()
+                                   + " because they are in the wrong net");
+                }
+                 */
+                _context.shitlist().shitlistRouter(dsm.getRouterInfo().getIdentity().calculateHash(), "Part of the wrong network");                
+                dropPeer(dsm.getRouterInfo().getIdentity().calculateHash());
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping the peer " + dsm.getRouterInfo().getIdentity().calculateHash().toBase64() 
+                               + " because they are in the wrong net");
+                return;
+            } else {
+                if (dsm.getRouterInfo() != null) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Received an RI from the same net");
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Received a leaseSet: " + dsm);
+                }
+            }
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Received another message: " + inMsg.getClass().getName());
+        }
+        super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
+    }
+
+    
     void dropPeer(Hash peer) {
         PeerState state = getPeerState(peer);
         if (state != null)
             dropPeer(state, false);
     }
     private void dropPeer(PeerState peer, boolean shouldShitlist) {
-        if (_log.shouldLog(Log.INFO)) {
+        if (_log.shouldLog(Log.WARN)) {
             long now = _context.clock().now();
             StringBuffer buf = new StringBuffer(4096);
             long timeSinceSend = now - peer.getLastSendTime();
@@ -574,7 +617,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     buf.append("\n");
                 }
             }
-            _log.info(buf.toString(), new Exception("Dropped by"));
+            _log.warn(buf.toString(), new Exception("Dropped by"));
         }
         
         _introManager.remove(peer);
@@ -684,10 +727,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long lastSend = peer.getLastSendFullyTime();
             long lastRecv = peer.getLastReceiveTime();
             long now = _context.clock().now();
+            int inboundActive = peer.expireInboundMessages();
             if ( (lastSend > 0) && (lastRecv > 0) ) {
                 if ( (now - lastSend > MAX_IDLE_TIME) && 
                      (now - lastRecv > MAX_IDLE_TIME) && 
-                     (peer.getConsecutiveFailedSends() > 0) ) {
+                     (peer.getConsecutiveFailedSends() > 0) &&
+                     (inboundActive <= 0)) {
                     // peer is waaaay idle, drop the con and queue it up as a new con
                     dropPeer(peer, false);
                     msg.timestamp("peer is really idle, dropping con and reestablishing");
@@ -747,6 +792,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     void rebuildExternalAddress() { rebuildExternalAddress(true); }
     void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
+        if (_context.router().isHidden())
+            return;
+        
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         String port = _context.getProperty(PROP_EXTERNAL_PORT);
@@ -822,6 +870,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean wantsRebuild = false;
         if ( (_externalAddress == null) || !(_externalAddress.equals(addr)) )
             wantsRebuild = true;
+        
         RouterAddress oldAddress = _externalAddress;
         _externalAddress = addr;
         if (_log.shouldLog(Log.INFO))
@@ -883,7 +932,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return "";
     }
 
-    private static final int DROP_INACTIVITY_TIME = 10*1000;
+    private static final int DROP_INACTIVITY_TIME = 60*1000;
     
     public void failed(OutboundMessageState msg) {
         if (msg == null) return;
@@ -892,31 +941,76 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
                (msg.isExpired())) ) {
             OutNetMessage m = msg.getMessage();
+            long recvDelay = _context.clock().now() - msg.getPeer().getLastReceiveTime();
+            long sendDelay = _context.clock().now() - msg.getPeer().getLastSendFullyTime();
             if (m != null)
                 m.timestamp("message failure - volleys = " + msg.getMaxSends() 
-                            + " lastReceived: " + (_context.clock().now() - msg.getPeer().getLastReceiveTime())
-                            + " lastSentFully: " + (_context.clock().now() - msg.getPeer().getLastSendFullyTime())
+                            + " lastReceived: " + recvDelay
+                            + " lastSentFully: " + sendDelay
                             + " expired? " + msg.isExpired());
             consecutive = msg.getPeer().incrementConsecutiveFailedSends();
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());
+                _log.warn("Consecutive failure #" + consecutive 
+                          + " on " + msg.toString()
+                          + " to " + msg.getPeer());
             if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
                 dropPeer(msg.getPeer(), false);
         }
-        failed(msg.getMessage());
+        noteSend(msg, false);
+        super.afterSend(msg.getMessage(), false);
     }
     
-    public void failed(OutNetMessage msg) {
+    private void noteSend(OutboundMessageState msg, boolean successful) {
+        int pushCount = msg.getPushCount();
+        int sends = msg.getMaxSends();
+        boolean expired = msg.isExpired();
+     
+        OutNetMessage m = msg.getMessage();
+        PeerState p = msg.getPeer();
+        StringBuffer buf = new StringBuffer(64);
+        buf.append(" lifetime: ").append(msg.getLifetime());
+        buf.append(" sends: ").append(sends);
+        buf.append(" pushes: ").append(pushCount);
+        buf.append(" expired? ").append(expired);
+        buf.append(" unacked: ").append(msg.getUnackedSize());
+        if (!successful) {
+            buf.append(" consec_failed: ").append(p.getConsecutiveFailedSends());
+            long timeSinceSend = _context.clock().now() - p.getLastSendFullyTime();
+            buf.append(" lastFullSend: ").append(timeSinceSend);
+            long timeSinceRecv = _context.clock().now() - p.getLastReceiveTime();
+            buf.append(" lastRecv: ").append(timeSinceRecv);
+            buf.append(" xfer: ").append(p.getSendBps()).append("/").append(p.getReceiveBps());
+            buf.append(" mtu: ").append(p.getMTU());
+            buf.append(" rto: ").append(p.getRTO());
+            buf.append(" sent: ").append(p.getMessagesSent()).append("/").append(p.getPacketsTransmitted());
+            buf.append(" recv: ").append(p.getMessagesReceived()).append("/").append(p.getPacketsReceived());
+            buf.append(" uptime: ").append(_context.clock().now()-p.getKeyEstablishedTime());
+        }
+        if ( (m != null) && (p != null) ) {
+            _context.messageHistory().sendMessage(m.getMessageType(), msg.getMessageId(), m.getExpiration(), 
+                                                  p.getRemotePeer(), successful, buf.toString());
+        } else {
+            _context.messageHistory().sendMessage("establish", msg.getMessageId(), -1, 
+                                                  (p != null ? p.getRemotePeer() : null), successful, buf.toString());
+        }
+    }
+    
+    public void failed(OutNetMessage msg, String reason) {
         if (msg == null) return;
         if (_log.shouldLog(Log.WARN))
             _log.warn("Sending message failed: " + msg, new Exception("failed from"));
+        
+        _context.messageHistory().sendMessage(msg.getMessageType(), msg.getMessageId(), msg.getExpiration(), 
+                                              msg.getTarget().getIdentity().calculateHash(), false, reason);
         super.afterSend(msg, false);
     }
-    public void succeeded(OutNetMessage msg) {
+    public void succeeded(OutboundMessageState msg) {
         if (msg == null) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending message succeeded: " + msg);
-        super.afterSend(msg, true);
+        noteSend(msg, true);
+        if (msg.getMessage() != null)
+            super.afterSend(msg.getMessage(), true);
     }
 
     public int countActivePeers() {

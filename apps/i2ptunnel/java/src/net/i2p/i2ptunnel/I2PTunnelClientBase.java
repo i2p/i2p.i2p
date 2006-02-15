@@ -62,7 +62,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private Object conLock = new Object();
     
     /** List of Socket for those accept()ed but not yet started up */
-    private List _waitingSockets;
+    private List _waitingSockets = new ArrayList();
     /** How many connections will we allow to be in the process of being built at once? */
     private int _numConnectionBuilders;
     /** How long will we allow sockets to sit in the _waitingSockets map before killing them? */

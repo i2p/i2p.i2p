@@ -80,14 +80,17 @@ public class DecayingBloomFilter {
      *
      */
     public boolean add(byte entry[]) {
+        return add(entry, 0, entry.length);
+    }
+    public boolean add(byte entry[], int off, int len) {
         if (ALWAYS_MISS) return false;
         if (entry == null) 
             throw new IllegalArgumentException("Null entry");
-        if (entry.length != _entryBytes) 
-            throw new IllegalArgumentException("Bad entry [" + entry.length + ", expected " 
+        if (len != _entryBytes) 
+            throw new IllegalArgumentException("Bad entry [" + len + ", expected " 
                                                + _entryBytes + "]");
         synchronized (this) {
-            return locked_add(entry);
+            return locked_add(entry, off, len);
         }
     }
     
@@ -101,14 +104,15 @@ public class DecayingBloomFilter {
         if (ALWAYS_MISS) return false;
         synchronized (this) {
             if (_entryBytes <= 7)
-                entry &= _longToEntryMask; 
+                entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask);
+                //entry &= _longToEntryMask; 
             if (entry < 0) {
                 DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
                 _longToEntry[0] |= (1 << 7);
             } else {
                 DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
             }
-            return locked_add(_longToEntry);
+            return locked_add(_longToEntry, 0, _longToEntry.length);
         }
     }
     
@@ -121,26 +125,26 @@ public class DecayingBloomFilter {
         if (ALWAYS_MISS) return false;
         synchronized (this) {
             if (_entryBytes <= 7)
-                entry &= _longToEntryMask; 
+                entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask); 
             if (entry < 0) {
                 DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
                 _longToEntry[0] |= (1 << 7);
             } else {
                 DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
             }
-            return locked_add(_longToEntry, false);
+            return locked_add(_longToEntry, 0, _longToEntry.length, false);
         }
     }
     
-    private boolean locked_add(byte entry[]) {
-        return locked_add(entry, true);
+    private boolean locked_add(byte entry[], int offset, int len) {
+        return locked_add(entry, offset, len, true);
     }
-    private boolean locked_add(byte entry[], boolean addIfNew) {
+    private boolean locked_add(byte entry[], int offset, int len, boolean addIfNew) {
         if (_extended != null) {
             // extend the entry to 32 bytes
-            System.arraycopy(entry, 0, _extended, 0, entry.length);
+            System.arraycopy(entry, offset, _extended, 0, len);
             for (int i = 0; i < _extenders.length; i++)
-                DataHelper.xor(entry, 0, _extenders[i], 0, _extended, _entryBytes * (i+1), _entryBytes);
+                DataHelper.xor(entry, offset, _extenders[i], 0, _extended, _entryBytes * (i+1), _entryBytes);
 
             boolean seen = _current.member(_extended);
             seen = seen || _previous.member(_extended);
@@ -155,15 +159,15 @@ public class DecayingBloomFilter {
                 return false;
             }
         } else {
-            boolean seen = _current.locked_member(entry);
-            seen = seen || _previous.locked_member(entry);
+            boolean seen = _current.locked_member(entry, offset, len);
+            seen = seen || _previous.locked_member(entry, offset, len);
             if (seen) {
                 _currentDuplicates++;
                 return true;
             } else {
                 if (addIfNew) {
-                    _current.locked_insert(entry);
-                    _previous.locked_insert(entry);
+                    _current.locked_insert(entry, offset, len);
+                    _previous.locked_insert(entry, offset, len);
                 }
                 return false;
             }

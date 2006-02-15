@@ -63,6 +63,16 @@ public class RouterIdentity extends DataStructureImpl {
         _signingKey = key;
         __calculatedHash = null;
     }
+    
+    /** 
+     * This router specified that they should not be used as a part of a tunnel,
+     * nor queried for the netDb, and that disclosure of their contact information
+     * should be limited.
+     *
+     */
+    public boolean isHidden() {
+        return (_certificate != null) && (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_HIDDEN);
+    }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _publicKey = new PublicKey();

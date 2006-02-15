@@ -41,5 +41,6 @@ public interface CPUInfo
      * @return true iff the CPU support the SSE2 instruction set.
      */
     public boolean hasSSE2();
-    
+
+    public boolean IsC3Compatible();
 }

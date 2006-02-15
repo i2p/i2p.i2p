@@ -185,6 +185,8 @@ public class UDPSender {
                         }
                         long sendTime = _context.clock().now() - before;
                         _context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Sent the packet " + packet);
                         long throttleTime = afterBW - acquireTime;
                         if (throttleTime > 10)
                             _context.statManager().addRateData("udp.sendBWThrottleTime", throttleTime, acquireTime - packet.getBegin());

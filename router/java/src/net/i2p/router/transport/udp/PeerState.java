@@ -14,6 +14,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Contain all of the state about a UDP connection to a peer.
@@ -168,6 +169,9 @@ public class PeerState {
     /** Message (Long) to InboundMessageState for active message */
     private Map _inboundMessages;
     
+    /** have we migrated away from this peer to another newer one? */
+    private volatile boolean _dead;
+    
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
@@ -188,8 +192,8 @@ public class PeerState {
      */
     private static final int LARGE_MTU = 1350;
     
-    private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 2500; // 5000;
+    private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
+    private static final int MAX_RTO = 1200; // 5000;
     /** override the default MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     
@@ -241,6 +245,7 @@ public class PeerState {
         _packetsReceived = 0;
         _packetsReceivedDuplicate = 0;
         _inboundMessages = new HashMap(8);
+        _dead = false;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -433,14 +438,21 @@ public class PeerState {
      * the previous second's ACKs be sent?
      */
     public void remoteDoesNotWantPreviousACKs() { _remoteWantsPreviousACKs = false; }
+    
+    /** should we ignore the peer state's congestion window, and let anything through? */
+    private static final boolean IGNORE_CWIN = false;
+    /** should we ignore the congestion window on the first push of every message? */
+    private static final boolean ALWAYS_ALLOW_FIRST_PUSH = false;
+    
     /** 
      * Decrement the remaining bytes in the current period's window,
      * returning true if the full size can be decremented, false if it
      * cannot.  If it is not decremented, the window size remaining is 
      * not adjusted at all.
      */
-    public boolean allocateSendingBytes(int size) { return allocateSendingBytes(size, false); }
-    public boolean allocateSendingBytes(int size, boolean isForACK) { 
+    public boolean allocateSendingBytes(int size, int messagePushCount) { return allocateSendingBytes(size, false, messagePushCount); }
+    public boolean allocateSendingBytes(int size, boolean isForACK) { return allocateSendingBytes(size, isForACK, -1); }
+    public boolean allocateSendingBytes(int size, boolean isForACK, int messagePushCount) { 
         long now = _context.clock().now();
         long duration = now - _lastSendRefill;
         if (duration >= 1000) {
@@ -456,7 +468,7 @@ public class PeerState {
             _lastSendRefill = now;
         }
         //if (true) return true;
-        if (size <= _sendWindowBytesRemaining) {
+        if (IGNORE_CWIN || size <= _sendWindowBytesRemaining || (ALWAYS_ALLOW_FIRST_PUSH && messagePushCount == 0)) {
             _sendWindowBytesRemaining -= size; 
             _sendBytes += size;
             _lastSendTime = now;
@@ -541,6 +553,32 @@ public class PeerState {
      * Access to this map must be synchronized explicitly!
      */
     public Map getInboundMessages() { return _inboundMessages; }
+    /**
+     * Expire partially received inbound messages, returning how many are still pending.
+     * This should probably be fired periodically, in case a peer goes silent and we don't
+     * try to send them any messages (and don't receive any messages from them either)
+     *
+     */
+    public int expireInboundMessages() { 
+        int rv = 0;
+        
+        synchronized (_inboundMessages) {
+            for (Iterator iter = _inboundMessages.values().iterator(); iter.hasNext(); ) {
+                InboundMessageState state = (InboundMessageState)iter.next();
+                if (state.isExpired()) {
+                    iter.remove();
+                } else {
+                    if (state.isComplete()) {
+                        _log.error("inbound message is complete, but wasn't handled inline? " + state + " with " + this);
+                        iter.remove();
+                    } else {
+                        rv++;
+                    }
+                }
+            }
+        }
+        return rv;
+    }
     
     /** 
      * either they told us to back off, or we had to resend to get 
@@ -593,7 +631,7 @@ public class PeerState {
         _lastACKSend = _context.clock().now();
     }
     
-    private static final int MAX_RESEND_ACKS = 8;
+    private static final int MAX_RESEND_ACKS = 16;
     
     /** 
      * grab a list of ACKBitfield instances, some of which may fully 
@@ -674,6 +712,8 @@ public class PeerState {
             for (Iterator iter = _inboundMessages.values().iterator(); iter.hasNext(); ) {
                 InboundMessageState state = (InboundMessageState)iter.next();
                 if (state.isExpired()) {
+                    //if (_context instanceof RouterContext)
+                    //    ((RouterContext)_context).messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired partially received: " + state.toString());
                     iter.remove();
                 } else {
                     if (!state.isComplete()) {
@@ -877,6 +917,42 @@ public class PeerState {
     
     public RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
+    /**
+     * Transfer the basic activity/state from the old peer to the current peer
+     *
+     */
+    public void loadFrom(PeerState oldPeer) {
+        _rto = oldPeer._rto;
+        _rtt = oldPeer._rtt;
+        _rttDeviation = oldPeer._rttDeviation;
+        _slowStartThreshold = oldPeer._slowStartThreshold;
+        _sendWindowBytes = oldPeer._sendWindowBytes;
+        oldPeer._dead = true;
+        
+        List tmp = new ArrayList();
+        synchronized (oldPeer._currentACKs) {
+            tmp.addAll(oldPeer._currentACKs);
+            oldPeer._currentACKs.clear();
+        }
+        synchronized (_currentACKs) { _currentACKs.addAll(tmp); }
+        tmp.clear();
+        
+        synchronized (oldPeer._currentACKsResend) {
+            tmp.addAll(oldPeer._currentACKsResend);
+            oldPeer._currentACKsResend.clear();
+        }
+        synchronized (_currentACKsResend) { _currentACKsResend.addAll(tmp); }
+        tmp.clear();
+        
+        Map msgs = new HashMap();
+        synchronized (oldPeer._inboundMessages) {
+            msgs.putAll(oldPeer._inboundMessages);
+            oldPeer._inboundMessages.clear();
+        }
+        synchronized (_inboundMessages) { _inboundMessages.putAll(msgs); }
+        
+    }
+    
     public int hashCode() {
         if (_remotePeer != null) 
             return _remotePeer.hashCode();
@@ -901,6 +977,17 @@ public class PeerState {
         buf.append(_remoteHostId.toString());
         if (_remotePeer != null)
             buf.append(" ").append(_remotePeer.toBase64().substring(0,6));
+
+        long now = _context.clock().now();
+        buf.append(" recvAge: ").append(now-_lastReceiveTime);
+        buf.append(" sendAge: ").append(now-_lastSendFullyTime);
+        buf.append(" sendAttemptAge: ").append(now-_lastSendTime);
+        buf.append(" sendACKAge: ").append(now-_lastACKSend);
+        buf.append(" lifetime: ").append(now-_keyEstablishedTime);
+        buf.append(" cwin: ").append(_sendWindowBytes);
+        buf.append(" acwin: ").append(_sendWindowBytesRemaining);
+        buf.append(" recv OK/Dup: ").append(_packetsReceived).append('/').append(_packetsReceivedDuplicate);
+        buf.append(" send OK/Dup: ").append(_packetsTransmitted).append('/').append(_packetsRetransmitted);
         return buf.toString();
     }
 }

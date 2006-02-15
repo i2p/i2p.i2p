@@ -28,11 +28,7 @@ import java.util.TreeSet;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.DHSessionKeyBuilder;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataHelper;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
-import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.*;
 import net.i2p.data.i2np.GarlicMessage;
 //import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.message.GarlicMessageHandler;
@@ -73,7 +69,7 @@ public class Router {
     public final static long CLOCK_FUDGE_FACTOR = 1*60*1000; 
 
     /** used to differentiate routerInfo files on different networks */
-    public static final int NETWORK_ID = 1;
+    public static final int NETWORK_ID = 2;
     
     public final static String PROP_HIDDEN = "router.hiddenMode";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
@@ -387,6 +383,24 @@ public class Router {
                 // no explicit capability
                 break;
         }
+    }
+    
+    public boolean isHidden() {
+        RouterInfo ri = _routerInfo;
+        if ( (ri != null) && (ri.isHidden()) )
+            return true;
+        return Boolean.valueOf(_context.getProperty("router.isHidden", "false")).booleanValue();
+    }
+    public Certificate createCertificate() {
+        Certificate cert = new Certificate();
+        if (isHidden()) {
+            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_HIDDEN);
+            cert.setPayload(null);
+        } else {
+            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
+            cert.setPayload(null);
+        }
+        return cert;
     }
     
     /**

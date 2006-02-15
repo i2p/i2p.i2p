@@ -51,7 +51,7 @@ public class Updater {
         User user = new User();
         RemoteArchiveBean rab = new RemoteArchiveBean();
         
-        rab.fetchIndex(user, "web", archive, bm.getDefaultProxyHost(), bm.getDefaultProxyPort());
+        rab.fetchIndex(user, "web", archive, bm.getDefaultProxyHost(), bm.getDefaultProxyPort(), true);
         if (rab.getRemoteIndex() != null) {
             HashMap parameters = new HashMap();
             parameters.put("action", new String[] {"Fetch all new entries"});

@@ -29,13 +29,13 @@ class LeaseRequestState {
     private boolean _successful;
 
     public LeaseRequestState(Job onGranted, Job onFailed, long expiration, LeaseSet requested) {
-	_onGranted = onGranted;
-	_onFailed = onFailed;
-	_expiration = expiration;
-	_requestedLeaseSet = requested;
-	_successful = false;
+        _onGranted = onGranted;
+        _onFailed = onFailed;
+        _expiration = expiration;
+        _requestedLeaseSet = requested;
+        _successful = false;
     }
-
+    
     /** created lease set from client */
     public LeaseSet getGranted() { return _grantedLeaseSet; }
     public void setGranted(LeaseSet ls) { _grantedLeaseSet = ls; }
@@ -59,4 +59,11 @@ class LeaseRequestState {
     /** whether the request was successful in the time allotted */
     public boolean getIsSuccessful() { return _successful; }
     public void setIsSuccessful(boolean is) { _successful = is; }
+
+    public String toString() { 
+        return "leaseSet request asking for " + _requestedLeaseSet 
+               + " having received " + _grantedLeaseSet 
+               + " succeeding? " + _successful
+               + " expiring on " + _expiration; 
+    }
 }

@@ -34,10 +34,11 @@ class SessionStatusMessageHandler extends HandlerImpl {
             break;
         case SessionStatusMessage.STATUS_DESTROYED:
             _log.info("Session destroyed");
-            session.destroySession();
+            //session.destroySession();
+            session.reconnect(); // la la la
             break;
         case SessionStatusMessage.STATUS_INVALID:
-            session.destroySession();
+            session.destroySession(); // ok, honor this destroy message, because we're b0rked
             break;
         case SessionStatusMessage.STATUS_UPDATED:
             _log.info("Session status updated");
