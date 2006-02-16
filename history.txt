@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.400 2006/02/16 04:45:23 jrandom Exp $
+$Id: history.txt,v 1.401 2006/02/16 05:33:31 jrandom Exp $
+
+* 2006-02-16  0.6.1.10 released
 
 2006-02-16  jrandom
     * Add a new toggle to the web config to enable/disable the load testing
