@@ -1,6 +1,0 @@
-This directory is intended for tests which are useful for testing 
-I2P, but don't test any of the I2P components directly. Instead,
-tests are run on "application" level (TCP, IRC, HTTP etc.).
-
-IOW: These tests may be useful for any other project that allows 
-tunneling of "normal" protocols, not only I2P.
