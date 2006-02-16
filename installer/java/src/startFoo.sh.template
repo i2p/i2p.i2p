@@ -1,6 +1,0 @@
-#!/bin/sh
-cd ##_scripts_installdir##
-export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
-nohup nice java -DloggerFilenameOverride=logs/##_scripts_logname## -Djava.library.path=. -Dcrypto.dh.precalc.min=0  -cp lib/mstreaming.jar:lib/i2p.jar -jar lib/i2ptunnel.jar -nocli -e "config localhost ##_scripts_port##" -e "##_scripts_cmd##" > /dev/null &
-
-echo '##_scripts_message##'

@@ -1,5 +1,0 @@
-@echo off
-title ##_scripts_winttl##
-cd ##_scripts_installdir##
-echo ##_scripts_message##
-javaw -DloggerFilenameOverride=logs\##_scripts_logname## -Djava.library.path=. -Dcrypto.dh.precalc.min=0 -cp lib\mstreaming.jar;lib\i2p.jar -jar lib\i2ptunnel.jar -nocli -e "config localhost ##_scripts_port##" -e "##_scripts_cmd##"
