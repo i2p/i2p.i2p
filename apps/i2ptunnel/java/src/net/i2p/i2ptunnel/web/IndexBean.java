@@ -448,7 +448,6 @@ public class IndexBean {
     /** I2CP host the router is on */
     public void setClientHost(String host) {
         _i2cpHost = (host != null ? host.trim() : null);
-        System.out.println("set client host [" + host + "]");
     }
     /** I2CP port the router is on */
     public void setClientport(String port) {
