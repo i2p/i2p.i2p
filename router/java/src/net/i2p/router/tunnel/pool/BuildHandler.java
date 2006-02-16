@@ -221,8 +221,8 @@ class BuildHandler {
                     _context.statManager().addRateData("tunnel.buildClientReject", rtt, rtt);
             }
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
         }
     }
     
@@ -247,8 +247,8 @@ class BuildHandler {
         _context.statManager().addRateData("tunnel.decryptRequestTime", decryptTime, decryptTime);
         if (req == null) {
             // no records matched, or the decryption failed.  bah
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("The request " + state.msg.getUniqueId() + " could not be decrypted");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("The request " + state.msg.getUniqueId() + " could not be decrypted");
             return;
         }
 
@@ -309,8 +309,8 @@ class BuildHandler {
         public String getName() { return "Timeout looking for next peer for tunnel join"; }
         public void runJob() {
             getContext().statManager().addRateData("tunnel.rejectTimeout", 1, 1);
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Request " + _state.msg.getUniqueId() 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Request " + _state.msg.getUniqueId() 
                           + " could no be satisfied, as the next peer could not be found: " + _nextPeer.toBase64());
             getContext().messageHistory().tunnelRejected(_state.fromHash, new TunnelId(_req.readReceiveTunnelId()), _nextPeer, 
                                                          "rejected because we couldn't find " + _nextPeer.toBase64() + ": " +

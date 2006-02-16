@@ -148,10 +148,18 @@ public class EepGet {
     }
     
     public static String suggestName(String url) {
+        int last = url.lastIndexOf('/');
+        if ((last < 0) || (url.lastIndexOf('#') > last))
+            last = url.lastIndexOf('#');
+        if ((last < 0) || (url.lastIndexOf('?') > last))
+            last = url.lastIndexOf('?');
+        if ((last < 0) || (url.lastIndexOf('=') > last))
+            last = url.lastIndexOf('=');
+        
         String name = null;
-        if (url.lastIndexOf('/') >= 0)
-            name = sanitize(url.substring(url.lastIndexOf('/')+1));
-        if (name != null) 
+        if (last >= 0)
+            name = sanitize(url.substring(last+1));
+        if ( (name != null) && (name.length() > 0) )
             return name;
         else
             return sanitize(url);

@@ -113,7 +113,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
-    private static final int TEST_FREQUENCY = 3*60*1000;
+    private static final int TEST_FREQUENCY = 13*60*1000;
     
     public UDPTransport(RouterContext ctx) {
         super(ctx);
@@ -973,7 +973,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(" pushes: ").append(pushCount);
         buf.append(" expired? ").append(expired);
         buf.append(" unacked: ").append(msg.getUnackedSize());
-        if (!successful) {
+        if ( (p != null) && (!successful) ) {
             buf.append(" consec_failed: ").append(p.getConsecutiveFailedSends());
             long timeSinceSend = _context.clock().now() - p.getLastSendFullyTime();
             buf.append(" lastFullSend: ").append(timeSinceSend);

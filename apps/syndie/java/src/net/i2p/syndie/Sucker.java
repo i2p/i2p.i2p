@@ -33,97 +33,78 @@ import net.i2p.syndie.data.BlogURI;
 import net.i2p.util.EepGet;
 import net.i2p.util.Log;
 
+/**
+ *
+ * todo:
+ * - factor out the parsing / formatting / posting to let the sucker pull in arbitrary HTML pages
+ *   (importing the images and SMLizing some stuff)
+ * - push the posts out to a remote syndie instance too
+ */
 public class Sucker {
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Sucker.class);
-    private String urlToLoad;
-    private String outputDir="./sucker_out";
-    private String historyPath="./sucker.history";
-    private String feedTag="feed";
-    private File historyFile;
-    private String proxyPort;
-    private String proxyHost;
-    private String pushScript;
-    private int attachmentCounter=0;
-    private String messagePath;
-    private String baseUrl;
-    private boolean importEnclosures=true;
-    private boolean importRefs=true;
-    private boolean pendingEndLink;
-    private boolean shouldProxy;
-    private int proxyPortNum;
-    private String blog;
-    private boolean pushToSyndie;
-    private long messageNumber=0;
-    private BlogManager bm;
-    private User user;
-    
-    //
-    private List fileNames;
-    private List fileStreams;
-    private List fileTypes;
-    private List tempFiles; // deleted after finished push 
-    private boolean stripNewlines;
-    
-    public Sucker() {
-    }
+    private SuckerState _state;
+
+    public Sucker() {}
     
     /**
      * Constructor for BlogManager. 
      */
     public Sucker(String[] strings) throws IllegalArgumentException {
-        pushToSyndie=true;
-        urlToLoad = strings[0];
-        blog = strings[1];
-        feedTag = strings[2];
-        outputDir = "blog-"+blog;
+        SuckerState state = new SuckerState();
+        state.pushToSyndie=true;
+        state.urlToLoad = strings[0];
+        state.blog = strings[1];
+        state.feedTag = strings[2];
+        state.outputDir = "blog-"+state.blog;
         try {
-            historyPath=BlogManager.instance().getRootDir().getCanonicalPath()+"/rss.history";
+            state.historyPath=BlogManager.instance().getRootDir().getCanonicalPath()+"/rss.history";
         } catch (IOException e) {
             e.printStackTrace();
         }
-        proxyPort = BlogManager.instance().getDefaultProxyPort();
-        proxyHost = BlogManager.instance().getDefaultProxyHost();
+        state.proxyPort = BlogManager.instance().getDefaultProxyPort();
+        state.proxyHost = BlogManager.instance().getDefaultProxyHost();
 
-        bm = BlogManager.instance();
+        state.bm = BlogManager.instance();
         Hash blogHash = new Hash();
         try {
-            blogHash.fromBase64(blog);
+            blogHash.fromBase64(state.blog);
         } catch (DataFormatException e1) {
             throw new IllegalArgumentException("ooh, bad $blog");
         }
      
-        user = bm.getUser(blogHash);
-        if(user==null)
+        state.user = state.bm.getUser(blogHash);
+        if(state.user==null)
             throw new IllegalArgumentException("wtf, user==null? hash:"+blogHash);
+        _state = state;
     }
 
     public boolean parseArgs(String args[]) {
         for (int i = 0; i < args.length; i++) {
             if ("--load".equals(args[i]))
-                urlToLoad = args[++i];
+                _state.urlToLoad = args[++i];
             if ("--outputdir".equals(args[i]))
-                outputDir = args[++i];
+                _state.outputDir = args[++i];
             if ("--history".equals(args[i]))
-                historyPath = args[++i];
+                _state.historyPath = args[++i];
             if ("--tag".equals(args[i]))
-                feedTag = args[++i];
+                _state.feedTag = args[++i];
             if ("--proxyhost".equals(args[i]))
-                proxyHost = args[++i];
+                _state.proxyHost = args[++i];
             if ("--proxyport".equals(args[i]))
-                proxyPort = args[++i];
+                _state.proxyPort = args[++i];
             if ("--exec".equals(args[i]))
-                pushScript = args[++i];
+                _state.pushScript = args[++i];
             if ("--importenclosures".equals(args[i]))
-                importEnclosures= args[++i].equals("true");
+                _state.importEnclosures= args[++i].equals("true");
             if ("--importenrefs".equals(args[i]))
-                importRefs= args[++i].equals("true");
+                _state.importRefs= args[++i].equals("true");
         }
 
         // Cut ending '/' from outputDir
-        if (outputDir.endsWith("/"))
-            outputDir = outputDir.substring(0, outputDir.length() - 1);
+        if (_state.outputDir.endsWith("/"))
+            _state.outputDir = _state.outputDir.substring(0, _state.outputDir.length() - 1);
 
-        if (urlToLoad == null)
+        if (_state.urlToLoad == null)
             return false;
 
         return true;
@@ -131,31 +112,33 @@ public class Sucker {
     
     /**
      * Fetch urlToLoad and call convertToHtml() on any new entries.
+     * @return list of BlogURI entries posted, if any
      */
-    public void suck() {
+    public List suck() {
+        _state.entriesPosted = new ArrayList();
         SyndFeed feed;
         File fetched=null;
         
-        tempFiles = new ArrayList();
+        _state.tempFiles = new ArrayList();
         
         // Find base url
-        int idx=urlToLoad.lastIndexOf('/');
+        int idx=_state.urlToLoad.lastIndexOf('/');
         if(idx>0)
-            baseUrl=urlToLoad.substring(0,idx);
+            _state.baseUrl=_state.urlToLoad.substring(0,idx);
         else
-            baseUrl=urlToLoad;
+            _state.baseUrl=_state.urlToLoad;
 
-        infoLog("Processing: "+urlToLoad);
-        debugLog("Base url: "+baseUrl);
+        infoLog("Processing: "+_state.urlToLoad);
+        debugLog("Base url: "+_state.baseUrl);
 
         //
         try {
             File lastIdFile=null;
          
             // Get next message number to use (for messageId in history only)
-            if(!pushToSyndie) {
+            if(!_state.pushToSyndie) {
                 
-                lastIdFile = new File(historyPath + ".lastId");
+                lastIdFile = new File(_state.historyPath + ".lastId");
                 if (!lastIdFile.exists())
                     lastIdFile.createNewFile();
                 
@@ -163,34 +146,34 @@ public class Sucker {
                 try {
                     fis = new FileInputStream(lastIdFile);
                     String number = readLine(fis);
-                    messageNumber = Integer.parseInt(number);
+                    _state.messageNumber = Integer.parseInt(number);
                 } catch (NumberFormatException e) {
-                    messageNumber = 0;
+                    _state.messageNumber = 0;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
 
                 // Create outputDir if missing
-                File f = new File(outputDir);
+                File f = new File(_state.outputDir);
                 f.mkdirs();
             } else {
-                messageNumber=bm.getNextBlogEntry(user);
+                _state.messageNumber=_state.bm.getNextBlogEntry(_state.user);
             }
 
-            _log.debug("message number: " + messageNumber);
+            _log.debug("message number: " + _state.messageNumber);
             
             // Create historyFile if missing
-            historyFile = new File(historyPath);
-            if (!historyFile.exists())
-                historyFile.createNewFile();
+            _state.historyFile = new File(_state.historyPath);
+            if (!_state.historyFile.exists())
+                _state.historyFile.createNewFile();
 
-            shouldProxy = false;
-            proxyPortNum = -1;
-            if ( (proxyHost != null) && (proxyPort != null) ) {
+            _state.shouldProxy = false;
+            _state.proxyPortNum = -1;
+            if ( (_state.proxyHost != null) && (_state.proxyPort != null) ) {
                 try {
-                    proxyPortNum = Integer.parseInt(proxyPort);
-                    if (proxyPortNum > 0)
-                        shouldProxy = true;
+                    _state.proxyPortNum = Integer.parseInt(_state.proxyPort);
+                    if (_state.proxyPortNum > 0)
+                        _state.shouldProxy = true;
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
                 }
@@ -199,12 +182,12 @@ public class Sucker {
             // fetch
             int numRetries = 2;
             fetched = File.createTempFile("sucker", ".fetch");
-            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, proxyHost, proxyPortNum, 
-                                    numRetries, fetched.getAbsolutePath(), urlToLoad);
+            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), _state.shouldProxy, _state.proxyHost, _state.proxyPortNum, 
+                                    numRetries, fetched.getAbsolutePath(), _state.urlToLoad);
             SuckerFetchListener lsnr = new SuckerFetchListener();
             get.addStatusListener(lsnr);
             
-            _log.debug("fetching [" + urlToLoad + "] / " + shouldProxy + "/" + proxyHost + "/" + proxyHost);
+            _log.debug("fetching [" + _state.urlToLoad + "] / " + _state.shouldProxy + "/" + _state.proxyHost + "/" + _state.proxyHost);
             
             get.fetch();
             _log.debug("fetched: " + get.getNotModified() + "/" + get.getETag());
@@ -213,13 +196,13 @@ public class Sucker {
                 _log.debug("success? " + ok);
                 System.err.println("Unable to retrieve the url after " + numRetries + " tries.");
                 fetched.delete();
-                return;
+                return _state.entriesPosted;
             }
             _log.debug("fetched successfully? " + ok);
             if(get.getNotModified()) {
                 debugLog("not modified, saving network bytes from useless fetch");
                 fetched.delete();
-                return;
+                return _state.entriesPosted;
             }
 
             // Build entry list from fetched rss file
@@ -233,19 +216,19 @@ public class Sucker {
             FileOutputStream hos = null;
 
             try {
-                hos = new FileOutputStream(historyFile, true);
+                hos = new FileOutputStream(_state.historyFile, true);
                 
                 // Process list backwards to get syndie to display the 
                 // entries in the right order. (most recent at top)
                 for (int i = entries.size()-1; i >= 0; i--) { 
                     SyndEntry e = (SyndEntry) entries.get(i);
 
-                    attachmentCounter=0;
+                    _state.attachmentCounter=0;
 
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Syndicate entry: " + e.getLink());
 
-                    String messageId = convertToSml(e);
+                    String messageId = convertToSml(_state, e);
                     if (messageId!=null) {
                         hos.write(messageId.getBytes());
                         hos.write("\n".getBytes());
@@ -255,11 +238,11 @@ public class Sucker {
                 if (hos != null) try { hos.close(); } catch (IOException ioe) {}
             }
             
-            if(!pushToSyndie) {
+            if(!_state.pushToSyndie) {
                 FileOutputStream fos = null;
                 try {
                     fos = new FileOutputStream(lastIdFile);
-                    fos.write(("" + messageNumber).getBytes());
+                    fos.write(("" + _state.messageNumber).getBytes());
                 } finally {
                     if (fos != null) try { fos.close(); } catch (IOException ioe) {}
                 }
@@ -278,6 +261,7 @@ public class Sucker {
         if(fetched!=null)
             fetched.delete();
         debugLog("Done.");
+        return _state.entriesPosted;
     }
 
     public static void main(String[] args) {
@@ -302,11 +286,11 @@ public class Sucker {
     /**
      * Call the specified script with "$outputDir $id and $time". 
      */
-    private boolean execPushScript(String id, String time) {
+    private static boolean execPushScript(SuckerState state, String id, String time) {
         try {
             String ls_str;
 
-            String cli = pushScript + " " + outputDir + " " + id + " " + time;
+            String cli = state.pushScript + " " + state.outputDir + " " + id + " " + time;
             Process pushScript_proc = Runtime.getRuntime().exec(cli);
 
             // get its output (your input) stream
@@ -318,7 +302,7 @@ public class Sucker {
                 while (true) {
                     boolean eof = DataHelper.readLine(ls_in, buf);
                     if (buf.length() > 0) 
-                        infoLog(pushScript + ": " + buf.toString());
+                        infoLog(state.pushScript + ": " + buf.toString());
                     buf.setLength(0);
                     if (eof)
                         break;
@@ -343,13 +327,13 @@ public class Sucker {
     /** 
      * Converts the SyndEntry e to sml and fetches any images as attachments 
      */ 
-    private String convertToSml(SyndEntry e) {
+    private static String convertToSml(SuckerState state, SyndEntry e) {
         String subject;
 
-        stripNewlines=false;
+        state.stripNewlines=false;
         
         // Calculate messageId, and check if we have got the message already
-        String feedHash = sha1(urlToLoad);
+        String feedHash = sha1(state.urlToLoad);
         String itemHash = sha1(e.getTitle() + e.getDescription());
         Date d = e.getPublishedDate();
         String time;
@@ -357,10 +341,10 @@ public class Sucker {
             time = "" + d.getTime();
         else
             time = "" + new Date().getTime();
-        String outputFileName = outputDir + "/" + messageNumber;
+        String outputFileName = state.outputDir + "/" + state.messageNumber;
         String messageId = feedHash + ":" + itemHash + ":" + time + ":" + outputFileName;
         // Check if we already have this
-        if (existsInHistory(messageId))
+        if (existsInHistory(state, messageId))
             return null;
         
         infoLog("new: " + messageId);
@@ -371,14 +355,14 @@ public class Sucker {
             subject=e.getTitle();
             List cats = e.getCategories();
             Iterator iter = cats.iterator();
-            String tags = feedTag;
+            String tags = state.feedTag;
             while (iter.hasNext()) {
                 SyndCategory c = (SyndCategory) iter.next();
                 debugLog("Name: "+c.getName());
                 debugLog("uri:"+c.getTaxonomyUri());
                 String tag=c.getName();
                 tag=tag.replaceAll("[^a-zA-z.-_:]","_");
-                tags += "\t" + feedTag + "." + tag;
+                tags += "\t" + state.feedTag + "." + tag;
             }
 
             SyndContent content;
@@ -393,7 +377,7 @@ public class Sucker {
                     content = (SyndContent)iter.next();
                     String c = content.getValue();
                     debugLog("Content: "+c);
-                                  sml += htmlToSml(c);
+                                  sml += htmlToSml(state, c);
                                   sml += "\n";
                 }
             }
@@ -408,85 +392,86 @@ public class Sucker {
                         // e.g. postman's rss feed @ http://tracker.postman.i2p/rss.jsp has
                         // baseUrl = http://tracker.postman.i2p
                         // and enclosure URLs are /download.php?id=123&file=blah
-                        if (enclosureURL.startsWith("/") || baseUrl.endsWith("/"))
-                            enclosureURL = baseUrl + enclosureURL;
+                        if (enclosureURL.startsWith("/") || state.baseUrl.endsWith("/"))
+                            enclosureURL = state.baseUrl + enclosureURL;
                         else
-                            enclosureURL = baseUrl + '/' + enclosureURL;
+                            enclosureURL = state.baseUrl + '/' + enclosureURL;
                     }   
-                    fetchAttachment(enclosureURL, enc.getType()); // fetches and adds to our streams
+                    fetchAttachment(state, enclosureURL, enc.getType()); // fetches and adds to our streams
                 }
             }
             
             String source=e.getLink(); //Uri();
             if(source.indexOf("http")<0)
-            source=baseUrl+source;
+            source=state.baseUrl+source;
             sml += "[link schema=\"web\" location=\""+source+"\"]source[/link]\n";
 
-            if(pushToSyndie) {
-                debugLog("user.blog: "+user.getBlogStr());
-                debugLog("user.id: "+bm.getNextBlogEntry(user));
+            if(state.pushToSyndie) {
+                debugLog("user.blog: "+state.user.getBlogStr());
+                debugLog("user.id: "+state.bm.getNextBlogEntry(state.user));
                 debugLog("subject: "+subject);
                 debugLog("tags: "+tags);
                 debugLog("sml: "+sml);
                 debugLog("");
-                BlogURI uri = bm.createBlogEntry(
-                        user, 
+                BlogURI uri = state.bm.createBlogEntry(
+                        state.user, 
                         false,
                         subject, 
                         tags, 
                         null,
                         sml, 
-                        fileNames, 
-                        fileStreams, 
-                        fileTypes);
+                        state.fileNames, 
+                        state.fileStreams, 
+                        state.fileTypes);
 
                 if(uri==null) {
                     errorLog("pushToSyndie failure.");
                     return null;
-                }
-                else
+                } else {
+                    state.entriesPosted.add(uri);
                     infoLog("pushToSyndie success, uri: "+uri.toString());
+                }
             }
             else
             {
                 FileOutputStream fos;
-                fos = new FileOutputStream(messagePath);
+                fos = new FileOutputStream(state.messagePath);
                 sml=subject + "\nTags: " + tags + "\n\n" + sml;
                 fos.write(sml.getBytes());
-                if (pushScript != null) {
-                    if (!execPushScript(""+messageNumber, time)) {
+                if (state.pushScript != null) {
+                    if (!execPushScript(state, ""+state.messageNumber, time)) {
                         errorLog("push script failed");
                     } else {
-                        infoLog("push script success: nr "+messageNumber);
+                        infoLog("push script success: nr "+state.messageNumber);
                     }
                 }
             }
-            messageNumber++;
-            deleteTempFiles();
+            state.messageNumber++;
+            deleteTempFiles(state);
             return messageId;
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         } catch (IOException e2) {
             e2.printStackTrace();
         }
-        deleteTempFiles();
+        deleteTempFiles(state);
         return null;
     }
 
-    private void deleteTempFiles() {
-        Iterator iter = tempFiles.iterator();
+    private static void deleteTempFiles(SuckerState state) {
+        Iterator iter = state.tempFiles.iterator();
         while(iter.hasNext()) {
             File tempFile = (File)iter.next();
             tempFile.delete();
         }
     }
 
-    private String htmlToSml(String html) {
+    private static String htmlToSml(SuckerState state, String html) {
 
         String sml="";
         int i=0;
 
-        pendingEndLink=false;
+        state.pendingEndLink=false;
 
         while(i<html.length())
         {
@@ -506,7 +491,7 @@ public class Sucker {
                 
                 //log("htmlTag: "+htmlTag);
                 
-                String smlTag = htmlTagToSmlTag(htmlTag);
+                String smlTag = htmlTagToSmlTag(state, htmlTag);
                 if(smlTag!=null) {
                     sml+=smlTag;
                     i+=tagLen;
@@ -517,11 +502,11 @@ public class Sucker {
                 sml+="&lt;";
                 break;
             case '\r':
-                if(!stripNewlines)
+                if(!state.stripNewlines)
                     sml+='\r';
                 break;
             case '\n':
-                if(!stripNewlines)
+                if(!state.stripNewlines)
                     sml+='\n';
                 break;
             case '[':
@@ -540,7 +525,7 @@ public class Sucker {
         return sml;
     }
 
-    private String htmlTagToSmlTag(String htmlTag) {
+    private static String htmlTagToSmlTag(SuckerState state, String htmlTag) {
         final String ignoreTags[] = {
                 "span",
                 "tr",
@@ -564,12 +549,12 @@ public class Sucker {
                 b++;
             String imageLink=htmlTag.substring(a,b);
             
-            if(pendingEndLink) { // <a href="..."><img src="..."></a> -> [link][/link][img][/img]
+            if(state.pendingEndLink) { // <a href="..."><img src="..."></a> -> [link][/link][img][/img]
                 ret="[/link]";
-                pendingEndLink=false;
+                state.pendingEndLink=false;
             }
     
-            ret += "[img attachment=\""+""+ attachmentCounter +"\"]";
+            ret += "[img attachment=\""+""+ state.attachmentCounter +"\"]";
             
             a=htmlTagLowerCase.indexOf("alt=\"")+5;
             if(a>=5)
@@ -586,9 +571,9 @@ public class Sucker {
             ret+="[/img]";
             
             if(imageLink.indexOf("http")<0)
-                imageLink=baseUrl+"/"+imageLink;
+                imageLink=state.baseUrl+"/"+imageLink;
             
-            fetchAttachment(imageLink);
+            fetchAttachment(state, imageLink);
 
             debugLog("Converted to: "+ret);
             
@@ -608,7 +593,7 @@ public class Sucker {
                 return null; // abort the b0rked tag
             String link=htmlTag.substring(a,b);
             if(link.indexOf("http")<0)
-                link=baseUrl+"/"+link;
+                link=state.baseUrl+"/"+link;
             
             String schema="web";
             
@@ -616,7 +601,7 @@ public class Sucker {
             if(htmlTagLowerCase.endsWith("/>"))
                 ret += "[/link]";
             else
-                pendingEndLink=true;
+                state.pendingEndLink=true;
         
             debugLog("Converted to: "+ret);
 
@@ -624,8 +609,8 @@ public class Sucker {
         }
         
         if ("</a>".equals(htmlTagLowerCase)) {
-            if (pendingEndLink) {
-                pendingEndLink=false;
+            if (state.pendingEndLink) {
+                state.pendingEndLink=false;
                 return "[/link]";
             }
         }
@@ -647,7 +632,7 @@ public class Sucker {
         if("</strong>".equals(htmlTagLowerCase))
             return "[/b]";
         if(htmlTagLowerCase.startsWith("<br")) {
-            stripNewlines=true;
+            state.stripNewlines=true;
             return "\n";
         }
         if("<p>".equals(htmlTagLowerCase))
@@ -675,15 +660,15 @@ public class Sucker {
         return null;
     }
 
-    private void fetchAttachment(String link) { fetchAttachment(link, null); }
-    private void fetchAttachment(String link, String suggestedMimeType) {
+    private static void fetchAttachment(SuckerState state, String link) { fetchAttachment(state, link, null); }
+    private static void fetchAttachment(SuckerState state, String link, String suggestedMimeType) {
         
         link=link.replaceAll("&amp;","&");
         
         infoLog("Fetch attachment from: "+link);
         
         File fetched;
-        if(pushToSyndie) {
+        if(state.pushToSyndie) {
             try {
                 // perhaps specify a temp dir?
                 fetched = File.createTempFile("sucker",".attachment");
@@ -692,14 +677,14 @@ public class Sucker {
                 e.printStackTrace();
                 return;
             }
-            tempFiles.add(fetched);
+            state.tempFiles.add(fetched);
         } else {
-            String attachmentPath = messagePath+"."+attachmentCounter;
+            String attachmentPath = state.messagePath+"."+state.attachmentCounter;
             fetched = new File(attachmentPath);
         }
         int numRetries = 2;
         // we use eepGet, since it retries and doesn't leak DNS requests like URL does
-        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, proxyHost, proxyPortNum, 
+        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), state.shouldProxy, state.proxyHost, state.proxyPortNum, 
                                 numRetries, fetched.getAbsolutePath(), link);
         SuckerFetchListener lsnr = new SuckerFetchListener();
         get.addStatusListener(lsnr);
@@ -710,7 +695,7 @@ public class Sucker {
             fetched.delete();
             return;
         }
-        tempFiles.add(fetched);
+        state.tempFiles.add(fetched);
         String filename=EepGet.suggestName(link);
         String contentType = suggestedMimeType;
         if (contentType == null)
@@ -719,38 +704,38 @@ public class Sucker {
             contentType="text/plain";
         debugLog("successful fetch of filename "+filename + " suggested mime type [" + suggestedMimeType 
                  + "], fetched mime type [" + get.getContentType() + "], final type [" + contentType + "]");
-        if(fileNames==null) fileNames = new ArrayList();
-        if(fileTypes==null) fileTypes = new ArrayList();
-        if(fileStreams==null) fileStreams = new ArrayList();
-        fileNames.add(filename);
-        fileTypes.add(contentType);
+        if(state.fileNames==null) state.fileNames = new ArrayList();
+        if(state.fileTypes==null) state.fileTypes = new ArrayList();
+        if(state.fileStreams==null) state.fileStreams = new ArrayList();
+        state.fileNames.add(filename);
+        state.fileTypes.add(contentType);
         try {
-            fileStreams.add(new FileInputStream(fetched));
+            state.fileStreams.add(new FileInputStream(fetched));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        attachmentCounter++;
+        state.attachmentCounter++;
     }
 
-    private void errorLog(String string) {
+    private static void errorLog(String string) {
         if (_log.shouldLog(Log.ERROR))
             _log.error(string);
-        if(!pushToSyndie)
-            System.out.println(string);
+        //if(!pushToSyndie)
+        //    System.out.println(string);
     }
 
-    private void infoLog(String string) {
+    private static void infoLog(String string) {
         if (_log.shouldLog(Log.INFO))
             _log.info(string);
-        if(!pushToSyndie)
-            System.out.println(string);
+        //if(!pushToSyndie)
+        //    System.out.println(string);
     }
 
-    private void debugLog(String string) {
+    private static void debugLog(String string) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(string);
-        if(!pushToSyndie)
-            System.out.println(string);
+        //if(!pushToSyndie)
+        //    System.out.println(string);
     }
 
     private static int findTagLen(String s) {
@@ -769,7 +754,7 @@ public class Sucker {
         return -1;
     }
 
-    private boolean existsInHistory(String messageId) {
+    private static boolean existsInHistory(SuckerState state, String messageId) {
         int idx;
         idx = messageId.lastIndexOf(":");
         String lineToCompare = messageId.substring(0, idx-1);
@@ -777,7 +762,7 @@ public class Sucker {
         lineToCompare = lineToCompare.substring(0, idx-1);
         FileInputStream his = null;
         try {
-            his = new FileInputStream(historyFile);
+            his = new FileInputStream(state.historyFile);
             String line;
             while ((line = readLine(his)) != null) {
                 idx = line.lastIndexOf(":");
@@ -885,5 +870,39 @@ class SuckerFetchListener implements EepGet.StatusListener {
     public void headerReceived(String url, int currentAttempt, String key, String val) {
         // ignore
     }
-    
+}
+
+
+
+class SuckerState {
+    String urlToLoad;
+    String outputDir="./sucker_out";
+    String historyPath="./sucker.history";
+    String feedTag="feed";
+    File historyFile;
+    String proxyPort;
+    String proxyHost;
+    String pushScript;
+    int attachmentCounter=0;
+    String messagePath;
+    String baseUrl;
+    boolean importEnclosures=true;
+    boolean importRefs=true;
+    boolean pendingEndLink;
+    boolean shouldProxy;
+    int proxyPortNum;
+    String blog;
+    boolean pushToSyndie;
+    long messageNumber=0;
+    BlogManager bm;
+    User user;
+    List entriesPosted;
+
+    //
+    List fileNames;
+    List fileStreams;
+    List fileTypes;
+    List tempFiles; // deleted after finished push 
+
+    boolean stripNewlines;
 }

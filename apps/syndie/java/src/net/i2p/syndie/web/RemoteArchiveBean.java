@@ -583,6 +583,12 @@ public class RemoteArchiveBean {
         List uris = new ArrayList(entries.length);
         for (int i = 0; i < entries.length; i++)
             uris.add(new BlogURI(entries[i]));
+        postSelectedEntries(user, uris, proxyHost, proxyPort, location);
+    }
+    public void postSelectedEntries(User user, List uris, String location) {
+        postSelectedEntries(user, uris, _proxyHost, _proxyPort, location);
+    }
+    public void postSelectedEntries(User user, List uris, String proxyHost, int proxyPort, String location) {
         if ( (proxyPort > 0) && (proxyHost != null) && (proxyHost.trim().length() > 0) ) {
             _proxyPort = proxyPort;
             _proxyHost = proxyHost;

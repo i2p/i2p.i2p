@@ -82,8 +82,8 @@ class BuildExecutor implements Runnable {
                 PooledTunnelCreatorConfig cfg = (PooledTunnelCreatorConfig)expired.get(i);
                 // note the fact that this tunnel request timed out in the peers' profiles.
                 // or... not.
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Timed out waiting for reply asking for " + cfg);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Timed out waiting for reply asking for " + cfg);
                 TunnelPool pool = cfg.getTunnelPool();
                 if (pool != null)
                     pool.buildComplete(cfg);
@@ -274,8 +274,8 @@ class BuildExecutor implements Runnable {
         }
         long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
         if (cfg.getExpiration() <= expireBefore) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Build complete for expired tunnel: " + cfg);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Build complete for expired tunnel: " + cfg);
         }
     }
     

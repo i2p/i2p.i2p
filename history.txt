@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.397 2006/02/15 00:33:17 jrandom Exp $
+$Id: history.txt,v 1.398 2006/02/15 08:36:29 jrandom Exp $
+
+2006-02-16  jrandom
+    * Bugfix to the I2PTunnel web config to properly accept i2cp port settings
+    * Initial sucker refactoring to simplify reuse of the html parsing
+    * Beginnings of hooks to push imported rss/atom out to remote syndie
+      archives automatically (though not enabled currently)
+    * Further SSU peer test cleanup
 
 2006-02-15  jrandom
     * Add in per-blog RSS feeds to Syndie

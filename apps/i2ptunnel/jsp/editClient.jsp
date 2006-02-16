@@ -254,7 +254,7 @@
                 <label for="clientPort" accesskey="r">
                     Po<span class="accessKey">r</span>t:
                 </label>
-                <input type="text" id="clientPort" name="clientPort" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
+                <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
             </div>
             
             <div class="subdivider">

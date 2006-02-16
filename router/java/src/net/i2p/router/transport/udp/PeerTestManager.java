@@ -47,6 +47,8 @@ class PeerTestManager {
         _currentTest = null;
         _currentTestComplete = false;
         _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveTestReply", "How often we get a reply to our peer test?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveTest", "How often we get a packet requesting us to participate in a peer test?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
     }
     
     private static final int RESEND_TIMEOUT = 5*1000;
@@ -146,6 +148,7 @@ class PeerTestManager {
      * test
      */
     private void receiveTestReply(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo) {
+        _context.statManager().addRateData("udp.receiveTestReply", 1, 0);
         PeerTestState test = _currentTest;
         if (expired())
             return;
@@ -161,7 +164,7 @@ class PeerTestManager {
                 test.setAlicePort(testInfo.readPort());
 
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Receive test reply from bob @ " + from.getIP() + " via our " + test.getAlicePort() + "/" + test.getAlicePortFromCharlie());
+                    _log.debug("Receive test reply from bob @ " + from + " via our " + test.getAlicePort() + "/" + test.getAlicePortFromCharlie());
                 if (test.getAlicePortFromCharlie() > 0)
                     testComplete(false);
             } catch (UnknownHostException uhe) {
@@ -177,6 +180,7 @@ class PeerTestManager {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bob chose a charlie we already have a session to, cancelling the test and rerunning (bob: " 
                               + _currentTest + ", charlie: " + from + ")");
+                _currentTestComplete = true;
                 _context.statManager().addRateData("udp.statusKnownCharlie", 1, 0);
                 honorStatus(CommSystemFacade.STATUS_UNKNOWN);
                 return;
@@ -286,6 +290,7 @@ class PeerTestManager {
      *
      */
     public void receiveTest(RemoteHostId from, UDPPacketReader reader) {
+        _context.statManager().addRateData("udp.receiveTest", 1, 0);
         UDPPacketReader.PeerTestReader testInfo = reader.getPeerTestReader();
         byte testIP[] = null;
         int testPort = testInfo.readPort();
@@ -318,7 +323,7 @@ class PeerTestManager {
                     // initiated test
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We are charlie, as te testIP/port is " + testIP + ":" + testPort + " and the state is unknown for " + nonce);
+                        _log.debug("We are charlie, as te testIP/port is " + RemoteHostId.toString(testIP) + ":" + testPort + " and the state is unknown for " + nonce);
                     // we are charlie, since alice never sends us her IP and port, only bob does (and,
                     // erm, we're not alice, since it isn't our nonce)
                     receiveFromBobAsCharlie(from, testInfo, nonce, null);
