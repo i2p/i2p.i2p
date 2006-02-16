@@ -1,10 +1,10 @@
 package net.i2p.syndie;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetName;
+import net.i2p.client.naming.PetNameDB;
 import net.i2p.util.Log;
 import net.i2p.syndie.web.RemoteArchiveBean;
 
@@ -14,6 +14,8 @@ public class Updater {
     private static final Updater _instance = new Updater();
     private long _lastUpdate;
     private static boolean _woken;
+    
+    private static boolean ALLOW_REMOTE_PUSH = false;
     
     public void update() {
         BlogManager bm = BlogManager.instance();
@@ -31,15 +33,54 @@ public class Updater {
         }
         _log.debug("Done fetching archives");
         List rssFeeds = bm.getRssFeeds();
+        List allEntries = new ArrayList();
         Iterator iter = rssFeeds.iterator();
         while(iter.hasNext()) {
             String args[] = (String[])iter.next();
             _log.debug("rss feed begin: " + args[0]);
             Sucker sucker = new Sucker(args);
-            sucker.suck();
+            allEntries.addAll(sucker.suck());
             _log.debug("rss feed end: " + args[0]);
         }
+        
+        if (ALLOW_REMOTE_PUSH && (allEntries.size() > 0) ) {
+            String pushedRemoteArchive = getAutomaticallyPushedArchive();
+            if (pushedRemoteArchive != null) {
+                _log.debug("Pushing all of the new entries to " + pushedRemoteArchive + ": " + allEntries);
+                // push all of the new entries to the configured default archive
+                User user = new User();
+                RemoteArchiveBean rab = new RemoteArchiveBean();
+
+                rab.fetchIndex(user, "web", pushedRemoteArchive, bm.getDefaultProxyHost(), bm.getDefaultProxyPort(), true);
+                if (rab.getRemoteIndex() != null) {
+                    rab.postSelectedEntries(user, allEntries, pushedRemoteArchive);
+                    _log.debug(rab.getStatus());
+                } 
+            }
+        }
         _log.debug("Done with all updating");
+    }
+    
+    /**
+     * Pick the archive to which any posts imported from a feed should be pushed to,
+     * beyond the local archive.  This currently pushes it to the first (alphabetically)
+     * syndie archive in the default user's addressbook that is marked as 'public'.
+     *
+     * @return archive location, or null if no archive should be used
+     */
+    private String getAutomaticallyPushedArchive() {
+        BlogManager bm = BlogManager.instance();
+        User user = bm.getDefaultUser();
+        PetNameDB db = user.getPetNameDB();
+        for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            PetName pn = db.getByName(name);
+            String proto = pn.getProtocol();
+            if ( (proto != null) && ("syndiearchive".equals(proto)) )
+                if (pn.getIsPublic())
+                    return pn.getLocation();
+        }
+        return null;
     }
     
     public void fetchArchive(String archive) {
