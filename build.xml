@@ -24,8 +24,6 @@
         <ant dir="apps/streaming/java/" target="jar" />
         <ant dir="apps/i2ptunnel/java/" target="jar" />
         <ant dir="apps/sam/java/" target="jar" />
-        <ant dir="apps/heartbeat/java/" target="jar" />
-        <ant dir="apps/netmonitor/java/" target="jar" />
         <ant dir="apps/systray/java/" target="jar" />
         <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="apps/addressbook/" target="war" />
@@ -99,8 +97,6 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
-        <copy file="apps/heartbeat/java/build/heartbeat.jar" todir="build/" />
-        <copy file="apps/netmonitor/java/build/netmonitor.jar" todir="build/" />
         <copy file="apps/systray/java/build/systray.jar" todir="build/" />
         <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
@@ -162,53 +158,16 @@
         <ant dir="apps/streaming/java/" target="distclean" />
         <ant dir="apps/i2ptunnel/java/" target="distclean" />
         <ant dir="apps/sam/java/" target="distclean" />
-        <ant dir="apps/heartbeat/java/" target="distclean" />
-        <ant dir="apps/netmonitor/java/" target="distclean" />
         <ant dir="apps/routerconsole/java/" target="distclean" />
         <ant dir="apps/addressbook/" target="distclean" />
         <ant dir="apps/susimail/" target="distclean" />
         <ant dir="apps/susidns/src/" target="distclean" />
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
-        <ant dir="installer/java/" target="distclean" />
         <delete>
             <fileset dir="." includes="**/*.class" />
             <fileset dir="." includes="**/*.java~" />
         </delete>
-    </target>
-    <target name="distGUI" depends="clean, buildGUI">
-        <mkdir dir="build/lib" />
-        <copy file="apps/jfreechart/jfreechart-0.9.17/jfreechart-0.9.17.jar" todir="build/lib" />
-        <copy file="apps/jfreechart/jfreechart-0.9.17/lib/log4j-1.2.8.jar" todir="build/lib" />
-        <copy file="apps/jfreechart/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" todir="build/lib" />
-        <copy file="apps/jfreechart/GUI-licenses.txt" todir="build/" />
-        <copy file="apps/netmonitor/java/build/netviewer.jar" todir="build/lib" />
-        <copy file="apps/heartbeat/java/build/heartbeatGUI.jar" todir="build/lib" />
-        <zip destfile="build/gui.zip" basedir="build/" includes="GUI-licenses.txt lib/*.jar" />
-    </target>
-    <target name="prepGUI">
-        <echo message="The code being fetched comes from http://www.jfree.org/jfreechart/" />
-        <echo message="It includes code licensed under the LGPL and the APL - please see" />
-        <echo message="the JFreeChart site (or the info downloaded) for source and details" />
-        <ant dir="apps/jfreechart/" target="fetchJfreechart" />
-        <ant dir="apps/jfreechart/" target="build" />
-    </target>
-    <target name="buildGUI">
-        <echo message="Building the GUIs for the heartbeat and netmonitor apps, which depend upon" />
-        <echo message="the JFreeChart and related packages.  The following will fail if you haven't" />
-        <echo message="already run 'ant prepGUI' to fetch the LGPL/APL'ed code" />
-        <ant dir="apps/heartbeat/java" target="buildGUI" />
-        <ant dir="apps/netmonitor/java" target="buildGUI" />
-        <copy file="apps/jfreechart/jfreechart-0.9.17/jfreechart-0.9.17.jar" todir="build/" />
-        <copy file="apps/jfreechart/jfreechart-0.9.17/lib/log4j-1.2.8.jar" todir="build/" />
-        <copy file="apps/jfreechart/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" todir="build/" />
-        <copy file="apps/jfreechart/GUI-licenses.txt" todir="build/" />
-        <copy file="apps/netmonitor/java/build/netviewer.jar" todir="build/" />
-        <copy file="apps/heartbeat/java/build/heartbeatGUI.jar" todir="build/" />
-        <echo message="GUIs created.  You will need the following files to run them: " />
-        <echo message="jfreechart-0.9.17.jar log4j-1.2.8.jar jcommon-0.9.2.jar" />
-        <echo message="To run the netmonitor GUI: java -cp jfreechart-0.9.17.jar:log4j-1.2.8.jar:jcommon-0.9.2.jar -jar netviewer.jar" />
-        <echo message="To run the heartbeat GUI: java -cp jfreechart-0.9.17.jar:log4j-1.2.8.jar:jcommon-0.9.2.jar -jar heartbeatGUI.jar" />
     </target>
     <target name="pkg" depends="updater, tarball, installer" />
     <target name="pkgclean">
@@ -220,7 +179,6 @@
     <target name="preppkg" depends="build, buildexe">
         <delete dir="pkg-temp" />
         <copy file="build/ant.jar" todir="pkg-temp/lib/" />
-        <copy file="build/heartbeat.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
@@ -231,7 +189,6 @@
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/netmonitor.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
@@ -353,10 +310,6 @@
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
-        
-	<!-- for 0.6.1.7, push jetty 5.1.6 -->
-        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />

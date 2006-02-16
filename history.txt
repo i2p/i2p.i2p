@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.398 2006/02/15 08:36:29 jrandom Exp $
+$Id: history.txt,v 1.399 2006/02/16 03:24:23 jrandom Exp $
+
+2006-02-16  jrandom
+    * Dropped much of the abandonware from the apps/ directory
 
 2006-02-16  jrandom
     * Bugfix to the I2PTunnel web config to properly accept i2cp port settings
