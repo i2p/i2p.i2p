@@ -112,7 +112,7 @@
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
         <copy file="apps/jdom/jdom.jar" todir="build/" />
-        <copy file="apps/rome/rome-0.7.jar" todir="build/" />
+        <copy file="apps/rome/rome-0.8.jar" todir="build/" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
