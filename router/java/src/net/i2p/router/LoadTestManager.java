@@ -76,7 +76,7 @@ public class LoadTestManager {
     /** 4 messages per peer at a time */
     private static final int CONCURRENT_MESSAGES = 1;//4;
     
-    private static final boolean DEFAULT_ENABLE = true;
+    private static final boolean DEFAULT_ENABLE = false;
 
     public static boolean isEnabled(I2PAppContext ctx) { 
         String enable = ctx.getProperty("router.enableLoadTesting");
