@@ -18,6 +18,7 @@ import java.util.Set;
 import net.i2p.time.Timestamper;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.Router;
+import net.i2p.router.LoadTestManager;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerTask;
 import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
@@ -46,6 +47,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _outboundBurstRate;
     private String _outboundBurst;
     private String _reseedFrom;
+    private boolean _enableLoadTesting;
     private String _sharePct;
     private boolean _ratesOnly;
     
@@ -72,6 +74,7 @@ public class ConfigNetHandler extends FormHandler {
     public void setHiddenMode(String moo) { _hiddenMode = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
     public void setUpdateratesonly(String moo) { _ratesOnly = true; }
+    public void setEnableloadtesting(String moo) { _enableLoadTesting = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -313,6 +316,8 @@ public class ConfigNetHandler extends FormHandler {
             } else {
                 _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "true");
             }
+            
+            LoadTestManager.setEnableLoadTesting(_context, _enableLoadTesting);
         }
         
         boolean saved = _context.router().saveConfig();

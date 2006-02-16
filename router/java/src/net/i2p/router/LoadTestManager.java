@@ -2,6 +2,7 @@ package net.i2p.router;
 
 import java.io.*;
 import java.util.*;
+import net.i2p.I2PAppContext;
 import net.i2p.util.*;
 import net.i2p.data.*;
 import net.i2p.data.i2np.*;
@@ -75,7 +76,26 @@ public class LoadTestManager {
     /** 4 messages per peer at a time */
     private static final int CONCURRENT_MESSAGES = 1;//4;
     
+    private static final boolean DEFAULT_ENABLE = true;
+
+    public static boolean isEnabled(I2PAppContext ctx) { 
+        String enable = ctx.getProperty("router.enableLoadTesting");
+        if ( (DEFAULT_ENABLE) && (enable != null) && (!Boolean.valueOf(enable).booleanValue()) )
+            return false;
+        else if ( (!DEFAULT_ENABLE) && ((enable == null) || (!Boolean.valueOf(enable).booleanValue()) ) )
+            return false;
+        return true;
+    }
+    public static void setEnableLoadTesting(RouterContext ctx, boolean enable) {
+        if (enable)
+            ctx.router().setConfigSetting("router.enableLoadTesting", "true");
+        else
+            ctx.router().setConfigSetting("router.enableLoadTesting", "false");
+    }
+    
     private int getConcurrency() {
+        if (!isEnabled(_context)) return 0;
+        
         int rv = CONCURRENT_PEERS;
         try {
             rv = Integer.parseInt(_context.getProperty("router.loadTestConcurrency", CONCURRENT_PEERS+""));

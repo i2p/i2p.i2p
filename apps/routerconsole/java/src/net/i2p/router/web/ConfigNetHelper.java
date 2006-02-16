@@ -4,6 +4,7 @@ import net.i2p.time.Timestamper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.data.RouterAddress;
+import net.i2p.router.LoadTestManager;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.Router;
@@ -193,6 +194,13 @@ public class ConfigNetHelper {
         }
         buf.append("</select>\n");
         return buf.toString();
+    }
+    
+    public String getEnableLoadTesting() {
+        if (LoadTestManager.isEnabled(_context))
+            return " checked ";
+        else
+            return "";
     }
     
     public String getSharePercentageBox() {

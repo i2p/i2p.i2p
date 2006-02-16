@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.399 2006/02/16 03:24:23 jrandom Exp $
+$Id: history.txt,v 1.400 2006/02/16 04:45:23 jrandom Exp $
+
+2006-02-16  jrandom
+    * Add a new toggle to the web config to enable/disable the load testing
 
 2006-02-16  jrandom
     * Dropped much of the abandonware from the apps/ directory
