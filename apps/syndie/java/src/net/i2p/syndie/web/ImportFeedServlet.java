@@ -33,6 +33,7 @@ public class ImportFeedServlet extends BaseServlet {
  
         if (!BlogManager.instance().authorizeRemote(user)) {
             out.write("<tr><td colspan=\"3\"><span class=\"b_rssMsgErr\">You are not authorized for remote access.</span></td></tr>\n");
+            return;
         } else {
             out.write("<tr><td colspan=\"3\">");
           

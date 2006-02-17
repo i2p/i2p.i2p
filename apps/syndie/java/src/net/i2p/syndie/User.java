@@ -106,7 +106,12 @@ public class User {
     public String getUsername() { return _username; }
     public String getUserHash() { return _userHash; }
     public Hash getBlog() { return _blog; }
-    public String getBlogStr() { return Base64.encode(_blog.getData()); }
+    public String getBlogStr() { 
+        if (_blog != null)
+            return Base64.encode(_blog.getData()); 
+        else
+            return null;
+    }
     public long getMostRecentEntry() { return _mostRecentEntry; }
     public Map getBlogGroups() { return _blogGroups; }
     public List getShitlistedBlogs() { return _shitlistedBlogs; }
