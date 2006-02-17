@@ -47,9 +47,9 @@ import java.util.Map;
  * <p>An abstract class to facilitate implementing PRNG algorithms.</p>
  *
  * Modified slightly by jrandom for I2P (removing unneeded exceptions)
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.1 $
  */
-public abstract class BasePRNG implements IRandom {
+public abstract class BasePRNGStandalone implements IRandom {
 
    // Constants and variables
    // -------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public abstract class BasePRNG implements IRandom {
     *
     * @param name the canonical name of this instance.
     */
-   protected BasePRNG(String name) {
+   protected BasePRNGStandalone(String name) {
       super();
 
       this.name = name;

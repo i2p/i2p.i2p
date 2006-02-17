@@ -57,9 +57,17 @@ class BuildHandler {
     }
     
     private static final int MAX_HANDLE_AT_ONCE = 5;
+    /** 
+     * Don't keep too many messages on the queue - when it reaches this size, delete the oldest request
+     */
+    private static final int MAX_QUEUED_REQUESTS = MAX_HANDLE_AT_ONCE * (BuildRequestor.REQUEST_TIMEOUT/1000);
     private static final int NEXT_HOP_LOOKUP_TIMEOUT = 5*1000;
     
-    void handleInboundRequests() {
+    /**
+     * Blocking call to handle a few of the pending inbound requests, returning true if
+     * there are remaining requeusts we skipped over
+     */
+    boolean handleInboundRequests() {
         List handled = null;
         synchronized (_inboundBuildMessages) {
             int toHandle = _inboundBuildMessages.size();
@@ -100,6 +108,11 @@ class BuildHandler {
                 BuildEndMessageState state = (BuildEndMessageState)handled.get(i);
                 handleRequestAsInboundEndpoint(state);
             }
+        }
+        
+        // anything else?
+        synchronized (_inboundBuildMessages) {
+            return _inboundBuildMessages.size() > 0;
         }
     }
     
@@ -503,6 +516,8 @@ class BuildHandler {
                         _log.warn("Dropping the reply " + reqId + ", as we used to be building that");
                 } else {
                     synchronized (_inboundBuildMessages) {
+                        while (_inboundBuildMessages.size() > MAX_QUEUED_REQUESTS)
+                            _inboundBuildMessages.remove(0); // keep the newest requests first, to offer better service
                         _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
                     }
                     _exec.repoll();

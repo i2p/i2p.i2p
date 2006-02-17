@@ -93,10 +93,11 @@ import net.i2p.crypto.CryptixAESKeyCache;
  *
  * Modified by jrandom for I2P to use Bouncycastle's SHA256, Cryptix's AES,
  * to strip out some unnecessary dependencies and increase the buffer size.
+ * Renamed from Fortuna to FortunaStandalone so it doesn't conflict with the
+ * gnu-crypto implementation, which has been imported into GNU/classpath
  *
  */
-public class Fortuna extends BasePRNG
-  implements Serializable, RandomEventListener
+public class FortunaStandalone extends BasePRNGStandalone implements Serializable, RandomEventListener
 {
 
   private static final long serialVersionUID = 0xFACADE;
@@ -113,7 +114,7 @@ public class Fortuna extends BasePRNG
 
   public static final String SEED = "gnu.crypto.prng.fortuna.seed";
 
-  public Fortuna()
+  public FortunaStandalone()
   {
     super("Fortuna i2p");
     generator = new Generator();
@@ -215,7 +216,7 @@ public class Fortuna extends BasePRNG
    * right; Fortuna itself is basically a wrapper around this generator
    * that manages reseeding in a secure way.
    */
-  public static class Generator extends BasePRNG implements Cloneable
+  public static class Generator extends BasePRNGStandalone implements Cloneable
   {
 
     private static final int LIMIT = 1 << 20;
@@ -341,7 +342,7 @@ public class Fortuna extends BasePRNG
   }
   
   public static void main(String args[]) {
-      Fortuna f = new Fortuna();
+      FortunaStandalone f = new FortunaStandalone();
       java.util.HashMap props = new java.util.HashMap();
       byte initSeed[] = new byte[1234];
       new java.util.Random().nextBytes(initSeed);

@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
 
-import gnu.crypto.prng.Fortuna;
+import gnu.crypto.prng.FortunaStandalone;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,13 +26,13 @@ import java.io.IOException;
  *
  */
 public class FortunaRandomSource extends RandomSource implements EntropyHarvester {
-    private Fortuna _fortuna;
+    private FortunaStandalone _fortuna;
     private double _nextGaussian;
     private boolean _haveNextGaussian;
 
     public FortunaRandomSource(I2PAppContext context) {
         super(context);
-        _fortuna = new Fortuna();
+        _fortuna = new FortunaStandalone();
         byte seed[] = new byte[1024];
         if (initSeed(seed)) {
             _fortuna.seed(seed);

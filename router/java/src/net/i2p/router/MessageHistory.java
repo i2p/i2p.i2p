@@ -39,7 +39,7 @@ public class MessageHistory {
         
     /** config property determining whether we want to debug with the message history */
     public final static String PROP_KEEP_MESSAGE_HISTORY = "router.keepHistory";
-    public final static boolean DEFAULT_KEEP_MESSAGE_HISTORY = true;
+    public final static boolean DEFAULT_KEEP_MESSAGE_HISTORY = false;
     /** config property determining where we want to log the message history, if we're keeping one */
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";

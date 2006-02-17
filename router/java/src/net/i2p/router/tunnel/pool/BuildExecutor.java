@@ -199,7 +199,9 @@ class BuildExecutor implements Runnable {
                     }
                 }
                 
-                _handler.handleInboundRequests();
+                boolean pendingRemaining = _handler.handleInboundRequests();
+                if (pendingRemaining)
+                    _repoll = true;
 
                 wanted.clear();
                 pools.clear();

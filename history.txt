@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.401 2006/02/16 05:33:31 jrandom Exp $
+$Id: history.txt,v 1.402 2006/02/16 15:44:07 jrandom Exp $
+
+2006-02-17  jrandom
+    * Disable the message history log file by default (duh - feel free to
+      delete messageHistory.txt after upgrading.  thanks deathfatty!)
+    * Limit the size of the inbound tunnel build request queue so we don't
+      get an insane backlog of requests that we're bound to reject, and adjust
+      the queue processing so we keep on churning through them when we've got
+      a backlog.
+    * Small fixes for the multiuser syndie operation (thanks Complication!)
+    * Renamed modified PRNG classes that were imported from gnu-crypto so we
+      don't conflict with JVMs using that as a JCE provider (thanks blx!)
 
 * 2006-02-16  0.6.1.10 released
 
