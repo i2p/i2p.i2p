@@ -117,9 +117,11 @@ class BuildExecutor implements Runnable {
         List wanted = new ArrayList(8);
         List pools = new ArrayList(8);
         
+        boolean pendingRemaining = false;
+        
         while (!_manager.isShutdown()){
             try {
-                _repoll = false;
+                _repoll = pendingRemaining; // resets repoll to false unless there are inbound requeusts pending
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
                     TunnelPool pool = (TunnelPool)pools.get(i);
@@ -199,9 +201,7 @@ class BuildExecutor implements Runnable {
                     }
                 }
                 
-                boolean pendingRemaining = _handler.handleInboundRequests();
-                if (pendingRemaining)
-                    _repoll = true;
+                pendingRemaining = _handler.handleInboundRequests();
 
                 wanted.clear();
                 pools.clear();

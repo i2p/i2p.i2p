@@ -43,6 +43,8 @@ class BuildHandler {
 
         _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.acceptLoad", "How long we had to wait before processing the request (when it was accepted)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropLoad", "How long we had to wait before finally giving up on an inbound request (period is queue count)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         
         _context.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionTransient", "How often we are rejected due to transient overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -57,10 +59,6 @@ class BuildHandler {
     }
     
     private static final int MAX_HANDLE_AT_ONCE = 5;
-    /** 
-     * Don't keep too many messages on the queue - when it reaches this size, delete the oldest request
-     */
-    private static final int MAX_QUEUED_REQUESTS = MAX_HANDLE_AT_ONCE * (BuildRequestor.REQUEST_TIMEOUT/1000);
     private static final int NEXT_HOP_LOOKUP_TIMEOUT = 5*1000;
     
     /**
@@ -112,7 +110,10 @@ class BuildHandler {
         
         // anything else?
         synchronized (_inboundBuildMessages) {
-            return _inboundBuildMessages.size() > 0;
+            int remaining = _inboundBuildMessages.size();
+            if (remaining > 0)
+                _context.statManager().addRateData("tunnel.handleRemaining", remaining, 0);
+            return remaining > 0;
         }
     }
     
@@ -516,8 +517,17 @@ class BuildHandler {
                         _log.warn("Dropping the reply " + reqId + ", as we used to be building that");
                 } else {
                     synchronized (_inboundBuildMessages) {
-                        while (_inboundBuildMessages.size() > MAX_QUEUED_REQUESTS)
-                            _inboundBuildMessages.remove(0); // keep the newest requests first, to offer better service
+                        boolean removed = false;
+                        while (_inboundBuildMessages.size() > 0) {
+                            BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(0);
+                            long age = System.currentTimeMillis() - cur.recvTime;
+                            if (age >= BuildRequestor.REQUEST_TIMEOUT) {
+                                _inboundBuildMessages.remove(0);
+                                _context.statManager().addRateData("tunnel.dropLoad", age, _inboundBuildMessages.size());
+                            } else {
+                                break;
+                            }
+                        }
                         _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
                     }
                     _exec.repoll();

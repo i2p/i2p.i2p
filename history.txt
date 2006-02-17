@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.402 2006/02/16 15:44:07 jrandom Exp $
+$Id: history.txt,v 1.403 2006/02/17 04:07:53 jrandom Exp $
+
+2006-02-17  jrandom
+    * Properly fix the build request queue throttling, using queue age to
+      detect congestion, rather than queue size.
 
 2006-02-17  jrandom
     * Disable the message history log file by default (duh - feel free to
