@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.403 2006/02/17 04:07:53 jrandom Exp $
+$Id: history.txt,v 1.404 2006/02/17 17:29:33 jrandom Exp $
+
+2006-02-18  jrandom
+    * Add a new AIMD throttle in SSU to control the number of concurrent
+      messages being sent to a given peer, in addition to the throttle on the
+      number of concurrent bytes to that peer.
+    * Adjust the existing SSU outbound queue to throttle based on the queue's
+      lag, not an arbitrary number of packets.
 
 2006-02-17  jrandom
     * Properly fix the build request queue throttling, using queue age to
