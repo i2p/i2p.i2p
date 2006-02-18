@@ -73,8 +73,8 @@ class BuildHandler {
                 if (toHandle > MAX_HANDLE_AT_ONCE)
                     toHandle = MAX_HANDLE_AT_ONCE;
                 handled = new ArrayList(toHandle);
-                for (int i = 0; i < toHandle; i++)
-                    handled.add(_inboundBuildMessages.remove(0));
+                for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
+                    handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
             }
         }
         if (handled != null) {

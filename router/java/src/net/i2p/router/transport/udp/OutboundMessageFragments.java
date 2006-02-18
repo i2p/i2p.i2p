@@ -78,6 +78,8 @@ public class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.packetsRetransmitted", "Lifetime of packets during their retransmission (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.peerPacketsRetransmitted", "How many packets have been retransmitted to the peer (lifetime) when a burst of packets are retransmitted (period == packets transmitted, lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.blockedRetransmissions", "How packets have been transmitted to the peer when we blocked a retransmission to them?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendCycleTime", "How long it takes to cycle through all of the active messages?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendCycleTimeSlow", "How long it takes to cycle through all of the active messages, when its going slowly?", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() { _alive = true; }
@@ -145,6 +147,8 @@ public class OutboundMessageFragments {
             if (ok)
                 _activeMessages.add(state);
             active = _activeMessages.size();
+            if (active == 1)
+                _lastCycleTime = System.currentTimeMillis();
             _activeMessages.notifyAll();
         }
         msg.timestamp("made active along with: " + active);
@@ -158,6 +162,8 @@ public class OutboundMessageFragments {
     public void add(OutboundMessageState state) {
         synchronized (_activeMessages) {
             _activeMessages.add(state);
+            if (_activeMessages.size() == 1)
+                _lastCycleTime = System.currentTimeMillis();
             _activeMessages.notifyAll();
         }
     }
@@ -264,6 +270,8 @@ public class OutboundMessageFragments {
     
     private static final long SECOND_MASK = 1023l;
 
+    private long _lastCycleTime = System.currentTimeMillis();
+    
     /**
      * Fetch all the packets for a message volley, blocking until there is a 
      * message which can be fully transmitted (or the transport is shut down).
@@ -282,6 +290,14 @@ public class OutboundMessageFragments {
                 synchronized (_activeMessages) {
                     for (int i = 0; i < _activeMessages.size(); i++) {
                         int cur = (i + _nextPacketMessage) % _activeMessages.size();
+                        if (cur == 0) {
+                            long ts = System.currentTimeMillis();
+                            long cycleTime = ts - _lastCycleTime;
+                            _lastCycleTime = ts;
+                            _context.statManager().addRateData("udp.sendCycleTime", cycleTime, _activeMessages.size());
+                            if (cycleTime > 1000)
+                                _context.statManager().addRateData("udp.sendCycleTimeSlow", cycleTime, _activeMessages.size());
+                        }
                         state = (OutboundMessageState)_activeMessages.get(cur);
                         peer = state.getPeer(); // known if this is immediately after establish
                         if (peer == null)

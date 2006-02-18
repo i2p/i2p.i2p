@@ -955,6 +955,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                           + " to " + msg.getPeer());
             if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
                 dropPeer(msg.getPeer(), false);
+            else if (consecutive > 2 * MAX_CONSECUTIVE_FAILED) // they're sending us data, but we cant reply?
+                dropPeer(msg.getPeer(), false);
         }
         noteSend(msg, false);
         super.afterSend(msg.getMessage(), false);
@@ -1198,7 +1200,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<td valign=\"top\" ><code>");
             buf.append(sendWindow/1024);
-            buf.append("K</code></td>");
+            buf.append("K");
+            buf.append("/").append(peer.getConcurrentSends());
+            buf.append("/").append(peer.getConcurrentSendWindow());
+            buf.append("/").append(peer.getConsecutiveSendRejections());
+            buf.append("</code></td>");
 
             buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getSlowStartThreshold()/1024);
@@ -1329,7 +1335,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.rate\">in/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second)<br />\n" +
         "<b id=\"def.up\">up</b>: the uptime is how long ago this session was established<br />\n" +
         "<b id=\"def.skew\">skew</b>: the skew says how far off the other user's clock is, relative to your own<br />\n" +
-        "<b id=\"def.cwnd\">cwnd</b>: the congestion window is how many bytes in 'in flight' you can send without an acknowledgement<br />\n" +
+        "<b id=\"def.cwnd\">cwnd</b>: the congestion window is how many bytes in 'in flight' you can send without an acknowledgement / <br />\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent /<br />\n the maximum number of concurrent messages to send /<br />\n"+ 
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of consecutive sends which were blocked due to throws message window size<br />\n" +
         "<b id=\"def.ssthresh\">ssthresh</b>: the slow start threshold help make sure the cwnd doesn't grow too fast<br />\n" +
         "<b id=\"def.rtt\">rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet<br />\n" +
         "<b id=\"def.dev\">dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout<br />\n" +

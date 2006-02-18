@@ -171,6 +171,15 @@ public class PeerState {
     
     /** have we migrated away from this peer to another newer one? */
     private volatile boolean _dead;
+
+    /** how many concurrent outbound messages do we allow throws OutboundMessageFragments to send */
+    private volatile int _concurrentMessagesAllowed = 8;
+    /** 
+     * how many outbound messages are currently being transmitted.  Not thread safe, as we're not strict
+     */
+    private volatile int _concurrentMessagesActive = 0;
+    /** how many concurrency rejections have we had in a row */
+    private volatile int _consecutiveRejections = 0;
     
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
@@ -253,6 +262,9 @@ public class PeerState {
         _context.statManager().createRateStat("udp.receiveBps", "How fast we are receiving when a packet is fully received (at most one per second)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.mtuIncrease", "How many retransmissions have there been to the peer when the MTU was increased (period is total packets transmitted)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.mtuDecrease", "How many retransmissions have there been to the peer when the MTU was decreased (period is total packets transmitted)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.rejectConcurrentActive", "How many messages are currently being sent to the peer when we reject it (period is how many concurrent packets we allow)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.allowConcurrentActive", "How many messages are currently being sent to the peer when we accept it (period is how many concurrent packets we allow)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.rejectConcurrentSequence", "How many consecutive concurrency rejections have we had when we stop rejecting (period is how many concurrent packets we are on)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     private int getDefaultMTU() {
@@ -414,6 +426,10 @@ public class PeerState {
     public int getSendBps() { return _sendBps; }
     public int getReceiveBps() { return _receiveBps; }
     public int incrementConsecutiveFailedSends() { 
+        _concurrentMessagesActive--;
+        if (_concurrentMessagesActive < 0)
+            _concurrentMessagesActive = 0;
+        
         long now = _context.clock().now()/(10*1000);
         if (_lastFailedSendPeriod >= now) {
             // ignore... too fast
@@ -469,6 +485,17 @@ public class PeerState {
         }
         //if (true) return true;
         if (IGNORE_CWIN || size <= _sendWindowBytesRemaining || (ALWAYS_ALLOW_FIRST_PUSH && messagePushCount == 0)) {
+            if ( (messagePushCount == 0) && (_concurrentMessagesActive > _concurrentMessagesAllowed) ) {
+                _consecutiveRejections++;
+                _context.statManager().addRateData("udp.rejectConcurrentActive", _concurrentMessagesActive, _consecutiveRejections);
+                return false;
+            } else if (messagePushCount == 0) {
+                _context.statManager().addRateData("udp.allowConcurrentActive", _concurrentMessagesActive, _concurrentMessagesAllowed);
+                _concurrentMessagesActive++;
+                if (_consecutiveRejections > 0) 
+                    _context.statManager().addRateData("udp.rejectConcurrentSequence", _consecutiveRejections, _concurrentMessagesActive);
+                _consecutiveRejections = 0;
+            }
             _sendWindowBytesRemaining -= size; 
             _sendBytes += size;
             _lastSendTime = now;
@@ -479,6 +506,7 @@ public class PeerState {
             return false;
         }
     }
+    
     /** what IP+port is the peer sending and receiving packets on? */
     public void setRemoteAddress(byte ip[], int port) { 
         _remoteIP = ip;
@@ -505,6 +533,9 @@ public class PeerState {
         _mtuLastChecked = _context.clock().now();
     }
     public int getSlowStartThreshold() { return _slowStartThreshold; }
+    public int getConcurrentSends() { return _concurrentMessagesActive; }
+    public int getConcurrentSendWindow() { return _concurrentMessagesAllowed; }
+    public int getConsecutiveSendRejections() { return _consecutiveRejections; }
     
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }
@@ -745,9 +776,16 @@ public class PeerState {
         
     /** we sent a message which was ACKed containing the given # of bytes */
     public void messageACKed(int bytesACKed, long lifetime, int numSends) {
+        _concurrentMessagesActive--;
+        if (_concurrentMessagesActive < 0)
+            _concurrentMessagesActive = 0;
+        
         _consecutiveFailedSends = 0;
         _lastFailedSendPeriod = -1;
         if (numSends < 2) {
+            if (_context.random().nextInt(_concurrentMessagesAllowed) <= 0)
+                _concurrentMessagesAllowed++;
+            
             if (_sendWindowBytes <= _slowStartThreshold) {
                 _sendWindowBytes += bytesACKed;
             } else {
@@ -761,6 +799,11 @@ public class PeerState {
                         _sendWindowBytes += bytesACKed; //512; // bytesACKed;
                 }
             }
+        } else {
+            int allow = _concurrentMessagesAllowed - 1;
+            if (allow < 8)
+                allow = 8;
+            _concurrentMessagesAllowed = allow;
         }
         if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;

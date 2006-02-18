@@ -36,6 +36,8 @@ public class UDPSender {
         _name = name;
         _context.statManager().createRateStat("udp.pushTime", "How long a UDP packet takes to get pushed out", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendQueueSize", "How many packets are queued on the UDP sender", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendQueueFailed", "How often it was unable to add a new packet to the queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendQueueTrimmed", "How many packets were removed from the queue for being too old (duration == remaining)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendPacketSize", "How large packets sent are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -89,12 +91,29 @@ public class UDPSender {
         long expiration = _context.clock().now() + blockTime;
         int remaining = -1;
         long lifetime = -1;
+        boolean added = false;
+        int removed = 0;
         while ( (_keepRunning) && (remaining < 0) ) {
             try {
                 synchronized (_outboundQueue) {
-                    if (_outboundQueue.size() < MAX_QUEUED) {
+                    // clear out any too-old packets
+                    UDPPacket head = null;
+                    if (_outboundQueue.size() > 0) {
+                        head = (UDPPacket)_outboundQueue.get(0);
+                        while (head.getLifetime() > MAX_HEAD_LIFETIME) {
+                            _outboundQueue.remove(0);
+                            removed++;
+                            if (_outboundQueue.size() > 0)
+                                head = (UDPPacket)_outboundQueue.get(0);
+                            else
+                                break;
+                        }
+                    }
+                    
+                    if (true || (_outboundQueue.size() < MAX_QUEUED)) {
                         lifetime = packet.getLifetime();
                         _outboundQueue.add(packet);
+                        added = true;
                         remaining = _outboundQueue.size();
                         _outboundQueue.notifyAll();
                     } else {
@@ -105,15 +124,22 @@ public class UDPSender {
                             remaining = _outboundQueue.size();
                             _outboundQueue.notifyAll();
                         }
+                        lifetime = packet.getLifetime();
                     }
                 }
             } catch (InterruptedException ie) {}
         }
         _context.statManager().addRateData("udp.sendQueueSize", remaining, lifetime);
+        if (!added)
+            _context.statManager().addRateData("udp.sendQueueFailed", remaining, lifetime);
+        if (removed > 0)
+            _context.statManager().addRateData("udp.sendQueueTrimmed", removed, remaining);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Added the packet onto the queue with " + remaining + " remaining and a lifetime of " + lifetime);
         return remaining;
     }
+    
+    private static final int MAX_HEAD_LIFETIME = 1000;
     
     /**
      *
@@ -123,13 +149,28 @@ public class UDPSender {
         if (packet == null) return 0;
         int size = 0;
         long lifetime = -1;
+        int removed = 0;
         synchronized (_outboundQueue) {
             lifetime = packet.getLifetime();
+            UDPPacket head = null;
+            if (_outboundQueue.size() > 0) {
+                head = (UDPPacket)_outboundQueue.get(0);
+                while (head.getLifetime() > MAX_HEAD_LIFETIME) {
+                    _outboundQueue.remove(0);
+                    removed++;
+                    if (_outboundQueue.size() > 0)
+                        head = (UDPPacket)_outboundQueue.get(0);
+                    else
+                        break;
+                }
+            }
             _outboundQueue.add(packet);
             size = _outboundQueue.size();
             _outboundQueue.notifyAll();
         }
         _context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
+        if (removed > 0)
+            _context.statManager().addRateData("udp.sendQueueTrimmed", removed, size);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Added the packet onto the queue with " + size + " remaining and a lifetime of " + lifetime);
         return size;

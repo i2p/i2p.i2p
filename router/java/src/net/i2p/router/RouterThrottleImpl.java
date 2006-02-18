@@ -121,7 +121,7 @@ class RouterThrottleImpl implements RouterThrottle {
         if (rs != null)
             r = rs.getRate(60*1000);
         double processTime = (r != null ? r.getAverageValue() : 0);
-        if (processTime > 2000) {
+        if (processTime > 5000) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Refusing tunnel request with the job lag of " + lag 
                            + "since the 1 minute message processing time is too slow (" + processTime + ")");
