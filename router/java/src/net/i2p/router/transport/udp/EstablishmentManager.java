@@ -169,6 +169,7 @@ public class EstablishmentManager {
                                                        msg.getTarget().getIdentity(), 
                                                        new SessionKey(addr.getIntroKey()), addr);
                     _outboundStates.put(to, state);
+                    SimpleTimer.getInstance().addEvent(new Expire(to, state), 10*1000);
                 }
             }
             if (state != null) {
@@ -185,6 +186,33 @@ public class EstablishmentManager {
         else if (state != null)
             msg.timestamp("establish state already waiting " + state.getLifetime());
         notifyActivity();
+    }
+    
+    private class Expire implements SimpleTimer.TimedEvent {
+        private RemoteHostId _to;
+        private OutboundEstablishState _state;
+        public Expire(RemoteHostId to, OutboundEstablishState state) { 
+            _to = to;
+            _state = state; 
+        }
+        public void timeReached() {
+            Object removed = null;
+            synchronized (_outboundStates) {
+                removed = _outboundStates.remove(_to);
+                if (removed != _state) { // oops, we must have failed, then retried
+                    _outboundStates.put(_to, removed);
+                    removed = null;
+                }/* else {
+                    locked_admitQueued();
+                }*/
+            }
+            if (removed != null) {
+                _context.statManager().addRateData("udp.outboundEstablishFailedState", _state.getState(), _state.getLifetime());
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Timing out expired outbound: " + _state);
+                processExpired(_state);
+            }
+        }
     }
     
     /**
@@ -213,11 +241,11 @@ public class EstablishmentManager {
             state = (InboundEstablishState)_inboundStates.get(from);
             if (state == null) {
                 state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
+                state.receiveSessionRequest(reader.getSessionRequestReader());
                 isNew = true;
                 _inboundStates.put(from, state);
             }
         }
-        state.receiveSessionRequest(reader.getSessionRequestReader());
         if (isNew) {
             if (!_transport.introducersRequired()) {
                 long tag = _context.random().nextLong(MAX_TAG_VALUE);
@@ -332,6 +360,7 @@ public class EstablishmentManager {
                                                msg.getTarget().getIdentity(), 
                                                new SessionKey(addr.getIntroKey()), addr);
             _outboundStates.put(to, qstate);
+            SimpleTimer.getInstance().addEvent(new Expire(to, qstate), 10*1000);
 
             for (int i = 0; i < queued.size(); i++) {
                 OutNetMessage m = (OutNetMessage)queued.get(i);
@@ -361,7 +390,7 @@ public class EstablishmentManager {
     private void handleCompletelyEstablished(InboundEstablishState state) {
         long now = _context.clock().now();
         RouterIdentity remote = state.getConfirmedIdentity();
-        PeerState peer = new PeerState(_context);
+        PeerState peer = new PeerState(_context, _transport);
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
         peer.setCurrentReceiveSecond(now - (now % 1000));
@@ -396,7 +425,7 @@ public class EstablishmentManager {
     private PeerState handleCompletelyEstablished(OutboundEstablishState state) {
         long now = _context.clock().now();
         RouterIdentity remote = state.getRemoteIdentity();
-        PeerState peer = new PeerState(_context);
+        PeerState peer = new PeerState(_context, _transport);
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
         peer.setCurrentReceiveSecond(now - (now % 1000));
@@ -721,6 +750,7 @@ public class EstablishmentManager {
             //    _log.debug("# outbound states: " + _outboundStates.size());
             for (Iterator iter = _outboundStates.values().iterator(); iter.hasNext(); ) {
                 OutboundEstablishState cur = (OutboundEstablishState)iter.next();
+                if (cur == null) continue;
                 if (cur.getState() == OutboundEstablishState.STATE_CONFIRMED_COMPLETELY) {
                     // completely received
                     iter.remove();
@@ -770,46 +800,7 @@ public class EstablishmentManager {
         
         if (outboundState != null) {
             if (outboundState.getLifetime() > MAX_ESTABLISH_TIME) {
-                if (outboundState.getState() != OutboundEstablishState.STATE_CONFIRMED_COMPLETELY) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Lifetime of expired outbound establish: " + outboundState.getLifetime());
-                    while (true) {
-                        OutNetMessage msg = outboundState.getNextQueuedMessage();
-                        if (msg == null)
-                            break;
-                        _transport.failed(msg, "Expired during failed establish");
-                    }
-                    String err = null;
-                    switch (outboundState.getState()) {
-                        case OutboundEstablishState.STATE_CONFIRMED_PARTIALLY:
-                            err = "Took too long to establish remote connection (confirmed partially)";
-                            break;
-                        case OutboundEstablishState.STATE_CREATED_RECEIVED:
-                            err = "Took too long to establish remote connection (created received)";
-                            break;
-                        case OutboundEstablishState.STATE_REQUEST_SENT:
-                            err = "Took too long to establish remote connection (request sent)";
-                            break;
-                        case OutboundEstablishState.STATE_PENDING_INTRO:
-                            err = "Took too long to establish remote connection (intro failed)";
-                            break;
-                        case OutboundEstablishState.STATE_UNKNOWN: // fallthrough
-                        default:
-                            err = "Took too long to establish remote connection (unknown state)";
-                    }
-                    
-                    Hash peer = outboundState.getRemoteIdentity().calculateHash();
-                    _context.shitlist().shitlistRouter(peer, err);
-                    _transport.dropPeer(peer);
-                    //_context.profileManager().commErrorOccurred(peer);
-                } else {
-                    while (true) {
-                        OutNetMessage msg = outboundState.getNextQueuedMessage();
-                        if (msg == null)
-                            break;
-                        _transport.send(msg);
-                    }
-                }
+                processExpired(outboundState);
             } else {
                 switch (outboundState.getState()) {
                     case OutboundEstablishState.STATE_UNKNOWN:
@@ -847,6 +838,49 @@ public class EstablishmentManager {
         
         return nextSendTime;
     }
+    
+    private void processExpired(OutboundEstablishState outboundState) {
+        if (outboundState.getState() != OutboundEstablishState.STATE_CONFIRMED_COMPLETELY) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Lifetime of expired outbound establish: " + outboundState.getLifetime());
+            while (true) {
+                OutNetMessage msg = outboundState.getNextQueuedMessage();
+                if (msg == null)
+                    break;
+                _transport.failed(msg, "Expired during failed establish");
+            }
+            String err = null;
+            switch (outboundState.getState()) {
+                case OutboundEstablishState.STATE_CONFIRMED_PARTIALLY:
+                    err = "Took too long to establish remote connection (confirmed partially)";
+                    break;
+                case OutboundEstablishState.STATE_CREATED_RECEIVED:
+                    err = "Took too long to establish remote connection (created received)";
+                    break;
+                case OutboundEstablishState.STATE_REQUEST_SENT:
+                    err = "Took too long to establish remote connection (request sent)";
+                    break;
+                case OutboundEstablishState.STATE_PENDING_INTRO:
+                    err = "Took too long to establish remote connection (intro failed)";
+                    break;
+                case OutboundEstablishState.STATE_UNKNOWN: // fallthrough
+                default:
+                    err = "Took too long to establish remote connection (unknown state)";
+            }
+
+            Hash peer = outboundState.getRemoteIdentity().calculateHash();
+            _context.shitlist().shitlistRouter(peer, err);
+            _transport.dropPeer(peer);
+            //_context.profileManager().commErrorOccurred(peer);
+        } else {
+            while (true) {
+                OutNetMessage msg = outboundState.getNextQueuedMessage();
+                if (msg == null)
+                    break;
+                _transport.send(msg);
+            }
+        }
+    }
 
     /**    
      * Driving thread, processing up to one step for an inbound peer and up to
@@ -881,13 +915,15 @@ public class EstablishmentManager {
 
         long delay = nextSendTime - now;
         if ( (nextSendTime == -1) || (delay > 0) ) {
+            if (delay > 5000)
+                delay = 5000;
             boolean interrupted = false;
             try {
                 synchronized (_activityLock) {
                     if (_activity > 0)
                         return;
                     if (nextSendTime == -1)
-                        _activityLock.wait();
+                        _activityLock.wait(5000);
                     else
                         _activityLock.wait(delay);
                 }

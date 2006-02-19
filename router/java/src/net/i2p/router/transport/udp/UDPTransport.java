@@ -590,7 +590,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(" lifetime: ").append(now - peer.getKeyEstablishedTime());
             buf.append(" time since send/recv/ack: ").append(timeSinceSend).append(" / ");
             buf.append(timeSinceRecv).append(" / ").append(timeSinceAck);
-            
+            /*
             buf.append("Existing peers: \n");
             synchronized (_peersByIdent) {
                 for (Iterator iter = _peersByIdent.keySet().iterator(); iter.hasNext(); ) {
@@ -617,13 +617,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     buf.append("\n");
                 }
             }
+             */
             _log.warn(buf.toString(), new Exception("Dropped by"));
         }
         
         _introManager.remove(peer);
+        _fragments.dropPeer(peer);
         // a bit overzealous - perhaps we should only rebuild the external if the peer being dropped
-        // is one of our introducers?
-        rebuildExternalAddress();
+        // is one of our introducers?  dropping it only if we are considered 'not reachable' is a start
+        if (introducersRequired())
+            rebuildExternalAddress();
         
         if (peer.getRemotePeer() != null) {
             dropPeerCapacities(peer);
@@ -723,6 +726,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         msg.timestamp("sending on UDP transport");
         Hash to = msg.getTarget().getIdentity().calculateHash();
         PeerState peer = getPeerState(to);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending to " + (to != null ? to.toBase64() : ""));
         if (peer != null) {
             long lastSend = peer.getLastSendFullyTime();
             long lastRecv = peer.getLastReceiveTime();
@@ -736,14 +741,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     // peer is waaaay idle, drop the con and queue it up as a new con
                     dropPeer(peer, false);
                     msg.timestamp("peer is really idle, dropping con and reestablishing");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Proactive reestablish to " + to.toBase64());
                     _establisher.establish(msg);
                     _context.statManager().addRateData("udp.proactiveReestablish", now-lastSend, now-peer.getKeyEstablishedTime());
                     return;
                 }
             }
             msg.timestamp("enqueueing for an already established peer");
-            _outboundMessages.add(msg);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Add to fragments for " + to.toBase64());
+            if (true) // skip the priority queue and go straight to the active pool
+                _fragments.add(msg);
+            else
+                _outboundMessages.add(msg);
         } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Establish new connection to " + to.toBase64());
             msg.timestamp("establishing a new connection");
             _establisher.establish(msg);
         }
@@ -752,20 +766,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Injecting a data message to a new peer: " + peer);
         OutboundMessageState state = new OutboundMessageState(_context);
-        state.initialize(msg, peer);
-        _fragments.add(state);
+        boolean ok = state.initialize(msg, peer);
+        if (ok)
+            _fragments.add(state);
     }
 
-    public OutNetMessage getNextMessage() { return getNextMessage(-1); }
+    //public OutNetMessage getNextMessage() { return getNextMessage(-1); }
     /**
      * Get the next message, blocking until one is found or the expiration
      * reached.
      *
      * @param blockUntil expiration, or -1 if indefinite
      */
+    /*
     public OutNetMessage getNextMessage(long blockUntil) {
         return _outboundMessages.getNext(blockUntil);
     }
+     */
 
     
     // we don't need the following, since we have our own queueing
@@ -791,7 +808,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     void rebuildExternalAddress() { rebuildExternalAddress(true); }
-    void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
+    void rebuildExternalAddress(boolean allowuterInfo) {
         if (_context.router().isHidden())
             return;
         
@@ -937,10 +954,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void failed(OutboundMessageState msg) {
         if (msg == null) return;
         int consecutive = 0;
+        OutNetMessage m = msg.getMessage();
         if ( (msg.getPeer() != null) && 
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
                (msg.isExpired())) ) {
-            OutNetMessage m = msg.getMessage();
             long recvDelay = _context.clock().now() - msg.getPeer().getLastReceiveTime();
             long sendDelay = _context.clock().now() - msg.getPeer().getLastSendFullyTime();
             if (m != null)
@@ -959,7 +976,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 dropPeer(msg.getPeer(), false);
         }
         noteSend(msg, false);
-        super.afterSend(msg.getMessage(), false);
+        if (m != null)
+            super.afterSend(m, false);
     }
     
     private void noteSend(OutboundMessageState msg, boolean successful) {
@@ -1011,8 +1029,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending message succeeded: " + msg);
         noteSend(msg, true);
-        if (msg.getMessage() != null)
-            super.afterSend(msg.getMessage(), true);
+        OutNetMessage m = msg.getMessage();
+        if (m != null)
+            super.afterSend(m, true);
     }
 
     public int countActivePeers() {
@@ -1171,8 +1190,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(idleOut);
             buf.append("s</code></td>");
  
-            int recvBps = (idleIn > 10 ? 0 : peer.getReceiveBps());
-            int sendBps = (idleOut > 10 ? 0 : peer.getSendBps());
+            int recvBps = (idleIn > 2 ? 0 : peer.getReceiveBps());
+            int sendBps = (idleOut > 2 ? 0 : peer.getSendBps());
             
             buf.append("<td valign=\"top\" ><code>");
             buf.append(formatKBps(recvBps));

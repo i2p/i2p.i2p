@@ -15,6 +15,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.OutNetMessage;
 
 /**
  * Contain all of the state about a UDP connection to a peer.
@@ -168,6 +169,12 @@ public class PeerState {
     
     /** Message (Long) to InboundMessageState for active message */
     private Map _inboundMessages;
+    /** Message (Long) to OutboundMessageState */
+    private Map _outboundMessages;
+    /** which outbound message is currently being retransmitted */
+    private OutboundMessageState _retransmitter;
+    
+    private UDPTransport _transport;
     
     /** have we migrated away from this peer to another newer one? */
     private volatile boolean _dead;
@@ -206,9 +213,10 @@ public class PeerState {
     /** override the default MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     
-    public PeerState(I2PAppContext ctx) {
+    public PeerState(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(PeerState.class);
+        _transport = transport;
         _remotePeer = null;
         _currentMACKey = null;
         _currentCipherKey = null;
@@ -254,6 +262,7 @@ public class PeerState {
         _packetsReceived = 0;
         _packetsReceivedDuplicate = 0;
         _inboundMessages = new HashMap(8);
+        _outboundMessages = new HashMap(8);
         _dead = false;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -938,8 +947,8 @@ public class PeerState {
     }
     private int countMaxACKData() {
         return _mtu 
-                - OutboundMessageFragments.IP_HEADER_SIZE
-                - OutboundMessageFragments.UDP_HEADER_SIZE
+                - IP_HEADER_SIZE
+                - UDP_HEADER_SIZE
                 - UDPPacket.IV_SIZE 
                 - UDPPacket.MAC_SIZE
                 - 1 // type flag
@@ -959,6 +968,381 @@ public class PeerState {
     }
     
     public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+
+    
+    public int add(OutboundMessageState state) {
+        state.setPeer(this);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Adding to " + _remotePeer.toBase64() + ": " + state.getMessageId());
+        Map msgs = _outboundMessages;
+        if (msgs == null) return 0;
+        synchronized (msgs) {
+            msgs.put(new Long(state.getMessageId()), state);
+            return msgs.size();
+        }
+    }
+    /** drop all outbound messages */
+    public void dropOutbound() {
+        if (_dead) return;
+        _dead = true;
+        Map msgs = _outboundMessages;
+        //_outboundMessages = null;
+        _retransmitter = null;
+        if (msgs != null) {
+            synchronized (msgs) {
+                for (Iterator iter = msgs.values().iterator(); iter.hasNext();)
+                    _transport.failed((OutboundMessageState)iter.next());
+                msgs.clear();
+            }
+        }
+    }
+    
+    /**
+     * Expire / complete any outbound messages
+     * @return number of active outbound messages remaining
+     */
+    public int finishMessages() {
+        int rv = 0;
+        Map msgs = _outboundMessages;
+        if (_dead) return 0;
+        List succeeded = null;
+        List failed = null;
+        synchronized (msgs) {
+            for (Iterator iter = msgs.keySet().iterator(); iter.hasNext(); ) {
+                Long id = (Long)iter.next();
+                OutboundMessageState state = (OutboundMessageState)msgs.get(id);
+                if (state.isComplete()) {
+                    iter.remove();
+                    if (_retransmitter == state)
+                        _retransmitter = null;
+                    if (succeeded == null) succeeded = new ArrayList(4);
+                    succeeded.add(state);
+                } else if (state.isExpired()) {
+                    iter.remove();
+                    if (_retransmitter == state)
+                        _retransmitter = null;
+                    _context.statManager().addRateData("udp.sendFailed", state.getPushCount(), state.getLifetime());
+                    if (failed == null) failed = new ArrayList(4);
+                    failed.add(state);
+                } else if (state.getPushCount() > OutboundMessageFragments.MAX_VOLLEYS) {
+                    iter.remove();
+                    if (state == _retransmitter)
+                        _retransmitter = null;
+                    _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount(), state.getLifetime());
+                    if (failed == null) failed = new ArrayList(4);
+                    failed.add(state);
+                } // end (pushCount > maxVolleys)
+            } // end iterating over outbound messages
+            rv = msgs.size();
+        }
+        
+        for (int i = 0; succeeded != null && i < succeeded.size(); i++) {
+            OutboundMessageState state = (OutboundMessageState)succeeded.get(i);
+            _transport.succeeded(state);
+            state.releaseResources();
+            OutNetMessage msg = state.getMessage();
+            if (msg != null)
+                msg.timestamp("sending complete");
+        }
+        
+        for (int i = 0; failed != null && i < failed.size(); i++) {
+            OutboundMessageState state = (OutboundMessageState)failed.get(i);
+            OutNetMessage msg = state.getMessage();
+            if (msg != null) {
+                msg.timestamp("expired in the active pool");
+                _transport.failed(state);
+            } else {
+                // it can not have an OutNetMessage if the source is the
+                // final after establishment message
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to send a direct message: " + state);
+            }
+            state.releaseResources();
+        }
+        
+        return rv;
+    }
+    
+    /**
+     * Pick a message we want to send and allocate it out of our window
+     * @return allocated message to send, or null if no messages or no resources
+     *
+     */
+    public OutboundMessageState allocateSend() {
+        int total = 0;
+        Map msgs = _outboundMessages;
+        if (_dead) return null;
+        synchronized (msgs) {
+            for (Iterator iter = msgs.values().iterator(); iter.hasNext(); ) {
+                OutboundMessageState state = (OutboundMessageState)iter.next();
+                if (locked_shouldSend(state)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Allocate sending to " + _remotePeer.toBase64() + ": " + state.getMessageId());
+                    /*
+                    while (iter.hasNext()) {
+                        OutboundMessageState later = (OutboundMessageState)iter.next();
+                        OutNetMessage msg = later.getMessage();
+                        if (msg != null)
+                            msg.timestamp("not reached for allocation " + msgs.size() + " other peers");
+                    }
+                     */
+                    return state;
+                } else {
+                    OutNetMessage msg = state.getMessage();
+                    if (msg != null)
+                        msg.timestamp("passed over for allocation with " + msgs.size() + " peers");
+                }
+            }
+            total = msgs.size();
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Nothing to send to " + _remotePeer.toBase64() + ", with " + total + " remaining");
+        return null;
+    }
+    
+    /**
+     * return how long to wait before sending, or -1 if we have nothing to send
+     */
+    public int getNextDelay() {
+        int rv = -1;
+        long now = _context.clock().now();
+        Map msgs = _outboundMessages;
+        if (_dead) return -1;
+        synchronized (msgs) {
+            if (_retransmitter != null) {
+                rv = (int)(now - _retransmitter.getNextSendTime());
+                if (rv <= 0)
+                    return 1;
+                else
+                    return rv;
+            }
+            for (Iterator iter = msgs.values().iterator(); iter.hasNext(); ) {
+                OutboundMessageState state = (OutboundMessageState)iter.next();
+                int delay = (int)(state.getNextSendTime() - now);
+                if (delay <= 0)
+                    delay = 1;
+                if ( (rv <= 0) || (delay < rv) )
+                    rv = delay;
+            }
+        }
+        return rv;
+    }
+
+    
+    /**
+     * If set to true, we should throttle retransmissions of all but the first message in
+     * flight to a peer.  If set to false, we will only throttle the initial flight of a
+     * message to a peer while a retransmission is going on.
+     */
+    private static final boolean THROTTLE_RESENDS = true;
+    /** 
+     * if true, throttle the initial volley of a message if there is a resend in progress.
+     * if false, always send the first volley, regardless of retransmissions (but keeping in
+     * mind bw/cwin throttle, etc)
+     *
+     */
+    private static final boolean THROTTLE_INITIAL_SEND = false;
+    
+    private static final int SSU_HEADER_SIZE = 46;
+    static final int UDP_HEADER_SIZE = 8;
+    static final int IP_HEADER_SIZE = 20;
+    /** how much payload data can we shove in there? */
+    private static final int fragmentSize(int mtu) {
+        return mtu - SSU_HEADER_SIZE - UDP_HEADER_SIZE - IP_HEADER_SIZE;
+    }
+    
+    private boolean locked_shouldSend(OutboundMessageState state) {
+        long now = _context.clock().now();
+        if (state.getNextSendTime() <= now) {
+            if (!state.isFragmented()) {
+                state.fragment(fragmentSize(getMTU()));
+                if (state.getMessage() != null)
+                    state.getMessage().timestamp("fragment into " + state.getFragmentCount());
+
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Fragmenting " + state);
+            }
+
+            
+            if ( (_retransmitter != null) && ( (_retransmitter.isExpired() || _retransmitter.isComplete()) ) )
+                _retransmitter = null;
+            
+            if ( (_retransmitter != null) && (_retransmitter != state) ) {
+                // choke it, since there's already another message retransmitting to this
+                // peer.
+                _context.statManager().addRateData("udp.blockedRetransmissions", getPacketsRetransmitted(), getPacketsTransmitted());
+                if ( (state.getMaxSends() <= 0) && (!THROTTLE_INITIAL_SEND) ) {
+                    if (state.getMessage() != null)
+                        state.getMessage().timestamp("another message is retransmitting, but we want to send our first volley...");
+                } else if ( (state.getMaxSends() <= 0) || (THROTTLE_RESENDS) ) {
+                    if (state.getMessage() != null)
+                        state.getMessage().timestamp("choked, with another message retransmitting");
+                    return false;
+                } else {
+                    if (state.getMessage() != null)
+                        state.getMessage().timestamp("another message is retransmitting, but since we've already begun sending...");                    
+                }
+            }
+
+            int size = state.getUnackedSize();
+            if (allocateSendingBytes(size, state.getPushCount())) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Allocation of " + size + " allowed with " 
+                              + getSendWindowBytesRemaining() 
+                              + "/" + getSendWindowBytes() 
+                              + " remaining"
+                              + " for message " + state.getMessageId() + ": " + state);
+
+                if (state.getPushCount() > 0)
+                    _retransmitter = state;
+
+                state.push();
+            
+                int rto = getRTO();
+                state.setNextSendTime(now + rto);
+
+                //if (peer.getSendWindowBytesRemaining() > 0)
+                //    _throttle.unchoke(peer.getRemotePeer());
+                return true;
+            } else {
+                _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
+                if (state.getMessage() != null)
+                    state.getMessage().timestamp("send rejected, available=" + getSendWindowBytesRemaining());
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
+                              + " available=" + getSendWindowBytesRemaining()
+                              + " for message " + state.getMessageId() + ": " + state);
+                state.setNextSendTime(now+(_context.random().nextInt(2*ACKSender.ACK_FREQUENCY))); //(now + 1024) & ~SECOND_MASK);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
+                //_throttle.choke(peer.getRemotePeer());
+
+                if (state.getMessage() != null)
+                    state.getMessage().timestamp("choked, not enough available, wsize=" 
+                                                 + getSendWindowBytes() + " available="
+                                                 + getSendWindowBytesRemaining());
+                return false;
+            }
+        } // nextTime <= now 
+
+        return false;
+    }
+    
+    public int acked(long messageId) {
+        OutboundMessageState state = null;
+        Map msgs = _outboundMessages;
+        if (_dead) return 0;
+        synchronized (msgs) {
+            state = (OutboundMessageState)msgs.remove(new Long(messageId));
+            if ( (state != null) && (state == _retransmitter) )
+                _retransmitter = null;
+        }
+        
+        if (state != null) {
+            int numSends = state.getMaxSends();
+            if (state.getMessage() != null) {
+                state.getMessage().timestamp("acked after " + numSends
+                                             + " lastReceived: " 
+                                             + (_context.clock().now() - getLastReceiveTime())
+                                             + " lastSentFully: " 
+                                             + (_context.clock().now() - getLastSendFullyTime()));
+            }
+
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Received ack of " + messageId + " by " + _remotePeer.toBase64() 
+                          + " after " + state.getLifetime() + " and " + numSends + " sends");
+            _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
+            if (state.getFragmentCount() > 1)
+                _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
+            if (numSends > 1)
+                _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
+            _transport.succeeded(state);
+            int numFragments = state.getFragmentCount();
+            // this adjusts the rtt/rto/window/etc
+            messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), numSends);
+            //if (getSendWindowBytesRemaining() > 0)
+            //    _throttle.unchoke(peer.getRemotePeer());
+            
+            state.releaseResources();
+            return numFragments;
+        } else {
+            // dupack, likely
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received an ACK for a message not pending: " + messageId);
+            return 0;
+        }
+    }
+    
+    public void acked(ACKBitfield bitfield) {
+        if (_dead)
+            return;
+        
+        if (bitfield.receivedComplete()) {
+            acked(bitfield.getMessageId());
+            return;
+        }
+    
+        Map msgs = _outboundMessages;
+        
+        OutboundMessageState state = null;
+        boolean isComplete = false;
+        synchronized (msgs) {
+            state = (OutboundMessageState)msgs.get(new Long(bitfield.getMessageId()));
+            if (state != null) {
+                if (state.acked(bitfield)) {
+                    // this partial ack actually clears it fully
+                    isComplete = true;
+                    msgs.remove(new Long(bitfield.getMessageId()));
+                    if (state == _retransmitter)
+                        _retransmitter = null;
+                }
+            }
+        }
+        
+        if (state != null) {
+            int numSends = state.getMaxSends();
+                        
+            int bits = bitfield.fragmentCount();
+            int numACKed = 0;
+            for (int i = 0; i < bits; i++)
+                if (bitfield.received(i))
+                    numACKed++;
+            
+            _context.statManager().addRateData("udp.partialACKReceived", numACKed, state.getLifetime());
+            
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Received partial ack of " + state.getMessageId() + " by " + _remotePeer.toBase64() 
+                          + " after " + state.getLifetime() + " and " + numSends + " sends: " + bitfield + ": completely removed? " 
+                          + isComplete + ": " + state);
+            
+            if (isComplete) {
+                _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
+                if (state.getFragmentCount() > 1)
+                    _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
+                if (numSends > 1)
+                    _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
+                if (state.getMessage() != null)
+                    state.getMessage().timestamp("partial ack to complete after " + numSends);
+                _transport.succeeded(state);
+                
+                // this adjusts the rtt/rto/window/etc
+                messageACKed(state.getFragmentCount()*state.getFragmentSize(), state.getLifetime(), 0);
+                //if (state.getPeer().getSendWindowBytesRemaining() > 0)
+                //    _throttle.unchoke(state.getPeer().getRemotePeer());
+
+                state.releaseResources();
+            } else {
+                if (state.getMessage() != null)
+                    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());
+            }
+            return;
+        } else {
+            // dupack
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received an ACK for a message not pending: " + bitfield);
+            return;
+        }
+    }
     
     /**
      * Transfer the basic activity/state from the old peer to the current peer
@@ -993,7 +1377,24 @@ public class PeerState {
             oldPeer._inboundMessages.clear();
         }
         synchronized (_inboundMessages) { _inboundMessages.putAll(msgs); }
+        msgs.clear();
         
+        OutboundMessageState retransmitter = null;
+        Map omsgs = oldPeer._outboundMessages;
+        if (omsgs != null) {
+            synchronized (omsgs) {
+                msgs.putAll(omsgs);
+                omsgs.clear();
+                retransmitter = oldPeer._retransmitter;
+            }
+        }
+        omsgs = _outboundMessages;
+        if (omsgs != null) {
+            synchronized (omsgs) { 
+                omsgs.putAll(msgs); 
+                _retransmitter = retransmitter;
+            }
+        }
     }
     
     public int hashCode() {
@@ -1003,6 +1404,7 @@ public class PeerState {
             return super.hashCode();
     }
     public boolean equals(Object o) {
+        if (o == this) return true;
         if (o == null) return false;
         if (o instanceof PeerState) {
             PeerState s = (PeerState)o;

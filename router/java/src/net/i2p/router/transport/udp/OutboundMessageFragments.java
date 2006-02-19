@@ -31,21 +31,15 @@ public class OutboundMessageFragments {
     private Log _log;
     private UDPTransport _transport;
     private ActiveThrottle _throttle;
-    /** OutboundMessageState for messages being sent */
-    private List _activeMessages;
+    /** peers we are actively sending messages to */
+    private List _activePeers;
     private boolean _alive;
-    /** which message should we build the next packet out of? */
-    private int _nextPacketMessage;
+    /** which peer should we build the next packet out of? */
+    private int _nextPeer;
     private PacketBuilder _builder;
     /** if we can handle more messages explicitly, set this to true */
     private boolean _allowExcess;
     private volatile long _packetsRetransmitted;
-    /** 
-     * Map of peer to OutboundMessageState for messages being retransmitted, to
-     * keep bad peers from bursting too much due to congestion/outage.  This
-     * should only be accessed when holding the lock on _activeMessages.
-     */
-    private Map _retransmitters;
     
     private static final int MAX_ACTIVE = 64;
     // don't send a packet more than 10 times
@@ -56,9 +50,8 @@ public class OutboundMessageFragments {
         _log = ctx.logManager().getLog(OutboundMessageFragments.class);
         _transport = transport;
         _throttle = throttle;
-        _activeMessages = new ArrayList(MAX_ACTIVE);
-        _retransmitters = new HashMap(MAX_ACTIVE);
-        _nextPacketMessage = 0;
+        _activePeers = new ArrayList(256);
+        _nextPeer = 0;
         _builder = new PacketBuilder(ctx, transport);
         _alive = true;
         _allowExcess = false;
@@ -85,8 +78,16 @@ public class OutboundMessageFragments {
     public void startup() { _alive = true; }
     public void shutdown() {
         _alive = false;
-        synchronized (_activeMessages) {
-            _activeMessages.notifyAll();
+        synchronized (_activePeers) {
+            _activePeers.notifyAll();
+        }
+    }
+    void dropPeer(PeerState peer) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Dropping peer " + peer.getRemotePeer().toBase64());
+        peer.dropOutbound();
+        synchronized (_activePeers) {
+            _activePeers.remove(peer);
         }
     }
     
@@ -99,7 +100,8 @@ public class OutboundMessageFragments {
     public boolean waitForMoreAllowed() {
         // test without choking.  
         // perhaps this should check the lifetime of the first activeMessage?
-        if (true) return true; 
+        if (true) return true;
+        /*
         
         long start = _context.clock().now();
         int numActive = 0;
@@ -121,6 +123,7 @@ public class OutboundMessageFragments {
                 _context.statManager().addRateData("udp.activeDelay", numActive, _context.clock().now() - start);
             } catch (InterruptedException ie) {}
         }
+         */
         return false;
     }
     
@@ -131,28 +134,32 @@ public class OutboundMessageFragments {
     public void add(OutNetMessage msg) {
         I2NPMessage msgBody = msg.getMessage();
         RouterInfo target = msg.getTarget();
-        if ( (msgBody == null) || (target == null) ) {
-            synchronized (_activeMessages) {
-                _activeMessages.notifyAll();
-            }
+        if ( (msgBody == null) || (target == null) )
             return;
-        }
         
         OutboundMessageState state = new OutboundMessageState(_context);
         boolean ok = state.initialize(msg, msgBody);
-        state.setPeer(_transport.getPeerState(target.getIdentity().calculateHash()));
-        finishMessages();
-        int active = 0;
-        synchronized (_activeMessages) {
-            if (ok)
-                _activeMessages.add(state);
-            active = _activeMessages.size();
-            if (active == 1)
-                _lastCycleTime = System.currentTimeMillis();
-            _activeMessages.notifyAll();
+        if (ok) {
+            PeerState peer = _transport.getPeerState(target.getIdentity().calculateHash());
+            int active = peer.add(state);
+            synchronized (_activePeers) {
+                if (!_activePeers.contains(peer)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Add a new message to a new peer " + peer.getRemotePeer().toBase64());
+                    _activePeers.add(peer);
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Add a new message to an existing peer " + peer.getRemotePeer().toBase64());
+                }
+                _activePeers.notifyAll();
+            }
+            msg.timestamp("made active along with: " + active);
+            _context.statManager().addRateData("udp.outboundActiveCount", active, 0);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error initializing " + msg);
         }
-        msg.timestamp("made active along with: " + active);
-        _context.statManager().addRateData("udp.outboundActiveCount", active, 0);
+        finishMessages();
     }
     
     /** 
@@ -160,116 +167,55 @@ public class OutboundMessageFragments {
      * complete message reliably
      */
     public void add(OutboundMessageState state) {
+        PeerState peer = state.getPeer();
+        if (peer == null)
+            throw new RuntimeException("wtf, null peer for " + state);
+        int active = peer.add(state);
+        synchronized (_activePeers) {
+            if (!_activePeers.contains(peer)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Add a new message to a new peer " + peer.getRemotePeer().toBase64());
+                _activePeers.add(peer);
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Add a new message to an existing peer " + peer.getRemotePeer().toBase64());
+            }
+            if (_activePeers.size() == 1)
+                _lastCycleTime = System.currentTimeMillis();
+            _activePeers.notifyAll();
+        }
+        _context.statManager().addRateData("udp.outboundActiveCount", active, 0);
+        // should we finish messages here too?
+        /*
         synchronized (_activeMessages) {
             _activeMessages.add(state);
             if (_activeMessages.size() == 1)
                 _lastCycleTime = System.currentTimeMillis();
             _activeMessages.notifyAll();
         }
+         */
     }
 
     /**
      * Remove any expired or complete messages
      */
     private void finishMessages() {
-        synchronized (_activeMessages) {
-            for (int i = 0; i < _activeMessages.size(); i++) {
-                OutboundMessageState state = (OutboundMessageState)_activeMessages.get(i);
-                PeerState peer = state.getPeer();
-                if (state.isComplete()) {
-                    _activeMessages.remove(i);
-                    locked_removeRetransmitter(state);
-                    _transport.succeeded(state);
-                    if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
-                        _throttle.unchoke(peer.getRemotePeer());
-                    state.releaseResources();
-                    if (i < _nextPacketMessage) {
-                        _nextPacketMessage--; 
-                        if (_nextPacketMessage < 0)
-                            _nextPacketMessage = 0;
-                    }
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("sending complete");
+        int rv = 0;
+        synchronized (_activePeers) {
+            for (int i = 0; i < _activePeers.size(); i++) {
+                PeerState state = (PeerState)_activePeers.get(i);
+                int remaining = state.finishMessages();
+                if (remaining <= 0) {
+                    _activePeers.remove(i);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("No more pending messages for " + state.getRemotePeer().toBase64());
                     i--;
-                } else if (state.isExpired()) {
-                    _activeMessages.remove(i);
-                    locked_removeRetransmitter(state);
-                    _context.statManager().addRateData("udp.sendFailed", state.getPushCount(), state.getLifetime());
-
-                    if (state.getMessage() != null) {
-                        state.getMessage().timestamp("expired in the active pool");
-                        _transport.failed(state);
-                    } else {
-                        // it can not have an OutNetMessage if the source is the
-                        // final after establishment message
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Unable to send an expired direct message: " + state);
-                    }
-                    if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
-                        _throttle.unchoke(peer.getRemotePeer());
-                    state.releaseResources();
-                    if (i < _nextPacketMessage) {
-                        _nextPacketMessage--; 
-                        if (_nextPacketMessage < 0)
-                            _nextPacketMessage = 0;
-                    }
-                    i--;
-                } else if (state.getPushCount() > MAX_VOLLEYS) {
-                    _activeMessages.remove(i);
-                    locked_removeRetransmitter(state);
-                    _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount(), state.getLifetime());
-                    //if (state.getPeer() != null)
-                    //    state.getPeer().congestionOccurred();
-
-                    if (state.getMessage() != null) {
-                        state.getMessage().timestamp("too many sends");
-                        _transport.failed(state);
-                    } else {
-                        // it can not have an OutNetMessage if the source is the
-                        // final after establishment message
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Unable to send a direct message after too many volleys: " + state);
-                    }
-                    if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
-                        _throttle.unchoke(peer.getRemotePeer());
-                    state.releaseResources();
-                    if (i < _nextPacketMessage) {
-                        _nextPacketMessage--; 
-                        if (_nextPacketMessage < 0)
-                            _nextPacketMessage = 0;
-                    }
-                    i--;
-                } // end (pushCount > maxVolleys)
-            } // end iterating over active
-            _activeMessages.notifyAll();
-        } // end synchronized
-    }
-    
-    /**
-     * Remove the block on retransmissions to the peer if and only if the given
-     * message is the current "retransmitter" for it.
-     *
-     */
-    private void locked_removeRetransmitter(OutboundMessageState state) {
-        PeerState curPeer = state.getPeer();
-        if (curPeer == null) {
-            for (Iterator iter = _retransmitters.keySet().iterator(); iter.hasNext(); ) {
-                PeerState cpeer = (PeerState)iter.next();
-                OutboundMessageState cstate = (OutboundMessageState)_retransmitters.get(cpeer);
-                if (cstate == state) {
-                    iter.remove();
-                    break;
                 }
+                rv += remaining;
             }
-        } else {
-            OutboundMessageState remState = (OutboundMessageState)_retransmitters.get(curPeer);
-            if (remState == state)
-                _retransmitters.remove(curPeer);
         }
     }
     
-    private static final long SECOND_MASK = 1023l;
-
     private long _lastCycleTime = System.currentTimeMillis();
     
     /**
@@ -284,76 +230,58 @@ public class OutboundMessageFragments {
         OutboundMessageState state = null;
         while (_alive && (state == null) ) {
             long now = _context.clock().now();
-            long nextSend = -1;
+            int nextSendDelay = -1;
             finishMessages();
             try {
-                synchronized (_activeMessages) {
-                    for (int i = 0; i < _activeMessages.size(); i++) {
-                        int cur = (i + _nextPacketMessage) % _activeMessages.size();
+                synchronized (_activePeers) {
+                    for (int i = 0; i < _activePeers.size(); i++) {
+                        int cur = (i + _nextPeer) % _activePeers.size();
                         if (cur == 0) {
                             long ts = System.currentTimeMillis();
                             long cycleTime = ts - _lastCycleTime;
-                            _lastCycleTime = ts;
-                            _context.statManager().addRateData("udp.sendCycleTime", cycleTime, _activeMessages.size());
+                            _context.statManager().addRateData("udp.sendCycleTime", cycleTime, _activePeers.size());
                             if (cycleTime > 1000)
-                                _context.statManager().addRateData("udp.sendCycleTimeSlow", cycleTime, _activeMessages.size());
+                                _context.statManager().addRateData("udp.sendCycleTimeSlow", cycleTime, _activePeers.size());
                         }
-                        state = (OutboundMessageState)_activeMessages.get(cur);
-                        peer = state.getPeer(); // known if this is immediately after establish
-                        if (peer == null)
-                            peer = _transport.getPeerState(state.getMessage().getTarget().getIdentity().calculateHash());
-
-                        if ((peer != null) && locked_shouldSend(state, peer)) {
-                            // for fairness, we move on in a round robin
-                            _nextPacketMessage = i + 1;
+                        peer = (PeerState)_activePeers.get(i);
+                        state = peer.allocateSend();
+                        if (state != null) {
+                            _nextPeer = i + 1;
                             break;
                         } else {
-                            if (peer == null) {
-                                // peer disconnected
-                                _activeMessages.remove(cur);
-                                locked_removeRetransmitter(state);
-                                if (state.getMessage() != null)
-                                    state.getMessage().timestamp("peer disconnected");
-                                _transport.failed(state);
-                                if (_log.shouldLog(Log.ERROR))
-                                    _log.error("Peer disconnected for " + state);
-                                if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
-                                    _throttle.unchoke(peer.getRemotePeer());
-                                state.releaseResources();
-                                i--;
-                            }
-
-                            long time = state.getNextSendTime();
-                            if ( (nextSend < 0) || (time < nextSend) )
-                                nextSend = time;
-                            state = null;
+                            int delay = peer.getNextDelay();
+                            if ( (nextSendDelay <= 0) || (delay < nextSendDelay) )
+                                nextSendDelay = delay;
                             peer = null;
+                            state = null;
                         }
-                    } // end of the for(activeMessages)
-
-                    if (state == null) {
-                        if (nextSend <= 0) {
-                            _activeMessages.notifyAll();
-                            _activeMessages.wait(1000);
-                        } else {
-                            // none of the packets were eligible for sending
-                            long delay = nextSend - now;
-                            if (delay <= 0)
-                                delay = 10;
-                            if (delay > 1000) 
-                                delay = 1000;
-                            _allowExcess = true;
-                            _activeMessages.notifyAll();
-                            _activeMessages.wait(delay);
-                        }
-                    } else {
-                        _activeMessages.notifyAll();
                     }
-                    _allowExcess = false;
-                } // end of the synchronized block
-            } catch (InterruptedException ie) {}
-        } // end of the while (alive && !found)
-
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Done looping, next peer we are sending for: " + 
+                                   (peer != null ? peer.getRemotePeer().toBase64() : "none"));
+                    if (state == null) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("wait for " + nextSendDelay);
+                        // wait.. or somethin'
+                        if (nextSendDelay > 0)
+                            _activePeers.wait(nextSendDelay);
+                        else
+                            _activePeers.wait(1000);
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("dont wait: alive=" + _alive + " state = " + state);
+                    }
+                }
+            } catch (InterruptedException ie) {
+                // noop
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Woken up while waiting");
+            }
+        }
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending " + state);
+   
         UDPPacket packets[] = preparePackets(state, peer);
         if ( (state != null) && (state.getMessage() != null) ) {
             int valid = 0;
@@ -367,120 +295,6 @@ public class OutboundMessageFragments {
                                          + (_context.clock().now() - peer.getLastSendFullyTime()));
         }
         return packets;
-    }
-    
-    /**
-     * If set to true, we should throttle retransmissions of all but the first message in
-     * flight to a peer.  If set to false, we will only throttle the initial flight of a
-     * message to a peer while a retransmission is going on.
-     */
-    private static final boolean THROTTLE_RESENDS = true;
-    /** 
-     * if true, throttle the initial volley of a message if there is a resend in progress.
-     * if false, always send the first volley, regardless of retransmissions (but keeping in
-     * mind bw/cwin throttle, etc)
-     *
-     */
-    private static final boolean THROTTLE_INITIAL_SEND = false;
-    
-    private boolean locked_shouldSend(OutboundMessageState state, PeerState peer) {
-        long now = _context.clock().now();
-        if (state.getNextSendTime() <= now) {
-            if (!state.isFragmented()) {
-                state.fragment(fragmentSize(peer.getMTU()));
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("fragment into " + state.getFragmentCount());
-
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Fragmenting " + state);
-            }
-
-            OutboundMessageState curRetransMsg = (OutboundMessageState)_retransmitters.get(peer);
-            if ( (curRetransMsg != null) && ( (curRetransMsg.isExpired() || curRetransMsg.isComplete()) ) ) {
-                _retransmitters.remove(peer);
-                curRetransMsg = null;
-            }
-            
-            if ( (curRetransMsg != null) && (curRetransMsg != state) ) {
-                // choke it, since there's already another message retransmitting to this
-                // peer.
-                _context.statManager().addRateData("udp.blockedRetransmissions", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
-                if ( (state.getMaxSends() <= 0) && (!THROTTLE_INITIAL_SEND) ) {
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("another message is retransmitting, but we want to send our first volley...");
-                } else if ( (state.getMaxSends() <= 0) || (THROTTLE_RESENDS) ) {
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("choked, with another message retransmitting");
-                    return false;
-                } else {
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("another message is retransmitting, but since we've already begun sending...");                    
-                }
-            }
-
-            int size = state.getUnackedSize();
-            if (peer.allocateSendingBytes(size, state.getPushCount())) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Allocation of " + size + " allowed with " 
-                              + peer.getSendWindowBytesRemaining() 
-                              + "/" + peer.getSendWindowBytes() 
-                              + " remaining"
-                              + " for message " + state.getMessageId() + ": " + state);
-
-                if (state.getPushCount() > 0) {
-                    _retransmitters.put(peer, state);
-                    /*
-
-                    int fragments = state.getFragmentCount();
-                    int toSend = 0;
-                    for (int i = 0; i < fragments; i++) {
-                        if (state.needsSending(i))
-                            toSend++;
-                    }
-
-                    peer.messageRetransmitted(toSend);
-                    _packetsRetransmitted += toSend; // lifetime for the transport
-                    _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
-                    _context.statManager().addRateData("udp.packetsRetransmitted", _packetsRetransmitted, peer.getPacketsTransmitted());
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Retransmitting " + state + " to " + peer);
-                    _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), toSend);
-                    */
-                }
-
-                state.push();
-            
-                int rto = peer.getRTO();// * state.getPushCount();
-                state.setNextSendTime(now + rto);
-
-                if (peer.getSendWindowBytesRemaining() > 0)
-                    _throttle.unchoke(peer.getRemotePeer());
-                return true;
-            } else {
-                _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("send rejected, available=" + peer.getSendWindowBytesRemaining());
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Allocation of " + size + " rejected w/ wsize=" + peer.getSendWindowBytes()
-                              + " available=" + peer.getSendWindowBytesRemaining()
-                              + " for message " + state.getMessageId() + ": " + state);
-                state.setNextSendTime(now+(_context.random().nextInt(2*ACKSender.ACK_FREQUENCY))); //(now + 1024) & ~SECOND_MASK);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
-                _throttle.choke(peer.getRemotePeer());
-
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("choked, not enough available, wsize=" 
-                                                 + peer.getSendWindowBytes() + " available="
-                                                 + peer.getSendWindowBytesRemaining());
-                return false;
-            }
-        } // nextTime <= now 
-
-        //if (state.getMessage() != null)
-        //    state.getMessage().timestamp("choked, time remaining to retransmit: " + (state.getNextSendTime() - now));
-        
-        return false;
     }
     
     private UDPPacket[] preparePackets(OutboundMessageState state, PeerState peer) {
@@ -562,14 +376,6 @@ public class OutboundMessageFragments {
         }
     }
     
-    private static final int SSU_HEADER_SIZE = 46;
-    static final int UDP_HEADER_SIZE = 8;
-    static final int IP_HEADER_SIZE = 20;
-    /** how much payload data can we shove in there? */
-    private static final int fragmentSize(int mtu) {
-        return mtu - SSU_HEADER_SIZE - UDP_HEADER_SIZE - IP_HEADER_SIZE;
-    }
-    
     /**
      * We received an ACK of the given messageId from the given peer, so if it
      * is still unacked, mark it as complete. 
@@ -577,165 +383,27 @@ public class OutboundMessageFragments {
      * @return fragments acked
      */
     public int acked(long messageId, Hash ackedBy) {
-        OutboundMessageState state = null;
-        synchronized (_activeMessages) {
-            // linear search, since its tiny
-            for (int i = 0; i < _activeMessages.size(); i++) {
-                state = (OutboundMessageState)_activeMessages.get(i);
-                if (state.getMessageId() == messageId) {
-                    OutNetMessage msg = state.getMessage();
-                    if (msg != null) {
-                        Hash expectedBy = msg.getTarget().getIdentity().getHash();
-                        if (!expectedBy.equals(ackedBy)) {
-                            state = null;
-                            _activeMessages.notifyAll();
-                            return 0;
-                        }
-                    }
-                    // either the message was a short circuit after establishment,
-                    // or it was received from who we sent it to.  yay!
-                    _activeMessages.remove(i);
-                    if (i < _nextPacketMessage) {
-                        _nextPacketMessage--; 
-                        if (_nextPacketMessage < 0)
-                            _nextPacketMessage = 0;
-                    }
-                    locked_removeRetransmitter(state);
-                    break;
-                } else {
-                    state = null;
-                }
-            }
-            _activeMessages.notifyAll();
-        }
-        
-        if (state != null) {
-            int numSends = state.getMaxSends();
-            if (state.getMessage() != null) {
-                PeerState peer = state.getPeer();
-                if (peer != null)
-                    state.getMessage().timestamp("acked after " + numSends
-                                                 + " lastReceived: " 
-                                                 + (_context.clock().now() - peer.getLastReceiveTime())
-                                                 + " lastSentFully: " 
-                                                 + (_context.clock().now() - peer.getLastSendFullyTime()));
-            }
-                            
-            
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Received ack of " + messageId + " by " + ackedBy.toBase64() 
-                          + " after " + state.getLifetime() + " and " + numSends + " sends");
-            _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
-            if (state.getFragmentCount() > 1)
-                _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-            if (numSends > 1)
-                _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
-            _transport.succeeded(state);
-            int numFragments = state.getFragmentCount();
-            PeerState peer = state.getPeer();
-            if (peer != null) {
-                // this adjusts the rtt/rto/window/etc
-                peer.messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), numSends);
-                if (peer.getSendWindowBytesRemaining() > 0)
-                    _throttle.unchoke(peer.getRemotePeer());
-            } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("message acked, but no peer attacked: " + state);
-            }
-            state.releaseResources();
-            return numFragments;
+        PeerState peer = _transport.getPeerState(ackedBy);
+        if (peer != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("acked [" + messageId + "] by " + ackedBy.toBase64());
+            return peer.acked(messageId);
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Received an ACK for a message not pending: " + messageId);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("acked [" + messageId + "] by an unknown remote peer?  " + ackedBy.toBase64());
             return 0;
         }
     }
     
     public void acked(ACKBitfield bitfield, Hash ackedBy) {
-        if (bitfield.receivedComplete()) {
-            acked(bitfield.getMessageId(), ackedBy);
-            return;
-        }
-        
-        OutboundMessageState state = null;
-        boolean isComplete = false;
-        synchronized (_activeMessages) {
-            // linear search, since its tiny
-            for (int i = 0; i < _activeMessages.size(); i++) {
-                state = (OutboundMessageState)_activeMessages.get(i);
-                if (state.getMessageId() == bitfield.getMessageId()) {
-                    OutNetMessage msg = state.getMessage();
-                    if (msg != null) {
-                        Hash expectedBy = msg.getTarget().getIdentity().getHash();
-                        if (!expectedBy.equals(ackedBy)) {
-                            state = null;
-                            _activeMessages.notifyAll();
-                            return;
-                        }
-                    }
-                    isComplete = state.acked(bitfield);
-                    if (isComplete) {
-                        // either the message was a short circuit after establishment,
-                        // or it was received from who we sent it to.  yay!
-                        _activeMessages.remove(i);
-                        if (i < _nextPacketMessage) {
-                            _nextPacketMessage--; 
-                            if (_nextPacketMessage < 0)
-                                _nextPacketMessage = 0;
-                        }
-                    }
-                    locked_removeRetransmitter(state);
-                    break;
-                } else {
-                    state = null;
-                }
-            }
-            _activeMessages.notifyAll();
-        }
-        
-        if (state != null) {
-            int numSends = state.getMaxSends();
-                        
-            int bits = bitfield.fragmentCount();
-            int numACKed = 0;
-            for (int i = 0; i < bits; i++)
-                if (bitfield.received(i))
-                    numACKed++;
-            
-            _context.statManager().addRateData("udp.partialACKReceived", numACKed, state.getLifetime());
-            
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Received partial ack of " + state.getMessageId() + " by " + ackedBy.toBase64() 
-                          + " after " + state.getLifetime() + " and " + numSends + " sends: " + bitfield + ": completely removed? " 
-                          + isComplete + ": " + state);
-            
-            if (isComplete) {
-                _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
-                if (state.getFragmentCount() > 1)
-                    _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-                if (numSends > 1)
-                    _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("partial ack to complete after " + numSends);
-                _transport.succeeded(state);
-                
-                if (state.getPeer() != null) {
-                    // this adjusts the rtt/rto/window/etc
-                    state.getPeer().messageACKed(state.getFragmentCount()*state.getFragmentSize(), state.getLifetime(), 0);
-                    if (state.getPeer().getSendWindowBytesRemaining() > 0)
-                        _throttle.unchoke(state.getPeer().getRemotePeer());
-                }
-
-                state.releaseResources();
-            } else {
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());
-            }
-            return;
+        PeerState peer = _transport.getPeerState(ackedBy);
+        if (peer != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("partial acked [" + bitfield + "] by " + ackedBy.toBase64());
+            peer.acked(bitfield);
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Received an ACK for a message not pending: " + bitfield);
-            return;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("partial acked [" + bitfield + "] by an unknown remote peer?  " + ackedBy.toBase64());
         }
     }
     

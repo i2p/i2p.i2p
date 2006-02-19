@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.404 2006/02/17 17:29:33 jrandom Exp $
+$Id: history.txt,v 1.405 2006/02/18 01:48:48 jrandom Exp $
+
+2006-02-18  jrandom
+    * Migrate the outbound packets from a central component to the individual
+      per-peer components, substantially cutting down on lock contention when
+      dealing with higher degrees.
+    * Load balance the outbound SSU transfers evenly across peers, rather than
+      across messages (so peers with few messages won't be starved by peers
+      with many).
+    * Reduce the frequency of router info rebuilds (thanks bar!)
 
 2006-02-18  jrandom
     * Add a new AIMD throttle in SSU to control the number of concurrent
