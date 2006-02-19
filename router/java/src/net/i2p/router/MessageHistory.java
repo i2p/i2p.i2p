@@ -1,5 +1,6 @@
 package net.i2p.router;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,7 @@ public class MessageHistory {
     private ReinitializeJob _reinitializeJob;
     private WriteJob _writeJob;
     private SubmitMessageHistoryJob _submitMessageHistoryJob;
+    private volatile boolean _firstPass;
     
     private final static byte[] NL = System.getProperty("line.separator").getBytes();
     private final static int FLUSH_SIZE = 1000; // write out at least once every 1000 entries
@@ -53,6 +55,7 @@ public class MessageHistory {
         _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         _reinitializeJob = new ReinitializeJob();
         _writeJob = new WriteJob();
+        _firstPass = true;
         //_submitMessageHistoryJob = new SubmitMessageHistoryJob(_context);
         initialize(true);
     }
@@ -103,6 +106,12 @@ public class MessageHistory {
             _localIdent = getName(_context.routerHash());
             _unwrittenEntries = new ArrayList(64);
             updateSettings();
+            // clear the history file on startup
+            if (_firstPass) {
+                File f = new File(_historyFile);
+                f.delete();
+            }
+            _firstPass = false;
             addEntry(getPrefix() + "** Router initialized (started up or changed identities)");
             _context.jobQueue().addJob(_writeJob);
             //_submitMessageHistoryJob.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);

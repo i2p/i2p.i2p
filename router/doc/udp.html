@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.18.2.1 2006/02/15 00:16:29 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.19 2006/02/15 00:33:32 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -47,13 +47,18 @@ size payload encrypted with the appropriate key.  The MAC used is
 HMAC-MD5, truncated to 16 bytes, while the key is a full AES256 
 key.  The specific construct of the MAC is the first 16 bytes from:</p>
 <pre>
-  HMAC-MD5(payload || IV || payloadLength, macKey)
+  HMAC-MD5(payload || IV || (payloadLength ^ protocolVersion), macKey)
 </pre>
 
 <p>The payload itself is AES256/CBC encrypted with the IV and the 
 sessionKey, with replay prevention addressed within its body, 
 explained below.  The payloadLength in the MAC is a 2 byte unsigned 
 integer in 2s complement.</p>
+  
+<p>The protocolVersion is a 2 byte unsigned integer in 2s complement,
+and currently set to 0.  Peers using a different protocol version will
+not be able to communicate with this peer, though earlier versions not
+using this flag are.</p>
 
 <h2><a name="payload">Payload</a></h2>
 

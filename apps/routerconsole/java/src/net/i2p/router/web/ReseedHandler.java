@@ -17,7 +17,7 @@ import net.i2p.util.I2PThread;
 
 /**
  * Handler to deal with reseed requests.  This reseed from the URL
- * http://dev.i2p.net/i2pdb/ unless the java env property "i2p.reseedURL" is
+ * http://dev.i2p.net/i2pdb2/ unless the java env property "i2p.reseedURL" is
  * set.  It always writes to ./netDb/, so don't mess with that.
  *
  */
@@ -58,7 +58,7 @@ public class ReseedHandler {
         }
     }
     
-    private static final String DEFAULT_SEED_URL = "http://dev.i2p.net/i2pdb/";
+    static final String DEFAULT_SEED_URL = "http://dev.i2p.net/i2pdb2/";
     /**
      * Reseed has been requested, so lets go ahead and do it.  Fetch all of
      * the routerInfo-*.dat files from the specified URL (or the default) and

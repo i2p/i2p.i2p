@@ -28,19 +28,6 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
 
- <b>External UDP address:</b> <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
- <b>Require SSU introductions? </b>
-<input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> /><br />
- <p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
-    you on your external UDP address.  If you can't, I2P now includes supports UDP hole punching
-    with "SSU introductions" - peers who will relay a request from someone you don't know to your
-    router for your router so that you can make an outbound connection to them.  I2P will use these
-    introductions automatically if it detects that the port is not forwarded (as shown by
-    the <i>Status: OK (NAT)</i> line), or you can manually require them here.  
-    Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
-<input type="submit" name="recheckReachability" value="Check network reachability..." />
- <hr />
- 
  <b>Bandwidth limiter</b><br />
  Inbound rate: 
     <input name="inboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
@@ -65,6 +52,18 @@
  to pick faster peers, but can cost substantial bandwidth.  Relevent data from the
  load testing is fed into the profiles as well as the 
  <a href="oldstats.jsp#test.rtt">test.rtt</a> and related stats.</p>
+ <hr />
+ <b>External UDP address:</b> <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
+ <b>Require SSU introductions? </b>
+<input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> /><br />
+ <p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
+    you on your external UDP address.  If you can't, I2P now includes supports UDP hole punching
+    with "SSU introductions" - peers who will relay a request from someone you don't know to your
+    router for your router so that you can make an outbound connection to them.  I2P will use these
+    introductions automatically if it detects that the port is not forwarded (as shown by
+    the <i>Status: OK (NAT)</i> line), or you can manually require them here.  
+    Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
+<input type="submit" name="recheckReachability" value="Check network reachability..." />
  <hr />
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />

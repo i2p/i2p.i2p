@@ -88,6 +88,7 @@ public class OutboundMessageFragments {
         peer.dropOutbound();
         synchronized (_activePeers) {
             _activePeers.remove(peer);
+            _activePeers.notifyAll();
         }
     }
     
@@ -159,7 +160,7 @@ public class OutboundMessageFragments {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error initializing " + msg);
         }
-        finishMessages();
+        //finishMessages();
     }
     
     /** 
@@ -211,6 +212,7 @@ public class OutboundMessageFragments {
                     i--;
                 }
             }
+            _activePeers.notifyAll();
         }
         for (int i = 0; i < peers.size(); i++) {
             PeerState state = (PeerState)peers.get(i);
@@ -238,7 +240,7 @@ public class OutboundMessageFragments {
         while (_alive && (state == null) ) {
             long now = _context.clock().now();
             int nextSendDelay = -1;
-            //finishMessages();
+            finishMessages();
             try {
                 synchronized (_activePeers) {
                     for (int i = 0; i < _activePeers.size(); i++) {

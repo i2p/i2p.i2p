@@ -14,10 +14,10 @@
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><br /><%
+ <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><%
     if (helper.updateAvailable()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
-            out.print(update.getStatus());
+            out.print("<br />" + update.getStatus());
         } else {
             long nonce = new java.util.Random().nextLong();
             String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
@@ -28,10 +28,12 @@
                 uri = uri + "&updateNonce=" + nonce;
             else
                 uri = uri + "?updateNonce=" + nonce;
-            out.print(" <a href=\"" + uri + "\">Update available</a>");
+            out.print("<br /><a href=\"" + uri + "\">Update available</a>");
         }
     }
- %><hr />
+ %>
+ <br /><%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
+ <hr />
  
  <u><b><a href="peers.jsp">Peers</a></b></u><br />
  <b>Active:</b> <jsp:getProperty name="helper" property="activePeers" />/<jsp:getProperty name="helper" property="activeProfiles" /><br />
@@ -62,7 +64,7 @@
     }
  %><hr />
  
- <u><b>Bandwidth in/out</b></u><br />
+ <u><b><a href="config.jsp" title="Configure the bandwidth limits">Bandwidth in/out</a></b></u><br />
  <b>1s:</b> <jsp:getProperty name="helper" property="inboundMinuteKBps" />/<jsp:getProperty name="helper" property="outboundMinuteKBps" />KBps<br />
  <b>5m:</b> <jsp:getProperty name="helper" property="inboundFiveMinuteKBps" />/<jsp:getProperty name="helper" property="outboundFiveMinuteKBps" />KBps<br />
  <b>Total:</b> <jsp:getProperty name="helper" property="inboundLifetimeKBps" />/<jsp:getProperty name="helper" property="outboundLifetimeKBps" />KBps<br />

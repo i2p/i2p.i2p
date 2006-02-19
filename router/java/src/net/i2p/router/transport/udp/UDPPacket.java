@@ -145,7 +145,7 @@ public class UDPPacket {
         ByteArray buf = _validateCache.acquire();
         
         // validate by comparing _data[0:15] and
-        // HMAC(payload + IV + payloadLength, macKey)
+        // HMAC(payload + IV + (payloadLength ^ protocolVersion), macKey)
         
         int payloadLength = _packet.getLength() - MAC_SIZE - IV_SIZE;
         if (payloadLength > 0) {
@@ -154,7 +154,7 @@ public class UDPPacket {
             off += payloadLength;
             System.arraycopy(_data, _packet.getOffset() + MAC_SIZE, buf.getData(), off, IV_SIZE);
             off += IV_SIZE;
-            DataHelper.toLong(buf.getData(), off, 2, payloadLength);
+            DataHelper.toLong(buf.getData(), off, 2, payloadLength ^ PacketBuilder.PROTOCOL_VERSION);
             off += 2;
 
             eq = _context.hmac().verify(macKey, buf.getData(), 0, off, _data, _packet.getOffset(), MAC_SIZE);

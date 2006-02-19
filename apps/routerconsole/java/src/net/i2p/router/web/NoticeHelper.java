@@ -24,6 +24,7 @@ public class NoticeHelper {
     }
     
     public String getSystemNotice() {
+        if (true) return ""; // moved to the left hand nav
         if (_context.router().gracefulShutdownInProgress()) {
             long remaining = _context.router().getShutdownTimeRemaining();
             if (remaining > 0)

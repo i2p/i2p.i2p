@@ -570,7 +570,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.INFO))
                 _log.info("Received another message: " + inMsg.getClass().getName());
         }
+        PeerState peer = getPeerState(remoteIdentHash);
         super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
+        if (peer != null)
+            peer.expireInboundMessages();
     }
 
     
@@ -1354,8 +1357,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.rate\">in/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second)<br />\n" +
         "<b id=\"def.up\">up</b>: the uptime is how long ago this session was established<br />\n" +
         "<b id=\"def.skew\">skew</b>: the skew says how far off the other user's clock is, relative to your own<br />\n" +
-        "<b id=\"def.cwnd\">cwnd</b>: the congestion window is how many bytes in 'in flight' you can send without an acknowledgement / <br />\n" +
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent /<br />\n the maximum number of concurrent messages to send /<br />\n"+ 
+        "<b id=\"def.cwnd\">cwnd</b>: the congestion window is how many bytes in 'in flight' you can send w/out an acknowledgement / <br />\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent /<br />\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the maximum number of concurrent messages to send /<br />\n"+ 
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of consecutive sends which were blocked due to throws message window size<br />\n" +
         "<b id=\"def.ssthresh\">ssthresh</b>: the slow start threshold help make sure the cwnd doesn't grow too fast<br />\n" +
         "<b id=\"def.rtt\">rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet<br />\n" +

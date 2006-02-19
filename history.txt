@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.405 2006/02/18 01:48:48 jrandom Exp $
+$Id: history.txt,v 1.406 2006/02/18 22:22:33 jrandom Exp $
+
+2006-02-19  jrandom
+    * Moved the current net's reseed URL to a different location than where
+      the old net looks (dev.i2p.net/i2pdb2/ vs .../i2pdb/)
+    * More aggressively expire inbound messages (on receive, not just on send)
+    * Add in a hook for breaking backwards compatibility in the SSU wire
+      protocol directly by including a version as part of the handshake.  The
+      version is currently set to 0, however, so the wire protocol from this
+      build is compatible with all earlier SSU implementations.
+    * Increased the number of complete message readers, cutting down
+      substantially on the delay processing inbound messages.
+    * Delete the message history file on startup
+    * Reworked the restart/shutdown display on the console (thanks bd_!)
 
 2006-02-18  jrandom
     * Migrate the outbound packets from a central component to the individual

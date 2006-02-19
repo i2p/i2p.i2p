@@ -30,6 +30,9 @@ public class PacketBuilder {
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
     private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
     private static final ByteCache _blockCache = ByteCache.getInstance(64, 16);
+
+    /** we only talk to people of the right version */
+    static final int PROTOCOL_VERSION = 0;
     
     public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -160,10 +163,11 @@ public class PacketBuilder {
         off += 2;
         
         int sizeWritten = state.writeFragment(data, off, fragment);
-        if (sizeWritten != size)
+        if (sizeWritten != size) {
             _log.error("Size written: " + sizeWritten + " but size: " + size 
                        + " for fragment " + fragment + " of " + state.getMessageId());
-        else if (_log.shouldLog(Log.DEBUG))
+            return null;
+        } else if (_log.shouldLog(Log.DEBUG))
             _log.debug("Size written: " + sizeWritten + " for fragment " + fragment 
                        + " of " + state.getMessageId());
         size = sizeWritten;
@@ -1004,7 +1008,7 @@ public class PacketBuilder {
      * Encrypt the packet with the cipher key and the given IV, generate a 
      * MAC for that encrypted data and IV, and store the result in the packet.
      * The MAC used is: 
-     *     HMAC-SHA256(payload || IV || payloadLength, macKey)[0:15]
+     *     HMAC-SHA256(payload || IV || (payloadLength ^ protocolVersion), macKey)[0:15]
      *
      * @param packet prepared packet with the first 32 bytes empty and a length
      *               whose size is mod 16
@@ -1024,7 +1028,7 @@ public class PacketBuilder {
         off += encryptSize;
         System.arraycopy(iv.getData(), 0, data, off, UDPPacket.IV_SIZE);
         off += UDPPacket.IV_SIZE;
-        DataHelper.toLong(data, off, 2, encryptSize);
+        DataHelper.toLong(data, off, 2, encryptSize ^ PROTOCOL_VERSION);
         
         int hmacOff = packet.getPacket().getOffset();
         int hmacLen = encryptSize + UDPPacket.IV_SIZE + 2;
