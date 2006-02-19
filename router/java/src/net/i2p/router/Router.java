@@ -106,6 +106,7 @@ public class Router {
             System.exit(-1);
         }
 
+        _gracefulExitCode = -1;
         _config = new Properties();
 
         if (configFilename == null) {
@@ -891,17 +892,22 @@ public class Router {
      *
      */
     public void cancelGracefulShutdown() {
+        _gracefulExitCode = -1;
         _config.remove(PROP_SHUTDOWN_IN_PROGRESS);
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
         }        
     }
-    
+    /**
+     * What exit code do we plan on using when we shut down (or -1, if there isn't a graceful shutdown planned)
+     */
+    public int scheduledGracefulExitCode() { return _gracefulExitCode; }
     public boolean gracefulShutdownInProgress() {
         return (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
     }
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
+        if (_gracefulExitCode <= 0) return -1;
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
             return -1;
