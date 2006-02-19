@@ -808,7 +808,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     void rebuildExternalAddress() { rebuildExternalAddress(true); }
-    void rebuildExternalAddress(boolean allowuterInfo) {
+    void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
         if (_context.router().isHidden())
             return;
         

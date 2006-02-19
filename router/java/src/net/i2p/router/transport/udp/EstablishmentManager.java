@@ -713,7 +713,8 @@ public class EstablishmentManager {
                         break;
                     } else {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("why are we confirmed with no identity? " + inboundState);
+                            _log.warn("confirmed with invalid? " + inboundState);
+                        inboundState.fail();
                         break;
                     }
                 case InboundEstablishState.STATE_FAILED:

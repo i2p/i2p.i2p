@@ -201,18 +201,25 @@ public class OutboundMessageFragments {
      */
     private void finishMessages() {
         int rv = 0;
+        List peers = new ArrayList();
         synchronized (_activePeers) {
+            peers = new ArrayList(_activePeers);
             for (int i = 0; i < _activePeers.size(); i++) {
                 PeerState state = (PeerState)_activePeers.get(i);
-                int remaining = state.finishMessages();
-                if (remaining <= 0) {
+                if (state.getOutboundMessageCount() <= 0) {
                     _activePeers.remove(i);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("No more pending messages for " + state.getRemotePeer().toBase64());
                     i--;
                 }
-                rv += remaining;
             }
+        }
+        for (int i = 0; i < peers.size(); i++) {
+            PeerState state = (PeerState)peers.get(i);
+            int remaining = state.finishMessages();
+            if (remaining <= 0) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("No more pending messages for " + state.getRemotePeer().toBase64());
+            }
+            rv += remaining;
         }
     }
     
@@ -231,7 +238,7 @@ public class OutboundMessageFragments {
         while (_alive && (state == null) ) {
             long now = _context.clock().now();
             int nextSendDelay = -1;
-            finishMessages();
+            //finishMessages();
             try {
                 synchronized (_activePeers) {
                     for (int i = 0; i < _activePeers.size(); i++) {

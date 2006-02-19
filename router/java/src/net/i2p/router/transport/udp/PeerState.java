@@ -997,6 +997,18 @@ public class PeerState {
         }
     }
     
+    public int getOutboundMessageCount() {
+        Map msgs = _outboundMessages;
+        if (_dead) return 0;
+        if (msgs != null) {
+            synchronized (msgs) {
+                return msgs.size();
+            }
+        } else {
+            return 0;
+        }
+    }
+    
     /**
      * Expire / complete any outbound messages
      * @return number of active outbound messages remaining
