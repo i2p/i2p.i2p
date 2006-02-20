@@ -110,7 +110,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private final static String PROP_I2NP_TCP_DISABLED = "i2np.tcp.disable";
     
     private RouterAddress createTCPAddress() {
-        if (true) return null;
+        if (!TransportManager.ALLOW_TCP) return null;
         RouterAddress addr = new RouterAddress();
         addr.setCost(10);
         addr.setExpiration(null);

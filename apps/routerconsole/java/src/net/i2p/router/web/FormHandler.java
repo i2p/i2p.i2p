@@ -114,7 +114,7 @@ public class FormHandler {
             return;
         }
         if (_nonce == null) {
-            addFormError("You trying to mess with me?  Huh?  Are you?");
+            //addFormError("You trying to mess with me?  Huh?  Are you?");
             _valid = false;
             return;
         }

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.409 2006/02/20 09:27:38 jrandom Exp $
+$Id: history.txt,v 1.410 2006/02/20 11:42:36 jrandom Exp $
+
+2006-02-20  jrandom
+    * Properly enable TCP this time (oops)
+    * Deal with multiple form handlers on the same page in the console without
+      being too annoying (thanks blubb and bd_!)
 
 2006-02-20  jrandom
     * Reenable the TCP transport as a fallback (we'll continue to muck with

@@ -454,8 +454,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public RouterInfo lookupRouterInfoLocally(Hash key) {
         if (!_initialized) return null;
-        if (_ds.isKnown(key)) {
-            DataStructure ds = _ds.get(key);
+        DataStructure ds = _ds.get(key);
+        if (ds != null) {
             if (ds instanceof RouterInfo)
                 return (RouterInfo)ds;
             else {

@@ -56,7 +56,7 @@ public class TransportManager implements TransportEventListener {
         transport.setListener(null);
     }
 
-    private static final boolean ALLOW_TCP = true;
+    static final boolean ALLOW_TCP = true;
     
     private void configTransports() {
         String disableTCP = _context.router().getConfigSetting(PROP_DISABLE_TCP);
