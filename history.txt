@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.407 2006/02/19 07:29:57 jrandom Exp $
+$Id: history.txt,v 1.408 2006/02/20 00:08:59 dust Exp $
+
+2006-02-20  jrandom
+    * Major SSU and router tuning to reduce contention, memory usage, and GC
+      churn.  There are still issues to be worked out, but this should be a
+      substantial improvement.
+    * Modified the optional netDb harvester task to support choosing whether
+      to use (non-anonymous) direct connections or (anonymous) exploratory
+      tunnels to do the harvesting.  Harvesting itself is enabled via the
+      advanced config "netDb.shouldHarvest=true" (default is false) and the
+      connection type can be chosen via "netDb.harvestDirectly=false" (default
+      is false).
 
 2006-02-19  dust
     * Added pruning of suckers history (it used to grow indefinitely).
