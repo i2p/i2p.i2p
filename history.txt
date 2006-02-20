@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.408 2006/02/20 00:08:59 dust Exp $
+$Id: history.txt,v 1.409 2006/02/20 09:27:38 jrandom Exp $
+
+2006-02-20  jrandom
+    * Reenable the TCP transport as a fallback (we'll continue to muck with
+      debugging SSU-only elsewhere)
 
 2006-02-20  jrandom
     * Major SSU and router tuning to reduce contention, memory usage, and GC
