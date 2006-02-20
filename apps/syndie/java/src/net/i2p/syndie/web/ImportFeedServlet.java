@@ -17,13 +17,6 @@ import net.i2p.syndie.sml.*;
 
 /**
  * Schedule the import of atom/rss feeds
- *
- * <p><h3>todo:</h3>
- * <p>caching (eepget should do it)
- * <p>enclosures support (requires cvs rome)
- * <p>syndie.sucker.minHistory/maxHistory used to roll over the history file?
- * <p>configurable update period
- *
  */
 public class ImportFeedServlet extends BaseServlet { 
     protected String getTitle() { return "Syndie :: Import feed"; }
@@ -80,7 +73,6 @@ public class ImportFeedServlet extends BaseServlet {
                     }
                 }
             } else if ( (action != null) && ("Delete".equals(action)) ) {
-                out.write("<span class=\"b_rssImportMsgErr\">Delete some thing</span><br />");
                 if (url == null || blog == null || tagPrefix == null) {
                     out.write("<span class=\"b_rssImportMsgErr\">error, some fields were empty.</span><br />");
                 } else {

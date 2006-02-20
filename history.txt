@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.406 2006/02/18 22:22:33 jrandom Exp $
+$Id: history.txt,v 1.407 2006/02/19 07:29:57 jrandom Exp $
+
+2006-02-19  dust
+    * Added pruning of suckers history (it used to grow indefinitely).
 
 2006-02-19  jrandom
     * Moved the current net's reseed URL to a different location than where
