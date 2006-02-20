@@ -306,10 +306,10 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <copy file="build/sucker.jar" todir="pkg-temp/lib" />
+        <!-- <copy file="build/sucker.jar" todir="pkg-temp/lib" /> -->
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         
-        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
+        <!--<copy file="installer/resources/runplain.sh" todir="pkg-temp/" />-->
         
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
@@ -318,25 +318,29 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
+        <!-- <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" /> -->
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
+        <!--
         <copy file="installer/resources/dnf-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfp-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfb-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfh-header.ht" todir="pkg-temp/docs/" />
 	<copy file="installer/resources/ahelper-conflict-header.ht" todir="pkg-temp/docs/" />
+        -->
         
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
         
+        <!--
         <mkdir dir="pkg-temp/docs/themes/" />
         <copy todir="pkg-temp/docs/themes/" >
           <fileset dir="installer/resources/themes/" />
         </copy>
+        -->
         
         <!-- the addressbook handles this for updates -->
         <!-- <copy file="hosts.txt" todir="pkg-temp/" /> -->
