@@ -42,6 +42,7 @@ public class UDPReceiver {
         _transport = transport;
         _runner = new Runner();
         _context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveRemaining", "How many packets are left sitting on the receiver's queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInboundProbabalistically", "How many packet we drop probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.acceptedInboundProbabalistically", "How many packet we accept probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
@@ -145,6 +146,7 @@ public class UDPReceiver {
         }
         
         // rejected
+        packet.release();
         _context.statManager().addRateData("udp.droppedInbound", queueSize, headPeriod);
         if (_log.shouldLog(Log.WARN)) {
             StringBuffer msg = new StringBuffer();
@@ -171,31 +173,36 @@ public class UDPReceiver {
      *
      */
     public UDPPacket receiveNext() {
+        UDPPacket rv = null;
+        int remaining = 0;
         while (_keepRunning) {
             synchronized (_inboundQueue) {
                 if (_inboundQueue.size() <= 0)
                     try { _inboundQueue.wait(); } catch (InterruptedException ie) {}
                 if (_inboundQueue.size() > 0) {
-                    UDPPacket rv = (UDPPacket)_inboundQueue.remove(0);
-                    if (_inboundQueue.size() > 0)
+                    rv = (UDPPacket)_inboundQueue.remove(0);
+                    remaining = _inboundQueue.size();
+                    if (remaining > 0)
                         _inboundQueue.notifyAll();
-                    return rv;
+                    break;
                 }
             }
         }
-        return null;
+        _context.statManager().addRateData("udp.receiveRemaining", remaining, 0);
+        return rv;
     }
     
     private class Runner implements Runnable {
         private boolean _socketChanged;
         public void run() {
             _socketChanged = false;
+            FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().createRequest();
             while (_keepRunning) {
                 if (_socketChanged) {
                     Thread.currentThread().setName(_name + "." + _id);
                     _socketChanged = false;
                 }
-                UDPPacket packet = UDPPacket.acquire(_context);
+                UDPPacket packet = UDPPacket.acquire(_context, true);
                 
                 // block before we read...
                 if (_log.shouldLog(Log.DEBUG))
@@ -217,7 +224,9 @@ public class UDPReceiver {
                     // and block after we know how much we read but before
                     // we release the packet to the inbound queue
                     if (size > 0) {
-                        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
+                        //FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
+                        //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
+                        req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         while (req.getPendingInboundRequested() > 0)
                             req.waitForNextAllocation();
                         

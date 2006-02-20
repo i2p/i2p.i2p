@@ -270,17 +270,17 @@ public class UDPPacketReader {
         public boolean readExtendedDataIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXTENDED);
         }
-        public long[] readACKs() {
-            if (!readACKsIncluded()) return null;
+        public int readACKCount() {
+            if (!readACKsIncluded()) return 0;
             int off = readBodyOffset() + 1;
-            int num = (int)DataHelper.fromLong(_message, off, 1);
+            return (int)DataHelper.fromLong(_message, off, 1);
+        }
+        public long readACK(int index) {
+            if (!readACKsIncluded()) return -1;
+            int off = readBodyOffset() + 1;
+            //int num = (int)DataHelper.fromLong(_message, off, 1);
             off++;
-            long rv[] = new long[num];
-            for (int i = 0; i < num; i++) {
-                rv[i] = DataHelper.fromLong(_message, off, 4);
-                off += 4;
-            }
-            return rv;
+            return DataHelper.fromLong(_message, off + (4 * index), 4);
         }
         public ACKBitfield[] readACKBitfields() {
             if (!readACKBitfieldsIncluded()) return null;

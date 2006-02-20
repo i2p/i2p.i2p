@@ -30,10 +30,19 @@ public class DataMessage extends I2NPMessageImpl {
         _data = null;
     }
     
-    public byte[] getData() { return _data; }
-    public void setData(byte data[]) { _data = data; }
+    public byte[] getData() { 
+        verifyUnwritten();
+        return _data; 
+    }
+    public void setData(byte[] data) { 
+        verifyUnwritten();
+        _data = data; 
+    }
     
-    public int getSize() { return _data.length; }
+    public int getSize() { 
+        verifyUnwritten();
+        return _data.length;
+    }
     
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
@@ -55,6 +64,7 @@ public class DataMessage extends I2NPMessageImpl {
     }
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) {
+        verifyUnwritten();
         if (_data == null) {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
@@ -68,6 +78,11 @@ public class DataMessage extends I2NPMessageImpl {
             curIndex += _data.length;
         }
         return curIndex;
+    }
+    
+    protected void written() {
+        super.written();
+        _data = null;
     }
     
     public int getType() { return MESSAGE_TYPE; }

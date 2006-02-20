@@ -40,6 +40,7 @@ public class UDPPacket {
     private long _receivedTime;
     private long _beforeReceiveFragments;
     private long _afterHandlingTime;
+    private boolean _isInbound;
   
     private static final List _packetCache;
     static {
@@ -47,7 +48,8 @@ public class UDPPacket {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
     }
     
-    private static final boolean CACHE = false; // TODO: support caching to cut churn down a /lot/
+    private static final boolean CACHE = true; // TODO: support caching to cut churn down a /lot/
+    private static final int CACHE_SIZE = 64;
       
     static final int MAX_PACKET_SIZE = 2048;
     public static final int IV_SIZE = 16;
@@ -75,18 +77,31 @@ public class UDPPacket {
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
     private static final ByteCache _validateCache = ByteCache.getInstance(64, MAX_VALIDATE_SIZE);
     private static final ByteCache _ivCache = ByteCache.getInstance(64, IV_SIZE);
-    private static final ByteCache _dataCache = ByteCache.getInstance(128, MAX_PACKET_SIZE);
+    private static final ByteCache _dataCache = ByteCache.getInstance(64, MAX_PACKET_SIZE);
 
-    private UDPPacket(I2PAppContext ctx) {
+    private UDPPacket(I2PAppContext ctx, boolean inbound) {
+        ctx.statManager().createRateStat("udp.packetsLiveInbound", "Number of live inbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
+        ctx.statManager().createRateStat("udp.packetsLiveOutbound", "Number of live outbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
+        ctx.statManager().createRateStat("udp.packetsLivePendingRecvInbound", "Number of live inbound packets not yet handled by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
+        ctx.statManager().createRateStat("udp.packetsLivePendingHandleInbound", "Number of live inbound packets not yet handled fully by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
+        // the data buffer is clobbered on init(..), but we need it to bootstrap
+        _packet = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
+        init(ctx, inbound);
+    }
+    private void init(I2PAppContext ctx, boolean inbound) {
         _context = ctx;
         _dataBuf = _dataCache.acquire();
         _data = _dataBuf.getData(); 
-        _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
+        //_packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
+        _packet.setData(_data);
+        _isInbound = inbound;
         _initializeTime = _context.clock().now();
         _markedType = -1;
         _remoteHost = null;
+        _released = false;
     }
     
+    /*
     public void initialize(int priority, long expiration, InetAddress host, int port) {
         _priority = (short)priority;
         _expiration = expiration;
@@ -99,6 +114,7 @@ public class UDPPacket {
         _released = false;
         _releasedBy = null;
     }
+     */
     
     public void writeData(byte src[], int offset, int len) { 
         verifyNotReleased();
@@ -129,8 +145,12 @@ public class UDPPacket {
     void setFragmentCount(int count) { _fragmentCount = count; }
     
     public RemoteHostId getRemoteHost() {
-        if (_remoteHost == null)
-            _remoteHost = new RemoteHostId(_packet.getAddress().getAddress(), _packet.getPort());
+        if (_remoteHost == null) {
+            InetAddress addr = _packet.getAddress();
+            byte ip[] = addr.getAddress();
+            int port = _packet.getPort();
+            _remoteHost = new RemoteHostId(ip, port);
+        }
         return _remoteHost;
     }
     
@@ -234,7 +254,7 @@ public class UDPPacket {
         return buf.toString();
     }
     
-    public static UDPPacket acquire(I2PAppContext ctx) {
+    public static UDPPacket acquire(I2PAppContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
             synchronized (_packetCache) {
@@ -242,27 +262,12 @@ public class UDPPacket {
                     rv = (UDPPacket)_packetCache.remove(0);
                 }
             }
-            /*
-            if (rv != null) {
-                rv._context = ctx;
-                //rv._log = ctx.logManager().getLog(UDPPacket.class);
-                rv.resetBegin();
-                Arrays.fill(rv._data, (byte)0x00);
-                rv._markedType = -1;
-                rv._dataBuf.setValid(0);
-                rv._released = false;
-                rv._releasedBy = null;
-                rv._acquiredBy = null;
-                rv.setPacketDataLength(0);
-                synchronized (rv._packet) {
-                    //rv._packet.setLength(0);
-                    //rv._packet.setPort(1);
-                }
-            }
-             */
+            
+            if (rv != null)
+                rv.init(ctx, inbound);
         }
         if (rv == null)
-            rv = new UDPPacket(ctx);
+            rv = new UDPPacket(ctx, inbound);
         //if (rv._acquiredBy != null) {
         //    _log.log(Log.CRIT, "Already acquired!  current stack trace is:", new Exception());
         //    _log.log(Log.CRIT, "Earlier acquired:", rv._acquiredBy);
@@ -277,15 +282,12 @@ public class UDPPacket {
         //_releasedBy = new Exception("released by");
         //_acquiredBy = null;
         //
-        if (!CACHE) {
-            _dataCache.release(_dataBuf);
+        _dataCache.release(_dataBuf);
+        if (!CACHE)
             return;
-        }
         synchronized (_packetCache) {
-            if (_packetCache.size() <= 64) {
+            if (_packetCache.size() <= CACHE_SIZE) {
                 _packetCache.add(this);
-            } else {
-                _dataCache.release(_dataBuf);
             }
         }
     }

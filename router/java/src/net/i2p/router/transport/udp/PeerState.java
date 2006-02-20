@@ -167,10 +167,10 @@ public class PeerState {
     private long _packetsReceivedDuplicate;
     private long _packetsReceived;
     
-    /** Message (Long) to InboundMessageState for active message */
+    /** list of InboundMessageState for active message */
     private Map _inboundMessages;
-    /** Message (Long) to OutboundMessageState */
-    private Map _outboundMessages;
+    /** list of OutboundMessageState */
+    private List _outboundMessages;
     /** which outbound message is currently being retransmitted */
     private OutboundMessageState _retransmitter;
     
@@ -262,7 +262,7 @@ public class PeerState {
         _packetsReceived = 0;
         _packetsReceivedDuplicate = 0;
         _inboundMessages = new HashMap(8);
-        _outboundMessages = new HashMap(8);
+        _outboundMessages = new ArrayList(32);
         _dead = false;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -603,7 +603,8 @@ public class PeerState {
         int rv = 0;
         
         synchronized (_inboundMessages) {
-            for (Iterator iter = _inboundMessages.values().iterator(); iter.hasNext(); ) {
+            int remaining = _inboundMessages.size();
+            for (Iterator iter = _inboundMessages.values().iterator(); remaining > 0; remaining--) {
                 InboundMessageState state = (InboundMessageState)iter.next();
                 if (state.isExpired()) {
                     iter.remove();
@@ -687,7 +688,7 @@ public class PeerState {
         List rv = null;
         int bytesRemaining = countMaxACKData();
         synchronized (_currentACKs) {
-            rv = new ArrayList(_currentACKs.size());
+            rv = new ArrayList(16); //_currentACKs.size());
             int oldIndex = _currentACKsResend.size();
             while ( (bytesRemaining >= 4) && (_currentACKs.size() > 0) ) {
                 Long val = (Long)_currentACKs.remove(0);
@@ -701,7 +702,10 @@ public class PeerState {
             if (alwaysIncludeRetransmissions || rv.size() > 0) {
                 // now repeat by putting in some old ACKs
                 for (int i = 0; (i < oldIndex) && (bytesRemaining >= 4); i++) {
-                    rv.add(new FullACKBitfield(((Long)_currentACKsResend.get(i)).longValue()));
+                    Long cur = (Long)_currentACKsResend.get(i);
+                    long c = cur.longValue();
+                    FullACKBitfield bf = new FullACKBitfield(c);
+                    rv.add(bf);
                     bytesRemaining -= 4;
                 }
             }
@@ -749,7 +753,9 @@ public class PeerState {
             int numMessages = _inboundMessages.size();
             if (numMessages <= 0) 
                 return;
-            for (Iterator iter = _inboundMessages.values().iterator(); iter.hasNext(); ) {
+            // todo: make this a list instead of a map, so we can iterate faster w/out the memory overhead?
+            int remaining = _inboundMessages.size();
+            for (Iterator iter = _inboundMessages.values().iterator(); remaining > 0; remaining--) {
                 InboundMessageState state = (InboundMessageState)iter.next();
                 if (state.isExpired()) {
                     //if (_context instanceof RouterContext)
@@ -974,10 +980,10 @@ public class PeerState {
         state.setPeer(this);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding to " + _remotePeer.toBase64() + ": " + state.getMessageId());
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         if (msgs == null) return 0;
         synchronized (msgs) {
-            msgs.put(new Long(state.getMessageId()), state);
+            msgs.add(state);
             return msgs.size();
         }
     }
@@ -985,20 +991,23 @@ public class PeerState {
     public void dropOutbound() {
         if (_dead) return;
         _dead = true;
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         //_outboundMessages = null;
         _retransmitter = null;
         if (msgs != null) {
+            List tempList = null;
             synchronized (msgs) {
-                for (Iterator iter = msgs.values().iterator(); iter.hasNext();)
-                    _transport.failed((OutboundMessageState)iter.next());
+                tempList = new ArrayList(msgs);
                 msgs.clear();
             }
+            int sz = tempList.size();
+            for (int i = 0; i < sz; i++)
+                _transport.failed((OutboundMessageState)tempList.get(i));
         }
     }
     
     public int getOutboundMessageCount() {
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         if (_dead) return 0;
         if (msgs != null) {
             synchronized (msgs) {
@@ -1015,29 +1024,35 @@ public class PeerState {
      */
     public int finishMessages() {
         int rv = 0;
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         if (_dead) return 0;
         List succeeded = null;
         List failed = null;
         synchronized (msgs) {
-            for (Iterator iter = msgs.keySet().iterator(); iter.hasNext(); ) {
-                Long id = (Long)iter.next();
-                OutboundMessageState state = (OutboundMessageState)msgs.get(id);
+            int size = msgs.size();
+            for (int i = 0; i < size; i++) {
+                OutboundMessageState state = (OutboundMessageState)msgs.get(i);
                 if (state.isComplete()) {
-                    iter.remove();
+                    msgs.remove(i);
+                    i--;
+                    size--;
                     if (_retransmitter == state)
                         _retransmitter = null;
                     if (succeeded == null) succeeded = new ArrayList(4);
                     succeeded.add(state);
                 } else if (state.isExpired()) {
-                    iter.remove();
+                    msgs.remove(i);
+                    i--;
+                    size--;
                     if (_retransmitter == state)
                         _retransmitter = null;
                     _context.statManager().addRateData("udp.sendFailed", state.getPushCount(), state.getLifetime());
                     if (failed == null) failed = new ArrayList(4);
                     failed.add(state);
                 } else if (state.getPushCount() > OutboundMessageFragments.MAX_VOLLEYS) {
-                    iter.remove();
+                    msgs.remove(i);
+                    i--;
+                    size--;
                     if (state == _retransmitter)
                         _retransmitter = null;
                     _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount(), state.getLifetime());
@@ -1082,11 +1097,12 @@ public class PeerState {
      */
     public OutboundMessageState allocateSend() {
         int total = 0;
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         if (_dead) return null;
         synchronized (msgs) {
-            for (Iterator iter = msgs.values().iterator(); iter.hasNext(); ) {
-                OutboundMessageState state = (OutboundMessageState)iter.next();
+            int size = msgs.size();
+            for (int i = 0; i < size; i++) {
+                OutboundMessageState state = (OutboundMessageState)msgs.get(i);
                 if (locked_shouldSend(state)) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Allocate sending to " + _remotePeer.toBase64() + ": " + state.getMessageId());
@@ -1099,11 +1115,11 @@ public class PeerState {
                     }
                      */
                     return state;
-                } else {
+                } /* else {
                     OutNetMessage msg = state.getMessage();
                     if (msg != null)
                         msg.timestamp("passed over for allocation with " + msgs.size() + " peers");
-                }
+                } */
             }
             total = msgs.size();
         }
@@ -1118,7 +1134,7 @@ public class PeerState {
     public int getNextDelay() {
         int rv = -1;
         long now = _context.clock().now();
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         if (_dead) return -1;
         synchronized (msgs) {
             if (_retransmitter != null) {
@@ -1128,8 +1144,9 @@ public class PeerState {
                 else
                     return rv;
             }
-            for (Iterator iter = msgs.values().iterator(); iter.hasNext(); ) {
-                OutboundMessageState state = (OutboundMessageState)iter.next();
+            int size = msgs.size();
+            for (int i = 0; i < size; i++) {
+                OutboundMessageState state = (OutboundMessageState)msgs.get(i);
                 int delay = (int)(state.getNextSendTime() - now);
                 if (delay <= 0)
                     delay = 1;
@@ -1140,7 +1157,6 @@ public class PeerState {
         return rv;
     }
 
-    
     /**
      * If set to true, we should throttle retransmissions of all but the first message in
      * flight to a peer.  If set to false, we will only throttle the initial flight of a
@@ -1182,17 +1198,18 @@ public class PeerState {
             if ( (_retransmitter != null) && (_retransmitter != state) ) {
                 // choke it, since there's already another message retransmitting to this
                 // peer.
-                _context.statManager().addRateData("udp.blockedRetransmissions", getPacketsRetransmitted(), getPacketsTransmitted());
-                if ( (state.getMaxSends() <= 0) && (!THROTTLE_INITIAL_SEND) ) {
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("another message is retransmitting, but we want to send our first volley...");
-                } else if ( (state.getMaxSends() <= 0) || (THROTTLE_RESENDS) ) {
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("choked, with another message retransmitting");
+                _context.statManager().addRateData("udp.blockedRetransmissions", _packetsRetransmitted, _packetsTransmitted);
+                int max = state.getMaxSends();
+                if ( (max <= 0) && (!THROTTLE_INITIAL_SEND) ) {
+                    //if (state.getMessage() != null)
+                    //    state.getMessage().timestamp("another message is retransmitting, but we want to send our first volley...");
+                } else if ( (max <= 0) || (THROTTLE_RESENDS) ) {
+                    //if (state.getMessage() != null)
+                    //    state.getMessage().timestamp("choked, with another message retransmitting");
                     return false;
                 } else {
-                    if (state.getMessage() != null)
-                        state.getMessage().timestamp("another message is retransmitting, but since we've already begun sending...");                    
+                    //if (state.getMessage() != null)
+                    //    state.getMessage().timestamp("another message is retransmitting, but since we've already begun sending...");                    
                 }
             }
 
@@ -1218,8 +1235,8 @@ public class PeerState {
                 return true;
             } else {
                 _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("send rejected, available=" + getSendWindowBytesRemaining());
+                //if (state.getMessage() != null)
+                //    state.getMessage().timestamp("send rejected, available=" + getSendWindowBytesRemaining());
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
                               + " available=" + getSendWindowBytesRemaining()
@@ -1229,10 +1246,10 @@ public class PeerState {
                     _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
                 //_throttle.choke(peer.getRemotePeer());
 
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("choked, not enough available, wsize=" 
-                                                 + getSendWindowBytes() + " available="
-                                                 + getSendWindowBytesRemaining());
+                //if (state.getMessage() != null)
+                //    state.getMessage().timestamp("choked, not enough available, wsize=" 
+                //                                 + getSendWindowBytes() + " available="
+                //                                 + getSendWindowBytesRemaining());
                 return false;
             }
         } // nextTime <= now 
@@ -1242,23 +1259,32 @@ public class PeerState {
     
     public int acked(long messageId) {
         OutboundMessageState state = null;
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         if (_dead) return 0;
         synchronized (msgs) {
-            state = (OutboundMessageState)msgs.remove(new Long(messageId));
+            int sz = msgs.size();
+            for (int i = 0; i < sz; i++) {
+                state = (OutboundMessageState)msgs.get(i);
+                if (state.getMessageId() == messageId) {
+                    msgs.remove(i);
+                    break;
+                } else {
+                    state = null;
+                }
+            }
             if ( (state != null) && (state == _retransmitter) )
                 _retransmitter = null;
         }
         
         if (state != null) {
             int numSends = state.getMaxSends();
-            if (state.getMessage() != null) {
-                state.getMessage().timestamp("acked after " + numSends
-                                             + " lastReceived: " 
-                                             + (_context.clock().now() - getLastReceiveTime())
-                                             + " lastSentFully: " 
-                                             + (_context.clock().now() - getLastSendFullyTime()));
-            }
+            //if (state.getMessage() != null) {
+            //    state.getMessage().timestamp("acked after " + numSends
+            //                                 + " lastReceived: " 
+            //                                 + (_context.clock().now() - getLastReceiveTime())
+            //                                 + " lastSentFully: " 
+            //                                 + (_context.clock().now() - getLastSendFullyTime()));
+            //}
 
             if (_log.shouldLog(Log.INFO))
                 _log.info("Received ack of " + messageId + " by " + _remotePeer.toBase64() 
@@ -1294,19 +1320,24 @@ public class PeerState {
             return;
         }
     
-        Map msgs = _outboundMessages;
+        List msgs = _outboundMessages;
         
         OutboundMessageState state = null;
         boolean isComplete = false;
         synchronized (msgs) {
-            state = (OutboundMessageState)msgs.get(new Long(bitfield.getMessageId()));
-            if (state != null) {
-                if (state.acked(bitfield)) {
-                    // this partial ack actually clears it fully
-                    isComplete = true;
-                    msgs.remove(new Long(bitfield.getMessageId()));
-                    if (state == _retransmitter)
-                        _retransmitter = null;
+            for (int i = 0; i < msgs.size(); i++) {
+                state = (OutboundMessageState)msgs.get(i);
+                if (state.getMessageId() == bitfield.getMessageId()) {
+                    boolean complete = state.acked(bitfield);
+                    if (complete) {
+                        isComplete = true;
+                        msgs.remove(i);
+                        if (state == _retransmitter)
+                            _retransmitter = null;
+                    }
+                    break;
+                } else {
+                    state = null;
                 }
             }
         }
@@ -1333,8 +1364,8 @@ public class PeerState {
                     _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
                 if (numSends > 1)
                     _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("partial ack to complete after " + numSends);
+                //if (state.getMessage() != null)
+                //    state.getMessage().timestamp("partial ack to complete after " + numSends);
                 _transport.succeeded(state);
                 
                 // this adjusts the rtt/rto/window/etc
@@ -1344,8 +1375,8 @@ public class PeerState {
 
                 state.releaseResources();
             } else {
-                if (state.getMessage() != null)
-                    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());
+                //if (state.getMessage() != null)
+                //    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());
             }
             return;
         } else {
@@ -1392,21 +1423,16 @@ public class PeerState {
         msgs.clear();
         
         OutboundMessageState retransmitter = null;
-        Map omsgs = oldPeer._outboundMessages;
-        if (omsgs != null) {
-            synchronized (omsgs) {
-                msgs.putAll(omsgs);
-                omsgs.clear();
-                retransmitter = oldPeer._retransmitter;
-            }
+        synchronized (oldPeer._outboundMessages) {
+            tmp.addAll(oldPeer._outboundMessages);
+            oldPeer._outboundMessages.clear();
+            retransmitter = oldPeer._retransmitter;
         }
-        omsgs = _outboundMessages;
-        if (omsgs != null) {
-            synchronized (omsgs) { 
-                omsgs.putAll(msgs); 
-                _retransmitter = retransmitter;
-            }
+        synchronized (_outboundMessages) {
+            _outboundMessages.addAll(tmp);
+            _retransmitter = retransmitter;
         }
+        tmp.clear();
     }
     
     public int hashCode() {

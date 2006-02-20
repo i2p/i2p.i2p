@@ -13,6 +13,7 @@ import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.util.Log;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.SendMessageDirectJob;
 
 /**
@@ -41,6 +42,10 @@ class HarvesterJob extends JobImpl {
     private static final int PRIORITY = 100;
     
     private static final String PROP_ENABLED = "netDb.shouldHarvest";
+
+    private boolean harvestDirectly() { 
+        return Boolean.valueOf(getContext().getProperty("netDb.harvestDirectly", "false")).booleanValue();
+    }
     
     public HarvesterJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
@@ -107,13 +112,28 @@ class HarvesterJob extends JobImpl {
      */
     private void harvest(Hash peer) {
         long now = getContext().clock().now();
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
-        msg.setFrom(getContext().routerHash());
-        msg.setMessageExpiration(10*1000+now);
-        msg.setSearchKey(peer);
-        msg.setReplyTunnel(null);
-        SendMessageDirectJob job = new SendMessageDirectJob(getContext(), msg, peer, 10*1000, PRIORITY);
-        job.runJob();
-        //getContext().jobQueue().addJob(job);
+        if (harvestDirectly()) {
+            DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
+            msg.setFrom(getContext().routerHash());
+            msg.setMessageExpiration(10*1000+now);
+            msg.setSearchKey(peer);
+            msg.setReplyTunnel(null);
+            SendMessageDirectJob job = new SendMessageDirectJob(getContext(), msg, peer, 10*1000, PRIORITY);
+            job.runJob();
+            //getContext().jobQueue().addJob(job);
+        } else {
+            TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel();
+            TunnelInfo sendTunnel = getContext().tunnelManager().selectOutboundTunnel();
+            if ( (replyTunnel != null) && (sendTunnel != null) ) {
+                DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
+                msg.setFrom(replyTunnel.getPeer(0));
+                msg.setMessageExpiration(10*1000+now);
+                msg.setSearchKey(peer);
+                msg.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
+                // we don't even bother to register a reply selector, because we don't really care.
+                // just send it out, and if we get a reply, neat.  if not, oh well
+                getContext().tunnelDispatcher().dispatchOutbound(msg, sendTunnel.getSendTunnelId(0), peer);
+            }
+        }
     }
 }

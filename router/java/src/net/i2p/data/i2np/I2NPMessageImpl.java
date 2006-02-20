@@ -32,7 +32,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     protected I2PAppContext _context;
     private long _expiration;
     private long _uniqueId;
-    private byte _data[];
+    private boolean _written;
     
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
@@ -53,6 +53,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         _log = context.logManager().getLog(I2NPMessageImpl.class);
         _expiration = _context.clock().now() + DEFAULT_EXPIRATION_MS;
         _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
+        _written = false;
         //_context.statManager().createRateStat("i2np.writeTime", "How long it takes to write an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
         //_context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
     }
@@ -264,6 +265,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
 
     
     public int toRawByteArray(byte buffer[]) {
+        verifyUnwritten();
         if (RAW_FULL_SIZE)
             return toByteArray(buffer);
         try {
@@ -277,6 +279,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             _context.logManager().getLog(getClass()).log(Log.CRIT, "Error writing", ime);
             throw new IllegalStateException("Unable to serialize the message (" + getClass().getName() 
                                             + "): " + ime.getMessage());
+        } finally {
+            written();
         }
     }
 
@@ -316,6 +320,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         }
     }
 
+    protected void verifyUnwritten() { if (_written) throw new RuntimeException("Already written"); }
+    protected void written() { _written = true; }
     
     /**
      * Yes, this is fairly ugly, but its the only place it ever happens.

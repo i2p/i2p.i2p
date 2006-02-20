@@ -108,9 +108,10 @@ public class UDPEndpointTest {
                     curPeer = 0;
                 short priority = 1;
                 long expiration = -1;
-                UDPPacket packet = UDPPacket.acquire(_context);
-                try {
-                    packet.initialize(priority, expiration, InetAddress.getLocalHost(), _endpoints[curPeer].getListenPort());
+                UDPPacket packet = UDPPacket.acquire(_context, true);
+                //try {
+                    if (true) throw new RuntimeException("fixme");
+                    //packet.initialize(priority, expiration, InetAddress.getLocalHost(), _endpoints[curPeer].getListenPort());
                     packet.writeData(data, 0, 1024);
                     packet.getPacket().setLength(1024);
                     int outstanding = _sentNotReceived.size() + 1;
@@ -118,9 +119,9 @@ public class UDPEndpointTest {
                     _log.debug("Sending packet " + curPacket + " with outstanding " + outstanding);
                     _endpoint.send(packet);
                     //try { Thread.sleep(10); } catch (InterruptedException ie) {}
-                } catch (UnknownHostException uhe) {
-                    _log.error("foo!", uhe);
-                }
+                //} catch (UnknownHostException uhe) {
+                //    _log.error("foo!", uhe);
+                //}
                 //if (_log.shouldLog(Log.DEBUG)) {
                 //    _log.debug("Sent to " + _endpoints[curPeer].getListenPort() + " from " + _endpoint.getListenPort());
                 //}

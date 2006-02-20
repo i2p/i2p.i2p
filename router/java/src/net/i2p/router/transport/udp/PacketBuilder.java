@@ -56,7 +56,7 @@ public class PacketBuilder {
      *                        included, it should be removed from the list.
      */
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List ackIdsRemaining, List partialACKsRemaining) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
 
         StringBuffer msg = null;
         boolean acksIncluded = false;
@@ -156,8 +156,10 @@ public class PacketBuilder {
         off++;
         
         int size = state.fragmentSize(fragment);
-        if (size < 0)
+        if (size < 0) {
+            packet.release();
             return null;
+        }
         DataHelper.toLong(data, off, 2, size);
         data[off] &= (byte)0x3F; // 2 highest bits are reserved
         off += 2;
@@ -166,12 +168,16 @@ public class PacketBuilder {
         if (sizeWritten != size) {
             _log.error("Size written: " + sizeWritten + " but size: " + size 
                        + " for fragment " + fragment + " of " + state.getMessageId());
+            packet.release();
             return null;
         } else if (_log.shouldLog(Log.DEBUG))
             _log.debug("Size written: " + sizeWritten + " for fragment " + fragment 
                        + " of " + state.getMessageId());
         size = sizeWritten;
-        if (size < 0) return null;
+        if (size < 0) {
+            packet.release();
+            return null;
+        }
         off += size;
 
         // we can pad here if we want, maybe randomized?
@@ -202,7 +208,7 @@ public class PacketBuilder {
      * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
      */
     public UDPPacket buildACK(PeerState peer, List ackBitfields) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         
         StringBuffer msg = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -308,7 +314,7 @@ public class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState state, int externalPort, SessionKey ourIntroKey) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         
         InetAddress to = null;
         try {
@@ -316,6 +322,7 @@ public class PacketBuilder {
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
+            packet.release();
             return null;
         }
 
@@ -337,6 +344,7 @@ public class PacketBuilder {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did our sent IP become invalid? " + state);
             state.fail();
+            packet.release();
             return null;
         }
         // now for the body
@@ -408,9 +416,10 @@ public class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte toIP[] = state.getSentIP();
         if ( (_transport !=null) && (!_transport.isValid(toIP)) ) {
+            packet.release();
             return null;
         }
         InetAddress to = null;
@@ -419,6 +428,7 @@ public class PacketBuilder {
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
+            packet.release();
             return null;
         }
         
@@ -488,13 +498,14 @@ public class PacketBuilder {
      * @return ready to send packets, or null if there was a problem
      */
     public UDPPacket buildSessionConfirmedPacket(OutboundEstablishState state, int fragmentNum, int numFragments, byte identity[]) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         InetAddress to = null;
         try {
             to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
+            packet.release();
             return null;
         }
         
@@ -578,7 +589,7 @@ public class PacketBuilder {
         return buildPeerTestFromAlice(toIP, toPort, toIntroKey, toIntroKey, nonce, aliceIntroKey);
     }
     public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toCipherKey, SessionKey toMACKey, long nonce, SessionKey aliceIntroKey) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -619,7 +630,7 @@ public class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -665,7 +676,7 @@ public class PacketBuilder {
     public UDPPacket buildPeerTestToCharlie(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, 
                                             InetAddress charlieIP, int charliePort, 
                                             SessionKey charlieCipherKey, SessionKey charlieMACKey) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -709,7 +720,7 @@ public class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, SessionKey bobCipherKey, SessionKey bobMACKey) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -783,7 +794,7 @@ public class PacketBuilder {
     }
     
     public UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[], long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -851,7 +862,7 @@ public class PacketBuilder {
     private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
     
     public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -907,7 +918,7 @@ public class PacketBuilder {
             return null;
         }
         
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -954,7 +965,7 @@ public class PacketBuilder {
     }
     
     public UDPPacket buildHolePunch(UDPPacketReader reader) {
-        UDPPacket packet = UDPPacket.acquire(_context);
+        UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -970,6 +981,7 @@ public class PacketBuilder {
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("IP for alice to hole punch to is invalid", uhe);
+            packet.release();
             return null;
         }
         

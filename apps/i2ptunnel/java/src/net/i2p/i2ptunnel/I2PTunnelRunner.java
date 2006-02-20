@@ -250,6 +250,10 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                            + from + " and " + to);
             }
             
+            // boo, hiss!  shouldn't need this - the streaming lib should be configurable, but
+            // somehow the inactivity timer is sometimes failing to get triggered properly
+            //i2ps.setReadTimeout(2*60*1000);
+            
             ByteArray ba = _cache.acquire();
             byte[] buffer = ba.getData(); // new byte[NETWORK_BUFFER_SIZE];
             try {

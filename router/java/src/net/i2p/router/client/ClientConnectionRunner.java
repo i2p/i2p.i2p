@@ -21,6 +21,7 @@ import java.util.Set;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
+import net.i2p.data.Hash;
 import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -71,6 +72,7 @@ public class ClientConnectionRunner {
      */
     private List _alreadyProcessed;
     private ClientWriterRunner _writer;
+    private Hash _destHashCache;
     /** are we, uh, dead */
     private boolean _dead;
     
@@ -144,6 +146,7 @@ public class ClientConnectionRunner {
     /** currently allocated leaseSet */
     public LeaseSet getLeaseSet() { return _currentLeaseSet; }
     void setLeaseSet(LeaseSet ls) { _currentLeaseSet = ls; }
+    public Hash getDestHash() { return _destHashCache; }
     
     /** current client's sessionId */
     SessionId getSessionId() { return _sessionId; }
@@ -206,8 +209,9 @@ public class ClientConnectionRunner {
     }
     
     void sessionEstablished(SessionConfig config) {
+        _destHashCache = config.getDestination().calculateHash();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("SessionEstablished called for destination " + config.getDestination().calculateHash().toBase64());
+            _log.debug("SessionEstablished called for destination " + _destHashCache.toBase64());
         _config = config;
         _manager.destinationEstablished(this);
     }

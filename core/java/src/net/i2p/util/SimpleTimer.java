@@ -45,6 +45,10 @@ public class SimpleTimer {
         }
     }
     
+    public void reschedule(TimedEvent event, long timeoutMs) {
+        addEvent(event, timeoutMs, false);
+    }
+    
     /**
      * Queue up the given event to be fired no sooner than timeoutMs from now.
      * However, if this event is already scheduled, the event will be scheduled
@@ -52,7 +56,12 @@ public class SimpleTimer {
      * timeout.  If this is not the desired behavior, call removeEvent first.
      *
      */
-    public void addEvent(TimedEvent event, long timeoutMs) {
+    public void addEvent(TimedEvent event, long timeoutMs) { addEvent(event, timeoutMs, true); }
+    /**
+     * @param useEarliestEventTime if its already scheduled, use the earlier of the 
+     *                             two timeouts, else use the later
+     */
+    public void addEvent(TimedEvent event, long timeoutMs, boolean useEarliestTime) {
         int totalEvents = 0;
         long now = System.currentTimeMillis();
         long eventTime = now + timeoutMs;
@@ -61,11 +70,20 @@ public class SimpleTimer {
             // remove the old scheduled position, then reinsert it
             Long oldTime = (Long)_eventTimes.get(event);
             if (oldTime != null) {
-                if (oldTime.longValue() < eventTime) {
-                    _events.notifyAll();
-                    return; // already scheduled for sooner than requested
+                if (useEarliestTime) {
+                    if (oldTime.longValue() < eventTime) {
+                        _events.notifyAll();
+                        return; // already scheduled for sooner than requested
+                    } else {
+                        _events.remove(oldTime);
+                    }
                 } else {
-                    _events.remove(oldTime);
+                    if (oldTime.longValue() > eventTime) {
+                        _events.notifyAll();
+                        return; // already scheduled for later than the given period
+                    } else {
+                        _events.remove(oldTime);
+                    }
                 }
             }
             while (_events.containsKey(time))

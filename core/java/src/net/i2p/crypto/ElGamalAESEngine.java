@@ -283,11 +283,12 @@ public class ElGamalAESEngine {
         try {
             SessionKey newKey = null;
             Hash readHash = null;
-            List tags = new ArrayList();
+            List tags = null;
 
             //ByteArrayInputStream bais = new ByteArrayInputStream(decrypted);
             int cur = 0;
             long numTags = DataHelper.fromLong(decrypted, cur, 2);
+            if (numTags > 0) tags = new ArrayList((int)numTags);
             cur += 2;
             //_log.debug("# tags: " + numTags);
             if ((numTags < 0) || (numTags > 200)) throw new Exception("Invalid number of session tags");
@@ -326,7 +327,8 @@ public class ElGamalAESEngine {
             
             if (eq) {
                 // everything matches.  w00t.
-                foundTags.addAll(tags);
+                if (tags != null)
+                    foundTags.addAll(tags);
                 if (newKey != null) foundKey.setData(newKey.getData());
                 return unencrData;
             }

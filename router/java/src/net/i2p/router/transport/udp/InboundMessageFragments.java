@@ -125,8 +125,6 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
             boolean fragmentOK = false;
             boolean partialACK = false;
          
-            // perhaps compact the synchronized block further by synchronizing on the
-            // particular state once its found?
             synchronized (messages) {
                 state = (InboundMessageState)messages.get(messageId);
                 if (state == null) {
@@ -145,36 +143,36 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                 } else {
                     partialACK = true;
                 }
-
-                if (messageComplete) {
-                    _recentlyCompletedMessages.add(mid);
-                    _messageReceiver.receiveMessage(state);
-
-                    from.messageFullyReceived(messageId, state.getCompleteSize());
-                    _ackSender.ackPeer(from);
-
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Message received completely!  " + state);
-
-                    _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
-                    if (state.getFragmentCount() > 0)
-                        _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
-                } else if (messageExpired) {
-                    state.releaseResources();
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Message expired while only being partially read: " + state);
-                    _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired hile partially read: " + state.toString());
-                } else if (partialACK) {
-                    // not expired but not yet complete... lets queue up a partial ACK
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Queueing up a partial ACK for peer: " + from + " for " + state);
-                    from.messagePartiallyReceived();
-                    _ackSender.ackPeer(from);
-                }
-
-                if (!fragmentOK)
-                    break;
             }
+
+            if (messageComplete) {
+                _recentlyCompletedMessages.add(mid);
+                _messageReceiver.receiveMessage(state);
+
+                from.messageFullyReceived(messageId, state.getCompleteSize());
+                _ackSender.ackPeer(from);
+
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Message received completely!  " + state);
+
+                _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
+                if (state.getFragmentCount() > 0)
+                    _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
+            } else if (messageExpired) {
+                state.releaseResources();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Message expired while only being partially read: " + state);
+                _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired hile partially read: " + state.toString());
+            } else if (partialACK) {
+                // not expired but not yet complete... lets queue up a partial ACK
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Queueing up a partial ACK for peer: " + from + " for " + state);
+                from.messagePartiallyReceived();
+                _ackSender.ackPeer(from);
+            }
+
+            if (!fragmentOK)
+                break;
         }
         return fragments;
     }
@@ -183,16 +181,17 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         int rv = 0;
         if (data.readACKsIncluded()) {
             int fragments = 0;
-            long acks[] = data.readACKs();
-            if (acks != null) {
-                rv += acks.length;
-                _context.statManager().addRateData("udp.receivedACKs", acks.length, 0);
+            int ackCount = data.readACKCount();
+            if (ackCount > 0) {
+                rv += ackCount;
+                _context.statManager().addRateData("udp.receivedACKs", ackCount, 0);
                 //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receiveACKCount", acks.length, 0);
 
-                for (int i = 0; i < acks.length; i++) {
+                for (int i = 0; i < ackCount; i++) {
+                    long id = data.readACK(i);
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Full ACK of message " + acks[i] + " received!");
-                    fragments += _outbound.acked(acks[i], from.getRemotePeer());
+                        _log.info("Full ACK of message " + id + " received!");
+                    fragments += _outbound.acked(id, from.getRemotePeer());
                 }
             } else {
                 _log.error("Received ACKs with no acks?! " + data);

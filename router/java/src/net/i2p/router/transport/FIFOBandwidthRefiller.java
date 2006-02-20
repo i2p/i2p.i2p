@@ -1,5 +1,6 @@
 package net.i2p.router.transport;
 
+import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
@@ -62,6 +63,7 @@ class FIFOBandwidthRefiller implements Runnable {
     public void run() {
         // bootstrap 'em with nothing
         _lastRefillTime = _limiter.now();
+        List buffer = new ArrayList(2);
         while (true) {
             long now = _limiter.now();
             if (now >= _lastCheckConfigTime + _configCheckPeriodMs) {
@@ -70,7 +72,7 @@ class FIFOBandwidthRefiller implements Runnable {
                 _lastCheckConfigTime = now;
             }
             
-            boolean updated = updateQueues(now);
+            boolean updated = updateQueues(buffer, now);
             if (updated) {
                 _lastRefillTime = now;
             }
@@ -85,7 +87,7 @@ class FIFOBandwidthRefiller implements Runnable {
         _lastCheckConfigTime = _lastRefillTime;
     }
     
-    private boolean updateQueues(long now) {
+    private boolean updateQueues(List buffer, long now) {
         long numMs = (now - _lastRefillTime);
         if (_log.shouldLog(Log.INFO))
             _log.info("Updating bandwidth after " + numMs + " (status: " + _limiter.getStatus().toString()
@@ -114,7 +116,7 @@ class FIFOBandwidthRefiller implements Runnable {
             
             long maxBurstIn = ((_inboundBurstKBytesPerSecond-_inboundKBytesPerSecond)*1024*numMs)/1000;
             long maxBurstOut = ((_outboundBurstKBytesPerSecond-_outboundKBytesPerSecond)*1024*numMs)/1000;
-            _limiter.refillBandwidthQueues(inboundToAdd, outboundToAdd, maxBurstIn, maxBurstOut);
+            _limiter.refillBandwidthQueues(buffer, inboundToAdd, outboundToAdd, maxBurstIn, maxBurstOut);
             
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Adding " + inboundToAdd + " bytes to inboundAvailable");

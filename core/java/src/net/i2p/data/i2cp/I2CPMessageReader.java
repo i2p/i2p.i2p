@@ -151,15 +151,17 @@ public class I2CPMessageReader {
                             _log.debug("After handling the newly received message");
                         }
                     } catch (I2CPMessageException ime) {
-                        _log.error("Error handling message", ime);
+                        _log.warn("Error handling message", ime);
                         _listener.readError(I2CPMessageReader.this, ime);
                         cancelRunner();
                     } catch (IOException ioe) {
-                        _log.error("IO Error handling message", ioe);
+                        _log.warn("IO Error handling message", ioe);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();
-                    } catch (Throwable t) {
-                        _log.log(Log.CRIT, "Unhandled error reading I2CP stream", t);
+                    } catch (OutOfMemoryError oom) {
+                        throw oom;
+                    } catch (Exception e) {
+                        _log.log(Log.CRIT, "Unhandled error reading I2CP stream", e);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();
                     }

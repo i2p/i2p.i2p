@@ -71,7 +71,9 @@ public class ReseedHandler {
             seedURL = DEFAULT_SEED_URL;
         try {
             URL dir = new URL(seedURL);
-            String content = new String(readURL(dir));
+            byte contentRaw[] = readURL(dir);
+            if (contentRaw == null) return;
+            String content = new String(contentRaw);
             Set urls = new HashSet();
             int cur = 0;
             while (true) {

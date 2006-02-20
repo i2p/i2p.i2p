@@ -140,6 +140,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         loadConfig(options);
         _sessionId = null;
         _leaseSet = null;
+        _context.statManager().createRateStat("client.availableMessages", "How many messages are available for the current client", "ClientMessages", new long[] { 60*1000, 10*60*1000 });
     }
 
     /**
@@ -299,11 +300,17 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
+        int remaining = 0;
         MessagePayloadMessage msg = null;
         synchronized (_availableMessages) {
             msg = (MessagePayloadMessage) _availableMessages.remove(new Long(msgId));
+            remaining = _availableMessages.size();
         }
-        if (msg == null) return null;
+        _context.statManager().addRateData("client.availableMessages", remaining, 0);
+        if (msg == null) {
+            _log.error("Receive message " + msgId + " had no matches, remaining=" + remaining);
+            return null;
+        }
         return msg.getPayload().getUnencryptedData();
     }
 
@@ -339,9 +346,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve a payload message and let the app know its available
      */
     public void addNewMessage(MessagePayloadMessage msg) {
+        Long mid = new Long(msg.getMessageId());
+        int avail = 0;
         synchronized (_availableMessages) {
-            _availableMessages.put(new Long(msg.getMessageId()), msg);
+            _availableMessages.put(mid, msg);
+            avail = _availableMessages.size();
         }
+        _context.statManager().addRateData("client.availableMessages", avail, 0);
         long id = msg.getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {
@@ -354,20 +365,23 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Notified availability for session " + _sessionId + ", message " + id);
         }
-        SimpleTimer.getInstance().addEvent(new VerifyUsage(id), 30*1000);
+        SimpleTimer.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
     private class VerifyUsage implements SimpleTimer.TimedEvent {
-        private long _msgId;
-        public VerifyUsage(long id) { _msgId = id; }
+        private Long _msgId;
+        public VerifyUsage(Long id) { _msgId = id; }
         public void timeReached() {
             MessagePayloadMessage removed = null;
+            int remaining = 0;
             synchronized (_availableMessages) {
-                removed = (MessagePayloadMessage)_availableMessages.remove(new Long(_msgId));
+                removed = (MessagePayloadMessage)_availableMessages.remove(_msgId);
+                remaining = _availableMessages.size();
             }
-            if (removed != null)
-                _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed);
+            if (removed != null) {
+                _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed + ": remaining: " + remaining);
+                _context.statManager().addRateData("client.availableMessages", remaining, 0);
+            }
         }
-        
     }
 
     private class AvailabilityNotifier implements Runnable {

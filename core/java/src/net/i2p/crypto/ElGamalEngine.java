@@ -129,6 +129,7 @@ public class ElGamalEngine {
                          (ybytes.length > 257 ? 257 : ybytes.length));
         System.arraycopy(dbytes, 0, out, (dbytes.length < 257 ? 514 - dbytes.length : 257),
                          (dbytes.length > 257 ? 257 : dbytes.length));
+        /*
         StringBuffer buf = new StringBuffer(1024);
         buf.append("Timing\n");
         buf.append("0-1: ").append(t1 - t0).append('\n');
@@ -142,6 +143,7 @@ public class ElGamalEngine {
         buf.append("8-9: ").append(t9 - t8).append('\n');
         buf.append("9-10: ").append(t10 - t9).append('\n');
         //_log.debug(buf.toString());
+         */
         long end = _context.clock().now();
 
         long diff = end - start;

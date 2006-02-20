@@ -66,7 +66,7 @@ public class JobTiming implements Clock.ClockUpdateListener {
      */
     public void end() {
         _actualEnd = _context.clock().now();
-        _context.clock().removeUpdateListener(this);
+        //_context.clock().removeUpdateListener(this);
     }
     
     public void offsetChanged(long delta) {

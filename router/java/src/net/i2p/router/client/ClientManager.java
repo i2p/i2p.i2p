@@ -251,21 +251,11 @@ public class ClientManager {
     }
     public boolean isLocal(Hash destHash) { 
         if (destHash == null) return false;
-        Set dests = new HashSet();
-        long beforeLock = _ctx.clock().now();
-        long inLock = 0;
         synchronized (_runners) {
-            inLock = _ctx.clock().now();
-            dests.addAll(_runners.keySet());
-        }
-        long afterLock = _ctx.clock().now();
-        if (afterLock - beforeLock > 50) {
-            _log.warn("isLocal(Hash).locking took too long: " + (afterLock-beforeLock)
-                      + " overall, synchronized took " + (inLock - beforeLock));
-        }
-        for (Iterator iter = dests.iterator(); iter.hasNext();) {
-            Destination d = (Destination)iter.next();
-            if (d.calculateHash().equals(destHash)) return true;
+            for (Iterator iter = _runners.values().iterator(); iter.hasNext(); ) {
+                ClientConnectionRunner cur = (ClientConnectionRunner)iter.next();
+                if (destHash.equals(cur.getDestHash())) return true;
+            }
         }
         return false;
     }
@@ -324,23 +314,12 @@ public class ClientManager {
     private ClientConnectionRunner getRunner(Hash destHash) {
         if (destHash == null) 
             return null;
-        Set dests = new HashSet();
-        long beforeLock = _ctx.clock().now();
-        long inLock = 0;
         synchronized (_runners) {
-            inLock = _ctx.clock().now();
-            dests.addAll(_runners.keySet());
-        }
-        long afterLock = _ctx.clock().now();
-        if (afterLock - beforeLock > 50) {
-            _log.warn("getRunner(Hash).locking took too long: " + (afterLock-beforeLock)
-                      + " overall, synchronized took " + (inLock - beforeLock));
-        }
-        
-        for (Iterator iter = dests.iterator(); iter.hasNext(); ) {
-            Destination d = (Destination)iter.next();
-            if (d.calculateHash().equals(destHash))
-                return getRunner(d);
+            for (Iterator iter = _runners.values().iterator(); iter.hasNext(); ) {
+                ClientConnectionRunner cur = (ClientConnectionRunner)iter.next();
+                if (cur.getDestHash().equals(destHash))
+                    return cur;
+	    }
         }
         return null;
     }

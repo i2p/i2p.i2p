@@ -961,13 +961,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if ( (msg.getPeer() != null) && 
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
                (msg.isExpired())) ) {
-            long recvDelay = _context.clock().now() - msg.getPeer().getLastReceiveTime();
-            long sendDelay = _context.clock().now() - msg.getPeer().getLastSendFullyTime();
-            if (m != null)
-                m.timestamp("message failure - volleys = " + msg.getMaxSends() 
-                            + " lastReceived: " + recvDelay
-                            + " lastSentFully: " + sendDelay
-                            + " expired? " + msg.isExpired());
+            //long recvDelay = _context.clock().now() - msg.getPeer().getLastReceiveTime();
+            //long sendDelay = _context.clock().now() - msg.getPeer().getLastSendFullyTime();
+            //if (m != null)
+            //    m.timestamp("message failure - volleys = " + msg.getMaxSends() 
+            //                + " lastReceived: " + recvDelay
+            //                + " lastSentFully: " + sendDelay
+            //                + " expired? " + msg.isExpired());
             consecutive = msg.getPeer().incrementConsecutiveFailedSends();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Consecutive failure #" + consecutive 

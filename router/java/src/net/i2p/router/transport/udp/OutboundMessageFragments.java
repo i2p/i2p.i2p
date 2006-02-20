@@ -202,14 +202,16 @@ public class OutboundMessageFragments {
      */
     private void finishMessages() {
         int rv = 0;
-        List peers = new ArrayList();
+        List peers = null;
         synchronized (_activePeers) {
-            peers = new ArrayList(_activePeers);
+            peers = new ArrayList(_activePeers.size());
             for (int i = 0; i < _activePeers.size(); i++) {
                 PeerState state = (PeerState)_activePeers.get(i);
                 if (state.getOutboundMessageCount() <= 0) {
                     _activePeers.remove(i);
                     i--;
+                } else {
+                    peers.add(state);
                 }
             }
             _activePeers.notifyAll();
@@ -297,11 +299,13 @@ public class OutboundMessageFragments {
             for (int i = 0; packets != null && i < packets.length ; i++)
                 if (packets[i] != null)
                     valid++;
+            /*
             state.getMessage().timestamp("sending a volley of " + valid
                                          + " lastReceived: " 
                                          + (_context.clock().now() - peer.getLastReceiveTime())
                                          + " lastSentFully: " 
                                          + (_context.clock().now() - peer.getLastSendFullyTime()));
+            */
         }
         return packets;
     }
