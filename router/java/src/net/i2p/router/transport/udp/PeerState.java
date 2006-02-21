@@ -606,7 +606,7 @@ public class PeerState {
             int remaining = _inboundMessages.size();
             for (Iterator iter = _inboundMessages.values().iterator(); remaining > 0; remaining--) {
                 InboundMessageState state = (InboundMessageState)iter.next();
-                if (state.isExpired()) {
+                if (state.isExpired() || _dead) {
                     iter.remove();
                 } else {
                     if (state.isComplete()) {
@@ -977,6 +977,10 @@ public class PeerState {
 
     
     public int add(OutboundMessageState state) {
+        if (_dead) { 
+            _transport.failed(state, false);
+            return 0;
+	}
         state.setPeer(this);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding to " + _remotePeer.toBase64() + ": " + state.getMessageId());
@@ -989,20 +993,23 @@ public class PeerState {
     }
     /** drop all outbound messages */
     public void dropOutbound() {
-        if (_dead) return;
+        //if (_dead) return;
         _dead = true;
         List msgs = _outboundMessages;
         //_outboundMessages = null;
         _retransmitter = null;
         if (msgs != null) {
+            int sz = 0;
             List tempList = null;
             synchronized (msgs) {
-                tempList = new ArrayList(msgs);
-                msgs.clear();
+                sz = msgs.size();
+                if (sz > 0) {
+                    tempList = new ArrayList(msgs);
+                    msgs.clear();
+		}
             }
-            int sz = tempList.size();
             for (int i = 0; i < sz; i++)
-                _transport.failed((OutboundMessageState)tempList.get(i));
+                _transport.failed((OutboundMessageState)tempList.get(i), false);
         }
     }
     
@@ -1025,7 +1032,10 @@ public class PeerState {
     public int finishMessages() {
         int rv = 0;
         List msgs = _outboundMessages;
-        if (_dead) return 0;
+        if (_dead) {
+            dropOutbound();
+            return 0;
+	}
         List succeeded = null;
         List failed = null;
         synchronized (msgs) {
@@ -1404,14 +1414,18 @@ public class PeerState {
             tmp.addAll(oldPeer._currentACKs);
             oldPeer._currentACKs.clear();
         }
-        synchronized (_currentACKs) { _currentACKs.addAll(tmp); }
+        if (!_dead) {
+            synchronized (_currentACKs) { _currentACKs.addAll(tmp); }
+	}
         tmp.clear();
         
         synchronized (oldPeer._currentACKsResend) {
             tmp.addAll(oldPeer._currentACKsResend);
             oldPeer._currentACKsResend.clear();
         }
-        synchronized (_currentACKsResend) { _currentACKsResend.addAll(tmp); }
+        if (!_dead) {
+            synchronized (_currentACKsResend) { _currentACKsResend.addAll(tmp); }
+	}
         tmp.clear();
         
         Map msgs = new HashMap();
@@ -1419,7 +1433,9 @@ public class PeerState {
             msgs.putAll(oldPeer._inboundMessages);
             oldPeer._inboundMessages.clear();
         }
-        synchronized (_inboundMessages) { _inboundMessages.putAll(msgs); }
+        if (!_dead) {
+            synchronized (_inboundMessages) { _inboundMessages.putAll(msgs); }
+	}
         msgs.clear();
         
         OutboundMessageState retransmitter = null;
@@ -1429,9 +1445,11 @@ public class PeerState {
             retransmitter = oldPeer._retransmitter;
             oldPeer._retransmitter = null;
         }
-        synchronized (_outboundMessages) {
-            _outboundMessages.addAll(tmp);
-            _retransmitter = retransmitter;
+        if (!_dead) {
+            synchronized (_outboundMessages) {
+                _outboundMessages.addAll(tmp);
+                _retransmitter = retransmitter;
+            }
         }
         tmp.clear();
     }

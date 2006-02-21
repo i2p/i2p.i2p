@@ -372,8 +372,6 @@ public class MessageOutputStream extends OutputStream {
     /** 
      * called whenever the engine wants to push more data to the
      * peer
-     *
-     * @return true if the data was flushed
      */
     void flushAvailable(DataReceiver target) throws IOException {
         flushAvailable(target, true);

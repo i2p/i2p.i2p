@@ -142,6 +142,11 @@ public class OutboundMessageFragments {
         boolean ok = state.initialize(msg, msgBody);
         if (ok) {
             PeerState peer = _transport.getPeerState(target.getIdentity().calculateHash());
+            if (peer == null) {
+                _transport.failed(msg, "Peer disconnected quickly");
+                state.releaseResources();
+                return;
+            }
             int active = peer.add(state);
             synchronized (_activePeers) {
                 if (!_activePeers.contains(peer)) {

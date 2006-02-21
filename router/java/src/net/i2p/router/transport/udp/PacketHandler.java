@@ -61,7 +61,8 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.droppedInvalidInboundEstablish", "How old the packet we dropped due to invalidity (inbound establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidSkew", "How skewed the packet we dropped due to invalidity (valid except bad skew) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", new long[] { 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (when its slow)", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (period is dequeue time)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() { 
@@ -140,8 +141,11 @@ public class PacketHandler {
                     timeToVerify = beforeRecv - packet.getTimeSinceReceived();
                 if (timeToDequeue > 50)
                     _context.statManager().addRateData("udp.packetDequeueTime", timeToDequeue, timeToDequeue);
-                if (timeToVerify > 50)
-                    _context.statManager().addRateData("udp.packetVerifyTime", timeToVerify, timeToVerify);
+                if (timeToVerify > 0) {
+                    _context.statManager().addRateData("udp.packetVerifyTime", timeToVerify, timeToDequeue);
+                    if (timeToVerify > 100)
+                        _context.statManager().addRateData("udp.packetVerifyTimeSlow", timeToVerify, timeToDequeue);
+                }
                 
                 // back to the cache with thee!
                 packet.release();

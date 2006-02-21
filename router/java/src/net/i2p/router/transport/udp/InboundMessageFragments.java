@@ -174,6 +174,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
             if (!fragmentOK)
                 break;
         }
+        from.expireInboundMessages();
         return fragments;
     }
     

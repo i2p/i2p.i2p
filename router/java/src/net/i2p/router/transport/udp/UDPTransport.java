@@ -59,6 +59,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _introducersSelectedOn;
     private long _lastInboundReceivedOn;
     
+    /** do we need to rebuild our external router address asap? */
+    private boolean _needsRebuild;
+    
     /** summary info to distribute */
     private RouterAddress _externalAddress;
     /** port number on which we can be reached, or -1 */
@@ -140,6 +143,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
+        _needsRebuild = true;
         
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -302,7 +306,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.INFO))
             _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort + " from " 
                       + from.toBase64() + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
-                      + ", receivedInboundRecent? " + inboundRecent);
+                      + ", receivedInboundRecent? " + inboundRecent + " status " + _reachabilityStatus);
         
         if (explicitSpecified) 
             return;
@@ -319,8 +323,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return;
         } else if (inboundRecent) {
             // use OS clock since its an ordering thing, not a time thing
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Ignoring IP address suggestion, since we have received an inbound con recently");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Ignoring IP address suggestion, since we have received an inbound con recently");
         } else {
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
@@ -328,6 +332,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
                          (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Trying to change our external address...");
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
                             if (!fixedPort)
@@ -337,14 +343,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             updated = true;
                         } catch (UnknownHostException uhe) {
                             _externalListenHost = null;
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Error trying to change our external address", uhe);
                         }
                     } else {
                         // they told us something different, but our tests are recent and positive,
                         // so lets test again
                         fireTest = true;
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Different address, but we're fine..");
                     }
                 } else {
                     // matched what we expect
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Same address as the current one");
                 }
             }
         }
@@ -524,8 +536,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (oldEstablishedOn > 0)
             _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn, 0);
         
-        // if we need introducers, try to shift 'em around every 10 minutes
-        if (introducersRequired() && (_introducersSelectedOn < _context.clock().now() - 10*60*1000))
+        if (needsRebuild())
             rebuildExternalAddress();
         
         if (getReachabilityStatus() != CommSystemFacade.STATUS_OK) {
@@ -536,8 +547,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public RouterAddress getCurrentAddress() {
-        // if we need introducers, try to shift 'em around every 10 minutes
-        if (introducersRequired() && (_introducersSelectedOn < _context.clock().now() - 10*60*1000))
+        if (needsRebuild())
             rebuildExternalAddress(false);
         return super.getCurrentAddress();
     }
@@ -578,8 +588,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Received another message: " + inMsg.getClass().getName());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received another message: " + inMsg.getClass().getName());
         }
         PeerState peer = getPeerState(remoteIdentHash);
         super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
@@ -636,12 +646,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
         peer.dropOutbound();
+        peer.expireInboundMessages();
         _introManager.remove(peer);
         _fragments.dropPeer(peer);
-        // a bit overzealous - perhaps we should only rebuild the external if the peer being dropped
-        // is one of our introducers?  dropping it only if we are considered 'not reachable' is a start
-        if (introducersRequired())
-            rebuildExternalAddress();
+        
+        PeerState altByIdent = null;
+        PeerState altByHost = null;
         
         if (peer.getRemotePeer() != null) {
             dropPeerCapacities(peer);
@@ -655,14 +665,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _context.statManager().addRateData("udp.droppedPeerInactive", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             }
             synchronized (_peersByIdent) {
-                _peersByIdent.remove(peer.getRemotePeer());
+                altByIdent = (PeerState)_peersByIdent.remove(peer.getRemotePeer());
             }
         }
         
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (remoteId != null) {
             synchronized (_peersByRemoteHost) {
-                _peersByRemoteHost.remove(remoteId);
+                altByHost = (PeerState)_peersByRemoteHost.remove(remoteId);
             }
         }
         
@@ -672,6 +682,64 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (SHOULD_FLOOD_PEERS)
             _flooder.removePeer(peer);
         _expireEvent.remove(peer);
+        
+        if (needsRebuild())
+            rebuildExternalAddress();
+        
+        // deal with races to make sure we drop the peers fully
+        if ( (altByIdent != null) && (peer != altByIdent) ) dropPeer(altByIdent, shouldShitlist);
+        if ( (altByHost != null) && (peer != altByHost) ) dropPeer(altByHost, shouldShitlist);
+    }
+    
+    private boolean needsRebuild() {
+        if (_needsRebuild) return true; // simple enough
+        if (_context.router().isHidden()) return false;
+        if (introducersRequired()) {
+            RouterAddress addr = _externalAddress;
+            UDPAddress ua = new UDPAddress(addr);
+            int valid = 0;
+            Hash peerHash = new Hash();
+            for (int i = 0; i < ua.getIntroducerCount(); i++) {
+                // warning: this is only valid as long as we use the ident hash as their key.
+                peerHash.setData(ua.getIntroducerKey(i));
+                PeerState peer = getPeerState(peerHash);
+                if (peer != null)
+                    valid++;
+            }
+            if (valid >= PUBLIC_RELAY_COUNT) {
+                // try to shift 'em around every 10 minutes or so
+                if (_introducersSelectedOn < _context.clock().now() - 10*60*1000) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Our introducers are valid, but thy havent changed in a while, so lets rechoose");
+                    return true;
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Our introducers are valid and haven't changed in a while");
+                    return false;
+                }
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Our introducers are not valid (" +valid + ")");
+                return true;
+            }
+        } else {
+            boolean rv = (_externalListenHost == null) || (_externalListenPort <= 0);
+            if (_log.shouldLog(Log.INFO)) {
+                if (rv) {
+                    _log.info("Need to initialize our direct SSU info");
+                } else {
+                    RouterAddress addr = _externalAddress;
+                    UDPAddress ua = new UDPAddress(addr);
+                    if ( (ua.getPort() <= 0) || (ua.getHost() == null) ) {
+                        _log.info("Our direct SSU info is initialized, but not used in our address yet");
+                        rv = true;
+                    } else {
+                        _log.info("Our direct SSU info is initialized");
+                    }
+                }
+            }
+            return rv;
+        }
     }
     
     /**
@@ -785,20 +853,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (ok)
             _fragments.add(state);
     }
-
-    //public OutNetMessage getNextMessage() { return getNextMessage(-1); }
-    /**
-     * Get the next message, blocking until one is found or the expiration
-     * reached.
-     *
-     * @param blockUntil expiration, or -1 if indefinite
-     */
-    /*
-    public OutNetMessage getNextMessage(long blockUntil) {
-        return _outboundMessages.getNext(blockUntil);
-    }
-     */
-
     
     // we don't need the following, since we have our own queueing
     protected void outboundMessageReady() { throw new UnsupportedOperationException("Not used for UDP"); }
@@ -848,68 +902,58 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
             
         Properties options = new Properties(); 
+        boolean directIncluded = false;
+        if ( allowDirectUDP() && (_externalListenPort > 0) && (_externalListenHost != null) && (isValid(_externalListenHost.getAddress())) ) {
+            options.setProperty(UDPAddress.PROP_PORT, String.valueOf(_externalListenPort));
+            options.setProperty(UDPAddress.PROP_HOST, _externalListenHost.getHostAddress());
+            directIncluded = true;
+        }
+        
         boolean introducersRequired = introducersRequired();
-        if (introducersRequired) {
-            List peers = new ArrayList(PUBLIC_RELAY_COUNT);
-            int found = 0;
-            _introManager.pickInbound(peers, PUBLIC_RELAY_COUNT);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Introducers required, picked peers: " + peers);
-            for (int i = 0; i < peers.size(); i++) {
-                PeerState peer = (PeerState)peers.get(i);
-                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
-                if (ri == null) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Picked peer has no local routerInfo: " + peer);
-                    continue;
-                }
-                RouterAddress ra = ri.getTargetAddress(STYLE);
-                if (ra == null) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Picked peer has no SSU address: " + ri);
-                    continue;
-                }
-                UDPAddress ura = new UDPAddress(ra);
-                options.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, peer.getRemoteHostId().toHostString());
-                options.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, String.valueOf(peer.getRemotePort()));
-                options.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, Base64.encode(ura.getIntroKey()));
-                options.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, String.valueOf(peer.getTheyRelayToUsAs()));
-                found++;
-            }
+        boolean introducersIncluded = false;
+        if (introducersRequired || !directIncluded) {
+            int found = _introManager.pickInbound(options, PUBLIC_RELAY_COUNT);
             if (found > 0) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Picked peers: " + found);
                 _introducersSelectedOn = _context.clock().now();
+                introducersIncluded = true;
             }
-        } 
-        if ( allowDirectUDP() && (_externalListenPort > 0) && (_externalListenHost != null) && (isValid(_externalListenHost.getAddress())) ) {
-            options.setProperty(UDPAddress.PROP_PORT, String.valueOf(_externalListenPort));
-            options.setProperty(UDPAddress.PROP_HOST, _externalListenHost.getHostAddress());
-            // if we have explicit external addresses, they had better be reachable
-            if (introducersRequired)
-                options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
-            else
-                options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
         }
-        options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
         
-        RouterAddress addr = new RouterAddress();
-        addr.setCost(5);
-        addr.setExpiration(null);
-        addr.setTransportStyle(STYLE);
-        addr.setOptions(options);
-        
-        boolean wantsRebuild = false;
-        if ( (_externalAddress == null) || !(_externalAddress.equals(addr)) )
-            wantsRebuild = true;
-        
-        RouterAddress oldAddress = _externalAddress;
-        _externalAddress = addr;
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Address rebuilt: " + addr);
-        replaceAddress(addr, oldAddress);
-        if (allowRebuildRouterInfo)
-            _context.router().rebuildRouterInfo();
+        // if we have explicit external addresses, they had better be reachable
+        if (introducersRequired)
+            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
+        else
+            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
+
+        if (directIncluded || introducersIncluded) {
+            options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
+
+            RouterAddress addr = new RouterAddress();
+            addr.setCost(5);
+            addr.setExpiration(null);
+            addr.setTransportStyle(STYLE);
+            addr.setOptions(options);
+
+            boolean wantsRebuild = false;
+            if ( (_externalAddress == null) || !(_externalAddress.equals(addr)) )
+                wantsRebuild = true;
+
+            RouterAddress oldAddress = _externalAddress;
+            _externalAddress = addr;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Address rebuilt: " + addr);
+            replaceAddress(addr, oldAddress);
+            if (allowRebuildRouterInfo && wantsRebuild)
+                _context.router().rebuildRouterInfo();
+            _needsRebuild = false;
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Wanted to rebuild my SSU address, but couldn't specify either the direct or indirect info (needs introducers? " 
+                           + introducersRequired + ")", new Exception("source"));
+            _needsRebuild = true;
+        }
     }
 
     protected void replaceAddress(RouterAddress address, RouterAddress oldAddress) {
@@ -940,13 +984,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public boolean introducersRequired() {
         String forceIntroducers = _context.getProperty(PROP_FORCE_INTRODUCERS);
-        if ( (forceIntroducers != null) && (Boolean.valueOf(forceIntroducers).booleanValue()) )
+        if ( (forceIntroducers != null) && (Boolean.valueOf(forceIntroducers).booleanValue()) ) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Force introducers specified");
             return true;
-        switch (getReachabilityStatus()) {
+        }
+        short status = getReachabilityStatus();
+        switch (status) {
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
             case CommSystemFacade.STATUS_DIFFERENT:
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Require introducers, because our status is " + status);
                 return true;
             default:
+                if (!allowDirectUDP()) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Require introducers, because we do not allow direct UDP connections");
+                    return true;
+                }
                 return false;
         }
     }
@@ -966,11 +1021,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     private static final int DROP_INACTIVITY_TIME = 60*1000;
     
-    public void failed(OutboundMessageState msg) {
+    public void failed(OutboundMessageState msg) { failed(msg, true); }
+    void failed(OutboundMessageState msg, boolean allowPeerFailure) {
         if (msg == null) return;
         int consecutive = 0;
         OutNetMessage m = msg.getMessage();
-        if ( (msg.getPeer() != null) && 
+        if ( allowPeerFailure && (msg.getPeer() != null) && 
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
                (msg.isExpired())) ) {
             //long recvDelay = _context.clock().now() - msg.getPeer().getLastReceiveTime();
@@ -1456,6 +1512,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final long STATUS_GRACE_PERIOD = 5*60*1000;
     
     void setReachabilityStatus(short status) { 
+        short old = _reachabilityStatus;
         long now = _context.clock().now();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
@@ -1484,6 +1541,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //    _reachabilityStatusLastUpdated = now;
                 //}
                 break;
+        }
+        if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
+            if (needsRebuild())
+                rebuildExternalAddress();
         }
     }
     private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";

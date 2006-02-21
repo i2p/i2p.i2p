@@ -1,10 +1,12 @@
-$Id: history.txt,v 1.411 2006/02/20 13:12:47 jrandom Exp $
+$Id: history.txt,v 1.412 2006/02/20 21:02:49 jrandom Exp $
 
-2006-02-20  jrandom
+2006-02-21  jrandom
     * Throttle the outbound SSU establishment queue, so it doesn't fill up the
       heap when backlogged (and so that the messages queued up on it don't sit
       there forever)
     * Further SSU memory cleanup
+    * Clean up the address regeneration code so it knows when to rebuild the
+      local info more precisely.
 
 2006-02-20  jrandom
     * Properly enable TCP this time (oops)

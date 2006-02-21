@@ -139,7 +139,6 @@ public class CryptixAESEngine extends AESEngine {
     /** decrypt the data with the session key provided
      * @param payload encrypted data
      * @param sessionKey private session key
-     * @return unencrypted data
      */
     public final void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
         if ( (payload == null) || (rv == null) )

@@ -153,7 +153,6 @@ public class AESEngine {
     /** decrypt the data with the session key provided
      * @param payload encrypted data
      * @param sessionKey private session key
-     * @return unencrypted data
      */
     public void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
         System.arraycopy(payload, inIndex, rv, outIndex, rv.length - outIndex);

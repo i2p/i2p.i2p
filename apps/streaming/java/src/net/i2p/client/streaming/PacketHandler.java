@@ -102,7 +102,8 @@ public class PacketHandler {
         Connection con = (sendId > 0 ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
             receiveKnownCon(con, packet);
-            displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
+            if (_log.shouldLog(Log.INFO))
+                displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
         } else {
             receiveUnknownCon(packet, sendId);
             displayPacket(packet, "UNKN", null);

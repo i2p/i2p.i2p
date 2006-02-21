@@ -58,8 +58,8 @@ public class SimpleTimer {
      */
     public void addEvent(TimedEvent event, long timeoutMs) { addEvent(event, timeoutMs, true); }
     /**
-     * @param useEarliestEventTime if its already scheduled, use the earlier of the 
-     *                             two timeouts, else use the later
+     * @param useEarliestTime if its already scheduled, use the earlier of the 
+     *                        two timeouts, else use the later
      */
     public void addEvent(TimedEvent event, long timeoutMs, boolean useEarliestTime) {
         int totalEvents = 0;

@@ -211,6 +211,7 @@ public class StatisticsManager implements Service {
 
             Rate curRate = rate.getRate(periods[i]);
             if (curRate == null) continue;
+            if (curRate.getLifetimeEventCount() <= 0) continue;
             stats.setProperty("stat_" + rateName + '.' + getPeriod(curRate), renderRate(curRate, fudgeQuantity));
         }
     }

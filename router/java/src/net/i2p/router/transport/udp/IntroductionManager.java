@@ -2,7 +2,10 @@ package net.i2p.router.transport.udp;
 
 import java.util.*;
 
+import net.i2p.data.Base64;
 import net.i2p.data.SessionKey;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.RouterAddress;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -68,18 +71,47 @@ public class IntroductionManager {
         return (PeerState)_outbound.get(new Long(id));
     }
     
-    public void pickInbound(List rv, int howMany) {
+    /**
+     * Grab a bunch of peers who are willing to be introducers for us that
+     * are locally known (duh) and have published their own SSU address (duh^2).
+     * The picked peers have their info tacked on to the ssuOptions parameter for
+     * use in the SSU RouterAddress.
+     *
+     */
+    public int pickInbound(Properties ssuOptions, int howMany) {
+        List peers = null;
         int start = _context.random().nextInt(Integer.MAX_VALUE);
         synchronized (_inbound) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Picking inbound out of " + _inbound);
-            if (_inbound.size() <= 0) return;
-            start = start % _inbound.size();
-            for (int i = 0; i < _inbound.size() && rv.size() < howMany; i++) {
-                PeerState cur = (PeerState)_inbound.get((start + i) % _inbound.size());
-                rv.add(cur);
-            }
+            if (_inbound.size() <= 0) return 0;
+            peers = new ArrayList(_inbound);
         }
+        int sz = peers.size();
+        start = start % sz;
+        int found = 0;
+        for (int i = 0; i < sz && found < howMany; i++) {
+            PeerState cur = (PeerState)peers.get((start + i) % sz);
+            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
+            if (ri == null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Picked peer has no local routerInfo: " + cur);
+                continue;
+            }
+            RouterAddress ra = ri.getTargetAddress(UDPTransport.STYLE);
+            if (ra == null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Picked peer has no SSU address: " + ri);
+                continue;
+            }
+            UDPAddress ura = new UDPAddress(ra);
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + found, cur.getRemoteHostId().toHostString());
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + found, String.valueOf(cur.getRemotePort()));
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + found, Base64.encode(ura.getIntroKey()));
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + found, String.valueOf(cur.getTheyRelayToUsAs()));
+            found++;
+        }
+        return found;
     }
     
     public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
