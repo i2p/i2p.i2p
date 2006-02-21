@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.412 2006/02/20 21:02:49 jrandom Exp $
+$Id: history.txt,v 1.413 2006/02/21 08:31:25 jrandom Exp $
+
+* 2006-02-21  0.6.1.11 released
 
 2006-02-21  jrandom
     * Throttle the outbound SSU establishment queue, so it doesn't fill up the
