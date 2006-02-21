@@ -483,6 +483,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
+        if (oldPeer != null) {
+            oldPeer.dropOutbound();
+            _introManager.remove(oldPeer);
+            _expireEvent.remove(oldPeer);
+        }
         oldPeer = null;
         
         RemoteHostId remoteId = peer.getRemoteHostId();
@@ -495,6 +500,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 peer.loadFrom(oldPeer);
                 oldEstablishedOn = oldPeer.getKeyEstablishedTime();
             }
+        }
+        
+        if (oldPeer != null) {
+            oldPeer.dropOutbound();
+            _introManager.remove(oldPeer);
+            _expireEvent.remove(oldPeer);
         }
         
         if ( (oldPeer != null) && (_log.shouldLog(Log.WARN)) )
@@ -624,6 +635,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn(buf.toString(), new Exception("Dropped by"));
         }
         
+        peer.dropOutbound();
         _introManager.remove(peer);
         _fragments.dropPeer(peer);
         // a bit overzealous - perhaps we should only rebuild the external if the peer being dropped
@@ -1384,67 +1396,53 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int EXPIRE_TIMEOUT = 10*60*1000;
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
-        private List _peers;
-        // toAdd and toRemove are kept separate from _peers so that add and
-        // remove calls won't block packet handling while the big iteration is
-        // in process
-        private List _toAdd;
-        private List _toRemove;
+        private List _expirePeers;
+        private List _expireBuffer;
         private boolean _alive;
         public ExpirePeerEvent() {
-            _peers = new ArrayList(128);
-            _toAdd = new ArrayList(4);
-            _toRemove = new ArrayList(4);
+            _expirePeers = new ArrayList(128);
+            _expireBuffer = new ArrayList(128);
         }
         public void timeReached() {
             long inactivityCutoff = _context.clock().now() - EXPIRE_TIMEOUT;
-            for (int i = 0; i < _peers.size(); i++) {
-                PeerState peer = (PeerState)_peers.get(i);
-                if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
-                    dropPeer(peer, false);
-                    _peers.remove(i);
-                    i--;
+            _expireBuffer.clear();
+            synchronized (_expirePeers) {
+                int sz = _expirePeers.size();
+                for (int i = 0; i < sz; i++) {
+                    PeerState peer = (PeerState)_expirePeers.get(i);
+                    if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
+                        _expireBuffer.add(peer);
+                        _expirePeers.remove(i);
+                        i--;
+                        sz--;
+                    }
                 }
             }
-            synchronized (_toAdd) {
-                for (int i = 0; i < _toAdd.size(); i++) {
-                    PeerState peer = (PeerState)_toAdd.get(i);
-                    _peers.remove(peer);  // in case we are switching peers
-                    _peers.add(peer);
-                }
-                _toAdd.clear();
-            }
-            synchronized (_toRemove) {
-                for (int i = 0; i < _toRemove.size(); i++) {
-                    PeerState peer = (PeerState)_toRemove.get(i);
-                    _peers.remove(peer);
-                }
-                _toRemove.clear();
-            }
+            for (int i = 0; i < _expireBuffer.size(); i++)
+                dropPeer((PeerState)_expireBuffer.get(i), false);
+            _expireBuffer.clear();
+
             if (_alive)
-                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 5*60*1000);
+                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 30*1000);
         }
         public void add(PeerState peer) {
-            synchronized (_toAdd) {
-                _toAdd.add(peer);
+            synchronized (_expirePeers) {
+                _expirePeers.add(peer);
             }
         }
         public void remove(PeerState peer) {
-            synchronized (_toRemove) {
-                _toRemove.add(peer);
+            synchronized (_expirePeers) {
+                _expirePeers.remove(peer);
             }
         }
         public void setIsAlive(boolean isAlive) {
             _alive = isAlive;
             if (isAlive) {
-                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 5*60*1000);
+                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 30*1000);
             } else {
                 SimpleTimer.getInstance().removeEvent(ExpirePeerEvent.this);
-                synchronized (_toAdd) {
-                    _toAdd.clear();
-                }
-                synchronized (_peers) {
-                    _peers.clear();
+                synchronized (_expirePeers) {
+                    _expirePeers.clear();
                 }
             }
         }

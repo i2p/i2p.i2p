@@ -33,6 +33,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     private long _expiration;
     private long _uniqueId;
     private boolean _written;
+    private boolean _read;
     
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
@@ -54,6 +55,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         _expiration = _context.clock().now() + DEFAULT_EXPIRATION_MS;
         _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
         _written = false;
+        _read = false;
         //_context.statManager().createRateStat("i2np.writeTime", "How long it takes to write an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
         //_context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
     }
@@ -105,6 +107,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             long time = _context.clock().now() - start;
             //if (time > 50)
             //    _context.statManager().addRateData("i2np.readTime", time, time);
+            _read = true;
             return size + Hash.HASH_LENGTH + 1 + 4 + DataHelper.DATE_LENGTH;
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
@@ -149,6 +152,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         long time = _context.clock().now() - start;
         //if (time > 50)
         //    _context.statManager().addRateData("i2np.readTime", time, time);
+        _read = true;
         return cur - offset;
     }
     
@@ -296,7 +300,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len, I2NPMessageHandler handler) throws I2NPMessageException {
         int type = (int)DataHelper.fromLong(buffer, offset, 1);
         offset++;
-        I2NPMessage msg = createMessage(ctx, type);
+        I2NPMessageImpl msg = (I2NPMessageImpl)createMessage(ctx, type);
         if (msg == null) 
             throw new I2NPMessageException("Unknown message type: " + type);
         if (RAW_FULL_SIZE) {
@@ -305,6 +309,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Error reading the " + msg, ioe);
             }
+            msg.read();
             return msg;
         }
 
@@ -314,6 +319,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         try {
             msg.readMessage(buffer, offset, dataSize, type, handler);
             msg.setMessageExpiration(expiration);
+            msg.read();
             return msg;
         } catch (IOException ioe) {
             throw new I2NPMessageException("IO error reading raw message", ioe);
@@ -322,6 +328,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
 
     protected void verifyUnwritten() { if (_written) throw new RuntimeException("Already written"); }
     protected void written() { _written = true; }
+    protected void read() { _read = true; }
     
     /**
      * Yes, this is fairly ugly, but its the only place it ever happens.

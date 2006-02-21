@@ -1427,6 +1427,7 @@ public class PeerState {
             tmp.addAll(oldPeer._outboundMessages);
             oldPeer._outboundMessages.clear();
             retransmitter = oldPeer._retransmitter;
+            oldPeer._retransmitter = null;
         }
         synchronized (_outboundMessages) {
             _outboundMessages.addAll(tmp);
@@ -1434,7 +1435,8 @@ public class PeerState {
         }
         tmp.clear();
     }
-    
+
+    /*
     public int hashCode() {
         if (_remotePeer != null) 
             return _remotePeer.hashCode();
@@ -1454,6 +1456,7 @@ public class PeerState {
             return false;
         }
     }
+    */
     
     public String toString() {
         StringBuffer buf = new StringBuffer(64);

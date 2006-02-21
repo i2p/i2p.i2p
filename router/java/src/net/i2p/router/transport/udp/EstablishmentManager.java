@@ -47,7 +47,7 @@ public class EstablishmentManager {
     private Object _activityLock;
     private int _activity;
     
-    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 4;
+    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 10;
     public static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
     
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
@@ -67,6 +67,8 @@ public class EstablishmentManager {
         _context.statManager().createRateStat("udp.sendIntroRelayRequest", "How often we send a relay request to reach a peer", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendIntroRelayTimeout", "How often a relay request times out before getting a response (due to the target or intro peer being offline)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.receiveIntroRelayResponse", "How long it took to receive a relay response", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.establishRejected", "How many pending outbound connections are there when we refuse to add any more?", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.establishOverflow", "How many messages were queued up on a pending connection when it was too much?", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -112,6 +114,9 @@ public class EstablishmentManager {
         }
         return DEFAULT_MAX_CONCURRENT_ESTABLISH;
     }
+    
+    private static final int MAX_QUEUED_OUTBOUND = 10*1000;
+    private static final int MAX_QUEUED_PER_PEER = 3;
   
     /**
      * Send the message to its specified recipient by establishing a connection
@@ -153,16 +158,24 @@ public class EstablishmentManager {
         
         OutboundEstablishState state = null;
         int deferred = 0;
+        boolean rejected = false;
+        int queueCount = 0;
         synchronized (_outboundStates) {
             state = (OutboundEstablishState)_outboundStates.get(to);
             if (state == null) {
                 if (_outboundStates.size() >= getMaxConcurrentEstablish()) {
                     List queued = (List)_queuedOutbound.get(to);
                     if (queued == null) {
-                        queued = new ArrayList(1);
-                        _queuedOutbound.put(to, queued);
+                        if (_queuedOutbound.size() > MAX_QUEUED_OUTBOUND) {
+                            rejected = true;
+                        } else {
+                            queued = new ArrayList(1);
+                            _queuedOutbound.put(to, queued);
+                        }
                     }
-                    queued.add(msg);
+                    queueCount = queued.size();
+                    if ( (queueCount < MAX_QUEUED_PER_PEER) && (!rejected) )
+                        queued.add(msg);
                     deferred = _queuedOutbound.size();
                 } else {
                     state = new OutboundEstablishState(_context, remAddr, port, 
@@ -179,6 +192,17 @@ public class EstablishmentManager {
                     for (int i = 0; i < queued.size(); i++)
                         state.addMessage((OutNetMessage)queued.get(i));
             }
+        }
+        
+        if (rejected) {
+            _transport.failed(msg, "Too many pending outbound connections");
+            _context.statManager().addRateData("udp.establishRejected", deferred, 0);
+            return;
+        }
+        if (queueCount >= MAX_QUEUED_PER_PEER) {
+            _transport.failed(msg, "Too many pending messages for the given peer");
+            _context.statManager().addRateData("udp.establishOverflow", queueCount, deferred);
+            return;
         }
         
         if (deferred > 0)
@@ -199,7 +223,7 @@ public class EstablishmentManager {
             Object removed = null;
             synchronized (_outboundStates) {
                 removed = _outboundStates.remove(_to);
-                if (removed != _state) { // oops, we must have failed, then retried
+                if ( (removed != null) && (removed != _state) ) { // oops, we must have failed, then retried
                     _outboundStates.put(_to, removed);
                     removed = null;
                 }/* else {
@@ -388,6 +412,8 @@ public class EstablishmentManager {
      *
      */
     private void handleCompletelyEstablished(InboundEstablishState state) {
+        if (state.complete()) return;
+        
         long now = _context.clock().now();
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer = new PeerState(_context, _transport);
@@ -423,6 +449,12 @@ public class EstablishmentManager {
      *
      */
     private PeerState handleCompletelyEstablished(OutboundEstablishState state) {
+        if (state.complete()) {
+            RouterIdentity rem = state.getRemoteIdentity();
+            if (rem != null)
+                return _transport.getPeerState(rem.getHash());
+        }
+        
         long now = _context.clock().now();
         RouterIdentity remote = state.getRemoteIdentity();
         PeerState peer = new PeerState(_context, _transport);

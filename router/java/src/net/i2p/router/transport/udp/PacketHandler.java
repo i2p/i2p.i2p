@@ -413,22 +413,24 @@ public class PacketHandler {
                         state = _establisher.receiveData(outState);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received new DATA packet from " + state + ": " + packet);
-                    UDPPacketReader.DataReader dr = reader.getDataReader();
-                    if (_log.shouldLog(Log.INFO)) {
-                        StringBuffer msg = new StringBuffer();
-                        msg.append("Receive ").append(System.identityHashCode(packet));
-                        msg.append(" from ").append(state.getRemotePeer().toBase64()).append(" ").append(state.getRemoteHostId());
-                        for (int i = 0; i < dr.readFragmentCount(); i++) {
-                            msg.append(" msg ").append(dr.readMessageId(i));
-                            msg.append(":").append(dr.readMessageFragmentNum(i));
-                            if (dr.readMessageIsLast(i))
-                                msg.append("*");
+                    if (state != null) {
+                        UDPPacketReader.DataReader dr = reader.getDataReader();
+                        if (_log.shouldLog(Log.INFO)) {
+                            StringBuffer msg = new StringBuffer();
+                            msg.append("Receive ").append(System.identityHashCode(packet));
+                            msg.append(" from ").append(state.getRemotePeer().toBase64()).append(" ").append(state.getRemoteHostId());
+                            for (int i = 0; i < dr.readFragmentCount(); i++) {
+                                msg.append(" msg ").append(dr.readMessageId(i));
+                                msg.append(":").append(dr.readMessageFragmentNum(i));
+                                if (dr.readMessageIsLast(i))
+                                    msg.append("*");
+                            }
+                            msg.append(": ").append(dr.toString());
+                            _log.info(msg.toString());
                         }
-                        msg.append(": ").append(dr.toString());
-                        _log.info(msg.toString());
+                        packet.beforeReceiveFragments();
+                        _inbound.receiveData(state, dr);
                     }
-                    packet.beforeReceiveFragments();
-                    _inbound.receiveData(state, dr);
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
                     _state = 51;

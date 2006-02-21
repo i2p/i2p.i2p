@@ -54,6 +54,7 @@ public class InboundEstablishState {
     private long _nextSend;
     private RemoteHostId _remoteHostId;
     private int _currentState;
+    private boolean _complete;
     
     /** nothin known yet */
     public static final int STATE_UNKNOWN = 0;
@@ -77,11 +78,17 @@ public class InboundEstablishState {
         _bobPort = localPort;
         _keyBuilder = null;
         _verificationAttempted = false;
+        _complete = false;
         _currentState = STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
     }
     
     public synchronized int getState() { return _currentState; }
+    public synchronized boolean complete() { 
+        boolean already = _complete; 
+        _complete = true; 
+        return already; 
+    }
     
     public synchronized void receiveSessionRequest(UDPPacketReader.SessionRequestReader req) {
         if (_receivedX == null)

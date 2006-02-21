@@ -34,7 +34,7 @@ public class OutboundMessageState {
     private int _nextSendFragment;
     
     public static final int MAX_FRAGMENTS = 32;
-    private static final ByteCache _cache = ByteCache.getInstance(128, MAX_FRAGMENTS*1024);
+    private static final ByteCache _cache = ByteCache.getInstance(64, MAX_FRAGMENTS*1024);
     
     public OutboundMessageState(I2PAppContext context) {
         _context = context;

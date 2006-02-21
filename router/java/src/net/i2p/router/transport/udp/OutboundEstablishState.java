@@ -59,6 +59,7 @@ public class OutboundEstablishState {
     private long _introductionNonce;
     // intro
     private UDPAddress _remoteAddress;
+    private boolean _complete;
     
     /** nothin sent yet */
     public static final int STATE_UNKNOWN = 0;
@@ -94,6 +95,7 @@ public class OutboundEstablishState {
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;
+        _complete = false;
         prepareSessionRequest();
         if ( (addr != null) && (addr.getIntroducerCount() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -103,6 +105,11 @@ public class OutboundEstablishState {
     }
     
     public synchronized int getState() { return _currentState; }
+    public synchronized boolean complete() { 
+        boolean already = _complete; 
+        _complete = true; 
+        return already; 
+    }
 
     public UDPAddress getRemoteAddress() { return _remoteAddress; }
     public void setIntroNonce(long nonce) { _introductionNonce = nonce; }
