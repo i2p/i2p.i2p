@@ -38,6 +38,8 @@ public class UDPPacket {
     private volatile Exception _acquiredBy;
     private long _enqueueTime;
     private long _receivedTime;
+    private long _beforeValidate;
+    private long _afterValidate;
     private long _beforeReceiveFragments;
     private long _afterHandlingTime;
     private boolean _isInbound;
@@ -84,6 +86,7 @@ public class UDPPacket {
         ctx.statManager().createRateStat("udp.packetsLiveOutbound", "Number of live outbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
         ctx.statManager().createRateStat("udp.packetsLivePendingRecvInbound", "Number of live inbound packets not yet handled by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
         ctx.statManager().createRateStat("udp.packetsLivePendingHandleInbound", "Number of live inbound packets not yet handled fully by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
+        ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", new long[] { 60*1000 });
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _packet = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
         init(ctx, inbound);
@@ -146,10 +149,14 @@ public class UDPPacket {
     
     public RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
+            long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
             byte ip[] = addr.getAddress();
             int port = _packet.getPort();
             _remoteHost = new RemoteHostId(ip, port);
+            long timeToFetch = System.currentTimeMillis() - before;
+            if (timeToFetch > 50)
+                _context.statManager().addRateData("udp.fetchRemoteSlow", timeToFetch, getLifetime());
         }
         return _remoteHost;
     }
@@ -161,6 +168,7 @@ public class UDPPacket {
      */
     public boolean validate(SessionKey macKey) {
         verifyNotReleased(); 
+        _beforeValidate = _context.clock().now();
         boolean eq = false;
         ByteArray buf = _validateCache.acquire();
         
@@ -202,6 +210,7 @@ public class UDPPacket {
         }
         
         _validateCache.release(buf);
+        _afterValidate = _context.clock().now();
         return eq;
     }
     
@@ -236,6 +245,15 @@ public class UDPPacket {
     long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
     /** a packet handler has finished parsing out the good bits */
     long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
+    
+    /** when it was added to the endpoint's receive queue */
+    long getEnqueueTime() { return _enqueueTime; }
+    /** when it was pulled off the endpoint receive queue */
+    long getReceivedTime() { return _receivedTime; }
+    /** when we began validate() */
+    long getBeforeValidate() { return _beforeValidate; }
+    /** when we finished validate() */
+    long getAfterValidate() { return _afterValidate; }
     
     public String toString() {
         verifyNotReleased(); 

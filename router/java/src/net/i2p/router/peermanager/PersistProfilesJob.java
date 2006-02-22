@@ -20,35 +20,29 @@ class PersistProfilesJob extends JobImpl {
     public String getName() { return "Persist profiles"; }
     public void runJob() {
         Set peers = _mgr.selectPeers();
-        Hash hashes[] = new Hash[peers.size()];
-        int i = 0;
-        for (Iterator iter = peers.iterator(); iter.hasNext(); )
-            hashes[i] = (Hash)iter.next();
-        getContext().jobQueue().addJob(new PersistProfileJob(getContext(), hashes));
+        getContext().jobQueue().addJob(new PersistProfileJob(getContext(), this, peers));
     }
-    
-    private class PersistProfileJob extends JobImpl {
-        private Hash _peers[];
-        private int _cur;
-        public PersistProfileJob(RouterContext enclosingContext, Hash peers[]) {
-            super(enclosingContext);
-            _peers = peers;
-            _cur = 0;
-        }
-        public void runJob() {
-            if (_cur < _peers.length) {
-                _mgr.storeProfile(_peers[_cur]);
-                _cur++;
-            }
-            if (_cur >= _peers.length) {
-                // no more left, requeue up the main persist-em-all job
-                PersistProfilesJob.this.getTiming().setStartAfter(getContext().clock().now() + PERSIST_DELAY);
-                PersistProfilesJob.this.getContext().jobQueue().addJob(PersistProfilesJob.this);
-            } else {
-                // we've got peers left to persist, so requeue the persist profile job
-                PersistProfilesJob.PersistProfileJob.this.requeue(1000);
-            }
-        }
-        public String getName() { return "Persist profile"; }
+    void persist(Hash peer) { _mgr.storeProfile(peer); }
+    void requeue() { requeue(PERSIST_DELAY); }
+}
+
+class PersistProfileJob extends JobImpl {
+    private PersistProfilesJob _job;
+    private Iterator _peers;
+    public PersistProfileJob(RouterContext enclosingContext, PersistProfilesJob job, Set peers) {
+        super(enclosingContext);
+        _peers = peers.iterator();
+        _job = job;
     }
+    public void runJob() {
+        if (_peers.hasNext())
+            _job.persist((Hash)_peers.next());
+        if (_peers.hasNext()) {
+            requeue(1000);
+        } else {
+            // no more left, requeue up the main persist-em-all job
+            _job.requeue();
+        }
+    }
+    public String getName() { return "Persist profile"; }
 }

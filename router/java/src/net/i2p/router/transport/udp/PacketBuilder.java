@@ -38,6 +38,8 @@ public class PacketBuilder {
         _context = ctx;
         _transport = transport;
         _log = ctx.logManager().getLog(PacketBuilder.class);
+        _context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", new long[] { 60*1000 });
+        _context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", new long[] { 60*1000, 10*60*1000 });
     }
     
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer) {
@@ -1029,6 +1031,7 @@ public class PacketBuilder {
      * @param iv IV to deliver
      */
     private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, ByteArray iv) {
+        long before = System.currentTimeMillis();
         int encryptOffset = packet.getPacket().getOffset() + UDPPacket.IV_SIZE + UDPPacket.MAC_SIZE;
         int encryptSize = packet.getPacket().getLength() - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
         byte data[] = packet.getPacket().getData();
@@ -1059,5 +1062,9 @@ public class PacketBuilder {
         System.arraycopy(ba.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
         System.arraycopy(iv.getData(), 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
         _hmacCache.release(ba);
+        long timeToAuth = System.currentTimeMillis() - before;
+        _context.statManager().addRateData("udp.packetAuthTime", timeToAuth, timeToAuth);
+        if (timeToAuth > 100)
+            _context.statManager().addRateData("udp.packetAuthTimeSlow", timeToAuth, timeToAuth);
     }
 }

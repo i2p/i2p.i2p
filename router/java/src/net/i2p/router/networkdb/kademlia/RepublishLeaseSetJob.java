@@ -51,7 +51,7 @@ public class RepublishLeaseSetJob extends JobImpl {
                             _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
                         getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1, 0);
-                        _facade.sendStore(_dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT, null);
+                        _facade.sendStore(_dest, ls, new OnRepublishSuccess(getContext()), new OnRepublishFailure(getContext(), this), REPUBLISH_LEASESET_TIMEOUT, null);
                         //getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
                     }
                 } else {
@@ -76,21 +76,28 @@ public class RepublishLeaseSetJob extends JobImpl {
         }
     }
     
-    private class OnSuccess extends JobImpl {
-        public OnSuccess(RouterContext ctx) { super(ctx); }
-        public String getName() { return "Publish leaseSet successful"; }
-        public void runJob() { 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
-        }
+    void requeueRepublish() {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
+        requeue(getContext().random().nextInt(60*1000));
     }
-    private class OnFailure extends JobImpl {
-        public OnFailure(RouterContext ctx) { super(ctx); }
-        public String getName() { return "Publish leaseSet failed"; }
-        public void runJob() { 
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
-            RepublishLeaseSetJob.this.requeue(getContext().random().nextInt(60*1000));
-        }
+}
+
+class OnRepublishSuccess extends JobImpl {
+    public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
+    public String getName() { return "Publish leaseSet successful"; }
+    public void runJob() { 
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
     }
+}
+
+class OnRepublishFailure extends JobImpl {
+    private RepublishLeaseSetJob _job;
+    public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
+        super(ctx); 
+        _job = job;
+    }
+    public String getName() { return "Publish leaseSet failed"; }
+    public void runJob() {  _job.requeueRepublish(); }
 }

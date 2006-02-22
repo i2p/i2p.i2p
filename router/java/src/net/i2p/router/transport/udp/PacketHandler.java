@@ -134,17 +134,26 @@ public class PacketHandler {
                                   + packet + ": " + _reader);
                 }
                 
-                long timeToDequeue = packet.getTimeSinceEnqueue() - packet.getTimeSinceReceived();
-                long timeToVerify = 0;
-                long beforeRecv = packet.getTimeSinceReceiveFragments();
-                if (beforeRecv > 0)
-                    timeToVerify = beforeRecv - packet.getTimeSinceReceived();
+                long enqueueTime = packet.getEnqueueTime();
+                long recvTime = packet.getReceivedTime();
+                long beforeValidateTime = packet.getBeforeValidate();
+                long afterValidateTime = packet.getAfterValidate();
+                
+                long timeToDequeue = recvTime - enqueueTime;
+                long timeToValidate = 0;
+                long authTime = 0;
+                if (afterValidateTime > 0) {
+                    timeToValidate = afterValidateTime - enqueueTime;
+                    authTime = afterValidateTime - beforeValidateTime;
+                }
                 if (timeToDequeue > 50)
                     _context.statManager().addRateData("udp.packetDequeueTime", timeToDequeue, timeToDequeue);
-                if (timeToVerify > 0) {
-                    _context.statManager().addRateData("udp.packetVerifyTime", timeToVerify, timeToDequeue);
-                    if (timeToVerify > 100)
-                        _context.statManager().addRateData("udp.packetVerifyTimeSlow", timeToVerify, timeToDequeue);
+                if (authTime > 50)
+                    _context.statManager().addRateData("udp.packetAuthRecvTime", authTime, beforeValidateTime-recvTime);
+                if (timeToValidate > 0) {
+                    _context.statManager().addRateData("udp.packetVerifyTime", timeToValidate, authTime);
+                    if (timeToValidate > 50)
+                        _context.statManager().addRateData("udp.packetVerifyTimeSlow", timeToValidate, authTime);
                 }
                 
                 // back to the cache with thee!

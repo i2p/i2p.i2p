@@ -35,12 +35,16 @@ public class PacketPusher implements Runnable {
      
     public void run() {
         while (_alive) {
-            UDPPacket packets[] = _fragments.getNextVolley();
-            if (packets != null) {
-                for (int i = 0; i < packets.length; i++) {
-                    if (packets[i] != null) // null for ACKed fragments
-                        _sender.add(packets[i], 0); // 0 does not block //100); // blocks for up to 100ms
+            try {
+                UDPPacket packets[] = _fragments.getNextVolley();
+                if (packets != null) {
+                    for (int i = 0; i < packets.length; i++) {
+                        if (packets[i] != null) // null for ACKed fragments
+                            _sender.add(packets[i], 0); // 0 does not block //100); // blocks for up to 100ms
+                    }
                 }
+            } catch (Exception e) {
+                _log.log(Log.CRIT, "Error pushing", e);
             }
         }
     }

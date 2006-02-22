@@ -1202,10 +1202,13 @@ public class PeerState {
             }
 
             
-            if ( (_retransmitter != null) && ( (_retransmitter.isExpired() || _retransmitter.isComplete()) ) )
+            OutboundMessageState retrans = _retransmitter;
+            if ( (retrans != null) && ( (retrans.isExpired() || retrans.isComplete()) ) ) {
                 _retransmitter = null;
+                retrans = null;
+	    }
             
-            if ( (_retransmitter != null) && (_retransmitter != state) ) {
+            if ( (retrans != null) && (retrans != state) ) {
                 // choke it, since there's already another message retransmitting to this
                 // peer.
                 _context.statManager().addRateData("udp.blockedRetransmissions", _packetsRetransmitted, _packetsTransmitted);

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.414 2006/02/21 10:20:21 jrandom Exp $
+$Id: history.txt,v 1.415 2006/02/22 01:19:19 complication Exp $
+
+2006-02-22  jrandom
+    * Handle a rare race under high bandwidth situations in the SSU transport
+    * Minor refactoring so we don't confuse sun's 1.6.0-b2 validator
 
 2006-02-21  Complication
     * Reactivate TCP tranport by default, in addition to re-allowing
