@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.413 2006/02/21 08:31:25 jrandom Exp $
+$Id: history.txt,v 1.414 2006/02/21 10:20:21 jrandom Exp $
+
+2006-02-21  Complication
+    * Reactivate TCP tranport by default, in addition to re-allowing
 
 * 2006-02-21  0.6.1.11 released
 
