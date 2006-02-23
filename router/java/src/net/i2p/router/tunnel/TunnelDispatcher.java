@@ -105,6 +105,15 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.participatingMessageCount", 
                                          "How many messages are sent through a participating tunnel?", "Tunnels", 
                                          new long[] { 60*10*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
+                                         "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 
+                                         new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.failedCompletelyMessages", 
+                                         "How many messages are sent through a tunnel that failed prematurely (period == failures)?", "Tunnels", 
+                                         new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.failedPartially", 
+                                         "How many messages are sent through a tunnel that only failed partially (period == failures)?", "Tunnels", 
+                                         new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
     }
 
     private TunnelGateway.QueuePreprocessor createPreprocessor(HopConfig cfg) {
@@ -300,6 +309,15 @@ public class TunnelDispatcher implements Service {
             if (gw != null) {
                 // update stats based on gw.getMessagesSent()
             }
+        }
+        long msgs = cfg.getProcessedMessagesCount();
+        int failures = cfg.getTunnelFailures();
+        boolean failed = cfg.getTunnelFailed();
+        _context.statManager().addRateData("tunnel.ownedMessageCount", msgs, failures);
+        if (failed) {
+            _context.statManager().addRateData("tunnel.failedCompletelyMessages", msgs, failures);
+        } else if (failures > 0) {
+            _context.statManager().addRateData("tunnel.failedPartiallyMessages", msgs, failures);
         }
     }
     

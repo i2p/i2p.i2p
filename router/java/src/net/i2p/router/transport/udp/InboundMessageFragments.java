@@ -81,7 +81,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         int acksIncluded = receiveACKs(from, data);
         long afterACKs = _context.clock().now();
         
-        from.packetReceived();
+        from.packetReceived(data.getPacketSize());
         _context.statManager().addRateData("udp.receiveMessagePeriod", afterMsgs-beforeMsgs, afterACKs-beforeMsgs);
         _context.statManager().addRateData("udp.receiveACKPeriod", afterACKs-afterMsgs, afterACKs-beforeMsgs);
         if ( (fragmentsIncluded > 0) && (acksIncluded > 0) )

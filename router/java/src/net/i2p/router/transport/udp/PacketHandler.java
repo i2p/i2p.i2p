@@ -63,6 +63,8 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (period is dequeue time)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.packetValidateMultipleCount", "How many times we validate a packet, if done more than once (period = afterValidate-enqueue)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.packetNoValidationLifetime", "How long packets that are never validated are around for", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() { 
@@ -138,6 +140,7 @@ public class PacketHandler {
                 long recvTime = packet.getReceivedTime();
                 long beforeValidateTime = packet.getBeforeValidate();
                 long afterValidateTime = packet.getAfterValidate();
+                int validateCount = packet.getValidateCount();
                 
                 long timeToDequeue = recvTime - enqueueTime;
                 long timeToValidate = 0;
@@ -150,11 +153,15 @@ public class PacketHandler {
                     _context.statManager().addRateData("udp.packetDequeueTime", timeToDequeue, timeToDequeue);
                 if (authTime > 50)
                     _context.statManager().addRateData("udp.packetAuthRecvTime", authTime, beforeValidateTime-recvTime);
-                if (timeToValidate > 0) {
+                if (afterValidateTime > 0) {
                     _context.statManager().addRateData("udp.packetVerifyTime", timeToValidate, authTime);
                     if (timeToValidate > 50)
                         _context.statManager().addRateData("udp.packetVerifyTimeSlow", timeToValidate, authTime);
                 }
+                if (validateCount > 1)
+                    _context.statManager().addRateData("udp.packetValidateMultipleCount", validateCount, timeToValidate);
+                else if (validateCount <= 0)
+                    _context.statManager().addRateData("udp.packetNoValidationLifetime", packet.getLifetime(), 0);
                 
                 // back to the cache with thee!
                 packet.release();

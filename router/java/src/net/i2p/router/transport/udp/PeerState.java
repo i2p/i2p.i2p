@@ -138,6 +138,9 @@ public class PeerState {
     private long _theyRelayToUsAs;
     /** what is the largest packet we can send to the peer? */
     private int _mtu;
+    private int _mtuReceive;
+    /* how many consecutive packets at or under the min MTU have been received */
+    private long _consecutiveSmall;
     /** when did we last check the MTU? */
     private long _mtuLastChecked;
     private long _mtuIncreases;
@@ -209,7 +212,7 @@ public class PeerState {
     private static final int LARGE_MTU = 1350;
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 1200; // 5000;
+    private static final int MAX_RTO = 2000; // 5000;
     /** override the default MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     
@@ -248,6 +251,7 @@ public class PeerState {
         _weRelayToThemAs = 0;
         _theyRelayToUsAs = 0;
         _mtu = getDefaultMTU();
+        _mtuReceive = _mtu;
         _mtuLastChecked = -1;
         _lastACKSend = -1;
         _rtt = 1000;
@@ -378,6 +382,8 @@ public class PeerState {
     public long getTheyRelayToUsAs() { return _theyRelayToUsAs; }
     /** what is the largest packet we can send to the peer? */
     public int getMTU() { return _mtu; }
+    /** estimate how large the other side is sending packets */
+    public int getReceiveMTU() { return _mtuReceive; }
     /** when did we last check the MTU? */
     public long getMTULastChecked() { return _mtuLastChecked; }
     public long getMTUIncreases() { return _mtuIncreases; }
@@ -866,7 +872,7 @@ public class PeerState {
     
     private void adjustMTU() {
         double retransPct = 0;
-        if (_packetsTransmitted > 0) {
+        if (_packetsTransmitted > 10) {
             retransPct = (double)_packetsRetransmitted/(double)_packetsTransmitted;
             boolean wantLarge = retransPct < .25d; // heuristic to allow fairly lossy links to use large MTUs
             if (wantLarge && _mtu != LARGE_MTU) {
@@ -930,7 +936,18 @@ public class PeerState {
     public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
     public long getPacketsReceived() { return _packetsReceived; }
     public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
-    public void packetReceived() { _packetsReceived++; }
+    public void packetReceived(int size) { 
+        _packetsReceived++; 
+        if (size <= MIN_MTU)
+            _consecutiveSmall++;
+        else
+            _consecutiveSmall = 0;
+        
+        if ( (_consecutiveSmall < 50) && (_packetsReceived > 50) )
+            _mtuReceive = LARGE_MTU;
+        else
+            _mtuReceive = MIN_MTU;
+    }
     
     /** 
      * we received a backoff request, so cut our send window

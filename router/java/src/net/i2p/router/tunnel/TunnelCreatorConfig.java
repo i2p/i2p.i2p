@@ -28,6 +28,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private boolean _isInbound;
     private long _messagesProcessed;
     private volatile long _verifiedBytesTransferred;
+    private boolean _failed;
+    private int _failures;
     
     public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
         this(ctx, length, isInbound, null);
@@ -45,6 +47,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
         _destination = destination;
         _messagesProcessed = 0;
         _verifiedBytesTransferred = 0;
+        _failed = false;
+        _failures = 0;
     }
     
     /** how many hops are there in the tunnel? */
@@ -90,8 +94,6 @@ public class TunnelCreatorConfig implements TunnelInfo {
     public long getReplyMessageId() { return _replyMessageId; }
     public void setReplyMessageId(long id) { _replyMessageId = id; }
     
-    public void testSuccessful(int ms) {}
-    
     /** take note of a message being pumped through this tunnel */
     public void incrementProcessedMessages() { _messagesProcessed++; }
     public long getProcessedMessagesCount() { return _messagesProcessed; }
@@ -135,6 +137,30 @@ public class TunnelCreatorConfig implements TunnelInfo {
     }
     
     
+    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 2;
+    
+    /**
+     * The tunnel failed, so stop using it
+     */
+    public boolean tunnelFailed() {
+        _failures++;
+        if (_failures > MAX_CONSECUTIVE_TEST_FAILURES) {
+            _failed = true;
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public boolean getTunnelFailed() { return _failed; }
+    public int getTunnelFailures() { return _failures; }
+    
+    public void testSuccessful(int ms) {
+        int failures = _failures - 1;
+        if (failures < 0)
+            _failures = 0;
+        else
+            _failures = failures;
+    }
     
     public String toString() {
         // H0:1235-->H1:2345-->H2:2345
@@ -168,6 +194,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
         if (_replyMessageId > 0)
             buf.append(" replyMessageId ").append(_replyMessageId);
         buf.append(" with ").append(_messagesProcessed).append("/").append(_verifiedBytesTransferred).append(" msgs/bytes");
+    
+        buf.append(" with ").append(_failures).append(" failures");
         return buf.toString();
     }
     

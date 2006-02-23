@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.416 2006/02/22 09:54:22 jrandom Exp $
+$Id: history.txt,v 1.417 2006/02/23 03:08:37 jrandom Exp $
+
+2006-02-23  jrandom
+    * Increase the SSU retransmit ceiling (for slow links)
+    * Estimate the sender's SSU MTU (to help see if we agree)
 
 2006-02-22  jrandom
     * Fix to properly profile tunnel joins (thanks Ragnarok, frosk, et al!)

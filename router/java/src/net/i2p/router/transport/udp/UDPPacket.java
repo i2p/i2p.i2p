@@ -42,6 +42,7 @@ public class UDPPacket {
     private long _afterValidate;
     private long _beforeReceiveFragments;
     private long _afterHandlingTime;
+    private int _validateCount;
     private boolean _isInbound;
   
     private static final List _packetCache;
@@ -211,6 +212,7 @@ public class UDPPacket {
         
         _validateCache.release(buf);
         _afterValidate = _context.clock().now();
+        _validateCount++;
         return eq;
     }
     
@@ -254,6 +256,8 @@ public class UDPPacket {
     long getBeforeValidate() { return _beforeValidate; }
     /** when we finished validate() */
     long getAfterValidate() { return _afterValidate; }
+    /** how many times we tried to validate the packet */
+    int getValidateCount() { return _validateCount; }
     
     public String toString() {
         verifyNotReleased(); 

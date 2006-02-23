@@ -1316,9 +1316,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</code></td>");
             
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getMTU()).append('/');
-            buf.append(peer.getMTUIncreases()).append('/');
-            buf.append(peer.getMTUDecreases());
+            buf.append(peer.getMTU()).append("/").append(peer.getReceiveMTU());
+            
+            //.append('/');
+            //buf.append(peer.getMTUIncreases()).append('/');
+            //buf.append(peer.getMTUDecreases());
             buf.append("</code></td>");
         
             long sent = peer.getPacketsTransmitted();
@@ -1433,7 +1435,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.rtt\">rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet<br />\n" +
         "<b id=\"def.dev\">dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout<br />\n" +
         "<b id=\"def.rto\">rto</b>: the retransmit timeout controls how frequently an unacknowledged packet will be retransmitted<br />\n" +
-        "<b id=\"def.mtu\">mtu</b>: current sending packet size/number of times it increased/number of times it decreased<br />\n" +
+        "<b id=\"def.mtu\">mtu</b>: current sending packet size / estimated receiving packet size<br />\n" +
         "<b id=\"def.send\">send</b>: the number of packets sent to the peer<br />\n" +
         "<b id=\"def.recv\">recv</b>: the number of packets received from the peer<br />\n" +
         "<b id=\"def.resent\">resent</b>: the number of packets retransmitted to the peer<br />\n" +

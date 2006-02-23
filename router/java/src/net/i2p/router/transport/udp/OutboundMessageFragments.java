@@ -138,6 +138,7 @@ public class OutboundMessageFragments {
         if ( (msgBody == null) || (target == null) )
             return;
         
+        // todo: make sure the outNetMessage is initialzed once and only once
         OutboundMessageState state = new OutboundMessageState(_context);
         boolean ok = state.initialize(msg, msgBody);
         if (ok) {

@@ -13,10 +13,8 @@ import net.i2p.util.Log;
  */
 public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
-    private boolean _failed;
     private TestJob _testJob;
     private Job _expireJob;
-    private int _failures;
     private TunnelInfo _pairedTunnel;
     
     /** Creates a new instance of PooledTunnelCreatorConfig */
@@ -26,20 +24,29 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     }
     public PooledTunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
         super(ctx, length, isInbound, destination);
-        _failed = false;
         _pool = null;
-        _failures = 0;
     }
     
     public void testSuccessful(int ms) {
-        if (_testJob != null) {
+        if (_testJob != null)
             _testJob.testSuccessful(ms);
+        super.testSuccessful(ms);
+    }
+    
+    /**
+     * The tunnel failed, so stop using it
+     */
+    public boolean tunnelFailed() {
+        boolean rv = super.tunnelFailed();
+        if (!rv) {
+            // remove us from the pool (but not the dispatcher) so that we aren't 
+            // selected again.  _expireJob is left to do its thing, in case there
+            // are any straggling messages coming down the tunnel
+            _pool.tunnelFailed(this);
+            if (_testJob != null) // just in case...
+                _context.jobQueue().removeJob(_testJob);
         }
-        int failures = _failures - 1;
-        if (failures < 0)
-            _failures = 0;
-        else
-            _failures = failures;
+        return rv;
     }
     
     public Properties getOptions() {
@@ -47,31 +54,6 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         return _pool.getSettings().getUnknownOptions();
     }
     
-    public String toString() {
-        return super.toString() + " with " + _failures + " failures";
-    }
-    
-    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 2;
-    
-    /**
-     * The tunnel failed, so stop using it
-     */
-    public boolean tunnelFailed() {
-        _failures++;
-        if (_failures > MAX_CONSECUTIVE_TEST_FAILURES) {
-            _failed = true;
-            // remove us from the pool (but not the dispatcher) so that we aren't 
-            // selected again.  _expireJob is left to do its thing, in case there
-            // are any straggling messages coming down the tunnel
-            _pool.tunnelFailed(this);
-            if (_testJob != null) // just in case...
-                _context.jobQueue().removeJob(_testJob);
-            return false;
-        } else {
-            return true;
-        }
-    }
-    public boolean getTunnelFailed() { return _failed; }
     public void setTunnelPool(TunnelPool pool) {
         if (pool != null) {
             _pool = pool; 

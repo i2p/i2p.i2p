@@ -252,6 +252,7 @@ public class UDPPacketReader {
     
     /** parse out the data message */
     public class DataReader {
+        public int getPacketSize() { return _payloadLength; }
         public boolean readACKsIncluded() {
             return flagSet(UDPPacket.DATA_FLAG_EXPLICIT_ACK);
         }
