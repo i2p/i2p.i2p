@@ -188,6 +188,7 @@ class BuildHandler {
                 
                 if (howBad == 0) {
                     // w3wt
+                    _context.profileManager().tunnelJoined(peer, rtt);
                 } else {
                     allAgree = false;
                     switch (howBad) {

@@ -153,7 +153,7 @@ public class Router {
                 shutdown(EXIT_OOM); 
             }
         };
-        _shutdownHook = new ShutdownHook();
+        _shutdownHook = new ShutdownHook(_context);
         _gracefulShutdownDetector = new I2PThread(new GracefulShutdown());
         _gracefulShutdownDetector.setDaemon(true);
         _gracefulShutdownDetector.setName("Graceful shutdown hook");
@@ -210,7 +210,7 @@ public class Router {
     public void setRouterInfo(RouterInfo info) { 
         _routerInfo = info; 
         if (info != null)
-            _context.jobQueue().addJob(new PersistRouterInfoJob());
+            _context.jobQueue().addJob(new PersistRouterInfoJob(_context));
     }
 
     /**
@@ -245,8 +245,8 @@ public class Router {
         _context.tunnelDispatcher().startup();
         _context.inNetMessagePool().startup();
         startupQueue();
-        _context.jobQueue().addJob(new CoalesceStatsJob());
-        _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob());
+        _context.jobQueue().addJob(new CoalesceStatsJob(_context));
+        _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
@@ -447,89 +447,6 @@ public class Router {
         }
         // hard and ugly
         finalShutdown(EXIT_HARD_RESTART);
-    }
-    
-    /**
-     * coalesce the stats framework every minute
-     *
-     */
-    private final class CoalesceStatsJob extends JobImpl {
-        public CoalesceStatsJob() { 
-            super(Router.this._context); 
-            Router.this._context.statManager().createRateStat("bw.receiveBps", "How fast we receive data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-            Router.this._context.statManager().createRateStat("bw.sendBps", "How fast we send data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-            Router.this._context.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-            Router.this._context.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-            Router.this._context.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        }
-        public String getName() { return "Coalesce stats"; }
-        public void runJob() {
-            Router.this._context.statManager().coalesceStats();
-            
-            RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
-            if (receiveRate != null) {
-                Rate rate = receiveRate.getRate(60*1000);
-                if (rate != null) { 
-                    double bytes = rate.getLastTotalValue();
-                    double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                    Router.this._context.statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
-                }
-            }
-
-            RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
-            if (sendRate != null) {
-                Rate rate = sendRate.getRate(60*1000);
-                if (rate != null) {
-                    double bytes = rate.getLastTotalValue();
-                    double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                    Router.this._context.statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
-                }
-            }
-            
-            int active = Router.this._context.commSystem().countActivePeers();
-            Router.this._context.statManager().addRateData("router.activePeers", active, 60*1000);
-            
-            int fast = Router.this._context.profileOrganizer().countFastPeers();
-            Router.this._context.statManager().addRateData("router.fastPeers", fast, 60*1000);
-            
-            int highCap = Router.this._context.profileOrganizer().countHighCapacityPeers();
-            Router.this._context.statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
-
-            requeue(60*1000);
-        }
-    }
-    
-    /**
-     * Update the routing Key modifier every day at midnight (plus on startup).
-     * This is done here because we want to make sure the key is updated before anyone
-     * uses it.
-     */
-    private final class UpdateRoutingKeyModifierJob extends JobImpl {
-        private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-        public UpdateRoutingKeyModifierJob() { super(Router.this._context); }
-        public String getName() { return "Update Routing Key Modifier"; }
-        public void runJob() {
-            Router.this._context.routingKeyGenerator().generateDateBasedModData();
-            requeue(getTimeTillMidnight());
-        }
-        private long getTimeTillMidnight() {
-            long now = Router.this._context.clock().now();
-            _cal.setTime(new Date(now));
-            _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
-            _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
-            _cal.add(Calendar.DATE, 1);
-            _cal.set(Calendar.HOUR_OF_DAY, 0);
-            _cal.set(Calendar.MINUTE, 0);
-            _cal.set(Calendar.SECOND, 0);
-            _cal.set(Calendar.MILLISECOND, 0);
-            long then = _cal.getTime().getTime();
-            long howLong = then - now;
-            if (howLong < 0) // hi kaffe
-                howLong = 24*60*60*1000l + howLong;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Time till midnight: " + howLong + "ms");
-            return howLong;
-        }
     }
     
     private void warmupCrypto() {
@@ -1060,7 +977,7 @@ public class Router {
         return _context.getProperty("router.pingFile", "router.ping");
     }
     
-    private static final long LIVELINESS_DELAY = 60*1000;
+    static final long LIVELINESS_DELAY = 60*1000;
     
     /** 
      * Start a thread that will periodically update the file "router.ping", but if 
@@ -1082,84 +999,177 @@ public class Router {
             }
         }
         // not an I2PThread for context creation issues
-        Thread t = new Thread(new MarkLiveliness(f));
+        Thread t = new Thread(new MarkLiveliness(_context, this, f));
         t.setName("Mark router liveliness");
         t.setDaemon(true);
         t.start();
         return true;
     }
-    
-    private class MarkLiveliness implements Runnable {
-        private File _pingFile;
-        public MarkLiveliness(File f) {
-            _pingFile = f;
-        }
-        public void run() {
-            _pingFile.deleteOnExit();
-            do {
-                ping();
-                try { Thread.sleep(LIVELINESS_DELAY); } catch (InterruptedException ie) {}
-            } while (_isAlive);
-            _pingFile.delete();
-        }
-        
-        private void ping() {
-            FileOutputStream fos = null;
-            try { 
-                fos = new FileOutputStream(_pingFile);
-                fos.write(("" + System.currentTimeMillis()).getBytes());
-            } catch (IOException ioe) {
-                if (_log != null) {
-                    _log.log(Log.CRIT, "Error writing to ping file", ioe);
-                } else {
-                    System.err.println("Error writing to ping file");
-                    ioe.printStackTrace();
-                }
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+}
+
+/**
+ * coalesce the stats framework every minute
+ *
+ */
+class CoalesceStatsJob extends JobImpl {
+    public CoalesceStatsJob(RouterContext ctx) { 
+        super(ctx); 
+        ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("bw.sendBps", "How fast we send data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+    }
+    public String getName() { return "Coalesce stats"; }
+    public void runJob() {
+        getContext().statManager().coalesceStats();
+
+        RateStat receiveRate = getContext().statManager().getRate("transport.receiveMessageSize");
+        if (receiveRate != null) {
+            Rate rate = receiveRate.getRate(60*1000);
+            if (rate != null) { 
+                double bytes = rate.getLastTotalValue();
+                double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
+                getContext().statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
             }
         }
+
+        RateStat sendRate = getContext().statManager().getRate("transport.sendMessageSize");
+        if (sendRate != null) {
+            Rate rate = sendRate.getRate(60*1000);
+            if (rate != null) {
+                double bytes = rate.getLastTotalValue();
+                double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
+                getContext().statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
+            }
+        }
+
+        int active = getContext().commSystem().countActivePeers();
+        getContext().statManager().addRateData("router.activePeers", active, 60*1000);
+
+        int fast = getContext().profileOrganizer().countFastPeers();
+        getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);
+
+        int highCap = getContext().profileOrganizer().countHighCapacityPeers();
+        getContext().statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
+
+        requeue(60*1000);
     }
-    
-    
+}
+
+/**
+ * Update the routing Key modifier every day at midnight (plus on startup).
+ * This is done here because we want to make sure the key is updated before anyone
+ * uses it.
+ */
+class UpdateRoutingKeyModifierJob extends JobImpl {
+    private Log _log;
+    private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+    public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
+        super(ctx);
+    }
+    public String getName() { return "Update Routing Key Modifier"; }
+    public void runJob() {
+        _log = getContext().logManager().getLog(getClass());
+        getContext().routingKeyGenerator().generateDateBasedModData();
+        requeue(getTimeTillMidnight());
+    }
+    private long getTimeTillMidnight() {
+        long now = getContext().clock().now();
+        _cal.setTime(new Date(now));
+        _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
+        _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
+        _cal.add(Calendar.DATE, 1);
+        _cal.set(Calendar.HOUR_OF_DAY, 0);
+        _cal.set(Calendar.MINUTE, 0);
+        _cal.set(Calendar.SECOND, 0);
+        _cal.set(Calendar.MILLISECOND, 0);
+        long then = _cal.getTime().getTime();
+        long howLong = then - now;
+        if (howLong < 0) // hi kaffe
+            howLong = 24*60*60*1000l + howLong;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Time till midnight: " + howLong + "ms");
+        return howLong;
+    }
+}
+
+class MarkLiveliness implements Runnable {
+    private RouterContext _context;
+    private Router _router;
+    private File _pingFile;
+    public MarkLiveliness(RouterContext ctx, Router router, File pingFile) {
+        _context = ctx;
+        _router = router;
+        _pingFile = pingFile;
+    }
+    public void run() {
+        _pingFile.deleteOnExit();
+        do {
+            ping();
+            try { Thread.sleep(Router.LIVELINESS_DELAY); } catch (InterruptedException ie) {}
+        } while (_router.isAlive());
+        _pingFile.delete();
+    }
+
+    private void ping() {
+        FileOutputStream fos = null;
+        try { 
+            fos = new FileOutputStream(_pingFile);
+            fos.write(("" + System.currentTimeMillis()).getBytes());
+        } catch (IOException ioe) {
+            System.err.println("Error writing to ping file");
+            ioe.printStackTrace();
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+    }
+}
+
+class ShutdownHook extends Thread {
+    private RouterContext _context;
     private static int __id = 0;
-    private class ShutdownHook extends Thread {
-        private int _id;
-        public ShutdownHook() {
-            _id = ++__id;
-        }
-        public void run() {
-            setName("Router " + _id + " shutdown");
-            _log.log(Log.CRIT, "Shutting down the router...");
-            shutdown(EXIT_HARD);
-        }
+    private int _id;
+    public ShutdownHook(RouterContext ctx) {
+        _context = ctx;
+        _id = ++__id;
     }
-    
-    /** update the router.info file whenever its, er, updated */
-    private class PersistRouterInfoJob extends JobImpl {
-        public PersistRouterInfoJob() { super(Router.this._context); }
-        public String getName() { return "Persist Updated Router Information"; }
-        public void runJob() {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Persisting updated router info");
+    public void run() {
+        setName("Router " + _id + " shutdown");
+        Log l = _context.logManager().getLog(Router.class);
+        l.log(Log.CRIT, "Shutting down the router...");
+        _context.router().shutdown(Router.EXIT_HARD);
+    }
+}
 
-            String infoFilename = getConfigSetting(PROP_INFO_FILENAME);
-            if (infoFilename == null)
-                infoFilename = PROP_INFO_FILENAME_DEFAULT;
+/** update the router.info file whenever its, er, updated */
+class PersistRouterInfoJob extends JobImpl {
+    private Log _log;
+    public PersistRouterInfoJob(RouterContext ctx) { 
+        super(ctx); 
+    }
+    public String getName() { return "Persist Updated Router Information"; }
+    public void runJob() {
+        _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Persisting updated router info");
 
-            RouterInfo info = getRouterInfo();
+        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME);
+        if (infoFilename == null)
+            infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
 
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(infoFilename);
-                info.writeBytes(fos);
-            } catch (DataFormatException dfe) {
-                _log.error("Error rebuilding the router information", dfe);
-            } catch (IOException ioe) {
-                _log.error("Error writing out the rebuilt router information", ioe);
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-            }
+        RouterInfo info = getContext().router().getRouterInfo();
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(infoFilename);
+            info.writeBytes(fos);
+        } catch (DataFormatException dfe) {
+            _log.error("Error rebuilding the router information", dfe);
+        } catch (IOException ioe) {
+            _log.error("Error writing out the rebuilt router information", ioe);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
 }

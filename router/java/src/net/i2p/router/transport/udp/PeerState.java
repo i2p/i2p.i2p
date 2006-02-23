@@ -835,13 +835,7 @@ public class PeerState {
         _messagesSent++;
         if (numSends < 2) {
             recalculateTimeouts(lifetime);
-            if (_mtu <= MIN_MTU) {
-                if (_context.random().nextInt(50*(int)_mtuDecreases) <= 0) {
-                    _context.statManager().addRateData("udp.mtuIncrease", _packetsRetransmitted, _packetsTransmitted);
-                    _mtu = LARGE_MTU;
-                    _mtuIncreases++;
-                }
-            }
+            adjustMTU();
         }
         else if (_log.shouldLog(Log.WARN))
             _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
@@ -870,14 +864,24 @@ public class PeerState {
             _rto = MAX_RTO;
     }
     
-    private void reduceMTU() {
-        if (_mtu > MIN_MTU) {
-            double retransPct = (double)_packetsRetransmitted/(double)_packetsTransmitted;
-            if (retransPct >= 0.05) { // should we go for lower?
-                _context.statManager().addRateData("udp.mtuDecrease", _packetsRetransmitted, _packetsTransmitted);
+    private void adjustMTU() {
+        double retransPct = 0;
+        if (_packetsTransmitted > 0) {
+            retransPct = (double)_packetsRetransmitted/(double)_packetsTransmitted;
+            boolean wantLarge = retransPct < .25d; // heuristic to allow fairly lossy links to use large MTUs
+            if (wantLarge && _mtu != LARGE_MTU) {
+                if (_context.random().nextLong(_mtuDecreases) <= 0) {
+                    _mtu = LARGE_MTU;
+                    _mtuIncreases++;
+                    _context.statManager().addRateData("udp.mtuIncrease", _mtuIncreases, _mtuDecreases);
+		}
+	    } else if (!wantLarge && _mtu == LARGE_MTU) {
                 _mtu = MIN_MTU;
                 _mtuDecreases++;
-            }
+                _context.statManager().addRateData("udp.mtuDecrease", _mtuDecreases, _mtuIncreases);
+	    }
+        } else {
+            _mtu = DEFAULT_MTU;
         }
     }
     
@@ -895,7 +899,7 @@ public class PeerState {
         }
         congestionOccurred();
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
-        reduceMTU();
+        adjustMTU();
         //_rto *= 2; 
     }
     public void packetsTransmitted(int packets) { 
