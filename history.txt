@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.415 2006/02/22 01:19:19 complication Exp $
+$Id: history.txt,v 1.416 2006/02/22 09:54:22 jrandom Exp $
+
+2006-02-22  jrandom
+    * Fix to properly profile tunnel joins (thanks Ragnarok, frosk, et al!)
+    * More aggressive poor-man's PMTU, allowing larger MTUs on less reliable
+      links
+    * Further class validator refactorings
 
 2006-02-22  jrandom
     * Handle a rare race under high bandwidth situations in the SSU transport
