@@ -47,6 +47,7 @@ public class UDPReceiver {
         _context.statManager().createRateStat("udp.droppedInboundProbabalistically", "How many packet we drop probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.acceptedInboundProbabalistically", "How many packet we accept probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.receiveHolePunch", "How often we receive a NAT hole punch", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() {
@@ -124,6 +125,15 @@ public class UDPReceiver {
     private final int doReceive(UDPPacket packet) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Received: " + packet);
+        
+        RemoteHostId from = packet.getRemoteHost();
+        if (_transport.isInDropList(from)) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Ignoring packet from the drop-listed peer: " + from);
+            _context.statManager().addRateData("udp.ignorePacketFromDroplist", packet.getLifetime(), 0);
+            packet.release();
+            return 0;
+        }
 
         packet.enqueue();
         boolean rejected = false;

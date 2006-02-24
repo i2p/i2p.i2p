@@ -58,6 +58,9 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.droppedInvalidUnkown", "How old the packet we dropped due to invalidity (unkown type) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidReestablish", "How old the packet we dropped due to invalidity (doesn't use existing key, not an establishment) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidEstablish", "How old the packet we dropped due to invalidity (establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidEstablish.inbound", "How old the packet we dropped due to invalidity (even though we have an active inbound establishment with the peer) was", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidEstablish.outbound", "How old the packet we dropped due to invalidity (even though we have an active outbound establishment with the peer) was", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidEstablish.new", "How old the packet we dropped due to invalidity (even though we do not have any active establishment with the peer) was", "udp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidInboundEstablish", "How old the packet we dropped due to invalidity (inbound establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInvalidSkew", "How skewed the packet we dropped due to invalidity (valid except bad skew) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", new long[] { 10*60*1000, 60*60*1000 });
@@ -90,6 +93,13 @@ public class PacketHandler {
         }
         return rv.toString();
     }
+
+    /** the packet is from a peer we are establishing an outbound con to, but failed validation, so fallback */
+    private static final short OUTBOUND_FALLBACK = 1;
+    /** the packet is from a peer we are establishing an inbound con to, but failed validation, so fallback */
+    private static final short INBOUND_FALLBACK = 2;
+    /** the packet is not from anyone we know */
+    private static final short NEW_PEER = 3;
     
     private class Handler implements Runnable { 
         private UDPPacketReader _reader;
@@ -106,6 +116,7 @@ public class PacketHandler {
                 UDPPacket packet = _endpoint.receive();
                 _state = 3;
                 if (packet == null) continue; // keepReading is probably false...
+
                 packet.received();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Received the packet " + packet);
@@ -202,7 +213,7 @@ public class PacketHandler {
                             _log.debug("Packet received is not for an inbound or outbound establishment");
                         // ok, not already known establishment, try as a new one
                         _state = 15;
-                        receivePacket(reader, packet);
+                        receivePacket(reader, packet, NEW_PEER);
                     }
                 }
             } else {
@@ -264,13 +275,24 @@ public class PacketHandler {
             _state = 26;
         }
 
-        private void receivePacket(UDPPacketReader reader, UDPPacket packet) {
+        private void receivePacket(UDPPacketReader reader, UDPPacket packet, short peerType) {
             _state = 27;
             boolean isValid = packet.validate(_transport.getIntroKey());
             if (!isValid) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid introduction packet received: " + packet, new Exception("path"));
                 _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
+                switch (peerType) {
+                    case INBOUND_FALLBACK:
+                        _context.statManager().addRateData("udp.droppedInvalidEstablish.inbound", packet.getLifetime(), packet.getTimeSinceReceived());
+                        break;
+                    case OUTBOUND_FALLBACK:
+                        _context.statManager().addRateData("udp.droppedInvalidEstablish.outbound", packet.getLifetime(), packet.getTimeSinceReceived());
+                        break;
+                    case NEW_PEER:
+                        _context.statManager().addRateData("udp.droppedInvalidEstablish.new", packet.getLifetime(), packet.getTimeSinceReceived());
+                        break;
+                }
                 _state = 28;
                 return;
             } else {
@@ -322,7 +344,7 @@ public class PacketHandler {
                 // ok, we couldn't handle it with the established stuff, so fall back
                 // on earlier state packets
                 _state = 34;
-                receivePacket(reader, packet);
+                receivePacket(reader, packet, INBOUND_FALLBACK);
             } else {
                 _context.statManager().addRateData("udp.droppedInvalidInboundEstablish", packet.getLifetime(), packet.getExpiration());
             }
@@ -373,7 +395,7 @@ public class PacketHandler {
             // ok, we couldn't handle it with the established stuff, so fall back
             // on earlier state packets
             _state = 41;
-            receivePacket(reader, packet);
+            receivePacket(reader, packet, OUTBOUND_FALLBACK);
             _state = 42;
         }
 
@@ -413,7 +435,7 @@ public class PacketHandler {
             _state = 45;
             RemoteHostId from = packet.getRemoteHost();
             _state = 46;
-
+            
             switch (reader.readPayloadType()) {
                 case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                     _state = 47;

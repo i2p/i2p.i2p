@@ -16,6 +16,8 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
@@ -440,7 +442,41 @@ public class EstablishmentManager {
         _transport.inboundConnectionReceived();
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
-        sendOurInfo(peer, true);
+        sendInboundComplete(peer);
+    }
+
+    /**
+     * dont send our info immediately, just send a small data packet, and 5-10s later, 
+     * if the peer isnt shitlisted, *then* send them our info.  this will help kick off
+     * the oldnet
+     */
+    private void sendInboundComplete(PeerState peer) {
+        SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Completing to the peer after confirm: " + peer);
+        DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
+        dsm.setArrival(Router.NETWORK_ID); // overloaded, sure, but future versions can check this
+        dsm.setMessageExpiration(dsm.getArrival()+10*1000);
+        dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        _transport.send(dsm, peer);
+    }
+    private class PublishToNewInbound implements SimpleTimer.TimedEvent {
+        private PeerState _peer;
+        public PublishToNewInbound(PeerState peer) { _peer = peer; }
+        public void timeReached() {
+            Hash peer = _peer.getRemotePeer();
+            if ((peer != null) && (!_context.shitlist().isShitlisted(peer))) {
+                // ok, we are fine with them, send them our latest info
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Publishing to the peer after confirm plus delay (without shitlist): " + peer.toBase64());
+                sendOurInfo(_peer, true);
+            } else {
+                // nuh uh.  fuck 'em.
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("NOT publishing to the peer after confirm plus delay (WITH shitlist): " + (peer != null ? peer.toBase64() : "unknown"));
+            }
+            _peer = null;
+        }
     }
     
     /** 

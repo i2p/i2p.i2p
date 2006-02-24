@@ -187,10 +187,10 @@ public class Rate {
             // ok ok, lets coalesce
 
             // how much were we off by?  (so that we can sample down the measured values)
-            double periodFactor = measuredPeriod / _period;
-            _lastTotalValue = (_currentTotalValue == 0 ? 0.0D : _currentTotalValue / periodFactor);
-            _lastEventCount = (_currentEventCount == 0 ? 0L : (long) (_currentEventCount / periodFactor));
-            _lastTotalEventTime = (_currentTotalEventTime == 0 ? 0L : (long) (_currentTotalEventTime / periodFactor));
+            double periodFactor = measuredPeriod / (double)_period;
+            _lastTotalValue = _currentTotalValue / periodFactor;
+            _lastEventCount = (long) (_currentEventCount / periodFactor);
+            _lastTotalEventTime = (long) (_currentTotalEventTime / periodFactor);
             _lastCoalesceDate = now;
 
             if (_lastTotalValue > _extremeTotalValue) {
@@ -237,10 +237,12 @@ public class Rate {
      */
     public double getLastEventSaturation() {
         if ((_lastEventCount > 0) && (_lastTotalEventTime > 0)) {
-            double eventTime = (double) _lastTotalEventTime / (double) _lastEventCount;
+            /*double eventTime = (double) _lastTotalEventTime / (double) _lastEventCount;
             double maxEvents = _period / eventTime;
             double saturation = _lastEventCount / maxEvents;
             return saturation;
+             */
+            return ((double)_lastTotalEventTime) / (double)_period;
         }
         
         return 0.0D;

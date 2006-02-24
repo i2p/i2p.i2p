@@ -1014,8 +1014,8 @@ public class Router {
 class CoalesceStatsJob extends JobImpl {
     public CoalesceStatsJob(RouterContext ctx) { 
         super(ctx); 
-        ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendBps", "How fast we send data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("bw.sendBps", "How fast we send data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
@@ -1029,8 +1029,8 @@ class CoalesceStatsJob extends JobImpl {
             Rate rate = receiveRate.getRate(60*1000);
             if (rate != null) { 
                 double bytes = rate.getLastTotalValue();
-                double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
+                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
+                getContext().statManager().addRateData("bw.receiveBps", (long)KBps, 60*1000);
             }
         }
 
@@ -1039,8 +1039,8 @@ class CoalesceStatsJob extends JobImpl {
             Rate rate = sendRate.getRate(60*1000);
             if (rate != null) {
                 double bytes = rate.getLastTotalValue();
-                double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
+                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
+                getContext().statManager().addRateData("bw.sendBps", (long)KBps, 60*1000);
             }
         }
 

@@ -146,15 +146,15 @@ public class DecayingBloomFilter {
             for (int i = 0; i < _extenders.length; i++)
                 DataHelper.xor(entry, offset, _extenders[i], 0, _extended, _entryBytes * (i+1), _entryBytes);
 
-            boolean seen = _current.member(_extended);
-            seen = seen || _previous.member(_extended);
+            boolean seen = _current.locked_member(_extended);
+            seen = seen || _previous.locked_member(_extended);
             if (seen) {
                 _currentDuplicates++;
                 return true;
             } else {
                 if (addIfNew) {
-                    _current.insert(_extended);
-                    _previous.insert(_extended);
+                    _current.locked_insert(_extended);
+                    _previous.locked_insert(_extended);
                 }
                 return false;
             }

@@ -78,6 +78,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** shared slow bid for unconnected peers when we want to prefer UDP */
     private TransportBid _slowPreferredBid;
     
+    /** list of RemoteHostId for peers whose packets we want to drop outright */
+    private List _dropList;
+    
+    private static final int DROPLIST_PERIOD = 10*60*1000;
+    private static final int MAX_DROPLIST_SIZE = 256;
+    
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
 
@@ -124,6 +130,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new HashMap(128);
         _peersByRemoteHost = new HashMap(128);
+        _dropList = new ArrayList(256);
         _endpoint = null;
         
         TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
@@ -572,11 +579,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                    + " because they are in the wrong net");
                 }
                  */
-                _context.shitlist().shitlistRouter(dsm.getRouterInfo().getIdentity().calculateHash(), "Part of the wrong network");                
-                dropPeer(dsm.getRouterInfo().getIdentity().calculateHash());
+                Hash peerHash = dsm.getRouterInfo().getIdentity().calculateHash();
+                PeerState peer = getPeerState(peerHash);
+                if (peer != null) {
+                    RemoteHostId remote = peer.getRemoteHostId();
+                    boolean added = false;
+                    synchronized (_dropList) {
+                        if (!_dropList.contains(remote)) {
+                            while (_dropList.size() > MAX_DROPLIST_SIZE)
+                                _dropList.remove(0);
+                            _dropList.add(remote);
+                            added = true;
+                        }
+                    }
+                    if (added) SimpleTimer.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                }
+                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network");                
+                dropPeer(peerHash);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping the peer " + dsm.getRouterInfo().getIdentity().calculateHash().toBase64() 
-                               + " because they are in the wrong net");
+                    _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net");
                 return;
             } else {
                 if (dsm.getRouterInfo() != null) {
@@ -597,6 +618,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             peer.expireInboundMessages();
     }
 
+    private class RemoveDropList implements SimpleTimer.TimedEvent {
+        private RemoteHostId _peer;
+        public RemoveDropList(RemoteHostId peer) { _peer = peer; }
+        public void timeReached() { 
+            synchronized (_dropList) {
+                _dropList.remove(_peer);
+            }
+        }
+    }
+    
+    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
     
     void dropPeer(Hash peer) {
         PeerState state = getPeerState(peer);
