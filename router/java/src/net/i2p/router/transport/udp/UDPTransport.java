@@ -162,7 +162,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        
+        _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", new long[] { 1*60*1000, 20*60*1000 });
         __instance = this;
     }
     
@@ -584,6 +584,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (peer != null) {
                     RemoteHostId remote = peer.getRemoteHostId();
                     boolean added = false;
+                    int droplistSize = 0;
                     synchronized (_dropList) {
                         if (!_dropList.contains(remote)) {
                             while (_dropList.size() > MAX_DROPLIST_SIZE)
@@ -591,8 +592,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             _dropList.add(remote);
                             added = true;
                         }
+                        droplistSize = _dropList.size();
                     }
-                    if (added) SimpleTimer.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                    if (added) {
+                        _context.statManager().addRateData("udp.dropPeerDroplist", droplistSize, 0);
+                        SimpleTimer.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                    }
                 }
                 _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network");                
                 dropPeer(peerHash);

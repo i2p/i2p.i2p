@@ -122,36 +122,52 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     
     public static String getViewPostLink(String uri, ThreadNode node, User user, boolean isPermalink, 
                                          String offset, String tags, String author, boolean authorOnly) {
-        StringBuffer buf = new StringBuffer(64);
-        buf.append(uri);
-        if (node.getChildCount() > 0) {
-            buf.append('?').append(PARAM_VISIBLE).append('=');
-            ThreadNode child = node.getChild(0);
-            buf.append(child.getEntry().getKeyHash().toBase64()).append('/');
-            buf.append(child.getEntry().getEntryId()).append('&');
+        if (isPermalink) {
+            // link to the blog view of the original poster
+            BlogURI rootBlog = null;
+            ThreadNode parent = node;
+            while (parent != null) {
+                if (parent.getParent() != null) {
+                    parent = parent.getParent();
+                } else {
+                    rootBlog = parent.getEntry();
+                    break;
+                }
+            }
+            BlogInfo root = BlogManager.instance().getArchive().getBlogInfo(rootBlog.getKeyHash());
+            return BlogRenderer.getEntryURL(parent.getEntry(), root, node.getEntry(), true);
         } else {
-            buf.append('?').append(PARAM_VISIBLE).append('=');
+            StringBuffer buf = new StringBuffer(64);
+            buf.append(uri);
+            if (node.getChildCount() > 0) {
+                buf.append('?').append(PARAM_VISIBLE).append('=');
+                ThreadNode child = node.getChild(0);
+                buf.append(child.getEntry().getKeyHash().toBase64()).append('/');
+                buf.append(child.getEntry().getEntryId()).append('&');
+            } else {
+                buf.append('?').append(PARAM_VISIBLE).append('=');
+                buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
+                buf.append(node.getEntry().getEntryId()).append('&');
+            }
+            buf.append(PARAM_VIEW_POST).append('=');
             buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
             buf.append(node.getEntry().getEntryId()).append('&');
+
+            if (!isPermalink) {
+                if (!empty(offset))
+                    buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
+                if (!empty(tags))
+                    buf.append(PARAM_TAGS).append('=').append(tags).append('&');
+            }
+
+            if (authorOnly && !empty(author)) {
+                buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+                buf.append(PARAM_THREAD_AUTHOR).append("=true&");
+            } else if (!isPermalink && !empty(author))
+                buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+        
+            return buf.toString();
         }
-        buf.append(PARAM_VIEW_POST).append('=');
-        buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
-        buf.append(node.getEntry().getEntryId()).append('&');
-        
-        if (!isPermalink) {
-            if (!empty(offset))
-                buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
-            if (!empty(tags))
-                buf.append(PARAM_TAGS).append('=').append(tags).append('&');
-        }
-        
-        if (authorOnly && !empty(author)) {
-            buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
-            buf.append(PARAM_THREAD_AUTHOR).append("=true&");
-        } else if (!isPermalink && !empty(author))
-            buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
-        
-        return buf.toString();
     }
     
     public static String getViewPostLink(String uri, BlogURI post, User user, boolean isPermalink, 
@@ -272,8 +288,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         
         out.write("\n<a href=\"");
         out.write(getViewPostLink(baseURI, node, user, true, offset, requestTags, filteredAuthor, authorOnly));
-        out.write("\" title=\"Select a shareable link directly to this post\">permalink</a>\n");
-
+        out.write("\" title=\"Select a link directly to this post within the blog\">permalink</a>\n");
 
         if (true || (!inlineReply) ) {
             String refuseReply = (String)_headers.get(HEADER_REFUSE_REPLIES);

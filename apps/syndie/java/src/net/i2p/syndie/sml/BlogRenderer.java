@@ -34,7 +34,9 @@ public class BlogRenderer extends HTMLRenderer {
     }
     
     public void receiveHeaderEnd() {
-        _preBodyBuffer.append("<div class=\"syndieBlogPost\"><hr style=\"display: none\" />\n");
+        _preBodyBuffer.append("<div class=\"syndieBlogPost\" id=\"");
+        _preBodyBuffer.append(_entry.getURI().getKeyHash().toBase64()).append('/').append(_entry.getURI().getEntryId());
+        _preBodyBuffer.append("\"><hr style=\"display: none\" />\n");
         _preBodyBuffer.append("<div class=\"syndieBlogPostHeader\">\n");
         _preBodyBuffer.append("<div class=\"syndieBlogPostSubject\">");
         String subject = (String)_headers.get(HEADER_SUBJECT);
@@ -160,12 +162,24 @@ public class BlogRenderer extends HTMLRenderer {
     protected String getEntryURL(boolean showImages) {
         return getEntryURL(_entry, _blog, showImages);
     }
-    static String getEntryURL(EntryContainer entry, BlogInfo blog, boolean showImages) {
+    static String getEntryURL(EntryContainer entry, BlogInfo blog, boolean showImages) { 
         if (entry == null) return "unknown";
-        return "blog.jsp?" 
-               + ViewBlogServlet.PARAM_BLOG + "=" + (blog != null ? blog.getKey().calculateHash().toBase64() : "") + "&amp;"
-               + ViewBlogServlet.PARAM_ENTRY + "="
-               + Base64.encode(entry.getURI().getKeyHash().getData()) + '/' + entry.getURI().getEntryId();
+        return getEntryURL(entry.getURI(), blog, null, showImages); 
+    }
+    static String getEntryURL(BlogURI entry, BlogInfo blog, BlogURI comment, boolean showImages) {
+        if (entry == null) return "unknown";
+        if (comment == null) {
+            return "blog.jsp?" 
+                   + ViewBlogServlet.PARAM_BLOG + "=" + (blog != null ? blog.getKey().calculateHash().toBase64() : "") + "&amp;"
+                   + ViewBlogServlet.PARAM_ENTRY + "="
+                   + Base64.encode(entry.getKeyHash().getData()) + '/' + entry.getEntryId();
+        } else {
+            return "blog.jsp?" 
+                   + ViewBlogServlet.PARAM_BLOG + "=" + (blog != null ? blog.getKey().calculateHash().toBase64() : "") + "&amp;"
+                   + ViewBlogServlet.PARAM_ENTRY + "="
+                   + Base64.encode(entry.getKeyHash().getData()) + '/' + entry.getEntryId()
+                   + '#' + Base64.encode(comment.getKeyHash().getData()) + '/' + comment.getEntryId();
+	}
     }
     
     protected String getAttachmentURLBase() { 

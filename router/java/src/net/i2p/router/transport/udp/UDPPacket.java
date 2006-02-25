@@ -101,6 +101,7 @@ public class UDPPacket {
         _isInbound = inbound;
         _initializeTime = _context.clock().now();
         _markedType = -1;
+        _validateCount = 0;
         _remoteHost = null;
         _released = false;
     }

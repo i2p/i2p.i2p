@@ -212,7 +212,7 @@ public class PeerState {
     private static final int LARGE_MTU = 1350;
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 2000; // 5000;
+    private static final int MAX_RTO = 3000; // 5000;
     /** override the default MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     

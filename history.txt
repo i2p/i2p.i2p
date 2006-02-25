@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.418 2006/02/23 09:38:41 jrandom Exp $
+$Id: history.txt,v 1.419 2006/02/24 04:35:52 jrandom Exp $
+
+2006-02-25  jrandom
+    * Made the Syndie permalinks in the thread view point to the blog view
+    * Disabled TCP again (since the live net seems to be doing well w/out it)
+    * Fix the message time on inbound SSU establishment (thanks zzz!)
+    * Don't be so aggressive with parallel tunnel creation when a tunnel pool
+      just starts up
 
 2006-02-24  jrandom
     * Rounding calculation cleanup in the stats, and avoid an uncontested

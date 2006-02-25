@@ -33,6 +33,7 @@ public class TunnelPool {
     private TunnelInfo _lastSelected;
     private long _lastSelectionPeriod;
     private int _expireSkew;
+    private long _started;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -46,11 +47,13 @@ public class TunnelPool {
         _lastSelected = null;
         _lifetimeProcessed = 0;
         _expireSkew = _context.random().nextInt(90*1000);
+        _started = System.currentTimeMillis();
         refreshSettings();
     }
     
     public void startup() {
         _alive = true;
+        _started = System.currentTimeMillis();
         _manager.getExecutor().repoll();
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             // we just reconnected and didn't require any new tunnel builders.
@@ -100,6 +103,8 @@ public class TunnelPool {
             period = period - ms;
         return period;
     }
+    
+    private long getLifetime() { return System.currentTimeMillis() - _started; }
     
     /**
      * Pull a random tunnel out of the pool.  If there are none available but
@@ -555,12 +560,16 @@ public class TunnelPool {
         if (rv + inProgress + expireLater + fallback > 4*standardAmount)
             rv = 4*standardAmount - inProgress - expireLater - fallback;
         
+        long lifetime = getLifetime();
+        if ( (lifetime < 60*1000) && (rv + inProgress + fallback >= standardAmount) )
+                rv = standardAmount - inProgress - fallback;
+        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Count: rv: " + rv + " allow? " + allowZeroHop
                        + " 30s " + expire30s + " 90s " + expire90s + " 150s " + expire150s + " 210s " + expire210s
                        + " 270s " + expire270s + " later " + expireLater
                        + " std " + standardAmount + " inProgress " + inProgress + " fallback " + fallback 
-                       + " for " + toString());
+                       + " for " + toString() + " up for " + lifetime);
         
         if (rv < 0)
             return 0;
