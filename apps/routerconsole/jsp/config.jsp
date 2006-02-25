@@ -49,7 +49,7 @@
 <input type="checkbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
  <p>If enabled, your router will periodically anonymously probe some of your peers
  to see what sort of throughput they can handle.  This improves your router's ability
- to pick faster peers, but can cost substantial bandwidth.  Relevent data from the
+ to pick faster peers, but can cost substantial bandwidth.  Relevant data from the
  load testing is fed into the profiles as well as the 
  <a href="oldstats.jsp#test.rtt">test.rtt</a> and related stats.</p>
  <hr />
