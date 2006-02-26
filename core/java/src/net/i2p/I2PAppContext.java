@@ -11,11 +11,10 @@ import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.DummyDSAEngine;
 import net.i2p.crypto.DummyElGamalEngine;
-import net.i2p.crypto.DummyHMACSHA256Generator;
 import net.i2p.crypto.DummyPooledRandomSource;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
-import net.i2p.crypto.HMACSHA256Generator;
+import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.PersistentSessionKeyManager;
 import net.i2p.crypto.SHA256Generator;
@@ -67,7 +66,7 @@ public class I2PAppContext {
     private ElGamalAESEngine _elGamalAESEngine;
     private AESEngine _AESEngine;
     private LogManager _logManager;
-    private HMACSHA256Generator _hmac;
+    private HMACGenerator _hmac;
     private SHA256Generator _sha;
     private Clock _clock;
     private DSAEngine _dsa;
@@ -342,17 +341,14 @@ public class I2PAppContext {
      * other than for consistency, and perhaps later we'll want to 
      * include some stats.
      */
-    public HMACSHA256Generator hmac() { 
+    public HMACGenerator hmac() { 
         if (!_hmacInitialized) initializeHMAC();
         return _hmac;
     }
     private void initializeHMAC() {
         synchronized (this) {
             if (_hmac == null) {
-                if ("true".equals(getProperty("i2p.fakeHMAC", "false")))
-                    _hmac = new DummyHMACSHA256Generator(this);
-                else
-                    _hmac= new HMACSHA256Generator(this);
+                _hmac= new HMACGenerator(this);
             }
             _hmacInitialized = true;
         }

@@ -54,7 +54,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
+import gnu.crypto.hash.Sha256Standalone;
 import net.i2p.crypto.CryptixRijndael_Algorithm;
 import net.i2p.crypto.CryptixAESKeyCache;
 
@@ -91,7 +91,7 @@ import net.i2p.crypto.CryptixAESKeyCache;
  * Bruce Schneier). ISBN 0-471-22357-3.</li>
  * </ul>
  *
- * Modified by jrandom for I2P to use Bouncycastle's SHA256, Cryptix's AES,
+ * Modified by jrandom for I2P to use a standalone gnu-crypto SHA256, Cryptix's AES,
  * to strip out some unnecessary dependencies and increase the buffer size.
  * Renamed from Fortuna to FortunaStandalone so it doesn't conflict with the
  * gnu-crypto implementation, which has been imported into GNU/classpath
@@ -106,7 +106,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   private static final int NUM_POOLS = 32;
   private static final int MIN_POOL_SIZE = 64;
   private final Generator generator;
-  private final SHA256Digest[] pools;
+  private final Sha256Standalone[] pools;
   private long lastReseed;
   private int pool;
   private int pool0Count;
@@ -118,9 +118,9 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   {
     super("Fortuna i2p");
     generator = new Generator();
-    pools = new SHA256Digest[NUM_POOLS];
+    pools = new Sha256Standalone[NUM_POOLS];
     for (int i = 0; i < NUM_POOLS; i++)
-      pools[i] = new SHA256Digest();
+      pools[i] = new Sha256Standalone();
     lastReseed = 0;
     pool = 0;
     pool0Count = 0;
@@ -143,8 +143,6 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     generator.init(attributes);
   }
 
-  /** fillBlock is not thread safe, so will be locked anyway */
-  private byte fillBlockBuf[] = new byte[32];
   public void fillBlock()
   {
     if (pool0Count >= MIN_POOL_SIZE
@@ -155,9 +153,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
         for (int i = 0; i < NUM_POOLS; i++)
           {
             if (reseedCount % (1 << i) == 0) {
-              byte buf[] = fillBlockBuf;//new byte[32];
-              pools[i].doFinal(buf, 0);
-              generator.addRandomBytes(buf);//pools[i].digest());
+              generator.addRandomBytes(pools[i].digest());
             }
           }
         lastReseed = System.currentTimeMillis();
@@ -221,7 +217,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
 
     private static final int LIMIT = 1 << 20;
 
-    private final SHA256Digest hash;
+    private final Sha256Standalone hash;
     private final byte[] counter;
     private final byte[] key;
     /** current encryption key built from the keying material */
@@ -232,7 +228,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     public Generator ()
     {
       super("Fortuna.generator.i2p");
-      this.hash = new SHA256Digest();
+      this.hash = new Sha256Standalone();
       counter = new byte[16]; //cipher.defaultBlockSize()];
       buffer = new byte[16]; //cipher.defaultBlockSize()];
       int keysize = 32;
@@ -285,9 +281,9 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     {
       hash.update(key, 0, key.length);
       hash.update(seed, offset, length);
-      //byte[] newkey = hash.digest();
-      //System.arraycopy(newkey, 0, key, 0, Math.min(key.length, newkey.length));
-      hash.doFinal(key, 0);
+      byte[] newkey = hash.digest();
+      System.arraycopy(newkey, 0, key, 0, Math.min(key.length, newkey.length));
+      //hash.doFinal(key, 0);
       resetKey();
       incrementCounter();
       seeded = true;

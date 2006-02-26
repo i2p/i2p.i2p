@@ -1291,6 +1291,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             long idleIn = (now-peer.getLastReceiveTime())/1000;
             long idleOut = (now-peer.getLastSendTime())/1000;
+            if (idleIn < 0) idleIn = 0;
+            if (idleOut < 0) idleOut = 0;
             
             buf.append("<td valign=\"top\" ><code>");
             buf.append(idleIn);

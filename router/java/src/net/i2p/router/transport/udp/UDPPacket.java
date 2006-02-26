@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
-import net.i2p.crypto.HMACSHA256Generator;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -29,8 +28,9 @@ public class UDPPacket {
     private volatile short _priority;
     private volatile long _initializeTime;
     private volatile long _expiration;
-    private volatile byte[] _data;
-    private volatile ByteArray _dataBuf;
+    private byte[] _data;
+    private byte[] _validateBuf;
+    private byte[] _ivBuf;
     private volatile int _markedType;
     private volatile RemoteHostId _remoteHost;
     private volatile boolean _released;
@@ -78,9 +78,6 @@ public class UDPPacket {
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);
     
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
-    private static final ByteCache _validateCache = ByteCache.getInstance(64, MAX_VALIDATE_SIZE);
-    private static final ByteCache _ivCache = ByteCache.getInstance(64, IV_SIZE);
-    private static final ByteCache _dataCache = ByteCache.getInstance(64, MAX_PACKET_SIZE);
 
     private UDPPacket(I2PAppContext ctx, boolean inbound) {
         ctx.statManager().createRateStat("udp.packetsLiveInbound", "Number of live inbound packets in memory", "udp", new long[] { 60*1000, 5*60*1000 });
@@ -89,13 +86,16 @@ public class UDPPacket {
         ctx.statManager().createRateStat("udp.packetsLivePendingHandleInbound", "Number of live inbound packets not yet handled fully by the PacketHandler", "udp", new long[] { 60*1000, 5*60*1000 });
         ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", new long[] { 60*1000 });
         // the data buffer is clobbered on init(..), but we need it to bootstrap
-        _packet = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
+        _data = new byte[MAX_PACKET_SIZE];
+        _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
+        _validateBuf = new byte[MAX_VALIDATE_SIZE];
+        _ivBuf = new byte[IV_SIZE];
         init(ctx, inbound);
     }
     private void init(I2PAppContext ctx, boolean inbound) {
         _context = ctx;
-        _dataBuf = _dataCache.acquire();
-        _data = _dataBuf.getData(); 
+        //_dataBuf = _dataCache.acquire();
+        Arrays.fill(_data, (byte)0);
         //_packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _packet.setData(_data);
         _isInbound = inbound;
@@ -105,21 +105,6 @@ public class UDPPacket {
         _remoteHost = null;
         _released = false;
     }
-    
-    /*
-    public void initialize(int priority, long expiration, InetAddress host, int port) {
-        _priority = (short)priority;
-        _expiration = expiration;
-        resetBegin();
-        Arrays.fill(_data, (byte)0x00);
-        //_packet.setLength(0);
-        _packet.setAddress(host);
-        _packet.setPort(port);
-        _remoteHost = null;
-        _released = false;
-        _releasedBy = null;
-    }
-     */
     
     public void writeData(byte src[], int offset, int len) { 
         verifyNotReleased();
@@ -172,7 +157,7 @@ public class UDPPacket {
         verifyNotReleased(); 
         _beforeValidate = _context.clock().now();
         boolean eq = false;
-        ByteArray buf = _validateCache.acquire();
+        Arrays.fill(_validateBuf, (byte)0);
         
         // validate by comparing _data[0:15] and
         // HMAC(payload + IV + (payloadLength ^ protocolVersion), macKey)
@@ -180,14 +165,14 @@ public class UDPPacket {
         int payloadLength = _packet.getLength() - MAC_SIZE - IV_SIZE;
         if (payloadLength > 0) {
             int off = 0;
-            System.arraycopy(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, buf.getData(), off, payloadLength);
+            System.arraycopy(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _validateBuf, off, payloadLength);
             off += payloadLength;
-            System.arraycopy(_data, _packet.getOffset() + MAC_SIZE, buf.getData(), off, IV_SIZE);
+            System.arraycopy(_data, _packet.getOffset() + MAC_SIZE, _validateBuf, off, IV_SIZE);
             off += IV_SIZE;
-            DataHelper.toLong(buf.getData(), off, 2, payloadLength ^ PacketBuilder.PROTOCOL_VERSION);
+            DataHelper.toLong(_validateBuf, off, 2, payloadLength ^ PacketBuilder.PROTOCOL_VERSION);
             off += 2;
 
-            eq = _context.hmac().verify(macKey, buf.getData(), 0, off, _data, _packet.getOffset(), MAC_SIZE);
+            eq = _context.hmac().verify(macKey, _validateBuf, 0, off, _data, _packet.getOffset(), MAC_SIZE);
             /*
             Hash hmac = _context.hmac().calculate(macKey, buf.getData(), 0, off);
 
@@ -211,7 +196,6 @@ public class UDPPacket {
                 _log.warn("Payload length is " + payloadLength);
         }
         
-        _validateCache.release(buf);
         _afterValidate = _context.clock().now();
         _validateCount++;
         return eq;
@@ -224,11 +208,10 @@ public class UDPPacket {
      */
     public void decrypt(SessionKey cipherKey) {
         verifyNotReleased(); 
-        ByteArray iv = _ivCache.acquire();
-        System.arraycopy(_data, MAC_SIZE, iv.getData(), 0, IV_SIZE);
+        Arrays.fill(_ivBuf, (byte)0);
+        System.arraycopy(_data, MAC_SIZE, _ivBuf, 0, IV_SIZE);
         int len = _packet.getLength();
-        _context.aes().decrypt(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _data, _packet.getOffset() + MAC_SIZE + IV_SIZE, cipherKey, iv.getData(), len - MAC_SIZE - IV_SIZE);
-        _ivCache.release(iv);
+        _context.aes().decrypt(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _data, _packet.getOffset() + MAC_SIZE + IV_SIZE, cipherKey, _ivBuf, len - MAC_SIZE - IV_SIZE);
     }
 
     /** the UDPReceiver has tossed it onto the inbound queue */
@@ -305,7 +288,7 @@ public class UDPPacket {
         //_releasedBy = new Exception("released by");
         //_acquiredBy = null;
         //
-        _dataCache.release(_dataBuf);
+        //_dataCache.release(_dataBuf);
         if (!CACHE)
             return;
         synchronized (_packetCache) {

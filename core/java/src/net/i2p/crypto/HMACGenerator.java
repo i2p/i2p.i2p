@@ -8,46 +8,26 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.macs.HMac;
 
 /**
- * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
+ * Calculate the HMAC-MD5 of a key+message.  All the good stuff occurs
  * in {@link org.bouncycastle.crypto.macs.HMac} and 
- * {@link org.bouncycastle.crypto.digests.SHA256Digest}.  Alternately, if 
- * the context property "i2p.HMACMD5" is set to true, then this whole HMAC
- * generator will be transformed into HMACMD5, maintaining the same size and
- * using {@link org.bouncycastle.crypto.digests.MD5Digest}.
+ * {@link org.bouncycastle.crypto.digests.MD5Digest}.
  *
  */
-public class HMACSHA256Generator {
+public class HMACGenerator {
     private I2PAppContext _context;
     /** set of available HMAC instances for calculate */
     private List _available;
     /** set of available byte[] buffers for verify */
     private List _availableTmp;
-    private boolean _useMD5;
-    private int _macSize;
     
-    public static final boolean DEFAULT_USE_MD5 = true;
-    
-    public HMACSHA256Generator(I2PAppContext context) {
+    public HMACGenerator(I2PAppContext context) {
         _context = context;
         _available = new ArrayList(32);
         _availableTmp = new ArrayList(32);
-        if ("true".equals(context.getProperty("i2p.HMACMD5", Boolean.toString(DEFAULT_USE_MD5).toLowerCase())))
-            _useMD5 = true;
-        else
-            _useMD5 = false;
-        if ("true".equals(context.getProperty("i2p.HMACBrokenSize", "false")))
-            _macSize = 32;
-        else
-            _macSize = (_useMD5 ? 16 : 32);
-    }
-    
-    public static HMACSHA256Generator getInstance() {
-        return I2PAppContext.getGlobalContext().hmac();
     }
     
     /**
@@ -60,24 +40,6 @@ public class HMACSHA256Generator {
         calculate(key, data, 0, data.length, rv, 0);
         return new Hash(rv);
     }
-    
-    /**
-     * Calculate the HMAC of the data with the given key
-     */
-    /*
-    public Hash calculate(SessionKey key, byte data[], int offset, int length) {
-        if ((key == null) || (key.getData() == null) || (data == null))
-            throw new NullPointerException("Null arguments for HMAC");
-        
-        HMac mac = acquire();
-        mac.init(key.getData());
-        mac.update(data, offset, length);
-        byte rv[] = new byte[Hash.HASH_LENGTH];
-        mac.doFinal(rv, 0);
-        release(mac);
-        return new Hash(rv);
-    }
-    */
     
     /**
      * Calculate the HMAC of the data with the given key
@@ -131,10 +93,7 @@ public class HMACSHA256Generator {
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
-        if (_useMD5)
-            return new HMac(new MD5Digest(), 32);
-        else
-        return new HMac(new SHA256Digest(), 32);
+        return new HMac(new MD5Digest(), 32);
     }
     private void release(HMac mac) {
         synchronized (_available) {

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.419 2006/02/24 04:35:52 jrandom Exp $
+$Id: history.txt,v 1.420 2006/02/25 15:41:52 jrandom Exp $
+
+2006-02-26  jrandom
+    * Switch from the bouncycastle to the gnu-crypto implementation for
+      SHA256, as benchmarks show a 10-30% speedup.
+    * Removed some unnecessary object caches
+    * Don't close i2psnark streams prematurely
 
 2006-02-25  jrandom
     * Made the Syndie permalinks in the thread view point to the blog view

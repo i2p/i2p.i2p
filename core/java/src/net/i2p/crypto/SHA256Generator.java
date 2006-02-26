@@ -7,17 +7,19 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
+import gnu.crypto.hash.Sha256Standalone;
 
 /** 
  * Defines a wrapper for SHA-256 operation.  All the good stuff occurs
- * in the Bouncycastle {@link org.bouncycastle.crypto.digests.SHA256Digest}
+ * in the GNU-Crypto {@link gnu.crypto.hash.Sha256Standalone}
  * 
  */
 public final class SHA256Generator {
     private List _digests;
+    private List _digestsGnu;
     public SHA256Generator(I2PAppContext context) {
         _digests = new ArrayList(32);
+        _digestsGnu = new ArrayList(32);
     }
     
     public static final SHA256Generator getInstance() {
@@ -32,47 +34,44 @@ public final class SHA256Generator {
         return calculateHash(source, 0, source.length);
     }
     public final Hash calculateHash(byte[] source, int start, int len) {
-        byte rv[] = new byte[Hash.HASH_LENGTH];
-        calculateHash(source, start, len, rv, 0);
+        Sha256Standalone digest = acquireGnu();
+        digest.update(source, start, len);
+        byte rv[] = digest.digest();
+        releaseGnu(digest);
         return new Hash(rv);
     }
+    
     public final void calculateHash(byte[] source, int start, int len, byte out[], int outOffset) {
-        SHA256Digest digest = acquire();
+        Sha256Standalone digest = acquireGnu();
         digest.update(source, start, len);
-        digest.doFinal(out, outOffset);
-        release(digest);
+        byte rv[] = digest.digest();
+        releaseGnu(digest);
+        System.arraycopy(rv, 0, out, outOffset, rv.length);
     }
     
-    private SHA256Digest acquire() {
-        SHA256Digest rv = null;
-        synchronized (_digests) {
-            if (_digests.size() > 0)
-                rv = (SHA256Digest)_digests.remove(0);
+    private Sha256Standalone acquireGnu() {
+        Sha256Standalone rv = null;
+        synchronized (_digestsGnu) {
+            if (_digestsGnu.size() > 0)
+                rv = (Sha256Standalone)_digestsGnu.remove(0);
         }
         if (rv != null)
             rv.reset();
         else
-            rv = new SHA256Digest();
+            rv = new Sha256Standalone();
         return rv;
     }
-    private void release(SHA256Digest digest) {
-        synchronized (_digests) {
-            if (_digests.size() < 32) {
-                _digests.add(digest);
+    
+    private void releaseGnu(Sha256Standalone digest) {
+        synchronized (_digestsGnu) {
+            if (_digestsGnu.size() < 32) {
+                _digestsGnu.add(digest);
             }
         }
     }
     
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        byte orig[] = new byte[4096];
-        ctx.random().nextBytes(orig);
-        Hash old = ctx.sha().calculateHash(orig);
-        SHA256Digest d = new SHA256Digest();
-        d.update(orig, 0, orig.length);
-        byte out[] = new byte[Hash.HASH_LENGTH];
-        d.doFinal(out, 0);
-        System.out.println("eq? " + net.i2p.data.DataHelper.eq(out, old.getData()));
         for (int i = 0; i < args.length; i++)
             System.out.println("SHA256 [" + args[i] + "] = [" + Base64.encode(ctx.sha().calculateHash(args[i].getBytes()).getData()) + "]");
     }
