@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.420 2006/02/25 15:41:52 jrandom Exp $
+$Id: history.txt,v 1.421 2006/02/26 16:30:58 jrandom Exp $
+
+* 2006-02-27  0.6.1.12 released
+
+2006-02-27  jrandom
+    * Adjust the jbigi.jar to use the athlon-optimized jbigi on windows/amd64
+      machines, rather than the generic jbigi (until we have an athlon64
+      optimized version)
 
 2006-02-26  jrandom
     * Switch from the bouncycastle to the gnu-crypto implementation for

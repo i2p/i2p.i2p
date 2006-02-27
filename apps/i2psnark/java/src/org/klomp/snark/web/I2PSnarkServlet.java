@@ -127,7 +127,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 }
             } else if ( (newURL != null) && (newURL.trim().length() > "http://.i2p/".length()) ) {
                 _manager.addMessage("Fetching " + newURL);
-                I2PThread fetch = new I2PThread(new FetchAndAdd(newURL), "Fetch and add");
+                I2PThread fetch = new I2PThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
                 fetch.start();
             } else {
                 // no file or URL specified
@@ -263,56 +263,6 @@ public class I2PSnarkServlet extends HttpServlet {
                 } else {
                     _manager.addMessage("Cannot create a torrent for the nonexistant data: " + baseFile.getAbsolutePath());
                 }
-            }
-        }
-    }
-    
-    private class FetchAndAdd implements Runnable {
-        private String _url;
-        public FetchAndAdd(String url) {
-            _url = url;
-        }
-        public void run() {
-            _url = _url.trim();
-            File file = I2PSnarkUtil.instance().get(_url, false);
-            try {
-                if ( (file != null) && (file.exists()) && (file.length() > 0) ) {
-                    _manager.addMessage("Torrent fetched from " + _url);
-                    FileInputStream in = null;
-                    try {
-                        in = new FileInputStream(file);
-                        MetaInfo info = new MetaInfo(in);
-                        String name = info.getName();
-                        name = name.replace('/', '_');
-                        name = name.replace('\\', '_');
-                        name = name.replace('&', '+');
-                        name = name.replace('\'', '_');
-                        name = name.replace('"', '_');
-                        name = name.replace('`', '_');
-                        name = name + ".torrent";
-                        File torrentFile = new File(_manager.getDataDir(), name);
-                        
-                        String canonical = torrentFile.getCanonicalPath();
-                        
-                        if (torrentFile.exists()) {
-                            if (_manager.getTorrent(canonical) != null)
-                                _manager.addMessage("Torrent already running: " + name);
-                            else
-                                _manager.addMessage("Torrent already in the queue: " + name);
-                        } else {
-                            FileUtil.copy(file.getAbsolutePath(), canonical, true);
-                            _manager.addTorrent(canonical);
-                        }
-                    } catch (IOException ioe) {
-                        _manager.addMessage("Torrent at " + _url + " was not valid: " + ioe.getMessage());
-                    } finally {
-                        try { in.close(); } catch (IOException ioe) {}
-                    }
-                } else {
-                    _manager.addMessage("Torrent was not retrieved from " + _url);
-                }
-            } finally {
-                if (file != null) file.delete();
             }
         }
     }
@@ -635,4 +585,57 @@ public class I2PSnarkServlet extends HttpServlet {
     private static final String TABLE_FOOTER = "</table>\n";
     
     private static final String FOOTER = "</body></html>";
+}
+
+
+class FetchAndAdd implements Runnable {
+    private SnarkManager _manager;
+    private String _url;
+    public FetchAndAdd(SnarkManager mgr, String url) {
+        _manager = mgr;
+        _url = url;
+    }
+    public void run() {
+        _url = _url.trim();
+        File file = I2PSnarkUtil.instance().get(_url, false);
+        try {
+            if ( (file != null) && (file.exists()) && (file.length() > 0) ) {
+                _manager.addMessage("Torrent fetched from " + _url);
+                FileInputStream in = null;
+                try {
+                    in = new FileInputStream(file);
+                    MetaInfo info = new MetaInfo(in);
+                    String name = info.getName();
+                    name = name.replace('/', '_');
+                    name = name.replace('\\', '_');
+                    name = name.replace('&', '+');
+                    name = name.replace('\'', '_');
+                    name = name.replace('"', '_');
+                    name = name.replace('`', '_');
+                    name = name + ".torrent";
+                    File torrentFile = new File(_manager.getDataDir(), name);
+
+                    String canonical = torrentFile.getCanonicalPath();
+
+                    if (torrentFile.exists()) {
+                        if (_manager.getTorrent(canonical) != null)
+                            _manager.addMessage("Torrent already running: " + name);
+                        else
+                            _manager.addMessage("Torrent already in the queue: " + name);
+                    } else {
+                        FileUtil.copy(file.getAbsolutePath(), canonical, true);
+                        _manager.addTorrent(canonical);
+                    }
+                } catch (IOException ioe) {
+                    _manager.addMessage("Torrent at " + _url + " was not valid: " + ioe.getMessage());
+                } finally {
+                    try { in.close(); } catch (IOException ioe) {}
+                }
+            } else {
+                _manager.addMessage("Torrent was not retrieved from " + _url);
+            }
+        } finally {
+            if (file != null) file.delete();
+        }
+    }
 }

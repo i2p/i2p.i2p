@@ -19,3 +19,7 @@ the libg++.so.5 dependency that has been a problem for a few linux distros.
 
 On Feb 8, 2006, the libjbigi-linux-viac3.so was added to jbigi.jar after
 being compiled by jrandom on linux/p4 (cross compiled to --host=viac3)
+
+On Feb 27, 2006, jbigi-win-athlon.dll was copied to jbigi-win-athlon64.dll,
+as it should offer amd64 users better performance than jbigi-win-none.dll
+until we get a full amd64 build.
