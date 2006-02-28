@@ -1,6 +1,8 @@
 HTTP/1.1 400 Destination Not Found
 Content-Type: text/html; charset=iso-8859-1
 Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
 
 <html><head>
 <title>Invalid eepsite destination</title>

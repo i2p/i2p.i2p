@@ -1,6 +1,8 @@
 HTTP/1.1 504 Gateway Timeout
 Content-Type: text/html; charset=iso-8859-1
 Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
 
 <html><head>
 <title>Outproxy Not Found</title>

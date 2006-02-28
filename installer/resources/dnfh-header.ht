@@ -1,6 +1,8 @@
 HTTP/1.1 404 Domain Not Found
 Content-Type: text/html; charset=iso-8859-1
 Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
 
 <html><head>
 <title>Eepsite unknown</title>

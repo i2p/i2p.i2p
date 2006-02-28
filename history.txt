@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.421 2006/02/26 16:30:58 jrandom Exp $
+$Id: history.txt,v 1.422 2006/02/27 14:05:41 jrandom Exp $
+
+2006-02-27  zzz
+    * Update error page templates to add \r, Connection: close, and
+      Proxy-connection: close to headers.
 
 * 2006-02-27  0.6.1.12 released
 
