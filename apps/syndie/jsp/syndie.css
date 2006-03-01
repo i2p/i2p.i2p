@@ -86,3 +86,359 @@ td.s_summary_summ {
    font-size: 0.8em;
    background-color: #DDDDFF;
 }
+
+<!-- following are doubtful salmon's contributions -->
+body {
+	margin :  0px;
+	padding : 0px;
+	width: 99%;
+	font-family : Arial, sans-serif, Helvetica;
+	background-color : #FFF;
+	color :  black;
+   font-size : 100%;
+    
+    /* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of 
+    ** box rendering. (and therefore one of mozilla's
+    ** proprietry -moz properties (which hopefully they'll
+    ** drop soon).
+    */
+    -moz-box-sizing : border-box;
+    box-sizing :      border-box;
+}
+a:link{color:#007}
+a:visited{color:#606}
+a:hover{color:#720}
+a:active{color:#900}
+
+select {
+    min-width: 1.5em;
+}
+.overallTable {
+    border-spacing: 0px;
+    border-collapse: collapse;
+    float: left;
+}
+.topNav {
+   background-color: #BBB;
+}
+.topNav_user {
+   text-align: left;
+   float: left;
+   display: inline;
+}
+.topNav_admin {
+   text-align: right;
+   float: right;
+   margin: 0 5px 0 0;
+   display: inline;
+}
+.controlBar {
+	margin: 0em;
+	padding: 0em;
+//	border: medium solid #DDF;
+	background-color: #EEF;
+	color: inherit;
+	font-size: small;
+	clear: left; /* fixes a bug in Opera */
+}
+.controlBarRight {
+   text-align: right;
+}
+.threadEven {
+   background-color: #FFF;
+   white-space: nowrap;
+}
+.threadOdd {
+   background-color: #FFC;
+   white-space: nowrap;
+}
+.threadLeft {
+   text-align: left;
+   align: left;
+}
+.threadNav {
+   background-color: #EEF;
+   border: medium solid #CCF;
+}
+.threadNavRight {
+   text-align: right;
+   float: right;
+   background-color: #EEF;
+}
+.rightOffset {
+    float: right;
+    margin: 0 5px 0 0;
+    display: inline;
+}
+.threadInfoLeft {
+    float: left;
+    margin: 5px 0px 0 0;
+    display: inline;
+}
+.threadInfoRight {
+    float: right;
+    margin: 0 5px 0 0;
+    display: inline;
+}
+.postMeta {
+    border-top: 1px solid black;
+    background-color: #FFB;
+}
+.postMetaSubject {
+   text-align: left;
+   font-size: large;
+}
+.postMetaLink {
+   text-align: right;
+}
+.postDetails {
+   background-color: #FFC;
+}
+.postReply {
+   background-color: #CCF;
+}
+.postReplyText {
+   background-color: #CCF;
+}
+.postReplyOptions {
+   background-color: #CCF;
+}
+.syndieBlogTopNav {
+	padding: 0.5em;
+	width: 98%;
+	border: medium solid #CCF;
+	background-color: #EEF;
+	font-size: small;
+}
+.syndieBlogTopNavUser {
+    text-align: left;
+}
+.syndieBlogTopNavAdmin {
+    text-align: right;
+}
+.syndieBlogHeader {
+    width: 100%;
+    font-size: 1.4em;
+    background-color: #000;
+    text-align: Left;
+    float: Left;
+}
+.syndieBlogHeader a {
+    color: #FFF;
+    padding: 4px;
+}
+.syndieBlogHeader a:hover {
+	color:#88F;
+	padding: 4px;
+}
+.syndieBlogLogo {
+    float: left;
+    display: inline;
+}
+.syndieBlogLinks {
+    width: 20%;
+    float: left;
+}
+.syndieBlogLinkGroup {
+    font-size: 0.8em;
+    background-color: #DDD;
+    border: 1px solid black;
+    margin: 5px;
+    padding: 2px;
+}
+.syndieBlogLinkGroup ul {
+    list-style: none;
+}
+.syndieBlogLinkGroup li {
+}
+.syndieBlogLinkGroupName {
+    font-weight: bold;
+    width: 100%;
+    border-bottom: 1px dashed black;
+    display: block;
+}
+.syndieBlogPostInfoGroup {
+    font-size: 0.8em;
+    background-color: #FFEA9F;
+    border: 1px solid black;
+    margin: 5px;
+    padding: 2px;
+}
+.syndieBlogPostInfoGroup ol {
+   list-style: none;
+}
+.syndieBlogPostInfoGroup li {
+}
+.syndieBlogPostInfoGroup li a {
+    display: block;
+}
+.syndieBlogPostInfoGroupName {
+    font-weight: bold;
+    width: 100%;
+    border-bottom: 1px dashed black;
+    display: block;
+}
+.syndieBlogMeta {
+    text-align: left;
+    font-size: 0.8em;
+    background-color: #DDD;
+    border: 1px solid black;
+    margin: 5px;
+    padding: 2px;
+}
+.syndieBlogBody {
+    width: 80%;
+    float: left;
+}
+.syndieBlogPost {
+    border: 1px solid black;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+.syndieBlogPostHeader {
+    background-color: #FFB;
+    padding: 2px;
+}
+.syndieBlogPostSubject {
+    font-weight: bold;
+}
+.syndieBlogPostFrom {
+    text-align: right;
+}
+.syndieBlogPostSummary {
+    background-color: #FFF;
+    padding: 2px;
+}
+.syndieBlogPostDetails {
+    background-color: #FFC;
+    padding: 2px;
+}
+.syndieBlogNav {
+    text-align: center;
+}
+.syndieBlogComments {
+    border: none;
+    margin-top: 5px;
+    margin-left: 0px;
+    float: left;
+}
+.syndieBlogComments ul {
+    list-style: none;
+    margin-left: 10px;
+}
+.syndieBlogCommentInfoGroup {
+    font-size: 0.8em;
+    margin-right: 5px;
+}
+.syndieBlogCommentInfoGroup ol {
+    list-style: none;
+}
+.syndieBlogCommentInfoGroup li {
+}
+.syndieBlogCommentInfoGroup li a {
+    display: block;
+}
+.syndieBlogCommentInfoGroupName {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.syndieBlogFavorites {
+    float: left;
+    margin: 5px 0px 0 0;
+   display: inline;
+}
+.syndieBlogList {
+    float: right;
+    margin: 5px 0px 0 0;
+   display: inline;
+}
+.b_topnavUser {
+   text-align: right;
+   background-color: #CCD;
+}
+.b_topnavHome {
+   background-color: #CCD;
+   color: #000;
+   width: 50px;
+   text-align: left;
+}
+.b_topnav {
+   background-color: #CCD;
+}
+.b_content {
+}
+.s_summary_overall {
+}
+.s_detail_overall {
+}
+.s_detail_subject {
+    font-size: 0.8em;
+    text-align: left;
+    background-color: #CCF;
+}
+.s_detail_quote {
+    margin-left: 1em;
+    border: 1px solid #DBDBDB;
+    background-color: #E0E0E0;
+}
+.s_detail_italic {
+    font-style: italic;
+}
+.s_detail_bold {
+    font-style: normal;
+    font-weight: bold;
+}
+.s_detail_underline {
+    font-style: normal;
+    text-decoration: underline;
+}
+.s_detail_meta {
+   font-size: 0.8em;
+   text-align: right;
+   background-color: #CCF;
+}
+
+.s_summary_subject {
+   font-size: 0.8em;
+   text-align: left;
+   background-color: #CCF;
+}
+.s_summary_meta {
+   font-size: 0.8em;
+   text-align: right;
+   background-color: #CCF;
+}
+.s_summary_quote {
+    margin-left: 1em;
+    border-width: 1px solid #DBDBDB;
+    background-color: #E0E0E0;
+}
+.s_summary_italic {
+    font-style: italic;
+}
+.s_summary_bold {
+    font-style: normal;
+    font-weight: bold;
+}
+.s_summary_underline {
+    font-style: normal;
+    text-decoration: underline;
+}
+.s_summary_summDetail {
+   font-size: 0.8em;
+}
+.s_detail_summDetail {
+}
+.s_detail_summDetailBlog {
+}
+.s_detail_summDetailBlogLink {
+}
+td.s_detail_summDetail {
+   background-color: #CCF;
+}
+td.s_summary_summ {	width: 80%;
+   font-size: 0.8em;
+   background-color: #CCF;
+}

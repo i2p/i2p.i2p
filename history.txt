@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.422 2006/02/27 14:05:41 jrandom Exp $
+$Id: history.txt,v 1.423 2006/02/27 22:55:18 zzz Exp $
+
+2006-03-01  jrandom
+    * More aggressive tunnel throttling as we approach our bandwidth limit,
+      and throttle based off periods wider than 1 second.
+    * Included Doubtful Salmon's syndie stylings (thanks!)
 
 2006-02-27  zzz
     * Update error page templates to add \r, Connection: close, and

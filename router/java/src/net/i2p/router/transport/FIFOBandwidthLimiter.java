@@ -47,7 +47,6 @@ public class FIFOBandwidthLimiter {
     private long _lastTotalSent;
     private long _lastTotalReceived;
     private long _lastStatsUpdated;
-    private long _lastRateUpdated;
     private float _sendBps;
     private float _recvBps;
     
@@ -65,8 +64,6 @@ public class FIFOBandwidthLimiter {
         _context.statManager().createRateStat("bwLimiter.pendingInboundRequests", "How many inbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bwLimiter.outboundDelayedTime", "How long it takes to honor an outbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        _context.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate, averaged every minute", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        _context.statManager().createRateStat("bw.recvRate", "Low level bandwidth receive rate, averaged every minute", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _pendingInboundRequests = new ArrayList(16);
         _pendingOutboundRequests = new ArrayList(16);
         _lastTotalSent = _totalAllocatedOutboundBytes;
@@ -74,7 +71,6 @@ public class FIFOBandwidthLimiter {
         _sendBps = 0;
         _recvBps = 0;
         _lastStatsUpdated = now();
-        _lastRateUpdated = _lastStatsUpdated;
         _refiller = new FIFOBandwidthRefiller(_context, this);
         I2PThread t = new I2PThread(_refiller);
         t.setName("BWRefiller" + (++__id));
@@ -294,11 +290,6 @@ public class FIFOBandwidthLimiter {
                 _context.statManager().getStatLog().addData("bw", "bw.sendBps1s", (long)_sendBps, sent);
                 _context.statManager().getStatLog().addData("bw", "bw.recvBps1s", (long)_recvBps, recv);
             }
-        }
-        if (60*1000 + _lastRateUpdated <= now) {
-            _lastRateUpdated = now;
-            _context.statManager().addRateData("bw.sendRate", (long)_sendBps, 0);
-            _context.statManager().addRateData("bw.recvRate", (long)_recvBps, 0);
         }
     }
     

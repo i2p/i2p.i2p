@@ -1016,12 +1016,26 @@ class CoalesceStatsJob extends JobImpl {
         super(ctx); 
         ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("bw.sendBps", "How fast we send data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate, averaged every minute", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("bw.recvRate", "Low level bandwidth receive rate, averaged every minute", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
     }
     public String getName() { return "Coalesce stats"; }
     public void runJob() {
+        int active = getContext().commSystem().countActivePeers();
+        getContext().statManager().addRateData("router.activePeers", active, 60*1000);
+
+        int fast = getContext().profileOrganizer().countFastPeers();
+        getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);
+
+        int highCap = getContext().profileOrganizer().countHighCapacityPeers();
+        getContext().statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
+
+        getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps(), 0);
+        getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps(), 0);
+        
         getContext().statManager().coalesceStats();
 
         RateStat receiveRate = getContext().statManager().getRate("transport.receiveMessageSize");
@@ -1043,16 +1057,7 @@ class CoalesceStatsJob extends JobImpl {
                 getContext().statManager().addRateData("bw.sendBps", (long)KBps, 60*1000);
             }
         }
-
-        int active = getContext().commSystem().countActivePeers();
-        getContext().statManager().addRateData("router.activePeers", active, 60*1000);
-
-        int fast = getContext().profileOrganizer().countFastPeers();
-        getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);
-
-        int highCap = getContext().profileOrganizer().countHighCapacityPeers();
-        getContext().statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
-
+        
         requeue(60*1000);
     }
 }
