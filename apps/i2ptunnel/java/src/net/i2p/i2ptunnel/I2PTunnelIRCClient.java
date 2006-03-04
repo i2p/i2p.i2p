@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.lang.IndexOutOfBoundsException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
@@ -277,9 +278,14 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         
         if(field[0].charAt(0)==':')
             idx++;
-        
-        command = field[idx++];
-        
+
+        try { command = field[idx++]; }
+         catch (IndexOutOfBoundsException ioobe) // wtf, server sent borked command?
+        {
+           _log.warn("Dropping defective message: index out of bounds while extracting command.");
+           return null;
+        }
+
         idx++; //skip victim
 
         // Allow numerical responses

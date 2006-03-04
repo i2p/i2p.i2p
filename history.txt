@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.423 2006/02/27 22:55:18 zzz Exp $
+$Id: history.txt,v 1.424 2006/03/01 18:01:20 jrandom Exp $
+
+2006-03-03  Complication
+    * Explicit check for an index out of bounds exception while parsing
+      an inbound IRC command (implicit check was there already)
 
 2006-03-01  jrandom
     * More aggressive tunnel throttling as we approach our bandwidth limit,
