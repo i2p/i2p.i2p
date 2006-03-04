@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.424 2006/03/01 18:01:20 jrandom Exp $
+$Id: history.txt,v 1.425 2006/03/03 22:04:06 complication Exp $
+
+2006-03-04  Complication
+    * Fix the announce URL of orion's tracker in Snark sources
 
 2006-03-03  Complication
     * Explicit check for an index out of bounds exception while parsing
