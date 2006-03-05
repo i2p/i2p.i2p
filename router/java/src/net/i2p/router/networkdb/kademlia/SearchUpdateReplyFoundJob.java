@@ -26,6 +26,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     private SearchJob _job;
     private TunnelInfo _outTunnel;
     private TunnelInfo _replyTunnel;
+    private boolean _isFloodfillPeer;
     private long _sentOn;
     
     public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, 
@@ -39,6 +40,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
         super(context);
         _log = context.logManager().getLog(SearchUpdateReplyFoundJob.class);
         _peer = peer.getIdentity().getHash();
+        _isFloodfillPeer = FloodfillNetworkDatabaseFacade.isFloodfill(peer);
         _state = state;
         _facade = facade;
         _job = job;
@@ -49,6 +51,9 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     
     public String getName() { return "Update Reply Found for Kademlia Search"; }
     public void runJob() {
+        if (_isFloodfillPeer)
+            _job.decrementOutstandingFloodfillSearches();
+
         I2NPMessage message = _message;
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Reply from " + _peer.toBase64() 

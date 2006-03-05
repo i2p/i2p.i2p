@@ -799,8 +799,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * without any match)
      *
      */
-    void search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
-        if (!_initialized) return;
+    SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
+        if (!_initialized) return null;
         boolean isNew = true;
         SearchJob searchJob = null;
         synchronized (_activeRequests) {
@@ -823,6 +823,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             int deferred = searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
             _context.statManager().addRateData("netDb.lookupLeaseSetDeferred", deferred, searchJob.getExpiration()-_context.clock().now());
         }
+        return searchJob;
     }
     
     private Set getLeases() {
@@ -851,8 +852,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** smallest allowed period */
-    private static final int MIN_PER_PEER_TIMEOUT = 3*1000;
-    private static final int MAX_PER_PEER_TIMEOUT = 5*1000;
+    private static final int MIN_PER_PEER_TIMEOUT = 5*1000;
+    private static final int MAX_PER_PEER_TIMEOUT = 10*1000;
     
     public int getPeerTimeout(Hash peer) {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);

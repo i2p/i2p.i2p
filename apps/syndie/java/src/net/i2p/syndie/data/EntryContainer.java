@@ -60,7 +60,7 @@ public class EntryContainer {
         this();
         _entryURI = uri;
         if ( (smlData == null) || (smlData.length <= 0) )
-            _entryData = new Entry(null);
+            _entryData = new Entry(""); //null);
         else
             _entryData = new Entry(DataHelper.getUTF8(smlData));
         setHeader(HEADER_BLOGKEY, Base64.encode(uri.getKeyHash().getData()));
@@ -277,7 +277,7 @@ public class EntryContainer {
         }
         
         if (_entryData == null)
-            _entryData = new Entry(null);
+            _entryData = new Entry(""); //null);
         
         _attachments = new Attachment[attachments.size()];
         

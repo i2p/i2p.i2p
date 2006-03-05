@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.426 2006/03/04 18:50:01 complication Exp $
+$Id: history.txt,v 1.427 2006/03/05 02:44:59 complication Exp $
+
+2006-03-05  jrandom
+    * HTML fixes in Syndie to work better with opera (thanks shaklen!)
+    * Give netDb lookups to floodfill peers more time, as they are much more
+      likely to succeed (thereby cutting down on the unnecessary netDb
+      searches outside the floodfill set)
+    * Fix to the SSU IP detection code so we won't use introducers when we
+      don't need them (thanks Complication!)
+    * Add a brief shitlist to i2psnark so it doesn't keep on trying to reach
+      peers given to it
+    * Don't let netDb searches wander across too many peers
+    * Don't use the 1s bandwidth usage in the tunnel participation throttle,
+      as its too volatile to have much meaning.
+    * Don't bork if a Syndie post is missing an entry.sml
 
 2006-03-05  Complication
     * Reduce exposed statistical information,

@@ -10,6 +10,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 import java.io.*;
 import java.util.*;
@@ -31,6 +32,7 @@ public class I2PSnarkUtil {
     private Map _opts;
     private I2PSocketManager _manager;
     private boolean _configured;
+    private Set _shitlist;
     
     private I2PSnarkUtil() {
         _context = I2PAppContext.getGlobalContext();
@@ -38,6 +40,7 @@ public class I2PSnarkUtil {
         _opts = new HashMap();
         setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", 7654, null);
+        _shitlist = new HashSet(64);
         _configured = false;
     }
     
@@ -110,16 +113,34 @@ public class I2PSnarkUtil {
     public void disconnect() {
         I2PSocketManager mgr = _manager;
         _manager = null;
+        _shitlist.clear();
         mgr.destroySocketManager();
     }
     
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
+        Hash dest = peer.getAddress().calculateHash();
+        synchronized (_shitlist) {
+            if (_shitlist.contains(dest))
+                throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
+        }
         try {
-            return _manager.connect(peer.getAddress());
+            I2PSocket rv = _manager.connect(peer.getAddress());
+            if (rv != null) synchronized (_shitlist) { _shitlist.remove(dest); }
+            return rv;
         } catch (I2PException ie) {
+            synchronized (_shitlist) {
+                _shitlist.add(dest);
+            }
+            SimpleTimer.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
+    }
+    
+    private class Unshitlist implements SimpleTimer.TimedEvent {
+        private Hash _dest;
+        public Unshitlist(Hash dest) { _dest = dest; }
+        public void timeReached() { synchronized (_shitlist) { _shitlist.remove(_dest); } }
     }
     
     /**

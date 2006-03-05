@@ -483,10 +483,6 @@ public class LoadTestManager {
             // length == #hops+1 (as it includes the creator)
             if (cfg.getLength() < 2)
                 return false;
-            // only load test the client tunnels
-            // XXX why?
-            ////if (cfg.getTunnel().getDestination() == null)
-            ////    return false;
             _active.add(cfg);
             return true;
         } else {
@@ -496,16 +492,24 @@ public class LoadTestManager {
     
     private boolean bandwidthOverloaded() {
         int msgLoadBps = CONCURRENT_MESSAGES
-                         * 5 // message size
+                         * 5 * 1024 // message size
                          / 10; // 10 seconds before timeout & retransmission
         msgLoadBps *= 2; // buffer
-        if (_context.bandwidthLimiter().getSendBps()/1024d + (double)msgLoadBps >= _context.bandwidthLimiter().getOutboundKBytesPerSecond())
+        int curBps = getBps();
+        if ((curBps + msgLoadBps)/1024 >= _context.bandwidthLimiter().getOutboundKBytesPerSecond())
             return true;
-        if (_context.bandwidthLimiter().getReceiveBps()/1024d + (double)msgLoadBps >= _context.bandwidthLimiter().getInboundKBytesPerSecond())
+        if ((curBps + msgLoadBps)/1024 >= _context.bandwidthLimiter().getInboundKBytesPerSecond())
             return true;
         if (_context.throttle().getMessageDelay() > 1000)
             return true;
         return false;
+    }
+    
+    private int getBps() {
+        int used1s = RouterThrottleImpl.get1sRate(_context);
+        int used1m = RouterThrottleImpl.get1mRate(_context);
+        int used5m = RouterThrottleImpl.get5mRate(_context);
+        return Math.max(used1s, Math.max(used1m, used5m));
     }
     
     private class CreatedJob extends JobImpl {

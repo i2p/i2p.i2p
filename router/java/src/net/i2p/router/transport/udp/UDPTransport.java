@@ -317,7 +317,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         if (explicitSpecified) 
             return;
-            
+        
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         boolean fireTest = false;
@@ -328,7 +328,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                            + RemoteHostId.toString(ourIP) + ".  Lets throw tomatoes at them");
             _context.shitlist().shitlistRouter(from, "They said we had an invalid IP");
             return;
-        } else if (inboundRecent) {
+        } else if (inboundRecent && _externalListenPort > 0 && _externalListenHost != null) {
             // use OS clock since its an ordering thing, not a time thing
             if (_log.shouldLog(Log.INFO))
                 _log.info("Ignoring IP address suggestion, since we have received an inbound con recently");
@@ -761,9 +761,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         } else {
             boolean rv = (_externalListenHost == null) || (_externalListenPort <= 0);
+            if (!rv) {
+                RouterAddress addr = _externalAddress;
+                UDPAddress ua = new UDPAddress(addr);
+                if (ua.getIntroducerCount() > 0)
+                    rv = true;  // status == ok and we don't actually need introducers, so rebuild
+            }
             if (_log.shouldLog(Log.INFO)) {
                 if (rv) {
-                    _log.info("Need to initialize our direct SSU info");
+                    _log.info("Need to initialize our direct SSU info (" + _externalListenHost + ":" + _externalListenPort + ")");
                 } else {
                     RouterAddress addr = _externalAddress;
                     UDPAddress ua = new UDPAddress(addr);

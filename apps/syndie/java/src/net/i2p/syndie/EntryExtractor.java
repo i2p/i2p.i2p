@@ -59,9 +59,9 @@ public class EntryExtractor {
     }
     
     public void extract(EntryContainer entry, File entryDir) throws IOException {
+        extractEntry(entry, entryDir);
         extractHeaders(entry, entryDir);
         extractMeta(entry, entryDir);
-        extractEntry(entry, entryDir);
         Attachment attachments[] = entry.getAttachments();
         if (attachments != null) {
             for (int i = 0; i < attachments.length; i++) {
@@ -97,10 +97,14 @@ public class EntryExtractor {
         }
     }
     private void extractEntry(EntryContainer entry, File entryDir) throws IOException {
+        Entry e = entry.getEntry();
+        if (e == null) throw new IOException("Entry is null");
+        String text = e.getText();
+        if (text == null) throw new IOException("Entry text is null");
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File(entryDir, ENTRY));
-            out.write(DataHelper.getUTF8(entry.getEntry().getText()));
+            out.write(DataHelper.getUTF8(text));
         } finally {
             out.close();
         }

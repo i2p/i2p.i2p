@@ -64,13 +64,13 @@ public abstract class BaseServlet extends HttpServlet {
      * key=value& of params that need to be tacked onto an http request that updates data, to 
      * prevent spoofing 
      */
-    protected static String getAuthActionParams() { return PARAM_AUTH_ACTION + '=' + _authNonce + '&'; }
+    protected static String getAuthActionParams() { return PARAM_AUTH_ACTION + '=' + _authNonce + "&amp;"; }
     /** 
      * key=value& of params that need to be tacked onto an http request that updates data, to 
      * prevent spoofing 
      */
     public static void addAuthActionParams(StringBuffer buf) { 
-        buf.append(PARAM_AUTH_ACTION).append('=').append(_authNonce).append('&'); 
+        buf.append(PARAM_AUTH_ACTION).append('=').append(_authNonce).append("&amp;"); 
     }
     
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -866,22 +866,22 @@ public abstract class BaseServlet extends HttpServlet {
             ThreadNode child = node.getChild(0);
             buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=');
             buf.append(child.getEntry().getKeyHash().toBase64()).append('/');
-            buf.append(child.getEntry().getEntryId()).append('&');
+            buf.append(child.getEntry().getEntryId()).append("&amp;");
         }
         
         if (!empty(viewPost))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append("&amp;");
         else if (!empty(viewThread))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append("&amp;");
         
         if (!empty(offset))
-            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append("&amp;");
         
         if (!empty(tags)) 
-            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append("&amp;");
         
         if (!empty(author)) 
-            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append("&amp;");
         
         return buf.toString();
     }
@@ -901,21 +901,21 @@ public abstract class BaseServlet extends HttpServlet {
         // collapse node == let the node be visible
         buf.append('?').append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=');
         buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
-        buf.append(node.getEntry().getEntryId()).append('&');
+        buf.append(node.getEntry().getEntryId()).append("&amp;");
 
         if (!empty(viewPost))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append("&amp;");
         else if (!empty(viewThread))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append("&amp;");
         
         if (!empty(offset))
-            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append("&amp;");
         
         if (!empty(tags))
-            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append("&amp;");
         
         if (!empty(author))
-            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append("&amp;");
         
         return buf.toString();
     }
@@ -939,23 +939,23 @@ public abstract class BaseServlet extends HttpServlet {
         buf.append(uri);
         buf.append('?');
         if (!empty(visible))
-            buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(visible).append('&');
-        buf.append(ThreadedHTMLRenderer.PARAM_ADD_TO_GROUP_LOCATION).append('=').append(author.toBase64()).append('&');
-        buf.append(ThreadedHTMLRenderer.PARAM_ADD_TO_GROUP_NAME).append('=').append(group).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(visible).append("&amp;");
+        buf.append(ThreadedHTMLRenderer.PARAM_ADD_TO_GROUP_LOCATION).append('=').append(author.toBase64()).append("&amp;");
+        buf.append(ThreadedHTMLRenderer.PARAM_ADD_TO_GROUP_NAME).append('=').append(group).append("&amp;");
 
         if (!empty(viewPost))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append("&amp;");
         else if (!empty(viewThread))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append("&amp;");
         
         if (!empty(offset))
-            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append("&amp;");
 
         if (!empty(tags))
-            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append("&amp;");
         
         if (!empty(filteredAuthor))
-            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append("&amp;");
         
         addAuthActionParams(buf);
         return buf.toString();
@@ -966,23 +966,23 @@ public abstract class BaseServlet extends HttpServlet {
         buf.append(uri);
         buf.append('?');
         if (!empty(visible))
-            buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(visible).append('&');
-        buf.append(ThreadedHTMLRenderer.PARAM_REMOVE_FROM_GROUP_NAME).append('=').append(name).append('&');
-        buf.append(ThreadedHTMLRenderer.PARAM_REMOVE_FROM_GROUP).append('=').append(group).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(visible).append("&amp;");
+        buf.append(ThreadedHTMLRenderer.PARAM_REMOVE_FROM_GROUP_NAME).append('=').append(name).append("&amp;");
+        buf.append(ThreadedHTMLRenderer.PARAM_REMOVE_FROM_GROUP).append('=').append(group).append("&amp;");
 
         if (!empty(viewPost))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(viewPost).append("&amp;");
         else if (!empty(viewThread))
-            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=').append(viewThread).append("&amp;");
         
         if (!empty(offset))
-            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append("&amp;");
 
         if (!empty(tags))
-            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append("&amp;");
         
         if (!empty(filteredAuthor))
-            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append("&amp;");
         
         addAuthActionParams(buf);
         return buf.toString();
@@ -1024,24 +1024,23 @@ public abstract class BaseServlet extends HttpServlet {
         } 
         buf.append('?').append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=');
         buf.append(expandTo.getKeyHash().toBase64()).append('/');
-        buf.append(expandTo.getEntryId()).append('&');
+        buf.append(expandTo.getEntryId()).append("&amp;");
         
         buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=');
         buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
-        buf.append(node.getEntry().getEntryId()).append('&');
+        buf.append(node.getEntry().getEntryId()).append("&amp;");
         
         if (!empty(offset))
-            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(offset).append("&amp;");
         
         if (!empty(tags))
-            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append("&amp;");
         
         if (!empty(author)) {
-            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append("&amp;");
             if (authorOnly)
-                buf.append(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR).append("=true&");
+                buf.append(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR).append("=true&amp;");
         }
-        
         buf.append("#").append(node.getEntry().toString());
         return buf.toString();
     }

@@ -14,9 +14,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public static final char CAPACITY_FLOODFILL = 'f';
     private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
     private static final String DEFAULT_FLOODFILL_PARTICIPANT = "false";
+    private Map _activeFloodQueries;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
+        _activeFloodQueries = new HashMap();
     }
 
     protected void createHandlers() {
@@ -106,4 +108,267 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         else
             return false;
     }
+    
+    /**
+     * Begin a kademlia style search for the key specified, which can take up to timeoutMs and
+     * will fire the appropriate jobs on success or timeout (or if the kademlia search completes
+     * without any match)
+     *
+     */
+    SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
+        //if (true) return super.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
+        
+        boolean isNew = true;
+        FloodSearchJob searchJob = null;
+        synchronized (_activeFloodQueries) {
+            searchJob = (FloodSearchJob)_activeFloodQueries.get(key);
+            if (searchJob == null) {
+                searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                _activeFloodQueries.put(key, searchJob);
+                isNew = true;
+            }
+        }
+        
+        if (isNew) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("this is the first search for that key, fire off the FloodSearchJob");
+            _context.jobQueue().addJob(searchJob);
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Deferring flood search for " + key.toBase64() + " with " + onFindJob);
+            searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
+            _context.statManager().addRateData("netDb.lookupLeaseSetDeferred", 1, searchJob.getExpiration()-_context.clock().now());
+        }
+        return null;
+    }
+    
+    /**
+     * Ok, the initial set of searches to the floodfill peers timed out, lets fall back on the
+     * wider kademlia-style searches
+     */
+    void searchFull(Hash key, List onFind, List onFailed, long timeoutMs, boolean isLease) {
+        synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
+        
+        Job find = null;
+        if ( (onFind != null) && (onFind.size() > 0) )
+            find = (Job)onFind.remove(0);
+        Job fail = null;
+        if ( (onFailed != null) && (onFailed.size() > 0) )
+            fail = (Job)onFailed.remove(0);
+        SearchJob job = super.search(key, find, fail, timeoutMs, isLease);
+        if (job != null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Floodfill search timed out for " + key.toBase64() + ", falling back on normal search (#" 
+                          + job.getJobId() + ") with " + timeoutMs + " remaining");
+            long expiration = timeoutMs + _context.clock().now();
+            while ( (onFind != null) && (onFind.size() > 0) )
+                job.addDeferred((Job)onFind.remove(0), null, expiration, isLease);
+            while ( (onFailed != null) && (onFailed.size() > 0) )
+                job.addDeferred(null, (Job)onFailed.remove(0), expiration, isLease);
+        }
+    }
+    void complete(Hash key) {
+        synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
+    }
+    
+    /** list of the Hashes of currently known floodfill peers */
+    List getFloodfillPeers() {
+        FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
+        return sel.selectFloodfillParticipants(getKBuckets());
+    }
+}
+
+/**
+ * Try sending a search to some floodfill peers, but if we don't get a successful
+ * match within half the allowed lookup time, give up and start querying through
+ * the normal (kademlia) channels.  This should cut down on spurious lookups caused
+ * by simple delays in responses from floodfill peers
+ *
+ */
+class FloodSearchJob extends JobImpl {
+    private Log _log;
+    private FloodfillNetworkDatabaseFacade _facade;
+    private Hash _key;
+    private List _onFind;
+    private List _onFailed;
+    private long _expiration;
+    private int _timeoutMs;
+    private long _origExpiration;
+    private boolean _isLease;
+    private volatile int _lookupsRemaining;
+    private volatile boolean _dead;
+    public FloodSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
+        super(ctx);
+        _log = ctx.logManager().getLog(FloodSearchJob.class);
+        _facade = facade;
+        _key = key;
+        _onFind = new ArrayList();
+        _onFind.add(onFind);
+        _onFailed = new ArrayList();
+        _onFailed.add(onFailed);
+        int timeout = timeoutMs / FLOOD_SEARCH_TIME_FACTOR;
+        if (timeout < timeoutMs)
+            timeout = timeoutMs;
+        _timeoutMs = timeout;
+        _expiration = timeout + ctx.clock().now();
+        _origExpiration = timeoutMs + ctx.clock().now();
+        _isLease = isLease;
+        _lookupsRemaining = 0;
+        _dead = false;
+    }
+    void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
+        if (_dead) {
+            getContext().jobQueue().addJob(onFailed);
+        } else {
+            if (onFind != null) synchronized (_onFind) { _onFind.add(onFind); }
+            if (onFailed != null) synchronized (_onFailed) { _onFailed.add(onFailed); }
+        }
+    }
+    public long getExpiration() { return _expiration; }
+    private static final int CONCURRENT_SEARCHES = 2;
+    private static final int FLOOD_SEARCH_TIME_FACTOR = 2;
+    private static final int FLOOD_SEARCH_TIME_MIN = 30*1000;
+    public void runJob() {
+        // pick some floodfill peers and send out the searches
+        List floodfillPeers = _facade.getFloodfillPeers();
+        FloodLookupSelector replySelector = new FloodLookupSelector(getContext(), this);
+        ReplyJob onReply = new FloodLookupMatchJob(getContext(), this);
+        Job onTimeout = new FloodLookupTimeoutJob(getContext(), this);
+        OutNetMessage out = getContext().messageRegistry().registerPending(replySelector, onReply, onTimeout, _timeoutMs);
+
+        for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
+            Hash peer = (Hash)floodfillPeers.get(i);
+            if (peer.equals(getContext().routerHash()))
+                continue;
+            
+            DatabaseLookupMessage dlm = new DatabaseLookupMessage(getContext(), true);
+            TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel();
+            TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+            if ( (replyTunnel == null) || (outTunnel == null) ) {
+                _dead = true;
+                while (_onFailed.size() > 0) {
+                    Job job = (Job)_onFailed.remove(0);
+                    getContext().jobQueue().addJob(job);
+                }
+                getContext().messageRegistry().unregisterPending(out);
+                return;
+            }
+            dlm.setFrom(replyTunnel.getPeer(0));
+            dlm.setMessageExpiration(getContext().clock().now()+10*1000);
+            dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
+            dlm.setSearchKey(_key);
+            
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " to " + peer.toBase64());
+            getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), peer);
+            _lookupsRemaining++;
+        }
+        
+        if (_lookupsRemaining <= 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " had no peers to send to");
+            // no floodfill peers, go to the normal ones
+            getContext().messageRegistry().unregisterPending(out);
+            _facade.searchFull(_key, _onFind, _onFailed, _timeoutMs*FLOOD_SEARCH_TIME_FACTOR, _isLease);
+        }
+    }
+    public String getName() { return "NetDb search (phase 1)"; }
+    
+    Hash getKey() { return _key; }
+    void decrementRemaining() { _lookupsRemaining--; }
+    int getLookupsRemaining() { return _lookupsRemaining; }
+    
+    void failed() {
+        if (_dead) return;
+        _dead = true;
+        int timeRemaining = (int)(_origExpiration - getContext().clock().now());
+        if (_log.shouldLog(Log.INFO))
+            _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " failed with " + timeRemaining);
+        if (timeRemaining > 0) {
+            _facade.searchFull(_key, _onFind, _onFailed, timeRemaining, _isLease);
+        } else {
+            for (int i = 0; i < _onFailed.size(); i++) {
+                Job j = (Job)_onFailed.remove(0);
+                getContext().jobQueue().addJob(j);
+            }
+        }
+    }
+    void success() {
+        if (_dead) return;
+        if (_log.shouldLog(Log.INFO))
+            _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " successful");
+        _dead = true;
+        _facade.complete(_key);
+        while (_onFind.size() > 0)
+            getContext().jobQueue().addJob((Job)_onFind.remove(0));
+    }
+}
+
+class FloodLookupTimeoutJob extends JobImpl {
+    private FloodSearchJob _search;
+    public FloodLookupTimeoutJob(RouterContext ctx, FloodSearchJob job) {
+        super(ctx);
+        _search = job;
+    }
+    public void runJob() {
+        _search.decrementRemaining();
+        if (_search.getLookupsRemaining() <= 0)
+            _search.failed(); 
+    }
+    public String getName() { return "NetDb search (phase 1) timeout"; }
+}
+
+class FloodLookupMatchJob extends JobImpl implements ReplyJob {
+    private Log _log;
+    private FloodSearchJob _search;
+    public FloodLookupMatchJob(RouterContext ctx, FloodSearchJob job) {
+        super(ctx);
+        _log = ctx.logManager().getLog(FloodLookupMatchJob.class);
+        _search = job;
+    }
+    public void runJob() { 
+        if ( (getContext().netDb().lookupLeaseSetLocally(_search.getKey()) != null) ||
+             (getContext().netDb().lookupRouterInfoLocally(_search.getKey()) != null) ) {
+            _search.success();
+        } else {
+            int remaining = _search.getLookupsRemaining();
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + "/" + _search.getJobId() + ": got a reply looking for " 
+                          + _search.getKey().toBase64() + ", with " + remaining + " outstanding searches");
+            // netDb reply pointing us at other people
+            if (remaining <= 0)
+                _search.failed();
+        }
+    }
+    public String getName() { return "NetDb search (phase 1) match"; }
+    public void setMessage(I2NPMessage message) {}
+}
+
+class FloodLookupSelector implements MessageSelector {
+    private RouterContext _context;
+    private FloodSearchJob _search;
+    public FloodLookupSelector(RouterContext ctx, FloodSearchJob search) {
+        _context = ctx;
+        _search = search;
+    }
+    public boolean continueMatching() { return _search.getLookupsRemaining() > 0; }
+    public long getExpiration() { return _search.getExpiration(); }
+    public boolean isMatch(I2NPMessage message) {
+        if (message == null) return false;
+        if (message instanceof DatabaseStoreMessage) {
+            DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
+            // is it worth making sure the reply came in on the right tunnel?
+            if (_search.getKey().equals(dsm.getKey())) {
+                _search.decrementRemaining();
+                return true;
+            }
+        } else if (message instanceof DatabaseSearchReplyMessage) {
+            DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
+            if (_search.getKey().equals(dsrm.getSearchKey())) {
+                _search.decrementRemaining();
+                return true;
+            }
+        }
+        return false;
+    }   
 }

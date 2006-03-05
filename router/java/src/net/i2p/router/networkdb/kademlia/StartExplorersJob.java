@@ -29,7 +29,7 @@ class StartExplorersJob extends JobImpl {
     /** don't explore more than 1 bucket at a time */
     private static final int MAX_PER_RUN = 1;
     /** dont explore the network more often than once every minute */
-    private static final int MIN_RERUN_DELAY_MS = 60*1000;
+    private static final int MIN_RERUN_DELAY_MS = 5*60*1000;
     /** explore the network at least once every thirty minutes */
     private static final int MAX_RERUN_DELAY_MS = 30*60*1000;
     

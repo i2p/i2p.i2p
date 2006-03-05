@@ -211,7 +211,13 @@ public class Archive {
         if (!entryDir.exists())
             entryDir.mkdirs();
         
-        boolean ok = _extractor.extract(entryFile, entryDir, null, info);
+        boolean ok = true;
+        try {
+            ok = _extractor.extract(entryFile, entryDir, null, info);
+        } catch (IOException ioe) {
+            ok = false;
+            _log.error("Error extracting " + entryFile.getPath() + ", deleting it", ioe);
+        }
         if (!ok) {
             File files[] = entryDir.listFiles();
             for (int i = 0; i < files.length; i++)

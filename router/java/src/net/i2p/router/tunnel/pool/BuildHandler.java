@@ -307,7 +307,11 @@ class BuildHandler {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + _state.msg.getUniqueId() + " handled with a successful deferred lookup for the next peer " + _nextPeer.toBase64());
 
-            handleReq(getContext().netDb().lookupRouterInfoLocally(_nextPeer), _state, _req, _nextPeer);
+            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(_nextPeer);
+            if (ri != null)
+                handleReq(ri, _state, _req, _nextPeer);
+            else
+                _log.error("Deferred successfully, but we couldnt find " + _nextPeer.toBase64() + "?");
         }
     }
 

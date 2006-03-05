@@ -92,6 +92,8 @@ class StoreJob extends JobImpl {
     private boolean isExpired() { 
         return getContext().clock().now() >= _expiration;
     }
+    
+    private static final int MAX_PEERS_SENT = 10;
 
     /**
      * send the key to the next batch of peers
@@ -103,6 +105,9 @@ class StoreJob extends JobImpl {
             return;
         }
         if (isExpired()) {
+            _state.complete(true);
+            fail();
+        } else if (_state.getAttempted().size() > MAX_PEERS_SENT) {
             _state.complete(true);
             fail();
         } else {
