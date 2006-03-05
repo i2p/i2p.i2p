@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.425 2006/03/03 22:04:06 complication Exp $
+$Id: history.txt,v 1.426 2006/03/04 18:50:01 complication Exp $
+
+2006-03-05  Complication
+    * Reduce exposed statistical information,
+      to make build and uptime tracking more expensive
 
 2006-03-04  Complication
     * Fix the announce URL of orion's tracker in Snark sources

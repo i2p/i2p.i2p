@@ -95,9 +95,11 @@ public class StatisticsManager implements Service {
     public Properties publishStatistics() { 
         Properties stats = new Properties();
         stats.setProperty("router.version", RouterVersion.VERSION);
-        stats.setProperty("router.id", RouterVersion.ID);
         stats.setProperty("coreVersion", CoreVersion.VERSION);
-        stats.setProperty("core.id", CoreVersion.ID);
+
+        // No longer expose, to make build tracking more expensive
+        // stats.setProperty("router.id", RouterVersion.ID);
+        // stats.setProperty("core.id", CoreVersion.ID);
 	
         if (_includePeerRankings) {
             if (false)
@@ -147,7 +149,12 @@ public class StatisticsManager implements Service {
             includeRate("udp.congestionOccurred", stats, new long[] { 10*60*1000 });
             //includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
-            stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
+
+            // Round smaller uptimes to 1 hour, to frustrate uptime tracking
+            long publishedUptime = _context.router().getUptime();
+            if (publishedUptime < 60*60*1000) publishedUptime = 60*60*1000;
+
+            stats.setProperty("stat_uptime", DataHelper.formatDuration(publishedUptime));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             
             includeRate("tunnel.buildRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
