@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.427 2006/03/05 02:44:59 complication Exp $
+$Id: history.txt,v 1.428 2006/03/05 12:07:15 jrandom Exp $
+
+2006-03-05  zzz
+    * Remove the +++--- from the logs on i2psnark startup
 
 2006-03-05  jrandom
     * HTML fixes in Syndie to work better with opera (thanks shaklen!)

@@ -670,12 +670,7 @@ public class Snark
                            + " pieces: ");
         checking = true;
       }
-    if (checking)
-      if (checked)
-        System.out.print("+");
-      else
-        System.out.print("-");
-    else
+    if (!checking)
       Snark.debug("Got " + (checked ? "" : "BAD ") + "piece: " + num,
                   Snark.INFO);
   }
