@@ -38,6 +38,7 @@ public interface Transport {
     public String getStyle();
     
     public int countActivePeers();    
+    public int countActiveSendPeers();
     public List getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out) throws IOException;
