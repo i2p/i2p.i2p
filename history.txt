@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.428 2006/03/05 12:07:15 jrandom Exp $
+$Id: history.txt,v 1.429 2006/03/05 20:57:50 zzz Exp $
+
+2006-03-15  jrandom
+    * Further stat cleanup
+    * Keep track of how many peers we are actively trying to communicate with,
+      beyond those who are just trying to communicate with us.
+    * Further router tunnel participation throttle revisions to avoid spurious
+      rejections
+    * Rate stat display cleanup (thanks ripple!)
+    * Don't even try to send messages that have been queued too long
 
 2006-03-05  zzz
     * Remove the +++--- from the logs on i2psnark startup

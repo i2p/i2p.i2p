@@ -287,8 +287,14 @@ public class StatisticsManager implements Service {
     
     private String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
-    private final String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
-    private final String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
+    private final String num(double num) { 
+        if (num < 0) num = 0;
+        synchronized (_fmt) { return _fmt.format(num); } 
+    }
+    private final String pct(double num) { 
+        if (num < 0) num = 0;
+        synchronized (_pct) { return _pct.format(num); } 
+    }
    
     public void renderStatusHTML(Writer out) { }
 }

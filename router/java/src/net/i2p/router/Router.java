@@ -1019,6 +1019,7 @@ class CoalesceStatsJob extends JobImpl {
         ctx.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate, averaged every minute", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("bw.recvRate", "Low level bandwidth receive rate, averaged every minute", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("router.activeSendPeers", "How many peers have sent messages to this minute", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
     }
@@ -1026,6 +1027,9 @@ class CoalesceStatsJob extends JobImpl {
     public void runJob() {
         int active = getContext().commSystem().countActivePeers();
         getContext().statManager().addRateData("router.activePeers", active, 60*1000);
+
+        int activeSend = getContext().commSystem().countActiveSendPeers();
+        getContext().statManager().addRateData("router.activeSendPeers", activeSend, 60*1000);
 
         int fast = getContext().profileOrganizer().countFastPeers();
         getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);

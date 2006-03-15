@@ -122,8 +122,10 @@ public class GarlicMessageBuilder {
         msg.setMessageExpiration(config.getExpiration());
         
         long timeFromNow = config.getExpiration() - ctx.clock().now();
-        if (timeFromNow < 1*1000)
+        if (timeFromNow < 1*1000) {
             log.error("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
+            return null;
+        }
         
         if (log.shouldLog(Log.WARN))
             log.warn("CloveSet size for message " + msg.getUniqueId() + " is " + cloveSet.length

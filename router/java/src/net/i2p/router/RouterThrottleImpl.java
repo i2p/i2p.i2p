@@ -249,35 +249,50 @@ class RouterThrottleImpl implements RouterThrottle {
         int maxKBps = Math.min(_context.bandwidthLimiter().getOutboundKBytesPerSecond(), _context.bandwidthLimiter().getInboundKBytesPerSecond());
         int used1s = 0; //get1sRate(_context); // dont throttle on the 1s rate, its too volatile
         int used1m = get1mRate(_context);
-        int used5m = get5mRate(_context);
+        int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
         int used = Math.max(Math.max(used1s, used1m), used5m);
         int availBps = (int)(((maxKBps*1024) - used) * getSharePercentage());
 
         _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
+        /*
         if (availBps <= 8*1024) {
             // lets be more conservative for people near their limit and assume 1KBps per tunnel
-            return ( (numTunnels + 1)*1024 < availBps);
+            boolean rv = ( (numTunnels + 1)*1024 < availBps);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Nearly full router (" + availBps + ") with " + numTunnels + " tunnels, allow a new request? " + rv);
+            return rv;
         }
+        */
 
         double growthFactor = ((double)(numTunnels+1))/(double)numTunnels;
         double toAllocate = (numTunnels > 0 ? bytesAllocated * growthFactor : 0);
         
-        double allocatedKBps = toAllocate / (10 * 60 * 1024);
-        double pctFull = allocatedKBps / availBps;
+        double allocatedBps = toAllocate / (10 * 60);
+        double pctFull = allocatedBps / availBps;
         
         if ( (pctFull < 1.0) && (pctFull >= 0.0) ) { // (_context.random().nextInt(100) > 100 * pctFull) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Probabalistically allowing the tunnel w/ " + pctFull + " of our " + availBps
-                           + "Bps/" + allocatedKBps + "KBps allocated through " + numTunnels + " tunnels");
+                _log.debug("Allowing the tunnel w/ " + pctFull + " of our " + availBps
+                           + "Bps/" + allocatedBps + "KBps allocated through " + numTunnels + " tunnels");
             return true;
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting the tunnel w/ " + pctFull + " of our " + availBps 
-                           + "Bps allowed (" + toAllocate + "bytes / " + allocatedKBps 
-                           + "KBps) through " + numTunnels + " tunnels");
-            return false;
+            double probAllow = availBps / (allocatedBps + availBps);
+            boolean allow = _context.random().nextDouble() <= probAllow;
+            if (allow) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Probabalistically allowing the tunnel w/ " + (pctFull*100d) + "% of our " + availBps 
+                               + "Bps allowed (" + toAllocate + "bytes / " + allocatedBps 
+                               + "Bps) through " + numTunnels + " tunnels");
+                return true;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Rejecting the tunnel w/ " + (pctFull*100d) + "% of our " + availBps 
+                               + "Bps allowed (" + toAllocate + "bytes / " + allocatedBps 
+                               + "Bps) through " + numTunnels + " tunnels");
+                return false;
+            }
         }
     }
     
@@ -287,7 +302,7 @@ class RouterThrottleImpl implements RouterThrottle {
      *
      */
     private double getSharePercentage() {
-        String pct = _context.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE, "0.8");
+        String pct = _context.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
         if (pct != null) {
             try {
                 double d = Double.parseDouble(pct);

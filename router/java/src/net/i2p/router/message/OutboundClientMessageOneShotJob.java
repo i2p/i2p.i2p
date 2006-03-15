@@ -313,6 +313,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private void send() {
         if (_finished) return;
+        if (getContext().clock().now() >= _overallExpiration) {
+            dieFatal();
+            return;
+        }
         boolean wantACK = true;
         int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
         if (existingTags > 30)
@@ -333,8 +337,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         buildClove();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Clove built to " + _toString);
+        long msgExpiration = _overallExpiration; // getContext().clock().now() + OVERALL_TIMEOUT_MS_DEFAULT;
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
-                                                                               _overallExpiration, key, 
+                                                                               msgExpiration, key, 
                                                                                _clove, _from.calculateHash(), 
                                                                                _to, _inTunnel,
                                                                                sessKey, tags, 
@@ -344,7 +349,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             // (should we always fail for this? or should we send it anyway, even if
             // we dont receive the reply? hmm...)
             if (_log.shouldLog(Log.WARN))
-                _log.warn(getJobId() + ": Unable to create the garlic message (no tunnels left) to " + _toString);
+                _log.warn(getJobId() + ": Unable to create the garlic message (no tunnels left or too lagged) to " + _toString);
             getContext().statManager().addRateData("client.dispatchNoTunnels", getContext().clock().now() - _start, 0);            
             dieFatal();
             return;

@@ -29,6 +29,7 @@ public abstract class CommSystemFacade implements Service {
     public Set createAddresses() { return new HashSet(); }
     
     public int countActivePeers() { return 0; }
+    public int countActiveSendPeers() { return 0; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
     /**

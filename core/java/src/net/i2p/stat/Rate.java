@@ -189,7 +189,7 @@ public class Rate {
             // how much were we off by?  (so that we can sample down the measured values)
             double periodFactor = measuredPeriod / (double)_period;
             _lastTotalValue = _currentTotalValue / periodFactor;
-            _lastEventCount = (long) (_currentEventCount / periodFactor);
+            _lastEventCount = (long) ( (_currentEventCount + periodFactor - 1) / periodFactor);
             _lastTotalEventTime = (long) (_currentTotalEventTime / periodFactor);
             _lastCoalesceDate = now;
 

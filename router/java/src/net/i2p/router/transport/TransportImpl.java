@@ -64,6 +64,10 @@ public abstract class TransportImpl implements Transport {
      *
      */
     public int countActivePeers() { return 0; }
+    /**
+     * How many peers are we actively sending messages to (this minute)
+     */
+    public int countActiveSendPeers() { return 0; }
     
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     /**

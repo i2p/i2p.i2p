@@ -1164,6 +1164,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
+    public int countActiveSendPeers() {
+        long now = _context.clock().now();
+        int active = 0;
+        int inactive = 0;
+        synchronized (_peersByIdent) {
+            for (Iterator iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
+                PeerState peer = (PeerState)iter.next();
+                if (now-peer.getLastSendFullyTime() > 1*60*1000)
+                    inactive++;
+                else
+                    active++;
+            }
+        }
+        return active;
+    }
+    
     private static class AlphaComparator implements Comparator {
         private static final AlphaComparator _instance = new AlphaComparator();
         public static final AlphaComparator instance() { return _instance; }

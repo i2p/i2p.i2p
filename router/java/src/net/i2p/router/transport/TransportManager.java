@@ -120,6 +120,14 @@ public class TransportManager implements TransportEventListener {
         return peers;
     }
     
+    public int countActiveSendPeers() { 
+        int peers = 0;
+        for (int i = 0; i < _transports.size(); i++) {
+            peers += ((Transport)_transports.get(i)).countActiveSendPeers();
+        }
+        return peers;
+    }
+    
     public short getReachabilityStatus() { 
         if (_transports.size() <= 0) return CommSystemFacade.STATUS_UNKNOWN;
         short status[] = new short[_transports.size()];
