@@ -43,7 +43,7 @@
     A negative rate means a default limit of 16KBytes per second.</i><br />
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
- Sharing a higher percentage will improve your anonymity and help the network
+ Sharing a higher percentage will improve your anonymity and help the network<br />
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
  <b>Enable load testing: </b>
