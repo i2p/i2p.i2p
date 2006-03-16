@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.429 2006/03/05 20:57:50 zzz Exp $
+$Id: history.txt,v 1.430 2006/03/15 17:26:45 jrandom Exp $
+
+2006-03-15  Complication
+    * Trim out an old, inactive IP second-guessing method
+      (thanks for spotting, Anonymous!)
 
 2006-03-15  jrandom
     * Further stat cleanup

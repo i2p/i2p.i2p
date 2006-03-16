@@ -30,7 +30,6 @@ import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
  */
 public class ConfigNetHandler extends FormHandler {
     private String _hostname;
-    private boolean _guessRequested;
     private boolean _reseedRequested;
     private boolean _saveRequested;
     private boolean _recheckReachabilityRequested;
@@ -52,9 +51,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _ratesOnly;
     
     protected void processForm() {
-        if (_guessRequested) {
-            guessHostname();
-        } else if (_reseedRequested) {
+        if (_reseedRequested) {
             reseed();
         } else if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
             saveChanges();
@@ -65,7 +62,6 @@ public class ConfigNetHandler extends FormHandler {
         }
     }
     
-    public void setGuesshost(String moo) { _guessRequested = true; }
     public void setReseed(String moo) { _reseedRequested = true; }
     public void setSave(String moo) { _saveRequested = true; }
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
@@ -110,37 +106,7 @@ public class ConfigNetHandler extends FormHandler {
         _sharePct = (pct != null ? pct.trim() : null);
     }
 
-    private static final String IP_PREFIX = "<h1>Your IP is ";
-    private static final String IP_SUFFIX = " <br></h1>";
-    private void guessHostname() {
-        BufferedReader reader = null;
-        try {
-            URL url = new URL("http://www.whatismyip.com/");
-            URLConnection con = url.openConnection();
-            con.connect();
-            reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String line = null;
-            while ( (line = reader.readLine()) != null) {
-                if (line.startsWith(IP_PREFIX)) {
-                    int end = line.indexOf(IP_SUFFIX);
-                    if (end == -1) {
-                        addFormError("Unable to guess the host (BAD_SUFFIX)");
-                        return;
-                    }
-                    String ip = line.substring(IP_PREFIX.length(), end);
-                    addFormNotice("Host guess: " + ip);
-                    return;
-                }
-            }
-            addFormError("Unable to guess the host (NO_PREFIX)");
-        } catch (IOException ioe) {
-            addFormError("Unable to guess the host (IO_ERROR)");
-            _context.logManager().getLog(ConfigNetHandler.class).error("Unable to guess the host", ioe);
-        } finally {
-            if (reader != null) try { reader.close(); } catch (IOException ioe) {}
-        }
-    }
-    
+
     private static final String DEFAULT_SEED_URL = ReseedHandler.DEFAULT_SEED_URL;
     /**
      * Reseed has been requested, so lets go ahead and do it.  Fetch all of
