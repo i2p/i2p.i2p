@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.430 2006/03/15 17:26:45 jrandom Exp $
+$Id: history.txt,v 1.431 2006/03/15 19:49:22 complication Exp $
+
+2006-03-16  jrandom
+    * Integrate basic hooks for jrobin (http://jrobin.org) into the router
+      console.  Selected stats can be harvested automatically and fed into
+      in-memory RRD databases, and those databases can be served up either as
+      PNG images or as RRDtool compatible XML dumps (see oldstats.jsp for
+      details).  A base set of stats are harvested by default, but an
+      alternate list can be specified by setting the 'stat.summaries' list on
+      the advanced config.  For instance:
+      stat.summaries=bw.recvRate.60000,bw.sendRate.60000
+    * HTML tweaking for the general config page (thanks void!)
+    * Odd NPE fix (thanks Complication!)
 
 2006-03-15  Complication
     * Trim out an old, inactive IP second-guessing method

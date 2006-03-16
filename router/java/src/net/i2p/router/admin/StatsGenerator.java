@@ -180,6 +180,15 @@ public class StatsGenerator {
                 buf.append(num(curRate.getExtremeEventCount()));
                 buf.append(")");
             }
+            if (curRate.getSummaryListener() != null) {
+                buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
+                buf.append("&amp;period=").append(periods[i]);
+                buf.append("\" title=\"Render summarized data\">render</a>");
+                buf.append(" (as <a href=\"viewstat.jsp?stat=").append(name);
+                buf.append("&amp;period=").append(periods[i]);
+                buf.append("&amp;format=xml\" title=\"Dump stat history as XML\">XML</a>");
+                buf.append(" in a format <a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool\">RRDTool</a> understands)");
+            }
             buf.append("</li>");
             if (i + 1 == periods.length) {
                 // last one, so lets display the strict average

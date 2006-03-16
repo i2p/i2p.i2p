@@ -27,8 +27,10 @@ public class RateStat {
         _description = description;
         _groupName = group;
         _rates = new Rate[periods.length];
-        for (int i = 0; i < periods.length; i++)
+        for (int i = 0; i < periods.length; i++) {
             _rates[i] = new Rate(periods[i]);
+            _rates[i].setRateStat(this);
+        }
     }
     public void setStatLog(StatLog sl) { _statLog = sl; }
     
@@ -159,6 +161,7 @@ public class RateStat {
                 _rates[i].load(props, curPrefix, treatAsCurrent);
             } catch (IllegalArgumentException iae) {
                 _rates[i] = new Rate(period);
+                _rates[i].setRateStat(this);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rate for " + prefix + " is corrupt, reinitializing that period");
             }

@@ -25,6 +25,7 @@ public class RouterConsoleRunner {
     
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
+        System.setProperty("java.awt.headless", "true");
     }
     
     public RouterConsoleRunner(String args[]) {
@@ -95,6 +96,10 @@ public class RouterConsoleRunner {
         I2PThread t = new I2PThread(fetcher, "NewsFetcher");
         t.setDaemon(true);
         t.start();
+        
+        I2PThread st = new I2PThread(new StatSummarizer(), "StatSummarizer");
+        st.setDaemon(true);
+        st.start();
     }
     
     private void initialize(WebApplicationContext context) {

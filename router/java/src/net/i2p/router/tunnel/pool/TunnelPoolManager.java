@@ -58,10 +58,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         
         ctx.statManager().createRateStat("tunnel.testSuccessTime", 
                                          "How long do successful tunnel tests take?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.participatingTunnels", 
                                          "How many tunnels are we participating in?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
     }
     
     /** pick an inbound tunnel not bound to a particular destination */

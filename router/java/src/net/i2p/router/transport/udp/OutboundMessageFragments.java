@@ -160,7 +160,7 @@ public class OutboundMessageFragments {
                 }
                 _activePeers.notifyAll();
             }
-            msg.timestamp("made active along with: " + active);
+            //msg.timestamp("made active along with: " + active);
             _context.statManager().addRateData("udp.outboundActiveCount", active, 0);
         } else {
             if (_log.shouldLog(Log.WARN))

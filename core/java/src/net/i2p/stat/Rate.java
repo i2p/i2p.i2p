@@ -26,6 +26,8 @@ public class Rate {
     private volatile double _lifetimeTotalValue;
     private volatile long _lifetimeEventCount;
     private volatile long _lifetimeTotalEventTime;
+    private RateSummaryListener _summaryListener;
+    private RateStat _stat;
 
     private volatile long _lastCoalesceDate;
     private long _creationDate;
@@ -108,6 +110,9 @@ public class Rate {
     public long getPeriod() {
         return _period;
     }
+    
+    public RateStat getRateStat() { return _stat; }
+    public void setRateStat(RateStat rs) { _stat = rs; }
 
     /**
      *
@@ -203,8 +208,13 @@ public class Rate {
             _currentEventCount = 0;
             _currentTotalEventTime = 0;
         }
+        if (_summaryListener != null)
+            _summaryListener.add(_lastTotalValue, _lastEventCount, _lastTotalEventTime, _period);
     }
 
+    public void setSummaryListener(RateSummaryListener listener) { _summaryListener = listener; }
+    public RateSummaryListener getSummaryListener() { return _summaryListener; }
+    
     /** what was the average value across the events in the last period? */
     public double getAverageValue() {
         if ((_lastTotalValue != 0) && (_lastEventCount > 0))

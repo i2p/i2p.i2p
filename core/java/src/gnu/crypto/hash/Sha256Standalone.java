@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha256.java,v 1.2 2005/10/06 04:24:14 rsdio Exp $
+// $Id: Sha256Standalone.java,v 1.1 2006/02/26 16:30:59 jrandom Exp $
 //
 // Copyright (C) 2003 Free Software Foundation, Inc.
 //
@@ -59,7 +59,7 @@ package gnu.crypto.hash;
  * renamed from Sha256 to avoid conflicts with JVMs using gnu-crypto as their JCE
  * provider.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  */
 public class Sha256Standalone extends BaseHash {
    // Constants and variables
@@ -127,10 +127,12 @@ public class Sha256Standalone extends BaseHash {
    // Class methods
    // -------------------------------------------------------------------------
 
+   /*
    public static final int[] G(int hh0, int hh1, int hh2, int hh3, int hh4,
                                int hh5, int hh6, int hh7, byte[] in, int offset) {
       return sha(hh0, hh1, hh2, hh3, hh4, hh5, hh6, hh7, in, offset);
    }
+   */
 
    // Instance methods
    // -------------------------------------------------------------------------
@@ -143,17 +145,19 @@ public class Sha256Standalone extends BaseHash {
 
    // Implementation of concrete methods in BaseHash --------------------------
 
+   private int transformResult[] = new int[8];
    protected void transform(byte[] in, int offset) {
-      int[] result = sha(h0, h1, h2, h3, h4, h5, h6, h7, in, offset);
+      //int[] result = sha(h0, h1, h2, h3, h4, h5, h6, h7, in, offset);
+      sha(h0, h1, h2, h3, h4, h5, h6, h7, in, offset, transformResult);
 
-      h0 = result[0];
-      h1 = result[1];
-      h2 = result[2];
-      h3 = result[3];
-      h4 = result[4];
-      h5 = result[5];
-      h6 = result[6];
-      h7 = result[7];
+      h0 = transformResult[0];
+      h1 = transformResult[1];
+      h2 = transformResult[2];
+      h3 = transformResult[3];
+      h4 = transformResult[4];
+      h5 = transformResult[5];
+      h6 = transformResult[6];
+      h7 = transformResult[7];
    }
 
    protected byte[] padBuffer() {
@@ -218,8 +222,8 @@ public class Sha256Standalone extends BaseHash {
 
    // SHA specific methods ----------------------------------------------------
 
-   private static final synchronized int[]
-   sha(int hh0, int hh1, int hh2, int hh3, int hh4, int hh5, int hh6, int hh7, byte[] in, int offset) {
+   private static final synchronized void
+   sha(int hh0, int hh1, int hh2, int hh3, int hh4, int hh5, int hh6, int hh7, byte[] in, int offset, int out[]) {
       int A = hh0;
       int B = hh1;
       int C = hh2;
@@ -255,8 +259,18 @@ public class Sha256Standalone extends BaseHash {
          A = T + T2;
       }
 
+      /*
       return new int[] {
          hh0 + A, hh1 + B, hh2 + C, hh3 + D, hh4 + E, hh5 + F, hh6 + G, hh7 + H
       };
+      */
+      out[0] = hh0 + A;
+      out[1] = hh1 + B;
+      out[2] = hh2 + C;
+      out[3] = hh3 + D;
+      out[4] = hh4 + E;
+      out[5] = hh5 + F;
+      out[6] = hh6 + G;
+      out[7] = hh7 + H;
    }
 }

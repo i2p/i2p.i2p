@@ -16,6 +16,7 @@ import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
+import net.i2p.data.Payload;
 import net.i2p.data.i2cp.MessageId;
 
 import net.i2p.data.i2np.DataMessage;
@@ -334,7 +335,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (wantACK)
             _inTunnel = selectInboundTunnel();
 
-        buildClove();
+        boolean ok = buildClove();
+        if (!ok) {
+            dieFatal();
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Clove built to " + _toString);
         long msgExpiration = _overallExpiration; // getContext().clock().now() + OVERALL_TIMEOUT_MS_DEFAULT;
@@ -475,7 +480,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
     
     /** build the payload clove that will be used for all of the messages, placing the clove in the status structure */
-    private void buildClove() {
+    private boolean buildClove() {
         PayloadGarlicConfig clove = new PayloadGarlicConfig();
         
         DeliveryInstructions instructions = new DeliveryInstructions();
@@ -492,7 +497,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         clove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         
         DataMessage msg = new DataMessage(getContext());
-        msg.setData(_clientMessage.getPayload().getEncryptedData());
+        Payload p = _clientMessage.getPayload();
+        if (p == null)
+            return false;
+        byte d[] = p.getEncryptedData();
+        if (d == null)
+            return false;
+        msg.setData(d);
         msg.setMessageExpiration(clove.getExpiration());
         
         clove.setPayload(msg);
@@ -504,6 +515,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Built payload clove with id " + clove.getId());
+        return true;
     }
     
     /**

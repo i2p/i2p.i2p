@@ -25,6 +25,7 @@
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
+                <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
             </classpath>
         </javac>
     </target>
@@ -34,6 +35,12 @@
                 <attribute name="Class-Path" value="i2p.jar router.jar" />
             </manifest>
         </jar>
+        
+        <delete dir="./tmpextract" />
+        <unjar src="../../jrobin/jrobin-1.4.0.jar" dest="./tmpextract" />
+        <jar destfile="./build/routerconsole.jar" basedir="./tmpextract" update="true" />
+        <delete dir="./tmpextract" />
+        
         <ant target="war" />
     </target>
     <target name="war" depends="precompilejsp">
@@ -60,6 +67,7 @@
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
+                <pathelement location="build/" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
@@ -86,6 +94,7 @@
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
+                <pathelement location="build" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
