@@ -23,7 +23,11 @@ if (rs != null) {
         if (str != null) try { width = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
         str = request.getParameter("height");
         if (str != null) try { height = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
-        rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height);
+        boolean hideLegend = Boolean.valueOf(""+request.getParameter("hideLegend")).booleanValue();
+        boolean hideGrid = Boolean.valueOf(""+request.getParameter("hideGrid")).booleanValue();
+        boolean hideTitle = Boolean.valueOf(""+request.getParameter("hideTitle")).booleanValue();
+        boolean showEvents = Boolean.valueOf(""+request.getParameter("showEvents")).booleanValue();
+        rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents);
       }
       if (rendered)
         cout.close();

@@ -184,6 +184,8 @@ public class StatsGenerator {
                 buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
                 buf.append("&amp;period=").append(periods[i]);
                 buf.append("\" title=\"Render summarized data\">render</a>");
+                buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
+                buf.append("&amp;period=").append(periods[i]).append("&amp;showEvents=true\" title=\"Render summarized event counts\">events</a>");
                 buf.append(" (as <a href=\"viewstat.jsp?stat=").append(name);
                 buf.append("&amp;period=").append(periods[i]);
                 buf.append("&amp;format=xml\" title=\"Dump stat history as XML\">XML</a>");

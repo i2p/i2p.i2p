@@ -482,9 +482,10 @@ public class ProfileOrganizer {
             
             placeTime = System.currentTimeMillis()-placeStart;
 
-            if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
                            + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
+            if (_log.shouldLog(Log.DEBUG)) {
                 StringBuffer buf = new StringBuffer(512);
                 for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                     PeerProfile prof = (PeerProfile)iter.next();
@@ -522,7 +523,7 @@ public class ProfileOrganizer {
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
                     if (!isSelectable(cur.getPeer())) {
                         // skip peers we dont have in the netDb
-                        if (_log.shouldLog(Log.INFO))
+                        if (_log.shouldLog(Log.INFO))   
                             _log.info("skip unknown peer from fast promotion: " + cur.getPeer().toBase64());
                         continue;
                     }
@@ -611,8 +612,9 @@ public class ProfileOrganizer {
                 continue;
         
             // dont bother trying to make sense of things below the baseline
-            if (profile.getCapacityValue() <= CapacityCalculator.GROWTH_FACTOR)
-                continue;
+            // otoh, keep them in the threshold calculation, so we can adapt
+            ////if (profile.getCapacityValue() <= CapacityCalculator.GROWTH_FACTOR)
+            ////    continue;
             
             totalCapacity += profile.getCapacityValue();
             totalIntegration += profile.getIntegrationValue();

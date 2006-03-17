@@ -86,12 +86,14 @@ public class StatSummarizer implements Runnable {
         lsnr.startListening();
         //System.out.println("Start listening for " + r.getRateStat().getName() + ": " + r.getPeriod());
     }
-    public boolean renderPng(Rate rate, OutputStream out) throws IOException { return renderPng(rate, out, -1, -1); }
-    public boolean renderPng(Rate rate, OutputStream out, int width, int height) throws IOException {
+    public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
+        return renderPng(rate, out, -1, -1, false, false, false, false); 
+    }
+    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents) throws IOException {
         for (int i = 0; i < _listeners.size(); i++) {
             SummaryListener lsnr = (SummaryListener)_listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
-                lsnr.renderPng(out, width, height);
+                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents);
                 return true;
             }
         }

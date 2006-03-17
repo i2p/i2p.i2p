@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.431 2006/03/15 19:49:22 complication Exp $
+$Id: history.txt,v 1.432 2006/03/16 16:45:28 jrandom Exp $
+
+2006-03-17  jrandom
+    * Add support for graphing the event count as well as the average stat
+      value (done by adding &showEvents=true to the URL).  Also supports
+      hiding the legend (&hideLegend=true), the grid (&hideGrid=true), and
+      the title (&hideTitle=true).
+    * Removed an unnecessary arbitrary filter on the profile organizer so we
+      can pick high capacity and fast peers more appropriately
 
 2006-03-16  jrandom
     * Integrate basic hooks for jrobin (http://jrobin.org) into the router

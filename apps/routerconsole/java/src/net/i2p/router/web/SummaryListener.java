@@ -116,7 +116,9 @@ class SummaryListener implements RateSummaryListener {
         _factory.delete(_db.getPath());
         _db = null;
     }
-    public void renderPng(OutputStream out, int width, int height) throws IOException { _renderer.render(out, width, height); }
+    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents) throws IOException {
+        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents); 
+    }
     public void renderPng(OutputStream out) throws IOException { _renderer.render(out); }
  
     String getName() { return _name; }
@@ -138,8 +140,8 @@ class SummaryRenderer {
         _listener = lsnr;
     }
     
-    public void render(OutputStream out) throws IOException { render(out, -1, -1); }
-    public void render(OutputStream out, int width, int height) throws IOException {
+    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false); }
+    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents) throws IOException {
         long end = _listener.now();
         long start = end - _listener.getRate().getPeriod()*SummaryListener.PERIODS;
         long begin = System.currentTimeMillis();
@@ -148,15 +150,30 @@ class SummaryRenderer {
             def.setTimePeriod(start/1000, end/1000);
             String title = _listener.getRate().getRateStat().getName() + " averaged for " 
                            + DataHelper.formatDuration(_listener.getRate().getPeriod());
-            def.setTitle(title);
+            if (!hideTitle)
+                def.setTitle(title);
             String path = _listener.getData().getPath();
             String dsNames[] = _listener.getData().getDsNames();
-            def.datasource(_listener.getName(), path, dsNames[0], "AVERAGE", "MEMORY");
-            // include the average event count on the plot
-            //def.datasource(_listener.getName(), path, dsNames[1], "AVERAGE", "MEMORY");
-            def.area(dsNames[0], Color.BLUE, _listener.getRate().getRateStat().getDescription());
-            //def.line(dsNames[1], Color.RED, "Events per period");
-            //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
+            String plotName = null;
+            String descr = null;
+            if (showEvents) {
+                // include the average event count on the plot
+                plotName = dsNames[1];
+                descr = "Events per period";
+            } else {
+                // include the average value
+                plotName = dsNames[0];
+                descr = _listener.getRate().getRateStat().getDescription();
+            }
+            def.datasource(plotName, path, plotName, "AVERAGE", "MEMORY");
+            def.area(plotName, Color.BLUE, descr);
+            if (hideLegend) 
+                def.setShowLegend(false);
+            if (hideGrid) {
+                def.setGridX(false);
+                def.setGridY(false);
+            }
+            System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
             def.setAntiAliasing(false);
             RrdGraph graph = new RrdGraph(def);
             //System.out.println("Graph created");em.
