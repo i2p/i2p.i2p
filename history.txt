@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.432 2006/03/16 16:45:28 jrandom Exp $
+$Id: history.txt,v 1.433 2006/03/17 18:46:03 jrandom Exp $
+
+2006-03-18  jrandom
+    * Made the netDb search load limitations a little less stringent
+    * Add support for specifying the number of periods to be plotted on the
+      graphs - e.g. to plot only the last hour of a stat that is averaged at
+      the 60 second period, add &periodCount=60
 
 2006-03-17  jrandom
     * Add support for graphing the event count as well as the average stat

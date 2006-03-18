@@ -133,7 +133,7 @@ class SearchJob extends JobImpl {
     public long getExpiration() { return _expiration; }
     public long getTimeoutMs() { return _timeoutMs; }
     
-    private static final int PER_FLOODFILL_PEER_TIMEOUT = 30*1000;
+    private static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
     
     protected int getPerPeerTimeoutMs(Hash peer) {
         int timeout = 0;
@@ -174,7 +174,7 @@ class SearchJob extends JobImpl {
          */
     }
     
-    private static int MAX_PEERS_QUERIED = 20;
+    private static int MAX_PEERS_QUERIED = 40;
     
     /**
      * Send the next search, or stop if its completed

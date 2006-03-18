@@ -18,6 +18,7 @@ import org.jrobin.core.Sample;
 import java.awt.Color;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
+import org.jrobin.graph.RrdGraphDefTemplate;
 import org.jrobin.core.RrdException;
 
 class SummaryListener implements RateSummaryListener {
@@ -116,8 +117,8 @@ class SummaryListener implements RateSummaryListener {
         _factory.delete(_db.getPath());
         _db = null;
     }
-    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents) throws IOException {
-        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents); 
+    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount) throws IOException {
+        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount); 
     }
     public void renderPng(OutputStream out) throws IOException { _renderer.render(out); }
  
@@ -140,10 +141,39 @@ class SummaryRenderer {
         _listener = lsnr;
     }
     
-    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false); }
-    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents) throws IOException {
+    /**
+     * Render the stats as determined by the specified JRobin xml config,
+     * but note that this doesn't work on stock jvms, as it requires 
+     * DOM level 3 load and store support.  Perhaps we can bundle that, or
+     * specify who can get it from where, etc.
+     *
+     */
+    public static void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
+        long end = ctx.clock().now();
+        long start = end - 60*1000*SummaryListener.PERIODS;
+        long begin = System.currentTimeMillis();
+        try {
+            RrdGraphDefTemplate template = new RrdGraphDefTemplate(filename);
+            RrdGraphDef def = template.getRrdGraphDef();
+            def.setTimePeriod(start/1000, end/1000); // ignore the periods in the template
+            RrdGraph graph = new RrdGraph(def);
+            byte img[] = graph.getPNGBytes();
+            out.write(img);
+        } catch (RrdException re) {
+            //_log.error("Error rendering " + filename, re);
+            throw new IOException("Error plotting: " + re.getMessage());
+        } catch (IOException ioe) {
+            //_log.error("Error rendering " + filename, ioe);
+            throw ioe;
+        }
+    }
+    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1); }
+    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount) throws IOException {
         long end = _listener.now();
-        long start = end - _listener.getRate().getPeriod()*SummaryListener.PERIODS;
+        if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
+        if (periodCount > SummaryListener.PERIODS)
+            periodCount = SummaryListener.PERIODS;
+        long start = end - _listener.getRate().getPeriod()*periodCount;
         long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
@@ -166,17 +196,31 @@ class SummaryRenderer {
                 descr = _listener.getRate().getRateStat().getDescription();
             }
             def.datasource(plotName, path, plotName, "AVERAGE", "MEMORY");
-            def.area(plotName, Color.BLUE, descr);
+            def.area(plotName, Color.BLUE, descr + "@r");
+            if (!hideLegend) {
+                def.gprint(plotName, "AVERAGE", "average: @2@s");
+                def.gprint(plotName, "MAX", " max: @2@s@r");
+            }
+            /*
+            // these four lines set up a graph plotting both values and events on the same chart
+            // (but with the same coordinates, so the values may look pretty skewed)
+                def.datasource(dsNames[0], path, dsNames[0], "AVERAGE", "MEMORY");
+                def.datasource(dsNames[1], path, dsNames[1], "AVERAGE", "MEMORY");
+                def.area(dsNames[0], Color.BLUE, _listener.getRate().getRateStat().getDescription());
+                def.line(dsNames[1], Color.RED, "Events per period");
+            */
             if (hideLegend) 
                 def.setShowLegend(false);
             if (hideGrid) {
                 def.setGridX(false);
                 def.setGridY(false);
             }
-            System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
+            //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
             def.setAntiAliasing(false);
+            //System.out.println("Rendering: \n" + def.exportXmlTemplate());
+            //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             RrdGraph graph = new RrdGraph(def);
-            //System.out.println("Graph created");em.
+            System.out.println("Graph created");
             byte data[] = null;
             if ( (width <= 0) || (height <= 0) )
                 data = graph.getPNGBytes();

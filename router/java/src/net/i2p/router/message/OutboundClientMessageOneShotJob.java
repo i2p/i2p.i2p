@@ -335,7 +335,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (wantACK)
             _inTunnel = selectInboundTunnel();
 
-        boolean ok = buildClove();
+        boolean ok = (_clientMessage != null) && buildClove();
         if (!ok) {
             dieFatal();
             return;

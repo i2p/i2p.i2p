@@ -87,17 +87,21 @@ public class StatSummarizer implements Runnable {
         //System.out.println("Start listening for " + r.getRateStat().getName() + ": " + r.getPeriod());
     }
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
-        return renderPng(rate, out, -1, -1, false, false, false, false); 
+        return renderPng(rate, out, -1, -1, false, false, false, false, -1); 
     }
-    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents) throws IOException {
+    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount) throws IOException {
         for (int i = 0; i < _listeners.size(); i++) {
             SummaryListener lsnr = (SummaryListener)_listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
-                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents);
+                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount);
                 return true;
             }
         }
         return false;
+    }
+    public boolean renderPng(OutputStream out, String templateFilename) throws IOException {
+        SummaryRenderer.render(_context, out, templateFilename);
+        return true;
     }
     public boolean getXML(Rate rate, OutputStream out) throws IOException {
         for (int i = 0; i < _listeners.size(); i++) {
