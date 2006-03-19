@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.433 2006/03/17 18:46:03 jrandom Exp $
+$Id: history.txt,v 1.434 2006/03/18 18:09:38 jrandom Exp $
+
+2006-03-18  jrandom
+    * Added a new graphs.jsp page to show all of the stats being harvested
 
 2006-03-18  jrandom
     * Made the netDb search load limitations a little less stringent

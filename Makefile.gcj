@@ -21,11 +21,12 @@ NATIVE_DIR=native
 #  router.jar: full I2P router
 #  jbigi.jar: collection of native optimized GMP routines for crypto
 JAR_BASE=i2p.jar mstreaming.jar streaming.jar
-JAR_CLIENTS=i2ptunnel.jar sam.jar i2psnark.jar
+JAR_CLIENTS=i2ptunnel.jar sam.jar
 JAR_ROUTER=router.jar
 JAR_JBIGI=jbigi.jar
 JAR_XML=xml-apis.jar resolver.jar xercesImpl.jar
 JAR_CONSOLE=\
+            i2psnark.jar \
             javax.servlet.jar \
             commons-el.jar \
             commons-logging.jar \
@@ -79,15 +80,15 @@ native_clean:
 native_shared: libi2p.so
 	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2p_dsa --main=net.i2p.crypto.DSAEngine 
 	@echo "* i2p_dsa is a simple test app with the DSA engine and Fortuna PRNG to make sure crypto is working"
-	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/prng --main=gnu.crypto.prng.Fortuna
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/prng --main=gnu.crypto.prng.FortunaStandalone
 	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnel --main=net.i2p.i2ptunnel.I2PTunnel 
 	@echo "* i2ptunnel is mihi's I2PTunnel CLI"
 	@echo "  run it as ./i2ptunnel -cli to avoid awt complaints"
 	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnelctl --main=net.i2p.i2ptunnel.TunnelControllerGroup 
 	@echo "* i2ptunnelctl is a controller for I2PTunnel, reading i2ptunnel.config"
 	@echo "  and launching the appropriate proxies"
-	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2psnark --main=org.klomp.snark.Snark
-	@echo "* i2psnark is an anonymous bittorrent client"
+	#@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2psnark --main=org.klomp.snark.Snark
+	#@echo "* i2psnark is an anonymous bittorrent client"
 	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2prouter --main=net.i2p.router.Router 
 	@echo "* i2prouter is the main I2P router"
 	@echo "  it can be used, and while the router console won't load,"
@@ -95,6 +96,6 @@ native_shared: libi2p.so
 
 libi2p.so:
 	@echo "* Building libi2p.so"
-	@(cd build ; ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/libi2p.so ${LIBI2P_JARS} ; cd .. )
+	@(cd build ; time ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/libi2p.so ${LIBI2P_JARS} ; cd .. )
 	@ls -l ${NATIVE_DIR}/libi2p.so
 	@echo "* libi2p.so built"

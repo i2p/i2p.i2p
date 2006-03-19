@@ -245,7 +245,8 @@ public class Router {
         _context.tunnelDispatcher().startup();
         _context.inNetMessagePool().startup();
         startupQueue();
-        _context.jobQueue().addJob(new CoalesceStatsJob(_context));
+        //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
+        SimpleTimer.getInstance().addEvent(new CoalesceStatsEvent(_context), 0);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
@@ -1011,9 +1012,10 @@ public class Router {
  * coalesce the stats framework every minute
  *
  */
-class CoalesceStatsJob extends JobImpl {
-    public CoalesceStatsJob(RouterContext ctx) { 
-        super(ctx); 
+class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
+    private RouterContext _ctx;
+    public CoalesceStatsEvent(RouterContext ctx) { 
+        _ctx = ctx; 
         ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("bw.sendBps", "How fast we send data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate, averaged every minute", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
@@ -1023,8 +1025,8 @@ class CoalesceStatsJob extends JobImpl {
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
     }
-    public String getName() { return "Coalesce stats"; }
-    public void runJob() {
+    private RouterContext getContext() { return _ctx; }
+    public void timeReached() {
         int active = getContext().commSystem().countActivePeers();
         getContext().statManager().addRateData("router.activePeers", active, 60*1000);
 
@@ -1062,7 +1064,7 @@ class CoalesceStatsJob extends JobImpl {
             }
         }
         
-        requeue(60*1000);
+        SimpleTimer.getInstance().addEvent(this, 60*1000);
     }
 }
 

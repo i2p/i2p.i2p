@@ -33,6 +33,7 @@
  <a href="netdb.jsp">NetDB</a> |
  <a href="logs.jsp">Logs</a> |
  <a href="jobs.jsp">Jobs</a> |
+ <a href="graphs.jsp">Graphs</a> |
  <a href="oldstats.jsp">Stats</a> |
  <a href="oldconsole.jsp">Internals</a>
 <% } %>

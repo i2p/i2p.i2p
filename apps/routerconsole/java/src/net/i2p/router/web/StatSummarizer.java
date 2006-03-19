@@ -31,6 +31,9 @@ public class StatSummarizer implements Runnable {
         }
     }
     
+    /** list of SummaryListener instances */
+    List getListeners() { return _listeners; }
+    
     private static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
                                                     ",bw.recvRate.60000" +
                                                     ",tunnel.testSuccessTime.60000" +
