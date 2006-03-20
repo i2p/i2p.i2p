@@ -36,7 +36,10 @@ if ( !rendered && (rs != null)) {
         boolean hideGrid = Boolean.valueOf(""+request.getParameter("hideGrid")).booleanValue();
         boolean hideTitle = Boolean.valueOf(""+request.getParameter("hideTitle")).booleanValue();
         boolean showEvents = Boolean.valueOf(""+request.getParameter("showEvents")).booleanValue();
-        rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount);
+        boolean showCredit = true;
+        if (request.getParameter("showCredit") != null)
+          showCredit = Boolean.valueOf(""+request.getParameter("showCredit")).booleanValue();
+        rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
       }
       if (rendered)
         cout.close();

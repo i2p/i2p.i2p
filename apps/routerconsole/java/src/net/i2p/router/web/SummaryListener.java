@@ -32,7 +32,7 @@ class SummaryListener implements RateSummaryListener {
     private RrdMemoryBackendFactory _factory;
     private SummaryRenderer _renderer;
     
-    static final int PERIODS = 600;
+    static final int PERIODS = 1440;
     
     static {
         try {
@@ -49,10 +49,13 @@ class SummaryListener implements RateSummaryListener {
     }
     
     public void add(double totalValue, long eventCount, double totalEventTime, long period) {
+        long now = now();
+        long when = now / 1000;
+        //System.out.println("add to " + getRate().getRateStat().getName() + " on " + System.currentTimeMillis() + " / " + now + " / " + when);
         if (_db != null) {
             // add one value to the db (the average value for the period)
             try {
-                _sample.setTime(now()/1000);
+                _sample.setTime(when);
                 double val = eventCount > 0 ? (totalValue / (double)eventCount) : 0d;
                 _sample.setValue(_name, val);
                 _sample.setValue(_eventName, eventCount);
@@ -88,10 +91,12 @@ class SummaryListener implements RateSummaryListener {
         _eventName = createName(_context, baseName + ".events");
         try {
             RrdDef def = new RrdDef(_name, now()/1000, period/1000);
-            long heartbeat = period*3/1000; // max seconds between events
+            // for info on the heartbeat, xff, steps, etc, see the rrdcreate man page, aka
+            // http://www.jrobin.org/support/man/rrdcreate.html
+            long heartbeat = period*10/1000;
             def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
             def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
-            double xff = 0.5;
+            double xff = 0.9;
             int steps = 1;
             int rows = PERIODS;
             def.addArchive("AVERAGE", xff, steps, rows);
@@ -117,8 +122,8 @@ class SummaryListener implements RateSummaryListener {
         _factory.delete(_db.getPath());
         _db = null;
     }
-    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount) throws IOException {
-        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount); 
+    public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+        _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit); 
     }
     public void renderPng(OutputStream out) throws IOException { _renderer.render(out); }
  
@@ -167,8 +172,8 @@ class SummaryRenderer {
             throw ioe;
         }
     }
-    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1); }
-    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount) throws IOException {
+    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1, true); }
+    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         long end = _listener.now();
         if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
         if (periodCount > SummaryListener.PERIODS)
@@ -201,6 +206,8 @@ class SummaryRenderer {
                 def.gprint(plotName, "AVERAGE", "average: @2@s");
                 def.gprint(plotName, "MAX", " max: @2@s@r");
             }
+            if (!showCredit)
+                def.setShowSignature(false);
             /*
             // these four lines set up a graph plotting both values and events on the same chart
             // (but with the same coordinates, so the values may look pretty skewed)
@@ -220,7 +227,7 @@ class SummaryRenderer {
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             RrdGraph graph = new RrdGraph(def);
-            System.out.println("Graph created");
+            //System.out.println("Graph created");
             byte data[] = null;
             if ( (width <= 0) || (height <= 0) )
                 data = graph.getPNGBytes();

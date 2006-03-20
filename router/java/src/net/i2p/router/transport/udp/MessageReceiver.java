@@ -118,10 +118,16 @@ public class MessageReceiver {
                 int size = message.getCompleteSize();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime());
-                I2NPMessage msg = readMessage(buf, message, handler);
-                long afterRead = System.currentTimeMillis();
-                if (msg != null)
-                    _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
+                long afterRead = -1;
+                try {
+                    I2NPMessage msg = readMessage(buf, message, handler);
+                    afterRead = System.currentTimeMillis();
+                    if (msg != null)
+                        _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
+                } catch (RuntimeException re) {
+                    _log.error("b0rked receiving a message.. wazza huzza hmm?", re);
+                    continue;
+                }
                 message = null;
                 long after = System.currentTimeMillis();
                 if (afterRead - before > 100)

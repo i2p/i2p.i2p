@@ -92,6 +92,10 @@ public class FragmentHandler {
             }
         } catch (ArrayIndexOutOfBoundsException aioobe) {
             _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
+        } catch (NullPointerException npe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Corrupt fragment received: offset = " + offset, npe);
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
         } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);

@@ -42,7 +42,7 @@ class BuildHandler {
         _context.statManager().createRateStat("tunnel.rejectTimeout", "How often we reject a tunnel because we can't find the next hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
         _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.acceptLoad", "How long we had to wait before processing the request (when it was accepted)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.acceptLoad", "Delay before processing the accepted request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoad", "How long we had to wait before finally giving up on an inbound request (period is queue count)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         

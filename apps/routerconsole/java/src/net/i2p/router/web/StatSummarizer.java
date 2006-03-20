@@ -43,7 +43,10 @@ public class StatSummarizer implements Runnable {
                                                     ",udp.sendConfirmTime.60000" +
                                                     ",udp.sendPacketSize.60000" +
                                                     ",router.activePeers.60000" +
-                                                    ",router.activeSendPeers.60000";
+                                                    ",router.activeSendPeers.60000" +
+                                                    ",tunnel.acceptLoad.60000" +
+                                                    ",client.sendAckTime.60000" +
+                                                    ",client.dispatchNoACK.60000";
     
     private String adjustDatabases(String oldSpecs) {
         String spec = _context.getProperty("stat.summaries", DEFAULT_DATABASES);
@@ -90,13 +93,13 @@ public class StatSummarizer implements Runnable {
         //System.out.println("Start listening for " + r.getRateStat().getName() + ": " + r.getPeriod());
     }
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
-        return renderPng(rate, out, -1, -1, false, false, false, false, -1); 
+        return renderPng(rate, out, -1, -1, false, false, false, false, -1, true); 
     }
-    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount) throws IOException {
+    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         for (int i = 0; i < _listeners.size(); i++) {
             SummaryListener lsnr = (SummaryListener)_listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
-                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount);
+                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
                 return true;
             }
         }

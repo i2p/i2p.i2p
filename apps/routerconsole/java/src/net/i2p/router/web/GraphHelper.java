@@ -31,10 +31,10 @@ public class GraphHelper {
     }
     
     public GraphHelper() {
-        _periodCount = SummaryListener.PERIODS;
+        _periodCount = 60; // SummaryListener.PERIODS;
         _showEvents = false;
-        _width = -1;
-        _height = -1;
+        _width = 250;
+        _height = 100;
         _refreshDelaySeconds = 60;
     }
     
@@ -79,12 +79,12 @@ public class GraphHelper {
     public String getForm() { 
         try {
             _out.write("<form action=\"graphs.jsp\" method=\"GET\">");
-            _out.write("Periods: <input type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\" /><br />\n");
+            _out.write("Periods: <input size=\"3\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\" /><br />\n");
             _out.write("Plot averages: <input type=\"radio\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + " /> ");
             _out.write("or plot events: <input type=\"radio\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"true\" " : "") + " /><br />\n");
             _out.write("Image sizes: width: <input size=\"4\" type=\"text\" name=\"width\" value=\"" + _width 
                        + "\" /> pixels, height: <input size=\"4\" type=\"text\" name=\"height\" value=\"" + _height  
-                       + "\" /> (-1 for the default) <br />\n");
+                       + "\" /><br />\n");
             _out.write("Refresh delay: <select name=\"refreshDelay\"><option value=\"60\">1 minute</option><option value=\"120\">2 minutes</option><option value=\"300\">5 minutes</option><option value=\"600\">10 minutes</option><option value=\"-1\">Never</option></select><br />\n");
             _out.write("<input type=\"submit\" value=\"Redraw\" />");
         } catch (IOException ioe) {

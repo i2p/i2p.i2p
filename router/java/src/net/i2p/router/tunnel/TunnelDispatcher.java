@@ -53,7 +53,7 @@ public class TunnelDispatcher implements Service {
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRateStat("tunnel.participatingTunnels", 
                                          "How many tunnels are we participating in?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundPeer", 
                                          "How many messages we send out a tunnel targetting a peer?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });

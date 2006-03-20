@@ -189,8 +189,6 @@ class TestJob extends JobImpl {
     private int getTestPeriod() { return 20*1000; }
     private void scheduleRetest() { scheduleRetest(false); }
     private void scheduleRetest(boolean asap) {
-        _outTunnel = null;
-        _replyTunnel = null;
         if (asap) {
             requeue(getContext().random().nextInt(TEST_DELAY));
         } else {

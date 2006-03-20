@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.434 2006/03/18 18:09:38 jrandom Exp $
+$Id: history.txt,v 1.435 2006/03/18 19:23:23 jrandom Exp $
+
+2006-03-20  jrandom
+    * Fix to allow for some slack when coalescing stats
+    * Workaround some oddball errors
 
 2006-03-18  jrandom
     * Added a new graphs.jsp page to show all of the stats being harvested
