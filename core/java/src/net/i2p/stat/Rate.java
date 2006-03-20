@@ -180,12 +180,14 @@ public class Rate {
         }
     }
 
+    /** 2s is plenty of slack to deal with slow coalescing (across many stats) */
+    private static final int SLACK = 2000;
     public void coalesce() {
         long now = now();
         synchronized (_lock) {
             long measuredPeriod = now - _lastCoalesceDate;
-            if (measuredPeriod < _period) {
-                // no need to coalesce
+            if (measuredPeriod < _period - SLACK) {
+                // no need to coalesce (assuming we only try to do so once per minute)
                 return;
             }
     
