@@ -117,7 +117,8 @@ public class OutboundEstablishState {
     
     public void addMessage(OutNetMessage msg) {
         synchronized (_queuedMessages) {
-            _queuedMessages.add(msg);
+            if (!_queuedMessages.contains(msg))
+                _queuedMessages.add(msg);
         }
     }
     public OutNetMessage getNextQueuedMessage() { 

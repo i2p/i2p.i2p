@@ -133,6 +133,12 @@ class SearchJob extends JobImpl {
     public long getExpiration() { return _expiration; }
     public long getTimeoutMs() { return _timeoutMs; }
     
+    private static final boolean DEFAULT_FLOODFILL_ONLY = false;
+    
+    protected boolean onlyQueryFloodfillPeers() {
+        return Boolean.valueOf(getContext().getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY + "")).booleanValue();
+    }
+    
     private static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
     
     protected int getPerPeerTimeoutMs(Hash peer) {
@@ -245,6 +251,14 @@ class SearchJob extends JobImpl {
         int sent = 0;
         Set attempted = _state.getAttempted();
         while (sent <= 0) {
+            boolean onlyFloodfill = onlyQueryFloodfillPeers();
+            if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().size() <= 0) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getJobId() + ": no non-floodfill peers left, and no more pending.  Searched: "
+                              + _state.getAttempted().size() + " failed: " + _state.getFailed().size());
+                fail();
+                return;
+            }
             List closestHashes = getClosestRouters(_state.getTarget(), toCheck, attempted);
             if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
                 if (_state.getPending().size() <= 0) {
@@ -278,10 +292,13 @@ class SearchJob extends JobImpl {
                         _state.replyTimeout(peer);
                     } else {
                         RouterInfo ri = (RouterInfo)ds;
-                        if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri))
+                        if (!FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
                             _floodfillPeersExhausted = true;
-                        if (ri.isHidden() ||
-                            getContext().shitlist().isShitlisted(peer)) {
+                            if (onlyFloodfill)
+                                continue;
+			}
+                        if (ri.isHidden()) {// || // allow querying shitlisted, since its indirect
+                            //getContext().shitlist().isShitlisted(peer)) {
                             // dont bother
                         } else {
                             _state.addPending(peer);

@@ -210,6 +210,11 @@ public class Connection {
             }
         }
         if (packet != null) {
+            if (packet.isFlagSet(Packet.FLAG_RESET)) {
+                // sendReset takes care to prevent too-frequent RSET transmissions
+                sendReset();
+                return;
+            }
             ResendPacketEvent evt = (ResendPacketEvent)packet.getResendEvent();
             if (evt != null) {
                 boolean sent = evt.retransmit(false);
@@ -240,9 +245,11 @@ public class Connection {
             _disconnectScheduledOn = _context.clock().now();
             SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
+        long now = _context.clock().now();
+        if (_resetSentOn + 10*1000 > now) return; // don't send resets too fast
         _resetSent = true;
         if (_resetSentOn <= 0)
-            _resetSentOn = _context.clock().now();
+            _resetSentOn = now;
         if ( (_remotePeer == null) || (_sendStreamId <= 0) ) return;
         PacketLocal reply = new PacketLocal(_context, _remotePeer);
         reply.setFlag(Packet.FLAG_RESET);

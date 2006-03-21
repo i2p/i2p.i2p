@@ -74,13 +74,14 @@ class FloodfillPeerSelector extends PeerSelector {
                 return;
             if (entry.equals(_context.routerHash()))
                 return;
-            if (_context.shitlist().isShitlisted(entry))
-                return;
+            // it isn't direct, so who cares if they're shitlisted
+            //if (_context.shitlist().isShitlisted(entry))
+            //    return;
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
-            if (info == null)
-                return;
+            //if (info == null)
+            //    return;
             
-            if (FloodfillNetworkDatabaseFacade.isFloodfill(info)) {
+            if (info != null && FloodfillNetworkDatabaseFacade.isFloodfill(info)) {
                 _floodfillMatches.add(entry);
             } else {
                 if ( (_wanted > _matches) && (_key != null) ) {

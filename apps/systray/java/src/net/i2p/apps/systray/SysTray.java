@@ -169,7 +169,14 @@ public class SysTray implements SysTrayMenuListener {
         _itemOpenConsole.addSysTrayMenuListener(this);
 //        _sysTrayMenu.addItem(_itemShutdown);
 //        _sysTrayMenu.addSeparator();
-        _sysTrayMenu.addItem(_itemSelectBrowser);
+        // hide it, as there have been reports of b0rked behavior on some JVMs.
+        // specifically, that on XP & sun1.5.0.1, a user launching i2p w/out the
+        // service wrapper would create netDb/, peerProfiles/, and other files
+        // underneath each directory browsed to - as if the router's "." directory
+        // is changing whenever the itemSelectBrowser's JFileChooser changed
+        // directories.  This has not been reproduced or confirmed yet, but is
+        // pretty scary, and this function isn't too necessary.
+        //_sysTrayMenu.addItem(_itemSelectBrowser);
         _sysTrayMenu.addItem(_itemOpenConsole);
         refreshDisplay();
     }

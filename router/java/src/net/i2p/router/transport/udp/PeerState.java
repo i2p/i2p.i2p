@@ -254,9 +254,9 @@ public class PeerState {
         _mtuReceive = _mtu;
         _mtuLastChecked = -1;
         _lastACKSend = -1;
-        _rtt = 1000;
+        _rto = MIN_RTO;
+        _rtt = _rto/2;
         _rttDeviation = _rtt;
-        _rto = MAX_RTO;
         _messagesReceived = 0;
         _messagesSent = 0;
         _packetsTransmitted = 0;
@@ -874,7 +874,7 @@ public class PeerState {
         double retransPct = 0;
         if (_packetsTransmitted > 10) {
             retransPct = (double)_packetsRetransmitted/(double)_packetsTransmitted;
-            boolean wantLarge = retransPct < .25d; // heuristic to allow fairly lossy links to use large MTUs
+            boolean wantLarge = retransPct < .50d; // heuristic to allow fairly lossy links to use large MTUs
             if (wantLarge && _mtu != LARGE_MTU) {
                 if (_context.random().nextLong(_mtuDecreases) <= 0) {
                     _mtu = LARGE_MTU;
@@ -943,10 +943,12 @@ public class PeerState {
         else
             _consecutiveSmall = 0;
         
-        if ( (_consecutiveSmall < 50) && (_packetsReceived > 50) )
-            _mtuReceive = LARGE_MTU;
-        else
-            _mtuReceive = MIN_MTU;
+	if (_packetsReceived > 50) {
+            if (_consecutiveSmall < 50)
+                _mtuReceive = LARGE_MTU;
+            else
+                _mtuReceive = MIN_MTU;
+	}
     }
     
     /** 

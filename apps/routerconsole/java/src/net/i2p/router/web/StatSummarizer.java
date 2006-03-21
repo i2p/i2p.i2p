@@ -46,7 +46,9 @@ public class StatSummarizer implements Runnable {
                                                     ",router.activeSendPeers.60000" +
                                                     ",tunnel.acceptLoad.60000" +
                                                     ",client.sendAckTime.60000" +
-                                                    ",client.dispatchNoACK.60000";
+                                                    ",client.dispatchNoACK.60000" +
+                                                    ",transport.sendMessageFailureLifetime.60000" +
+                                                    ",transport.sendProcessingTime.60000";
     
     private String adjustDatabases(String oldSpecs) {
         String spec = _context.getProperty("stat.summaries", DEFAULT_DATABASES);

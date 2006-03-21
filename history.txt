@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.435 2006/03/18 19:23:23 jrandom Exp $
+$Id: history.txt,v 1.436 2006/03/20 00:31:15 jrandom Exp $
+
+2006-03-21  jrandom
+    * Avoid a very strange (unconfirmed) bug that people using the systray's
+      browser picker dialog could cause by disabling the GUI-based browser
+      picker.
+    * Cut down on subsequent streaming lib reset packets transmitted
+    * Use a larger MTU more often
+    * Allow netDb searches to query shitlisted peers, as the queries are
+      indirect.
+    * Add an option to disable non-floodfill netDb searches (non-floodfill
+      searches are used by default, but can be disabled by adding
+      netDb.floodfillOnly=true to the advanced config)
 
 2006-03-20  jrandom
     * Fix to allow for some slack when coalescing stats
