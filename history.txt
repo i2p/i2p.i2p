@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.436 2006/03/20 00:31:15 jrandom Exp $
+$Id: history.txt,v 1.437 2006/03/21 18:11:33 jrandom Exp $
+
+2006-03-24  jrandom
+    * Try to desync tunnel building near startup (thanks Complication!)
+    * If we are highly congested, fall back on only querying the floodfill
+      netDb peers, and only storing to those peers too
+    * Cleaned up the floodfill-only queries
 
 2006-03-21  jrandom
     * Avoid a very strange (unconfirmed) bug that people using the systray's

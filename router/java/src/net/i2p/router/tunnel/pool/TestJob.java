@@ -129,6 +129,11 @@ class TestJob extends JobImpl {
                                                               getContext().keyManager().getPublicKey(), 
                                                               encryptKey, encryptTag);
 
+        if (msg == null) {
+            // overloaded / unknown peers / etc
+            scheduleRetest();
+            return;
+        }
         Set encryptTags = new HashSet(1);
         encryptTags.add(encryptTag);
         getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);

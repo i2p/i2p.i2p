@@ -103,18 +103,6 @@ class SearchJob extends JobImpl {
         _floodfillPeersExhausted = false;
         _floodfillSearchesOutstanding = 0;
         _expiration = getContext().clock().now() + timeoutMs;
-        getContext().statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.failedAttemptedPeers", "How many peers we sent a search to when the search fails", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
-        getContext().statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.searchMessageCount", "Overall number of mesages for all searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.searchReplyValidated", "How many search replies we get that we are able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
-
         getContext().statManager().addRateData("netDb.searchCount", 1, 0);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
@@ -135,11 +123,21 @@ class SearchJob extends JobImpl {
     
     private static final boolean DEFAULT_FLOODFILL_ONLY = false;
     
-    protected boolean onlyQueryFloodfillPeers() {
-        return Boolean.valueOf(getContext().getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY + "")).booleanValue();
+    static boolean onlyQueryFloodfillPeers(RouterContext ctx) {
+        if (isCongested(ctx))
+            return true;
+        return Boolean.valueOf(ctx.getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY + "")).booleanValue();
     }
     
-    private static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
+    static boolean isCongested(RouterContext ctx) {
+        float availableSend = ctx.bandwidthLimiter().getOutboundKBytesPerSecond()*1024 - ctx.bandwidthLimiter().getSendBps();
+        float availableRecv = ctx.bandwidthLimiter().getInboundKBytesPerSecond()*1024 - ctx.bandwidthLimiter().getReceiveBps();
+        // 6KBps is an arbitrary limit, but a wider search should be able to operate
+        // in that range without a problem
+        return ( (availableSend < 6*1024) || (availableRecv < 6*1024) );
+    }
+    
+    static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
     
     protected int getPerPeerTimeoutMs(Hash peer) {
         int timeout = 0;
@@ -251,7 +249,7 @@ class SearchJob extends JobImpl {
         int sent = 0;
         Set attempted = _state.getAttempted();
         while (sent <= 0) {
-            boolean onlyFloodfill = onlyQueryFloodfillPeers();
+            boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
             if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().size() <= 0) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": no non-floodfill peers left, and no more pending.  Searched: "

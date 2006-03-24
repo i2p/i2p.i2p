@@ -19,6 +19,18 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
+
+        _context.statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.failedAttemptedPeers", "How many peers we sent a search to when the search fails", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
+        _context.statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.searchMessageCount", "Overall number of mesages for all searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.searchReplyValidated", "How many search replies we get that we are able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
     }
 
     protected void createHandlers() {
@@ -117,13 +129,16 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         //if (true) return super.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
-        
         boolean isNew = true;
         FloodSearchJob searchJob = null;
         synchronized (_activeFloodQueries) {
             searchJob = (FloodSearchJob)_activeFloodQueries.get(key);
             if (searchJob == null) {
-                searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                if (SearchJob.onlyQueryFloodfillPeers(_context)) {
+                    searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                } else {
+                    searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                }
                 _activeFloodQueries.put(key, searchJob);
                 isNew = true;
             }
@@ -206,7 +221,8 @@ class FloodSearchJob extends JobImpl {
         _onFind.add(onFind);
         _onFailed = new ArrayList();
         _onFailed.add(onFailed);
-        int timeout = timeoutMs / FLOOD_SEARCH_TIME_FACTOR;
+        int timeout = -1;
+        timeout = timeoutMs / FLOOD_SEARCH_TIME_FACTOR;
         if (timeout < timeoutMs)
             timeout = timeoutMs;
         _timeoutMs = timeout;
