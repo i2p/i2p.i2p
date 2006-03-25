@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.437 2006/03/21 18:11:33 jrandom Exp $
+$Id: history.txt,v 1.438 2006/03/24 15:53:31 jrandom Exp $
+
+2006-03-25  jrandom
+    * Added a simple purge and ban of syndie authors, shown as the
+      "Purge and ban" button on the addressbook for authors that are already
+      on the ignore list.  All of their entries and metadata are deleted from
+      the archive, and the are transparently filtered from any remote
+      syndication (so no user on the syndie instance will pull any new posts
+      from them)
+    * More strict tunnel join throtting when congested
 
 2006-03-24  jrandom
     * Try to desync tunnel building near startup (thanks Complication!)

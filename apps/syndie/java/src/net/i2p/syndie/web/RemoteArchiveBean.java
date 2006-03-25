@@ -62,6 +62,8 @@ public class RemoteArchiveBean {
     }
     
     private boolean ignoreBlog(User user, Hash blog) {
+        if (BlogManager.instance().isBanned(blog))
+            return true;
         PetNameDB db = user.getPetNameDB();
         PetName pn = db.getByLocation(blog.toBase64());
         return ( (pn!= null) && (pn.isMember("Ignore")) );

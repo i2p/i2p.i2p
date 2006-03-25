@@ -6,6 +6,7 @@ import java.text.*;
 import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.data.*;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
@@ -330,6 +331,15 @@ public class Archive {
             }
         }
         return rv;
+    }
+    
+    public synchronized void delete(Hash blog) {
+        if (blog == null) return;
+        File blogDir = new File(_rootDir, blog.toBase64());
+        boolean deleted = FileUtil.rmdir(blogDir, false);
+        File cacheDir = new File(_cacheDir, blog.toBase64());
+        deleted = FileUtil.rmdir(cacheDir, false) && deleted;
+        _log.info("Deleted blog " + blog.toBase64() + " completely? " + deleted);
     }
     
     public boolean storeEntry(EntryContainer container) {

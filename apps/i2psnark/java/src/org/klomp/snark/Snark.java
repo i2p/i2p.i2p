@@ -633,11 +633,11 @@ public class Snark
   boolean allocating = false;
   public void storageCreateFile(Storage storage, String name, long length)
   {
-    if (allocating)
-      System.out.println(); // Done with last file.
+    //if (allocating)
+    //  System.out.println(); // Done with last file.
 
-    System.out.print("Creating file '" + name
-                     + "' of length " + length + ": ");
+    //System.out.print("Creating file '" + name
+    //                 + "' of length " + length + ": ");
     allocating = true;
   }
 
@@ -647,10 +647,10 @@ public class Snark
   public void storageAllocated(Storage storage, long length)
   {
     allocating = true;
-    System.out.print(".");
+    //System.out.print(".");
     allocated += length;
-    if (allocated == meta.getTotalLength())
-      System.out.println(); // We have all the disk space we need.
+    //if (allocated == meta.getTotalLength())
+    //  System.out.println(); // We have all the disk space we need.
   }
 
   boolean allChecked = false;
@@ -664,10 +664,10 @@ public class Snark
         // Use the MetaInfo from the storage since our own might not
         // yet be setup correctly.
         MetaInfo meta = storage.getMetaInfo();
-        if (meta != null)
-          System.out.print("Checking existing "
-                           + meta.getPieces()
-                           + " pieces: ");
+        //if (meta != null)
+        //  System.out.print("Checking existing "
+        //                   + meta.getPieces()
+        //                   + " pieces: ");
         checking = true;
       }
     if (!checking)
@@ -677,8 +677,8 @@ public class Snark
 
   public void storageAllChecked(Storage storage)
   {
-    if (checking)
-      System.out.println();
+    //if (checking)
+    //  System.out.println();
 
     allChecked = true;
     checking = false;
@@ -688,7 +688,7 @@ public class Snark
   {
     Snark.debug("Completely received " + torrent, Snark.INFO);
     //storage.close();
-    System.out.println("Completely received: " + torrent);
+    //System.out.println("Completely received: " + torrent);
     if (completeListener != null)
         completeListener.torrentComplete(this);
   }

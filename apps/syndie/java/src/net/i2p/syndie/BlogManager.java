@@ -1060,4 +1060,49 @@ public class BlogManager {
                 return true;
         return false;
     }
+    
+    public boolean isBanned(Hash blog) {
+        if (blog == null) return false;
+        String str = blog.toBase64();
+        String banned = System.getProperty("syndie.bannedBlogs", "");
+        return (banned.indexOf(str) >= 0);
+    }
+    
+    public String[] getBannedBlogs() {
+        List blogs = new ArrayList();
+        String str = System.getProperty("syndie.bannedBlogs", "");
+        StringTokenizer tok = new StringTokenizer(str, ",");
+        while (tok.hasMoreTokens()) {
+            String blog = tok.nextToken();
+            try {
+                Hash h = new Hash();
+                h.fromBase64(blog);
+                blogs.add(blog); // the base64 string, but verified
+            } catch (DataFormatException dfe) {
+                // ignored
+            }
+        }
+        String rv[] = new String[blogs.size()];
+        for (int i = 0; i < blogs.size(); i++)
+            rv[i] = (String)blogs.get(i);
+        return rv;
+    }
+    
+    /**
+     * Delete the blog from the archive completely, and ban them from ever being added again
+     */
+    public void purgeAndBan(Hash blog) {
+        String banned[] = getBannedBlogs();
+        StringBuffer buf = new StringBuffer();
+        String str = blog.toBase64();
+        buf.append(str);
+        for (int i = 0; banned != null && i < banned.length; i++) {
+            if (!banned[i].equals(str))
+                buf.append(",").append(banned[i]);
+        }
+        System.setProperty("syndie.bannedBlogs", buf.toString());
+        writeConfig();
+        _archive.delete(blog);
+        _archive.regenerateIndex();
+    }
 }

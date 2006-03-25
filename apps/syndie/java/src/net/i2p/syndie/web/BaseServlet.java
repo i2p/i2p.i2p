@@ -329,6 +329,34 @@ public abstract class BaseServlet extends HttpServlet {
              (AddressesServlet.ACTION_UPDATE_OTHER.equals(action)) ||
              (AddressesServlet.ACTION_UPDATE_PEER.equals(action)) ) {
             return updateAddress(user, req);
+        } else if (AddressesServlet.ACTION_PURGE_AND_BAN_BLOG.equals(action)) {
+            String name = req.getParameter(AddressesServlet.PARAM_NAME);
+            PetName pn = user.getPetNameDB().getByName(name);
+            if (pn != null) {
+                boolean purged = false;
+                if (BlogManager.instance().authorizeRemote(user)) {
+                    Hash h = null;
+                    BlogURI uri = new BlogURI(pn.getLocation());
+                    if (uri.getKeyHash() != null) {
+                        h = uri.getKeyHash();
+                    }
+                    if (h == null) {
+                        byte b[] = Base64.decode(pn.getLocation());
+                        if ( (b != null) && (b.length == Hash.HASH_LENGTH) )
+                            h = new Hash(b);
+                    }
+                    if (h != null) {
+                        BlogManager.instance().purgeAndBan(h);
+                        purged = true;
+                    }
+                }
+                if (purged) // force a new thread index
+                    return true;
+                else
+                    return false;
+            } else {
+                return false;
+            }
         } else if ( (AddressesServlet.ACTION_DELETE_ARCHIVE.equals(action)) || 
              (AddressesServlet.ACTION_DELETE_BLOG.equals(action)) ||
              (AddressesServlet.ACTION_DELETE_EEPSITE.equals(action)) || 

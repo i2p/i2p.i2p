@@ -46,6 +46,7 @@ public class AddressesServlet extends BaseServlet {
     public static final String ACTION_DELETE_BLOG = "Delete author";
     public static final String ACTION_UPDATE_BLOG = "Update author";
     public static final String ACTION_ADD_BLOG = "Add author";
+    public static final String ACTION_PURGE_AND_BAN_BLOG = "Purge and ban author";
     
     public static final String ACTION_DELETE_ARCHIVE = "Delete archive";
     public static final String ACTION_UPDATE_ARCHIVE = "Update archive";
@@ -128,6 +129,8 @@ public class AddressesServlet extends BaseServlet {
             if (pn.isMember(FilteredThreadIndex.GROUP_IGNORE)) {
                 out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE 
                           + "\" checked=\"true\" value=\"true\" title=\"If true, their threads are hidden\" /> ");
+                if (BlogManager.instance().authorizeRemote(user))
+                    out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_PURGE_AND_BAN_BLOG + "\" /> ");
             } else {
                 out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE 
                           + "\" value=\"true\" title=\"If true, their threads are hidden\" /> ");

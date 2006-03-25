@@ -238,6 +238,7 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     
     private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 600; // 1KBps
+    private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     
     /**
      * with bytesAllocated already accounted for across the numTunnels existing
@@ -279,7 +280,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return true;
         } else {
             double probAllow = availBps / (allocatedBps + availBps);
-            boolean allow = _context.random().nextDouble() <= probAllow;
+            boolean allow = (availBps > MIN_AVAILABLE_BPS) && (_context.random().nextDouble() <= probAllow);
             if (allow) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Probabalistically allowing the tunnel w/ " + (pctFull*100d) + "% of our " + availBps 
