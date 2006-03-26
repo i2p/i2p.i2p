@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.438 2006/03/24 15:53:31 jrandom Exp $
+$Id: history.txt,v 1.439 2006/03/25 18:50:51 jrandom Exp $
+
+* 2006-03-26  0.6.1.13 released
 
 2006-03-25  jrandom
     * Added a simple purge and ban of syndie authors, shown as the
