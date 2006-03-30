@@ -248,7 +248,7 @@ class RouterThrottleImpl implements RouterThrottle {
      */
     private boolean allowTunnel(double bytesAllocated, int numTunnels) {
         int maxKBps = Math.min(_context.bandwidthLimiter().getOutboundKBytesPerSecond(), _context.bandwidthLimiter().getInboundKBytesPerSecond());
-        int used1s = 0; //get1sRate(_context); // dont throttle on the 1s rate, its too volatile
+        int used1s = get1sRate(_context); // dont throttle on the 1s rate, its too volatile
         int used1m = get1mRate(_context);
         int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
         int used = Math.max(Math.max(used1s, used1m), used5m);

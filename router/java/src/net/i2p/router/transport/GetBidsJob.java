@@ -47,7 +47,7 @@ public class GetBidsJob extends JobImpl {
         if (context.shitlist().isShitlisted(to)) {
             if (log.shouldLog(Log.WARN))
                 log.warn("Attempt to send a message to a shitlisted peer - " + to);
-            context.messageRegistry().peerFailed(to);
+            //context.messageRegistry().peerFailed(to);
             fail(context, msg);
             return;
         }

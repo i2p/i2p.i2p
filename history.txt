@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.439 2006/03/25 18:50:51 jrandom Exp $
+$Id: history.txt,v 1.440 2006/03/26 18:23:54 jrandom Exp $
+
+2006-03-30  jrandom
+    * Substantially reduced the lock contention in the message registry (a
+      major hotspot that can choke most threads).  Also reworked the locking
+      so we don't need per-message timer events
+    * No need to have additional per-peer message clearing, as they are
+      either unregistered individually or expired.
+    * Include some of the more transient tunnel throttling
 
 * 2006-03-26  0.6.1.13 released
 

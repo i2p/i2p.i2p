@@ -84,7 +84,7 @@ public class Shitlist {
         
         _context.netDb().fail(peer);
         //_context.tunnelManager().peerFailed(peer);
-        _context.messageRegistry().peerFailed(peer);
+        //_context.messageRegistry().peerFailed(peer);
         if (!wasAlready)
             _context.messageHistory().shitlist(peer, reason);
         return wasAlready;
