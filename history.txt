@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.440 2006/03/26 18:23:54 jrandom Exp $
+$Id: history.txt,v 1.441 2006/03/30 02:26:43 jrandom Exp $
+
+2006-04-01  jrandom
+    * Take out the router watchdog's teeth (don't restart on leaseset failure)
 
 2006-03-30  jrandom
     * Substantially reduced the lock contention in the message registry (a

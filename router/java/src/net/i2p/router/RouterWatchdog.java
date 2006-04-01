@@ -47,7 +47,7 @@ class RouterWatchdog implements Runnable {
     }
     
     private boolean shutdownOnHang() {
-        return Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "true")).booleanValue();
+        return Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "false")).booleanValue();
     }
     
     private void dumpStatus() {

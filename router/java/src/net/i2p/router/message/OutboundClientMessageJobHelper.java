@@ -131,9 +131,9 @@ class OutboundClientMessageJobHelper {
         TunnelId replyToTunnelId = null; // tunnel id on that gateway
         
         if (replyToTunnel == null) {
-            if (log.shouldLog(Log.ERROR))
-                log.error("Unable to send client message from " + from.toBase64() 
-                          + ", as there are no inbound tunnels available");
+            if (log.shouldLog(Log.WARN))
+                log.warn("Unable to send client message from " + from.toBase64() 
+                         + ", as there are no inbound tunnels available");
             return null;
         }
         replyToTunnelId = replyToTunnel.getReceiveTunnelId(0);

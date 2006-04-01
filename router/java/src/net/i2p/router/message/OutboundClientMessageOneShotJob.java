@@ -213,8 +213,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (ok) {
                 send();
             } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to send on a random lease, as getNext returned null (to=" + _toString + ")");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to send on a random lease, as getNext returned null (to=" + _toString + ")");
                 dieFatal();
             }
         }
