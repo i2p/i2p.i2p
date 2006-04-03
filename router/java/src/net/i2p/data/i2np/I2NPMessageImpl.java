@@ -326,7 +326,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         }
     }
 
-    protected void verifyUnwritten() { if (_written) throw new RuntimeException("Already written"); }
+    protected void verifyUnwritten() { 
+        // if (_written) throw new RuntimeException("Already written"); 
+    }
     protected void written() { _written = true; }
     protected void read() { _read = true; }
     

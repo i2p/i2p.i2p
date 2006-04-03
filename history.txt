@@ -1,7 +1,9 @@
-$Id: history.txt,v 1.441 2006/03/30 02:26:43 jrandom Exp $
+$Id: history.txt,v 1.442 2006/04/01 14:05:37 jrandom Exp $
 
 2006-04-01  jrandom
     * Take out the router watchdog's teeth (don't restart on leaseset failure)
+    * Filter the IRC ping/pong messages, as some clients send unsafe
+      information in them (thanks aardvax and dust!)
 
 2006-03-30  jrandom
     * Substantially reduced the lock contention in the message registry (a
