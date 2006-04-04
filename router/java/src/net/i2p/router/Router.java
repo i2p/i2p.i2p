@@ -323,13 +323,8 @@ public class Router {
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, NETWORK_ID+"");
             ri.setOptions(stats);
             ri.setAddresses(_context.commSystem().createAddresses());
-            if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
-                ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
-            if("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
-                ri.addCapability(RouterInfo.CAPABILITY_HIDDEN);
-            }
 
-            addReachabilityCapability(ri);
+            addCapabilities(ri);
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  wtf");
@@ -358,15 +353,43 @@ public class Router {
         }
     }
     
+    // publicize our ballpark capacity - this does not affect anything at
+    // the moment
+    public static final char CAPABILITY_BW16 = 'K';
+    public static final char CAPABILITY_BW32 = 'L';
+    public static final char CAPABILITY_BW64 = 'M';
+    public static final char CAPABILITY_BW128 = 'N';
+    public static final char CAPABILITY_BW256 = 'O';
+    
     public static final char CAPABILITY_REACHABLE = 'R';
     public static final char CAPABILITY_UNREACHABLE = 'U';
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
-    public void addReachabilityCapability(RouterInfo ri) {
-        // routers who can understand TunnelBuildMessages 
-        ////ri.addCapability(CAPABILITY_NEW_TUNNEL);
+    public void addCapabilities(RouterInfo ri) {
+        int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
+                             _context.bandwidthLimiter().getInboundKBytesPerSecond());
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
+        
+        if (bwLim <= 16) {
+            ri.addCapability(CAPABILITY_BW16);
+        } else if (bwLim <= 32) {
+            ri.addCapability(CAPABILITY_BW32);
+        } else if (bwLim <= 64) {
+            ri.addCapability(CAPABILITY_BW64);
+        } else if (bwLim <= 128) {
+            ri.addCapability(CAPABILITY_BW128);
+        } else { // ok, more than 128KBps... aka "lots"
+            ri.addCapability(CAPABILITY_BW256);
+        }
+        
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
+            ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+        
+        if("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+            ri.addCapability(RouterInfo.CAPABILITY_HIDDEN);
         
         String forceUnreachable = _context.getProperty(PROP_FORCE_UNREACHABLE);
         if ( (forceUnreachable != null) && ("true".equalsIgnoreCase(forceUnreachable)) ) {

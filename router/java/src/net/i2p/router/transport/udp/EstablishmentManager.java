@@ -552,7 +552,11 @@ public class EstablishmentManager {
             // offer to relay
             // (perhaps we should check our bw usage and/or how many peers we are 
             //  already offering introducing?)
-            state.setSentRelayTag(_context.random().nextLong(MAX_TAG_VALUE));
+            if (state.getSentRelayTag() < 0) {
+                state.setSentRelayTag(_context.random().nextLong(MAX_TAG_VALUE));
+            } else {
+                // don't change it, since we've already prepared our sig
+            }
         } else {
             // don't offer to relay
             state.setSentRelayTag(0);

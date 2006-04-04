@@ -682,6 +682,12 @@ public class ProfileOrganizer {
                           + "], but there aren't enough of them " + numExceedingMean);
             _thresholdCapacityValue = Math.max(thresholdAtMinHighCap, thresholdAtLowest);
         }
+        
+        // the base growth factor is the value we give to new routers that we don't
+        // know anything about.  dont go under that limit unless you want to expose
+        // the selection to simple ident flooding attacks
+        if (_thresholdCapacityValue <= CapacityCalculator.GROWTH_FACTOR)
+            _thresholdCapacityValue = CapacityCalculator.GROWTH_FACTOR + 0.0001;
     }
     
     /**

@@ -101,7 +101,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
-        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 4*1024));
+        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 960)); // 960 fits inside a single tunnel message
         setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));

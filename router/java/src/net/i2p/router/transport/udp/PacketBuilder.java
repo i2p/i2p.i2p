@@ -567,7 +567,7 @@ public class PacketBuilder {
             if ( (off % 16) != 0)
                 off += 16 - (off % 16);
             packet.getPacket().setLength(off);
-            authenticate(packet, state.getIntroKey(), state.getIntroKey());
+            authenticate(packet, state.getCipherKey(), state.getMACKey());
         } 
         
         setTo(packet, to, state.getSentPort());

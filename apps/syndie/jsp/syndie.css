@@ -134,9 +134,9 @@ select {
    display: inline;
 }
 .controlBar {
-	margin: 0em;
-	padding: 0em;
-//	border: medium solid #DDF;
+        border-bottom: thick double #CCF;
+        border-left: medium solid #CCF;
+        border-right: medium solid #CCF;
 	background-color: #EEF;
 	color: inherit;
 	font-size: small;

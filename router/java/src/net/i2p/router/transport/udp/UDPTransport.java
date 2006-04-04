@@ -337,6 +337,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
                     if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
+                         (_externalListenHost == null) || (_externalListenPort <= 0) ||
                          (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
                         if (_log.shouldLog(Log.INFO))
@@ -358,7 +359,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         // so lets test again
                         fireTest = true;
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("Different address, but we're fine..");
+                            _log.info("Different address, but we're fine.. (" + _reachabilityStatus + ")");
                     }
                 } else {
                     // matched what we expect

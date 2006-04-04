@@ -128,14 +128,7 @@ public class RebuildRouterInfoJob extends JobImpl {
                 Properties stats = getContext().statPublisher().publishStatistics();
                 stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
                 info.setOptions(stats);
-                if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
-                    info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
-
-                // Set caps=H for hidden mode routers
-                if ("true".equalsIgnoreCase(getContext().getProperty(Router.PROP_HIDDEN, "false"))) 
-                    info.addCapability(RouterInfo.CAPABILITY_HIDDEN);
-
-                getContext().router().addReachabilityCapability(info);
+                getContext().router().addCapabilities(info);
                 // info.setPeers(new HashSet()); // this would have the trusted peers
                 info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 

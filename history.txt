@@ -1,4 +1,25 @@
-$Id: history.txt,v 1.442 2006/04/01 14:05:37 jrandom Exp $
+$Id: history.txt,v 1.443 2006/04/03 05:07:24 jrandom Exp $
+
+2006-04-05  jrandom
+    * Fix during the ssu handshake to avoid an unnecessary failure on
+      packet retransmission (thanks ripple!)
+    * Fix during the SSU handshake to use the negotiated session key asap,
+      rather than using the intro key for more than we should (thanks ripple!)
+    * Fixes to the message reply registry (thanks Complication!)
+    * More comprehensive syndie banning (for repeated pushes)
+    * Publish the router's ballpark bandwidth limit (w/in a power of 2), for 
+      testing purposes
+    * Put a floor back on the capacity threshold, so too many failing peers
+      won't cause us to pick very bad peers (unless we have very few good
+      ones)
+    * Bugfix to cut down on peers using introducers unneessarily (thanks
+      Complication!)
+    * Reduced the default streaming lib message size to fit into a single
+      tunnel message, rather than require 5 tunnel messages to be transferred
+      without loss before recomposition.  This reduces throughput, but should
+      increase reliability, at least for the time being.
+    * Misc small bugfixes in the router (thanks all!)
+    * More tweaking for Syndie's CSS (thanks Doubtful Salmon!)
 
 2006-04-01  jrandom
     * Take out the router watchdog's teeth (don't restart on leaseset failure)

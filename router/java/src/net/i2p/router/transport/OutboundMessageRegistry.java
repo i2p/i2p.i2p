@@ -25,7 +25,7 @@ public class OutboundMessageRegistry {
     private Log _log;
     /** list of currently active MessageSelector instances */
     private List _selectors;
-    /** map of active MessageSelector to the OutNetMessage causing it (for quick removal) */
+    /** map of active MessageSelector to either an OutNetMessage or a List of OutNetMessages causing it (for quick removal) */
     private Map _selectorToMessage;
     /** set of active OutNetMessage (for quick removal and selector fetching) */
     private Set _activeMessages;
@@ -61,6 +61,8 @@ public class OutboundMessageRegistry {
         synchronized (_selectors) {
             for (int i = 0; i < _selectors.size(); i++) {
                 MessageSelector sel = (MessageSelector)_selectors.get(i);
+                if (sel == null)
+                    continue;
                 boolean isMatch = sel.isMatch(message);
                 if (isMatch) {
                     if (matchedSelectors == null) matchedSelectors = new ArrayList(1);
@@ -82,19 +84,36 @@ public class OutboundMessageRegistry {
                 MessageSelector sel = (MessageSelector)matchedSelectors.get(i);
                 boolean removed = false;
                 OutNetMessage msg = null;
+                List msgs = null;
                 synchronized (_selectorToMessage) {
+                    Object o = null;
                     if ( (removedSelectors != null) && (removedSelectors.contains(sel)) ) {
-                        msg = (OutNetMessage)_selectorToMessage.remove(sel);
+                        o = _selectorToMessage.remove(sel);
                         removed = true;
                     } else {
-                        msg = (OutNetMessage)_selectorToMessage.get(sel);
+                        o = _selectorToMessage.get(sel);
                     }
-                    if (msg != null)
-                        rv.add(msg);
+                    
+                    if (o instanceof OutNetMessage) {
+                        msg = (OutNetMessage)o;
+                        if (msg != null)
+                            rv.add(msg);
+                    } else if (o instanceof List) {
+                        msgs = (List)o;
+                        if (msgs != null)
+                            for (int j = 0; j < msgs.size(); j++)
+                                rv.add(msgs.get(j));
+                    }
                 }
-                if (removed && msg != null) {
-                    synchronized (_activeMessages) {
-                        _activeMessages.remove(msg);
+                if (removed) {
+                    if (msg != null) {
+                        synchronized (_activeMessages) {
+                            _activeMessages.remove(msg);
+                        }
+                    } else if (msgs != null) {
+                        synchronized (_activeMessages) {
+                            _activeMessages.removeAll(msgs);
+                        }
                     }
                 }
             }
@@ -128,7 +147,24 @@ public class OutboundMessageRegistry {
             if (!_activeMessages.add(msg))
                 return; // dont add dups
         }
-        synchronized (_selectorToMessage) { _selectorToMessage.put(sel, msg); }
+        synchronized (_selectorToMessage) { 
+            Object oldMsg = _selectorToMessage.put(sel, msg);
+            if (oldMsg != null) {
+                List multi = null;
+                if (oldMsg instanceof OutNetMessage) {
+                    multi = new ArrayList(4);
+                    multi.add(oldMsg);
+                    multi.add(msg);
+                    _selectorToMessage.put(sel, multi);
+                } else if (oldMsg instanceof List) {
+                    multi = (List)oldMsg;
+                    multi.add(msg);
+                    _selectorToMessage.put(sel, multi);
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("a single message selector [" + sel + "] with multiple messages ("+ multi + ")");
+            }
+        }
         synchronized (_selectors) { _selectors.add(sel); }
 
         _cleanupTask.scheduleExpiration(sel);
@@ -136,9 +172,22 @@ public class OutboundMessageRegistry {
     
     public void unregisterPending(OutNetMessage msg) {
         MessageSelector sel = msg.getReplySelector();
-        // remember, order matters
-        synchronized (_selectors) { _selectors.add(sel); }
-        synchronized (_selectorToMessage) { _selectorToMessage.put(sel, msg); }
+        boolean stillActive = false;
+        synchronized (_selectorToMessage) { 
+            Object old = _selectorToMessage.remove(sel);
+            if (old != null) {
+                if (old instanceof List) {
+                    List l = (List)old;
+                    l.remove(msg);
+                    if (l.size() > 0) {
+                        _selectorToMessage.put(sel, l);
+                        stillActive = true;
+                    }
+                }
+            }
+        }
+        if (!stillActive)
+            synchronized (_selectors) { _selectors.remove(sel); }
         synchronized (_activeMessages) { _activeMessages.remove(msg); }
     }
 
@@ -156,6 +205,7 @@ public class OutboundMessageRegistry {
             synchronized (_selectors) {
                 for (int i = 0; i < _selectors.size(); i++) {
                     MessageSelector sel = (MessageSelector)_selectors.get(i);
+                    if (sel == null) continue;
                     long expiration = sel.getExpiration();
                     if (expiration <= now) {
                         _removing.add(sel);
@@ -170,8 +220,13 @@ public class OutboundMessageRegistry {
                 for (int i = 0; i < _removing.size(); i++) {
                     MessageSelector sel = (MessageSelector)_removing.get(i);
                     OutNetMessage msg = null;
+                    List msgs = null;
                     synchronized (_selectorToMessage) {
-                        msg = (OutNetMessage)_selectorToMessage.remove(sel);
+                        Object o = _selectorToMessage.remove(sel);
+                        if (o instanceof OutNetMessage)
+                            msg = (OutNetMessage)o;
+                        else if (o instanceof List)
+                            msgs = (List)o;
                     }
                     if (msg != null) {
                         synchronized (_activeMessages) {
@@ -180,6 +235,16 @@ public class OutboundMessageRegistry {
                         Job fail = msg.getOnFailedReplyJob();
                         if (fail != null)
                             _context.jobQueue().addJob(fail);
+                    } else if (msgs != null) {
+                        synchronized (_activeMessages) {
+                            _activeMessages.removeAll(msgs);
+                        }
+                        for (int j = 0; j < msgs.size(); j++) {
+                            msg = (OutNetMessage)msgs.get(i);
+                            Job fail = msg.getOnFailedReplyJob();
+                            if (fail != null)
+                                _context.jobQueue().addJob(fail);
+                        }
                     }
                 }
                 _removing.clear();

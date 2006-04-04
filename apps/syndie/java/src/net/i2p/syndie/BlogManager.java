@@ -890,6 +890,8 @@ public class BlogManager {
         try {
             BlogInfo info = new BlogInfo();
             info.load(metadataStream);
+            if (isBanned(info.getKey().calculateHash()))
+                return false;
             return _archive.storeBlogInfo(info);
         } catch (IOException ioe) {
             _log.error("Error importing meta", ioe);
@@ -906,6 +908,8 @@ public class BlogManager {
         try {
             EntryContainer c = new EntryContainer();
             c.load(entryStream);
+            if (isBanned(c.getURI().getKeyHash()))
+                return false;
             return _archive.storeEntry(c);
         } catch (IOException ioe) {
             _log.error("Error importing entry", ioe);

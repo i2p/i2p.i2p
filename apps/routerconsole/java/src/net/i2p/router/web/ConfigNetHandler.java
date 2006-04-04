@@ -250,7 +250,7 @@ public class ConfigNetHandler extends FormHandler {
             // If hidden mode value changes, restart is required
             if (_hiddenMode && "false".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
                 _context.router().setConfigSetting(Router.PROP_HIDDEN, "true");
-                _context.router().getRouterInfo().addCapability(RouterInfo.CAPABILITY_HIDDEN);
+                _context.router().addCapabilities(_context.router().getRouterInfo());
                 addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
                               + "<a href=\"configtunnels.jsp\">tunnels!</a>");
                 hiddenSwitch();
