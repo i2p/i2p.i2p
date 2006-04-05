@@ -44,6 +44,8 @@ class BuildHandler {
         _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.acceptLoad", "Delay before processing the accepted request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoad", "How long we had to wait before finally giving up on an inbound request (period is queue count)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropLoadDelay", "How long we had to wait before finally giving up on an inbound request?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropLoadBacklog", "How many requests were pending when they were so lagged that we had to drop a new inbound request??", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         
         _context.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -66,6 +68,7 @@ class BuildHandler {
      * there are remaining requeusts we skipped over
      */
     boolean handleInboundRequests() {
+        int dropExpired = 0;
         List handled = null;
         synchronized (_inboundBuildMessages) {
             int toHandle = _inboundBuildMessages.size();
@@ -73,8 +76,31 @@ class BuildHandler {
                 if (toHandle > MAX_HANDLE_AT_ONCE)
                     toHandle = MAX_HANDLE_AT_ONCE;
                 handled = new ArrayList(toHandle);
-                for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
-                    handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
+                if (false) {
+                    for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
+                        handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
+                } else {
+                    // drop any expired messages
+                    long dropBefore = System.currentTimeMillis() - BuildRequestor.REQUEST_TIMEOUT;
+                    do {
+                        BuildMessageState state = (BuildMessageState)_inboundBuildMessages.get(0);
+                        if (state.recvTime <= dropBefore) {
+                            _inboundBuildMessages.remove(0);
+                            dropExpired++;
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
+                                           + ", since we received it a long time ago: " + (System.currentTimeMillis() - state.recvTime));
+                            _context.statManager().addRateData("tunnel.dropLoadDelay", System.currentTimeMillis() - state.recvTime, 0);
+                        } else {
+                            break;
+                        }
+                    } while (_inboundBuildMessages.size() > 0);
+                    
+                    // now pull off the oldest requests first (we're doing a tail-drop
+                    // when adding)
+                    for (int i = 0; i < toHandle; i++)
+                        handled.add(_inboundBuildMessages.remove(0));
+                }
             }
         }
         if (handled != null) {
@@ -246,11 +272,12 @@ class BuildHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(state.msg.getUniqueId() + ": handling request after " + timeSinceReceived);
         
-        if (timeSinceReceived > BuildRequestor.REQUEST_TIMEOUT*2) {
+        if (timeSinceReceived > BuildRequestor.REQUEST_TIMEOUT) {
             // don't even bother, since we are so overloaded locally
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
                            + ", since we received it a long time ago: " + timeSinceReceived);
+            _context.statManager().addRateData("tunnel.dropLoadDelay", timeSinceReceived, 0);
             return;
         }
         // ok, this is not our own tunnel, so we need to do some heavy lifting
@@ -358,7 +385,7 @@ class BuildHandler {
         //    response = TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
         
         long recvDelay = System.currentTimeMillis()-state.recvTime;
-        if ( (response == 0) && (recvDelay > BuildRequestor.REQUEST_TIMEOUT) ) {
+        if ( (response == 0) && (recvDelay > BuildRequestor.REQUEST_TIMEOUT/2) ) {
             _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, recvDelay);
             response = TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         } else if (response == 0) {
@@ -523,17 +550,24 @@ class BuildHandler {
                 } else {
                     synchronized (_inboundBuildMessages) {
                         boolean removed = false;
+                        int dropped = 0;
                         while (_inboundBuildMessages.size() > 0) {
-                            BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(0);
+                            BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(_inboundBuildMessages.size()-1);
                             long age = System.currentTimeMillis() - cur.recvTime;
                             if (age >= BuildRequestor.REQUEST_TIMEOUT) {
-                                _inboundBuildMessages.remove(0);
+                                _inboundBuildMessages.remove(_inboundBuildMessages.size()-1);
+                                dropped++;
                                 _context.statManager().addRateData("tunnel.dropLoad", age, _inboundBuildMessages.size());
                             } else {
                                 break;
                             }
                         }
-                        _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
+                        if (dropped > 0) {
+                            // if the queue is backlogged, stop adding new messages
+                            _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
+                        } else {
+                            _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
+                        }
                     }
                     _exec.repoll();
                 }

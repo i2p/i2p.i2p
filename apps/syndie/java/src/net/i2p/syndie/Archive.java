@@ -28,6 +28,7 @@ import net.i2p.util.Log;
 public class Archive {
     private I2PAppContext _context;
     private Log _log;
+    private BlogManager _mgr;
     private File _rootDir;
     private File _cacheDir;
     private Map _blogInfo;
@@ -43,9 +44,10 @@ public class Archive {
         public boolean accept(File dir, String name) { return name.endsWith(".snd"); }
     };    
     
-    public Archive(I2PAppContext ctx, String rootDir, String cacheDir) {
+    public Archive(I2PAppContext ctx, String rootDir, String cacheDir, BlogManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(Archive.class);
+        _mgr = mgr;
         _rootDir = new File(rootDir);
         if (!_rootDir.exists())
             _rootDir.mkdirs();
@@ -72,6 +74,13 @@ public class Archive {
                     try {
                         fi = new FileInputStream(meta);
                         bi.load(fi);
+                        if (_mgr.isBanned(bi.getKey().calculateHash())) {
+                            fi.close();
+                            fi = null;
+                            _log.error("Deleting banned blog " + bi.getKey().calculateHash().toBase64());
+                            delete(bi.getKey().calculateHash());
+                            continue;
+                        }
                         if (bi.verify(_context)) {
                             info.add(bi);
                         } else {
@@ -120,6 +129,12 @@ public class Archive {
             _log.warn("Not storing invalid blog " + info);
             return false;
         }
+        
+        if (_mgr.isBanned(info.getKey().calculateHash())) {
+            _log.error("Not storing banned blog " + info.getKey().calculateHash().toBase64(), new Exception("Stored by"));
+            return false;
+        }
+        
         boolean isNew = true;
         synchronized (_blogInfo) {
             BlogInfo old = (BlogInfo)_blogInfo.get(info.getKey().calculateHash());
@@ -274,8 +289,9 @@ public class Archive {
                 if (blogKey == null) {
                     // no key, cache.
                     File entryDir = getEntryDir(entries[i]);
-                    if (entryDir.exists())
+                    if (entryDir.exists()) {
                         entry = getCachedEntry(entryDir);
+                    }
                     if ((entry == null) || !entryDir.exists()) {
                         if (!extractEntry(entries[i], entryDir, info)) {
                             _log.error("Entry " + entries[i].getPath() + " is not valid");

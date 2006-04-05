@@ -101,8 +101,7 @@ public class OutboundMessageRegistry {
                     } else if (o instanceof List) {
                         msgs = (List)o;
                         if (msgs != null)
-                            for (int j = 0; j < msgs.size(); j++)
-                                rv.add(msgs.get(j));
+                            rv.addAll(msgs);
                     }
                 }
                 if (removed) {
@@ -152,7 +151,7 @@ public class OutboundMessageRegistry {
             if (oldMsg != null) {
                 List multi = null;
                 if (oldMsg instanceof OutNetMessage) {
-                    multi = new ArrayList(4);
+                    multi = Collections.synchronizedList(new ArrayList(4));
                     multi.add(oldMsg);
                     multi.add(msg);
                     _selectorToMessage.put(sel, multi);
@@ -226,7 +225,7 @@ public class OutboundMessageRegistry {
                         if (o instanceof OutNetMessage)
                             msg = (OutNetMessage)o;
                         else if (o instanceof List)
-                            msgs = (List)o;
+                            msgs = new ArrayList((List)o);
                     }
                     if (msg != null) {
                         synchronized (_activeMessages) {

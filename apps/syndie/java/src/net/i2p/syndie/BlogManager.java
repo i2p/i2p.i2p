@@ -74,7 +74,7 @@ public class BlogManager {
         _cacheDir.mkdirs();
         _userDir.mkdirs();
         _tempDir.mkdirs();
-        _archive = new Archive(ctx, _archiveDir.getAbsolutePath(), _cacheDir.getAbsolutePath());
+        _archive = new Archive(ctx, _archiveDir.getAbsolutePath(), _cacheDir.getAbsolutePath(), this);
         if (regenIndex)
             _archive.regenerateIndex();
     }

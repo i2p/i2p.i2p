@@ -295,7 +295,7 @@ public abstract class BaseServlet extends HttpServlet {
         
         if (AddressesServlet.ACTION_ADD_TAG.equals(action)) {
             String name = req.getParameter(AddressesServlet.PARAM_NAME);
-            if (!user.getPetNameDB().containsName(name)) {
+            if ((name != null) && (name.trim().length() > 0) && (!user.getPetNameDB().containsName(name)) ) {
                 PetName pn = new PetName(name, AddressesServlet.NET_SYNDIE, AddressesServlet.PROTO_TAG, name);
                 user.getPetNameDB().add(pn);
                 BlogManager.instance().saveUser(user);
@@ -307,7 +307,7 @@ public abstract class BaseServlet extends HttpServlet {
              (AddressesServlet.ACTION_ADD_OTHER.equals(action)) ||
              (AddressesServlet.ACTION_ADD_PEER.equals(action)) ) {
             PetName pn = buildNewAddress(req);
-            if ( (pn != null) && (pn.getName() != null) && (pn.getLocation() != null) && 
+            if ( (pn != null) && (pn.getName() != null) && (pn.getName().trim().length() > 0) && (pn.getLocation() != null) && 
                  (!user.getPetNameDB().containsName(pn.getName())) ) {
                 user.getPetNameDB().add(pn);
                 BlogManager.instance().saveUser(user);
@@ -744,6 +744,8 @@ public abstract class BaseServlet extends HttpServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
             PetName pn = db.getByName(name);
+            if (pn == null)
+                continue;
             String proto = pn.getProtocol();
             String loc = pn.getLocation();
             if (proto != null && loc != null && "syndieblog".equals(proto) && pn.isMember(FilteredThreadIndex.GROUP_FAVORITE)) {

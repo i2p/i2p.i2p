@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.443 2006/04/03 05:07:24 jrandom Exp $
+$Id: history.txt,v 1.444 2006/04/04 07:20:39 jrandom Exp $
+
+2006-04-05  jrandom
+    * Cut down on the time that we allow a tunnel creation request to sit by
+      without response, and reject tunnel creation requests that are lagged
+      locally.  Also switch to a bounded FIFO instead of a LIFO
+    * Threading tweaks for the message handling (thanks bar!)
+    * Don't add addresses to syndie with blank names (thanks Complication!)
+    * Further ban clearance
 
 2006-04-05  jrandom
     * Fix during the ssu handshake to avoid an unnecessary failure on
