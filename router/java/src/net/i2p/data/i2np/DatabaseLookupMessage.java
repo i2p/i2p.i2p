@@ -44,9 +44,9 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     }
     public DatabaseLookupMessage(I2PAppContext context, boolean locallyCreated) {
         super(context);
-        setSearchKey(null);
-        setFrom(null);
-        setDontIncludePeers(null);
+        //setSearchKey(null);
+        //setFrom(null);
+        //setDontIncludePeers(null);
         
         context.statManager().createRateStat("router.throttleNetDbDoSSend", "How many netDb lookup messages we are sending during a period with a DoS detected", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     

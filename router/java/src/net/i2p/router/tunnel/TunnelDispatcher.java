@@ -435,7 +435,7 @@ public class TunnelDispatcher implements Service {
             _context.statManager().addRateData("tunnel.dispatchInbound", 1, 0);
         } else {
             _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
-            int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            int level = (_context.router().getUptime() > 10*60*1000 ? Log.WARN : Log.INFO);
             if (_log.shouldLog(level))
                 _log.log(level, "no matching tunnel for id=" + msg.getTunnelId().getTunnelId() 
                            + ": gateway message expiring in " 

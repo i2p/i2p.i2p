@@ -129,6 +129,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         //if (true) return super.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
+        if (key == null) throw new IllegalArgumentException("searchin for nothin, eh?");
         boolean isNew = true;
         FloodSearchJob searchJob = null;
         synchronized (_activeFloodQueries) {

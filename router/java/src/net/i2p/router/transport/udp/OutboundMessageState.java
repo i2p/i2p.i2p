@@ -47,8 +47,7 @@ public class OutboundMessageState {
     public boolean initialize(OutNetMessage msg) {
         if (msg == null) return false;
         try {
-            initialize(msg, msg.getMessage(), null);
-            return true;
+            return initialize(msg, msg.getMessage(), null);
         } catch (OutOfMemoryError oom) {
             throw oom;
         } catch (Exception e) {
@@ -62,8 +61,7 @@ public class OutboundMessageState {
             return false;
         
         try {
-            initialize(null, msg, peer);
-            return true;
+            return initialize(null, msg, peer);
         } catch (OutOfMemoryError oom) {
             throw oom;
         } catch (Exception e) {
@@ -77,8 +75,7 @@ public class OutboundMessageState {
             return false;
         
         try {
-            initialize(m, msg, null);
-            return true;
+            return initialize(m, msg, null);
         } catch (OutOfMemoryError oom) {
             throw oom;
         } catch (Exception e) {
@@ -87,7 +84,7 @@ public class OutboundMessageState {
         }
     }
     
-    private void initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
+    private boolean initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
         _message = m;
         _peer = peer;
         if (_messageBuf != null) {
@@ -99,17 +96,24 @@ public class OutboundMessageState {
         int size = msg.getRawMessageSize();
         if (size > _messageBuf.getData().length)
             throw new IllegalArgumentException("Size too large!  " + size + " in " + msg);
-        int len = msg.toRawByteArray(_messageBuf.getData());
-        _messageBuf.setValid(len);
-        _messageId = msg.getUniqueId();
-        
-        _startedOn = _context.clock().now();
-        _nextSendTime = _startedOn;
-        _expiration = _startedOn + 10*1000;
-        //_expiration = msg.getExpiration();
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
+        try {
+            int len = msg.toRawByteArray(_messageBuf.getData());
+            _messageBuf.setValid(len);
+            _messageId = msg.getUniqueId();
+
+            _startedOn = _context.clock().now();
+            _nextSendTime = _startedOn;
+            _expiration = _startedOn + 10*1000;
+            //_expiration = msg.getExpiration();
+
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
+            return true;
+        } catch (IllegalStateException ise) {
+            _cache.release(_messageBuf);
+            _messageBuf = null;
+            return false;
+        }
     }
     
     public void releaseResources() { 

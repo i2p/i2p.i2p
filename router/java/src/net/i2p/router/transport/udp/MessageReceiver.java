@@ -156,8 +156,11 @@ public class MessageReceiver {
                                + " raw: " + Base64.encode(fragments[i].getData()) + ")");
                 off += fragments[i].getValid();
             }
-            if (off != state.getCompleteSize())
-                _log.error("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
+            if (off != state.getCompleteSize()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
+                return null;
+            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Raw byte array for " + state.getMessageId() + ": " + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
             I2NPMessage m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize(), handler);

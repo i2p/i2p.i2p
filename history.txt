@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.444 2006/04/04 07:20:39 jrandom Exp $
+$Id: history.txt,v 1.445 2006/04/04 23:40:04 jrandom Exp $
+
+* 2006-04-05  0.6.1.14 released
 
 2006-04-05  jrandom
     * Cut down on the time that we allow a tunnel creation request to sit by

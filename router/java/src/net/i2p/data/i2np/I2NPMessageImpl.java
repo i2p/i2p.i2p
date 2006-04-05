@@ -290,7 +290,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
 
     public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException {
         // ignore the handler (overridden in subclasses if necessary
-        readMessage(data, offset, dataSize, type);
+        try {
+            readMessage(data, offset, dataSize, type);
+        } catch (IllegalArgumentException iae) {
+            throw new I2NPMessageException("Error reading the message", iae);
+        }
     }
 
     
@@ -313,21 +317,23 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             return msg;
         }
 
-        long expiration = DataHelper.fromLong(buffer, offset, 4) * 1000; // seconds
-        offset += 4;
-        int dataSize = len - 1 - 4;
         try {
+            long expiration = DataHelper.fromLong(buffer, offset, 4) * 1000; // seconds
+            offset += 4;
+            int dataSize = len - 1 - 4;
             msg.readMessage(buffer, offset, dataSize, type, handler);
             msg.setMessageExpiration(expiration);
             msg.read();
             return msg;
         } catch (IOException ioe) {
             throw new I2NPMessageException("IO error reading raw message", ioe);
+        } catch (IllegalArgumentException iae) {
+            throw new I2NPMessageException("Corrupt message (negative expiration)", iae);
         }
     }
 
     protected void verifyUnwritten() { 
-        // if (_written) throw new RuntimeException("Already written"); 
+        if (_written) throw new RuntimeException("Already written"); 
     }
     protected void written() { _written = true; }
     protected void read() { _read = true; }
