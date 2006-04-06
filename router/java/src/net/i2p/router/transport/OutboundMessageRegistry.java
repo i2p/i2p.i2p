@@ -151,7 +151,8 @@ public class OutboundMessageRegistry {
             if (oldMsg != null) {
                 List multi = null;
                 if (oldMsg instanceof OutNetMessage) {
-                    multi = Collections.synchronizedList(new ArrayList(4));
+                    //multi = Collections.synchronizedList(new ArrayList(4));
+                    multi = new ArrayList(4);
                     multi.add(oldMsg);
                     multi.add(msg);
                     _selectorToMessage.put(sel, multi);
@@ -222,10 +223,12 @@ public class OutboundMessageRegistry {
                     List msgs = null;
                     synchronized (_selectorToMessage) {
                         Object o = _selectorToMessage.remove(sel);
-                        if (o instanceof OutNetMessage)
+                        if (o instanceof OutNetMessage) {
                             msg = (OutNetMessage)o;
-                        else if (o instanceof List)
-                            msgs = new ArrayList((List)o);
+                        } else if (o instanceof List) {
+                            //msgs = new ArrayList((List)o);
+                            msgs = (List)o;
+                        }
                     }
                     if (msg != null) {
                         synchronized (_activeMessages) {
@@ -239,7 +242,7 @@ public class OutboundMessageRegistry {
                             _activeMessages.removeAll(msgs);
                         }
                         for (int j = 0; j < msgs.size(); j++) {
-                            msg = (OutNetMessage)msgs.get(i);
+                            msg = (OutNetMessage)msgs.get(j);
                             Job fail = msg.getOnFailedReplyJob();
                             if (fail != null)
                                 _context.jobQueue().addJob(fail);

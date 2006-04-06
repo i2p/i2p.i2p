@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.445 2006/04/04 23:40:04 jrandom Exp $
+$Id: history.txt,v 1.446 2006/04/05 12:08:04 jrandom Exp $
+
+2006-04-06  jrandom
+    * Fixed a typo in the reply cleanup code
 
 * 2006-04-05  0.6.1.14 released
 

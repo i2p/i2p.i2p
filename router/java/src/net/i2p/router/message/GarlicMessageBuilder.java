@@ -123,7 +123,8 @@ public class GarlicMessageBuilder {
         
         long timeFromNow = config.getExpiration() - ctx.clock().now();
         if (timeFromNow < 1*1000) {
-            log.error("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
+            if (log.shouldLog(Log.WARN))
+                log.warn("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
             return null;
         }
         
