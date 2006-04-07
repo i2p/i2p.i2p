@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.446 2006/04/05 12:08:04 jrandom Exp $
+$Id: history.txt,v 1.447 2006/04/06 05:33:46 jrandom Exp $
+
+2006-04-06  jrandom
+    * Fix for a bug in the new irc ping/pong filter (thanks Complication!)
 
 2006-04-06  jrandom
     * Fixed a typo in the reply cleanup code

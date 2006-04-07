@@ -53,6 +53,7 @@ class RouterWatchdog implements Runnable {
     private void dumpStatus() {
         if (_log.shouldLog(Log.ERROR)) {
             Job cur = _context.jobQueue().getLastJob();
+            /*
             if (cur != null) 
                 _log.error("Most recent job: " + cur);
             _log.error("Last job began: " 
@@ -61,6 +62,7 @@ class RouterWatchdog implements Runnable {
             _log.error("Last job ended: " 
                        + DataHelper.formatDuration(_context.clock().now()-_context.jobQueue().getLastJobEnd())
                        + " ago");
+            */
             _log.error("Ready and waiting jobs: " + _context.jobQueue().getReadyCount());
             _log.error("Job lag: " + _context.jobQueue().getMaxLag());
             _log.error("Participating tunnel count: " + _context.tunnelManager().getParticipatingCount());

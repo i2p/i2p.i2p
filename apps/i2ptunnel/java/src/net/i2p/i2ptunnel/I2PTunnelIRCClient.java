@@ -228,36 +228,6 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                             String outmsg = outboundFilter(inmsg);
                             if(outmsg!=null)
                             {
-                                if (outmsg.indexOf("PING") >= 0) {
-                                    // Most clients just send a PING and are happy with any old PONG.  Others,
-                                    // like BitchX, actually expect certain behavior.  It sends two different pings:
-                                    // "PING :irc.freshcoffee.i2p" and "PING 1234567890 127.0.0.1" (where the IP is the proxy)
-                                    // the PONG to the former seems to be "PONG 127.0.0.1", while the PONG to the later is
-                                    // ":irc.freshcoffee.i2p PONG irc.freshcoffe.i2p :1234567890".
-                                    // We don't want to send them our proxy's IP address, so we need to rewrite the PING
-                                    // sent to the server, but when we get a PONG back, use what we expected, rather than
-                                    // what they sent.
-                                    //
-                                    // Yuck.
-                                    StringTokenizer tok = new StringTokenizer(inmsg, " ");
-                                    int tokens = tok.countTokens();
-                                    if ( (tokens <= 2) || (tokens == 3) ) { // "PING nonce" or "PING nonce serverIP"
-                                        tok.nextToken(); // skip
-                                        //_expectedPong = "PONG 127.0.0.1 :" + tok.nextToken();
-                                        _expectedPong = "PONG " + tok.nextToken();
-                                    } else {
-                                        // if it isn't one of those two, we will filter out all PONGs, which means
-                                        // the client will fail.  whee!
-                                        if (_log.shouldLog(Log.ERROR))
-                                            _log.error("IRC client sent a PING we don't understand (\"" + inmsg + "\"), so we're filtering it");
-                                        _expectedPong = null;
-                                    }
-                                    if (_log.shouldLog(Log.WARN)) {
-                                        _log.warn("outbound rewritten PING: "+outmsg + ", waiting for [" + _expectedPong + "]");
-                                        _log.warn(" - outbound was: "+inmsg);
-                                    }
-                                }
-                                
                                 if(!inmsg.equals(outmsg)) {
                                     if (_log.shouldLog(Log.WARN)) {
                                         _log.warn("outbound FILTERED: "+outmsg);
@@ -377,7 +347,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         return null;
     }
     
-    public static String outboundFilter(String s) {
+    public String outboundFilter(String s) {
         
         String field[]=s.split(" ",3);
         String command;
@@ -415,18 +385,38 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         command = field[0].toUpperCase();
 
 	if ("PING".equals(command)) {
-            // e.g. "PING", "PING nonce", or "PING nonce serverIP"
-            if (field.length == 1) {
-                return "PING";
-            } else if (field.length == 2) {
-                return "PING " + field[1];
-            } else if (field.length == 3) {
-                return "PING " + field[1];
+            // Most clients just send a PING and are happy with any old PONG.  Others,
+            // like BitchX, actually expect certain behavior.  It sends two different pings:
+            // "PING :irc.freshcoffee.i2p" and "PING 1234567890 127.0.0.1" (where the IP is the proxy)
+            // the PONG to the former seems to be "PONG 127.0.0.1", while the PONG to the later is
+            // ":irc.freshcoffee.i2p PONG irc.freshcoffe.i2p :1234567890".
+            // We don't want to send them our proxy's IP address, so we need to rewrite the PING
+            // sent to the server, but when we get a PONG back, use what we expected, rather than
+            // what they sent.
+            //
+            // Yuck.
+
+            String rv = null;
+            if (field.length == 1) { // PING
+                rv = "PING";
+                _expectedPong = "PONG 127.0.0.1";
+            } else if (field.length == 2) { // PING nonce
+                rv = "PING " + field[1];
+                _expectedPong = "PONG " + field[1];
+            } else if (field.length == 3) { // PING nonce serverLocation
+                rv = "PING " + field[1];
+                _expectedPong = "PONG " + field[1];
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("IRC client sent a PING we don't understand, filtering it (\"" + s + "\")");
-                return null;
+                rv = null;
+                _expectedPong = null;
             }
+            
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("sending ping " + rv + ", waiting for " + _expectedPong + " orig was [" + s  + "]");
+            
+            return rv;
         }
 	if ("PONG".equals(command))
             return "PONG 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
