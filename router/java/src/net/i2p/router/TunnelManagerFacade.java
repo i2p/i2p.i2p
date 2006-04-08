@@ -56,6 +56,9 @@ public interface TunnelManagerFacade extends Service {
     /** When does the last tunnel we are participating in expire? */
     public long getLastParticipatingExpiration();
     
+    /** count how many inbound tunnel requests we have received but not yet processed */
+    public int getInboundBuildQueueSize();
+    
     /** 
      * the client connected (or updated their settings), so make sure we have
      * the tunnels for them, and whenever necessary, ask them to authorize 
@@ -97,6 +100,7 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public void setOutboundSettings(TunnelPoolSettings settings) {}
     public void setInboundSettings(Hash client, TunnelPoolSettings settings) {}
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {}
+    public int getInboundBuildQueueSize() { return 0; }
     
     public void renderStatusHTML(Writer out) throws IOException {}
     public void restart() {}

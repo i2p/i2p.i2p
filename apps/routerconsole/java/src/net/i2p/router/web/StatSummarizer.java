@@ -45,6 +45,10 @@ public class StatSummarizer implements Runnable {
                                                     ",router.activePeers.60000" +
                                                     ",router.activeSendPeers.60000" +
                                                     ",tunnel.acceptLoad.60000" +
+                                                    ",tunnel.dropLoadProactive.60000" +
+                                                    ",tunnel.buildExploratorySuccess.60000" +
+                                                    ",tunnel.buildExploratoryReject.60000" +
+                                                    ",tunnel.buildExploratoryExpire.60000" +
                                                     ",client.sendAckTime.60000" +
                                                     ",client.dispatchNoACK.60000" +
                                                     ",transport.sendMessageFailureLifetime.60000" +

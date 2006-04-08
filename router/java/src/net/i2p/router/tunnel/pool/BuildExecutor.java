@@ -41,6 +41,7 @@ class BuildExecutor implements Runnable {
         _context.statManager().createRateStat("tunnel.buildClientReject", "How often a client tunnel is rejected", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestTime", "How long it takes to build a tunnel request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _repoll = false;
         _handler = new BuildHandler(ctx, this);
     }
@@ -117,11 +118,19 @@ class BuildExecutor implements Runnable {
         List wanted = new ArrayList(8);
         List pools = new ArrayList(8);
         
-        boolean pendingRemaining = false;
+        int pendingRemaining = 0;
         
+        long loopBegin = 0;
+        long beforeHandleInboundReplies = 0;
+        long afterHandleInboundReplies = 0;
+        long afterBuildZeroHop = 0;
+        long afterBuildReal = 0;
+        long afterHandleInbound = 0;
+                
         while (!_manager.isShutdown()){
+            loopBegin = System.currentTimeMillis();
             try {
-                _repoll = pendingRemaining; // resets repoll to false unless there are inbound requeusts pending
+                _repoll = pendingRemaining > 0; // resets repoll to false unless there are inbound requeusts pending
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
                     TunnelPool pool = (TunnelPool)pools.get(i);
@@ -130,7 +139,9 @@ class BuildExecutor implements Runnable {
                         wanted.add(pool);
                 }
 
+                beforeHandleInboundReplies = System.currentTimeMillis();
                 _handler.handleInboundReplies();
+                afterHandleInboundReplies = System.currentTimeMillis();
                 
                 // allowed() also expires timed out requests (for new style requests)
                 int allowed = allowed();
@@ -140,17 +151,22 @@ class BuildExecutor implements Runnable {
 
                 // zero hop ones can run inline
                 allowed = buildZeroHopTunnels(wanted, allowed);
+                afterBuildZeroHop = System.currentTimeMillis();
                 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
 
+                int realBuilt = 0;
                 TunnelManagerFacade mgr = _context.tunnelManager();
                 if ( (mgr == null) || (mgr.selectInboundTunnel() == null) || (mgr.selectOutboundTunnel() == null) ) {
                     // we don't have either inbound or outbound tunnels, so don't bother trying to build
                     // non-zero-hop tunnels
                     synchronized (_currentlyBuilding) {
-                        if (!_repoll)
-                            _currentlyBuilding.wait(5*1000+_context.random().nextInt(5*1000));
+                        if (!_repoll) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("No tunnel to build with (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
+                            _currentlyBuilding.wait(1*1000+_context.random().nextInt(1*1000));
+                        }
                     }
                 } else {
                     if ( (allowed > 0) && (wanted.size() > 0) ) {
@@ -173,6 +189,7 @@ class BuildExecutor implements Runnable {
                                     _currentlyBuilding.add(cfg);
                                 }
                                 buildTunnel(pool, cfg);
+                                realBuilt++;
                                 // 0hops are taken care of above, these are nonstandard 0hops
                                 //if (cfg.getLength() <= 1)
                                 //    i--; //0hop, we can keep going, as there's no worry about throttling
@@ -184,13 +201,13 @@ class BuildExecutor implements Runnable {
                             }
                         }
                     } else {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Nothin' doin, wait for a while");
                         try {
                             synchronized (_currentlyBuilding) {
                                 if (!_repoll) {
+                                    if (_log.shouldLog(Log.DEBUG))
+                                        _log.debug("Nothin' doin (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
                                     //if (allowed <= 0)
-                                        _currentlyBuilding.wait(_context.random().nextInt(5*1000));
+                                        _currentlyBuilding.wait(_context.random().nextInt(1*1000));
                                     //else // wanted <= 0
                                     //    _currentlyBuilding.wait(_context.random().nextInt(30*1000));
                                 }
@@ -201,8 +218,23 @@ class BuildExecutor implements Runnable {
                     }
                 }
                 
+                afterBuildReal = System.currentTimeMillis();
+                
                 pendingRemaining = _handler.handleInboundRequests();
+                afterHandleInbound = System.currentTimeMillis();
+                
+                if (pendingRemaining > 0)
+                    _context.statManager().addRateData("tunnel.pendingRemaining", pendingRemaining, afterHandleInbound-afterBuildReal);
 
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("build loop complete, tot=" + (afterHandleInbound-loopBegin) + 
+                              " inReply=" + (afterHandleInboundReplies-beforeHandleInboundReplies) +
+                              " zeroHop=" + (afterBuildZeroHop-afterHandleInboundReplies) +
+                              " real=" + (afterBuildReal-afterBuildZeroHop) +
+                              " in=" + (afterHandleInbound-afterBuildReal) + 
+                              " built=" + realBuilt +
+                              " pending=" + pendingRemaining);
+                
                 wanted.clear();
                 pools.clear();
             } catch (Exception e) {
@@ -300,4 +332,5 @@ class BuildExecutor implements Runnable {
     }
     
     List locked_getCurrentlyBuilding() { return _currentlyBuilding; }
+    public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
 }

@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.447 2006/04/06 05:33:46 jrandom Exp $
+$Id: history.txt,v 1.448 2006/04/06 20:26:33 jrandom Exp $
+
+2006-04-08  jrandom
+    * Process inbound tunnel requests more efficiently
+    * Proactively drop inbound tunnel requests if the queue before we'd
+      process it in is too long (dynamically adjusted by cpu load)
+    * Adjust the tunnel rejection throttle to reject requeusts when we have to
+      proactively drop too many requests.
+    * Display the number of pending inbound tunnel join requests on the router
+      console (as the "handle backlog")
+    * Include a few more stats in the default set of graphs
 
 2006-04-06  jrandom
     * Fix for a bug in the new irc ping/pong filter (thanks Complication!)

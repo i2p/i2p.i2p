@@ -83,6 +83,7 @@
  <b>Job lag:</b> <jsp:getProperty name="helper" property="jobLag" /><br />
  <b>Message delay:</b> <jsp:getProperty name="helper" property="messageDelay" /><br />
  <b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
+ <b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
  <hr />
  
 </div>

@@ -493,6 +493,13 @@ public class SummaryHelper {
         return _context.throttle().getTunnelLag() + "ms";
     }
     
+    public String getInboundBacklog() {
+        if (_context == null)
+            return "0";
+        
+        return String.valueOf(_context.tunnelManager().getInboundBuildQueueSize());
+    }
+    
     public boolean updateAvailable() { 
         return NewsFetcher.getInstance(_context).updateAvailable();
     }

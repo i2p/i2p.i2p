@@ -8,10 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.i2p.data.DataHelper;
-import net.i2p.data.Destination;
-import net.i2p.data.Hash;
-import net.i2p.data.TunnelId;
+import net.i2p.data.*;
 import net.i2p.data.i2np.*;
 import net.i2p.stat.RateStat;
 import net.i2p.router.*;
@@ -390,6 +387,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     void tunnelFailed() { _executor.repoll(); }
     BuildExecutor getExecutor() { return _executor; }
     boolean isShutdown() { return _isShutdown; }
+
+    public int getInboundBuildQueueSize() { return _executor.getInboundBuildQueueSize(); }
+    
     
     public void renderStatusHTML(Writer out) throws IOException {
         out.write("<h2><a name=\"exploratory\">Exploratory tunnels</a> (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
@@ -499,7 +499,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 if (_context.routerHash().equals(peer))
                     out.write("<td><i>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</i></td>");
                 else
-                    out.write("<td>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</td>");
+                    out.write("<td>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</td>");                
             }
             out.write("</tr>\n");
             
