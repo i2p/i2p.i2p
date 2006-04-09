@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.448 2006/04/06 20:26:33 jrandom Exp $
+$Id: history.txt,v 1.449 2006/04/08 01:15:45 jrandom Exp $
+
+2006-04-08  jrandom
+    * Stat summarization fix (removing the occational holes in the jrobin
+      graphs)
 
 2006-04-08  jrandom
     * Process inbound tunnel requests more efficiently

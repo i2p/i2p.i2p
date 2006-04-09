@@ -1087,7 +1087,7 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
             }
         }
         
-        SimpleTimer.getInstance().addEvent(this, 60*1000);
+        SimpleTimer.getInstance().addEvent(this, 20*1000);
     }
 }
 
