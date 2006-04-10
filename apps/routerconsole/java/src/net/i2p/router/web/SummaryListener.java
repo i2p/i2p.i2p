@@ -78,7 +78,7 @@ class SummaryListener implements RateSummaryListener {
      * munged version from the user/developer-visible name.
      *
      */
-    private static String createName(I2PAppContext ctx, String wanted) { 
+    static String createName(I2PAppContext ctx, String wanted) { 
         return ctx.sha().calculateHash(DataHelper.getUTF8(wanted)).toBase64().substring(0,20);
     }
     

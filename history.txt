@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.449 2006/04/08 01:15:45 jrandom Exp $
+$Id: history.txt,v 1.450 2006/04/08 20:14:09 jrandom Exp $
+
+2006-04-10  jrandom
+    * Include a combined send/receive graph (good idea cervantes!)
+    * Proactively drop inbound tunnel requests probabalistically as the
+      estimated queue time approaches our limit, rather than letting them all
+      through up to that limit.
 
 2006-04-08  jrandom
     * Stat summarization fix (removing the occational holes in the jrobin

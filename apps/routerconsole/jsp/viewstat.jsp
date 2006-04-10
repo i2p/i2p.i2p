@@ -9,18 +9,25 @@ if (templateFile != null) {
 net.i2p.stat.Rate rate = null;
 String stat = request.getParameter("stat");
 String period = request.getParameter("period");
+boolean fakeBw = (stat != null && ("bw.combined".equals(stat)));
 net.i2p.stat.RateStat rs = net.i2p.I2PAppContext.getGlobalContext().statManager().getRate(stat);
-if ( !rendered && (rs != null)) {
+if ( !rendered && ((rs != null) || fakeBw) ) {
   long per = -1;
   try { 
-    per = Long.parseLong(period); 
-    rate = rs.getRate(per);
-    if (rate != null) {
+    if (fakeBw)
+      per = 60*1000;
+    else
+      per = Long.parseLong(period); 
+    if (!fakeBw)
+      rate = rs.getRate(per);
+    if ( (rate != null) || (fakeBw) ) {
       java.io.OutputStream cout = response.getOutputStream();
       String format = request.getParameter("format");
       if ("xml".equals(format)) {
-        response.setContentType("text/xml");
-        rendered = net.i2p.router.web.StatSummarizer.instance().getXML(rate, cout);
+        if (!fakeBw) {
+          response.setContentType("text/xml");
+          rendered = net.i2p.router.web.StatSummarizer.instance().getXML(rate, cout);
+        }
       } else {
         response.setContentType("image/png");
         int width = -1;
@@ -39,7 +46,10 @@ if ( !rendered && (rs != null)) {
         boolean showCredit = true;
         if (request.getParameter("showCredit") != null)
           showCredit = Boolean.valueOf(""+request.getParameter("showCredit")).booleanValue();
-        rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
+        if (fakeBw)
+            rendered = net.i2p.router.web.StatSummarizer.instance().renderRatePng(cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
+        else
+            rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(rate, cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
       }
       if (rendered)
         cout.close();

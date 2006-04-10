@@ -55,6 +55,12 @@ public class GraphHelper {
     
     public String getImages() { 
         try {
+            _out.write("<img src=\"viewstat.jsp?stat=bw.combined"
+                           + "&amp;periodCount=" + _periodCount 
+                           + "&amp;width=" + _width
+                           + "&amp;height=" + _height
+                           + "\" title=\"Combined bandwidth graph\" />\n");
+            
             List listeners = StatSummarizer.instance().getListeners();
             for (int i = 0; i < listeners.size(); i++) {
                 SummaryListener lsnr = (SummaryListener)listeners.get(i);

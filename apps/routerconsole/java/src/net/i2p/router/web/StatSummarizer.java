@@ -5,18 +5,27 @@ import java.util.*;
 
 import net.i2p.stat.*;
 import net.i2p.router.*;
+import net.i2p.util.Log;
+
+import java.awt.Color;
+import org.jrobin.graph.RrdGraph;
+import org.jrobin.graph.RrdGraphDef;
+import org.jrobin.graph.RrdGraphDefTemplate;
+import org.jrobin.core.RrdException;
 
 /**
  *
  */
 public class StatSummarizer implements Runnable {
     private RouterContext _context;
+    private Log _log;
     /** list of SummaryListener instances */
     private List _listeners;
     private static StatSummarizer _instance;
     
     public StatSummarizer() {
         _context = (RouterContext)RouterContext.listContexts().get(0); // fuck it, only summarize one per jvm
+        _log = _context.logManager().getLog(getClass());
         _listeners = new ArrayList(16);
         _instance = this;
     }
@@ -126,6 +135,69 @@ public class StatSummarizer implements Runnable {
             }
         }
         return false;
+    }
+    
+    public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+        long end = _context.clock().now();
+        if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
+        if (periodCount > SummaryListener.PERIODS)
+            periodCount = SummaryListener.PERIODS;
+        long period = 60*1000;
+        long start = end - period*periodCount;
+        long begin = System.currentTimeMillis();
+        try {
+            RrdGraphDef def = new RrdGraphDef();
+            def.setTimePeriod(start/1000, end/1000);
+            String title = "Bandwidth usage";
+            if (!hideTitle)
+                def.setTitle(title);
+            String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
+            String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
+            def.datasource(sendName, sendName, sendName, "AVERAGE", "MEMORY");
+            def.datasource(recvName, recvName, recvName, "AVERAGE", "MEMORY");
+            def.area(sendName, Color.BLUE, "Outbound bytes/second");
+            //def.line(sendName, Color.BLUE, "Outbound bytes/second", 3);
+            //def.line(recvName, Color.RED, "Inbound bytes/second@r", 3);
+            def.area(recvName, Color.RED, "Inbound bytes/second@r");
+            if (!hideLegend) {
+                def.gprint(sendName, "AVERAGE", "outbound average: @2@sbytes/second");
+                def.gprint(sendName, "MAX", " max: @2@sbytes/second@r");
+                def.gprint(recvName, "AVERAGE", "inbound average: @2bytes/second@s");
+                def.gprint(recvName, "MAX", " max: @2@sbytes/second@r");
+            }
+            if (!showCredit)
+                def.setShowSignature(false);
+            if (hideLegend) 
+                def.setShowLegend(false);
+            if (hideGrid) {
+                def.setGridX(false);
+                def.setGridY(false);
+            }
+            //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
+            def.setAntiAliasing(false);
+            //System.out.println("Rendering: \n" + def.exportXmlTemplate());
+            //System.out.println("*****************\nData: \n" + _listener.getData().dump());
+            RrdGraph graph = new RrdGraph(def);
+            //System.out.println("Graph created");
+            byte data[] = null;
+            if ( (width <= 0) || (height <= 0) )
+                data = graph.getPNGBytes();
+            else
+                data = graph.getPNGBytes(width, height);
+            long timeToPlot = System.currentTimeMillis() - begin;
+            out.write(data);
+            //File t = File.createTempFile("jrobinData", ".xml");
+            //_listener.getData().dumpXml(new FileOutputStream(t));
+            //System.out.println("plotted: " + (data != null ? data.length : 0) + " bytes in " + timeToPlot
+            //                   ); // + ", data written to " + t.getAbsolutePath());
+            return true;
+        } catch (RrdException re) {
+            _log.error("Error rendering", re);
+            throw new IOException("Error plotting: " + re.getMessage());
+        } catch (IOException ioe) {
+            _log.error("Error rendering", ioe);
+            throw ioe;
+        }
     }
     
     /**
