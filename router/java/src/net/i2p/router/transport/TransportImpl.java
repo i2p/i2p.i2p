@@ -203,6 +203,8 @@ public abstract class TransportImpl implements Transport {
                               + msg.getMessageType() + " message with selector " + selector, new Exception("fail cause"));
                 if (msg.getOnFailedSendJob() != null)
                     _context.jobQueue().addJob(msg.getOnFailedSendJob());
+                if (msg.getOnFailedReplyJob() != null)
+                    _context.jobQueue().addJob(msg.getOnFailedReplyJob());
                 if (selector != null)
                     _context.messageRegistry().unregisterPending(msg);
                 log = true;

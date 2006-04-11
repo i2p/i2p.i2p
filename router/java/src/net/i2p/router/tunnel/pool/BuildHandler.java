@@ -603,8 +603,8 @@ class BuildHandler {
                             _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
                         } else {
                             int queueTime = estimateQueueTime(_inboundBuildMessages.size());
-                            float pDrop = queueTime/(BuildRequestor.REQUEST_TIMEOUT/2);
-                            pDrop = pDrop * pDrop * pDrop;
+                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT/2);
+                            pDrop = pDrop * pDrop;
                             float f = _context.random().nextFloat();
                             if (pDrop > f) {
                                 _context.statManager().addRateData("tunnel.dropLoadProactive", queueTime, _inboundBuildMessages.size());

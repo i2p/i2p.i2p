@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.450 2006/04/08 20:14:09 jrandom Exp $
+$Id: history.txt,v 1.451 2006/04/10 00:37:29 jrandom Exp $
+
+2006-04-11  jrandom
+    * Throttling improvements on SSU - throttle all transmissions to a peer
+      when we are retransmitting, not just retransmissions.  Also, if
+      we're already retransmitting to a peer, probabalistically tail drop new
+      messages targetting that peer, based on the estimated wait time before
+      transmission.
+    * Fixed the rounding error in the inbound tunnel drop probability.
 
 2006-04-10  jrandom
     * Include a combined send/receive graph (good idea cervantes!)
