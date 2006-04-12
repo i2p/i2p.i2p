@@ -1066,7 +1066,7 @@ public class BlogManager {
     }
     
     public boolean isBanned(Hash blog) {
-        if (blog == null) return false;
+        if ( (blog == null) || (blog.getData() == null) || (blog.getData().length <= 0) ) return false;
         String str = blog.toBase64();
         String banned = System.getProperty("syndie.bannedBlogs", "");
         return (banned.indexOf(str) >= 0);

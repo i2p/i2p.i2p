@@ -163,8 +163,9 @@ public class ArchiveIndex {
     /** list of unique blogs locally known (set of Hash) */
     public Set getUniqueBlogs() {
         Set rv = new HashSet();
-        for (int i = 0; i < _blogs.size(); i++)
+        for (int i = 0; i < _blogs.size(); i++) {
             rv.add(getBlog(i));
+        }
         return rv;
     }
     public List getReplies(BlogURI uri) {
@@ -367,7 +368,10 @@ public class ArchiveIndex {
             return;
         tok.nextToken();
         String keyStr = tok.nextToken();
-        Hash keyHash = new Hash(Base64.decode(keyStr));
+        byte k[] = Base64.decode(keyStr);
+        if ( (k == null) || (k.length != Hash.HASH_LENGTH) )
+            return; // ignore bad hashes
+        Hash keyHash = new Hash(k);
         String whenStr = tok.nextToken();
         long when = getIndexDate(whenStr);
         String tag = tok.nextToken();

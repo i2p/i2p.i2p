@@ -641,6 +641,8 @@ public class RemoteArchiveBean {
         int newBlogs = 0;
         for (Iterator iter = remoteBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
+            if ( (blog == null) || (blog.getData() == null) || (blog.getData().length <= 0) )
+                continue;
             if (ignoreBlog(user, blog))
                 continue;
             if (!localBlogs.contains(blog)) {
