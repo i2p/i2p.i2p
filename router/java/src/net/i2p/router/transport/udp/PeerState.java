@@ -1013,7 +1013,12 @@ public class PeerState {
         int rv = 0;
         boolean fail = false;
         synchronized (msgs) {
-            if (_retransmitter != null) {
+            rv = msgs.size() + 1;
+            if (rv > 32) { 
+                // 32 queued messages?  to *one* peer?  nuh uh.
+                fail = true;
+                rv--;
+            } else if (_retransmitter != null) {
                 long lifetime = _retransmitter.getLifetime();
                 long totalLifetime = lifetime;
                 for (int i = 1; i < msgs.size(); i++) { // skip the first, as thats the retransmitter
@@ -1049,7 +1054,6 @@ public class PeerState {
             } else {
                 msgs.add(state);
             }
-            rv = msgs.size();
         }
         if (fail)
             _transport.failed(state, false);
