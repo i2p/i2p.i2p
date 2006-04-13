@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.453 2006/04/12 01:49:04 jrandom Exp $
+$Id: history.txt,v 1.454 2006/04/12 23:22:07 jrandom Exp $
+
+* 2006-04-13  0.6.1.15 released
 
 2006-04-12  jrandom
     * Added a further failsafe against trying to queue up too many messages to
