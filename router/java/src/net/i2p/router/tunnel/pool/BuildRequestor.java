@@ -21,9 +21,16 @@ class BuildRequestor {
         for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++)
             ORDER.add(new Integer(i));
     }
-    private static final boolean USE_PAIRED_CLIENT_TUNNELS = true;
     private static final int PRIORITY = 500;
     static final int REQUEST_TIMEOUT = 20*1000;
+    
+    private static boolean usePairedTunnels(RouterContext ctx) {
+        String val = ctx.getProperty("router.usePairedTunnels");
+        if ( (val == null) || (Boolean.valueOf(val).booleanValue()) )
+            return true;
+        else
+            return false;
+    }
     
     /** new style requests need to fill in the tunnel IDs before hand */
     public static void prepare(RouterContext ctx, PooledTunnelCreatorConfig cfg) {
@@ -58,7 +65,7 @@ class BuildRequestor {
         cfg.setTunnelPool(pool);
         
         TunnelInfo pairedTunnel = null;
-        if (pool.getSettings().isExploratory() || !USE_PAIRED_CLIENT_TUNNELS) {
+        if (pool.getSettings().isExploratory() || !usePairedTunnels(ctx)) {
             if (pool.getSettings().isInbound())
                 pairedTunnel = ctx.tunnelManager().selectOutboundTunnel();
             else
@@ -72,7 +79,7 @@ class BuildRequestor {
         if (pairedTunnel == null) {   
             if (log.shouldLog(Log.WARN))
                 log.warn("Couldn't find a paired tunnel for " + cfg + ", fall back on exploratory tunnels for pairing");
-            if (!pool.getSettings().isExploratory() && USE_PAIRED_CLIENT_TUNNELS)
+            if (!pool.getSettings().isExploratory() && usePairedTunnels(ctx))
                 if (pool.getSettings().isInbound())
                     pairedTunnel = ctx.tunnelManager().selectOutboundTunnel();
                 else

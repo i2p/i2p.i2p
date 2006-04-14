@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.454 2006/04/12 23:22:07 jrandom Exp $
+$Id: history.txt,v 1.455 2006/04/13 07:40:21 jrandom Exp $
+
+2006-04-14  jrandom
+    * Make some more stats graphable, and allow some internal tweaking on the
+      tunnel pairing for creation and testing.
 
 * 2006-04-13  0.6.1.15 released
 
