@@ -157,11 +157,12 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      * through 2^numBits-1
      */
     protected synchronized int nextBits(int numBits) {
-        int rv = 0;
+        long rv = 0;
         int bytes = (numBits + 7) / 8;
         for (int i = 0; i < bytes; i++)
             rv += ((_fortuna.nextByte() & 0xFF) << i*8);
-        return rv;
+        rv >>>= (64-numBits);
+        return (int)rv;
     }
     
     public EntropyHarvester harvester() { return this; }

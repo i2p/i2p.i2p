@@ -190,9 +190,16 @@ class RouterThrottleImpl implements RouterThrottle {
         // of another tunnel?
         rs = _context.statManager().getRate("tunnel.participatingMessageCount");
         r = null;
-        if (rs != null)
+        double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
+        if (rs != null) {
             r = rs.getRate(10*60*1000);
-        double messagesPerTunnel = (r != null ? r.getAverageValue() : 0d);
+            if (r != null) {
+                if (r.getLastEventCount() > 0)
+                    messagesPerTunnel = r.getAverageValue();
+                else
+                    messagesPerTunnel = r.getLifetimeAverageValue();
+            }
+        }
         if (messagesPerTunnel < DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE)
             messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
         int participatingTunnels = _context.tunnelManager().getParticipatingCount();
@@ -237,7 +244,7 @@ class RouterThrottleImpl implements RouterThrottle {
         return Math.max(send, recv);
     }
     
-    private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 600; // 1KBps
+    private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 60; // .1KBps
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     
     /**
@@ -248,15 +255,37 @@ class RouterThrottleImpl implements RouterThrottle {
      */
     private boolean allowTunnel(double bytesAllocated, int numTunnels) {
         int maxKBps = Math.min(_context.bandwidthLimiter().getOutboundKBytesPerSecond(), _context.bandwidthLimiter().getInboundKBytesPerSecond());
-        int used1s = get1sRate(_context); // dont throttle on the 1s rate, its too volatile
+        int used1s = 0; //get1sRate(_context); // dont throttle on the 1s rate, its too volatile
         int used1m = get1mRate(_context);
         int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
         int used = Math.max(Math.max(used1s, used1m), used5m);
-        int availBps = (int)(((maxKBps*1024) - used) * getSharePercentage());
+        double share = getSharePercentage();
+        int availBps = (int)(((maxKBps*1024)*share) - used); //(int)(((maxKBps*1024) - used) * getSharePercentage());
 
         _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
+        if (true) {
+            // ok, ignore any predictions of 'bytesAllocated', since that makes poorly
+            // grounded conclusions about future use (or even the bursty use).  Instead,
+            // simply say "do we have the bw to handle a new request"?
+            float maxBps = maxKBps * 1024f;
+            float pctFull = (maxBps - availBps) / (maxBps);
+            double probReject = Math.pow(pctFull, 16); // steep curve 
+            double rand = _context.random().nextFloat();
+            boolean reject = (availBps < MIN_AVAILABLE_BPS) || (rand <= probReject);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("reject = " + reject + " avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                          + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
+                          + "rand = " + rand + " est = " + bytesAllocated + " share = " + (float)share);
+            if (reject) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        
+        
         /*
         if (availBps <= 8*1024) {
             // lets be more conservative for people near their limit and assume 1KBps per tunnel
@@ -280,7 +309,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return true;
         } else {
             double probAllow = availBps / (allocatedBps + availBps);
-            boolean allow = (availBps > MIN_AVAILABLE_BPS) && (_context.random().nextDouble() <= probAllow);
+            boolean allow = (availBps > MIN_AVAILABLE_BPS) && (_context.random().nextFloat() <= probAllow);
             if (allow) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Probabalistically allowing the tunnel w/ " + (pctFull*100d) + "% of our " + availBps 

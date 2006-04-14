@@ -49,6 +49,7 @@ class BuildHandler {
         _context.statManager().createRateStat("tunnel.dropLoadDelay", "How long we had to wait before finally giving up on an inbound request?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadBacklog", "How many requests were pending when they were so lagged that we had to drop a new inbound request??", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadProactive", "What the estimated queue time was when we dropped an inbound request (period is num pending)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropLoadProactiveAbort", "How often we would have proactively dropped a request, but allowed it through?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         
         _context.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -371,7 +372,7 @@ class BuildHandler {
      * If we are dropping lots of requests before even trying to handle them,
      * I suppose you could call us "overloaded"
      */
-    private final static int MAX_PROACTIVE_DROPS = 120;
+    private final static int MAX_PROACTIVE_DROPS = 240;
     
     private int countProactiveDrops() {
         int dropped = 0;
@@ -413,7 +414,7 @@ class BuildHandler {
         
         int proactiveDrops = countProactiveDrops();
         long recvDelay = System.currentTimeMillis()-state.recvTime;
-        if ( (response == 0) && ( (recvDelay > BuildRequestor.REQUEST_TIMEOUT/2) || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
+        if ( (response == 0) && ( (recvDelay > BuildRequestor.REQUEST_TIMEOUT) || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
             _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, proactiveDrops);
             if (true || (proactiveDrops < MAX_PROACTIVE_DROPS*2))
                 response = TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
@@ -603,10 +604,10 @@ class BuildHandler {
                             _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
                         } else {
                             int queueTime = estimateQueueTime(_inboundBuildMessages.size());
-                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT/2);
-                            pDrop = pDrop * pDrop;
+                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT);
+                            pDrop = pDrop * pDrop * pDrop;
                             float f = _context.random().nextFloat();
-                            if (pDrop > f) {
+                            if ( (pDrop > f) && (allowProactiveDrop()) ) {
                                 _context.statManager().addRateData("tunnel.dropLoadProactive", queueTime, _inboundBuildMessages.size());
                             } else {
                                 _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
@@ -618,6 +619,16 @@ class BuildHandler {
             }
             return _buildMessageHandlerJob;
         }
+    }
+    
+    private boolean allowProactiveDrop() {
+        String allow = _context.getProperty("router.allowProactiveDrop", "true");
+        boolean rv = false;
+        if ( (allow == null) || (Boolean.valueOf(allow).booleanValue()) )
+            rv = true;
+        if (!rv)
+            _context.statManager().addRateData("tunnel.dropLoadProactiveAbort", 1, 0);
+        return rv;
     }
     
     private int estimateQueueTime(int numPendingMessages) {
