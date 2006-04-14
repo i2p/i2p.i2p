@@ -592,7 +592,7 @@ class BuildHandler {
                         for (int i = 0; i < _inboundBuildMessages.size(); i++) {
                             BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(i);
                             long age = System.currentTimeMillis() - cur.recvTime;
-                            if (age >= BuildRequestor.REQUEST_TIMEOUT) {
+                            if (age >= BuildRequestor.REQUEST_TIMEOUT/2) {
                                 _inboundBuildMessages.remove(i);
                                 i--;
                                 dropped++;
@@ -604,7 +604,7 @@ class BuildHandler {
                             _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
                         } else {
                             int queueTime = estimateQueueTime(_inboundBuildMessages.size());
-                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT);
+                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT/2);
                             pDrop = pDrop * pDrop * pDrop;
                             float f = _context.random().nextFloat();
                             if ( (pDrop > f) && (allowProactiveDrop()) ) {

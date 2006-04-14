@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.456 2006/04/14 06:42:44 jrandom Exp $
+$Id: history.txt,v 1.457 2006/04/14 13:07:15 jrandom Exp $
+
+2006-04-14  jrandom
+    * 0 isn't very random
+    * Adjust the tunnel drop to be more reasonable
 
 2006-04-14  jrandom
     * -28.00230115311259 is not between 0 and 1 in any universe I know.

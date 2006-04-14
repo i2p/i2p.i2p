@@ -161,7 +161,11 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         int bytes = (numBits + 7) / 8;
         for (int i = 0; i < bytes; i++)
             rv += ((_fortuna.nextByte() & 0xFF) << i*8);
-        rv >>>= (64-numBits);
+        //rv >>>= (64-numBits);
+        if (rv < 0)
+            rv = 0 - rv;
+        int off = 8*bytes - numBits;
+        rv >>>= off;
         return (int)rv;
     }
     
