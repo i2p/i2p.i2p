@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.458 2006/04/14 15:24:07 jrandom Exp $
+$Id: history.txt,v 1.459 2006/04/15 02:15:19 jrandom Exp $
+
+* 2006-04-15  0.6.1.16 released
 
 2006-04-15  jrandom
     * Adjust the proactive tunnel request dropping so we will reject what we
