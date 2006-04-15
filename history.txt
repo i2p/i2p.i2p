@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.457 2006/04/14 13:07:15 jrandom Exp $
+$Id: history.txt,v 1.458 2006/04/14 15:24:07 jrandom Exp $
+
+2006-04-15  jrandom
+    * Adjust the proactive tunnel request dropping so we will reject what we
+      can instead of dropping so much (but still dropping if we get too far
+      overloaded)
 
 2006-04-14  jrandom
     * 0 isn't very random
