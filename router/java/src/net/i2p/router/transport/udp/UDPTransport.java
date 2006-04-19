@@ -1673,6 +1673,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (_alive) {
                 long delay = _context.random().nextInt(2*TEST_FREQUENCY);
+                if (delay <= 0)
+                    throw new RuntimeException("wtf, delay is " + delay);
                 SimpleTimer.getInstance().addEvent(PeerTestEvent.this, delay);
             }
         }

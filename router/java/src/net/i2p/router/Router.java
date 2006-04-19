@@ -35,8 +35,10 @@ import net.i2p.router.message.GarlicMessageHandler;
 //import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
+import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.stat.StatManager;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 import net.i2p.util.SimpleTimer;
@@ -1029,6 +1031,82 @@ public class Router {
         t.start();
         return true;
     }
+    
+    private static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
+    
+    /** 
+     * What fraction of the bandwidth specified in our bandwidth limits should
+     * we allow to be consumed by participating tunnels?
+     *
+     */
+    public double getSharePercentage() {
+        RouterContext ctx = _context;
+        if (ctx == null) return 0;
+        String pct = ctx.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
+        if (pct != null) {
+            try {
+                double d = Double.parseDouble(pct);
+                if (d > 1)
+                    return d/100d; // *cough* sometimes its 80 instead of .8 (!stab jrandom)
+                else
+                    return d;
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Unable to get the share percentage");
+            }
+        }
+        return 0.8;
+    }
+
+    public int get1sRate() { return get1sRate(false); }
+    public int get1sRate(boolean outboundOnly) {
+        RouterContext ctx = _context;
+        if (ctx != null) {
+            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
+            if (bw != null) {
+                int out = (int)bw.getSendBps();
+                if (outboundOnly)
+                    return out;
+                return (int)Math.max(out, bw.getReceiveBps());
+            }
+        }
+        return 0;
+    }
+    public int get1mRate() { return get1mRate(false); }
+    public int get1mRate(boolean outboundOnly) {
+        int send = 0;
+        RouterContext ctx = _context;
+        if (ctx == null)
+            return 0;
+        StatManager mgr = ctx.statManager();
+        if (mgr == null)
+            return 0;
+        RateStat rs = mgr.getRate("bw.sendRate");
+        if (rs != null)
+            send = (int)rs.getRate(1*60*1000).getAverageValue();
+        if (outboundOnly)
+            return send;
+        int recv = 0;
+        rs = mgr.getRate("bw.recvRate");
+        if (rs != null)
+            recv = (int)rs.getRate(1*60*1000).getAverageValue();
+        return Math.max(send, recv);
+    }
+    public int get5mRate() { return get5mRate(false); }
+    public int get5mRate(boolean outboundOnly) {
+        int send = 0;
+        RateStat rs = _context.statManager().getRate("bw.sendRate");
+        if (rs != null)
+            send = (int)rs.getRate(5*60*1000).getAverageValue();
+        if (outboundOnly)
+            return send;
+        int recv = 0;
+        rs = _context.statManager().getRate("bw.recvRate");
+        if (rs != null)
+            recv = (int)rs.getRate(5*60*1000).getAverageValue();
+        return Math.max(send, recv);
+    }
+    
 }
 
 /**

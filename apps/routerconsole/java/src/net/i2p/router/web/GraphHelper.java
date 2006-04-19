@@ -62,8 +62,10 @@ public class GraphHelper {
                            + "\" title=\"Combined bandwidth graph\" />\n");
             
             List listeners = StatSummarizer.instance().getListeners();
-            for (int i = 0; i < listeners.size(); i++) {
-                SummaryListener lsnr = (SummaryListener)listeners.get(i);
+            TreeSet ordered = new TreeSet(new AlphaComparator());
+            ordered.addAll(listeners);
+            for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
+                SummaryListener lsnr = (SummaryListener)iter.next();
                 Rate r = lsnr.getRate();
                 String title = r.getRateStat().getName() + " for " + DataHelper.formatDuration(_periodCount * r.getPeriod());
                 _out.write("<img src=\"viewstat.jsp?stat=" + r.getRateStat().getName() 
@@ -106,5 +108,15 @@ public class GraphHelper {
             ioe.printStackTrace();
         }
         return "";
+    }
+}
+
+class AlphaComparator implements Comparator {
+    public int compare(Object lhs, Object rhs) {
+        SummaryListener l = (SummaryListener)lhs;
+        SummaryListener r = (SummaryListener)rhs;
+        String lName = l.getRate().getRateStat().getName() + "." + l.getRate().getPeriod();
+        String rName = r.getRate().getRateStat().getName() + "." + r.getRate().getPeriod();
+        return lName.compareTo(rName);
     }
 }

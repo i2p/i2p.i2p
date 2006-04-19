@@ -32,8 +32,7 @@ class RouterThrottleImpl implements RouterThrottle {
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
-    private static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
-    
+
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
     
@@ -218,32 +217,6 @@ class RouterThrottleImpl implements RouterThrottle {
         return TUNNEL_ACCEPT;
     }
 
-    static int get1sRate(RouterContext ctx) {
-        return (int)Math.max(ctx.bandwidthLimiter().getSendBps(), ctx.bandwidthLimiter().getReceiveBps());
-    }
-    static int get1mRate(RouterContext ctx) {
-        int send = 0;
-        RateStat rs = ctx.statManager().getRate("bw.sendRate");
-        if (rs != null)
-            send = (int)rs.getRate(1*60*1000).getAverageValue();
-        int recv = 0;
-        rs = ctx.statManager().getRate("bw.recvRate");
-        if (rs != null)
-            recv = (int)rs.getRate(1*60*1000).getAverageValue();
-        return Math.max(send, recv);
-    }
-    static int get5mRate(RouterContext ctx) {
-        int send = 0;
-        RateStat rs = ctx.statManager().getRate("bw.sendRate");
-        if (rs != null)
-            send = (int)rs.getRate(5*60*1000).getAverageValue();
-        int recv = 0;
-        rs = ctx.statManager().getRate("bw.recvRate");
-        if (rs != null)
-            recv = (int)rs.getRate(5*60*1000).getAverageValue();
-        return Math.max(send, recv);
-    }
-    
     private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 60; // .1KBps
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     
@@ -256,10 +229,10 @@ class RouterThrottleImpl implements RouterThrottle {
     private boolean allowTunnel(double bytesAllocated, int numTunnels) {
         int maxKBps = Math.min(_context.bandwidthLimiter().getOutboundKBytesPerSecond(), _context.bandwidthLimiter().getInboundKBytesPerSecond());
         int used1s = 0; //get1sRate(_context); // dont throttle on the 1s rate, its too volatile
-        int used1m = get1mRate(_context);
+        int used1m = _context.router().get1mRate();
         int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
         int used = Math.max(Math.max(used1s, used1m), used5m);
-        double share = getSharePercentage();
+        double share = _context.router().getSharePercentage();
         int availBps = (int)(((maxKBps*1024)*share) - used); //(int)(((maxKBps*1024) - used) * getSharePercentage());
 
         _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
@@ -326,28 +299,6 @@ class RouterThrottleImpl implements RouterThrottle {
         }
     }
     
-    /** 
-     * What fraction of the bandwidth specified in our bandwidth limits should
-     * we allow to be consumed by participating tunnels?
-     *
-     */
-    private double getSharePercentage() {
-        String pct = _context.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
-        if (pct != null) {
-            try {
-                double d = Double.parseDouble(pct);
-                if (d > 1)
-                    return d/100d; // *cough* sometimes its 80 instead of .8 (!stab jrandom)
-                else
-                    return d;
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Unable to get the share percentage");
-            }
-        }
-        return 0.8;
-    }
-
     /** dont ever probabalistically throttle tunnels if we have less than this many */
     private int getMinThrottleTunnels() { 
         try {

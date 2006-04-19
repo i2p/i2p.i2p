@@ -52,7 +52,7 @@ class BuildExecutor implements Runnable {
             buf = new StringBuffer(128);
             buf.append("Allowed: ");
         }
-        int allowed = 20;
+        int allowed = 5;
         String prop = _context.getProperty("router.tunnelConcurrentBuilds");
         if (prop != null)
             try { allowed = Integer.valueOf(prop).intValue(); } catch (NumberFormatException nfe) {}
@@ -92,6 +92,8 @@ class BuildExecutor implements Runnable {
                     _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1, 0);
                 else
                     _context.statManager().addRateData("tunnel.buildClientExpire", 1, 0);
+                for (int j = 0; j < cfg.getLength(); j++)
+                    didNotReply(cfg.getReplyMessageId(), cfg.getPeer(j));
             }
         }
         
@@ -107,10 +109,32 @@ class BuildExecutor implements Runnable {
             _context.statManager().addRateData("tunnel.concurrentBuildsLagged", concurrent, lag);
             return 0; // if we have a job heavily blocking our jobqueue, ssllloowww dddooowwwnnn
         }
-        //if (isOverloaded()) 
-        //    return 0;
+        
+        if (isOverloaded())
+            return 0;
 
         return allowed;
+    }
+
+    /**
+     * Don't even try to build tunnels if we're saturated
+     */
+    private boolean isOverloaded() {
+        //if (true) return false;
+        // dont include the inbound rates when throttling tunnel building, since
+        // that'd expose a pretty trivial attack.
+        int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond(); 
+        int used1s = _context.router().get1sRate(true); // dont throttle on the 1s rate, its too volatile
+        int used1m = _context.router().get1mRate(true);
+        int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
+        int used = Math.max(Math.max(used1s, used1m), used5m);
+        if ((maxKBps * 1024) - used <= 0) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Too overloaded to build our own tunnels (used=" + used + ", maxKBps=" + maxKBps + ", 1s=" + used1s + ", 1m=" + used1m + ")");
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public void run() {
@@ -306,6 +330,7 @@ class BuildExecutor implements Runnable {
             _currentlyBuilding.remove(cfg);
             _currentlyBuilding.notifyAll();
         }
+        
         long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
         if (cfg.getExpiration() <= expireBefore) {
             if (_log.shouldLog(Log.INFO))
@@ -329,6 +354,11 @@ class BuildExecutor implements Runnable {
             _repoll = true;
             _currentlyBuilding.notifyAll(); 
         }
+    }
+    
+    private void didNotReply(long tunnel, Hash peer) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info(tunnel + ": Peer " + peer.toBase64() + " did not reply to the tunnel join request");
     }
     
     List locked_getCurrentlyBuilding() { return _currentlyBuilding; }

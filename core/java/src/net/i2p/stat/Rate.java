@@ -433,6 +433,7 @@ public class Rate {
 
     public boolean equals(Object obj) {
         if ((obj == null) || (obj.getClass() != Rate.class)) return false;
+        if (obj == this) return true;
         Rate r = (Rate) obj;
         return _period == r.getPeriod() && _creationDate == r.getCreationDate() &&
         //_lastCoalesceDate == r.getLastCoalesceDate() &&

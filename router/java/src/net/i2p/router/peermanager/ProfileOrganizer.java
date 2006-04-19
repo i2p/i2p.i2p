@@ -251,10 +251,12 @@ public class ProfileOrganizer {
             // we only use selectHighCapacityPeers when we are selecting for PURPOSE_TEST
             // or we are falling back due to _fastPeers being too small, so we can always 
             // exclude the fast peers
+            /*
             if (exclude == null)
                 exclude = new HashSet(_fastPeers.keySet());
             else
                 exclude.addAll(_fastPeers.keySet());
+             */
             locked_selectPeers(_highCapacityPeers, howMany, exclude, matches);
         }
         if (matches.size() < howMany) {
@@ -809,6 +811,8 @@ public class ProfileOrganizer {
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
+                // perhaps check to see if they are active?
+                
                 return true;
             }
         } else {

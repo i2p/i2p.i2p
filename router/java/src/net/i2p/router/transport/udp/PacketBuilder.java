@@ -402,6 +402,7 @@ public class PacketBuilder {
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());
         _ivCache.release(iv);
+        packet.setMessageType(53);
         return packet;
     }
     
@@ -465,6 +466,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
         setTo(packet, to, state.getSentPort());
+        packet.setMessageType(52);
         return packet;
     }
 
@@ -571,6 +573,7 @@ public class PacketBuilder {
         } 
         
         setTo(packet, to, state.getSentPort());
+        packet.setMessageType(51);
         return packet;
     }
 
@@ -623,6 +626,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, toCipherKey, toMACKey);
         setTo(packet, toIP, toPort);
+        packet.setMessageType(50);
         return packet;
     }
 
@@ -667,6 +671,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, aliceIntroKey, aliceIntroKey);
         setTo(packet, aliceIP, alicePort);
+        packet.setMessageType(49);
         return packet;
     }
 
@@ -713,6 +718,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, charlieCipherKey, charlieMACKey);
         setTo(packet, charlieIP, charliePort);
+        packet.setMessageType(48);
         return packet;
     }
     
@@ -757,6 +763,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, bobCipherKey, bobMACKey);
         setTo(packet, bobIP, bobPort);
+        packet.setMessageType(47);
         return packet;
     }
     
@@ -854,6 +861,7 @@ public class PacketBuilder {
         if (encrypt)
             authenticate(packet, new SessionKey(introKey), new SessionKey(introKey));
         setTo(packet, introHost, introPort);
+        packet.setMessageType(46);
         return packet;
     }
 
@@ -903,6 +911,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, charlie.getCurrentCipherKey(), charlie.getCurrentMACKey());
         setTo(packet, charlie.getRemoteIPAddress(), charlie.getRemotePort());
+        packet.setMessageType(45);
         return packet;
     }
 
@@ -963,6 +972,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, aliceIntroKey, aliceIntroKey);
         setTo(packet, aliceAddr, alice.getPort());
+        packet.setMessageType(44);
         return packet;
     }
     
@@ -994,6 +1004,8 @@ public class PacketBuilder {
         // its just for hole punching
         packet.getPacket().setLength(0);
         setTo(packet, to, port);
+        
+        packet.setMessageType(43);
         return packet;
     }
     

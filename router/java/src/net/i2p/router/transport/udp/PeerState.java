@@ -1036,7 +1036,7 @@ public class PeerState {
                     remaining = 1; // total lifetime will exceed it anyway, guaranteeing failure
                 float pDrop = totalLifetime / (float)remaining;
                 pDrop = pDrop * pDrop * pDrop;
-                if (pDrop >= _context.random().nextFloat()) {
+                if (false && (pDrop >= _context.random().nextFloat())) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Proactively tail dropping for " + _remotePeer.toBase64() + " (messages=" + msgs.size() 
                                   + " headLifetime=" + lifetime + " totalLifetime=" + totalLifetime + " curLifetime=" + state.getLifetime() 

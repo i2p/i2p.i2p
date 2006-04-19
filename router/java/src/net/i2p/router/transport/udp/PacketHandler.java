@@ -68,6 +68,17 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.packetValidateMultipleCount", "How many times we validate a packet, if done more than once (period = afterValidate-enqueue)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.packetNoValidationLifetime", "How long packets that are never validated are around for", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.sessionRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.sessionConfirmed", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.sessionCreated", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.dataKnown", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.dataKnownAck", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.dataUnknown", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.dataUnknownAck", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.test", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.relayRequest", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.relayIntro", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.receivePacketSize.relayResponse", "Packet size of the given inbound packet type (period is the packet's lifetime)", "udp", new long[] { 60*1000, 10*60*1000 });
     }
     
     public void startup() { 
@@ -440,14 +451,17 @@ public class PacketHandler {
                 case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                     _state = 47;
                     _establisher.receiveSessionRequest(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.sessionRequest", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
                     _state = 48;
                     _establisher.receiveSessionConfirmed(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.sessionConfirmed", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_CREATED:
                     _state = 49;
                     _establisher.receiveSessionCreated(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.sessionCreated", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_DATA:
                     _state = 50;
@@ -472,6 +486,14 @@ public class PacketHandler {
                         }
                         packet.beforeReceiveFragments();
                         _inbound.receiveData(state, dr);
+                        _context.statManager().addRateData("udp.receivePacketSize.dataKnown", packet.getPacket().getLength(), packet.getLifetime());
+                        if (dr.readFragmentCount() <= 0)
+                            _context.statManager().addRateData("udp.receivePacketSize.dataKnownAck", packet.getPacket().getLength(), packet.getLifetime());
+                    } else {
+                        _context.statManager().addRateData("udp.receivePacketSize.dataUnknown", packet.getPacket().getLength(), packet.getLifetime());
+                        UDPPacketReader.DataReader dr = reader.getDataReader();
+                        if (dr.readFragmentCount() <= 0)
+                            _context.statManager().addRateData("udp.receivePacketSize.dataUnknownAck", packet.getPacket().getLength(), packet.getLifetime());
                     }
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
@@ -479,21 +501,25 @@ public class PacketHandler {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Received test packet: " + reader + " from " + from);
                     _testManager.receiveTest(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.test", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST:
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay request packet: " + reader + " from " + from);
                     _introManager.receiveRelayRequest(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.relayRequest", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_INTRO:
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay intro packet: " + reader + " from " + from);
                     _introManager.receiveRelayIntro(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.relayIntro", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received relay response packet: " + reader + " from " + from);
                     _establisher.receiveRelayResponse(from, reader);
+                    _context.statManager().addRateData("udp.receivePacketSize.relayResponse", packet.getPacket().getLength(), packet.getLifetime());
                     break;
                 default:
                     _state = 52;

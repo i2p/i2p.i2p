@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.459 2006/04/15 02:15:19 jrandom Exp $
+$Id: history.txt,v 1.460 2006/04/15 02:58:12 jrandom Exp $
+
+2006-04-19  jrandom
+    * Adjust how we pick high capacity peers to allow the inclusion of fast 
+      peers (the previous filter assumed an old usage pattern)
+    * New set of stats to help track per-packet-type bandwidth usage better
+    * Cut out the proactive tail drop from the SSU transport, for now
+    * Reduce the frequency of tunnel build attempts while we're saturated
+    * Don't drop tunnel requests as easily - prefer to explicitly reject them
 
 * 2006-04-15  0.6.1.16 released
 

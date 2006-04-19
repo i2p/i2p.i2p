@@ -153,7 +153,7 @@ class SummaryRenderer {
      * specify who can get it from where, etc.
      *
      */
-    public static void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
+    public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         long end = ctx.clock().now();
         long start = end - 60*1000*SummaryListener.PERIODS;
         long begin = System.currentTimeMillis();

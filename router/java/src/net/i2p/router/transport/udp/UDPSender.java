@@ -55,7 +55,21 @@ public class UDPSender {
         _context.statManager().createRateStat("udp.sendPacketSize.18", "tunnel data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
         _context.statManager().createRateStat("udp.sendPacketSize.19", "tunnel gateway message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
         _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.21", "tunnel build", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.22", "tunnel build reply", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
         _context.statManager().createRateStat("udp.sendPacketSize.42", "ack-only packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.43", "hole punch packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.44", "relay response packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.45", "relay intro packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.46", "relay request packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.47", "peer test charlie to bob packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.48", "peer test bob to charlie packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.49", "peer test to alice packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.50", "peer test from alice packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.51", "session confirmed packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.52", "session request packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.53", "session created packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
     }
     
     public void startup() {
@@ -211,7 +225,7 @@ public class UDPSender {
                         //_log.debug("Sending packet: (size="+size + "/"+size2 +")\nraw: " + Base64.encode(packet.getPacket().getData(), 0, size));
                     }
                     
-                    //_context.statManager().addRateData("udp.sendPacketSize." + packet.getMessageType(), size, packet.getFragmentCount());
+                    _context.statManager().addRateData("udp.sendPacketSize." + packet.getMessageType(), size, packet.getFragmentCount());
                     
                     //packet.getPacket().setLength(size);
                     try {

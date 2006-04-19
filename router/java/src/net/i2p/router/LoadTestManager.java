@@ -506,9 +506,9 @@ public class LoadTestManager {
     }
     
     private int getBps() {
-        int used1s = RouterThrottleImpl.get1sRate(_context);
-        int used1m = RouterThrottleImpl.get1mRate(_context);
-        int used5m = RouterThrottleImpl.get5mRate(_context);
+        int used1s = _context.router().get1sRate();
+        int used1m = _context.router().get1mRate();
+        int used5m = _context.router().get5mRate();
         return Math.max(used1s, Math.max(used1m, used5m));
     }
     

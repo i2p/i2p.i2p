@@ -213,8 +213,8 @@ class BuildHandler {
                 Hash peer = cfg.getPeer(i);
                 int record = order.indexOf(new Integer(i));
                 int howBad = statuses[record];
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
                 
                 if (howBad == 0) {
                     // w3wt
@@ -415,7 +415,7 @@ class BuildHandler {
         int proactiveDrops = countProactiveDrops();
         long recvDelay = System.currentTimeMillis()-state.recvTime;
         if (response == 0) {
-            float pDrop = recvDelay / (BuildRequestor.REQUEST_TIMEOUT/2);
+            float pDrop = recvDelay / (BuildRequestor.REQUEST_TIMEOUT);
             pDrop = (float)Math.pow(pDrop, 16);
             if (_context.random().nextFloat() < pDrop) { // || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
                 _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, proactiveDrops);
@@ -547,6 +547,8 @@ class BuildHandler {
         }
     }
     
+    /** um, this is bad.  don't set this. */
+    private static final boolean DROP_ALL_REQUESTS = false;
     private static final boolean HANDLE_REPLIES_INLINE = true;
 
     private class TunnelBuildMessageHandlerJobBuilder implements HandlerJobBuilder {
@@ -586,7 +588,7 @@ class BuildHandler {
                     _exec.repoll();
                 }
             } else {
-                if (_exec.wasRecentlyBuilding(reqId)) {
+                if (DROP_ALL_REQUESTS || _exec.wasRecentlyBuilding(reqId)) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping the reply " + reqId + ", as we used to be building that");
                 } else {
@@ -608,7 +610,7 @@ class BuildHandler {
                             _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
                         } else {
                             int queueTime = estimateQueueTime(_inboundBuildMessages.size());
-                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT/2);
+                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT);
                             pDrop = (float)Math.pow(pDrop, 16); // steeeep
                             float f = _context.random().nextFloat();
                             if ( (pDrop > f) && (allowProactiveDrop()) ) {
