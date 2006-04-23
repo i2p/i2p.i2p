@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.460 2006/04/15 02:58:12 jrandom Exp $
+$Id: history.txt,v 1.461 2006/04/19 12:47:02 jrandom Exp $
+
+* 2006-04-23  0.6.1.17 released
 
 2006-04-19  jrandom
     * Adjust how we pick high capacity peers to allow the inclusion of fast 
