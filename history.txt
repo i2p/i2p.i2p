@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.462 2006/04/23 16:06:12 jrandom Exp $
+$Id: history.txt,v 1.463 2006/04/27 19:08:40 jrandom Exp $
+
+2006-04-27  jrandom
+    * Avoid a race in the message reply registry (thanks cervantes!)
 
 2006-04-27  jrandom
     * Fixed the tunnel expiration desync code (thanks Complication!)

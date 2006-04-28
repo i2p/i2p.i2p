@@ -194,21 +194,20 @@ public class OutboundMessageRegistry {
     public void renderStatusHTML(Writer out) throws IOException {}
     
     private class CleanupTask implements SimpleTimer.TimedEvent {
-        private List _removing;
         private long _nextExpire;
         public CleanupTask() {
-            _removing = new ArrayList(4);
             _nextExpire = -1;
         }
         public void timeReached() {
             long now = _context.clock().now();
+            List removing = new ArrayList(1);
             synchronized (_selectors) {
                 for (int i = 0; i < _selectors.size(); i++) {
                     MessageSelector sel = (MessageSelector)_selectors.get(i);
                     if (sel == null) continue;
                     long expiration = sel.getExpiration();
                     if (expiration <= now) {
-                        _removing.add(sel);
+                        removing.add(sel);
                         _selectors.remove(i);
                         i--;
                     } else if (expiration < _nextExpire || _nextExpire < now) {
@@ -216,9 +215,9 @@ public class OutboundMessageRegistry {
                     }
                 }
             }
-            if (_removing.size() > 0) {
-                for (int i = 0; i < _removing.size(); i++) {
-                    MessageSelector sel = (MessageSelector)_removing.get(i);
+            if (removing.size() > 0) {
+                for (int i = 0; i < removing.size(); i++) {
+                    MessageSelector sel = (MessageSelector)removing.get(i);
                     OutNetMessage msg = null;
                     List msgs = null;
                     synchronized (_selectorToMessage) {
@@ -249,7 +248,6 @@ public class OutboundMessageRegistry {
                         }
                     }
                 }
-                _removing.clear();
             }
 
             if (_nextExpire <= now)
