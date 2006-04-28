@@ -33,11 +33,6 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         if (_testJob != null)
             _testJob.testSuccessful(ms);
         super.testSuccessful(ms);
-        
-        // once a tunnel has been built and we know it works, lets skew ourselves a bit so we 
-        // aren't as cyclic
-        if ( (_context.router().getUptime() < 10*60*1000) && (!_live) )
-            setExpiration(getExpiration() - _context.random().nextInt(5*60*1000));
         _live = true;
     }
     

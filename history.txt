@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.461 2006/04/19 12:47:02 jrandom Exp $
+$Id: history.txt,v 1.462 2006/04/23 16:06:12 jrandom Exp $
+
+2006-04-27  jrandom
+    * Fixed the tunnel expiration desync code (thanks Complication!)
 
 * 2006-04-23  0.6.1.17 released
 
