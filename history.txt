@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.464 2006/04/27 19:31:21 jrandom Exp $
+$Id: history.txt,v 1.465 2006/05/01 14:09:02 jrandom Exp $
+
+2006-05-01  jrandom
+    * Adjust the tunnel build timeouts to cut down on expirations, and
+      increased the SSU connection establishment retransmission rate to
+      something less glacial.
+    * For the first 5 minutes of uptime, be less aggressive with tunnel
+      exploration, opting for more reliable peers to start with.
 
 2006-05-01  jrandom
     * Fix for a netDb lookup race (thanks cervantes!)

@@ -104,7 +104,7 @@ public class TunnelDispatcher implements Service {
                                          new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.participatingMessageCount", 
                                          "How many messages are sent through a participating tunnel?", "Tunnels", 
-                                         new long[] { 60*10*1000l, 60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000l, 60*10*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
                                          "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });

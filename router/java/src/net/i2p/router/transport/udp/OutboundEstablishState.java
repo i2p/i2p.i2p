@@ -360,9 +360,9 @@ public class OutboundEstablishState {
     /** note that we just sent the SessionConfirmed packet */
     public synchronized void confirmedPacketsSent() {
         _lastSend = _context.clock().now();
-        _nextSend = _lastSend + 5*1000;
+        _nextSend = _lastSend + 1000;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send confirm packets, nextSend = 5s");
+            _log.debug("Send confirm packets, nextSend = 1s");
         if ( (_currentState == STATE_UNKNOWN) || 
              (_currentState == STATE_REQUEST_SENT) ||
              (_currentState == STATE_CREATED_RECEIVED) )
@@ -371,15 +371,15 @@ public class OutboundEstablishState {
     /** note that we just sent the SessionRequest packet */
     public synchronized void requestSent() {
         _lastSend = _context.clock().now();
-        _nextSend = _lastSend + 5*1000;
+        _nextSend = _lastSend + 1000;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send a request packet, nextSend = 5s");
+            _log.debug("Send a request packet, nextSend = 1s");
         if (_currentState == STATE_UNKNOWN)
             _currentState = STATE_REQUEST_SENT;
     }
     public synchronized void introSent() {
         _lastSend = _context.clock().now();
-        _nextSend = _lastSend + 5*1000;
+        _nextSend = _lastSend + 1000;
         if (_currentState == STATE_UNKNOWN)
             _currentState = STATE_PENDING_INTRO;
     }

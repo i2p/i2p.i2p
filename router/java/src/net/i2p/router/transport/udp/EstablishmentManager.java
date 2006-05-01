@@ -576,9 +576,9 @@ public class EstablishmentManager {
             return;
         }
         _transport.send(_builder.buildSessionCreatedPacket(state, _transport.getExternalPort(), _transport.getIntroKey()));
-        // if they haven't advanced to sending us confirmed packets in 5s,
+        // if they haven't advanced to sending us confirmed packets in 1s,
         // repeat
-        state.setNextSendTime(now + 5*1000);
+        state.setNextSendTime(now + 1000);
     }
 
     private void sendRequest(OutboundEstablishState state) {
@@ -988,15 +988,15 @@ public class EstablishmentManager {
 
         long delay = nextSendTime - now;
         if ( (nextSendTime == -1) || (delay > 0) ) {
-            if (delay > 5000)
-                delay = 5000;
+            if (delay > 1000)
+                delay = 1000;
             boolean interrupted = false;
             try {
                 synchronized (_activityLock) {
                     if (_activity > 0)
                         return;
                     if (nextSendTime == -1)
-                        _activityLock.wait(5000);
+                        _activityLock.wait(1000);
                     else
                         _activityLock.wait(delay);
                 }

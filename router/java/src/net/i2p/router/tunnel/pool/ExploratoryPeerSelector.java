@@ -55,7 +55,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         if (Boolean.valueOf(ctx.getProperty("router.exploreHighCapacity", "false")).booleanValue())
             return true;
         // no need to explore too wildly at first
-        if (ctx.router().getUptime() <= 10*1000)
+        if (ctx.router().getUptime() <= 5*60*1000)
             return true;
         // ok, if we aren't explicitly asking for it, we should try to pick peers
         // randomly from the 'not failing' pool.  However, if we are having a

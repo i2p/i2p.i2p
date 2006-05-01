@@ -191,7 +191,7 @@ class TestJob extends JobImpl {
     /** randomized time we should wait before testing */
     private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY); }
     /** how long we allow tests to run for before failing them */
-    private int getTestPeriod() { return 20*1000; }
+    private int getTestPeriod() { return 15*1000; }
     private void scheduleRetest() { scheduleRetest(false); }
     private void scheduleRetest(boolean asap) {
         if (asap) {
