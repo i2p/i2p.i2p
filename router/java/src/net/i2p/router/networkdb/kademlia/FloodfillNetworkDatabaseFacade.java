@@ -166,21 +166,44 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
         
         Job find = null;
-        if ( (onFind != null) && (onFind.size() > 0) )
-            find = (Job)onFind.remove(0);
         Job fail = null;
-        if ( (onFailed != null) && (onFailed.size() > 0) )
-            fail = (Job)onFailed.remove(0);
+        if (onFind != null) {
+            synchronized (onFind) {
+                if (onFind.size() > 0)
+                    find = (Job)onFind.remove(0);
+            } 
+        }
+        if (onFailed != null) {
+            synchronized (onFailed) {
+                if (onFailed.size() > 0)
+                    fail = (Job)onFailed.remove(0);
+            }
+        }
         SearchJob job = super.search(key, find, fail, timeoutMs, isLease);
         if (job != null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Floodfill search timed out for " + key.toBase64() + ", falling back on normal search (#" 
                           + job.getJobId() + ") with " + timeoutMs + " remaining");
             long expiration = timeoutMs + _context.clock().now();
-            while ( (onFind != null) && (onFind.size() > 0) )
-                job.addDeferred((Job)onFind.remove(0), null, expiration, isLease);
-            while ( (onFailed != null) && (onFailed.size() > 0) )
-                job.addDeferred(null, (Job)onFailed.remove(0), expiration, isLease);
+            List removed = null;
+            if (onFind != null) {
+                synchronized (onFind) {
+                    removed = new ArrayList(onFind);
+                    onFind.clear();
+                }
+                for (int i = 0; i < removed.size(); i++)
+                    job.addDeferred((Job)removed.get(i), null, expiration, isLease);
+                removed = null;
+            }
+            if (onFailed != null) {
+                synchronized (onFailed) {
+                    removed = new ArrayList(onFailed);
+                    onFailed.clear();
+                }
+                for (int i = 0; i < removed.size(); i++)
+                    job.addDeferred(null, (Job)removed.get(i), expiration, isLease);
+                removed = null;
+            }
         }
     }
     void complete(Hash key) {
@@ -263,10 +286,13 @@ class FloodSearchJob extends JobImpl {
             TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
             if ( (replyTunnel == null) || (outTunnel == null) ) {
                 _dead = true;
-                while (_onFailed.size() > 0) {
-                    Job job = (Job)_onFailed.remove(0);
-                    getContext().jobQueue().addJob(job);
+                List removed = null;
+                synchronized (_onFailed) {
+                    removed = new ArrayList(_onFailed);
+                    _onFailed.clear();
                 }
+                while (removed.size() > 0)
+                    getContext().jobQueue().addJob((Job)removed.remove(0));
                 getContext().messageRegistry().unregisterPending(out);
                 return;
             }
@@ -304,10 +330,13 @@ class FloodSearchJob extends JobImpl {
         if (timeRemaining > 0) {
             _facade.searchFull(_key, _onFind, _onFailed, timeRemaining, _isLease);
         } else {
-            for (int i = 0; i < _onFailed.size(); i++) {
-                Job j = (Job)_onFailed.remove(0);
-                getContext().jobQueue().addJob(j);
+            List removed = null;
+            synchronized (_onFailed) {
+                removed = new ArrayList(_onFailed);
+                _onFailed.clear();
             }
+            while (removed.size() > 0)
+                getContext().jobQueue().addJob((Job)removed.remove(0));
         }
     }
     void success() {
@@ -316,8 +345,13 @@ class FloodSearchJob extends JobImpl {
             _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " successful");
         _dead = true;
         _facade.complete(_key);
-        while (_onFind.size() > 0)
-            getContext().jobQueue().addJob((Job)_onFind.remove(0));
+        List removed = null;
+        synchronized (_onFind) {
+            removed = new ArrayList(_onFind);
+            _onFind.clear();
+        }
+        while (removed.size() > 0)
+            getContext().jobQueue().addJob((Job)removed.remove(0));
     }
 }
 

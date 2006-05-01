@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.463 2006/04/27 19:08:40 jrandom Exp $
+$Id: history.txt,v 1.464 2006/04/27 19:31:21 jrandom Exp $
+
+2006-05-01  jrandom
+    * Fix for a netDb lookup race (thanks cervantes!)
 
 2006-04-27  jrandom
     * Avoid a race in the message reply registry (thanks cervantes!)
