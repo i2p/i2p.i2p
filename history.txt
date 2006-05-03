@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.465 2006/05/01 14:09:02 jrandom Exp $
+$Id: history.txt,v 1.466 2006/05/01 17:42:24 jrandom Exp $
+
+2006-05-02  Complication
+    * Correct a misnamed property in SummaryHelper.java
+      to avoid confusion
+    * Make the maximum allowance of our own concurrent
+      tunnel builds slightly adaptive: one concurrent build per 6 KB/s
+      within the fixed range 2..10
+    * While overloaded, try to avoid completely choking our own build attempts,
+      instead prefer limiting them to 1
 
 2006-05-01  jrandom
     * Adjust the tunnel build timeouts to cut down on expirations, and

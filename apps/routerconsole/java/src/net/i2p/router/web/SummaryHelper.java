@@ -213,11 +213,11 @@ public class SummaryHelper {
     }
  
     /**
-     * How fast we have been receiving data over the last minute (pretty printed
+     * How fast we have been receiving data over the last second (pretty printed
      * string with 2 decimal places representing the KBps)
      *
      */
-    public String getInboundMinuteKBps() { 
+    public String getInboundSecondKBps() { 
         if (_context == null) 
             return "0.0";
         double kbps = _context.bandwidthLimiter().getReceiveBps()/1024d;
@@ -225,11 +225,11 @@ public class SummaryHelper {
         return fmt.format(kbps);
     }
     /**
-     * How fast we have been sending data over the last minute (pretty printed
+     * How fast we have been sending data over the last second (pretty printed
      * string with 2 decimal places representing the KBps)
      *
      */
-    public String getOutboundMinuteKBps() { 
+    public String getOutboundSecondKBps() { 
         if (_context == null) 
             return "0.0";
         double kbps = _context.bandwidthLimiter().getSendBps()/1024d;

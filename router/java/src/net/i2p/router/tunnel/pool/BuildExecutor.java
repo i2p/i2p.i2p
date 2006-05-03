@@ -52,7 +52,12 @@ class BuildExecutor implements Runnable {
             buf = new StringBuffer(128);
             buf.append("Allowed: ");
         }
-        int allowed = 5;
+
+        int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
+        if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
+        if (allowed > 10) allowed = 10; // Never go beyond 10, that is uncharted territory (old limit was 5)
+
         String prop = _context.getProperty("router.tunnelConcurrentBuilds");
         if (prop != null)
             try { allowed = Integer.valueOf(prop).intValue(); } catch (NumberFormatException nfe) {}
@@ -107,11 +112,14 @@ class BuildExecutor implements Runnable {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Too lagged [" + lag + "], don't allow building");
             _context.statManager().addRateData("tunnel.concurrentBuildsLagged", concurrent, lag);
-            return 0; // if we have a job heavily blocking our jobqueue, ssllloowww dddooowwwnnn
+            _log.error("Allowed was " + allowed + ", but we had lag issues, so ended up allowing " + Math.min(allowed,1));
+            return Math.min(allowed,1); // if we have a job heavily blocking our jobqueue, ssllloowww dddooowwwnnn
         }
         
-        if (isOverloaded())
-            return 0;
+        if (isOverloaded()) {
+            _log.error("Allowed was " + allowed + ", but we were overloaded, so ended up allowing " + Math.min(allowed,1));
+            return Math.min(allowed,1);
+        }
 
         return allowed;
     }
@@ -124,7 +132,7 @@ class BuildExecutor implements Runnable {
         // dont include the inbound rates when throttling tunnel building, since
         // that'd expose a pretty trivial attack.
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond(); 
-        int used1s = _context.router().get1sRate(true); // dont throttle on the 1s rate, its too volatile
+        int used1s = 0; // dont throttle on the 1s rate, its too volatile
         int used1m = _context.router().get1mRate(true);
         int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
         int used = Math.max(Math.max(used1s, used1m), used5m);
