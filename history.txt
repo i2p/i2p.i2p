@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.466 2006/05/01 17:42:24 jrandom Exp $
+$Id: history.txt,v 1.467 2006/05/02 23:30:28 complication Exp $
+
+2006-05-03  Complication
+    * Allow a single build attempt to proceed despite 1-minute overload
+      only if the 1-second rate shows enough spare bandwidth
+      (e.g. overload has already eased)
 
 2006-05-02  Complication
     * Correct a misnamed property in SummaryHelper.java

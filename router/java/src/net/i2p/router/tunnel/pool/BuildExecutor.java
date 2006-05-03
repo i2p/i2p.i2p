@@ -46,6 +46,9 @@ class BuildExecutor implements Runnable {
         _handler = new BuildHandler(ctx, this);
     }
     
+    // Estimated cost of one tunnel build attempt, bytes
+    private static final int BUILD_BANDWIDTH_ESTIMATE_BYTES = 5*1024;
+
     private int allowed() {
         StringBuffer buf = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -112,13 +115,23 @@ class BuildExecutor implements Runnable {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Too lagged [" + lag + "], don't allow building");
             _context.statManager().addRateData("tunnel.concurrentBuildsLagged", concurrent, lag);
-            _log.error("Allowed was " + allowed + ", but we had lag issues, so ended up allowing " + Math.min(allowed,1));
-            return Math.min(allowed,1); // if we have a job heavily blocking our jobqueue, ssllloowww dddooowwwnnn
+            return 0; // if we have a job heavily blocking our jobqueue, ssllloowww dddooowwwnnn
         }
         
         if (isOverloaded()) {
-            _log.error("Allowed was " + allowed + ", but we were overloaded, so ended up allowing " + Math.min(allowed,1));
-            return Math.min(allowed,1);
+            int used1s = _context.router().get1sRate(true);
+            // If 1-second average indicates we could manage building one tunnel
+            if ((maxKBps*1024) - used1s > BUILD_BANDWIDTH_ESTIMATE_BYTES) {
+                // Allow one
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("We had overload, but 1s bandwidth was " + used1s + " so allowed building 1.");
+                return 1;
+            } else {
+                // Allow none
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("We had serious overload, so allowed building 0.");
+                return 0;
+            }
         }
 
         return allowed;
