@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.467 2006/05/02 23:30:28 complication Exp $
+$Id: history.txt,v 1.468 2006/05/03 06:13:29 complication Exp $
+
+2006-05-04  jrandom
+    * Short circuit a highly congested part of the stat logging unless its
+      required (may or may not help with a synchronization issue reported by
+      andreas)
 
 2006-05-03  Complication
     * Allow a single build attempt to proceed despite 1-minute overload

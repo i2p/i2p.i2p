@@ -29,6 +29,8 @@ public class BufferedStatLog implements StatLog {
     private String _lastFilters;
     private BufferedWriter _out;
     private String _outFile;
+    /** short circuit for adding data, set to true if some filters are set, false if its empty (so we can skip the sync) */
+    private volatile boolean _filtersSpecified;
     
     private static final int BUFFER_SIZE = 1024;
     private static final boolean DISABLE_LOGGING = false;
@@ -44,6 +46,7 @@ public class BufferedStatLog implements StatLog {
         _lastWrite = _events.length-1;
         _statFilters = new ArrayList(10);
         _flushFrequency = 500;
+        _filtersSpecified = false;
         I2PThread writer = new I2PThread(new StatLogWriter(), "StatLogWriter");
         writer.setDaemon(true);
         writer.start();
@@ -51,6 +54,7 @@ public class BufferedStatLog implements StatLog {
     
     public void addData(String scope, String stat, long value, long duration) {
         if (DISABLE_LOGGING) return;
+        if (!shouldLog(stat)) return;
         synchronized (_events) {
             _events[_eventNext].init(scope, stat, value, duration);
             _eventNext = (_eventNext + 1) % _events.length;
@@ -72,6 +76,7 @@ public class BufferedStatLog implements StatLog {
     }    
 
     private boolean shouldLog(String stat) {
+        if (!_filtersSpecified) return false;
         synchronized (_statFilters) {
             return _statFilters.contains(stat) || _statFilters.contains("*");
         }
@@ -88,11 +93,18 @@ public class BufferedStatLog implements StatLog {
                     _statFilters.clear();
                     while (tok.hasMoreTokens())
                         _statFilters.add(tok.nextToken().trim());
+                    if (_statFilters.size() > 0)
+                        _filtersSpecified = true;
+                    else
+                        _filtersSpecified = false;
                 }
             }
             _lastFilters = val;
         } else {
-            synchronized (_statFilters) { _statFilters.clear(); }
+            synchronized (_statFilters) {
+                _statFilters.clear(); 
+                _filtersSpecified = false;
+            }
         }
         
         String filename = _context.getProperty(StatManager.PROP_STAT_FILE);
@@ -146,7 +158,7 @@ public class BufferedStatLog implements StatLog {
                 updateFilters();
                 int cur = start;
                 while (cur != end) {
-                    if (shouldLog(_events[cur].getStat())) {
+                    //if (shouldLog(_events[cur].getStat())) {
                         String when = null;
                         synchronized (_fmt) {
                             when = _fmt.format(new Date(_events[cur].getTime()));
@@ -164,7 +176,7 @@ public class BufferedStatLog implements StatLog {
                         _out.write(" ");
                         _out.write(Long.toString(_events[cur].getDuration()));
                         _out.write("\n");
-                    }
+                    //}
                     cur = (cur + 1) % _events.length;
                 }
                 _out.flush();
