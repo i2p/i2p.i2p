@@ -22,7 +22,7 @@ class BuildRequestor {
             ORDER.add(new Integer(i));
     }
     private static final int PRIORITY = 500;
-    static final int REQUEST_TIMEOUT = 30*1000;
+    static final int REQUEST_TIMEOUT = 15*1000;
     
     private static boolean usePairedTunnels(RouterContext ctx) {
         String val = ctx.getProperty("router.usePairedTunnels");

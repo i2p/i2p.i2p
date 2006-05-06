@@ -51,6 +51,7 @@ class BuildHandler {
         _context.statManager().createRateStat("tunnel.dropLoadProactive", "What the estimated queue time was when we dropped an inbound request (period is num pending)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadProactiveAbort", "How often we would have proactively dropped a request, but allowed it through?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.handleRemaining", "How many pending inbound requests were left on the queue after one pass?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildReplyTooSlow", "How often a tunnel build reply came back after we had given up waiting for it?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         
         _context.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionTransient", "How often we are rejected due to transient overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -85,7 +86,7 @@ class BuildHandler {
                         handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
                 } else {
                     // drop any expired messages
-                    long dropBefore = System.currentTimeMillis() - BuildRequestor.REQUEST_TIMEOUT;
+                    long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT*2);
                     do {
                         BuildMessageState state = (BuildMessageState)_inboundBuildMessages.get(0);
                         if (state.recvTime <= dropBefore) {
@@ -193,6 +194,7 @@ class BuildHandler {
                 _log.warn("The reply " + replyMessageId + " did not match any pending tunnels");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Pending tunnels: " + buf.toString());
+            _context.statManager().addRateData("tunnel.buildReplyTooSlow", 1, 0);
         } else {
             handleReply(state.msg, cfg, System.currentTimeMillis()-state.recvTime);
         }
@@ -276,7 +278,7 @@ class BuildHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(state.msg.getUniqueId() + ": handling request after " + timeSinceReceived);
         
-        if (timeSinceReceived > BuildRequestor.REQUEST_TIMEOUT) {
+        if (timeSinceReceived > (BuildRequestor.REQUEST_TIMEOUT*2)) {
             // don't even bother, since we are so overloaded locally
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
@@ -415,7 +417,7 @@ class BuildHandler {
         int proactiveDrops = countProactiveDrops();
         long recvDelay = System.currentTimeMillis()-state.recvTime;
         if (response == 0) {
-            float pDrop = recvDelay / (BuildRequestor.REQUEST_TIMEOUT);
+            float pDrop = recvDelay / (BuildRequestor.REQUEST_TIMEOUT*2);
             pDrop = (float)Math.pow(pDrop, 16);
             if (_context.random().nextFloat() < pDrop) { // || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
                 _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, proactiveDrops);
@@ -598,7 +600,7 @@ class BuildHandler {
                         for (int i = 0; i < _inboundBuildMessages.size(); i++) {
                             BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(i);
                             long age = System.currentTimeMillis() - cur.recvTime;
-                            if (age >= BuildRequestor.REQUEST_TIMEOUT) {
+                            if (age >= BuildRequestor.REQUEST_TIMEOUT*2) {
                                 _inboundBuildMessages.remove(i);
                                 i--;
                                 dropped++;
@@ -610,7 +612,7 @@ class BuildHandler {
                             _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
                         } else {
                             int queueTime = estimateQueueTime(_inboundBuildMessages.size());
-                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT);
+                            float pDrop = queueTime/((float)BuildRequestor.REQUEST_TIMEOUT*2);
                             pDrop = (float)Math.pow(pDrop, 16); // steeeep
                             float f = _context.random().nextFloat();
                             if ( (pDrop > f) && (allowProactiveDrop()) ) {
