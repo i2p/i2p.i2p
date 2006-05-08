@@ -122,10 +122,16 @@ class BuildExecutor implements Runnable {
             int used1s = _context.router().get1sRate(true);
             // If 1-second average indicates we could manage building one tunnel
             if ((maxKBps*1024) - used1s > BUILD_BANDWIDTH_ESTIMATE_BYTES) {
-                // Allow one
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("We had overload, but 1s bandwidth was " + used1s + " so allowed building 1.");
-                return 1;
+                // Check if we're already building some tunnels
+                if (concurrent > 0) {
+                   if (_log.shouldLog(Log.WARN))
+                       _log.warn("Mild overload and favourable 1s rate (" + used1s + ") but already building, so allowed 0.");
+                   return 0;
+                } else {
+                   if (_log.shouldLog(Log.WARN))
+                       _log.warn("Mild overload and favourable 1s rate(" + used1s + "), so allowed 1.");
+                   return 1;
+                }
             } else {
                 // Allow none
                 if (_log.shouldLog(Log.WARN))

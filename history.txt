@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.469 2006/05/04 18:09:17 jrandom Exp $
+$Id: history.txt,v 1.470 2006/05/06 15:27:35 jrandom Exp $
+
+2006-05-07  Complication
+    * Fix problem whereby repeated calls to allowed() would make
+      the 1-tunnel exception permit more than one concurrent build
 
 2006-05-06  jrandom
     * Readjust the tunnel creation timeouts to reject less but fail earlier,
