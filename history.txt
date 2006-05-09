@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.470 2006/05/06 15:27:35 jrandom Exp $
+$Id: history.txt,v 1.471 2006/05/07 22:19:46 complication Exp $
+
+* 2006-05-09  0.6.1.18 released
+
+2006-05-09  jrandom
+    * Further tunnel creation timeout revamp
 
 2006-05-07  Complication
     * Fix problem whereby repeated calls to allowed() would make
