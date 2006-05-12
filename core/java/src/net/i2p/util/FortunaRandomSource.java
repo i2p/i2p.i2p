@@ -76,15 +76,33 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         if (n<=0)
           throw new IllegalArgumentException("n must be positive");
 
-        if ((n & -n) == n)  // i.e., n is a power of 2
-            return (int)((n * (long)nextBits(31)) >> 31);
+        ////
+        // this shortcut from sun's docs neither works nor is necessary.
+        //
+        //if ((n & -n) == n)  {
+        //    // i.e., n is a power of 2
+        //    return (int)((n * (long)nextBits(31)) >> 31);
+        //}
 
-        int bits, val;
-        do {
-            bits = nextBits(31);
-            val = bits % n;
-        } while(bits - val + (n-1) < 0);
-        return val;
+        int numBits = 0;
+        int remaining = n;
+        int rv = 0;
+        while (remaining > 0) {
+            remaining >>= 1;
+            rv += nextBits(8) << numBits*8;
+            numBits++;
+        }
+        if (rv < 0)
+            rv += n;
+        return rv % n;
+        
+        //int bits, val;
+        //do {
+        //    bits = nextBits(31);
+        //    val = bits % n;
+        //} while(bits - val + (n-1) < 0);
+        //
+        //return val;
     }
 
     /**
@@ -179,5 +197,20 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     /** reseed the fortuna */   
     public synchronized void feedEntropy(String source, byte[] data, int offset, int len) {
         _fortuna.addRandomBytes(data, offset, len);
+    }
+    
+    public static void main(String args[]) {
+        try {
+            RandomSource rand = I2PAppContext.getGlobalContext().random();
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.util.zip.GZIPOutputStream gos = new java.util.zip.GZIPOutputStream(baos);
+            for (int i = 0; i < 1024*1024; i++) {
+                int c = rand.nextInt(256);
+                gos.write((byte)c);
+            }
+            gos.finish();
+            byte compressed[] = baos.toByteArray();
+            System.out.println("Compressed size of 1MB: " + compressed.length);
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

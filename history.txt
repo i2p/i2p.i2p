@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.471 2006/05/07 22:19:46 complication Exp $
+$Id: history.txt,v 1.472 2006/05/09 16:17:17 jrandom Exp $
+
+2006-05-11  jrandom
+    * PRNG bugfix (thanks cervantes and Complication!)
 
 * 2006-05-09  0.6.1.18 released
 
