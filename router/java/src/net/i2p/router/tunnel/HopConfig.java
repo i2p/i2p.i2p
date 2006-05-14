@@ -23,6 +23,7 @@ public class HopConfig {
     private SessionKey _ivKey;
     private SessionKey _replyKey;
     private ByteArray _replyIV;
+    private long _creation;
     private long _expiration;
     private Map _options;
     private long _messagesProcessed;
@@ -37,8 +38,10 @@ public class HopConfig {
         _sendTo = null;
         _layerKey = null;
         _ivKey = null;
+        _creation = -1;
         _expiration = -1;
         _options = null;
+        _messagesProcessed = 0;
     }
     
     /** what tunnel ID are we receiving on? */
@@ -94,6 +97,10 @@ public class HopConfig {
     /** when does this tunnel expire (in ms since the epoch)? */
     public long getExpiration() { return _expiration; }
     public void setExpiration(long when) { _expiration = when; }
+
+    /** when was this tunnel created (in ms since the epoch)? */
+    public long getCreation() { return _creation; }
+    public void setCreation(long when) { _creation = when; }
     
     /** 
      * what are the configuration options for this tunnel (if any).  keys to

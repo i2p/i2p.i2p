@@ -38,6 +38,8 @@ public class TunnelDispatcher implements Service {
     private long _lastParticipatingExpiration;
     private BloomFilterIVValidator _validator;
     private LeaveTunnel _leaveJob;
+    /** what is the date/time we last deliberately dropped a tunnel? **/
+    private long _lastDropTime;
     
     /** Creates a new instance of TunnelDispatcher */
     public TunnelDispatcher(RouterContext ctx) {
@@ -49,6 +51,7 @@ public class TunnelDispatcher implements Service {
         _inboundGateways = new HashMap();
         _participatingConfig = new HashMap();
         _lastParticipatingExpiration = 0;
+        _lastDropTime = 0;
         _validator = null;
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRateStat("tunnel.participatingTunnels", 
@@ -526,6 +529,70 @@ public class TunnelDispatcher implements Service {
         synchronized (_participatingConfig) {
             return new ArrayList(_participatingConfig.values());
         }
+    }
+
+
+    private static final int DROP_BASE_INTERVAL = 40 * 1000;
+    private static final int DROP_RANDOM_BOOST = 10 * 1000;
+
+    /**
+     * If a router is too overloaded to build its own tunnels,
+     * the build executor may call this.
+     */
+
+    public void dropBiggestParticipating() {
+
+       List partTunnels = listParticipatingTunnels();
+       if ((partTunnels == null) || (partTunnels.size() == 0)) {
+           if (_log.shouldLog(Log.ERROR))
+               _log.error("Not dropping tunnel, since partTunnels was null or had 0 items!");
+           return;
+       }
+
+       long periodWithoutDrop = _context.clock().now() - _lastDropTime;
+       if (periodWithoutDrop < DROP_BASE_INTERVAL) {
+           if (_log.shouldLog(Log.WARN))
+               _log.error("Not dropping tunnel, since last drop was " + periodWithoutDrop + " ms ago!");
+           return;
+       }
+
+       HopConfig biggest = null;
+       HopConfig current = null;
+
+       long biggestMessages = 0;
+       long biggestAge = -1;
+       double biggestRate = 0;
+
+       for (int i=0; i<partTunnels.size(); i++) {
+
+           current = (HopConfig)partTunnels.get(i);
+
+           long currentMessages = current.getProcessedMessagesCount();
+           long currentAge = (_context.clock().now() - current.getCreation());
+           double currentRate = ((double) currentMessages / (currentAge / 1000));
+
+           // Determine if this is the biggest, but don't include tunnels
+           // with less than 20 messages (unpredictable rates)
+           if ((currentMessages > 20) && ((biggest == null) || (currentRate > biggestRate))) {
+               // Update our profile of the biggest
+               biggest = current;
+               biggestMessages = biggest.getProcessedMessagesCount();
+               biggestAge = (_context.clock().now() - current.getCreation());
+               biggestRate = ((double) biggestMessages / (biggestAge / 1000));
+           }
+       }
+
+       if (biggest == null) {
+           if (_log.shouldLog(Log.ERROR))
+               _log.error("Not dropping tunnel, since no suitable tunnel was found.");
+           return;
+       }
+
+       if (_log.shouldLog(Log.ERROR))
+           _log.error("Dropping tunnel with " + biggestRate + " messages/s and " + biggestMessages +
+                      " messages, last drop was " + (periodWithoutDrop / 1000) + " s ago.");
+       remove(biggest);
+       _lastDropTime = _context.clock().now() + _context.random().nextInt(DROP_RANDOM_BOOST);
     }
     
     public void startup() {

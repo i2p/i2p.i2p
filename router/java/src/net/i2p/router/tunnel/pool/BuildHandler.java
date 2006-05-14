@@ -438,6 +438,7 @@ class BuildHandler {
 
         if (response == 0) {
             HopConfig cfg = new HopConfig();
+            cfg.setCreation(_context.clock().now());
             cfg.setExpiration(_context.clock().now() + 10*60*1000);
             cfg.setIVKey(req.readIVKey());
             cfg.setLayerKey(req.readLayerKey());

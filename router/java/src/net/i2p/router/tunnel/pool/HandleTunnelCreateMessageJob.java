@@ -118,6 +118,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         
         HopConfig cfg = new HopConfig();
         long expiration = _request.getDurationSeconds()*1000 + getContext().clock().now();
+        cfg.setCreation(getContext().clock().now());
         cfg.setExpiration(expiration);
         cfg.setIVKey(_request.getIVKey());
         cfg.setLayerKey(_request.getLayerKey());

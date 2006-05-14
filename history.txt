@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.472 2006/05/09 16:17:17 jrandom Exp $
+$Id: history.txt,v 1.473 2006/05/11 22:31:44 jrandom Exp $
+
+2006-05-13  Complication
+    * Separate growth factors for tunnel count and tunnel test time
+    * Reduce growth factors, so probabalistic throttle would activate
+    * Square probAccept values to decelerate stronger when far from average
+    * Create a bandwidth stat with approximately 15-second half life
+    * Make allowTunnel() check the 1-second bandwidth for overload
+      before doing allowance calculations using 15-second bandwidth
+    * Tweak the overload detector in BuildExecutor to be more sensitive
+      for rising edges, add ability to initiate tunnel drops
+    * Add a function to seek and drop the highest-rate participating tunnel,
+      keeping a fixed+random grace period between such drops.
+      It doesn't seem very effective, so disabled by default
+      ("router.dropTunnelsOnOverload=true" to enable)
 
 2006-05-11  jrandom
     * PRNG bugfix (thanks cervantes and Complication!)

@@ -22,7 +22,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected I2PAppContext _context;
     private Log _log;
     
-    static final int PREPROCESSED_SIZE = 1024;
+    public static final int PREPROCESSED_SIZE = 1024;
     protected static final int IV_SIZE = HopProcessor.IV_LENGTH;
     protected static final ByteCache _dataCache = ByteCache.getInstance(512, PREPROCESSED_SIZE);
     protected static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);

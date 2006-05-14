@@ -1072,6 +1072,22 @@ public class Router {
         }
         return 0;
     }
+
+    public int get15sRate() { return get15sRate(false); }
+    public int get15sRate(boolean outboundOnly) {
+        RouterContext ctx = _context;
+        if (ctx != null) {
+            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
+            if (bw != null) {
+                int out = (int)bw.getSendBps15s();
+                if (outboundOnly)
+                    return out;
+                return (int)Math.max(out, bw.getReceiveBps15s());
+            }
+        }
+        return 0;
+    }
+
     public int get1mRate() { return get1mRate(false); }
     public int get1mRate(boolean outboundOnly) {
         int send = 0;

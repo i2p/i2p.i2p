@@ -49,6 +49,8 @@ public class FIFOBandwidthLimiter {
     private long _lastStatsUpdated;
     private float _sendBps;
     private float _recvBps;
+    private float _sendBps15s;
+    private float _recvBps15s;
     
     private static int __id = 0;
     
@@ -66,6 +68,8 @@ public class FIFOBandwidthLimiter {
         _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bw.sendBps1s", "How fast we are transmitting for the 1s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
         _context.statManager().createRateStat("bw.recvBps1s", "How fast we are receiving for the 1s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
+        _context.statManager().createRateStat("bw.sendBps15s", "How fast we are transmitting for the 15s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
+        _context.statManager().createRateStat("bw.recvBps15s", "How fast we are receiving for the 15s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
         _pendingInboundRequests = new ArrayList(16);
         _pendingOutboundRequests = new ArrayList(16);
         _lastTotalSent = _totalAllocatedOutboundBytes;
@@ -97,6 +101,8 @@ public class FIFOBandwidthLimiter {
     public void setOutboundUnlimited(boolean isUnlimited) { _outboundUnlimited = isUnlimited; }
     public float getSendBps() { return _sendBps; }
     public float getReceiveBps() { return _recvBps; }
+    public float getSendBps15s() { return _sendBps15s; }
+    public float getReceiveBps15s() { return _recvBps15s; }
     
     public int getOutboundKBytesPerSecond() { return _refiller.getOutboundKBytesPerSecond(); } 
     public int getInboundKBytesPerSecond() { return _refiller.getInboundKBytesPerSecond(); } 
@@ -270,14 +276,16 @@ public class FIFOBandwidthLimiter {
     private void updateStats() {
         long now = now();
         long time = now - _lastStatsUpdated;
+        // If at least one second has passed
         if (time >= 1000) {
             long totS = _totalAllocatedOutboundBytes;
             long totR = _totalAllocatedInboundBytes;
-            long sent = totS - _lastTotalSent;
-            long recv = totR - _lastTotalReceived;
+            long sent = totS - _lastTotalSent; // How much we sent meanwhile
+            long recv = totR - _lastTotalReceived; // How much we received meanwhile
             _lastTotalSent = totS;
             _lastTotalReceived = totR;
             _lastStatsUpdated = now;
+
             if (_sendBps <= 0)
                 _sendBps = ((float)sent*1000f)/(float)time;
             else
@@ -286,11 +294,32 @@ public class FIFOBandwidthLimiter {
                 _recvBps = ((float)recv*1000f)/(float)time;
             else
                 _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/(float)time;
+
             if (_log.shouldLog(Log.WARN)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("BW: time = " + time + " sent: " + sent + " recv: " + recv);
                 _context.statManager().getStatLog().addData("bw", "bw.sendBps1s", (long)_sendBps, sent);
                 _context.statManager().getStatLog().addData("bw", "bw.recvBps1s", (long)_recvBps, recv);
+            }
+
+            // Maintain an approximate average with a 15-second halflife
+            // Weights (0.955 and 0.045) are tuned so that transition between two values (e.g. 0..10)
+            // would reach their midpoint (e.g. 5) in 15s
+            if (_sendBps15s <= 0)
+                _sendBps15s = ((float)sent*15*1000f)/(float)time;
+            else
+                _sendBps15s = (0.955f)*_sendBps15s + (0.045f)*((float)sent*1000f)/(float)time;
+
+            if (_recvBps15s <= 0)
+                _recvBps15s = ((float)recv*15*1000f)/(float)time;
+            else
+                _recvBps15s = (0.955f)*_recvBps15s + (0.045f)*((float)recv*1000)/(float)time;
+
+            if (_log.shouldLog(Log.WARN)) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("BW15: time = " + time + " sent: " + sent + " recv: " + recv);
+                _context.statManager().getStatLog().addData("bw", "bw.sendBps15s", (long)_sendBps15s, sent);
+                _context.statManager().getStatLog().addData("bw", "bw.recvBps15s", (long)_recvBps15s, recv);
             }
         }
     }

@@ -46,9 +46,6 @@ class BuildExecutor implements Runnable {
         _handler = new BuildHandler(ctx, this);
     }
     
-    // Estimated cost of one tunnel build attempt, bytes
-    private static final int BUILD_BANDWIDTH_ESTIMATE_BYTES = 5*1024;
-
     private int allowed() {
         StringBuffer buf = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -118,52 +115,75 @@ class BuildExecutor implements Runnable {
             return 0; // if we have a job heavily blocking our jobqueue, ssllloowww dddooowwwnnn
         }
         
-        if (isOverloaded()) {
-            int used1s = _context.router().get1sRate(true);
-            // If 1-second average indicates we could manage building one tunnel
-            if ((maxKBps*1024) - used1s > BUILD_BANDWIDTH_ESTIMATE_BYTES) {
-                // Check if we're already building some tunnels
-                if (concurrent > 0) {
-                   if (_log.shouldLog(Log.WARN))
-                       _log.warn("Mild overload and favourable 1s rate (" + used1s + ") but already building, so allowed 0.");
-                   return 0;
-                } else {
-                   if (_log.shouldLog(Log.WARN))
-                       _log.warn("Mild overload and favourable 1s rate(" + used1s + "), so allowed 1.");
-                   return 1;
-                }
-            } else {
-                // Allow none
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("We had serious overload, so allowed building 0.");
-                return 0;
-            }
-        }
+        // Trim the number of allowed tunnels for overload,
+        // initiate a tunnel drop on severe overload
+        allowed = trimForOverload(allowed,concurrent);
 
         return allowed;
     }
 
+
+    // Estimated cost of tunnel build attempt, bytes
+    private static final int BUILD_BANDWIDTH_ESTIMATE_BYTES = 5*1024;
+
     /**
      * Don't even try to build tunnels if we're saturated
      */
-    private boolean isOverloaded() {
-        //if (true) return false;
+    private int trimForOverload(int allowed, int concurrent) {
+
         // dont include the inbound rates when throttling tunnel building, since
         // that'd expose a pretty trivial attack.
-        int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond(); 
-        int used1s = 0; // dont throttle on the 1s rate, its too volatile
-        int used1m = _context.router().get1mRate(true);
-        int used5m = 0; //get5mRate(_context); // don't throttle on the 5m rate, as that'd hide available bandwidth
-        int used = Math.max(Math.max(used1s, used1m), used5m);
-        if ((maxKBps * 1024) - used <= 0) {
+        int used1s = _context.router().get1sRate(true); // Avoid reliance on the 1s rate, too volatile
+        int used15s = _context.router().get15sRate(true);
+        int used1m = _context.router().get1mRate(true); // Avoid reliance on the 1m rate, too slow
+
+        int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        int maxBps = maxKBps * 1024;
+        int overBuildLimit = maxBps - BUILD_BANDWIDTH_ESTIMATE_BYTES; // Beyond this, refrain from building
+        int nearBuildLimit = maxBps - (2*BUILD_BANDWIDTH_ESTIMATE_BYTES); // Beyond this, consider it close
+
+        // Detect any fresh overload which could set back tunnel building
+        if (Math.max(used1s,used15s) > overBuildLimit) {
+
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Too overloaded to build our own tunnels (used=" + used + ", maxKBps=" + maxKBps + ", 1s=" + used1s + ", 1m=" + used1m + ")");
-            return true;
-        } else {
-            return false;
+                _log.warn("Overloaded, trouble building tunnels (maxKBps=" + maxKBps +
+                           ", 1s=" + used1s + ", 15s=" + used15s + ", 1m=" + used1m + ")");
+
+            // Detect serious overload
+            if (((used1s > maxBps) && (used1s > used15s) && (used15s > nearBuildLimit)) ||
+                ((used1s > maxBps) && (used15s > overBuildLimit)) ||
+                ((used1s > overBuildLimit) && (used15s > overBuildLimit))) {
+
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Serious overload, allow building 0.");
+
+               // If so configured, drop biggest participating tunnel
+               if (Boolean.valueOf(_context.getProperty("router.dropTunnelsOnOverload","false")).booleanValue() == true) {
+                   if (_log.shouldLog(Log.WARN))
+                       _log.warn("Requesting drop of biggest participating tunnel.");
+                   _context.tunnelDispatcher().dropBiggestParticipating();
+               }
+               return(0);
+            } else {
+                // Mild overload, check if we already build tunnels
+                if (concurrent <= 0) {
+                    // We aren't building, allow 1
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Mild overload, allow building 1.");
+                    return(1);
+                } else {
+                    // Already building, allow 0
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Mild overload but already building " + concurrent + ", so allow 0.");
+                    return(0);
+                }
+            }
         }
+        // No overload, allow as requested
+        return(allowed);
     }
-    
+
+
     public void run() {
         _isRunning = true;
         List wanted = new ArrayList(8);
