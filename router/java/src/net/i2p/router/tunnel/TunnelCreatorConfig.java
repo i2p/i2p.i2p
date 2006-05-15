@@ -137,7 +137,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
     }
     
     
-    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 2;
+    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
     
     /**
      * The tunnel failed, so stop using it

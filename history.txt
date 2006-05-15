@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.473 2006/05/11 22:31:44 jrandom Exp $
+$Id: history.txt,v 1.474 2006/05/13 23:52:44 complication Exp $
+
+2006-05-15  jrandom
+    * Add a load dependent throttle on the pending inbound tunnel request
+      backlog
+    * Increased the tunnel test failure slack before killing a tunnel
 
 2006-05-13  Complication
     * Separate growth factors for tunnel count and tunnel test time
