@@ -283,10 +283,14 @@ class RouterThrottleImpl implements RouterThrottle {
             double probReject = Math.pow(pctFull, 16); // steep curve 
             double rand = _context.random().nextFloat();
             boolean reject = (availBps < MIN_AVAILABLE_BPS) || (rand <= probReject);
-            if (_log.shouldLog(Log.WARN))
+            if (reject && _log.shouldLog(Log.WARN))
                 _log.warn("reject = " + reject + " avail/maxK/used " + availBps + "/" + maxKBps + "/" 
                           + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
                           + "rand = " + rand + " est = " + bytesAllocated + " share = " + (float)share);
+            else if (_log.shouldLog(Log.DEBUG))
+                _log.debug("reject = " + reject + " avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                           + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
+                           + "rand = " + rand + " est = " + bytesAllocated + " share = " + (float)share);
             if (reject) {
                 return false;
             } else {

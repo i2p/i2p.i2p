@@ -65,8 +65,10 @@ public class Shitlist {
         
         long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-        if (prof != null)
+        if (prof != null) {
             period = SHITLIST_DURATION_MS << prof.incrementShitlists();
+            period += _context.random().nextLong(period);
+        }
         
         if (period > 60*60*1000)
             period = 60*60*1000;

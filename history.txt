@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.474 2006/05/13 23:52:44 complication Exp $
+$Id: history.txt,v 1.475 2006/05/15 12:33:02 jrandom Exp $
+
+2006-05-16  jrandom
+    * Further shitlist randomizations
+    * Adjust the stats monitored for detecting cpu overload when dropping new
+      tunnel requests
 
 2006-05-15  jrandom
     * Add a load dependent throttle on the pending inbound tunnel request

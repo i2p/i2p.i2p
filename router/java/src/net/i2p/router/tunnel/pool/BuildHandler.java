@@ -642,7 +642,7 @@ class BuildHandler {
     
     private int estimateQueueTime(int numPendingMessages) {
         int decryptTime = 200;
-        RateStat rs = _context.statManager().getRate("crypto.elGamal.decrypt");
+        RateStat rs = _context.statManager().getRate("tunnel.decryptRequestTime");
         if (rs != null) {
             Rate r = rs.getRate(60*1000);
             double avg = 0;
