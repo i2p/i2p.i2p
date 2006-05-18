@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.477 2006-05-17 22:01:21 jrandom Exp $
+$Id: history.txt,v 1.478 2006-05-17 22:42:57 complication Exp $
+
+* 2006-05-18  0.6.1.19 released
+
+2006-05-18  jrandom
+    * Made the SSU ACKs less frequent when possible
 
 2006-05-17  Complication
     * Fix some oversights in my previous changes:

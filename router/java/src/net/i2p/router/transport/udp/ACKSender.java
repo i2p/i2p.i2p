@@ -22,7 +22,7 @@ public class ACKSender implements Runnable {
     private boolean _alive;
     
     /** how frequently do we want to send ACKs to a peer? */
-    static final int ACK_FREQUENCY = 100;
+    static final int ACK_FREQUENCY = 200;
     
     public ACKSender(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -60,6 +60,16 @@ public class ACKSender implements Runnable {
         }
     }
     
+    private long ackFrequency(long timeSinceACK, long rtt) {
+        // if we are actively pumping lots of data to them, we can depend upon
+        // the unsentACKThreshold to figure out when to send an ACK instead of
+        // using the timer, so we can set the timeout/frequency higher
+        if (timeSinceACK < 2*1000)
+            return Math.max(rtt/2, 500);
+        else
+            return ACK_FREQUENCY;
+    }
+    
     public void run() {
         while (_alive) {
             PeerState peer = null;
@@ -70,7 +80,7 @@ public class ACKSender implements Runnable {
                     for (int i = 0; i < _peersToACK.size(); i++) {
                         PeerState cur = (PeerState)_peersToACK.get(i);
                         long wanted = cur.getWantedACKSendSince();
-                        long delta = wanted + ACK_FREQUENCY - now;
+                        long delta = wanted + ackFrequency(now-cur.getLastACKSend(), cur.getRTT()) - now;
                         if ( ( (wanted > 0) && (delta < 0) ) || (cur.unsentACKThresholdReached()) ) {
                             _peersToACK.remove(i);
                             peer = cur;
