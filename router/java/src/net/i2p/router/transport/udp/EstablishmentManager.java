@@ -943,7 +943,7 @@ public class EstablishmentManager {
 
             Hash peer = outboundState.getRemoteIdentity().calculateHash();
             _context.shitlist().shitlistRouter(peer, err);
-            _transport.dropPeer(peer);
+            _transport.dropPeer(peer, false, err);
             //_context.profileManager().commErrorOccurred(peer);
         } else {
             while (true) {

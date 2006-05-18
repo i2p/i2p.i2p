@@ -244,7 +244,7 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
-    public void renderStatusHTML(Writer out) throws IOException {
+    public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         TreeMap transports = new TreeMap();
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
@@ -252,7 +252,7 @@ public class TransportManager implements TransportEventListener {
         }
         for (Iterator iter = transports.values().iterator(); iter.hasNext(); ) {
             Transport t= (Transport)iter.next();
-            t.renderStatusHTML(out);
+            t.renderStatusHTML(out, urlBase, sortFlags);
         }
         StringBuffer buf = new StringBuffer(4*1024);
         buf.append("Listening on: <br /><pre>\n");

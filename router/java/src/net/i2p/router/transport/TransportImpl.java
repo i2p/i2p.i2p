@@ -363,6 +363,7 @@ public abstract class TransportImpl implements Transport {
     public void setListener(TransportEventListener listener) { _listener = listener; }
     /** Make this stuff pretty (only used in the old console) */
     public void renderStatusHTML(Writer out) throws IOException {}
+    public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
     
     public RouterContext getContext() { return _context; }
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }

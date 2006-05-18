@@ -8,6 +8,8 @@ import net.i2p.router.RouterContext;
 public class PeerHelper {
     private RouterContext _context;
     private Writer _out;
+    private int _sortFlags;
+    private String _urlBase;
     /**
      * Configure this bean to query a particular router context
      *
@@ -25,10 +27,22 @@ public class PeerHelper {
     public PeerHelper() {}
     
     public void setOut(Writer out) { _out = out; }
+    public void setSort(String flags) {
+        if (flags != null) {
+            try {
+                _sortFlags = Integer.parseInt(flags);
+            } catch (NumberFormatException nfe) {
+                _sortFlags = 0;
+            }
+        } else {
+            _sortFlags = 0;
+        }
+    }
+    public void setUrlBase(String base) { _urlBase = base; }
     
     public String getPeerSummary() {
         try {
-            _context.commSystem().renderStatusHTML(_out);
+            _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
             _context.bandwidthLimiter().renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();

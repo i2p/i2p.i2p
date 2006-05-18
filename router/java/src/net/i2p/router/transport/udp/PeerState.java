@@ -447,13 +447,13 @@ public class PeerState {
         if (_concurrentMessagesActive < 0)
             _concurrentMessagesActive = 0;
         
-        long now = _context.clock().now()/(10*1000);
-        if (_lastFailedSendPeriod >= now) {
-            // ignore... too fast
-        } else {
-            _lastFailedSendPeriod = now;
+        //long now = _context.clock().now()/(10*1000);
+        //if (_lastFailedSendPeriod >= now) {
+        //    // ignore... too fast
+        //} else {
+        //    _lastFailedSendPeriod = now;
             _consecutiveFailedSends++; 
-        }
+        //}
         return _consecutiveFailedSends;
     }
     public long getInactivityTime() {
@@ -1561,6 +1561,7 @@ public class PeerState {
         buf.append(" lifetime: ").append(now-_keyEstablishedTime);
         buf.append(" cwin: ").append(_sendWindowBytes);
         buf.append(" acwin: ").append(_sendWindowBytesRemaining);
+        buf.append(" consecFail: ").append(_consecutiveFailedSends);
         buf.append(" recv OK/Dup: ").append(_packetsReceived).append('/').append(_packetsReceivedDuplicate);
         buf.append(" send OK/Dup: ").append(_packetsTransmitted).append('/').append(_packetsRetransmitted);
         return buf.toString();

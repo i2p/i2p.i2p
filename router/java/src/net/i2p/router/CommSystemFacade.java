@@ -23,7 +23,8 @@ import java.util.Set;
 public abstract class CommSystemFacade implements Service {
     public abstract void processMessage(OutNetMessage msg);
     
-    public void renderStatusHTML(Writer out) throws IOException { }
+    public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { }
+    public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, null, 0); }
     
     /** Create the set of RouterAddress structures based on the router's config */
     public Set createAddresses() { return new HashSet(); }

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.475 2006/05/15 12:33:02 jrandom Exp $
+$Id: history.txt,v 1.476 2006-05-16 13:34:28 jrandom Exp $
+
+2006-05-17  jrandom
+    * Make the peer page sortable
+    * SSU modifications to cut down on unnecessary connection failures
 
 2006-05-16  jrandom
     * Further shitlist randomizations

@@ -83,8 +83,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     public void recheckReachability() { _manager.recheckReachability(); }
 
-    public void renderStatusHTML(Writer out) throws IOException { 
-        _manager.renderStatusHTML(out); 
+    public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { 
+        _manager.renderStatusHTML(out, urlBase, sortFlags); 
     }
     
     public Set createAddresses() {

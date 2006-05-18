@@ -14,6 +14,8 @@
  <jsp:useBean class="net.i2p.router.web.PeerHelper" id="peerHelper" scope="request" />
  <jsp:setProperty name="peerHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="peerHelper" property="out" value="<%=out%>" />
+ <jsp:setProperty name="peerHelper" property="urlBase" value="peers.jsp" />
+ <jsp:setProperty name="peerHelper" property="sort" value="<%=request.getParameter("sort") != null ? request.getParameter("sort") : ""%>" />
  <jsp:getProperty name="peerHelper" property="peerSummary" />
 </div>
 

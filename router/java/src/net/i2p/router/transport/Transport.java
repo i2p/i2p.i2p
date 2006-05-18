@@ -41,7 +41,7 @@ public interface Transport {
     public int countActiveSendPeers();
     public List getMostRecentErrorMessages();
     
-    public void renderStatusHTML(Writer out) throws IOException;
+    public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
     public short getReachabilityStatus();
     public void recheckReachability();
 }

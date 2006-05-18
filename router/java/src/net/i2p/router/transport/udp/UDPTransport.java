@@ -163,6 +163,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", new long[] { 1*60*1000, 20*60*1000 });
+        _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", new long[] { 1*60*1000, 10*60*1000 });
         __instance = this;
     }
     
@@ -601,7 +602,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                 }
                 _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network");                
-                dropPeer(peerHash);
+                dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net");
                 return;
@@ -636,22 +637,28 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
     
-    void dropPeer(Hash peer) {
+    void dropPeer(Hash peer, boolean shouldShitlist, String why) {
         PeerState state = getPeerState(peer);
         if (state != null)
-            dropPeer(state, false);
+            dropPeer(state, shouldShitlist, why);
     }
-    private void dropPeer(PeerState peer, boolean shouldShitlist) {
+    private void dropPeer(PeerState peer, boolean shouldShitlist, String why) {
         if (_log.shouldLog(Log.WARN)) {
             long now = _context.clock().now();
             StringBuffer buf = new StringBuffer(4096);
             long timeSinceSend = now - peer.getLastSendTime();
             long timeSinceRecv = now - peer.getLastReceiveTime();
             long timeSinceAck  = now - peer.getLastACKSend();
+            long timeSinceSendOK = now - peer.getLastSendFullyTime();
+            int consec = peer.getConsecutiveFailedSends();
             buf.append("Dropping remote peer: ").append(peer.toString()).append(" shitlist? ").append(shouldShitlist);
             buf.append(" lifetime: ").append(now - peer.getKeyEstablishedTime());
-            buf.append(" time since send/recv/ack: ").append(timeSinceSend).append(" / ");
+            buf.append(" time since send/fully/recv/ack: ").append(timeSinceSend).append(" / ");
+            buf.append(timeSinceSendOK).append(" / ");
             buf.append(timeSinceRecv).append(" / ").append(timeSinceAck);
+            buf.append(" consec failures: ").append(consec);
+            if (why != null)
+                buf.append(" cause: ").append(why);
             /*
             buf.append("Existing peers: \n");
             synchronized (_peersByIdent) {
@@ -694,14 +701,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (peer.getRemotePeer() != null) {
             dropPeerCapacities(peer);
             
-            if (shouldShitlist) {
-                long now = _context.clock().now();
-                _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
+            if (shouldShitlist)
                 _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
-            } else {
-                long now = _context.clock().now();
-                _context.statManager().addRateData("udp.droppedPeerInactive", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
-            }
+            long now = _context.clock().now();
+            _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             synchronized (_peersByIdent) {
                 altByIdent = (PeerState)_peersByIdent.remove(peer.getRemotePeer());
             }
@@ -725,8 +728,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             rebuildExternalAddress();
         
         // deal with races to make sure we drop the peers fully
-        if ( (altByIdent != null) && (peer != altByIdent) ) dropPeer(altByIdent, shouldShitlist);
-        if ( (altByHost != null) && (peer != altByHost) ) dropPeer(altByHost, shouldShitlist);
+        if ( (altByIdent != null) && (peer != altByIdent) ) dropPeer(altByIdent, shouldShitlist, "recurse");
+        if ( (altByHost != null) && (peer != altByHost) ) dropPeer(altByHost, shouldShitlist, "recurse");
     }
     
     private boolean needsRebuild() {
@@ -842,7 +845,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (pref != null) && "true".equals(pref);
     }
     
-    private static final int MAX_IDLE_TIME = 60*1000;
+    private static final int MAX_IDLE_TIME = 5*60*1000;
     
     public String getStyle() { return STYLE; }
     public void send(OutNetMessage msg) { 
@@ -866,7 +869,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                      (peer.getConsecutiveFailedSends() > 0) &&
                      (inboundActive <= 0)) {
                     // peer is waaaay idle, drop the con and queue it up as a new con
-                    dropPeer(peer, false);
+                    dropPeer(peer, false, "proactive reconnection");
                     msg.timestamp("peer is really idle, dropping con and reestablishing");
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Proactive reestablish to " + to.toBase64());
@@ -1085,10 +1088,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.warn("Consecutive failure #" + consecutive 
                           + " on " + msg.toString()
                           + " to " + msg.getPeer());
-            if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
-                dropPeer(msg.getPeer(), false);
-            else if (consecutive > 2 * MAX_CONSECUTIVE_FAILED) // they're sending us data, but we cant reply?
-                dropPeer(msg.getPeer(), false);
+            if ( (_context.clock().now() - msg.getPeer().getLastSendFullyTime() <= 60*1000) || (consecutive < MAX_CONSECUTIVE_FAILED) ) {
+                // ok, a few conseutive failures, but we /are/ getting through to them
+            } else {
+                _context.statManager().addRateData("udp.dropPeerConsecutiveFailures", consecutive, msg.getPeer().getInactivityTime());
+                dropPeer(msg.getPeer(), false, "too many failures");
+            }
+            //if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
+            //    dropPeer(msg.getPeer(), false);
+            //else if (consecutive > 2 * MAX_CONSECUTIVE_FAILED) // they're sending us data, but we cant reply?
+            //    dropPeer(msg.getPeer(), false);
         }
         noteSend(msg, false);
         if (m != null)
@@ -1181,21 +1190,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
-    private static class AlphaComparator implements Comparator {
-        private static final AlphaComparator _instance = new AlphaComparator();
-        public static final AlphaComparator instance() { return _instance; }
-        
-        public int compare(Object lhs, Object rhs) {
-            if ( (lhs == null) || (rhs == null) || !(lhs instanceof PeerState) || !(rhs instanceof PeerState)) 
-                throw new IllegalArgumentException("rhs = " + rhs + " lhs = " + lhs);
-            PeerState l = (PeerState)lhs;
-            PeerState r = (PeerState)rhs;
-            // base64 retains binary ordering
-            return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
-        }
-        
-    }
-    
     private static UDPTransport __instance;
     /** **internal, do not use** */
     public static final UDPTransport _instance() { return __instance; }
@@ -1216,8 +1210,302 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return peers;
     }
     
-    public void renderStatusHTML(Writer out) throws IOException {
-        TreeSet peers = new TreeSet(AlphaComparator.instance());
+    private static final int FLAG_ALPHA = 0;
+    private static final int FLAG_IDLE_IN = 1;
+    private static final int FLAG_IDLE_OUT = 2;
+    private static final int FLAG_RATE_IN = 3;
+    private static final int FLAG_RATE_OUT = 4;
+    private static final int FLAG_SKEW = 5;
+    private static final int FLAG_CWND= 6;
+    private static final int FLAG_SSTHRESH = 7;
+    private static final int FLAG_RTT = 8;
+    private static final int FLAG_DEV = 9;
+    private static final int FLAG_RTO = 10;
+    private static final int FLAG_MTU = 11;
+    private static final int FLAG_SEND = 12;
+    private static final int FLAG_RECV = 13;
+    private static final int FLAG_RESEND = 14;
+    private static final int FLAG_DUP = 15;
+    private static final int FLAG_UPTIME = 16;
+    
+    private Comparator getComparator(int sortFlags) {
+        Comparator rv = null;
+        switch (Math.abs(sortFlags)) {
+            case FLAG_IDLE_IN:
+                rv = IdleInComparator.instance();
+                break;
+            case FLAG_IDLE_OUT:
+                rv = IdleOutComparator.instance();
+                break;
+            case FLAG_RATE_IN:
+                rv = RateInComparator.instance();
+                break;
+            case FLAG_RATE_OUT:
+                rv = RateOutComparator.instance();
+                break;
+            case FLAG_UPTIME:
+                rv = UptimeComparator.instance();
+                break;
+            case FLAG_SKEW:
+                rv = SkewComparator.instance();
+                break;
+            case FLAG_CWND:
+                rv = CwndComparator.instance();
+                break;
+            case FLAG_SSTHRESH:
+                rv = SsthreshComparator.instance();
+                break;
+            case FLAG_RTT:
+                rv = RTTComparator.instance();
+                break;
+            case FLAG_DEV:
+                rv = DevComparator.instance();
+                break;
+            case FLAG_RTO:
+                rv = RTOComparator.instance();
+                break;
+            case FLAG_MTU:
+                rv = MTUComparator.instance();
+                break;
+            case FLAG_SEND:
+                rv = SendCountComparator.instance();
+                break;
+            case FLAG_RECV:
+                rv = RecvCountComparator.instance();
+                break;
+            case FLAG_RESEND:
+                rv = ResendComparator.instance();
+                break;
+            case FLAG_DUP:
+                rv = DupComparator.instance();
+                break;
+            case FLAG_ALPHA:
+            default:
+                rv = AlphaComparator.instance();
+                break;
+        }
+        if (sortFlags < 0)
+            rv = new InverseComparator(rv);
+        return rv;
+    }
+    private static class AlphaComparator extends PeerComparator {
+        private static final AlphaComparator _instance = new AlphaComparator();
+        public static final AlphaComparator instance() { return _instance; }
+    }
+    private static class IdleInComparator extends PeerComparator {
+        private static final IdleInComparator _instance = new IdleInComparator();
+        public static final IdleInComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getLastReceiveTime() - r.getLastReceiveTime();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class IdleOutComparator extends PeerComparator {
+        private static final IdleOutComparator _instance = new IdleOutComparator();
+        public static final IdleOutComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getLastSendTime() - r.getLastSendTime();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class RateInComparator extends PeerComparator {
+        private static final RateInComparator _instance = new RateInComparator();
+        public static final RateInComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getReceiveBps() - r.getReceiveBps();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class RateOutComparator extends PeerComparator {
+        private static final RateOutComparator _instance = new RateOutComparator();
+        public static final RateOutComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getSendBps() - r.getSendBps();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class UptimeComparator extends PeerComparator {
+        private static final UptimeComparator _instance = new UptimeComparator();
+        public static final UptimeComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getKeyEstablishedTime() - r.getKeyEstablishedTime();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class SkewComparator extends PeerComparator {
+        private static final SkewComparator _instance = new SkewComparator();
+        public static final SkewComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = Math.abs(l.getClockSkew()) - Math.abs(r.getClockSkew());
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class CwndComparator extends PeerComparator {
+        private static final CwndComparator _instance = new CwndComparator();
+        public static final CwndComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getSendWindowBytes() - r.getSendWindowBytes();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class SsthreshComparator extends PeerComparator {
+        private static final SsthreshComparator _instance = new SsthreshComparator();
+        public static final SsthreshComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getSlowStartThreshold() - r.getSlowStartThreshold();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class RTTComparator extends PeerComparator {
+        private static final RTTComparator _instance = new RTTComparator();
+        public static final RTTComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getRTT() - r.getRTT();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class DevComparator extends PeerComparator {
+        private static final DevComparator _instance = new DevComparator();
+        public static final DevComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getRTTDeviation() - r.getRTTDeviation();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class RTOComparator extends PeerComparator {
+        private static final RTOComparator _instance = new RTOComparator();
+        public static final RTOComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getRTO() - r.getRTO();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class MTUComparator extends PeerComparator {
+        private static final MTUComparator _instance = new MTUComparator();
+        public static final MTUComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getMTU() - r.getMTU();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class SendCountComparator extends PeerComparator {
+        private static final SendCountComparator _instance = new SendCountComparator();
+        public static final SendCountComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getPacketsTransmitted() - r.getPacketsTransmitted();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class RecvCountComparator extends PeerComparator {
+        private static final RecvCountComparator _instance = new RecvCountComparator();
+        public static final RecvCountComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getPacketsReceived() - r.getPacketsReceived();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class ResendComparator extends PeerComparator {
+        private static final ResendComparator _instance = new ResendComparator();
+        public static final ResendComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getPacketsRetransmitted() - r.getPacketsRetransmitted();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    private static class DupComparator extends PeerComparator {
+        private static final DupComparator _instance = new DupComparator();
+        public static final DupComparator instance() { return _instance; }
+        protected int compare(PeerState l, PeerState r) {
+            long rv = l.getPacketsReceivedDuplicate() - r.getPacketsReceivedDuplicate();
+            if (rv == 0) // fallback on alpha
+                return super.compare(l, r);
+            else
+                return (int)rv;
+        }
+    }
+    
+    private static class PeerComparator implements Comparator {
+        public int compare(Object lhs, Object rhs) {
+            if ( (lhs == null) || (rhs == null) || !(lhs instanceof PeerState) || !(rhs instanceof PeerState)) 
+                throw new IllegalArgumentException("rhs = " + rhs + " lhs = " + lhs);
+            return compare((PeerState)lhs, (PeerState)rhs);
+        }
+        protected int compare(PeerState l, PeerState r) {
+            // base64 retains binary ordering
+            return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
+        }
+    }
+    private static class InverseComparator implements Comparator {
+        private Comparator _comp;
+        public InverseComparator(Comparator comp) { _comp = comp; }
+        public int compare(Object lhs, Object rhs) {
+            return -1 * _comp.compare(lhs, rhs);
+        }
+    }
+    
+    private void appendSortLinks(StringBuffer buf, String urlBase, int sortFlags, String descr, int ascending) {
+        if (sortFlags == ascending) {
+            buf.append(" <a href=\"").append(urlBase).append("?sort=").append(0-ascending);
+            buf.append("\" title=\"").append(descr).append("\">V</a><b>^</b> ");
+        } else if (sortFlags == 0 - ascending) {
+            buf.append(" <b>V</b><a href=\"").append(urlBase).append("?sort=").append(ascending);
+            buf.append("\" title=\"").append(descr).append("\">^</a> ");
+        } else {
+            buf.append(" <a href=\"").append(urlBase).append("?sort=").append(0-ascending);
+            buf.append("\" title=\"").append(descr).append("\">V</a><a href=\"").append(urlBase).append("?sort=").append(ascending);
+            buf.append("\" title=\"").append(descr).append("\">^</a> ");
+        }
+    }
+    
+    //public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, 0); }
+    public void renderStatusHTML(Writer out, int sortFlags) throws IOException {}
+    public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
+        TreeSet peers = new TreeSet(getComparator(sortFlags));
         synchronized (_peersByIdent) {
             peers.addAll(_peersByIdent.values());
         }
@@ -1238,13 +1526,50 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"udpcon\">UDP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td><td><b><a href=\"#def.idle\">idle</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.rate\">in/out</a></b></td>\n");
-        buf.append("     <td><b><a href=\"#def.up\">up</a></b></td><td><b><a href=\"#def.skew\">skew</a></b></td>\n");
-        buf.append("     <td><b><a href=\"#def.cwnd\">cwnd</a></b></td><td><b><a href=\"#def.ssthresh\">ssthresh</a></b></td>\n");
-        buf.append("     <td><b><a href=\"#def.rtt\">rtt</a></b></td><td><b><a href=\"#def.dev\">dev</a></b></td><td><b><a href=\"#def.rto\">rto</a></b></td>\n");
-        buf.append("     <td><b><a href=\"#def.mtu\">mtu</a></b></td><td><b><a href=\"#def.send\">send</a></b></td><td><b><a href=\"#def.recv\">recv</a></b></td>\n");
-        buf.append("     <td><b><a href=\"#def.resent\">resent</a></b></td><td><b><a href=\"#def.dupRecv\">dupRecv</a></b></td>\n");
+        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b>");
+        if (sortFlags == FLAG_ALPHA)
+            buf.append(" V ");
+        else
+            buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
+        buf.append("</td><td><b><a href=\"#def.idle\">idle</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by idle inbound", FLAG_IDLE_IN);
+        buf.append("/");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by idle outbound", FLAG_IDLE_OUT);
+        buf.append("</td>");
+        buf.append("     <td><b><a href=\"#def.rate\">in/out</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by inbound rate", FLAG_RATE_IN);
+        buf.append("/");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by outbound rate", FLAG_RATE_OUT);
+        buf.append("</td>\n");
+        buf.append("     <td><b><a href=\"#def.up\">up</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by connection uptime", FLAG_UPTIME);
+        buf.append("</td><td><b><a href=\"#def.skew\">skew</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by clock skew", FLAG_SKEW);
+        buf.append("</td>\n");
+        buf.append("     <td><b><a href=\"#def.cwnd\">cwnd</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by congestion window", FLAG_CWND);
+        buf.append("</td><td><b><a href=\"#def.ssthresh\">ssthresh</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by slow start threshold", FLAG_SSTHRESH);
+        buf.append("</td>\n");
+        buf.append("     <td><b><a href=\"#def.rtt\">rtt</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by round trip time", FLAG_RTT);
+        buf.append("</td><td><b><a href=\"#def.dev\">dev</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by round trip time deviation", FLAG_DEV);
+        buf.append("</td><td><b><a href=\"#def.rto\">rto</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by retransmission timeout", FLAG_RTO);
+        buf.append("</td>\n");
+        buf.append("     <td><b><a href=\"#def.mtu\">mtu</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by maximum transmit unit", FLAG_MTU);
+        buf.append("</td><td><b><a href=\"#def.send\">send</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by packets sent", FLAG_SEND);
+        buf.append("</td><td><b><a href=\"#def.recv\">recv</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by packets received", FLAG_RECV);
+        buf.append("</td>\n");
+        buf.append("     <td><b><a href=\"#def.resent\">resent</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by packets retransmitted", FLAG_RESEND);
+        buf.append("</td><td><b><a href=\"#def.dupRecv\">dupRecv</a></b>");
+        appendSortLinks(buf, urlBase, sortFlags, "Sort by packets received more than once", FLAG_DUP);
+        buf.append("</td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -1513,7 +1838,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public String toString() { return "UDP bid @ " + getLatencyMs(); }
     }
     
-    private static final int EXPIRE_TIMEOUT = 10*60*1000;
+    private static final int EXPIRE_TIMEOUT = 30*60*1000;
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
         private List _expirePeers;
@@ -1539,7 +1864,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
             for (int i = 0; i < _expireBuffer.size(); i++)
-                dropPeer((PeerState)_expireBuffer.get(i), false);
+                dropPeer((PeerState)_expireBuffer.get(i), false, "idle too long");
             _expireBuffer.clear();
 
             if (_alive)
