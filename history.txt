@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.476 2006-05-16 13:34:28 jrandom Exp $
+$Id: history.txt,v 1.477 2006-05-17 22:01:21 jrandom Exp $
+
+2006-05-17  Complication
+    * Fix some oversights in my previous changes:
+      adjust some loglevels, make a few statements less wasteful,
+      make one comparison less confusing and more likely to log unexpected values
 
 2006-05-17  jrandom
     * Make the peer page sortable

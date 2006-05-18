@@ -166,7 +166,7 @@ class BuildExecutor implements Runnable {
                return(0);
             } else {
                 // Mild overload, check if we already build tunnels
-                if (concurrent <= 0) {
+                if (concurrent == 0) {
                     // We aren't building, allow 1
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Mild overload, allow building 1.");

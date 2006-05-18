@@ -552,7 +552,7 @@ public class TunnelDispatcher implements Service {
        long periodWithoutDrop = _context.clock().now() - _lastDropTime;
        if (periodWithoutDrop < DROP_BASE_INTERVAL) {
            if (_log.shouldLog(Log.WARN))
-               _log.error("Not dropping tunnel, since last drop was " + periodWithoutDrop + " ms ago!");
+               _log.warn("Not dropping tunnel, since last drop was " + periodWithoutDrop + " ms ago!");
            return;
        }
 
@@ -576,9 +576,9 @@ public class TunnelDispatcher implements Service {
            if ((currentMessages > 20) && ((biggest == null) || (currentRate > biggestRate))) {
                // Update our profile of the biggest
                biggest = current;
-               biggestMessages = biggest.getProcessedMessagesCount();
-               biggestAge = (_context.clock().now() - current.getCreation());
-               biggestRate = ((double) biggestMessages / (biggestAge / 1000));
+               biggestMessages = currentMessages;
+               biggestAge = currentAge;
+               biggestRate = currentRate;
            }
        }
 
@@ -588,8 +588,8 @@ public class TunnelDispatcher implements Service {
            return;
        }
 
-       if (_log.shouldLog(Log.ERROR))
-           _log.error("Dropping tunnel with " + biggestRate + " messages/s and " + biggestMessages +
+       if (_log.shouldLog(Log.WARN))
+           _log.warn("Dropping tunnel with " + biggestRate + " messages/s and " + biggestMessages +
                       " messages, last drop was " + (periodWithoutDrop / 1000) + " s ago.");
        remove(biggest);
        _lastDropTime = _context.clock().now() + _context.random().nextInt(DROP_RANDOM_BOOST);
