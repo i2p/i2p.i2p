@@ -120,6 +120,22 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         else
             return false;
     }
+
+    public List getKnownRouterData() {
+        List rv = new ArrayList();
+        DataStore ds = getDataStore();
+        if (ds != null) {
+            Set keys = ds.getKeys();
+            if (keys != null) {
+                for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
+                    Object o = getDataStore().get((Hash)iter.next());
+                    if (o instanceof RouterInfo)
+                        rv.add(o);
+                }
+            }
+        }
+        return rv;
+    }
     
     /**
      * Begin a kademlia style search for the key specified, which can take up to timeoutMs and

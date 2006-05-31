@@ -15,8 +15,12 @@ import java.util.*;
 import net.i2p.data.Hash;
 import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Log;
+
+import net.i2p.data.RouterInfo;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 
 /**
  * Manage the current state of the statistics
@@ -204,12 +208,27 @@ class PeerManager {
         return null;
     }
     public List getPeersByCapability(char capability) { 
-        synchronized (_capabilitiesByPeer) {
-            List peers = locked_getPeers(capability);
-            if (peers != null)
-                return new ArrayList(peers);
+        if (false) {
+            synchronized (_capabilitiesByPeer) {
+                List peers = locked_getPeers(capability);
+                if (peers != null)
+                    return new ArrayList(peers);
+            }
+            return null;
+        } else {
+            FloodfillNetworkDatabaseFacade f = (FloodfillNetworkDatabaseFacade)_context.netDb();
+            List routerInfos = f.getKnownRouterData();
+            List rv = new ArrayList();
+            for (Iterator iter = routerInfos.iterator(); iter.hasNext(); ) {
+                RouterInfo ri = (RouterInfo)iter.next();
+                String caps = ri.getCapabilities();
+                if (caps.indexOf(capability) >= 0)
+                    rv.add(ri.getIdentity().calculateHash());
+            }
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Peers with capacity " + capability + ": " + rv.size());
+            return rv;
         }
-        return null;
     }
 
     public void renderStatusHTML(Writer out) throws IOException { 

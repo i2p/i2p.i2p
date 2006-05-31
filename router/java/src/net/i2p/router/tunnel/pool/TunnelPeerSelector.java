@@ -2,11 +2,11 @@ package net.i2p.router.tunnel.pool;
 
 import java.util.*;
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.Hash;
+import net.i2p.data.*;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -153,6 +153,103 @@ abstract class TunnelPeerSelector {
             if (caps == null) return new HashSet(0);
             HashSet rv = new HashSet(caps);
             return rv;
+        } else if (filterSlow(ctx, isInbound, isExploratory)) {
+            Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
+            String excludeCaps = ctx.getProperty("router.excludePeerCaps", 
+                                                 String.valueOf(Router.CAPABILITY_BW16) +
+                                                 String.valueOf(Router.CAPABILITY_BW32));
+            Set peers = new HashSet();
+            if (excludeCaps != null) {
+                char excl[] = excludeCaps.toCharArray();
+                FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
+                List known = fac.getKnownRouterData();
+                if (known != null) {
+                    for (int i = 0; i < known.size(); i++) {
+                        RouterInfo peer = (RouterInfo)known.get(i);
+                        String cap = peer.getCapabilities();
+                        if (cap == null) {
+                            peers.add(peer.getIdentity().calculateHash());
+                            continue;
+                        }
+                        for (int j = 0; j < excl.length; j++) {
+                            if (cap.indexOf(excl[j]) >= 0) {
+                                peers.add(peer.getIdentity().calculateHash());
+                                continue;
+                            }
+                        }
+                        int maxLen = 0;
+                        if (cap.indexOf(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL) >= 0)
+                            maxLen++;
+                        if (cap.indexOf(Router.CAPABILITY_REACHABLE) >= 0)
+                            maxLen++;
+                        if (cap.indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                            maxLen++;
+                        if (cap.length() <= maxLen)
+                            peers.add(peer.getIdentity().calculateHash());
+                        // otherwise, it contains flags we aren't trying to focus on,
+                        // so don't exclude it based on published capacity
+                        
+                        if (filterUptime(ctx, isInbound, isExploratory)) {
+                            Properties opts = peer.getOptions();
+                            if (opts != null) {
+                                String val = opts.getProperty("stat_uptime");
+                                long uptimeMs = 0;
+                                if (val != null) {
+                                    long factor = 1;
+                                    if (val.endsWith("ms")) {
+                                        factor = 1;
+                                        val = val.substring(0, val.length()-2);
+                                    } else if (val.endsWith("s")) {
+                                        factor = 1000l;
+                                        val = val.substring(0, val.length()-1);
+                                    } else if (val.endsWith("m")) {
+                                        factor = 60*1000l;
+                                        val = val.substring(0, val.length()-1);
+                                    } else if (val.endsWith("h")) {
+                                        factor = 60*60*1000l;
+                                        val = val.substring(0, val.length()-1);
+                                    } else if (val.endsWith("d")) {
+                                        factor = 24*60*60*1000l;
+                                        val = val.substring(0, val.length()-1);
+                                    }
+                                    try { uptimeMs = Long.parseLong(val); } catch (NumberFormatException nfe) {}
+                                    uptimeMs *= factor;
+                                } else {
+                                    // not publishing an uptime, so exclude it
+                                    peers.add(peer.getIdentity().calculateHash());
+                                    continue;
+                                }
+                                
+                                long infoAge = ctx.clock().now() - peer.getPublished();
+                                if (infoAge < 0) {
+                                    infoAge = 0;
+                                } else if (infoAge > 24*60*60*1000) {
+                                    peers.add(peer.getIdentity().calculateHash());
+                                    continue;
+                                } else {
+                                    if (infoAge + uptimeMs < 4*60*60*1000) {
+                                        // up for less than 4 hours, so exclude it
+                                        peers.add(peer.getIdentity().calculateHash());
+                                    }
+                                }
+                            } else {
+                                // not publishing stats, so exclude it
+                                peers.add(peer.getIdentity().calculateHash());
+                                continue;
+                            }
+                        }
+                    }
+                }
+                /*
+                for (int i = 0; i < excludeCaps.length(); i++) {
+                    List matches = ctx.peerManager().getPeersByCapability(excludeCaps.charAt(i));
+                    if (log.shouldLog(Log.INFO))
+                        log.info("Filtering out " + matches.size() + " peers with capability " + excludeCaps.charAt(i));
+                    peers.addAll(matches);
+                }
+                 */
+            }
+            return peers;
         } else {
             return new HashSet(1);
         }
@@ -162,6 +259,7 @@ abstract class TunnelPeerSelector {
     private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.outboundClientExcludeUnreachable";
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.inboundExploratoryExcludeUnreachable";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.inboundClientExcludeUnreachable";
+    
     private static final boolean DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
     private static final boolean DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
     private static final boolean DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
@@ -181,6 +279,58 @@ abstract class TunnelPeerSelector {
                 val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
             else 
                 val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+        
+        boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
+        //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
+        return rv;
+    }
+
+    
+    private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_SLOW = "router.outboundExploratoryExcludeSlow";
+    private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW = "router.outboundClientExcludeSlow";
+    private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW = "router.inboundExploratoryExcludeSlow";
+    private static final String PROP_INBOUND_CLIENT_EXCLUDE_SLOW = "router.inboundClientExcludeSlow";
+    
+    protected boolean filterSlow(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+        boolean def = true;
+        String val = null;
+        
+        if (isExploratory)
+            if (isInbound)
+                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW);
+            else
+                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_SLOW);
+        else
+            if (isInbound)
+                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_SLOW);
+            else 
+                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_SLOW);
+        
+        boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
+        //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
+        return rv;
+    }
+    
+    private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.outboundExploratoryExcludeUptime";
+    private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME = "router.outboundClientExcludeUptime";
+    private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.inboundExploratoryExcludeUptime";
+    private static final String PROP_INBOUND_CLIENT_EXCLUDE_UPTIME = "router.inboundClientExcludeUptime";
+    
+    /** do we want to skip peers who haven't been up for long? */
+    protected boolean filterUptime(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+        boolean def = true;
+        String val = null;
+        
+        if (isExploratory)
+            if (isInbound)
+                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME);
+            else
+                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UPTIME);
+        else
+            if (isInbound)
+                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UPTIME);
+            else 
+                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UPTIME);
         
         boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
         //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);

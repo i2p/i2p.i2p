@@ -87,6 +87,8 @@ class FloodfillPeerSelector extends PeerSelector {
                 if ( (!SearchJob.onlyQueryFloodfillPeers(_context)) && (_wanted > _matches) && (_key != null) ) {
                     BigInteger diff = getDistance(_key, entry);
                     _sorted.put(diff, entry);
+                } else {
+                    return;
                 }
             }
             _matches++;

@@ -495,11 +495,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             out.write("<td align=right>" + info.getProcessedMessagesCount() + "KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);
+                String cap = getCapacity(peer);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
                 if (_context.routerHash().equals(peer))
-                    out.write("<td><i>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</i></td>");
+                    out.write("<td><i>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</i>" + cap + "</td>");
                 else
-                    out.write("<td>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</td>");                
+                    out.write("<td>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + cap + "</td>");                
             }
             out.write("</tr>\n");
             
@@ -525,5 +526,27 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (live <= 0)
             out.write("<b>No tunnels, waiting for the grace period to end</b><br />\n");
         out.write("Lifetime bandwidth usage: " + processedIn + "KB in, " + processedOut + "KB out<br />");
+    }
+    
+    private String getCapacity(Hash peer) {
+        RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
+        if (info != null) {
+            String caps = info.getCapabilities();
+            if (caps.indexOf(Router.CAPABILITY_BW16) >= 0) {
+                return "[&lt;16&nbsp;]";
+            } else if (caps.indexOf(Router.CAPABILITY_BW32) >= 0) {
+                return "[&lt;32&nbsp;]";
+            } else if (caps.indexOf(Router.CAPABILITY_BW64) >= 0) {
+                return "[&lt;64&nbsp;]";
+            } else if (caps.indexOf(Router.CAPABILITY_BW128) >= 0) {
+                return "<b>[&lt;128]</b>";
+            } else if (caps.indexOf(Router.CAPABILITY_BW256) >= 0) {
+                return "<b>[&gt;128]</b>";
+            } else {
+                return "[&nbsp;&nbsp;&nbsp;&nbsp;]";
+            }
+        } else {
+            return "[&nbsp;&nbsp;&nbsp;&nbsp;]";
+        }
     }
 }

@@ -121,7 +121,7 @@ class SearchJob extends JobImpl {
     public long getExpiration() { return _expiration; }
     public long getTimeoutMs() { return _timeoutMs; }
     
-    private static final boolean DEFAULT_FLOODFILL_ONLY = false;
+    private static final boolean DEFAULT_FLOODFILL_ONLY = true;
     
     static boolean onlyQueryFloodfillPeers(RouterContext ctx) {
         if (isCongested(ctx))

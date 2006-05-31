@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.478 2006-05-17 22:42:57 complication Exp $
+$Id: history.txt,v 1.479 2006-05-18 17:31:08 jrandom Exp $
+
+2006-05-31  jrandom
+    * Only send netDb searches to the floodfill peers for the time being
+    * Add some proof of concept filters for tunnel participation.  By default,
+      it will skip peers with an advertised bandwith of less than 32KBps or
+      an advertised uptime of less than 2 hours.  If this is sufficient, a
+      safer implementation of these filters will be implemented.
 
 * 2006-05-18  0.6.1.19 released
 
