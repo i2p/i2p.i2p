@@ -105,7 +105,7 @@ class RouterThrottleImpl implements RouterThrottle {
 
         if (numTunnels > getMinThrottleTunnels()) {
             double tunnelGrowthFactor = getTunnelGrowthFactor();
-            Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(60*60*1000);
+            Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(10*60*1000);
             if (avgTunnels != null) {
                 double avg = 0;
                 if (avgTunnels.getLastEventCount() > 0) 
@@ -142,37 +142,37 @@ class RouterThrottleImpl implements RouterThrottle {
         
         double tunnelTestTimeGrowthFactor = getTunnelTestTimeGrowthFactor();
         Rate tunnelTestTime1m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(1*60*1000);
-        Rate tunnelTestTime60m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(60*60*1000);
-        if ( (tunnelTestTime1m != null) && (tunnelTestTime60m != null) && (tunnelTestTime1m.getLastEventCount() > 0) ) {
+        Rate tunnelTestTime10m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
+        if ( (tunnelTestTime1m != null) && (tunnelTestTime10m != null) && (tunnelTestTime1m.getLastEventCount() > 0) ) {
             double avg1m = tunnelTestTime1m.getAverageValue();
-            double avg60m = 0;
-            if (tunnelTestTime60m.getLastEventCount() > 0)
-                avg60m = tunnelTestTime60m.getAverageValue();
+            double avg10m = 0;
+            if (tunnelTestTime10m.getLastEventCount() > 0)
+                avg10m = tunnelTestTime10m.getAverageValue();
             else
-                avg60m = tunnelTestTime60m.getLifetimeAverageValue();
+                avg10m = tunnelTestTime10m.getLifetimeAverageValue();
 
-            if (avg60m < 2000)
-                avg60m = 2000; // minimum before complaining
+            if (avg10m < 2000)
+                avg10m = 2000; // minimum before complaining
 
-            if ( (avg60m > 0) && (avg1m > avg60m * tunnelTestTimeGrowthFactor) ) {
-                double probAccept = (avg60m*tunnelTestTimeGrowthFactor)/avg1m;
+            if ( (avg10m > 0) && (avg1m > avg10m * tunnelTestTimeGrowthFactor) ) {
+                double probAccept = (avg10m*tunnelTestTimeGrowthFactor)/avg1m;
                 probAccept = probAccept * probAccept; // square the decelerator for test times
                 int v = _context.random().nextInt(100);
                 if (v < probAccept*100) {
                     // ok
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Probabalistically accept tunnel request (p=" + probAccept 
-                                  + " v=" + v + " test time avg 1m=" + avg1m + " 60m=" + avg60m + ")");
+                                  + " v=" + v + " test time avg 1m=" + avg1m + " 10m=" + avg10m + ")");
                 } else {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Probabalistically refusing tunnel request (test time avg 1m=" + avg1m
-                                  + " 60m=" + avg60m + ")");
-                    _context.statManager().addRateData("router.throttleTunnelProbTestSlow", (long)(avg1m-avg60m), 0);
+                                  + " 10m=" + avg10m + ")");
+                    _context.statManager().addRateData("router.throttleTunnelProbTestSlow", (long)(avg1m-avg10m), 0);
                     return TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Accepting tunnel request, since 60m test time average is " + avg60m
+                    _log.info("Accepting tunnel request, since 60m test time average is " + avg10m
                               + " and past 1m only has " + avg1m + ")");
             }
         }
@@ -260,7 +260,7 @@ class RouterThrottleImpl implements RouterThrottle {
         int used1s = _context.router().get1sRate(); // dont throttle on the 1s rate, its too volatile
         int used15s = _context.router().get15sRate();
         int used1m = _context.router().get1mRate(); // dont throttle on the 1m rate, its too slow
-        int used = used15s;
+        int used = Math.min(used15s,used1s);
 
         double share = _context.router().getSharePercentage();
         int availBps = (int)(((maxKBps*1024)*share) - used); //(int)(((maxKBps*1024) - used) * getSharePercentage());
@@ -269,8 +269,8 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
-        if (used1s > (maxKBps*1024)) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1s rate (" + used1s + ") indicates overload.");
+        if (used1m > (maxKBps*1024)) {
+            if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + used1m + ") indicates overload.");
             return false;
         }
 
