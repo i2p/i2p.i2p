@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.479 2006-05-18 17:31:08 jrandom Exp $
+$Id: history.txt,v 1.481 2006-06-04 17:25:08 jrandom Exp $
+
+2006-06-04  Complication
+    * Trim out sending a blank line before USER in susimail.
+      Seemed to break in rare cases, thanks for reporting, Brachtus!
 
 * 2006-06-04  0.6.1.20 released
 

@@ -19,7 +19,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.8 $
+ * $Revision: 1.1 $
  */
 package i2p.susi.webmail.pop3;
 
@@ -373,8 +373,7 @@ public class POP3MailBox {
 		}
 		if (socket != null) {
 			try {
-				if (sendCmd1a("")
-					&& sendCmd1a("USER " + user)
+				if (sendCmd1a("USER " + user)
 					&& sendCmd1a("PASS " + pass)
 					&& sendCmd1a("STAT") ) {
 
