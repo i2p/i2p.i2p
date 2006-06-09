@@ -151,8 +151,8 @@ class RouterThrottleImpl implements RouterThrottle {
             else
                 avg10m = tunnelTestTime10m.getLifetimeAverageValue();
 
-            if (avg10m < 2000)
-                avg10m = 2000; // minimum before complaining
+            if (avg10m < 5000)
+                avg10m = 5000; // minimum before complaining
 
             if ( (avg10m > 0) && (avg1m > avg10m * tunnelTestTimeGrowthFactor) ) {
                 double probAccept = (avg10m*tunnelTestTimeGrowthFactor)/avg1m;
@@ -163,7 +163,7 @@ class RouterThrottleImpl implements RouterThrottle {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Probabalistically accept tunnel request (p=" + probAccept 
                                   + " v=" + v + " test time avg 1m=" + avg1m + " 10m=" + avg10m + ")");
-                } else {
+                } else if (false) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Probabalistically refusing tunnel request (test time avg 1m=" + avg1m
                                   + " 10m=" + avg10m + ")");
@@ -228,7 +228,7 @@ class RouterThrottleImpl implements RouterThrottle {
                 timePerRequest = (int)rs.getLifetimeAverageValue();
         }
         float pctFull = (queuedRequests * timePerRequest) / (10*1000f);
-        float pReject = 1 - ((1-pctFull) * (1-pctFull));
+        float pReject = pctFull * pctFull; //1 - ((1-pctFull) * (1-pctFull));
         if ( (pctFull >= 1) || (pReject >= _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting a new tunnel request because we have too many pending requests (" + queuedRequests 
@@ -269,7 +269,10 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
-        if (used1m > (maxKBps*1024)) {
+        long overage = used1m - (maxKBps*1024);
+        if ( (overage > 0) && 
+             ((overage/(float)(maxKBps*1024f)) > _context.random().nextFloat()) ) {
+                
             if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + used1m + ") indicates overload.");
             return false;
         }
@@ -342,9 +345,9 @@ class RouterThrottleImpl implements RouterThrottle {
     /** dont ever probabalistically throttle tunnels if we have less than this many */
     private int getMinThrottleTunnels() { 
         try {
-            return Integer.parseInt(_context.getProperty("router.minThrottleTunnels", "40"));
+            return Integer.parseInt(_context.getProperty("router.minThrottleTunnels", "1000"));
         } catch (NumberFormatException nfe) {
-            return 40;
+            return 1000;
         }
     }
     

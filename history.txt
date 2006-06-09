@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.481 2006-06-04 17:25:08 jrandom Exp $
+$Id: history.txt,v 1.482 2006-06-04 20:33:03 complication Exp $
+
+2006-06-08  jrandom
+    * Be more conservative in the proactive rejections
 
 2006-06-04  Complication
     * Trim out sending a blank line before USER in susimail.
