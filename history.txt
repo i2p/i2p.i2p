@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.483 2006-06-08 20:02:40 jrandom Exp $
+$Id: history.txt,v 1.484 2006-06-09 19:34:44 jrandom Exp $
+
+2006-06-10  jrandom
+    * Further reduction in proactive rejections
 
 2006-06-09  jrandom
     * Don't let the pending tunnel request queue grow beyond reason

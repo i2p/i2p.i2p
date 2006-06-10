@@ -227,8 +227,8 @@ class RouterThrottleImpl implements RouterThrottle {
             else
                 timePerRequest = (int)rs.getLifetimeAverageValue();
         }
-        float pctFull = (queuedRequests * timePerRequest) / (2*1000f);
-        float pReject = pctFull * pctFull; //1 - ((1-pctFull) * (1-pctFull));
+        float pctFull = (queuedRequests * timePerRequest) / (4*1000f);
+        double pReject = Math.pow(pctFull, 16); //1 - ((1-pctFull) * (1-pctFull));
         if ( (pctFull >= 1) || (pReject >= _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting a new tunnel request because we have too many pending requests (" + queuedRequests 
