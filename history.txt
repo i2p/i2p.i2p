@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.482 2006-06-04 20:33:03 complication Exp $
+$Id: history.txt,v 1.483 2006-06-08 20:02:40 jrandom Exp $
+
+2006-06-09  jrandom
+    * Don't let the pending tunnel request queue grow beyond reason
+      (letting things sit for up to 30s when they fail after 10s
+      seems a bit... off)
 
 2006-06-08  jrandom
     * Be more conservative in the proactive rejections

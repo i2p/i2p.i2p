@@ -227,7 +227,7 @@ class RouterThrottleImpl implements RouterThrottle {
             else
                 timePerRequest = (int)rs.getLifetimeAverageValue();
         }
-        float pctFull = (queuedRequests * timePerRequest) / (10*1000f);
+        float pctFull = (queuedRequests * timePerRequest) / (2*1000f);
         float pReject = pctFull * pctFull; //1 - ((1-pctFull) * (1-pctFull));
         if ( (pctFull >= 1) || (pReject >= _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN))
