@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.484 2006-06-09 19:34:44 jrandom Exp $
+$Id: history.txt,v 1.485 2006-06-10 15:14:57 jrandom Exp $
+
+2006-06-11  Kloug
+    * Bugfix to the I2PTunnel IRC filter to support multiple concurrent
+      outstanding pings/pongs
 
 2006-06-10  jrandom
     * Further reduction in proactive rejections

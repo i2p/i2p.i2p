@@ -27,8 +27,6 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
     protected List dests;
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000; // -1
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
-    /** this is the pong response the client expects for their last ping.  at least, i hope so... */
-    private String _expectedPong;
 
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -47,8 +45,6 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
               notifyThis, 
               "IRCHandler " + (++__clientId), tunnel);
         
-        _expectedPong = null;
-
         StringTokenizer tok = new StringTokenizer(destinations, ",");
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
@@ -85,9 +81,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         try {
             i2ps = createI2PSocket(dest);
             i2ps.setReadTimeout(readTimeout);
-            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps));
+            StringBuffer expectedPong = new StringBuffer();
+            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong));
             in.start();
-            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps));
+            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps, expectedPong));
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))
@@ -123,10 +120,12 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         
         private Socket local;
         private I2PSocket remote;
+        private StringBuffer expectedPong;
                 
-        IrcInboundFilter(Socket _local, I2PSocket _remote) {
+        IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
             local=_local;
             remote=_remote;
+            expectedPong=pong;
         }
 
         public void run() {
@@ -153,7 +152,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                             inmsg=inmsg.substring(0,inmsg.length()-1);
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("in: [" + inmsg + "]");
-                        String outmsg = inboundFilter(inmsg);
+                        String outmsg = inboundFilter(inmsg, expectedPong);
                         if(outmsg!=null)
                         {
                             if(!inmsg.equals(outmsg)) {
@@ -195,10 +194,12 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                     
             private Socket local;
             private I2PSocket remote;
+            private StringBuffer expectedPong;
                 
-            IrcOutboundFilter(Socket _local, I2PSocket _remote) {
+            IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
                 local=_local;
                 remote=_remote;
+                expectedPong=pong;
             }
                 
             public void run() {
@@ -225,7 +226,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                                 inmsg=inmsg.substring(0,inmsg.length()-1);
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("out: [" + inmsg + "]");
-                            String outmsg = outboundFilter(inmsg);
+                            String outmsg = outboundFilter(inmsg, expectedPong);
                             if(outmsg!=null)
                             {
                                 if(!inmsg.equals(outmsg)) {
@@ -264,7 +265,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
      *
      */
     
-    public String inboundFilter(String s) {
+    public String inboundFilter(String s, StringBuffer expectedPong) {
         
         String field[]=s.split(" ",4);
         String command;
@@ -311,9 +312,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             // though, does 127.0.0.1 work for irc clients connecting remotely?  and for all of them?  sure would
             // be great if irc clients actually followed the RFCs here, but i guess thats too much to ask.
             // If we haven't PINGed them, or the PING we sent isn't something we know how to filter, this 
-            // is null.
-            String pong = _expectedPong;
-            _expectedPong = null;
+            // is blank.
+            String pong = expectedPong.length() > 0 ? expectedPong.toString() : null;
+            expectedPong.setLength(0);
             return pong;
         }
         
@@ -347,7 +348,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         return null;
     }
     
-    public String outboundFilter(String s) {
+    public String outboundFilter(String s, StringBuffer expectedPong) {
         
         String field[]=s.split(" ",3);
         String command;
@@ -397,24 +398,24 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             // Yuck.
 
             String rv = null;
+            expectedPong.setLength(0);
             if (field.length == 1) { // PING
                 rv = "PING";
-                _expectedPong = "PONG 127.0.0.1";
+                expectedPong.append("PONG 127.0.0.1");
             } else if (field.length == 2) { // PING nonce
                 rv = "PING " + field[1];
-                _expectedPong = "PONG " + field[1];
+                expectedPong.append("PONG ").append(field[1]);
             } else if (field.length == 3) { // PING nonce serverLocation
                 rv = "PING " + field[1];
-                _expectedPong = "PONG " + field[1];
+                expectedPong.append("PONG ").append(field[1]);
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("IRC client sent a PING we don't understand, filtering it (\"" + s + "\")");
                 rv = null;
-                _expectedPong = null;
             }
             
             if (_log.shouldLog(Log.WARN))
-                _log.warn("sending ping " + rv + ", waiting for " + _expectedPong + " orig was [" + s  + "]");
+                _log.warn("sending ping " + rv + ", waiting for " + expectedPong + " orig was [" + s  + "]");
             
             return rv;
         }
