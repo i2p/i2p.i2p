@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.485 2006-06-10 15:14:57 jrandom Exp $
+$Id: history.txt,v 1.486 2006-06-11 14:48:41 jrandom Exp $
+
+2006-06-13  jrandom
+    * Cut down the proactive rejections due to queue size - if we are
+      at the point of having decrypted the request off the queue, might
+      as well let it through, rather than waste that decryption
 
 2006-06-11  Kloug
     * Bugfix to the I2PTunnel IRC filter to support multiple concurrent

@@ -229,6 +229,10 @@ class RouterThrottleImpl implements RouterThrottle {
         }
         float pctFull = (queuedRequests * timePerRequest) / (4*1000f);
         double pReject = Math.pow(pctFull, 16); //1 - ((1-pctFull) * (1-pctFull));
+        // let it in because we drop overload- rejecting may be overkill,
+        // especially since we've done the cpu-heavy lifting to figure out
+        // whats up
+        /*
         if ( (pctFull >= 1) || (pReject >= _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting a new tunnel request because we have too many pending requests (" + queuedRequests 
@@ -236,6 +240,7 @@ class RouterThrottleImpl implements RouterThrottle {
             _context.statManager().addRateData("router.throttleTunnelQueueOverload", queuedRequests, timePerRequest);
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
+        */
 
         // ok, all is well, let 'er in
         _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, 60*10*1000);
