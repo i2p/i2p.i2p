@@ -227,8 +227,8 @@ abstract class TunnelPeerSelector {
                                     peers.add(peer.getIdentity().calculateHash());
                                     continue;
                                 } else {
-                                    if (infoAge + uptimeMs < 4*60*60*1000) {
-                                        // up for less than 4 hours, so exclude it
+                                    if (infoAge + uptimeMs < 2*60*60*1000) {
+                                        // up for less than 2 hours, so exclude it
                                         peers.add(peer.getIdentity().calculateHash());
                                     }
                                 }
