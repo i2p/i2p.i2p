@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.488 2006-06-13 18:29:51 jrandom Exp $
+$Id: history.txt,v 1.489 2006-06-13 21:17:40 jrandom Exp $
+
+2006-06-14  cervantes
+    * Small tweak to I2PTunnel CSS, so it looks better with desktops
+      that use Bitstream Vera fonts @ 96 dpi
 
 * 2006-06-14  0.6.1.21 released
 
