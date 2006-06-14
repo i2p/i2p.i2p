@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.487 2006-06-13 04:38:48 jrandom Exp $
+$Id: history.txt,v 1.488 2006-06-13 18:29:51 jrandom Exp $
+
+* 2006-06-14  0.6.1.21 released
 
 2006-06-13  jrandom
     * Use a minimum uptime of 2 hours, not 4 (oops)
