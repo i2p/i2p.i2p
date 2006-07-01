@@ -190,6 +190,7 @@ public class IndexBean {
     }
     
     private String saveChanges() {
+        // Get current tunnel controller
         TunnelController cur = getController(_tunnel);
         
         Properties config = getConfig();
@@ -205,21 +206,28 @@ public class IndexBean {
         } else {
             cur.setConfig(config, "");
         }
-        
-        if ("ircclient".equals(cur.getType()) || 
-        		"httpclient".equals(cur.getType()) || 
-        		"client".equals(cur.getType())) {
-            // all clients use the same I2CP session, and as such, use the same
-            // I2CP options
+        // Only modify other shared tunnels
+        // if the current tunnel is shared, and of supported type
+        if ("true".equalsIgnoreCase(cur.getSharedClient()) &&
+            ("ircclient".equals(cur.getType()) ||
+             "httpclient".equals(cur.getType()) ||
+             "client".equals(cur.getType()))) {
+            // all clients use the same I2CP session, and as such, use the same I2CP options
             List controllers = _group.getControllers();
+
             for (int i = 0; i < controllers.size(); i++) {
                 TunnelController c = (TunnelController)controllers.get(i);
+
+                // Current tunnel modified by user, skip
                 if (c == cur) continue;
-                //only change when they really are declared of beeing a sharedClient
-                if (("httpclient".equals(c.getType()) || 
-                		"ircclient".equals(c.getType())||
-                		"client".equals(c.getType()) 
-                		) && "true".equalsIgnoreCase(c.getSharedClient())) {
+
+                // Only modify this non-current tunnel
+                // if it belongs to a shared destination, and is of supported type
+                if ("true".equalsIgnoreCase(c.getSharedClient()) &&
+                    ("httpclient".equals(c.getType()) ||
+                     "ircclient".equals(c.getType()) ||
+                     "client".equals(c.getType()))) {
+
                     Properties cOpt = c.getConfig("");
                     if (_tunnelQuantity != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelQuantity);

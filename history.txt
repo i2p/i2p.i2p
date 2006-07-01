@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.489 2006-06-13 21:17:40 jrandom Exp $
+$Id: history.txt,v 1.490 2006-06-14 00:24:35 cervantes Exp $
+
+2006-07-01  Complication
+    * Ensure that the I2PTunnel web interface won't update tunnel settings
+      for shared clients when a non-shared client is modified
+      (thanks for spotting, BarkerJr!)
 
 2006-06-14  cervantes
     * Small tweak to I2PTunnel CSS, so it looks better with desktops
