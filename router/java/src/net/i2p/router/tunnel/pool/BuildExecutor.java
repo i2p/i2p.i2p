@@ -102,8 +102,8 @@ class BuildExecutor implements Runnable {
             }
         }
         
-        if (buf != null)
-            _log.debug(buf.toString());
+        //if (buf != null)
+        //    _log.debug(buf.toString());
         
         _context.statManager().addRateData("tunnel.concurrentBuilds", concurrent, 0);
         
@@ -217,15 +217,15 @@ class BuildExecutor implements Runnable {
                 // allowed() also expires timed out requests (for new style requests)
                 int allowed = allowed();
                 
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Allowed: " + allowed + " wanted: " + wanted);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Allowed: " + allowed + " wanted: " + wanted);
 
                 // zero hop ones can run inline
                 allowed = buildZeroHopTunnels(wanted, allowed);
                 afterBuildZeroHop = System.currentTimeMillis();
                 
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
 
                 int realBuilt = 0;
                 TunnelManagerFacade mgr = _context.tunnelManager();
@@ -243,10 +243,10 @@ class BuildExecutor implements Runnable {
                     if ( (allowed > 0) && (wanted.size() > 0) ) {
                         Collections.shuffle(wanted, _context.random());
                         
-                        // force the loops to be short, since 20 consecutive tunnel build requests can take
+                        // force the loops to be short, since 3 consecutive tunnel build requests can take
                         // a long, long time
-                        if (allowed > 5)
-                            allowed = 5;
+                        if (allowed > 2)
+                            allowed = 2;
                         
                         for (int i = 0; (i < allowed) && (wanted.size() > 0); i++) {
                             TunnelPool pool = (TunnelPool)wanted.remove(0);
@@ -275,10 +275,10 @@ class BuildExecutor implements Runnable {
                         try {
                             synchronized (_currentlyBuilding) {
                                 if (!_repoll) {
-                                    if (_log.shouldLog(Log.DEBUG))
-                                        _log.debug("Nothin' doin (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
+                                    //if (_log.shouldLog(Log.DEBUG))
+                                    //    _log.debug("Nothin' doin (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
                                     //if (allowed <= 0)
-                                        _currentlyBuilding.wait(_context.random().nextInt(1*1000));
+                                        _currentlyBuilding.wait(_context.random().nextInt(2*1000));
                                     //else // wanted <= 0
                                     //    _currentlyBuilding.wait(_context.random().nextInt(30*1000));
                                 }
@@ -297,14 +297,14 @@ class BuildExecutor implements Runnable {
                 if (pendingRemaining > 0)
                     _context.statManager().addRateData("tunnel.pendingRemaining", pendingRemaining, afterHandleInbound-afterBuildReal);
 
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("build loop complete, tot=" + (afterHandleInbound-loopBegin) + 
-                              " inReply=" + (afterHandleInboundReplies-beforeHandleInboundReplies) +
-                              " zeroHop=" + (afterBuildZeroHop-afterHandleInboundReplies) +
-                              " real=" + (afterBuildReal-afterBuildZeroHop) +
-                              " in=" + (afterHandleInbound-afterBuildReal) + 
-                              " built=" + realBuilt +
-                              " pending=" + pendingRemaining);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("build loop complete, tot=" + (afterHandleInbound-loopBegin) + 
+                //              " inReply=" + (afterHandleInboundReplies-beforeHandleInboundReplies) +
+                //              " zeroHop=" + (afterBuildZeroHop-afterHandleInboundReplies) +
+                //              " real=" + (afterBuildReal-afterBuildZeroHop) +
+                //              " in=" + (afterHandleInbound-afterBuildReal) + 
+                //              " built=" + realBuilt +
+                //              " pending=" + pendingRemaining);
                 
                 wanted.clear();
                 pools.clear();

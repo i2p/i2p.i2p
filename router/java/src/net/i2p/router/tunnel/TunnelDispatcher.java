@@ -40,6 +40,7 @@ public class TunnelDispatcher implements Service {
     private LeaveTunnel _leaveJob;
     /** what is the date/time we last deliberately dropped a tunnel? **/
     private long _lastDropTime;
+    private TunnelGatewayPumper _pumper;
     
     /** Creates a new instance of TunnelDispatcher */
     public TunnelDispatcher(RouterContext ctx) {
@@ -53,6 +54,7 @@ public class TunnelDispatcher implements Service {
         _lastParticipatingExpiration = 0;
         _lastDropTime = 0;
         _validator = null;
+        _pumper = new TunnelGatewayPumper(ctx);
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRateStat("tunnel.participatingTunnels", 
                                          "How many tunnels are we participating in?", "Tunnels", 
@@ -142,7 +144,8 @@ public class TunnelDispatcher implements Service {
             TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
             TunnelGateway.Sender sender = new OutboundSender(_context, cfg);
             TunnelGateway.Receiver receiver = new OutboundReceiver(_context, cfg);
-            TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
+            //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
+            TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
             synchronized (_outboundGateways) {
                 _outboundGateways.put(outId, gw);
@@ -245,7 +248,8 @@ public class TunnelDispatcher implements Service {
         TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
-        TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
+        //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
+        TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
         TunnelId recvId = cfg.getReceiveTunnel();
         synchronized (_inboundGateways) {
             _inboundGateways.put(recvId, gw);
@@ -367,7 +371,7 @@ public class TunnelDispatcher implements Service {
      *
      */
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
-        long before = _context.clock().now();
+        long before = System.currentTimeMillis();
         TunnelParticipant participant = null;
         synchronized (_participants) {
             participant = (TunnelParticipant)_participants.get(msg.getTunnelIdObj());
@@ -404,7 +408,9 @@ public class TunnelDispatcher implements Service {
             }
         }
         
-        long dispatchTime = _context.clock().now() - before;
+        long dispatchTime = System.currentTimeMillis() - before;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Dispatch data time: " + dispatchTime + " participant? " + participant);
         _context.statManager().addRateData("tunnel.dispatchDataTime", dispatchTime, dispatchTime);
     }
 
@@ -414,7 +420,7 @@ public class TunnelDispatcher implements Service {
      *
      */
     public void dispatch(TunnelGatewayMessage msg) {
-        long before = _context.clock().now();
+        long before = System.currentTimeMillis();
         TunnelGateway gw = null;
         synchronized (_inboundGateways) {
             gw = (TunnelGateway)_inboundGateways.get(msg.getTunnelId());
@@ -451,7 +457,10 @@ public class TunnelDispatcher implements Service {
                            + " existing = " + _inboundGateways.size(), new Exception("source"));
         }
         
-        long dispatchTime = _context.clock().now() - before;
+        long dispatchTime = System.currentTimeMillis() - before;
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Dispatch in gw time: " + dispatchTime + " gateway? " + gw);
         _context.statManager().addRateData("tunnel.dispatchGatewayTime", dispatchTime, dispatchTime);
     }
     
@@ -519,6 +528,9 @@ public class TunnelDispatcher implements Service {
         }
         
         long dispatchTime = _context.clock().now() - before;
+        if (dispatchTime > 1000) {
+            _log.error("wtf, took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
+        }
         if (gw instanceof TunnelGatewayZeroHop)
             _context.statManager().addRateData("tunnel.dispatchOutboundZeroHopTime", dispatchTime, dispatchTime);
         else
@@ -603,6 +615,7 @@ public class TunnelDispatcher implements Service {
         if (_validator != null)
             _validator.destroy();
         _validator = null;
+        _pumper.stopPumping();
     }
     public void restart() { 
         shutdown(); 

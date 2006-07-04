@@ -21,6 +21,8 @@ import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.ntcp.NTCPAddress;
+import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.util.Log;
 
@@ -89,20 +91,30 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     public Set createAddresses() {
         Map addresses = null;
+        boolean newCreated = false;
         
-        if (_manager != null) 
+        if (_manager != null) {
             addresses = _manager.getAddresses();
-        else
+        } else {
             addresses = new HashMap(1);
+            newCreated = true;
+        }
         
         if (!addresses.containsKey(TCPTransport.STYLE)) {
             RouterAddress addr = createTCPAddress();
             if (addr != null)
                 addresses.put(TCPTransport.STYLE, addr);
         }
+        if (!addresses.containsKey(NTCPTransport.STYLE)) {
+            RouterAddress addr = createNTCPAddress(_context);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("NTCP address: " + addr);
+            if (addr != null)
+                addresses.put(NTCPTransport.STYLE, addr);
+        }
         
         if (_log.shouldLog(Log.INFO))
-            _log.info("Creating addresses: " + addresses);
+            _log.info("Creating addresses: " + addresses + " isNew? " + newCreated, new Exception("creator"));
         return new HashSet(addresses.values());
     }
     
@@ -132,6 +144,43 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         props.setProperty("port", port);
         addr.setOptions(props);
         addr.setTransportStyle(TCPTransport.STYLE);
+        return addr;
+    }
+    
+    public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
+    public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
+    
+    public static RouterAddress createNTCPAddress(RouterContext ctx) {
+        if (!TransportManager.enableNTCP(ctx)) return null;
+        RouterAddress addr = new RouterAddress();
+        addr.setCost(10);
+        addr.setExpiration(null);
+        Properties props = new Properties();
+        String name = ctx.router().getConfigSetting(PROP_I2NP_NTCP_HOSTNAME);
+        String port = ctx.router().getConfigSetting(PROP_I2NP_NTCP_PORT);
+        /*
+        boolean isNew = false;
+        if (name == null) {
+            name = "localhost";
+            isNew = true;
+        }
+        if (port == null) {
+            port = String.valueOf(ctx.random().nextInt(10240)+1024);
+            isNew = true;
+        }
+         */
+        if ( (name == null) || (port == null) )
+            return null;
+        props.setProperty(NTCPAddress.PROP_HOST, name);
+        props.setProperty(NTCPAddress.PROP_PORT, port);
+        addr.setOptions(props);
+        addr.setTransportStyle(NTCPTransport.STYLE);
+        //if (isNew) {
+            if (false) return null;
+            ctx.router().setConfigSetting(PROP_I2NP_NTCP_HOSTNAME, name);
+            ctx.router().setConfigSetting(PROP_I2NP_NTCP_PORT, port);
+            ctx.router().saveConfig();
+        //}
         return addr;
     }
 }

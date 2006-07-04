@@ -361,6 +361,8 @@ public class ProfileOrganizer {
                     Hash cur = (Hash)_notFailingPeersList.get(curIndex);
                     if (matches.contains(cur) ||
                         (exclude != null && exclude.contains(cur))) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("matched? " + matches.contains(cur) + " exclude: " + exclude + " cur=" + cur.toBase64());
                         continue;
                     } else if (onlyNotFailing && _highCapacityPeers.containsKey(cur)) {
                         // we dont want the good peers, just random ones
@@ -368,12 +370,14 @@ public class ProfileOrganizer {
                     } else {
                         if (isSelectable(cur))
                             selected.add(cur);
+                        else if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Not selectable: " + cur.toBase64());
                     }
                 }
             }
             if (_log.shouldLog(Log.INFO))
                 _log.info("Selecting all not failing (strict? " + onlyNotFailing + " start=" + start 
-                          + ") found " + selected.size() + " new peers: " + selected);
+                          + ") found " + selected.size() + " new peers: " + selected + " all=" + _notFailingPeersList.size() + " strict=" + _strictCapacityOrder.size());
             matches.addAll(selected);
         }
         if (matches.size() < howMany) {

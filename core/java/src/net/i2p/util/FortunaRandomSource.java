@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
 
-import gnu.crypto.prng.FortunaStandalone;
+import gnu.crypto.prng.AsyncFortunaStandalone;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,13 +26,13 @@ import java.io.IOException;
  *
  */
 public class FortunaRandomSource extends RandomSource implements EntropyHarvester {
-    private FortunaStandalone _fortuna;
+    private AsyncFortunaStandalone _fortuna;
     private double _nextGaussian;
     private boolean _haveNextGaussian;
 
     public FortunaRandomSource(I2PAppContext context) {
         super(context);
-        _fortuna = new FortunaStandalone();
+        _fortuna = new AsyncFortunaStandalone();
         byte seed[] = new byte[1024];
         if (initSeed(seed)) {
             _fortuna.seed(seed);
@@ -41,6 +41,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
             sr.nextBytes(seed);
             _fortuna.seed(seed);
         }
+        _fortuna.startup();
         // kickstart it
         _fortuna.nextBytes(seed);
         _haveNextGaussian = false;
@@ -202,6 +203,13 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     public static void main(String args[]) {
         try {
             RandomSource rand = I2PAppContext.getGlobalContext().random();
+            if (true) {
+                for (int i = 0; i < 1000; i++)
+                    if (rand.nextFloat() < 0)
+                        throw new RuntimeException("negative!");
+                System.out.println("All positive");
+                return;
+            }
             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
             java.util.zip.GZIPOutputStream gos = new java.util.zip.GZIPOutputStream(baos);
             for (int i = 0; i < 1024*1024; i++) {

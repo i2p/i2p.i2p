@@ -533,7 +533,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn("Peer already connected: old=" + oldPeer + " new=" + peer, new Exception("dup"));
         
         _activeThrottle.unchoke(peer.getRemotePeer());
-        _context.shitlist().unshitlistRouter(peer.getRemotePeer());
+        _context.shitlist().unshitlistRouter(peer.getRemotePeer(), STYLE);
 
         if (SHOULD_FLOOD_PEERS)
             _flooder.addPeer(peer);

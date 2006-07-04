@@ -159,7 +159,8 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     private void write(Hash key, DataStructure data) {
-        _log.info("Writing key " + key);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Writing key " + key);
         FileOutputStream fos = null;
         File dbFile = null;
         try {

@@ -66,6 +66,20 @@
     Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
  <hr />
+ <b>Inbound TCP connection configuration:</b><br />
+ Externally reachable hostname or IP address:
+    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" />
+    (dyndns and the like are fine)<br />
+ Externally reachable TCP port:
+    <input name ="ntcpport" type="text" size="6" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
+ <p>You do <i>not</i> need to allow inbound TCP connections - outbound connections work with no
+    configuration.  However, if you want to receive inbound TCP connections, you <b>must</b> poke a hole
+    in your NAT or firewall for unsolicited TCP connections.  If you specify the wrong IP address or
+    hostname, or do not properly configure your NAT or firewall, your network performance will degrade
+    substantially.  When in doubt, leave the hostname and port number blank.</p>
+ <p><b>Note: changing this setting will terminate all of your connections and effectively
+    restart your router.</b>
+ <hr />
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
  <p>

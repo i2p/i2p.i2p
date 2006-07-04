@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: IRandom.java,v 1.12 2005/10/06 04:24:17 rsdio Exp $
+// $Id: IRandomStandalone.java,v 1.1 2005/10/22 13:10:00 jrandom Exp $
 //
 // Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
 //
@@ -82,9 +82,9 @@ import java.util.Map;
  *    Menezes, A., van Oorschot, P. and S. Vanstone.</li>
  * </ol>
  *
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.1 $
  */
-public interface IRandom extends Cloneable {
+public interface IRandomStandalone extends Cloneable {
 
    // Constants
    // -------------------------------------------------------------------------
@@ -110,32 +110,32 @@ public interface IRandom extends Cloneable {
    void init(Map attributes);
 
    /**
-    * <p>Returns the next 8 bits of random data generated from this instance.</p>
-    *
-    * @return the next 8 bits of random data generated from this instance.
-    * @exception IllegalStateException if the instance is not yet initialised.
-    * @exception LimitReachedException if this instance has reached its
-    * theoretical limit for generating non-repetitive pseudo-random data.
-    */
-   byte nextByte() throws IllegalStateException, LimitReachedException;
+     * <p>Returns the next 8 bits of random data generated from this instance.</p>
+     * 
+     * @return the next 8 bits of random data generated from this instance.
+     * @exception IllegalStateException if the instance is not yet initialised.
+     * @exception LimLimitReachedExceptionStandalone this instance has reached its
+     * theoretical limit for generating non-repetitive pseudo-random data.
+     */
+   byte nextByte() throws IllegalStateException, LimitReachedExceptionStandalone;
 
    /**
-    * <p>Fills the designated byte array, starting from byte at index
-    * <code>offset</code>, for a maximum of <code>length</code> bytes with the
-    * output of this generator instance.
-    *
-    * @param out the placeholder to contain the generated random bytes.
-    * @param offset the starting index in <i>out</i> to consider. This method
-    * does nothing if this parameter is not within <code>0</code> and
-    * <code>out.length</code>.
-    * @param length the maximum number of required random bytes. This method
-    * does nothing if this parameter is less than <code>1</code>.
-    * @exception IllegalStateException if the instance is not yet initialised.
-    * @exception LimitReachedException if this instance has reached its
-    * theoretical limit for generating non-repetitive pseudo-random data.
-    */
+     * <p>Fills the designated byte array, starting from byte at index
+     * <code>offset</code>, for a maximum of <code>length</code> bytes with the
+     * output of this generator instance.
+     * 
+     * @param out the placeholder to contain the generated random bytes.
+     * @param offset the starting index in <i>out</i> to consider. This method
+     * does nothing if this parameter is not within <code>0</code> and
+     * <code>out.length</code>.
+     * @param length the maximum number of required random bytes. This method
+     * does nothing if this parameter is less than <code>1</code>.
+     * @exception IllegalStateException if the instance is not yet initialised.
+     * @exception LimitLimitReachedExceptionStandalonehis instance has reached its
+     * theoretical limit for generating non-repetitive pseudo-random data.
+     */
    void nextBytes(byte[] out, int offset, int length)
-   throws IllegalStateException, LimitReachedException;
+   throws IllegalStateException, LimitReachedExceptionStandalone;
 
    /**
     * <p>Supplement, or possibly replace, the random state of this PRNG with

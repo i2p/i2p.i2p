@@ -48,6 +48,12 @@ public class I2PThread extends Thread {
         if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
             _createdBy = new Exception("Created by");
     }
+    public I2PThread(Runnable r, String name, boolean isDaemon) {
+        super(r, name);
+	setDaemon(isDaemon);
+        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+            _createdBy = new Exception("Created by");
+    }
     
     private void log(int level, String msg) { log(level, msg, null); }
     private void log(int level, String msg, Throwable t) {

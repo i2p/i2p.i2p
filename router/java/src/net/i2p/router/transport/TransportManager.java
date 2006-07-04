@@ -27,6 +27,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.util.Log;
 
 public class TransportManager implements TransportEventListener {
@@ -36,7 +37,9 @@ public class TransportManager implements TransportEventListener {
 
     private final static String PROP_DISABLE_TCP = "i2np.tcp.disable";
     private final static String PROP_ENABLE_UDP = "i2np.udp.enable";
-    private static final String DEFAULT_ENABLE_UDP = "true";
+    private final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
+    private final static String DEFAULT_ENABLE_NTCP = "true";
+    private final static String DEFAULT_ENABLE_UDP = "true";
     
     public TransportManager(RouterContext context) {
         _context = context;
@@ -76,6 +79,17 @@ public class TransportManager implements TransportEventListener {
             udp.setListener(this);
             _transports.add(udp);
         }
+        enableNTCP(_context);
+        NTCPTransport ntcp = new NTCPTransport(_context);
+        ntcp.setListener(this);
+        _transports.add(ntcp);
+    }
+    
+    static boolean enableNTCP(RouterContext ctx) {
+        String enableNTCP = ctx.router().getConfigSetting(PROP_ENABLE_NTCP);
+        if (enableNTCP == null)
+            enableNTCP = DEFAULT_ENABLE_NTCP;
+        return "true".equalsIgnoreCase(enableNTCP);
     }
     
     public void startListening() {
@@ -92,7 +106,7 @@ public class TransportManager implements TransportEventListener {
     
     public void restart() {
         stopListening();
-        try { Thread.sleep(1*1000); } catch (InterruptedException ie) {}
+        try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
         startListening();
     }
     
@@ -260,6 +274,8 @@ public class TransportManager implements TransportEventListener {
             Transport t = (Transport)_transports.get(i);
             if (t.getCurrentAddress() != null)
                 buf.append(t.getCurrentAddress()).append("\n\n");
+            else
+                buf.append(t.getStyle()).append(" is used for outbound connections only");
         }
         buf.append("</pre>\n");
         out.write(buf.toString());

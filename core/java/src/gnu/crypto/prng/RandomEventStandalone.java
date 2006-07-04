@@ -1,4 +1,4 @@
-/* RandomEventListener.java -- event listener
+/* RandomEventStandalone.java -- a random event.
    Copyright (C) 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Crypto.
@@ -41,13 +41,42 @@ exception statement from your version.  */
 
 package gnu.crypto.prng;
 
-import java.util.EventListener;
+import java.util.EventObject;
 
 /**
  * An interface for entropy accumulators that will be notified of random
  * events.
  */
-public interface RandomEventListener extends EventListener
+public class RandomEventStandalone extends EventObject
 {
-  void addRandomEvent(RandomEvent event);
+
+  private final byte sourceNumber;
+  private final byte poolNumber;
+  private final byte[] data;
+
+  public RandomEventStandalone(Object source, byte sourceNumber, byte poolNumber,
+                     byte[] data)
+  {
+    super(source);
+    this.sourceNumber = sourceNumber;
+    this.poolNumber = poolNumber;
+    if (data.length == 0 || data.length > 32)
+      throw new IllegalArgumentException("random events take between 1 and 32 bytes of data");
+    this.data = (byte[]) data.clone();
+  }
+
+  public byte getSourceNumber()
+  {
+    return sourceNumber;
+  }
+
+  public byte getPoolNumber()
+  {
+    return poolNumber;
+  }
+
+  public byte[] getData()
+  {
+    return data;
+  }
 }

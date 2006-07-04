@@ -65,7 +65,7 @@ class BuildHandler {
         ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildReplyMessage.MESSAGE_TYPE, new TunnelBuildReplyMessageHandlerJobBuilder());
     }
     
-    private static final int MAX_HANDLE_AT_ONCE = 5;
+    private static final int MAX_HANDLE_AT_ONCE = 2;
     private static final int NEXT_HOP_LOOKUP_TIMEOUT = 5*1000;
     
     /**
@@ -74,7 +74,9 @@ class BuildHandler {
      */
     int handleInboundRequests() {
         int dropExpired = 0;
+        int remaining = 0;
         List handled = null;
+        long beforeFindHandled = System.currentTimeMillis();
         synchronized (_inboundBuildMessages) {
             int toHandle = _inboundBuildMessages.size();
             if (toHandle > 0) {
@@ -107,14 +109,18 @@ class BuildHandler {
                         handled.add(_inboundBuildMessages.remove(0));
                 }
             }
+            remaining = _inboundBuildMessages.size();
         }
         if (handled != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Handling " + handled.size() + " requests");
+                _log.debug("Handling " + handled.size() + " requests (took " + (System.currentTimeMillis()-beforeFindHandled) + "ms to find them)");
             
             for (int i = 0; i < handled.size(); i++) {
                 BuildMessageState state = (BuildMessageState)handled.get(i);
-                handleRequest(state);
+                long beforeHandle = System.currentTimeMillis();
+                long actualTime = handleRequest(state);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Handle took " + (System.currentTimeMillis()-beforeHandle) + "/" + actualTime + " (" + i + " out of " + handled.size() + " with " + remaining + " remaining)");
             }
             handled.clear();
         }
@@ -140,12 +146,15 @@ class BuildHandler {
         }
         
         // anything else?
+        /*
         synchronized (_inboundBuildMessages) {
             int remaining = _inboundBuildMessages.size();
-            if (remaining > 0)
-                _context.statManager().addRateData("tunnel.handleRemaining", remaining, 0);
             return remaining;
         }
+         */
+        if (remaining > 0)
+            _context.statManager().addRateData("tunnel.handleRemaining", remaining, 0);
+        return remaining;
     }
     
     void handleInboundReplies() {
@@ -273,7 +282,7 @@ class BuildHandler {
         }
     }
     
-    private void handleRequest(BuildMessageState state) {
+    private long handleRequest(BuildMessageState state) {
         long timeSinceReceived = System.currentTimeMillis()-state.recvTime;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(state.msg.getUniqueId() + ": handling request after " + timeSinceReceived);
@@ -284,7 +293,7 @@ class BuildHandler {
                 _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
                            + ", since we received it a long time ago: " + timeSinceReceived);
             _context.statManager().addRateData("tunnel.dropLoadDelay", timeSinceReceived, 0);
-            return;
+            return -1;
         }
         // ok, this is not our own tunnel, so we need to do some heavy lifting
         // this not only decrypts the current hop's record, but encrypts the other records
@@ -293,24 +302,37 @@ class BuildHandler {
         BuildRequestRecord req = _processor.decrypt(_context, state.msg, _context.routerHash(), _context.keyManager().getPrivateKey());
         long decryptTime = System.currentTimeMillis() - beforeDecrypt;
         _context.statManager().addRateData("tunnel.decryptRequestTime", decryptTime, decryptTime);
+        if (decryptTime > 500)
+            _log.warn("Took too long to decrypt the request: " + decryptTime + " for message " + state.msg.getUniqueId() + " received " + (timeSinceReceived+decryptTime) + " ago");
         if (req == null) {
             // no records matched, or the decryption failed.  bah
             if (_log.shouldLog(Log.WARN))
                 _log.warn("The request " + state.msg.getUniqueId() + " could not be decrypted");
-            return;
+            return -1;
         }
 
+        long beforeLookup = System.currentTimeMillis();
         Hash nextPeer = req.readNextIdentity();
+        long readPeerTime = System.currentTimeMillis()-beforeLookup;
         RouterInfo nextPeerInfo = _context.netDb().lookupRouterInfoLocally(nextPeer);
+        long lookupTime = System.currentTimeMillis()-beforeLookup;
+        if (lookupTime > 500)
+            _log.warn("Took too long to lookup the request: " + lookupTime + "/" + readPeerTime + " for message " + state.msg.getUniqueId() + " received " + (timeSinceReceived+decryptTime) + " ago");
         if (nextPeerInfo == null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + state.msg.getUniqueId() + "/" + req.readReceiveTunnelId() + "/" + req.readNextTunnelId() 
                            + " handled, looking for the next peer " + nextPeer.toBase64());
             _context.netDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer), new TimeoutReq(_context, state, req, nextPeer), NEXT_HOP_LOOKUP_TIMEOUT);
+            return -1;
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Request " + state.msg.getUniqueId() + " handled and we know the next peer " + nextPeer.toBase64());
+            long beforeHandle = System.currentTimeMillis();
             handleReq(nextPeerInfo, state, req, nextPeer);
+            long handleTime = System.currentTimeMillis() - beforeHandle;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Request " + state.msg.getUniqueId() + " handled and we know the next peer " 
+                           + nextPeer.toBase64() + " after " + handleTime
+                           + "/" + decryptTime + "/" + lookupTime + "/" + timeSinceReceived);
+            return handleTime;
         }
     }
     
@@ -488,9 +510,9 @@ class BuildHandler {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
                 state.msg.setRecord(j, new ByteArray(reply));
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Full reply record for slot " + ourSlot + "/" + ourId + "/" + nextId + "/" + req.readReplyMessageId()
-                               + ": " + Base64.encode(reply));
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Full reply record for slot " + ourSlot + "/" + ourId + "/" + nextId + "/" + req.readReplyMessageId()
+                //               + ": " + Base64.encode(reply));
                 break;
             }
         }
@@ -579,7 +601,7 @@ class BuildHandler {
                 _log.debug("Receive tunnel build message " + reqId + " from " 
                            + (from != null ? from.calculateHash().toBase64() : fromHash != null ? fromHash.toBase64() : "tunnels") 
                            + ", waiting ids: " + ids + ", found matching tunnel? " + (cfg != null), 
-                           new Exception("source"));
+                           null);//new Exception("source"));
             if (cfg != null) {
                 BuildEndMessageState state = new BuildEndMessageState(cfg, receivedMessage, from, fromHash);
                 if (HANDLE_REPLIES_INLINE) {

@@ -48,6 +48,10 @@ public class ConfigNetHelper {
         }
         return "" + port;
     }
+    public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
+    public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
+    public String getNtcphostname() { return _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); }
+    public String getNtcpport() { return _context.getProperty(PROP_I2NP_NTCP_PORT); }
     
     public String getUdpAddress() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");

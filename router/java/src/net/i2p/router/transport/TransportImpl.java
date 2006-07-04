@@ -138,8 +138,11 @@ public abstract class TransportImpl implements Transport {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("afterSend slow: [success=" + sendSuccessful + "] " + msg.getMessageSize() + "byte " 
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " 
-                          + _context.routerHash().toBase64().substring(0,6) + " took " + msToSend);
+                          + _context.routerHash().toBase64().substring(0,6) + " took " + msToSend 
+                          + "/" + msg.getTransmissionTime());
         }
+        //if (true) 
+        //    _log.error("(not error) I2NP message sent? " + sendSuccessful + " " + msg.getMessageId() + " after " + msToSend + "/" + msg.getTransmissionTime());
         
         long lifetime = msg.getLifetime();
         if (lifetime > 3000) {
@@ -147,7 +150,7 @@ public abstract class TransportImpl implements Transport {
             if (!sendSuccessful)
                 level = Log.INFO;
             if (_log.shouldLog(level))
-                _log.log(level, "afterSend slow (" + lifetime + "): [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte " 
+                _log.log(level, "afterSend slow (" + lifetime + "/" + msToSend + "/" + msg.getTransmissionTime() + "): [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte " 
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6) 
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + ": " + msg.toString());
         } else {
@@ -229,7 +232,7 @@ public abstract class TransportImpl implements Transport {
         if (allTime > 5*1000) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Took too long from preperation to afterSend(ok? " + sendSuccessful 
-                          + "): " + allTime + "ms " + " after failing on: " 
+                          + "): " + allTime + "ms/" + sendTime + "ms after failing on: " 
                           + msg.getFailedTransports() + " and succeeding on " + getStyle());
             if ( (allTime > 60*1000) && (sendSuccessful) ) {
                 // WTF!!@#
@@ -299,6 +302,9 @@ public abstract class TransportImpl implements Transport {
      *
      */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
+        //if (true) 
+        //    _log.error("(not error) I2NP message received: " + inMsg.getUniqueId() + " after " + msToReceive);
+        
         int level = Log.INFO;
         if (msToReceive > 5000)
             level = Log.WARN;
@@ -370,11 +376,18 @@ public abstract class TransportImpl implements Transport {
     public void recheckReachability() {}
 
     public static boolean isPubliclyRoutable(byte addr[]) {
-        if ((addr[0]&0xFF) == 127) return false;
-        if ((addr[0]&0xFF) == 10) return false; 
-        if ( ((addr[0]&0xFF) == 172) && ((addr[1]&0xFF) >= 16) && ((addr[1]&0xFF) <= 31) ) return false;
-        if ( ((addr[0]&0xFF) == 192) && ((addr[1]&0xFF) == 168) ) return false;
-        if ((addr[0]&0xFF) >= 224) return false; // no multicast
-        return true; // or at least possible to be true
+        if (addr.length == 4) {
+            if ((addr[0]&0xFF) == 127) return false;
+            if ((addr[0]&0xFF) == 10) return false; 
+            if ( ((addr[0]&0xFF) == 172) && ((addr[1]&0xFF) >= 16) && ((addr[1]&0xFF) <= 31) ) return false;
+            if ( ((addr[0]&0xFF) == 192) && ((addr[1]&0xFF) == 168) ) return false;
+            if ((addr[0]&0xFF) >= 224) return false; // no multicast
+            return true; // or at least possible to be true
+        } else if (addr.length == 16) {
+            return false;
+        } else {
+            // ipv?
+            return false;
+        }
     }
 }

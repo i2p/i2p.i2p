@@ -34,16 +34,16 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class TunnelGateway {
-    private I2PAppContext _context;
-    private Log _log;
-    private List _queue;
-    private QueuePreprocessor _preprocessor;
-    private Sender _sender;
-    private Receiver _receiver;
-    private long _lastFlush;
-    private int _flushFrequency;
-    private DelayedFlush _delayedFlush;
-    private int _messagesSent;
+    protected I2PAppContext _context;
+    protected Log _log;
+    protected List _queue;
+    protected QueuePreprocessor _preprocessor;
+    protected Sender _sender;
+    protected Receiver _receiver;
+    protected long _lastFlush;
+    protected int _flushFrequency;
+    protected DelayedFlush _delayedFlush;
+    protected int _messagesSent;
     
     /**
      * @param preprocessor this pulls Pending messages off a list, builds some
@@ -55,7 +55,7 @@ public class TunnelGateway {
      */
     public TunnelGateway(I2PAppContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
         _context = context;
-        _log = context.logManager().getLog(TunnelGateway.class);
+        _log = context.logManager().getLog(getClass());
         _queue = new ArrayList(4);
         _preprocessor = preprocessor;
         _sender = sender;
@@ -88,19 +88,22 @@ public class TunnelGateway {
      */
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
+        long startAdd = System.currentTimeMillis();
         boolean delayedFlush = false;
         long delayAmount = -1;
-        
         int remaining = 0;
-        long beforeLock = _context.clock().now();
-        long afterAdded = -1;
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);
+        long beforeLock = System.currentTimeMillis();
+        long afterAdded = -1;
+        long afterPreprocess = 0;
+        long afterExpire = 0;
         synchronized (_queue) {
             _queue.add(cur);
-            afterAdded = _context.clock().now();
+            afterAdded = System.currentTimeMillis();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Added before direct flush preprocessing: " + _queue);
             delayedFlush = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
+            afterPreprocess = System.currentTimeMillis();
             if (delayedFlush)
                 delayAmount = _preprocessor.getDelayAmount();
             _lastFlush = _context.clock().now();
@@ -115,6 +118,7 @@ public class TunnelGateway {
                     i--;
                 }
             }
+            afterExpire = System.currentTimeMillis();
             remaining = _queue.size();
             if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
                 _log.debug("Remaining after preprocessing: " + _queue);
@@ -124,6 +128,15 @@ public class TunnelGateway {
             FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
+        long complete = System.currentTimeMillis();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Time to add the message " + msg.getUniqueId() + ": " + (complete-startAdd)
+                       + " delayed? " + delayedFlush + " remaining: " + remaining
+                       + " prepare: " + (beforeLock-startAdd)
+                       + " add: " + (afterAdded-beforeLock)
+                       + " preprocess: " + (afterPreprocess-afterAdded)
+                       + " expire: " + (afterExpire-afterPreprocess)
+                       + " queue flush: " + (complete-afterExpire));
     }
     
     public int getMessagesSent() { return _messagesSent; }
@@ -163,7 +176,7 @@ public class TunnelGateway {
     public static class Pending {
         protected Hash _toRouter;
         protected TunnelId _toTunnel;
-        private long _messageId;
+        protected long _messageId;
         protected long _expiration;
         protected byte _remaining[];
         protected int _offset;
@@ -218,14 +231,14 @@ public class TunnelGateway {
             } 
         }
     }
-    private class PendingImpl extends Pending {
+    class PendingImpl extends Pending {
         public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
             super(message, toRouter, toTunnel, _context.clock().now());
         }        
         
         public String toString() {
             StringBuffer buf = new StringBuffer(64);
-            buf.append("Message on ");
+            buf.append("Message ").append(_messageId).append(" on ");
             buf.append(TunnelGateway.this.toString());
             if (_toRouter != null) {
                 buf.append(" targetting ");

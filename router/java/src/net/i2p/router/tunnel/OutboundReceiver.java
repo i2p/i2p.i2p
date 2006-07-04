@@ -40,8 +40,8 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             send(msg, ri);
             return msg.getUniqueId();
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
                            + " required for " + msg);
             _context.netDb().lookupRouterInfo(_config.getPeer(1), new SendJob(_context, msg), new FailedJob(_context), 10*1000);
             return -1;
@@ -50,7 +50,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
 
     private void send(TunnelDataMessage msg, RouterInfo ri) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("forwarding encrypted data out " + _config + ": " + msg);
+            _log.debug("forwarding encrypted data out " + _config + ": " + msg.getUniqueId());
         OutNetMessage m = new OutNetMessage(_context);
         m.setMessage(msg);
         m.setExpiration(msg.getMessageExpiration());

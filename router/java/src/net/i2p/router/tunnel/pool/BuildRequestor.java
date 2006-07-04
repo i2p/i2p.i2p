@@ -92,7 +92,9 @@ class BuildRequestor {
             return;
         }
         
+        long beforeCreate = System.currentTimeMillis();
         TunnelBuildMessage msg = createTunnelBuildMessage(ctx, pool, cfg, pairedTunnel, exec);
+        long createTime = System.currentTimeMillis()-beforeCreate;
         if (msg == null) {
             if (log.shouldLog(Log.ERROR))
                 log.error("Tunnel build failed, as we couldn't create the tunnel build message for " + cfg);
@@ -102,9 +104,10 @@ class BuildRequestor {
         
         cfg.setPairedTunnel(pairedTunnel);
         
+        long beforeDispatch = System.currentTimeMillis();
         if (cfg.isInbound()) {
             if (log.shouldLog(Log.DEBUG))
-                log.debug("Sending the tunnel build request out the tunnel " + pairedTunnel + " to " 
+                log.debug("Sending the tunnel build request " + msg.getUniqueId() + " out the tunnel " + pairedTunnel + " to " 
                           + cfg.getPeer(0).toBase64() + " for " + cfg + " waiting for the reply of "
                           + cfg.getReplyMessageId());
             // send it out a tunnel targetting the first hop
@@ -129,6 +132,9 @@ class BuildRequestor {
             outMsg.setTarget(peer);
             ctx.outNetMessagePool().add(outMsg);
         }
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Tunnel build message " + msg.getUniqueId() + " created in " + createTime
+                      + "ms and dispatched in " + (System.currentTimeMillis()-beforeDispatch));
     }
     
     private static TunnelBuildMessage createTunnelBuildMessage(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, TunnelInfo pairedTunnel, BuildExecutor exec) {

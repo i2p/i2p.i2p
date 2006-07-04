@@ -31,14 +31,14 @@ public class SimpleTimer {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SimpleTimer.class);
         _events = new TreeMap();
-        _eventTimes = new HashMap(1024);
+        _eventTimes = new HashMap(256);
         _readyEvents = new ArrayList(4);
         I2PThread runner = new I2PThread(new SimpleTimerRunner());
         runner.setName(name);
         runner.setDaemon(true);
         runner.start();
         for (int i = 0; i < 3; i++) {
-            I2PThread executor = new I2PThread(new Executor());
+            I2PThread executor = new I2PThread(new Executor(_context, _log, _readyEvents));
             executor.setName(name + "Executor " + i);
             executor.setDaemon(true);
             executor.start();
@@ -114,7 +114,7 @@ public class SimpleTimer {
         long timeToAdd = System.currentTimeMillis() - now;
         if (timeToAdd > 50) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("timer contention: took " + timeToAdd + "ms to add a job");
+                _log.warn("timer contention: took " + timeToAdd + "ms to add a job with " + totalEvents + " queued");
         }
             
     }
@@ -139,14 +139,6 @@ public class SimpleTimer {
          *
          */
         public void timeReached();
-    }
-    
-    private void log(String msg, Throwable t) {
-        synchronized (this) {
-            if (_log == null) 
-                _log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer.class);
-        }
-        _log.log(Log.CRIT, msg, t);
     }
     
     private long _occurredTime;
@@ -228,30 +220,45 @@ public class SimpleTimer {
             }
         }
     }
-    
-    private class Executor implements Runnable {
-        public void run() {
-            while (true) {
-                TimedEvent evt = null;
-                synchronized (_readyEvents) {
-                    if (_readyEvents.size() <= 0) 
-                        try { _readyEvents.wait(); } catch (InterruptedException ie) {}
-                    if (_readyEvents.size() > 0) 
-                        evt = (TimedEvent)_readyEvents.remove(0);
+}
+
+class Executor implements Runnable {
+    private I2PAppContext _context;
+    private Log _log;
+    private List _readyEvents;
+    public Executor(I2PAppContext ctx, Log log, List events) {
+        _context = ctx;
+        _readyEvents = events;
+    }
+    public void run() {
+        while (true) {
+            SimpleTimer.TimedEvent evt = null;
+            synchronized (_readyEvents) {
+                if (_readyEvents.size() <= 0) 
+                    try { _readyEvents.wait(); } catch (InterruptedException ie) {}
+                if (_readyEvents.size() > 0) 
+                    evt = (SimpleTimer.TimedEvent)_readyEvents.remove(0);
+            }
+
+            if (evt != null) {
+                long before = _context.clock().now();
+                try {
+                    evt.timeReached();
+                } catch (Throwable t) {
+                    log("wtf, event borked: " + evt, t);
                 }
-                
-                if (evt != null) {
-                    long before = _context.clock().now();
-                    try {
-                        evt.timeReached();
-                    } catch (Throwable t) {
-                        log("wtf, event borked: " + evt, t);
-                    }
-                    long time = _context.clock().now() - before;
-                    if ( (time > 1000) && (_log != null) && (_log.shouldLog(Log.WARN)) )
-                        _log.warn("wtf, event execution took " + time + ": " + evt);
-                }
+                long time = _context.clock().now() - before;
+                if ( (time > 1000) && (_log != null) && (_log.shouldLog(Log.WARN)) )
+                    _log.warn("wtf, event execution took " + time + ": " + evt);
             }
         }
+    }
+    
+    private void log(String msg, Throwable t) {
+        synchronized (this) {
+            if (_log == null) 
+                _log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer.class);
+        }
+        _log.log(Log.CRIT, msg, t);
     }
 }

@@ -299,7 +299,7 @@ public class TCPTransport extends TransportImpl {
                 }
             }
 
-            _context.shitlist().unshitlistRouter(ident.calculateHash());
+            _context.shitlist().unshitlistRouter(ident.calculateHash(), STYLE);
 
             con.runConnection();
             if (_log.shouldLog(Log.DEBUG))

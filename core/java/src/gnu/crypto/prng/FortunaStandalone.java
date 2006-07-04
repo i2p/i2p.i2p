@@ -97,20 +97,22 @@ import net.i2p.crypto.CryptixAESKeyCache;
  * gnu-crypto implementation, which has been imported into GNU/classpath
  *
  */
-public class FortunaStandalone extends BasePRNGStandalone implements Serializable, RandomEventListener
+public class FortunaStandalone extends BasePRNGStandalone implements Serializable, RandomEventListenerStandalone
 {
 
   private static final long serialVersionUID = 0xFACADE;
 
   private static final int SEED_FILE_SIZE = 64;
-  private static final int NUM_POOLS = 32;
-  private static final int MIN_POOL_SIZE = 64;
-  private final Generator generator;
-  private final Sha256Standalone[] pools;
-  private long lastReseed;
-  private int pool;
-  private int pool0Count;
-  private int reseedCount;
+  static final int NUM_POOLS = 32;
+  static final int MIN_POOL_SIZE = 64;
+  final Generator generator;
+  final Sha256Standalone[] pools;
+  long lastReseed;
+  int pool;
+  int pool0Count;
+  int reseedCount;
+  static long refillCount = 0;
+  static long lastRefill = System.currentTimeMillis();
 
   public static final String SEED = "gnu.crypto.prng.fortuna.seed";
 
@@ -124,6 +126,9 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     lastReseed = 0;
     pool = 0;
     pool0Count = 0;
+    allocBuffer();
+  }
+  protected void allocBuffer() {
     buffer = new byte[4*1024*1024]; //256]; // larger buffer to reduce churn
   }
 
@@ -145,6 +150,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
 
   public void fillBlock()
   {
+    long start = System.currentTimeMillis();
     if (pool0Count >= MIN_POOL_SIZE
         && System.currentTimeMillis() - lastReseed > 100)
       {
@@ -159,6 +165,11 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
         lastReseed = System.currentTimeMillis();
       }
     generator.nextBytes(buffer);
+    long now = System.currentTimeMillis();
+    long diff = now-lastRefill;
+    lastRefill = now;
+    long refillTime = now-start;
+    System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
   }
 
   public void addRandomByte(byte b)
@@ -177,7 +188,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     pool = (pool + 1) % NUM_POOLS;
   }
 
-  public void addRandomEvent(RandomEvent event)
+  public void addRandomEvent(RandomEventStandalone event)
   {
     if (event.getPoolNumber() < 0 || event.getPoolNumber() >= pools.length)
       throw new IllegalArgumentException("pool number out of range: "
@@ -338,6 +349,34 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
   }
   
   public static void main(String args[]) {
+      byte in[] = new byte[16];
+      byte out[] = new byte[16];
+      byte key[] = new byte[32];
+      try {
+          CryptixAESKeyCache.KeyCacheEntry buf = CryptixAESKeyCache.createNew();
+          Object cryptixKey = CryptixRijndael_Algorithm.makeKey(key, 16, buf);
+          long beforeAll = System.currentTimeMillis();
+          for (int i = 0; i < 256; i++) {
+              //long before =System.currentTimeMillis();
+              for (int j = 0; j < 1024; j++)
+                CryptixRijndael_Algorithm.blockEncrypt(in, out, 0, 0, cryptixKey);
+              //long after = System.currentTimeMillis();
+              //System.out.println("encrypting 16KB took " + (after-before));
+          }
+          long after = System.currentTimeMillis();
+          System.out.println("encrypting 4MB took " + (after-beforeAll));
+      } catch (Exception e) { e.printStackTrace(); }
+      
+      try {
+        CryptixAESKeyCache.KeyCacheEntry buf = CryptixAESKeyCache.createNew();
+        Object cryptixKey = CryptixRijndael_Algorithm.makeKey(key, 16, buf);
+        byte data[] = new byte[4*1024*1024];
+        long beforeAll = System.currentTimeMillis();
+        CryptixRijndael_Algorithm.ecbBulkEncrypt(data, data, cryptixKey);
+          long after = System.currentTimeMillis();
+          System.out.println("encrypting 4MB took " + (after-beforeAll));
+      } catch (Exception e) { e.printStackTrace(); }
+      /*
       FortunaStandalone f = new FortunaStandalone();
       java.util.HashMap props = new java.util.HashMap();
       byte initSeed[] = new byte[1234];
@@ -351,5 +390,6 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       }
       long time = System.currentTimeMillis() - before;
       System.out.println("512MB took " + time + ", or " + (8*64d)/((double)time/1000d) +"MBps");
+       */
   }
 }

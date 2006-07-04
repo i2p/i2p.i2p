@@ -37,6 +37,8 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _requireIntroductions;
     private boolean _hiddenMode;
     private boolean _dynamicKeys;
+    private String _ntcpHostname;
+    private String _ntcpPort;
     private String _tcpPort;
     private String _udpPort;
     private String _inboundRate;
@@ -77,6 +79,12 @@ public class ConfigNetHandler extends FormHandler {
     }
     public void setTcpPort(String port) { 
         _tcpPort = (port != null ? port.trim() : null); 
+    }
+    public void setNtcphost(String host) {
+        _ntcpHostname = (host != null ? host.trim() : null);
+    }
+    public void setNtcpport(String port) {
+        _ntcpPort = (port != null ? port.trim() : null);
     }
     public void setUdpPort(String port) { 
         _udpPort = (port != null ? port.trim() : null); 
@@ -222,6 +230,30 @@ public class ConfigNetHandler extends FormHandler {
                     restartRequired = true;
                 }
             }
+            
+            if ( (_ntcpHostname != null) && (_ntcpHostname.length() > 0) && (_ntcpPort != null) && (_ntcpPort.length() > 0) ) {
+                String oldHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
+                String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
+                if ( (oldHost == null) || (!oldHost.equalsIgnoreCase(_ntcpHostname)) ||
+                     (oldPort == null) || (!oldPort.equalsIgnoreCase(_ntcpPort)) ) {
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
+                    addFormNotice("Updating inbound TCP settings from " + oldHost + ":" + oldPort 
+                                  + " to " + _ntcpHostname + ":" + _ntcpPort);
+                    restartRequired = true;
+                }
+            } else {
+                String oldHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
+                String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
+                if ( (oldHost != null) || (oldPort != null) ) {
+                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
+                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
+                    addFormNotice("Updating inbound TCP settings from " + oldHost + ":" + oldPort 
+                                  + " so that we no longer receive inbound TCP connections");
+                    restartRequired = true;
+                }
+            }
+
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
                 String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT);
                 if ( (oldPort == null) && (_udpPort.equals("8887")) ) {

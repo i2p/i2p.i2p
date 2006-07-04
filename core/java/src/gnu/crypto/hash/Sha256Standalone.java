@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha256Standalone.java,v 1.1 2006/02/26 16:30:59 jrandom Exp $
+// $Id: Sha256Standalone.java,v 1.2 2006/03/16 16:45:19 jrandom Exp $
 //
 // Copyright (C) 2003 Free Software Foundation, Inc.
 //
@@ -59,9 +59,9 @@ package gnu.crypto.hash;
  * renamed from Sha256 to avoid conflicts with JVMs using gnu-crypto as their JCE
  * provider.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class Sha256Standalone extends BaseHash {
+public class Sha256Standalone extends BaseHashStandalone {
    // Constants and variables
    // -------------------------------------------------------------------------
    private static final int[] k = {
@@ -143,7 +143,7 @@ public class Sha256Standalone extends BaseHash {
       return new Sha256Standalone(this);
    }
 
-   // Implementation of concrete methods in BaseHash --------------------------
+   // Implementation of concrete methods in BaseHashStandalone --------------------------
 
    private int transformResult[] = new int[8];
    protected void transform(byte[] in, int offset) {

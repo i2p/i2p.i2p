@@ -129,13 +129,14 @@ public class FIFOBandwidthLimiter {
      * Request some bytes, blocking until they become available
      *
      */
-    public Request requestInbound(int bytesIn, String purpose) {
+    public Request requestInbound(int bytesIn, String purpose) { return requestInbound(bytesIn, purpose, null, null); }
+    public Request requestInbound(int bytesIn, String purpose, CompleteListener lsnr, Object attachment) {
         if (_inboundUnlimited) {
             _totalAllocatedInboundBytes += bytesIn;
             return _noop;
         }
         
-        SimpleRequest req = new SimpleRequest(bytesIn, 0, purpose);
+        SimpleRequest req = new SimpleRequest(bytesIn, 0, purpose, lsnr, attachment);
         requestInbound(req, bytesIn, purpose);
         return req;
     }
@@ -156,13 +157,14 @@ public class FIFOBandwidthLimiter {
      * Request some bytes, blocking until they become available
      *
      */
-    public Request requestOutbound(int bytesOut, String purpose) {
+    public Request requestOutbound(int bytesOut, String purpose) { return requestOutbound(bytesOut, purpose, null, null); }
+    public Request requestOutbound(int bytesOut, String purpose, CompleteListener lsnr, Object attachment) {
         if (_outboundUnlimited) {
             _totalAllocatedOutboundBytes += bytesOut;
             return _noop;
         }
 
-        SimpleRequest req = new SimpleRequest(0, bytesOut, purpose);
+        SimpleRequest req = new SimpleRequest(0, bytesOut, purpose, lsnr, attachment);
         requestOutbound(req, bytesOut, purpose);
         return req;
     }
@@ -296,8 +298,8 @@ public class FIFOBandwidthLimiter {
                 _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/(float)time;
 
             if (_log.shouldLog(Log.WARN)) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("BW: time = " + time + " sent: " + sent + " recv: " + recv);
+                //if (_log.shouldLog(Log.INFO))
+                //    _log.info("BW: time = " + time + " sent: " + _sendBps + " recv: " + _recvBps);
                 _context.statManager().getStatLog().addData("bw", "bw.sendBps1s", (long)_sendBps, sent);
                 _context.statManager().getStatLog().addData("bw", "bw.recvBps1s", (long)_recvBps, recv);
             }
@@ -305,19 +307,19 @@ public class FIFOBandwidthLimiter {
             // Maintain an approximate average with a 15-second halflife
             // Weights (0.955 and 0.045) are tuned so that transition between two values (e.g. 0..10)
             // would reach their midpoint (e.g. 5) in 15s
-            if (_sendBps15s <= 0)
-                _sendBps15s = ((float)sent*15*1000f)/(float)time;
-            else
+            //if (_sendBps15s <= 0)
+            //    _sendBps15s = (0.045f)*((float)sent*15*1000f)/(float)time;
+            //else
                 _sendBps15s = (0.955f)*_sendBps15s + (0.045f)*((float)sent*1000f)/(float)time;
 
-            if (_recvBps15s <= 0)
-                _recvBps15s = ((float)recv*15*1000f)/(float)time;
-            else
+            //if (_recvBps15s <= 0)
+            //    _recvBps15s = (0.045f)*((float)recv*15*1000f)/(float)time;
+            //else
                 _recvBps15s = (0.955f)*_recvBps15s + (0.045f)*((float)recv*1000)/(float)time;
 
             if (_log.shouldLog(Log.WARN)) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("BW15: time = " + time + " sent: " + sent + " recv: " + recv);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("BW15: time = " + time + " sent: " + _sendBps + " recv: " + _recvBps);
                 _context.statManager().getStatLog().addData("bw", "bw.sendBps15s", (long)_sendBps15s, sent);
                 _context.statManager().getStatLog().addData("bw", "bw.recvBps15s", (long)_recvBps15s, recv);
             }
@@ -432,10 +434,12 @@ public class FIFOBandwidthLimiter {
                 i--;
                 continue;
             }
-            if (req.getAllocationsSinceWait() > 0) {
+            if ( (req.getAllocationsSinceWait() > 0) && (req.getCompleteListener() == null) ) {
                 // we have already allocated some values to this request, but
                 // they haven't taken advantage of it yet (most likely they're
                 // IO bound)
+                // (also, the complete listener is only set for situations where 
+                // waitForNextAllocation() is never called)
                 continue;
             }
             // ok, they are really waiting for us to give them stuff
@@ -482,8 +486,8 @@ public class FIFOBandwidthLimiter {
                     locked_satisfyOutboundAvailable(satisfied);
                 } else {
                     // no bandwidth available
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Still denying the " + _pendingOutboundRequests.size() 
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Still denying the " + _pendingOutboundRequests.size() 
                                   + " pending outbound requests (status: " + getStatus().toString()
                                   + ", longest waited " + locked_getLongestOutboundWait() + " out)");
                 }
@@ -549,6 +553,8 @@ public class FIFOBandwidthLimiter {
                 // we have already allocated some values to this request, but
                 // they haven't taken advantage of it yet (most likely they're
                 // IO bound)
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("multiple allocations since wait... ntcp shouldn't do this: " + req.getRequestName());
                 continue;
             }
             // ok, they are really waiting for us to give them stuff
@@ -563,6 +569,15 @@ public class FIFOBandwidthLimiter {
             req.allocateBytes(0, allocated);
             satisfied.add(req);
             if (req.getPendingOutboundRequested() > 0) {
+                if (req.attachment() != null) {
+                    if (_log.shouldLog(Log.INFO))
+                         _log.info("Allocating " + allocated + " bytes outbound as a partial grant to " 
+                                    + req.getRequestName() + " (wanted " 
+                                    + req.getTotalOutboundRequested() + " bytes, waited " 
+                                    + waited
+                                    + "ms) pending " + _pendingOutboundRequests.size()
+                                    + ", longest waited " + locked_getLongestOutboundWait() + " out");
+                }
                 if (_log.shouldLog(Log.DEBUG))
                      _log.debug("Allocating " + allocated + " bytes outbound as a partial grant to " 
                                 + req.getRequestName() + " (wanted " 
@@ -571,6 +586,15 @@ public class FIFOBandwidthLimiter {
                                 + "ms) pending " + _pendingOutboundRequests.size()
                                 + ", longest waited " + locked_getLongestOutboundWait() + " out");
             } else {
+                if (req.attachment() != null) {
+                    if (_log.shouldLog(Log.INFO))
+                         _log.info("Allocating " + allocated + " bytes outbound to finish the partial grant to " 
+                                    + req.getRequestName() + " (total " 
+                                    + req.getTotalOutboundRequested() + " bytes, waited " 
+                                    + waited
+                                    + "ms) pending " + _pendingOutboundRequests.size()
+                                    + ", longest waited " + locked_getLongestOutboundWait() + " out)");
+                }
                 if (_log.shouldLog(Log.DEBUG))
                      _log.debug("Allocating " + allocated + " bytes outbound to finish the partial grant to " 
                                 + req.getRequestName() + " (total " 
@@ -629,7 +653,10 @@ public class FIFOBandwidthLimiter {
         private String _target;
         private int _allocationsSinceWait;
         private boolean _aborted;
+        private boolean _waited;
         List satisfiedBuffer;
+        private CompleteListener _lsnr;
+        private Object _attachment;
         
         public SimpleRequest() {
             satisfiedBuffer = new ArrayList(1);
@@ -639,7 +666,14 @@ public class FIFOBandwidthLimiter {
             satisfiedBuffer = new ArrayList(1);
             init(in, out, target);
 	}
+        public SimpleRequest(int in, int out, String target, CompleteListener lsnr, Object attachment) {
+            satisfiedBuffer = new ArrayList(1);
+            _lsnr = lsnr;
+            _attachment = attachment;
+            init(in, out, target);
+	}
         public void init(int in, int out, String target) {
+            _waited = false;
             _inTotal = in;
             _outTotal = out;
             _inAllocated = 0;
@@ -659,36 +693,77 @@ public class FIFOBandwidthLimiter {
         public int getPendingInboundRequested() { return _inTotal - _inAllocated; }
         public boolean getAborted() { return _aborted; }
         public void abort() { _aborted = true; }
+        public CompleteListener getCompleteListener() { return _lsnr; }
+        public void setCompleteListener(CompleteListener lsnr) {
+            boolean complete = false;
+            synchronized (SimpleRequest.this) {
+                _lsnr = lsnr;
+                if (isComplete()) {
+                    complete = true;
+                }
+            }
+            if (complete && lsnr != null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("complete listener set AND completed: " + lsnr);
+                lsnr.complete(SimpleRequest.this);
+            }
+        }
+        
+        private boolean isComplete() { return (_outAllocated >= _outTotal) && (_inAllocated >= _inTotal); }
         
         public void waitForNextAllocation() {
+            _waited = true;
             _allocationsSinceWait = 0;
-            if ( (_outAllocated >= _outTotal) && 
-                 (_inAllocated >= _inTotal) ) 
-                return;
+            boolean complete = false;
             try {
                 synchronized (SimpleRequest.this) {
-                    SimpleRequest.this.wait();
+                    if (isComplete())
+                        complete = true;
+                    else
+                        SimpleRequest.this.wait();
                 }
             } catch (InterruptedException ie) {}
+            if (complete && _lsnr != null)
+                _lsnr.complete(SimpleRequest.this);
         }
-        int getAllocationsSinceWait() { return _allocationsSinceWait; }
+        int getAllocationsSinceWait() { return _waited ? _allocationsSinceWait : 0; }
         void allocateAll() {
             _inAllocated = _inTotal;
             _outAllocated = _outTotal;
             _outAllocated = _outTotal;
-            _allocationsSinceWait++;
+            if (_lsnr == null)
+                _allocationsSinceWait++;
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("allocate all");
             notifyAllocation();
 	}
         void allocateBytes(int in, int out) {
             _inAllocated += in;
             _outAllocated += out;
-            _allocationsSinceWait++;
+            if (_lsnr == null)
+                _allocationsSinceWait++;
+            if (isComplete()) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("allocate " + in +"/"+ out + " completed, listener=" + _lsnr);
+            }
+            //notifyAllocation(); // handled within the satisfy* methods
         }
         void notifyAllocation() {
+            boolean complete = false;
             synchronized (SimpleRequest.this) {
+                if (isComplete())
+                    complete = true;
                 SimpleRequest.this.notifyAll();
             }
+            if (complete && _lsnr != null) {
+                _lsnr.complete(SimpleRequest.this);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("at completion for " + _inTotal + "/" + _outTotal 
+                              + ", recvBps=" + _recvBps + "/"+ _recvBps15s + " listener is " + _lsnr);
+            }
         }
+        public void attach(Object obj) { _attachment = obj; }
+        public Object attachment() { return _attachment; }
+        public String toString() { return getRequestName(); }
     }
 
     public interface Request {
@@ -712,10 +787,20 @@ public class FIFOBandwidthLimiter {
         public boolean getAborted();
         /** thar be dragons */
         public void init(int in, int out, String target);
+        public void setCompleteListener(CompleteListener lsnr);
+        public void attach(Object obj);
+        public Object attachment();
+        public CompleteListener getCompleteListener();
+    }
+    
+    public interface CompleteListener {
+        public void complete(Request req);
     }
 
     private static final NoopRequest _noop = new NoopRequest();
     private static class NoopRequest implements Request {
+        private CompleteListener _lsnr;
+        private Object _attachment;
         public void abort() {}
         public boolean getAborted() { return false; }
         public int getPendingInboundRequested() { return 0; }
@@ -726,5 +811,12 @@ public class FIFOBandwidthLimiter {
         public int getTotalOutboundRequested() { return 0; } 
         public void waitForNextAllocation() {}
         public void init(int in, int out, String target) {}
+        public CompleteListener getCompleteListener() { return _lsnr; }
+        public void setCompleteListener(CompleteListener lsnr) {
+            _lsnr = lsnr;
+            lsnr.complete(NoopRequest.this);
+        }
+        public void attach(Object obj) { _attachment = obj; }
+        public Object attachment() { return _attachment; }
     }
 }

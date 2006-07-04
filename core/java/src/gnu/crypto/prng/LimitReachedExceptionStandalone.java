@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: LimitReachedException.java,v 1.5 2005/10/06 04:24:17 rsdio Exp $
+// $Id: LimitReachedExceptionStandalone.java,v 1.1 2005/10/22 13:10:00 jrandom Exp $
 //
 // Copyright (C) 2001, 2002, Free Software Foundation, Inc.
 //
@@ -47,9 +47,9 @@ package gnu.crypto.prng;
  * A checked exception that indicates that a pseudo random number generated has
  * reached its theoretical limit in generating random bytes.
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.1 $
  */
-public class LimitReachedException extends Exception {
+public class LimitReachedExceptionStandalone extends Exception {
 
    // Constants and variables
    // -------------------------------------------------------------------------
@@ -57,11 +57,11 @@ public class LimitReachedException extends Exception {
    // Constructor(s)
    // -------------------------------------------------------------------------
 
-   public LimitReachedException() {
+   public LimitReachedExceptionStandalone() {
       super();
    }
 
-   public LimitReachedException(String msg) {
+   public LimitReachedExceptionStandalone(String msg) {
       super(msg);
    }
 

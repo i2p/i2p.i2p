@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.490 2006-06-14 00:24:35 cervantes Exp $
+$Id: history.txt,v 1.491 2006-07-01 17:44:34 complication Exp $
+
+2006-07-04  jrandom
+    * New NIO-based tcp transport (NTCP), enabled by default for outbound
+      connections only.  Those who configure their NAT/firewall to allow
+      inbound connections and specify the external host and port
+      (dyndns/etc is ok) on /config.jsp can receive inbound connections.
+      SSU is still enabled for use by default for all users as a fallback.
+    * Substantial bugfix to the tunnel gateway processing to transfer
+      messages sequentially instead of interleaved
+    * Renamed GNU/crypto classes to avoid name clashes with kaffe and other
+      GNU/Classpath based JVMs
+    * Adjust the Fortuna PRNG's pooling system to reduce contention on
+      refill with a background thread to refill the output buffer
+    * Add per-transport support for the shitlist
+    * Add a new async pumped tunnel gateway to reduce tunnel dispatcher
+      contention
 
 2006-07-01  Complication
     * Ensure that the I2PTunnel web interface won't update tunnel settings

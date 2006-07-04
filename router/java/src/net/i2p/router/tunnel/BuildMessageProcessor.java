@@ -32,12 +32,22 @@ public class BuildMessageProcessor {
         Log log = ctx.logManager().getLog(getClass());
         BuildRequestRecord rv = null;
         int ourHop = -1;
+        long beforeActualDecrypt = 0;
+        long afterActualDecrypt = 0;
+        long totalEq = 0;
+        long totalDup = 0;
+        long beforeLoop = System.currentTimeMillis();
         for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++) {
             ByteArray rec = msg.getRecord(i);
             int off = rec.getOffset();
             int len = BuildRequestRecord.PEER_SIZE;
-            if (DataHelper.eq(ourHash.getData(), 0, rec.getData(), off, len)) {
+            long beforeEq = System.currentTimeMillis();
+            boolean eq = DataHelper.eq(ourHash.getData(), 0, rec.getData(), off, len);
+            totalEq += System.currentTimeMillis()-beforeEq;
+            if (eq) {
+                long beforeIsDup = System.currentTimeMillis();
                 boolean isDup = _filter.add(rec.getData(), off + len, 32);
+                totalDup += System.currentTimeMillis()-beforeIsDup;
                 if (isDup) {
                     if (log.shouldLog(Log.WARN))
                         log.debug(msg.getUniqueId() + ": A record matching our hash was found, but it seems to be a duplicate");
@@ -45,7 +55,9 @@ public class BuildMessageProcessor {
                     return null;
                 }
                 BuildRequestRecord req = new BuildRequestRecord();
+                beforeActualDecrypt = System.currentTimeMillis();
                 boolean ok = req.decryptRecord(ctx, privKey, ourHash, rec);
+                afterActualDecrypt = System.currentTimeMillis();
                 if (ok) {
                     if (log.shouldLog(Log.DEBUG))
                         log.debug(msg.getUniqueId() + ": A record matching our hash was found and decrypted");
@@ -64,6 +76,8 @@ public class BuildMessageProcessor {
                 log.debug(msg.getUniqueId() + ": No records matching our hash was found");
             return null;
         }
+        
+        long beforeEncrypt = System.currentTimeMillis();
         SessionKey replyKey = rv.readReplyKey();
         byte iv[] = rv.readReplyIV();
         int ivOff = 0;
@@ -76,7 +90,17 @@ public class BuildMessageProcessor {
                                   iv, ivOff, data.getValid());
             }
         }
+        long afterEncrypt = System.currentTimeMillis();
         msg.setRecord(ourHop, null);
+        if (afterEncrypt-beforeLoop > 1000) {
+            if (log.shouldLog(Log.WARN))
+                log.warn("Slow decryption, total=" + (afterEncrypt-beforeLoop) 
+                         + " looping=" + (beforeEncrypt-beforeLoop)
+                         + " decrypt=" + (afterActualDecrypt-beforeActualDecrypt)
+                         + " eq=" + totalEq
+                         + " dup=" + totalDup
+                         + " encrypt=" + (afterEncrypt-beforeEncrypt));
+        }
         return rv;
     }
 }

@@ -320,9 +320,9 @@ public class DHSessionKeyBuilder {
             if (_myPrivateValue == null) generateMyValue();
             _sessionKey = calculateSessionKey(_myPrivateValue, _peerValue);
         } else {
-            System.err.println("Not ready yet.. privateValue and peerValue must be set ("
-                               + (_myPrivateValue != null ? "set" : "null") + ","
-                               + (_peerValue != null ? "set" : "null") + ")");
+            //System.err.println("Not ready yet.. privateValue and peerValue must be set ("
+            //                   + (_myPrivateValue != null ? "set" : "null") + ","
+            //                   + (_peerValue != null ? "set" : "null") + ")");
         }
         return _sessionKey;
     }

@@ -49,7 +49,7 @@ import java.util.Map;
  * Modified slightly by jrandom for I2P (removing unneeded exceptions)
  * @version $Revision: 1.1 $
  */
-public abstract class BasePRNGStandalone implements IRandom {
+public abstract class BasePRNGStandalone implements IRandomStandalone {
 
    // Constants and variables
    // -------------------------------------------------------------------------
@@ -88,7 +88,7 @@ public abstract class BasePRNGStandalone implements IRandom {
    // Instance methods
    // -------------------------------------------------------------------------
 
-   // IRandom interface implementation ----------------------------------------
+   // IRandomStandalone interface implementation ----------------------------------------
 
    public String name() {
       return name;

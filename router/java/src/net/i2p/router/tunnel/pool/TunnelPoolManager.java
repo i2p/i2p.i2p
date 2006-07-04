@@ -510,19 +510,22 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 processedOut += info.getProcessedMessagesCount();
         }
         out.write("</table>\n");
-        List pending = in.listPending();
-        for (int i = 0; i < pending.size(); i++) {
-            TunnelInfo info = (TunnelInfo)pending.get(i);
-            out.write("In progress: <code>" + info.toString() + "</code><br />\n");
+        if (in != null) {
+            List pending = in.listPending();
+            for (int i = 0; i < pending.size(); i++) {
+                TunnelInfo info = (TunnelInfo)pending.get(i);
+                out.write("In progress: <code>" + info.toString() + "</code><br />\n");
+            }
+            live += pending.size();
         }
-        live += pending.size();
-        pending = outPool.listPending();
-        for (int i = 0; i < pending.size(); i++) {
-            TunnelInfo info = (TunnelInfo)pending.get(i);
-            out.write("In progress: <code>" + info.toString() + "</code><br />\n");
+        if (outPool != null) {
+            List pending = outPool.listPending();
+            for (int i = 0; i < pending.size(); i++) {
+                TunnelInfo info = (TunnelInfo)pending.get(i);
+                out.write("In progress: <code>" + info.toString() + "</code><br />\n");
+            }
+            live += pending.size();
         }
-        live += pending.size();
-        
         if (live <= 0)
             out.write("<b>No tunnels, waiting for the grace period to end</b><br />\n");
         out.write("Lifetime bandwidth usage: " + processedIn + "KB in, " + processedOut + "KB out<br />");

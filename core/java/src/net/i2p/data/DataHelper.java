@@ -822,6 +822,8 @@ public class DataHelper {
             return (ms / (60 * 1000)) + "m";
         } else if (ms < 3 * 24 * 60 * 60 * 1000) {
             return (ms / (60 * 60 * 1000)) + "h";
+        } else if (ms > 365 * 24 * 60 * 60 * 1000) {
+            return "n/a";
         } else {
             return (ms / (24 * 60 * 60 * 1000)) + "d";
         }
