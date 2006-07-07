@@ -372,7 +372,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
         Object cryptixKey = CryptixRijndael_Algorithm.makeKey(key, 16, buf);
         byte data[] = new byte[4*1024*1024];
         long beforeAll = System.currentTimeMillis();
-        CryptixRijndael_Algorithm.ecbBulkEncrypt(data, data, cryptixKey);
+        //CryptixRijndael_Algorithm.ecbBulkEncrypt(data, data, cryptixKey);
           long after = System.currentTimeMillis();
           System.out.println("encrypting 4MB took " + (after-beforeAll));
       } catch (Exception e) { e.printStackTrace(); }
