@@ -107,7 +107,8 @@ public class SummaryHelper {
     }
     
     public boolean allowReseed() {
-        return (_context.netDb().getKnownRouters() < 30);
+        return (_context.netDb().getKnownRouters() < 30) ||
+                Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed", "false")).booleanValue();
     }
     
     public int getAllPeers() { return _context.netDb().getKnownRouters(); }

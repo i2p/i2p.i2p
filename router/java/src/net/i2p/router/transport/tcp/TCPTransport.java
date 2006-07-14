@@ -275,7 +275,7 @@ public class TCPTransport extends TransportImpl {
         }
         
         if (changedIdents) {
-            _context.shitlist().shitlistRouter(con.getAttemptedPeer(), "Changed identities");
+            _context.shitlist().shitlistRouter(con.getAttemptedPeer(), "Changed identities", STYLE);
             if (changedMsgs != null) {
                 for (int i = 0; i < changedMsgs.size(); i++) {
                     OutNetMessage cur = (OutNetMessage)changedMsgs.get(i);
@@ -676,7 +676,7 @@ public class TCPTransport extends TransportImpl {
                         iter.remove();
                         _context.shitlist().shitlistRouter(peer, "Peer " 
                                                            + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) 
-                                                           + " has no addresses");
+                                                           + " has no addresses", STYLE);
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
@@ -690,7 +690,7 @@ public class TCPTransport extends TransportImpl {
                         iter.remove();
                         _context.shitlist().shitlistRouter(peer, "Peer " 
                                                            + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) 
-                                                           + " has only invalid addresses");
+                                                           + " has only invalid addresses", STYLE);
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
@@ -716,7 +716,7 @@ public class TCPTransport extends TransportImpl {
                     if ( (_myAddress != null) && (_myAddress.equals(tcpAddr)) ) {
                         _log.error("Message points at our old TCP addresses! "  + msg.getTarget());
                         iter.remove();
-                        _context.shitlist().shitlistRouter(peer, "This is our old address...");
+                        _context.shitlist().shitlistRouter(peer, "This is our old address...", STYLE);
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
@@ -731,7 +731,7 @@ public class TCPTransport extends TransportImpl {
                                    + " address " + tcpAddr.toString());
                         
                         iter.remove();
-                        _context.shitlist().shitlistRouter(peer, "Invalid TCP address...");
+                        _context.shitlist().shitlistRouter(peer, "Invalid TCP address...", STYLE);
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);

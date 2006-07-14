@@ -117,7 +117,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * dont accept any dbDtore of a router over 24 hours old (unless we dont 
      * know anyone or just started up) 
      */
-    private final static long ROUTER_INFO_EXPIRATION = 24*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
     
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -278,8 +278,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _context.jobQueue().addJob(new DataPublisherJob(_context, this));
         // expire old leases
         _context.jobQueue().addJob(new ExpireLeasesJob(_context, this));
-        // expire some routers in overly full kbuckets
-        _context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
+        
+        // the ExpireRoutersJob never fired since the tunnel pool manager lied
+        // and said all peers are in use (for no good reason), but this expire
+        // thing was a bit overzealous anyway, since the kbuckets are only
+        // relevent when the network is huuuuuuuuge.
+        //// expire some routers in overly full kbuckets
+        ////_context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
+        
         if (!_quiet) {
             // fill the passive queue periodically
             _context.jobQueue().addJob(new DataRepublishingSelectorJob(_context, this));
@@ -643,7 +649,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature on " + key.toBase64();
-        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION)) {
+        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION) && (_context.router().getUptime() > 60*60*1000) ) {
             if (routerInfo.getNetworkId() != Router.NETWORK_ID) {
                 _context.shitlist().shitlistRouter(key, "Peer is not in our network");
                 return "Peer is not in our network (" + routerInfo.getNetworkId() + ", wants " 
@@ -661,7 +667,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                     + " peers left (curPeer: " + key.toBase64() + " published on "
                     + new Date(routerInfo.getPublished()));
             }
-        } else if (routerInfo.getPublished() > now + Router.CLOCK_FUDGE_FACTOR) {
+        } else if (routerInfo.getPublished() > now + 2*Router.CLOCK_FUDGE_FACTOR) {
             long age = routerInfo.getPublished() - _context.clock().now();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 

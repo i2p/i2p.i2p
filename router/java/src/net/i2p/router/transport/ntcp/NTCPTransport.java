@@ -379,7 +379,7 @@ public class NTCPTransport extends TransportImpl {
             cons = new HashMap(_conByIdent);
             _conByIdent.clear();
         }
-        for (Iterator iter = cons.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = cons.values().iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
             con.close();
         }
@@ -400,18 +400,22 @@ public class NTCPTransport extends TransportImpl {
         long sendTotal = 0;
         long recvTotal = 0;
         int numPeers = 0;
+        int readingPeers = 0;
+        int writingPeers = 0;
         
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">uptime</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">idle</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">sent</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">received</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">out/in</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">out queue</a></b></td>");
-        buf.append("     <td><b><a href=\"#def.peer\">skew</a></b></td>");
+        buf.append(" <tr><td><b>peer</b></td>");
+        buf.append("     <td><b>uptime</b></td>");
+        buf.append("     <td><b>idle</b></td>");
+        buf.append("     <td><b>sent</b></td>");
+        buf.append("     <td><b>received</b></td>");
+        buf.append("     <td><b>out/in</b></td>");
+        buf.append("     <td><b>out queue</b></td>");
+        buf.append("     <td><b>backlogged?</b></td>");
+        buf.append("     <td><b>reading?</b></td>");
+        buf.append("     <td><b>skew</b></td>");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -425,7 +429,23 @@ public class NTCPTransport extends TransportImpl {
             buf.append("</td><td>").append(con.getMessagesReceived());
             buf.append("</td><td>").append(formatRate(con.getSendRate()/1024));
             buf.append("/").append(formatRate(con.getRecvRate()/1024)).append("KBps");
-            buf.append("</td><td>").append(con.getOutboundQueueSize());
+            long outQueue = con.getOutboundQueueSize();
+            if (outQueue <= 0) {
+                buf.append("</td><td>No messages");
+            } else {
+                buf.append("</td><td>").append(outQueue).append(" message");
+                if (outQueue > 1)
+                    buf.append("s");
+                writingPeers++;
+            }
+            buf.append("</td><td>").append(con.getConsecutiveBacklog() > 0 ? "true" : "false");
+            long readTime = con.getReadTime();
+            if (readTime <= 0) {
+                buf.append("</td><td>No");
+            } else {
+                buf.append("</td><td>For ").append(DataHelper.formatDuration(readTime));
+                readingPeers++;
+            }
             buf.append("</td><td>").append(DataHelper.formatDuration(con.getClockSkew()));
             buf.append("</td></tr>\n");
             out.write(buf.toString());
@@ -433,6 +453,8 @@ public class NTCPTransport extends TransportImpl {
         }
 
         buf.append("</table>\n");
+        buf.append("Peers currently reading I2NP messages: ").append(readingPeers).append("<br />\n");
+        buf.append("Peers currently writing I2NP messages: ").append(writingPeers).append("<br />\n");
         out.write(buf.toString());
         buf.setLength(0);
     }

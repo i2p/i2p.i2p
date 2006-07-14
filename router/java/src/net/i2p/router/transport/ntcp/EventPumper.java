@@ -467,7 +467,7 @@ public class EventPumper implements Runnable {
                         _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage());
                         con.close(false);
                     } else {
-                        _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), NTCPTransport.STYLE, "unable to connect: " + ioe.getMessage());
+                        _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage(), NTCPTransport.STYLE);
                         con.close(true);
                     }
                 }

@@ -350,9 +350,10 @@ class PersistentDataStore extends TransientDataStore {
                     ri.readBytes(fis);
                     if (ri.getNetworkId() != Router.NETWORK_ID) {
                         corrupt = true;
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("The router is from a different network: " 
-                                      + ri.getIdentity().calculateHash().toBase64());
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("The router "
+                                       + ri.getIdentity().calculateHash().toBase64() 
+                                       + " is from a different network");
                     } else {
                         try {
                             _facade.store(ri.getIdentity().getHash(), ri);
@@ -362,14 +363,16 @@ class PersistentDataStore extends TransientDataStore {
                         }
                     }
                 } catch (DataFormatException dfe) {
-                    _log.warn("Error reading the routerInfo from " + _routerFile.getAbsolutePath(), dfe);
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Error reading the routerInfo from " + _routerFile.getName(), dfe);
                     corrupt = true;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
                 if (corrupt) _routerFile.delete();
             } catch (IOException ioe) {
-                _log.warn("Error reading the RouterInfo from " + _routerFile.getAbsolutePath(), ioe);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Unable to read the router reference in " + _routerFile.getName(), ioe);
             }
         }
     }

@@ -561,11 +561,14 @@ public class EstablishState {
     
     /** anything left over in the byte buffer after verification is extra */
     private void prepareExtra(ByteBuffer buf) {
-        _extra = new byte[buf.remaining()];
-        buf.get(_extra);
-        _received += _extra.length;
+        int remaining = buf.remaining();
+        if (remaining > 0) {
+            _extra = new byte[remaining];
+            buf.get(_extra);
+            _received += remaining;
+        }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(prefix() + "prepare extra " + _extra.length + " (total received: " + _received + ")");
+            _log.debug(prefix() + "prepare extra " + remaining + " (total received: " + _received + ")");
     }
     
     /**

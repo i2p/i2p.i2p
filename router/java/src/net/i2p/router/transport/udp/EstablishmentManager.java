@@ -146,7 +146,7 @@ public class EstablishmentManager {
 
             if (!_transport.isValid(to.getIP())) {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
-                _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address");
+                _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
                 return;
             }
             
@@ -942,7 +942,7 @@ public class EstablishmentManager {
             }
 
             Hash peer = outboundState.getRemoteIdentity().calculateHash();
-            _context.shitlist().shitlistRouter(peer, err);
+            _context.shitlist().shitlistRouter(peer, err, UDPTransport.STYLE);
             _transport.dropPeer(peer, false, err);
             //_context.profileManager().commErrorOccurred(peer);
         } else {

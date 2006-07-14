@@ -546,10 +546,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             } else if (caps.indexOf(Router.CAPABILITY_BW256) >= 0) {
                 return "<b>[&gt;128]</b>";
             } else {
-                return "[&nbsp;&nbsp;&nbsp;&nbsp;]";
+                return "[old&nbsp;]";
             }
         } else {
-            return "[&nbsp;&nbsp;&nbsp;&nbsp;]";
+            return "[unkn]";
         }
     }
 }

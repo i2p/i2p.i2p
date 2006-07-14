@@ -153,6 +153,8 @@ class Reader {
             } else if (buf.remaining() <= 0) {
                 con.removeReadBuf(buf);
             }
+            if (est.isComplete() && est.getExtraBytes() != null)
+                con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
         }
         while (!con.isClosed() && (buf = con.getNextReadBuf()) != null) {
             // decrypt the data and push it into an i2np message

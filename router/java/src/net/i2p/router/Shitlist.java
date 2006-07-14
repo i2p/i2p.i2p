@@ -101,7 +101,10 @@ public class Shitlist {
             }
         }
         
-        _context.netDb().fail(peer);
+        if (transport == null) {
+            // we hate the peer on *any* transport
+            _context.netDb().fail(peer);
+        }
         //_context.tunnelManager().peerFailed(peer);
         //_context.messageRegistry().peerFailed(peer);
         if (!wasAlready)
@@ -192,6 +195,9 @@ public class Shitlist {
             buf.append(" <a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">(?)</a>");
             buf.append(" expiring in ");
             buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
+            Set transports = entry.transports;
+            if ( (transports != null) && (transports.size() > 0) )
+                buf.append(" on the following transports: ").append(transports);
             if (entry.cause != null) {
                 buf.append("<br />\n");
                 buf.append(entry.cause);

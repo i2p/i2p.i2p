@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.491 2006-07-01 17:44:34 complication Exp $
+$Id: history.txt,v 1.492 2006-07-04 16:17:44 jrandom Exp $
+
+2006-07-14  jrandom
+    * Improve the multitransport shitlisting (thanks Complication!)
+    * Allow routers with a capacity of 16-32KBps to be used in tunnels under
+      the default configuration (thanks for the stats Complication!)
+    * Properly allow older router references to load on startup
+      (thanks bar, Complication, et al!)
+    * Add a new "i2p.alwaysAllowReseed" advanced config property, though
+      hopefully today's changes should make this unnecessary (thanks void!)
+    * Improved NTCP buffering
+    * Close NTCP connections if we are too backlogged when writing to them
 
 2006-07-04  jrandom
     * New NIO-based tcp transport (NTCP), enabled by default for outbound

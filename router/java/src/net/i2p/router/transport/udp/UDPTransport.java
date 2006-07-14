@@ -327,7 +327,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.ERROR))
                 _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
                            + RemoteHostId.toString(ourIP) + ".  Lets throw tomatoes at them");
-            _context.shitlist().shitlistRouter(from, "They said we had an invalid IP");
+            _context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
         } else if (inboundRecent && _externalListenPort > 0 && _externalListenHost != null) {
             // use OS clock since its an ordering thing, not a time thing
@@ -601,7 +601,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         SimpleTimer.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                     }
                 }
-                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network");                
+                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net");
@@ -702,7 +702,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             dropPeerCapacities(peer);
             
             if (shouldShitlist)
-                _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
+                _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries", STYLE);
             long now = _context.clock().now();
             _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             synchronized (_peersByIdent) {

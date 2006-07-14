@@ -94,6 +94,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /** unencrypted outbound metadata buffer */
     private byte _meta[] = new byte[16];
     private boolean _sendingMeta;
+    /** how many consecutive sends were failed due to (estimated) send queue time */
+    private int _consecutiveBacklog;
     
     private static final int META_FREQUENCY = 10*60*1000;
     
@@ -122,6 +124,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _conKey = key;
         _conKey.attach(this);
         _sendingMeta = false;
+        _consecutiveBacklog = 0;
         transport.establishing(this);
     }
     /**
@@ -147,6 +150,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _curReadState = new ReadState();
         _remotePeer = remotePeer;
         _sendingMeta = false;
+        _consecutiveBacklog = 0;
         //_establishState = new EstablishState(ctx, transport, this);
         transport.establishing(this);
     }
@@ -187,10 +191,18 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
     public long getMessagesSent() { return _messagesWritten; }
     public long getMessagesReceived() { return _messagesRead; }
-    public long getOutboundQueueSize() { synchronized (_outbound) { return _outbound.size(); } }
+    public long getOutboundQueueSize() { 
+        synchronized (_outbound) {
+            int queued = _outbound.size();
+            if (_currentOutbound != null)
+                queued++;
+            return queued;
+        }
+    }
     public long getTimeSinceSend() { return System.currentTimeMillis()-_lastSendTime; }
     public long getTimeSinceReceive() { return System.currentTimeMillis()-_lastReceiveTime; }
     public long getTimeSinceCreated() { return System.currentTimeMillis()-_created; }
+    public int getConsecutiveBacklog() { return _consecutiveBacklog; }
     
     public boolean isClosed() { return _closed; }
     public void close() { close(false); }
@@ -232,9 +244,16 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (tooBacklogged()) {
             boolean allowRequeue = false; // if we are too backlogged in tcp, don't try ssu
             boolean successful = false;
+            _consecutiveBacklog++;
             _transport.afterSend(msg, successful, allowRequeue, msg.getLifetime());
+            if (_consecutiveBacklog > 50) { // waaay too backlogged
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Too backlogged for too long (" + _consecutiveBacklog + " messages for " + DataHelper.formatDuration(queueTime()) + ") sending to " + _remotePeer.calculateHash().toBase64());
+                close();
+            }
             return;
         }
+        _consecutiveBacklog = 0;
         int enqueued = 0;
         if (FAST_LARGE)
             bufferedPrepare(msg);
@@ -247,8 +266,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (_established && _currentOutbound == null)
             _transport.getWriter().wantsWrite(this);
     }
-    
-    private boolean tooBacklogged() {
+
+    private long queueTime() {    
         long queueTime = 0;
         int size = 0;
         synchronized (_outbound) {
@@ -257,8 +276,17 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             if ( (msg == null) && (size > 0) )
                 msg = (OutNetMessage)_outbound.get(0);
             if (msg == null)
-                return false;
+                return 0;
             queueTime = msg.getSendTime(); // does not include any of the pre-send(...) preparation
+        }
+        return queueTime;
+    }
+    private boolean tooBacklogged() {
+        long queueTime = queueTime();
+        if (queueTime <= 0) return false;
+        int size = 0;
+        synchronized (_outbound) {
+            size = _outbound.size();
         }
         
         // perhaps we could take into account the size of the queued messages too, our
@@ -665,7 +693,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         synchronized (_writeBufs) {
             return _writeBufs.size();
         }
-    } 
+    }
     
     /**
      * We have read the data in the buffer, but we can't process it locally yet,
@@ -946,18 +974,51 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
     }
     
+    
+    public long getReadTime() { return _curReadState.getReadTime(); }
+    
+    private static class DataBuf {
+        byte data[];
+        ByteArrayInputStream bais;
+        public DataBuf() {
+            data = new byte[16*1024];
+            bais = new ByteArrayInputStream(data);
+        }
+    }
+    
+    private static int MAX_DATA_READ_BUFS = 16;
+    private static List _dataReadBufs = new ArrayList(16);
+    private static DataBuf acquireReadBuf() {
+        synchronized (_dataReadBufs) {
+            if (_dataReadBufs.size() > 0)
+                return (DataBuf)_dataReadBufs.remove(0);
+        }
+        return new DataBuf();
+    }
+    private static void releaseReadBuf(DataBuf buf) {
+        buf.bais.reset();
+        synchronized (_dataReadBufs) {
+            if (_dataReadBufs.size() < MAX_DATA_READ_BUFS)
+                _dataReadBufs.add(buf);
+        }
+    }
+    /**
+     * sizeof(data)+data+pad+crc.
+     *
+     * perhaps to reduce the per-con memory footprint, we can acquire/release
+     * the ReadState._data and ._bais when _size is > 0, so there are only
+     * J 16KB buffers for the cons actually transmitting, instead of one per
+     * con (including idle ones)
+     */
     private class ReadState {
         private int _size;
-        private byte _data[];
-	private ByteArrayInputStream _bais;
+        private DataBuf _dataBuf;
         private int _nextWrite;
         private long _expectedCrc;
         private Adler32 _crc;
         private long _stateBegin;
         private int _blocks;
         public ReadState() {
-            _data = new byte[16*1024];
-            _bais = new ByteArrayInputStream(_data);
             _crc = new Adler32();
             init();
         }
@@ -968,7 +1029,9 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             _stateBegin = -1;
             _blocks = -1;
             _crc.reset();
-            _bais.reset();
+            if (_dataBuf != null)
+                releaseReadBuf(_dataBuf);
+            _dataBuf = null;
         }
         public int getSize() { return _size; }
         public void receiveBlock(byte buf[]) {
@@ -978,15 +1041,24 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 receiveSubsequent(buf);
             }
         }
+        public long getReadTime() {
+            long now = System.currentTimeMillis();
+            long readTime = now - _stateBegin;
+            if (readTime >= now)
+                return -1;
+            else
+                return readTime;
+        }
         private void receiveInitial(byte buf[]) {
             _stateBegin = System.currentTimeMillis();
             _size = (int)DataHelper.fromLong(buf, 0, 2);
             if (_size == 0) {
                 readMeta(buf);
                 init();
-               return;
+                return;
             } else {
-                System.arraycopy(buf, 2, _data, 0, buf.length-2);
+                _dataBuf = acquireReadBuf();
+                System.arraycopy(buf, 2, _dataBuf.data, 0, buf.length-2);
                 _nextWrite += buf.length-2;
                 _crc.update(buf);
                 _blocks++;
@@ -999,7 +1071,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             int remaining = _size - _nextWrite;
             int blockUsed = Math.min(buf.length, remaining);
             if (remaining > 0) {
-                System.arraycopy(buf, 0, _data, _nextWrite, blockUsed);
+                System.arraycopy(buf, 0, _dataBuf.data, _nextWrite, blockUsed);
                 _nextWrite += blockUsed;
                 remaining -= blockUsed;
             }
@@ -1037,7 +1109,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     // depend upon EOF to stop reading, so its ok that the _bais could
                     // in theory return more data than _size bytes, since h.readMessage
                     // stops when it should.
-                    I2NPMessage read = h.readMessage(_bais);
+                    I2NPMessage read = h.readMessage(_dataBuf.bais);
                     long timeToRecv = System.currentTimeMillis() - _stateBegin;
                     releaseHandler(h);
                     if (_log.shouldLog(Log.DEBUG))
@@ -1070,120 +1142,6 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     _log.error("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " blocks " + _blocks);
                 close();
                 return;
-            }
-        }
-    }
-    
-    /**
-     * sizeof(data)+data+pad+crc
-     */
-    private class ReadState2 {
-        private int _size;
-        private byte _dataBegin[];
-        private byte _dataRemaining[];
-        private int _dataRemainingIndex;
-        private long _expectedCrc;
-        private Adler32 _crc;
-        private long _stateBegin;
-        private int _blocks;
-        private boolean _wasMeta;
-        public ReadState2(byte buf[]) {
-            _stateBegin = System.currentTimeMillis();
-            _size = (int)DataHelper.fromLong(buf, 0, 2);
-            if (_size == 0) {
-                readMeta(buf);
-                _wasMeta = true;
-                return;
-            } else {
-                _wasMeta = false;
-            }
-            _dataBegin = new byte[buf.length-2];
-            System.arraycopy(buf, 2, _dataBegin, 0, _dataBegin.length);
-            _dataRemaining = new byte[_size-_dataBegin.length];
-            _dataRemainingIndex = 0;
-            _crc = new Adler32();
-            _crc.update(buf);
-            _blocks++;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("new read state with size: " + _size + " remaining: " + _dataRemaining.length + " for message " + _messagesRead);
-        }
-        public int size() { return _size; }
-        public int block() { return _blocks; }
-        public boolean wasMeta() { return _wasMeta; }
-        public void recv(byte buf[]) {
-            _blocks++;
-            int remaining = _dataRemaining.length-_dataRemainingIndex;
-            int blockUsed = Math.min(buf.length, remaining);
-            if (remaining > 0) {
-                System.arraycopy(buf, 0, _dataRemaining, _dataRemainingIndex, blockUsed);
-                _dataRemainingIndex += blockUsed;
-                remaining -= blockUsed;
-            }
-            if ( (remaining <= 0) && (buf.length-blockUsed < 4) ) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("crc wraparound required on block " + _blocks + " in message " + _messagesRead);
-                _crc.update(buf);
-                return;
-            } else if (remaining <= 0) {
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("block remaining in the last block: " + (buf.length-blockUsed));
-                
-                // on the last block
-                _expectedCrc = DataHelper.fromLong(buf, buf.length-4, 4);
-                _crc.update(buf, 0, buf.length-4);
-                long val = _crc.getValue();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("CRC value computed: " + val + " expected: " + _expectedCrc + " size: " + _size
-                               + " remaining=" + remaining);
-                if (val == _expectedCrc) {
-                    try {
-                        I2NPMessageHandler h = acquireHandler(_context);
-                        I2NPMessage read = null;
-                        if (false) {
-                            byte msg[] = new byte[_size];
-                            System.arraycopy(_dataBegin, 0, msg, 0, _dataBegin.length);
-                            System.arraycopy(_dataRemaining, 0, msg, _dataBegin.length, _dataRemaining.length);
-                            read = h.readMessage(msg);
-                        } else {
-                            read = h.readMessage(new SequenceInputStream(new ByteArrayInputStream(_dataBegin),
-                                                                         new ByteArrayInputStream(_dataRemaining)));
-                        }
-                        long timeToRecv = System.currentTimeMillis() - _stateBegin;
-                        releaseHandler(h);
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
-                                       + " received after " + timeToRecv + " with " + _size +"/"+ (_blocks*16) + " bytes");
-                        _context.statManager().addRateData("ntcp.receiveTime", timeToRecv, timeToRecv);
-                        _context.statManager().addRateData("ntcp.receiveSize", _size, timeToRecv);
-                        if (read != null) {
-                            _transport.messageReceived(read, _remotePeer, null, timeToRecv, _size);
-                            if (_messagesRead <= 0)
-                                enqueueInfoMessage();
-                            _lastReceiveTime = System.currentTimeMillis();
-                            _messagesRead++;
-                        }
-                    } catch (IOException ioe) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Error parsing I2NP message", ioe);
-                        close();
-                        return;
-                    } catch (I2NPMessageException ime) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Error parsing I2NP message", ime);
-                        close();
-                        return;
-                    }
-                } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " remaining=" + remaining + " blocks " + _blocks);
-                    close();
-                    return;
-                }
-                _curReadState = null;
-            } else {
-                _crc.update(buf);
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("update read state with another block (remaining: " + remaining + ")");
             }
         }
     }

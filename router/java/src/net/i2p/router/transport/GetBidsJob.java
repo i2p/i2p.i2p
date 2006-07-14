@@ -62,8 +62,11 @@ public class GetBidsJob extends JobImpl {
         
         TransportBid bid = facade.getNextBid(msg);
         if (bid == null) {
-            if (msg.getFailedTransports().size() == 0) {
+            int failedCount = msg.getFailedTransports().size();
+            if (failedCount == 0) {
                 context.shitlist().shitlistRouter(to, "We share no common transports with them");
+            } else if (failedCount >= facade.getTransportCount()) {
+                // fail after all transports were unsuccessful
                 context.netDb().fail(to);
             }
             fail(context, msg);

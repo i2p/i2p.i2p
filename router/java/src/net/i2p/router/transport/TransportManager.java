@@ -117,6 +117,8 @@ public class TransportManager implements TransportEventListener {
         _transports.clear();
     }
     
+    int getTransportCount() { return _transports.size(); }
+    
     private boolean isSupported(Set addresses, Transport t) {
         for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();

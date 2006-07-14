@@ -67,6 +67,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public TransportBid getNextBid(OutNetMessage msg) {
         return _manager.getNextBid(msg);
     }
+    int getTransportCount() { return _manager.getTransportCount(); }
     
     public void processMessage(OutNetMessage msg) {	
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
