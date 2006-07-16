@@ -7,6 +7,7 @@ import net.i2p.router.*;
 import net.i2p.router.tunnel.*;
 import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.util.Log;
+import net.i2p.stat.StatManager;
 
 /**
  * Single threaded controller of the tunnel creation process, spanning all tunnel pools.
@@ -42,6 +43,22 @@ class BuildExecutor implements Runnable {
         _context.statManager().createRateStat("tunnel.buildRequestTime", "How long it takes to build a tunnel request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+
+        // Get stat manager, get recognized bandwidth tiers
+        StatManager statMgr = _context.statManager();
+        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS;
+        // For each bandwidth tier, create tunnel build agree/reject/expire stats
+        for (int i = 0; i < bwTiers.length(); i++) {
+            String bwTier = String.valueOf(bwTiers.charAt(i));
+            statMgr.createRateStat("tunnel.tierAgree" + bwTier, "Agreed joins from " + bwTier, "Tunnels", new long[] { 60*1000, 10*60*1000 });
+            statMgr.createRateStat("tunnel.tierReject" + bwTier, "Rejected joins from "+ bwTier, "Tunnels", new long[] { 60*1000, 10*60*1000 });
+            statMgr.createRateStat("tunnel.tierExpire" + bwTier, "Expired joins from "+ bwTier, "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        }
+        // For caution, also create stats for unknown
+        statMgr.createRateStat("tunnel.tierAgreeUnknown", "Agreed joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        statMgr.createRateStat("tunnel.tierRejectUnknown", "Rejected joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        statMgr.createRateStat("tunnel.tierExpireUnknown", "Expired joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+
         _repoll = false;
         _handler = new BuildHandler(ctx, this);
     }
@@ -90,6 +107,28 @@ class BuildExecutor implements Runnable {
                 // or... not.
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Timed out waiting for reply asking for " + cfg);
+
+                // Iterate through peers in the tunnel, get their bandwidth tiers,
+                // record for each that a peer of the given tier expired
+                for (int iPeer = 0; iPeer < cfg.getLength(); iPeer++) {
+                    // Look up peer
+                    Hash peer = cfg.getPeer(iPeer);
+                    // Avoid recording ourselves
+                    if (peer.toBase64().equals(_context.routerHash().toBase64())) {
+                        if (_log.shouldLog(Log.DEBUG)) _log.debug("Not recording our own expiry in stats.");
+                        continue;
+                    }
+                    // Look up routerInfo
+                    RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+                    // Default and detect bandwidth tier
+                    String bwTier = "Unknown";
+                    if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized
+                        else if (_log.shouldLog(Log.WARN)) _log.warn("Failed detecting bwTier, null routerInfo for: " + peer);
+                    // Record that a peer of the given tier expired
+                    _context.statManager().addRateData("tunnel.tierExpire" + bwTier, 1, 0);
+                }
+
+
                 TunnelPool pool = cfg.getTunnelPool();
                 if (pool != null)
                     pool.buildComplete(cfg);

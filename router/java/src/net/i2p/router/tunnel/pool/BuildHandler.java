@@ -220,6 +220,7 @@ class BuildHandler {
         int statuses[] = handler.decrypt(_context, msg, cfg, order);
         if (statuses != null) {
             boolean allAgree = true;
+            // For each peer in the tunnel
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
                 int record = order.indexOf(new Integer(i));
@@ -227,6 +228,22 @@ class BuildHandler {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
                 
+                // If this tunnel member isn't ourselves
+                if (!peer.toBase64().equals(_context.routerHash().toBase64())) {
+                    // Look up routerInfo
+                    RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+                    // Default and detect bandwidth tier
+                    String bwTier = "Unknown";
+                    if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized
+                        else if (_log.shouldLog(Log.WARN)) _log.warn("Failed detecting bwTier, null routerInfo for: " + peer);
+                    // Record that a peer of the given tier agreed or rejected
+                    if (howBad == 0) {
+                        _context.statManager().addRateData("tunnel.tierAgree" + bwTier, 1, 0);
+                    } else {
+                        _context.statManager().addRateData("tunnel.tierReject" + bwTier, 1, 0);
+                    }
+                }
+
                 if (howBad == 0) {
                     // w3wt
                     _context.profileManager().tunnelJoined(peer, rtt);

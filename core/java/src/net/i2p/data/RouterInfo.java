@@ -53,6 +53,9 @@ public class RouterInfo extends DataStructureImpl {
     public static final String PROP_CAPABILITIES = "caps";
     public static final char CAPABILITY_HIDDEN = 'H';
 
+    // Public string of chars which serve as bandwidth capacity markers
+    // NOTE: individual chars defined in Router.java
+    public static final String BW_CAPABILITY_CHARS = "KLMNO";
     
     public RouterInfo() {
         setIdentity(null);
@@ -332,6 +335,24 @@ public class RouterInfo extends DataStructureImpl {
      */
     public boolean isHidden() {
         return (getCapabilities().indexOf(CAPABILITY_HIDDEN) != -1);
+    }
+
+    /**
+     * Return a string representation of this node's bandwidth tier,
+     * or "Unknown"
+     */
+    public String getBandwidthTier() {
+        String bwTiers = BW_CAPABILITY_CHARS;
+        String bwTier = "Unknown";
+        String capabilities = getCapabilities();
+        // Iterate through capabilities, searching for known bandwidth tier
+        for (int i = 0; i < capabilities.length(); i++) {
+            if (bwTiers.contains(String.valueOf(capabilities.charAt(i)))) {
+                bwTier = String.valueOf(capabilities.charAt(i));
+                break;
+            }
+        }
+        return (bwTier);
     }
 
     public void addCapability(char cap) {

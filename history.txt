@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.492 2006-07-04 16:17:44 jrandom Exp $
+$Id: history.txt,v 1.493 2006-07-14 13:08:44 jrandom Exp $
+
+2006-07-16  Complication
+    * Collect tunnel build agree/reject/expire statistics
+      for each bandwidth tier of peers (and peers of unknown tiers,
+      even if those shouldn't exist)
 
 2006-07-14  jrandom
     * Improve the multitransport shitlisting (thanks Complication!)
