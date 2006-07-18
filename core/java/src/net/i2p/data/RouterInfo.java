@@ -347,7 +347,7 @@ public class RouterInfo extends DataStructureImpl {
         String capabilities = getCapabilities();
         // Iterate through capabilities, searching for known bandwidth tier
         for (int i = 0; i < capabilities.length(); i++) {
-            if (bwTiers.contains(String.valueOf(capabilities.charAt(i)))) {
+            if (bwTiers.indexOf(String.valueOf(capabilities.charAt(i))) >= 0) {
                 bwTier = String.valueOf(capabilities.charAt(i));
                 break;
             }
