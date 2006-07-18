@@ -3,14 +3,7 @@ package net.i2p.router.transport.ntcp;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.CancelledKeyException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.ClosedSelectorException;
-import java.nio.channels.NotYetConnectedException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +32,11 @@ public class EventPumper implements Runnable {
     
     private static final int BUF_SIZE = 8*1024;
     private static final int MAX_CACHE_SIZE = 64;
+    /** 
+     * every 30s or so, iterate across all ntcp connections just to make sure
+     * we have their interestOps set properly (and to expire any looong idle cons)
+     */
+    private static final long FAILSAFE_ITERATION_FREQ = 60*1000l;
     
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;
@@ -82,6 +80,7 @@ public class EventPumper implements Runnable {
     }
     
     public void run() {
+        long lastFailsafeIteration = System.currentTimeMillis();
         List bufList = new ArrayList(16);
         while (_alive && _selector.isOpen()) {
             try {
@@ -107,43 +106,56 @@ public class EventPumper implements Runnable {
                     continue;
                 }
 
-                for (Iterator iter = selected.iterator(); iter.hasNext(); ) {
+                processKeys(selected);
+                selected.clear();
+                
+                if (lastFailsafeIteration + FAILSAFE_ITERATION_FREQ < System.currentTimeMillis()) {
+                    // in the *cough* unthinkable possibility that there are bugs in
+                    // the code, lets periodically pass over all NTCP connections and
+                    // make sure that anything which should be able to write has been
+                    // properly marked as such, etc
+                    lastFailsafeIteration = System.currentTimeMillis();
                     try {
-                        SelectionKey key = (SelectionKey)iter.next();
-                        int ops = key.readyOps();
-                        boolean accept = (ops & SelectionKey.OP_ACCEPT) != 0;
-                        boolean connect = (ops & SelectionKey.OP_CONNECT) != 0;
-                        boolean read = (ops & SelectionKey.OP_READ) != 0;
-                        boolean write = (ops & SelectionKey.OP_WRITE) != 0;
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("ready ops for : " + key
-                                       + " accept? " + accept + " connect? " + connect
-                                       + " read? " + read 
-                                       + "/" + ((key.interestOps()&SelectionKey.OP_READ)!= 0)
-                                       + " write? " + write 
-                                       + "/" + ((key.interestOps()&SelectionKey.OP_WRITE)!= 0)
-                                       );
-                        if (accept) {
-                            processAccept(key);
+                        Set all = _selector.keys();
+                        
+                        int failsafeWrites = 0;
+                        int failsafeCloses = 0;
+                        
+                        long expireIdleWriteTime = 60*60*1000l + _context.random().nextLong(60*60*1000l);
+                        for (Iterator iter = all.iterator(); iter.hasNext(); ) {
+                            try {
+                                SelectionKey key = (SelectionKey)iter.next();
+                                Object att = key.attachment();
+                                if (!(att instanceof NTCPConnection))
+                                    continue; // to the next con
+                                NTCPConnection con = (NTCPConnection)att;
+                                
+                                if ( (con.getWriteBufCount() > 0) &&
+                                     ((key.interestOps() & SelectionKey.OP_WRITE) == 0) ) {
+                                    // the data queued to be sent has already passed through
+                                    // the bw limiter and really just wants to get shoved
+                                    // out the door asap.
+                                    key.interestOps(SelectionKey.OP_WRITE | key.interestOps());
+                                    failsafeWrites++;
+                                }
+                                
+                                if ( (con.getTimeSinceSend() > expireIdleWriteTime) && (con.getMessagesSent() > 0) ) {
+                                    // we haven't sent anything in a really long time, so lets just close 'er up
+                                    con.close();
+                                    failsafeCloses++;
+                                }
+                            } catch (CancelledKeyException cke) {
+                                // cancelled while updating the interest ops.  ah well
+                            }
+                            if (failsafeWrites > 0)
+                                _context.statManager().addRateData("ntcp.failsafeWrites", failsafeWrites, 0);
+                            if (failsafeCloses > 0)
+                                _context.statManager().addRateData("ntcp.failsafeCloses", failsafeCloses, 0);
                         }
-                        if (connect) {
-                            key.interestOps(key.interestOps() & ~SelectionKey.OP_CONNECT);
-                            processConnect(key);
-                        }
-                        if (read) {
-                            key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
-                            processRead(key);
-                        }
-                        if (write) {
-                            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-                            processWrite(key);
-                        }
-                    } catch (CancelledKeyException cke) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("key cancelled");
+                    } catch (ClosedSelectorException cse) {
+                        continue;
                     }
                 }
-                selected.clear();
             } catch (RuntimeException re) {
                 _log.log(Log.CRIT, "Error in the event pumper", re);
             }
@@ -182,6 +194,45 @@ public class EventPumper implements Runnable {
         synchronized (_wantsRead) { _wantsRead.clear(); }
         synchronized (_wantsRegister) { _wantsRegister.clear(); }
         synchronized (_wantsWrite) { _wantsWrite.clear(); }
+    }
+    
+    private void processKeys(Set selected) {
+        for (Iterator iter = selected.iterator(); iter.hasNext(); ) {
+            try {
+                SelectionKey key = (SelectionKey)iter.next();
+                int ops = key.readyOps();
+                boolean accept = (ops & SelectionKey.OP_ACCEPT) != 0;
+                boolean connect = (ops & SelectionKey.OP_CONNECT) != 0;
+                boolean read = (ops & SelectionKey.OP_READ) != 0;
+                boolean write = (ops & SelectionKey.OP_WRITE) != 0;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("ready ops for : " + key
+                               + " accept? " + accept + " connect? " + connect
+                               + " read? " + read 
+                               + "/" + ((key.interestOps()&SelectionKey.OP_READ)!= 0)
+                               + " write? " + write 
+                               + "/" + ((key.interestOps()&SelectionKey.OP_WRITE)!= 0)
+                               );
+                if (accept) {
+                    processAccept(key);
+                }
+                if (connect) {
+                    key.interestOps(key.interestOps() & ~SelectionKey.OP_CONNECT);
+                    processConnect(key);
+                }
+                if (read) {
+                    key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
+                    processRead(key);
+                }
+                if (write) {
+                    key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+                    processWrite(key);
+                }
+            } catch (CancelledKeyException cke) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("key cancelled");
+            }
+        }
     }
     
     public void wantsWrite(NTCPConnection con, byte data[]) {
@@ -305,7 +356,9 @@ public class EventPumper implements Runnable {
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Error processing connection", ioe);
-        }
+        } catch (NoConnectionPendingException ncpe) {
+	    // ignore
+	}
     }
     
     private void processRead(SelectionKey key) {
@@ -455,6 +508,7 @@ public class EventPumper implements Runnable {
                 con.setKey(key);
                 try {
                     NTCPAddress naddr = con.getRemoteAddress();
+		    if (naddr.getPort() <= 0) throw new IOException("Invalid NTCP address: " + naddr);
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {

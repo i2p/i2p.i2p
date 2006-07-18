@@ -64,7 +64,7 @@ public class NTCPAddress {
         } else { 
             _host = host.trim();
             String port = addr.getOptions().getProperty(PROP_PORT);
-            if ( (port != null) && (port.trim().length() > 0) ) {
+            if ( (port != null) && (port.trim().length() > 0) && !("null".equals(port)) ) {
                 try {
                     _port = Integer.parseInt(port.trim());
                 } catch (NumberFormatException nfe) {

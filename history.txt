@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.493 2006-07-14 13:08:44 jrandom Exp $
+$Id: history.txt,v 1.494 2006-07-16 12:20:46 complication Exp $
+
+* 2006-07-18  0.6.1.22 released
+
+2006-07-18  jrandom
+    * Add a failsafe to the NTCP transport to make sure we keep
+      pumping writes when we should.
+    * Properly reallow 16-32KBps routers in the default config
+      (thanks Complication!)
 
 2006-07-16  Complication
     * Collect tunnel build agree/reject/expire statistics

@@ -156,8 +156,7 @@ abstract class TunnelPeerSelector {
         } else if (filterSlow(ctx, isInbound, isExploratory)) {
             Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
             String excludeCaps = ctx.getProperty("router.excludePeerCaps", 
-                                                 String.valueOf(Router.CAPABILITY_BW16) +
-                                                 String.valueOf(Router.CAPABILITY_BW32));
+                                                 String.valueOf(Router.CAPABILITY_BW16));
             Set peers = new HashSet();
             if (excludeCaps != null) {
                 char excl[] = excludeCaps.toCharArray();
@@ -224,7 +223,17 @@ abstract class TunnelPeerSelector {
                                 if (infoAge < 0) {
                                     infoAge = 0;
                                 } else if (infoAge > 24*60*60*1000) {
-                                    peers.add(peer.getIdentity().calculateHash());
+				    // Only exclude long-unseen peers if we haven't just started up
+				    long DONT_EXCLUDE_PERIOD = 15*60*1000;
+				    if (ctx.router().getUptime() < DONT_EXCLUDE_PERIOD) {
+				        if (log.shouldLog(Log.DEBUG))
+				            log.debug("Not excluding a long-unseen peer, since we just started up.");
+				    } else {
+				        if (log.shouldLog(Log.DEBUG))
+				            log.debug("Excluding a long-unseen peer.");
+				        peers.add(peer.getIdentity().calculateHash());
+				    }
+                                    //peers.add(peer.getIdentity().calculateHash());
                                     continue;
                                 } else {
                                     if (infoAge + uptimeMs < 2*60*60*1000) {

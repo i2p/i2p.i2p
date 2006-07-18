@@ -246,9 +246,13 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             boolean successful = false;
             _consecutiveBacklog++;
             _transport.afterSend(msg, successful, allowRequeue, msg.getLifetime());
-            if (_consecutiveBacklog > 50) { // waaay too backlogged
+            if (_consecutiveBacklog > 10) { // waaay too backlogged
+                boolean wantsWrite = false;
+                try { wantsWrite = ( (_conKey.interestOps() & SelectionKey.OP_WRITE) != 0); } catch (Exception e) {}
+                int blocks = 0;
+		synchronized (_writeBufs) { blocks = _writeBufs.size(); }
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Too backlogged for too long (" + _consecutiveBacklog + " messages for " + DataHelper.formatDuration(queueTime()) + ") sending to " + _remotePeer.calculateHash().toBase64());
+                    _log.error("Too backlogged for too long (" + _consecutiveBacklog + " messages for " + DataHelper.formatDuration(queueTime()) + ", sched? " + wantsWrite + ", blocks: " + blocks + ") sending to " + _remotePeer.calculateHash().toBase64());
                 close();
             }
             return;

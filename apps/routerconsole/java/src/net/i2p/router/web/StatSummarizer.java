@@ -60,6 +60,10 @@ public class StatSummarizer implements Runnable {
                                                     ",tunnel.buildExploratoryExpire.60000" +
                                                     ",client.sendAckTime.60000" +
                                                     ",client.dispatchNoACK.60000" +
+                                                    ",ntcp.sendTime.60000" +
+                                                    ",ntcp.transmitTime.60000" +
+                                                    ",ntcp.sendBacklogTime.60000" +
+                                                    ",ntcp.receiveTime.60000" +
                                                     ",transport.sendMessageFailureLifetime.60000" +
                                                     ",transport.sendProcessingTime.60000";
     
