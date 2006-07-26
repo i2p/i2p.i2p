@@ -148,6 +148,7 @@ class Reader {
             if (est.isCorrupt()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("closing connection on establishment because: " +est.getError(), est.getException());
+                _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1, 0);
                 con.close();
                 return;
             } else if (buf.remaining() <= 0) {

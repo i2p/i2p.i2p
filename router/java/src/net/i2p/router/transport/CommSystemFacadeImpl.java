@@ -170,8 +170,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             isNew = true;
         }
          */
-        if ( (name == null) || (port == null) )
+        if ( (name == null) || (port == null) || (name.trim().length() <= 0) || ("null".equals(name)) )
             return null;
+        try {
+            int p = Integer.parseInt(port);
+            if ( (p <= 0) || (p > 64*1024) )
+                return null;
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
         props.setProperty(NTCPAddress.PROP_HOST, name);
         props.setProperty(NTCPAddress.PROP_PORT, port);
         addr.setOptions(props);

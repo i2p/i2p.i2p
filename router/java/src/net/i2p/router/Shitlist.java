@@ -18,10 +18,10 @@ import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**
- * Manage in memory the routers we are oh so fond of.
- * This needs to get a little bit more sophisticated... currently there is no
- * way out of the shitlist
- *
+ * Routers are shitlisted only if none of our transports can talk to them
+ * or their signed router info is completely screwy.  Individual transports
+ * manage their own unreachable lists and do not generally add to the overall
+ * shitlist.
  */
 public class Shitlist {
     private Log _log;
@@ -43,6 +43,39 @@ public class Shitlist {
         _context = context;
         _log = context.logManager().getLog(Shitlist.class);
         _entries = new HashMap(32);
+        _context.jobQueue().addJob(new Cleanup(_context));
+    }
+    
+    private class Cleanup extends JobImpl {
+        private List _toUnshitlist;
+        public Cleanup(RouterContext ctx) {
+            super(ctx);
+            _toUnshitlist = new ArrayList(4);
+        }
+        public String getName() { return "Cleanup shitlist"; }
+        public void runJob() {
+            _toUnshitlist.clear();
+            long now = getContext().clock().now();
+            synchronized (_entries) {
+                for (Iterator iter = _entries.keySet().iterator(); iter.hasNext(); ) {
+                    Hash peer = (Hash)iter.next();
+                    Entry entry = (Entry)_entries.get(peer);
+                    if (entry.expireOn <= now) {
+                        iter.remove();
+                        _toUnshitlist.add(peer);
+                    }
+                }
+            }
+            for (int i = 0; i < _toUnshitlist.size(); i++) {
+                Hash peer = (Hash)_toUnshitlist.get(i);
+                PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+                if (prof != null)
+                    prof.unshitlist();
+                _context.messageHistory().unshitlist(peer);
+            }
+            
+            requeue(30*1000);
+        }
     }
     
     public int getRouterCount() {
@@ -130,7 +163,10 @@ public class Shitlist {
                 fully = true;
             } else {
                 e.transports.remove(transport);
-                _entries.put(peer, e);
+                if (e.transports.size() <= 0)
+                    fully = true;
+                else
+                    _entries.put(peer, e);
             }
         }
         if (fully) {
@@ -188,9 +224,14 @@ public class Shitlist {
         }
         buf.append("<ul>");
         
+        int partial = 0;
         for (Iterator iter = entries.keySet().iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
             Entry entry = (Entry)entries.get(key);
+            if ( (entry.transports != null) && (entry.transports.size() > 0) ) {
+                partial++;
+                continue;
+            }
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
             buf.append(" <a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">(?)</a>");
             buf.append(" expiring in ");
@@ -205,6 +246,9 @@ public class Shitlist {
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
+        buf.append("<i>Partial shitlisted peers (only blocked on some transports): ");
+        buf.append(partial);
+        buf.append("</i>\n");
         out.write(buf.toString());
         out.flush();
     }

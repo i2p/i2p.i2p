@@ -320,7 +320,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         boolean wantACK = true;
         int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
-        if (existingTags > 30)
+        if ( (existingTags > 30) && (getContext().random().nextInt(100) >= 5) )
             wantACK = false;
         
         long token = (wantACK ? getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE) : -1);

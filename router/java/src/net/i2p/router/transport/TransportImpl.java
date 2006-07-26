@@ -10,13 +10,7 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -24,6 +18,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
+import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
@@ -39,6 +34,8 @@ public abstract class TransportImpl implements Transport {
     private RouterAddress _currentAddress;
     private List _sendPool;
     protected RouterContext _context;
+    /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
+    private Map _unreachableEntries;
 
     /**
      * Initialize the new transport
@@ -56,6 +53,7 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.sendProcessingTime", "How long does it take from noticing that we want to send the message to having it completely sent (successfully or failed)?", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
+        _unreachableEntries = new HashMap(16);
         _currentAddress = null;
     }
     
@@ -374,6 +372,54 @@ public abstract class TransportImpl implements Transport {
     public RouterContext getContext() { return _context; }
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
     public void recheckReachability() {}
+    
+    private static final long UNREACHABLE_PERIOD = 5*60*1000;
+    public boolean isUnreachable(Hash peer) {
+        long now = _context.clock().now();
+        synchronized (_unreachableEntries) {
+            Long when = (Long)_unreachableEntries.get(peer);
+            if (when == null) return false;
+            if (when.longValue() + UNREACHABLE_PERIOD < now) {
+                _unreachableEntries.remove(peer);
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+    /** called when we can't reach a peer */
+    public void markUnreachable(Hash peer) {
+        long now = _context.clock().now();
+        synchronized (_unreachableEntries) {
+            _unreachableEntries.put(peer, new Long(now));
+        }
+    }
+    /** called when we establish a peer connection (outbound or inbound) */
+    public void markReachable(Hash peer) {
+        // if *some* transport can reach them, then we shouldn't shitlist 'em
+        _context.shitlist().unshitlistRouter(peer);
+        synchronized (_unreachableEntries) {
+            _unreachableEntries.remove(peer);
+        }
+    }
+    private class CleanupUnreachable extends JobImpl {
+        public CleanupUnreachable(RouterContext ctx) {
+            super(ctx);
+        }
+        public String getName() { return "Cleanup " + getStyle() + " unreachable list"; }
+        public void runJob() {
+            long now = getContext().clock().now();
+            synchronized (_unreachableEntries) {
+                for (Iterator iter = _unreachableEntries.keySet().iterator(); iter.hasNext(); ) {
+                    Hash peer = (Hash)iter.next();
+                    Long when = (Long)_unreachableEntries.get(peer);
+                    if (when.longValue() + UNREACHABLE_PERIOD < now)
+                        iter.remove();
+                }
+            }
+            requeue(60*1000);
+        }
+    }
 
     public static boolean isPubliclyRoutable(byte addr[]) {
         if (addr.length == 4) {

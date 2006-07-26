@@ -323,6 +323,7 @@ public class Router {
             ri.setPublished(_context.clock().now());
             Properties stats = _context.statPublisher().publishStatistics();
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, NETWORK_ID+"");
+            
             ri.setOptions(stats);
             ri.setAddresses(_context.commSystem().createAddresses());
 
@@ -444,15 +445,32 @@ public class Router {
                                                                  "keyBackup/publicSigning.key",
                                                                  "sessionKeys.dat" };
 
+    static final String IDENTLOG = "identlog.txt";
     public static void killKeys() {
+        new Exception("Clearing identity files").printStackTrace();
+        int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
             File f = new File(_rebuildFiles[i]);
             if (f.exists()) {
                 boolean removed = f.delete();
-                if (removed)
+                if (removed) {
                     System.out.println("INFO:  Removing old identity file: " + _rebuildFiles[i]);
-                else
+                    remCount++;
+                } else {
                     System.out.println("ERROR: Could not remove old identity file: " + _rebuildFiles[i]);
+                }
+            }
+        }
+        if (remCount > 0) {
+            FileOutputStream log = null;
+            try {
+                log = new FileOutputStream(IDENTLOG, true);
+                log.write((new Date() + ": Old router identity keys cleared\n").getBytes());
+            } catch (IOException ioe) {
+                // ignore
+            } finally {
+                if (log != null)
+                    try { log.close(); } catch (IOException ioe) {}
             }
         }
     }

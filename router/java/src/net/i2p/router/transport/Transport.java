@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
+import net.i2p.data.Hash;
 
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
@@ -44,4 +45,6 @@ public interface Transport {
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
     public short getReachabilityStatus();
     public void recheckReachability();
+    
+    public boolean isUnreachable(Hash peer);
 }

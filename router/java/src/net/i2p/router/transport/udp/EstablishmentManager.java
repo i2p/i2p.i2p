@@ -134,6 +134,7 @@ public class EstablishmentManager {
         }
         if (msg.getTarget().getNetworkId() != Router.NETWORK_ID) {
             _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash());
+            _transport.markUnreachable(msg.getTarget().getIdentity().calculateHash());
             _transport.failed(msg, "Remote peer is on the wrong network, cannot establish");
             return;
         }
@@ -146,7 +147,8 @@ public class EstablishmentManager {
 
             if (!_transport.isValid(to.getIP())) {
                 _transport.failed(msg, "Remote peer's IP isn't valid");
-                _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
+                _transport.markUnreachable(msg.getTarget().getIdentity().calculateHash());
+                //_context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address", UDPTransport.STYLE);
                 return;
             }
             
@@ -465,7 +467,7 @@ public class EstablishmentManager {
         public PublishToNewInbound(PeerState peer) { _peer = peer; }
         public void timeReached() {
             Hash peer = _peer.getRemotePeer();
-            if ((peer != null) && (!_context.shitlist().isShitlisted(peer))) {
+            if ((peer != null) && (!_context.shitlist().isShitlisted(peer)) && (!_transport.isUnreachable(peer))) {
                 // ok, we are fine with them, send them our latest info
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Publishing to the peer after confirm plus delay (without shitlist): " + peer.toBase64());
@@ -942,7 +944,8 @@ public class EstablishmentManager {
             }
 
             Hash peer = outboundState.getRemoteIdentity().calculateHash();
-            _context.shitlist().shitlistRouter(peer, err, UDPTransport.STYLE);
+            //_context.shitlist().shitlistRouter(peer, err, UDPTransport.STYLE);
+            _transport.markUnreachable(peer);
             _transport.dropPeer(peer, false, err);
             //_context.profileManager().commErrorOccurred(peer);
         } else {

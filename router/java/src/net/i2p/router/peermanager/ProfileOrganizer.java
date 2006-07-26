@@ -21,6 +21,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.NetworkDatabaseFacade;
+import net.i2p.router.tunnel.pool.TunnelPeerSelector;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
@@ -813,11 +814,16 @@ public class ProfileOrganizer {
                     _log.warn("Peer " + peer.toBase64() + " is marked as hidden, disallowing its use");
                 return false;
             } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
-                // perhaps check to see if they are active?
-                
-                return true;
+                boolean exclude = TunnelPeerSelector.shouldExclude(_context, info);
+                if (exclude) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Peer " + peer.toBase64() + " has capabilities or other stats suggesting we avoid it");
+                    return false;
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
+                    return true;
+                }
             }
         } else {
             if (_log.shouldLog(Log.WARN))

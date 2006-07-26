@@ -211,10 +211,16 @@ public class TransportManager implements TransportEventListener {
     }
     
     public TransportBid getNextBid(OutNetMessage msg) {
+        int unreachableTransports = 0;
+        Hash peer = msg.getTarget().getIdentity().calculateHash();
         Set failedTransports = msg.getFailedTransports();
         TransportBid rv = null;
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
+            if (t.isUnreachable(peer)) {
+                unreachableTransports++;
+                continue;
+            }
             if (failedTransports.contains(t.getStyle())) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Skipping transport " + t.getStyle() + " as it already failed");
@@ -235,6 +241,8 @@ public class TransportManager implements TransportEventListener {
                     _log.debug("Transport " + t.getStyle() + " did not produce a bid");
             }
         }
+        if (unreachableTransports >= _transports.size())
+            _context.shitlist().shitlistRouter(peer, "Unreachable on any transport");
         return rv;
     }
     

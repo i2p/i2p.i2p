@@ -1,4 +1,26 @@
-$Id: history.txt,v 1.494 2006-07-16 12:20:46 complication Exp $
+$Id: history.txt,v 1.495 2006-07-18 15:08:00 jrandom Exp $
+
+2006-07-26  jrandom
+    * Every time we create a new router identity, add an entry to the
+      new "identlog.txt" text file in the I2P install directory.  For
+      debugging purposes, publish the count of how many identities the
+      router has cycled through, though not the identities itself.
+    * Cleaned up the way the multitransport shitlisting worked, and
+      added per-transport shitlists
+    * When dropping a router reference locally, first fire a netDb
+      lookup for the entry
+    * Take the peer selection filters into account when organizing the
+      profiles (thanks Complication!)
+    * Avoid some obvious configuration errors for the NTCP transport
+      (invalid ports, "null" ip, etc)
+    * Deal with some small NTCP bugs found in the wild (unresolveable
+      hosts, strange network discons, etc)
+    * Send our netDb info to peers we have direct NTCP connections to
+      after each 6-12 hours of connection uptime
+    * Clean up the NTCP reading and writing queue logic to avoid some
+      potential delays
+    * Allow people to specify the IP that the SSU transport binds on
+      locally, via the advanced config "i2np.udp.bindInterface=1.2.3.4"
 
 * 2006-07-18  0.6.1.22 released
 

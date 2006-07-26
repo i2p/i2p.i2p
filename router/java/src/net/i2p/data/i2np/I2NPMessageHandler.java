@@ -95,8 +95,18 @@ public class I2NPMessageHandler {
         cur++;
         _lastReadBegin = System.currentTimeMillis();
         I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
-        if (msg == null)
-            throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
+        if (msg == null) {
+            int sz = data.length-offset;
+            boolean allZero = false;
+            for (int i = offset; i < data.length; i++) {
+                if (data[i] != 0) {
+                    allZero = false;
+                    break;
+                }
+            }
+            throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message (remaining sz=" 
+                                           + sz + " all zeros? " + allZero + ")");
+        }
         try {
             _lastSize = msg.readBytes(data, type, cur);
             cur += _lastSize;

@@ -182,6 +182,12 @@ public class RouterInfo extends DataStructureImpl {
             return (Properties) _options.clone();
         }
     }
+    public String getOption(String opt) {
+        if (_options == null) return null;
+        synchronized (_options) {
+            return _options.getProperty(opt);
+        }
+    }
 
     /**
      * Configure a set of options or statistics that the router can expose
@@ -347,7 +353,7 @@ public class RouterInfo extends DataStructureImpl {
         String capabilities = getCapabilities();
         // Iterate through capabilities, searching for known bandwidth tier
         for (int i = 0; i < capabilities.length(); i++) {
-            if (bwTiers.indexOf(String.valueOf(capabilities.charAt(i))) >= 0) {
+            if (bwTiers.indexOf(String.valueOf(capabilities.charAt(i))) != -1) {
                 bwTier = String.valueOf(capabilities.charAt(i));
                 break;
             }

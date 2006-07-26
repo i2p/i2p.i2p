@@ -36,7 +36,7 @@ public class EventPumper implements Runnable {
      * every 30s or so, iterate across all ntcp connections just to make sure
      * we have their interestOps set properly (and to expire any looong idle cons)
      */
-    private static final long FAILSAFE_ITERATION_FREQ = 60*1000l;
+    private static final long FAILSAFE_ITERATION_FREQ = 30*1000l;
     
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;
@@ -75,6 +75,7 @@ public class EventPumper implements Runnable {
     }
     public void registerConnect(NTCPConnection con) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Registering outbound connection");
+        _context.statManager().addRateData("ntcp.registerConnect", 1, 0);
         synchronized (_wantsConRegister) { _wantsConRegister.add(con); }
         _selector.wakeup();
     }
@@ -212,8 +213,10 @@ public class EventPumper implements Runnable {
                                + "/" + ((key.interestOps()&SelectionKey.OP_READ)!= 0)
                                + " write? " + write 
                                + "/" + ((key.interestOps()&SelectionKey.OP_WRITE)!= 0)
+                               + " on " + key.attachment()
                                );
                 if (accept) {
+                    _context.statManager().addRateData("ntcp.accept", 1, 0);
                     processAccept(key);
                 }
                 if (connect) {
@@ -221,10 +224,12 @@ public class EventPumper implements Runnable {
                     processConnect(key);
                 }
                 if (read) {
+                    _context.statManager().addRateData("ntcp.read", 1, 0);
                     key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
                     processRead(key);
                 }
                 if (write) {
+                    _context.statManager().addRateData("ntcp.write", 1, 0);
                     key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
                     processWrite(key);
                 }
@@ -241,6 +246,7 @@ public class EventPumper implements Runnable {
         if (req.getPendingOutboundRequested() > 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("queued write on " + con + " for " + data.length);
+            _context.statManager().addRateData("ntcp.wantsQueuedWrite", 1, 0);
             con.queuedWrite(buf, req);
         } else {
             // fully allocated
@@ -290,7 +296,8 @@ public class EventPumper implements Runnable {
             rv = ByteBuffer.allocate(BUF_SIZE);
             NUM_BUFS = ++__liveBufs;
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("creating a new read buffer " + System.identityHashCode(rv) + " with " + __liveBufs + " live: " + rv);
+                _log.debug("creating a new read buffer " + System.identityHashCode(rv) + " with " + __liveBufs + " live: " + rv);            
+            _context.statManager().addRateData("ntcp.liveReadBufs", NUM_BUFS, 0);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("acquiring existing read buffer " + System.identityHashCode(rv) + " with " + __liveBufs + " live: " + rv);
@@ -351,11 +358,15 @@ public class EventPumper implements Runnable {
             if (connected) {
                 con.setKey(key);
                 con.outboundConnected();
+                _context.statManager().addRateData("ntcp.connectSuccessful", 1, 0);
             } else {
                 con.close();
+                _context.statManager().addRateData("ntcp.connectFailedTimeout", 1, 0);
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Error processing connection", ioe);
+            con.close();
+            _context.statManager().addRateData("ntcp.connectFailedTimeoutIOE", 1, 0);
         } catch (NoConnectionPendingException ncpe) {
 	    // ignore
 	}
@@ -368,9 +379,12 @@ public class EventPumper implements Runnable {
             int read = con.getChannel().read(buf);
             if (read == -1) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("EOF on " + con);
+                _context.statManager().addRateData("ntcp.readEOF", 1, 0);
                 con.close();
                 releaseBuf(buf);
             } else if (read == 0) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("nothing to read for " + con + ", but stay interested");
                 key.interestOps(key.interestOps() | SelectionKey.OP_READ);
                 releaseBuf(buf);
             } else if (read > 0) {
@@ -382,9 +396,14 @@ public class EventPumper implements Runnable {
                 FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(read, "NTCP read", null, null); //con, buf);
                 if (req.getPendingInboundRequested() > 0) {
                     key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("bw throttled reading for " + con + ", so we don't want to read anymore");
+                    _context.statManager().addRateData("ntcp.queuedRecv", read, 0);
                     con.queuedRecv(rbuf, req);
                 } else {
                     // fully allocated
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("not bw throttled reading for " + con);
                     key.interestOps(key.interestOps() | SelectionKey.OP_READ);
                     con.recv(rbuf);
                 }
@@ -392,6 +411,7 @@ public class EventPumper implements Runnable {
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN)) _log.warn("error reading", ioe);
             con.close();
+            _context.statManager().addRateData("ntcp.readError", 1, 0);
             if (buf != null) releaseBuf(buf);
         } catch (NotYetConnectedException nyce) {
             // ???
@@ -406,9 +426,19 @@ public class EventPumper implements Runnable {
         try {
             while (true) {
                 ByteBuffer buf = con.getNextWriteBuf();
-                if ( (buf != null) && (buf.remaining() > 0) ) {
+                if (buf != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("writing " + buf.remaining()+"...");
+                    if (buf.remaining() <= 0) {
+                        long beforeRem = System.currentTimeMillis();
+                        con.removeWriteBuf(buf);
+                        long afterRem = System.currentTimeMillis();
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("buffer was already fully written and removed after " + (afterRem-beforeRem) + "...");
+                        buf = null;
+                        buffers++;
+                        continue;                    
+                    }
                     int written = con.getChannel().write(buf);
                     totalWritten += written;
                     if (written == 0) {
@@ -441,6 +471,7 @@ public class EventPumper implements Runnable {
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN)) _log.warn("error writing", ioe);
+            _context.statManager().addRateData("ntcp.writeError", 1, 0);
             con.close();
         }
         long after = System.currentTimeMillis();
@@ -512,18 +543,32 @@ public class EventPumper implements Runnable {
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {
+                        _context.statManager().addRateData("ntcp.connectImmediate", 1, 0);
                         key.interestOps(SelectionKey.OP_READ);
                         processConnect(key);
                     }
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.WARN)) _log.warn("error connecting", ioe);
-                    if (ntcpOnly(con)) {
-                        _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage());
-                        con.close(false);
-                    } else {
-                        _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage(), NTCPTransport.STYLE);
+                    _context.statManager().addRateData("ntcp.connectFailedIOE", 1, 0);
+                    _transport.markUnreachable(con.getRemotePeer().calculateHash());
+                    //if (ntcpOnly(con)) {
+                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage());
+                    //    con.close(false);
+                    //} else {
+                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect: " + ioe.getMessage(), NTCPTransport.STYLE);
                         con.close(true);
-                    }
+                    //}
+                } catch (UnresolvedAddressException uae) {                    
+                    if (_log.shouldLog(Log.WARN)) _log.warn("unresolved address connecting", uae);
+                    _context.statManager().addRateData("ntcp.connectFailedUnresolved", 1, 0);
+                    _transport.markUnreachable(con.getRemotePeer().calculateHash());
+                    //if (ntcpOnly(con)) {
+                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect/resolve: " + uae.getMessage());
+                    //    con.close(false);
+                    //} else {
+                    //    _context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "unable to connect/resolve: " + uae.getMessage(), NTCPTransport.STYLE);
+                        con.close(true);
+                    //}
                 }
             } catch (ClosedChannelException cce) {
                 if (_log.shouldLog(Log.WARN)) _log.warn("Error registering", cce);

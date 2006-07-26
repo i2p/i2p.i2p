@@ -141,6 +141,7 @@ public class EstablishState {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("recv x" + (int)c + " received=" + _received);
             if (_received >= _X.length) {
                 if (isCheckInfo(_context, _context.routerHash(), _X)) {
+                    _context.statManager().addRateData("ntcp.inboundCheckConnection", 1, 0);
                     fail("Incoming connection was a check connection");
                     return;
                 }
@@ -170,6 +171,7 @@ public class EstablishState {
                     _log.debug(prefix()+"xor=" + Base64.encode(realXor));
                 }
                 if (!DataHelper.eq(realXor, _hX_xor_bobIdentHash)) {
+                    _context.statManager().addRateData("ntcp.invalidHXxorBIH", 1, 0);
                     fail("Invalid hX_xor");
                     return;
                 }
@@ -217,6 +219,7 @@ public class EstablishState {
                     _transport.getPumper().wantsWrite(_con, write);
                     if (!src.hasRemaining()) return;
                 } catch (DHSessionKeyBuilder.InvalidPublicParameterException e) {
+                    _context.statManager().addRateData("ntcp.invalidDH", 1, 0);
                     fail("Invalid X", e);
                     return;
                 }
@@ -306,6 +309,7 @@ public class EstablishState {
                         _log.debug(prefix()+"DH session key calculated (" + _dh.getSessionKey().toBase64() + ")");
                     _e_hXY_tsB = new byte[Hash.HASH_LENGTH+4+12];
                 } catch (DHSessionKeyBuilder.InvalidPublicParameterException e) {
+                    _context.statManager().addRateData("ntcp.invalidDH", 1, 0);
                     fail("Invalid X", e);
                     return;
                 }
@@ -328,6 +332,7 @@ public class EstablishState {
                 Hash h = _context.sha().calculateHash(XY);
                 if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix() + "h(XY)=" + h.toBase64());
                 if (!DataHelper.eq(h.getData(), 0, hXY_tsB, 0, Hash.HASH_LENGTH)) {
+                    _context.statManager().addRateData("ntcp.invalidHXY", 1, 0);
                     fail("Invalid H(X+Y) - mitm attack attempted?");
                     return;
                 }
@@ -421,6 +426,7 @@ public class EstablishState {
                     
                     _verified = _context.dsa().verifySignature(sig, toVerify, _con.getRemotePeer().getSigningPublicKey());
                     if (!_verified) {
+                        _context.statManager().addRateData("ntcp.invalidSignature", 1, 0);
                         fail("Signature was invalid - attempt to spoof " + _con.getRemotePeer().calculateHash().toBase64() + "?");
                         return;
                     } else {
@@ -478,6 +484,7 @@ public class EstablishState {
             RouterIdentity alice = new RouterIdentity();
             int sz = (int)DataHelper.fromLong(b, 0, 2);
             if ( (sz <= 0) || (sz > b.length-2-4-Signature.SIGNATURE_BYTES) ) {
+                _context.statManager().addRateData("ntcp.invalidInboundSize", sz, 0);
                 fail("size is invalid", new Exception("size is " + sz));
                 return;
             }
@@ -488,6 +495,7 @@ public class EstablishState {
             
             long diff = 1000*Math.abs(tsA-_tsB);
             if (diff >= Router.CLOCK_FUDGE_FACTOR) {
+                _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
                 fail("Clocks too skewed (" + diff + ")");
                 return;
             } else if (_log.shouldLog(Log.DEBUG)) {
@@ -525,11 +533,14 @@ public class EstablishState {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(prefix()+"Verified remote peer as " + alice.calculateHash().toBase64());
             } else {
+                _context.statManager().addRateData("ntcp.invalidInboundSignature", 1, 0);
                 fail("Peer verification failed - spoof of " + alice.calculateHash().toBase64() + "?");
             }
         } catch (IOException ioe) {
+            _context.statManager().addRateData("ntcp.invalidInboundIOE", 1, 0);
             fail("Error verifying peer", ioe);
         } catch (DataFormatException dfe) {
+            _context.statManager().addRateData("ntcp.invalidInboundDFE", 1, 0);
             fail("Error verifying peer", dfe);
         }
     }

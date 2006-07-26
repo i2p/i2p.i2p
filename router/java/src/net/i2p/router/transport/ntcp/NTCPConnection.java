@@ -96,8 +96,10 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private boolean _sendingMeta;
     /** how many consecutive sends were failed due to (estimated) send queue time */
     private int _consecutiveBacklog;
+    private long _nextInfoTime;
     
     private static final int META_FREQUENCY = 10*60*1000;
+    private static final int INFO_FREQUENCY = 6*60*60*1000;
     
     /**
      * Create an inbound connected (though not established) NTCP connection
@@ -181,6 +183,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _transport.inboundEstablished(this);
         _establishState = null;
         _nextMetaTime = System.currentTimeMillis() + _context.random().nextInt(META_FREQUENCY);
+        _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
     }
     public long getClockSkew() { return _clockSkew; }
     public long getUptime() { 
@@ -199,8 +202,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             return queued;
         }
     }
-    public long getTimeSinceSend() { return System.currentTimeMillis()-_lastSendTime; }
-    public long getTimeSinceReceive() { return System.currentTimeMillis()-_lastReceiveTime; }
+    public long getTimeSinceSend() { return _lastSendTime <= 0 ? 0 : System.currentTimeMillis()-_lastSendTime; }
+    public long getTimeSinceReceive() { return _lastReceiveTime <= 0 ? 0 : System.currentTimeMillis()-_lastReceiveTime; }
     public long getTimeSinceCreated() { return System.currentTimeMillis()-_created; }
     public int getConsecutiveBacklog() { return _consecutiveBacklog; }
     
@@ -253,22 +256,26 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
 		synchronized (_writeBufs) { blocks = _writeBufs.size(); }
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Too backlogged for too long (" + _consecutiveBacklog + " messages for " + DataHelper.formatDuration(queueTime()) + ", sched? " + wantsWrite + ", blocks: " + blocks + ") sending to " + _remotePeer.calculateHash().toBase64());
+                _context.statManager().addRateData("ntcp.closeOnBacklog", _consecutiveBacklog, getUptime());
                 close();
             }
+            _context.statManager().addRateData("ntcp.dontSendOnBacklog", _consecutiveBacklog, msg.getLifetime());
             return;
         }
         _consecutiveBacklog = 0;
         int enqueued = 0;
         if (FAST_LARGE)
             bufferedPrepare(msg);
+        boolean noOutbound = false;
         synchronized (_outbound) {
             _outbound.add(msg);
             enqueued = _outbound.size();
             msg.setQueueSize(enqueued);
+            noOutbound = (_currentOutbound == null);
         }
         if (_log.shouldLog(Log.DEBUG)) _log.debug("messages enqueued on " + toString() + ": " + enqueued + " new one: " + msg.getMessageId() + " of " + msg.getMessageType());
-        if (_established && _currentOutbound == null)
-            _transport.getWriter().wantsWrite(this);
+        if (_established && noOutbound)
+            _transport.getWriter().wantsWrite(this, "enqueued");
     }
 
     private long queueTime() {    
@@ -289,8 +296,10 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         long queueTime = queueTime();
         if (queueTime <= 0) return false;
         int size = 0;
+        boolean currentOutboundSet = false;
         synchronized (_outbound) {
             size = _outbound.size();
+            currentOutboundSet = (_currentOutbound != null);
         }
         
         // perhaps we could take into account the size of the queued messages too, our
@@ -299,8 +308,13 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (getUptime() < 10*1000) // allow some slack just after establishment
             return false;
         if (queueTime > 5*1000) { // bloody arbitrary.  well, its half the average message lifetime...
+            int writeBufs = 0;
+	    synchronized (_writeBufs) { writeBufs = _writeBufs.size(); }
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Too backlogged: queue time " + queueTime + " and the size is " + size);
+                _log.warn("Too backlogged: queue time " + queueTime + " and the size is " + size 
+                          + ", wantsWrite? " + (0 != (_conKey.interestOps()&SelectionKey.OP_WRITE))
+                          + ", currentOut set? " + currentOutboundSet
+			  + ", writeBufs: " + writeBufs + " on " + toString());
             _context.statManager().addRateData("ntcp.sendBacklogTime", queueTime, size);
             return true;
         //} else if (size > 32) { // another arbitrary limit.
@@ -324,6 +338,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (target != null) {
             infoMsg.setTarget(target);
             infoMsg.beginSend();
+            _context.statManager().addRateData("ntcp.infoMessageEnqueued", 1, 0);
             send(infoMsg);
         } else {
             if (_isInbound) {
@@ -351,15 +366,19 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _established = true;
         _establishedOn = System.currentTimeMillis();
         _establishState = null;
-        _context.shitlist().unshitlistRouter(getRemotePeer().calculateHash());
+        _transport.markReachable(getRemotePeer().calculateHash());
+        //_context.shitlist().unshitlistRouter(getRemotePeer().calculateHash(), NTCPTransport.STYLE);
         boolean msgs = false;
         synchronized (_outbound) {
             msgs = (_outbound.size() > 0);
         }
         _nextMetaTime = System.currentTimeMillis() + _context.random().nextInt(META_FREQUENCY);
+        _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
         if (msgs)
-            _transport.getWriter().wantsWrite(this);
+            _transport.getWriter().wantsWrite(this, "outbound established");
     }
+    
+    public boolean getIsInbound() { return _isInbound; }
     
     // Time vs space tradeoff:
     // on slow GCing jvms, the mallocs in the following preparation can cause the 
@@ -474,6 +493,14 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         //               + Base64.encode(encrypted, 0, 16) + "...\ndecrypted: " 
         //               + Base64.encode(unencrypted, 0, 16) + "..." + "\nIV=" + Base64.encode(_prevWriteEnd, 0, 16));
         _transport.getPumper().wantsWrite(this, encrypted);
+
+        // for every 6-12 hours that we are connected to a peer, send them
+	// our updated netDb info (they may not accept it and instead query
+	// the floodfill netDb servers, but they may...)
+        if (_nextInfoTime <= System.currentTimeMillis()) {
+            enqueueInfoMessage();
+            _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
+        }
     }
     
     /**
@@ -537,6 +564,15 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                        + " encrypted=" + (encryptedTime-begin)
                        + " wantsWrite=" + (wantsTime-encryptedTime)
                        + " releaseBuf=" + (releaseTime-wantsTime));
+
+        // for every 6-12 hours that we are connected to a peer, send them
+	// our updated netDb info (they may not accept it and instead query
+	// the floodfill netDb servers, but they may...)
+        if (_nextInfoTime <= System.currentTimeMillis()) {
+            // perhaps this should check to see if we are bw throttled, etc?
+            enqueueInfoMessage();
+            _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
+        }
     }
     
     /**
@@ -608,6 +644,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         NUM_PREP_BUFS = ++__liveBufs;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("creating a new prep buffer with " + __liveBufs + " live");
+        _context.statManager().addRateData("ntcp.prepBufCache", NUM_PREP_BUFS, 0);
         b.acquired();
         return b;
     }
@@ -675,16 +712,24 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _conKey.interestOps(SelectionKey.OP_READ);
         // schedule up the beginning of our handshaking by calling prepareNextWrite on the
         // writer thread pool
-        _transport.getWriter().wantsWrite(this);
+        _transport.getWriter().wantsWrite(this, "outbound connected");
     }
 
     public void complete(FIFOBandwidthLimiter.Request req) {
         removeRequest(req);
         ByteBuffer buf = (ByteBuffer)req.attachment();
-        if (req.getTotalInboundRequested() > 0)
+        if (req.getTotalInboundRequested() > 0) {
+            _context.statManager().addRateData("ntcp.throttledReadComplete", (System.currentTimeMillis()-req.getRequestTime()), 0);
             recv(buf);
-        else if (req.getTotalOutboundRequested() > 0)
+            // our reads used to be bw throttled (during which time we were no
+            // longer interested in reading from the network), but we aren't
+            // throttled anymore, so we should resume being interested in reading
+            _transport.getPumper().wantsRead(this);
+            //_transport.getReader().wantsRead(this);
+        } else if (req.getTotalOutboundRequested() > 0) {
+            _context.statManager().addRateData("ntcp.throttledWriteComplete", (System.currentTimeMillis()-req.getRequestTime()), 0);
             write(buf);
+        }
     }
     private void removeRequest(FIFOBandwidthLimiter.Request req) {
         synchronized (_bwRequests) { _bwRequests.remove(req); }
@@ -739,6 +784,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         synchronized (_writeBufs) {
             _writeBufs.add(buf);
         }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("After write(buf)");
         _transport.getPumper().wantsWrite(this);
     }
     
@@ -768,30 +814,38 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     public void removeWriteBuf(ByteBuffer buf) {
         _bytesSent += buf.capacity();
         OutNetMessage msg = null;
+        boolean bufsRemain = false;
+        boolean clearMessage = false;
         synchronized (_writeBufs) { 
             if (_sendingMeta && (buf.capacity() == _meta.length)) {
                 _sendingMeta = false;
             } else {
-                if (_currentOutbound != null) 
+                clearMessage = true;
+            }
+            _writeBufs.remove(buf);
+            bufsRemain = _writeBufs.size() > 0;
+        }
+        if (clearMessage) {
+            synchronized (_outbound) {
+                if (_currentOutbound != null)
                     msg = _currentOutbound;
                 _currentOutbound = null;
             }
-            _writeBufs.remove(buf); 
-        }
-        if (msg != null) {
-            _lastSendTime = System.currentTimeMillis();
-            _context.statManager().addRateData("ntcp.sendTime", msg.getSendTime(), msg.getSendTime());
-            _context.statManager().addRateData("ntcp.transmitTime", msg.getTransmissionTime(), msg.getTransmissionTime());
-            _context.statManager().addRateData("ntcp.sendQueueSize", msg.getQueueSize(), msg.getLifetime());
-            if (_log.shouldLog(Log.INFO)) {
-                _log.info("I2NP message " + _messagesWritten + "/" + msg.getMessageId() + " sent after " 
-                          + msg.getSendTime() + "/" + msg.getTransmissionTime() + "/" 
-                          + msg.getPreparationTime() + "/" + msg.getLifetime()
-                          + " queued after " + msg.getQueueSize()
-                          + " with " + buf.capacity() + " bytes (uid=" + System.identityHashCode(msg)+")");
+            if (msg != null) {
+                _lastSendTime = System.currentTimeMillis();
+                _context.statManager().addRateData("ntcp.sendTime", msg.getSendTime(), msg.getSendTime());
+                _context.statManager().addRateData("ntcp.transmitTime", msg.getTransmissionTime(), msg.getTransmissionTime());
+                _context.statManager().addRateData("ntcp.sendQueueSize", msg.getQueueSize(), msg.getLifetime());
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("I2NP message " + _messagesWritten + "/" + msg.getMessageId() + " sent after " 
+                              + msg.getSendTime() + "/" + msg.getTransmissionTime() + "/" 
+                              + msg.getPreparationTime() + "/" + msg.getLifetime()
+                              + " queued after " + msg.getQueueSize()
+                              + " with " + buf.capacity() + " bytes (uid=" + System.identityHashCode(msg)+" on " + toString() + ")");
+                }
+                _messagesWritten++;
+                _transport.sendComplete(msg);
             }
-            _messagesWritten++;
-            _transport.sendComplete(msg);
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("I2NP meta message sent completely");
@@ -801,8 +855,10 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         synchronized (_outbound) {
             msgs = ((_outbound.size() > 0) || (_currentOutbound != null));
         }
-        if (msgs)
-            _transport.getWriter().wantsWrite(this);
+        if (msgs) // push through the bw limiter to reach _writeBufs
+            _transport.getWriter().wantsWrite(this, "write completed");
+        if (bufsRemain) // send asap
+            _transport.getPumper().wantsWrite(this);
         updateStats();
     }
         
@@ -879,6 +935,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 if (!ok) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Read buffer " + System.identityHashCode(buf) + " contained corrupt data");
+                    _context.statManager().addRateData("ntcp.corruptDecryptedI2NP", 1, getUptime());
                     return;
                 }
                 byte swap[] = _prevReadBlock;
@@ -895,6 +952,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (_curReadState.getSize() > 16*1024) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("i2np message more than 16KB?  nuh uh: " + _curReadState.getSize());
+            _context.statManager().addRateData("ntcp.corruptTooLargeI2NP", _curReadState.getSize(), getUptime());
             close();
             return false;
         } else {
@@ -922,6 +980,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (read != expected) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("I2NP metadata message had a bad CRC value");
+            _context.statManager().addRateData("ntcp.corruptMetaCRC", 1, getUptime());
             close();
             return;
         } else {
@@ -929,9 +988,11 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             if ( (newSkew > Router.CLOCK_FUDGE_FACTOR) || (newSkew < 0-Router.CLOCK_FUDGE_FACTOR) ) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Peer's skew jumped too far (from " + _clockSkew + " to " + newSkew + "): " + toString());
+                _context.statManager().addRateData("ntcp.corruptSkew", newSkew, getUptime());
                 close();
                 return;
             }
+            _context.statManager().addRateData("ntcp.receiveMeta", newSkew, getUptime());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received NTCP metadata, old skew of " + _clockSkew + ", new skew of " + newSkew);
             _clockSkew = newSkew;
@@ -955,6 +1016,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             _log.debug("Sending NTCP metadata");
         _sendingMeta = true;
         _transport.getPumper().wantsWrite(this, encrypted);
+        // enqueueInfoMessage(); // this often?
     }
     
     public int hashCode() { return System.identityHashCode(this); }
@@ -1118,7 +1180,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     releaseHandler(h);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
-                                   + " received after " + timeToRecv + " with " + _size +"/"+ (_blocks*16) + " bytes");
+                                   + " received after " + timeToRecv + " with " + _size +"/"+ (_blocks*16) + " bytes on " + toString());
                     _context.statManager().addRateData("ntcp.receiveTime", timeToRecv, timeToRecv);
                     _context.statManager().addRateData("ntcp.receiveSize", _size, timeToRecv);
                     if (read != null) {
@@ -1133,17 +1195,20 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Error parsing I2NP message", ioe);
+                    _context.statManager().addRateData("ntcp.corruptI2NPIOE", 1, getUptime());
                     close();
                     return;
                 } catch (I2NPMessageException ime) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Error parsing I2NP message", ime);
+                    _context.statManager().addRateData("ntcp.corruptI2NPIME", 1, getUptime());
                     close();
                     return;
                 }
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " blocks " + _blocks);
+                    _context.statManager().addRateData("ntcp.corruptI2NPCRC", 1, getUptime());
                 close();
                 return;
             }

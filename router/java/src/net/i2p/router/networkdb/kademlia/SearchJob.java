@@ -841,15 +841,17 @@ class SearchReplyJob extends JobImpl {
                 if (!sendsBadInfo) {
                     // we don't need to search for everthing we're given here - only ones that
                     // are next in our search path...
-                    if (getContext().shitlist().isShitlisted(peer)) {
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Not looking for a shitlisted peer...");
-                        getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
-                    } else {
+                    // note: no need to think about shitlisted targets in the netdb search, given
+                    //       the floodfill's behavior
+                    //if (getContext().shitlist().isShitlisted(peer)) {
+                    //    if (_log.shouldLog(Log.INFO))
+                    //        _log.info("Not looking for a shitlisted peer...");
+                    //    getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
+                    //} else {
                         //getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
                         //_repliesPendingVerification++;
                         shouldAdd = true;
-                    }
+                    //}
                 } else {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Peer " + _peer.toBase64() + " sends us bad replies, so not verifying " + peer.toBase64());

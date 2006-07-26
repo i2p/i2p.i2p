@@ -742,12 +742,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 }
             }
             
-            _context.peerManager().removeCapabilities(dbEntry);
-            boolean removed = _kb.remove(dbEntry);
-            if (removed) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Removed kbucket entry for " + dbEntry);
-            }
+            lookupBeforeDropping(dbEntry, (RouterInfo)o);
+            return;
         } else {
             // we always drop leaseSets that are failed [timed out],
             // regardless of how many routers we have.  this is called on a lease if
@@ -772,6 +768,30 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         synchronized (_passiveSendKeys) {
             _passiveSendKeys.remove(dbEntry);
+        }
+    }
+    
+    protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
+        //bah, humbug.
+        dropAfterLookupFailed(peer, info);
+    }
+    protected void dropAfterLookupFailed(Hash peer, RouterInfo info) {
+        _context.peerManager().removeCapabilities(peer);
+        boolean removed = _kb.remove(peer);
+        if (removed) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Removed kbucket entry for " + peer);
+        }
+        
+        _ds.remove(peer);
+        synchronized (_lastSent) {
+            _lastSent.remove(peer);
+        }
+        synchronized (_explicitSendKeys) {
+            _explicitSendKeys.remove(peer);
+        }
+        synchronized (_passiveSendKeys) {
+            _passiveSendKeys.remove(peer);
         }
     }
     
@@ -935,8 +955,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 renderRouterInfo(buf, ri, false);
                 out.write(buf.toString());
                 buf.setLength(0);
-                String coreVersion = ri.getOptions().getProperty("coreVersion");
-                String routerVersion = ri.getOptions().getProperty("router.version");
+                String coreVersion = ri.getOption("coreVersion");
+                String routerVersion = ri.getOption("router.version");
                 if ( (coreVersion != null) && (routerVersion != null) ) {
                     Map routerVersions = (Map)versions.get(coreVersion);
                     if (routerVersions == null) {
@@ -1001,7 +1021,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         buf.append("Stats: <br /><i><code>\n");
         for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
             String key = (String)iter.next();
-            String val = info.getOptions().getProperty(key);
+            String val = info.getOption(key);
             buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br />\n");
         }
         buf.append("</code></i><hr />\n");

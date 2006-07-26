@@ -63,6 +63,58 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.failsafeWrites", "How many times do we need to proactively add in an extra nio write to a peer at any given failsafe pass?", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.failsafeCloses", "How many times do we need to proactively close an idle connection to a peer at any given failsafe pass?", "ntcp", new long[] { 60*1000, 10*60*1000 });
         
+        _context.statManager().createRateStat("ntcp.accept", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.attemptShitlistedPeer", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.attemptUnreachablePeer", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.closeOnBacklog", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectFailedIOE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectFailedInvalidPort", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectFailedNoNTCPAddress", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectFailedTimeout", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectFailedTimeoutIOE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectFailedUnresolved", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectImmediate", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.connectSuccessful", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptDecryptedI2NP", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptI2NPCRC", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptI2NPIME", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptI2NPIOE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptMetaCRC", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptSkew", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.corruptTooLargeI2NP", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.dontSendOnBacklog", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.inboundCheckConnection", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.inboundEstablished", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.inboundEstablishedDuplicate", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.infoMessageEnqueued", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidDH", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidHXY", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidHXxorBIH", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidInboundDFE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidInboundIOE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidInboundSignature", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidInboundSize", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidInboundSkew", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidSignature", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.liveReadBufs", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.multipleCloseOnRemove", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.outboundEstablishFailed", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.outboundFailedIOEImmediate", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.prepBufCache", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.queuedRecv", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.read", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.readEOF", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.readError", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.receiveCorruptEstablishment", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.receiveMeta", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.registerConnect", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.throttledReadComplete", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.throttledWriteComplete", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.wantsQueuedWrite", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.write", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.writeError", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+
+        
         _establishing = new ArrayList(4);
         _conLock = new Object();
         _conByIdent = new HashMap(64);
@@ -79,7 +131,9 @@ public class NTCPTransport extends TransportImpl {
     }
     
     void inboundEstablished(NTCPConnection con) {
-        _context.shitlist().unshitlistRouter(con.getRemotePeer().calculateHash());
+        _context.statManager().addRateData("ntcp.inboundEstablished", 1, 0);
+        markReachable(con.getRemotePeer().calculateHash());
+        //_context.shitlist().unshitlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old = null;
         synchronized (_conLock) {
             old = (NTCPConnection)_conByIdent.put(con.getRemotePeer().calculateHash(), con);
@@ -87,6 +141,7 @@ public class NTCPTransport extends TransportImpl {
         if (old != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Old connection closed: " + old + " replaced by " + con);
+            _context.statManager().addRateData("ntcp.inboundEstablishedDuplicate", old.getUptime(), 0);
             old.close();
         }
     }
@@ -127,6 +182,7 @@ public class NTCPTransport extends TransportImpl {
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Error opening a channel", ioe);
+                    _context.statManager().addRateData("ntcp.outboundFailedIOEImmediate", 1, 0);
                     con.close();
                 }
             } else {
@@ -152,8 +208,8 @@ public class NTCPTransport extends TransportImpl {
                         old = (NTCPConnection)_conByIdent.put(ih, con);
                     }
                     if (old != null) {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Multiple connections on out ready, closing " + old + " and keeping " + con);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Multiple connections on out ready, closing " + old + " and keeping " + con);
                         old.close();
                     }
                     con.enqueueInfoMessage(); // enqueues a netDb store of our own info
@@ -181,23 +237,50 @@ public class NTCPTransport extends TransportImpl {
         super.afterSend(msg, sendSuccessful, allowRequeue, msToSend);
     }
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
-        if (_context.shitlist().isShitlisted(toAddress.getIdentity().calculateHash(), STYLE)) {
+        Hash peer = toAddress.getIdentity().calculateHash();
+        if (_context.shitlist().isShitlisted(peer, STYLE)) {
             // we aren't shitlisted in general (since we are trying to get a bid), but we have
             // recently shitlisted the peer on the NTCP transport, so don't try it
+            _context.statManager().addRateData("ntcp.attemptShitlistedPeer", 1, 0);
+            return null;
+        } else if (isUnreachable(peer)) {
+            _context.statManager().addRateData("ntcp.attemptUnreachablePeer", 1, 0);
             return null;
         }
+        
+        boolean established = isEstablished(toAddress.getIdentity());
+        if (established) { // should we check the queue size?  nah, if its valid, use it
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("fast bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as its already established");
+            return _fastBid;
+        }
+        
         RouterAddress addr = toAddress.getTargetAddress(STYLE);
+        
+        if (addr == null) {
+            markUnreachable(peer);
+            _context.statManager().addRateData("ntcp.connectFailedNoNTCPAddress", 1, 0);
+            //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "No NTCP address", STYLE);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they don't have an ntcp address");
+            return null;
+        }
+        NTCPAddress naddr = new NTCPAddress(addr);
+        if ( (naddr.getPort() <= 0) || (naddr.getHost() == null) ) {
+            _context.statManager().addRateData("ntcp.connectFailedInvalidPort", 1, 0);
+            markUnreachable(peer);
+            //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they don't have a valid ntcp address");
+            return null;
+        }
         
         //if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
         //    return null; // dont talk to yourself
     
-        boolean established = isEstablished(toAddress.getIdentity());
-        if (established) // should we check the queue size?  nah, if its valid, use it
-            return _fastBid;
-        else if (addr != null)
-            return _slowBid;
-        else
-            return null;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("slow bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64());
+        return _slowBid;
     }
     
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
@@ -239,6 +322,7 @@ public class NTCPTransport extends TransportImpl {
         if ( (removed != null) && (removed != con) ) {// multiple cons, close 'em both
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Multiple connections on remove, closing " + removed + " (already closed " + con + ")");
+            _context.statManager().addRateData("ntcp.multipleCloseOnRemove", removed.getUptime(), 0);
             removed.close();
         }
     }
@@ -349,6 +433,8 @@ public class NTCPTransport extends TransportImpl {
         }
         for (int i = 0; expired != null && i < expired.size(); i++)
             ((NTCPConnection)expired.get(i)).close();
+        if ( (expired != null) && (expired.size() > 0) )
+            _context.statManager().addRateData("ntcp.outboundEstablishFailed", expired.size(), 0);
     }
     
     //private boolean bindAllInterfaces() { return true; }
@@ -360,10 +446,17 @@ public class NTCPTransport extends TransportImpl {
         } else {
             RouterAddress ra = CommSystemFacadeImpl.createNTCPAddress(ctx);
             if (ra != null) {
-                _myAddress = new NTCPAddress(ra);
-                replaceAddress(ra);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("NTCP address configured: " + _myAddress);
+                NTCPAddress addr = new NTCPAddress(ra);
+                if (addr.getPort() <= 0) {
+                    _myAddress = null;
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("NTCP address is outbound only, since the NTCP configuration is invalid");
+                } else {
+                    _myAddress = addr;
+                    replaceAddress(ra);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("NTCP address configured: " + _myAddress);
+                }
             } else {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("NTCP address is outbound only");
@@ -404,11 +497,17 @@ public class NTCPTransport extends TransportImpl {
         int numPeers = 0;
         int readingPeers = 0;
         int writingPeers = 0;
+        float bpsSend = 0;
+        float bpsRecv = 0;
+        long totalUptime = 0;
+        long totalSend = 0;
+        long totalRecv = 0;
         
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
         buf.append(" <tr><td><b>peer</b></td>");
+        buf.append("     <td><b>dir</b></td>");
         buf.append("     <td><b>uptime</b></td>");
         buf.append("     <td><b>idle</b></td>");
         buf.append("     <td><b>sent</b></td>");
@@ -424,13 +523,34 @@ public class NTCPTransport extends TransportImpl {
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
             buf.append("<tr><td>").append(con.getRemotePeer().calculateHash().toBase64().substring(0,8));
+            buf.append("</td><td>");
+            if (con.getIsInbound())
+                buf.append("in");
+            else
+                buf.append("out");
             buf.append("</td><td>").append(DataHelper.formatDuration(con.getUptime()));
-            buf.append("</td><td>").append(DataHelper.formatDuration(con.getTimeSinceSend()));
-            buf.append("/").append(DataHelper.formatDuration(con.getTimeSinceReceive()));
-            buf.append("</td><td>").append(con.getMessagesSent());
+            totalUptime += con.getUptime();
+            buf.append("</td><td>").append(con.getTimeSinceSend()/1000);
+            buf.append("s/").append(con.getTimeSinceReceive()/1000);
+            buf.append("s</td><td>").append(con.getMessagesSent());
+            totalSend += con.getMessagesSent();
             buf.append("</td><td>").append(con.getMessagesReceived());
-            buf.append("</td><td>").append(formatRate(con.getSendRate()/1024));
-            buf.append("/").append(formatRate(con.getRecvRate()/1024)).append("KBps");
+            totalRecv += con.getMessagesReceived();
+            buf.append("</td><td>");
+            if (con.getTimeSinceSend() < 10*1000) {
+                buf.append(formatRate(con.getSendRate()/1024));
+                bpsSend += con.getSendRate();
+            } else {
+                buf.append(formatRate(0));
+            }
+            buf.append("/");
+            if (con.getTimeSinceReceive() < 10*1000) {
+                buf.append(formatRate(con.getRecvRate()/1024));
+                bpsRecv += con.getRecvRate();
+            } else {
+                buf.append(formatRate(0));
+            }
+            buf.append("KBps");
             long outQueue = con.getOutboundQueueSize();
             if (outQueue <= 0) {
                 buf.append("</td><td>No messages");
@@ -454,6 +574,15 @@ public class NTCPTransport extends TransportImpl {
             buf.setLength(0);
         }
 
+        if (peers.size() > 0) {
+            buf.append("<tr><td colspan=\"11\"><hr /></td></tr>\n");
+            buf.append("<tr><td>").append(peers.size()).append(" peers</td><td>&nbsp;</td><td>").append(DataHelper.formatDuration(totalUptime/peers.size()));
+            buf.append("</td><td>&nbsp;</td><td>").append(totalSend).append("</td><td>").append(totalRecv);
+            buf.append("</td><td>").append(formatRate(bpsSend/1024)).append("/").append(formatRate(bpsRecv/1024)).append("KBps");
+            buf.append("</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
+            buf.append("</tr>\n");
+        }
+                
         buf.append("</table>\n");
         buf.append("Peers currently reading I2NP messages: ").append(readingPeers).append("<br />\n");
         buf.append("Peers currently writing I2NP messages: ").append(writingPeers).append("<br />\n");

@@ -8,6 +8,8 @@ package net.i2p.router;
  *
  */
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -100,7 +102,28 @@ public class StatisticsManager implements Service {
         // No longer expose, to make build tracking more expensive
         // stats.setProperty("router.id", RouterVersion.ID);
         // stats.setProperty("core.id", CoreVersion.ID);
-	
+
+        int newlines = 0;
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(Router.IDENTLOG);
+            int c = -1;
+            // perhaps later filter this to only include ident changes this
+            // day/week/month
+            while ( (c = in.read()) != -1) {
+                if (c == '\n')
+                    newlines++;
+            }
+        } catch (IOException ioe) {
+            // ignore
+        } finally {
+            if (in != null)
+                try { in.close(); } catch (IOException ioe) {}
+        }
+        if (newlines > 0)
+            stats.setProperty("stat_identities", newlines+"");
+
+        
         if (_includePeerRankings) {
             if (false)
                 stats.putAll(_context.profileManager().summarizePeers(_publishedStats));

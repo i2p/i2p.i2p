@@ -36,7 +36,7 @@ public class UDPEndpointTest {
             int base = 2000 + _context.random().nextInt(10000);
             for (int i = 0; i < numPeers; i++) {
                 _log.debug("Building " + i);
-                UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i);
+                UDPEndpoint endpoint = new UDPEndpoint(_context, null, base + i, null);
                 _endpoints[i] = endpoint;
                 endpoint.startup();
                 I2PThread read = new I2PThread(new TestRead(endpoint), "Test read " + i);

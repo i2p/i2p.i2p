@@ -231,6 +231,29 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         return sel.selectFloodfillParticipants(getKBuckets());
     }
+    
+    protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
+        // this sends out the search to the floodfill peers even if we already have the
+        // entry locally, firing no job if it gets a reply with an updated value (meaning
+        // we shouldn't drop them but instead use the new data), or if they all time out,
+        // firing the dropLookupFailedJob, which actually removes out local reference
+        search(peer, null, new DropLookupFailedJob(_context, peer, info), 10*1000, false);
+    }
+    
+    private class DropLookupFailedJob extends JobImpl {
+        private Hash _peer;
+        private RouterInfo _info;
+    
+        public DropLookupFailedJob(RouterContext ctx, Hash peer, RouterInfo info) {
+            super(ctx);
+            _peer = peer;
+            _info = info;
+        }
+        public String getName() { return "Lookup on failure of netDb peer timed out"; }
+        public void runJob() {
+            dropAfterLookupFailed(_peer, _info);
+        }
+    }
 }
 
 /**

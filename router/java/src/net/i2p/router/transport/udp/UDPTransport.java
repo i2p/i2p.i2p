@@ -108,6 +108,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
     /** do we allow direct SSU connections, sans introducers?  */
     public static final String PROP_ALLOW_DIRECT = "i2np.udp.allowDirect";
+    public static final String PROP_BIND_INTERFACE = "i2np.udp.bindInterface";
         
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
@@ -220,8 +221,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.info("Binding to the explicitly specified external port: " + port);
         }
         if (_endpoint == null) {
+            String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
+            InetAddress bindToAddr = null;
+            if (bindTo != null) {
+                try {
+                    bindToAddr = InetAddress.getByName(bindTo);
+                } catch (UnknownHostException uhe) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Invalid SSU bind interface specified [" + bindTo + "]", uhe);
+                    bindToAddr = null;
+                }
+            }
             try {
-                _endpoint = new UDPEndpoint(_context, this, port);
+                _endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
             } catch (SocketException se) {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "Unable to listen on the UDP port (" + port + ")", se);
@@ -327,7 +339,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.ERROR))
                 _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
                            + RemoteHostId.toString(ourIP) + ".  Lets throw tomatoes at them");
-            _context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
+            markUnreachable(from);
+            //_context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
         } else if (inboundRecent && _externalListenPort > 0 && _externalListenHost != null) {
             // use OS clock since its an ordering thing, not a time thing
@@ -533,7 +546,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn("Peer already connected: old=" + oldPeer + " new=" + peer, new Exception("dup"));
         
         _activeThrottle.unchoke(peer.getRemotePeer());
-        _context.shitlist().unshitlistRouter(peer.getRemotePeer(), STYLE);
+        markReachable(peer.getRemotePeer());
+        //_context.shitlist().unshitlistRouter(peer.getRemotePeer(), STYLE);
 
         if (SHOULD_FLOOD_PEERS)
             _flooder.addPeer(peer);
@@ -601,7 +615,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         SimpleTimer.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                     }
                 }
-                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
+                markUnreachable(peerHash);
+                //_context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net");
@@ -701,8 +716,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (peer.getRemotePeer() != null) {
             dropPeerCapacities(peer);
             
-            if (shouldShitlist)
-                _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries", STYLE);
+            if (shouldShitlist) {
+                markUnreachable(peer.getRemotePeer());
+                //_context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries", STYLE);
+            }
             long now = _context.clock().now();
             _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             synchronized (_peersByIdent) {
@@ -1630,7 +1647,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 buf.append(" [").append(peer.getConsecutiveFailedSends()).append(" failures]");
                 appended = true;
             }
-            if (_context.shitlist().isShitlisted(peer.getRemotePeer())) {
+            if (_context.shitlist().isShitlisted(peer.getRemotePeer(), STYLE)) {
                 if (!appended) buf.append("<br />");
                 buf.append(" [shitlisted]");
                 appended = true;

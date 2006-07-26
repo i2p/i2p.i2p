@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -18,12 +19,14 @@ public class UDPEndpoint {
     private UDPTransport _transport;
     private UDPSender _sender;
     private UDPReceiver _receiver;
+    private DatagramSocket _socket;
+    private InetAddress _bindAddress;
     
-    public UDPEndpoint(RouterContext ctx, UDPTransport transport, int listenPort) throws SocketException {
+    public UDPEndpoint(RouterContext ctx, UDPTransport transport, int listenPort, InetAddress bindAddress) throws SocketException {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPEndpoint.class);
         _transport = transport;
-        
+        _bindAddress = bindAddress;
         _listenPort = listenPort;
     }
     
@@ -32,9 +35,12 @@ public class UDPEndpoint {
             _log.debug("Starting up the UDP endpoint");
         shutdown();
         try {
-            DatagramSocket socket = new DatagramSocket(_listenPort);
-            _sender = new UDPSender(_context, socket, "UDPSend on " + _listenPort);
-            _receiver = new UDPReceiver(_context, _transport, socket, "UDPReceive on " + _listenPort);
+            if (_bindAddress == null)
+                _socket = new DatagramSocket(_listenPort);
+            else
+                _socket = new DatagramSocket(_listenPort, _bindAddress);
+            _sender = new UDPSender(_context, _socket, "UDPSend on " + _listenPort);
+            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceive on " + _listenPort);
             _sender.startup();
             _receiver.startup();
         } catch (SocketException se) {
@@ -48,16 +54,22 @@ public class UDPEndpoint {
             _sender.shutdown();
             _receiver.shutdown();
         }
+        if (_socket != null) {
+            _socket.close();
+        }
     }
     
     public void setListenPort(int newPort) { _listenPort = newPort; }
     public void updateListenPort(int newPort) {
         if (newPort == _listenPort) return;
         try {
-            DatagramSocket socket = new DatagramSocket(newPort);
-            _sender.updateListeningPort(socket, newPort);
+            if (_bindAddress == null)
+                _socket = new DatagramSocket(_listenPort);
+            else
+                _socket = new DatagramSocket(_listenPort, _bindAddress);
+            _sender.updateListeningPort(_socket, newPort);
             // note: this closes the old socket, so call this after the sender!
-            _receiver.updateListeningPort(socket, newPort);
+            _receiver.updateListeningPort(_socket, newPort);
             _listenPort = newPort;
         } catch (SocketException se) {
             if (_log.shouldLog(Log.ERROR))

@@ -363,6 +363,9 @@ public class FragmentHandler {
     
     private void receiveComplete(FragmentedMessage msg) {
         _completed++;
+        String stringified = null;
+        if (_log.shouldLog(Log.DEBUG))
+            stringified = msg.toString();
         try {
             int fragmentCount = msg.getFragmentCount();
             // toByteArray destroys the contents of the message completely
@@ -377,11 +380,13 @@ public class FragmentHandler {
             noteCompletion(m.getUniqueId());
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (IOException ioe) {
+            if (stringified == null) stringified = msg.toString();
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error receiving fragmented message (corrupt?): " + msg, ioe);
+                _log.error("Error receiving fragmented message (corrupt?): " + stringified, ioe);
         } catch (I2NPMessageException ime) {
+            if (stringified == null) stringified = msg.toString();
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error receiving fragmented message (corrupt?): " + msg, ime);
+                _log.error("Error receiving fragmented message (corrupt?): " + stringified, ime);
         }
     }
 
