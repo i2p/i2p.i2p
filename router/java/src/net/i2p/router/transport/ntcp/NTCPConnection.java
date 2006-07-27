@@ -236,6 +236,16 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
         for (int i = 0; i < msgs.size(); i++) {
             OutNetMessage msg = (OutNetMessage)msgs.get(i);
+            Object buf = msg.releasePreparationBuffer();
+            if (buf != null)
+                releaseBuf((PrepBuffer)buf);
+            _transport.afterSend(msg, false, allowRequeue, msg.getLifetime());
+        }
+        OutNetMessage msg = _currentOutbound;
+        if (msg != null) {
+            Object buf = msg.releasePreparationBuffer();
+            if (buf != null)
+                releaseBuf((PrepBuffer)buf);
             _transport.afterSend(msg, false, allowRequeue, msg.getLifetime());
         }
     }
@@ -806,7 +816,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     public ByteBuffer getNextWriteBuf() {
         synchronized (_writeBufs) {
             if (_writeBufs.size() > 0)
-                return (ByteBuffer)_writeBufs.remove(0);
+                return (ByteBuffer)_writeBufs.get(0); // not remove!  we removeWriteBuf afterwards
         }
         return null;
     }

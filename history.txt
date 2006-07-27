@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.496 2006-07-26 01:36:18 jrandom Exp $
+$Id: history.txt,v 1.497 2006-07-26 20:04:59 jrandom Exp $
+
+2006-07-27  jrandom
+    * Further NTCP write status cleanup
+    * Handle more oddly-timed NTCP disconnections (thanks bar!)
 
 2006-07-26  jrandom
     * When dropping a netDb router reference, only accept newer
