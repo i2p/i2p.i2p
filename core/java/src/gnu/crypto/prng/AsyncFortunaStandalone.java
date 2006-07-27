@@ -109,7 +109,10 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                     asyncBuffers.notifyAll();
                 }
                 Thread.yield();
-                try { Thread.sleep((after-before)*5); } catch (InterruptedException ie) {}
+                long waitTime = (after-before)*5;
+                if (waitTime <= 0) // somehow postman saw waitTime show up as negative
+                    waitTime = 50;
+                try { Thread.sleep(waitTime); } catch (InterruptedException ie) {}
             }
         }
     }
