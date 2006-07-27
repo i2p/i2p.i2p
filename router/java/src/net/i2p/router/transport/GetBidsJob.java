@@ -48,6 +48,7 @@ public class GetBidsJob extends JobImpl {
             if (log.shouldLog(Log.WARN))
                 log.warn("Attempt to send a message to a shitlisted peer - " + to);
             //context.messageRegistry().peerFailed(to);
+            context.statManager().addRateData("transport.bidFailShitlisted", msg.getLifetime(), 0);
             fail(context, msg);
             return;
         }
@@ -56,6 +57,7 @@ public class GetBidsJob extends JobImpl {
         if (to.equals(us)) {
             if (log.shouldLog(Log.ERROR))
                 log.error("wtf, send a message to ourselves?  nuh uh. msg = " + msg);
+            context.statManager().addRateData("transport.bidFailSelf", msg.getLifetime(), 0);
             fail(context, msg);
             return;
         }
@@ -64,8 +66,10 @@ public class GetBidsJob extends JobImpl {
         if (bid == null) {
             int failedCount = msg.getFailedTransports().size();
             if (failedCount == 0) {
+                context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime(), 0);
                 context.shitlist().shitlistRouter(to, "We share no common transports with them");
             } else if (failedCount >= facade.getTransportCount()) {
+                context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime(), 0);
                 // fail after all transports were unsuccessful
                 context.netDb().fail(to);
             }

@@ -43,7 +43,7 @@ public class StatManager {
         _log = context.logManager().getLog(StatManager.class);
         _context = context;
         _frequencyStats = Collections.synchronizedMap(new HashMap(128));
-        _rateStats = Collections.synchronizedMap(new HashMap(128));
+        _rateStats = new HashMap(128); // synchronized only on add //Collections.synchronizedMap(new HashMap(128));
         _statLog = new BufferedStatLog(context);
     }
     
@@ -80,10 +80,12 @@ public class StatManager {
      * @param periods array of period lengths (in milliseconds)
      */
     public void createRateStat(String name, String description, String group, long periods[]) {
-        if (_rateStats.containsKey(name)) return;
-        RateStat rs = new RateStat(name, description, group, periods);
-        if (_statLog != null) rs.setStatLog(_statLog);
-        _rateStats.put(name, rs);
+        synchronized (_rateStats) {
+            if (_rateStats.containsKey(name)) return;
+            RateStat rs = new RateStat(name, description, group, periods);
+            if (_statLog != null) rs.setStatLog(_statLog);
+            _rateStats.put(name, rs);
+        }
     }
 
     /** update the given frequency statistic, taking note that an event occurred (and recalculating all frequencies) */
@@ -94,7 +96,7 @@ public class StatManager {
 
     /** update the given rate statistic, taking note that the given data point was received (and recalculating all rates) */
     public void addRateData(String name, long data, long eventDuration) {
-        RateStat stat = (RateStat) _rateStats.get(name);
+        RateStat stat = (RateStat) _rateStats.get(name); // unsynchronized
         if (stat != null) stat.addData(data, eventDuration);
     }
 

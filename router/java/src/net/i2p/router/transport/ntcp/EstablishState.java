@@ -75,6 +75,7 @@ public class EstablishState {
     private Exception _e;
     private boolean _verified;
     private boolean _confirmWritten;
+    private boolean _failedBySkew;
     
     public EstablishState(RouterContext ctx, NTCPTransport transport, NTCPConnection con) {
         _context = ctx;
@@ -130,6 +131,8 @@ public class EstablishState {
      * establishment
      */
     public boolean confirmWritten() { return _confirmWritten; }
+    
+    public boolean getFailedBySkew() { return _failedBySkew; }
     
     /** we are Bob, so receive these bytes as part of an inbound connection */
     private void receiveInbound(ByteBuffer src) {
@@ -340,6 +343,19 @@ public class EstablishState {
                 _tsA = _context.clock().now()/1000;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"h(X+Y) is correct, tsA-tsB=" + (_tsA-_tsB));
+               
+                // the skew is not authenticated yet, but it is certainly fatal to
+                // the establishment, so fail hard if appropriate
+                long diff = 1000*Math.abs(_tsA-_tsB);
+                if (diff >= Router.CLOCK_FUDGE_FACTOR) {
+                    _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
+                    _transport.markReachable(_con.getRemotePeer().calculateHash());
+                    _context.shitlist().shitlistRouter(_con.getRemotePeer().calculateHash(), "Outbound clock skew of " + diff);
+                    fail("Clocks too skewed (" + diff + ")", null, true);
+                    return;
+                } else if (_log.shouldLog(Log.DEBUG)) {
+                    _log.debug(prefix()+"Clock skew: " + diff);
+                }
                 
                 // now prepare and send our response
                 // send E(#+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB), sk, hX_xor_Bob.identHash[16:31])
@@ -493,15 +509,6 @@ public class EstablishState {
             alice.fromByteArray(aliceData);
             long tsA = DataHelper.fromLong(b, 2+sz, 4);
             
-            long diff = 1000*Math.abs(tsA-_tsB);
-            if (diff >= Router.CLOCK_FUDGE_FACTOR) {
-                _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
-                fail("Clocks too skewed (" + diff + ")");
-                return;
-            } else if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug(prefix()+"Clock skew: " + diff);
-            }
-
             ByteArrayOutputStream baos = new ByteArrayOutputStream(768);
             baos.write(_X);
             baos.write(_Y);
@@ -523,6 +530,18 @@ public class EstablishState {
             if (_verified) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix() + "verification successful for " + _con);
+                                
+                long diff = 1000*Math.abs(tsA-_tsB);
+                if (diff >= Router.CLOCK_FUDGE_FACTOR) {
+                    _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
+                    _transport.markReachable(alice.calculateHash());
+                    _context.shitlist().shitlistRouter(alice.calculateHash(), "Clock skew of " + diff);
+                    fail("Clocks too skewed (" + diff + ")", null, true);
+                    return;
+                } else if (_log.shouldLog(Log.DEBUG)) {
+                    _log.debug(prefix()+"Clock skew: " + diff);
+                }
+
                 sendInboundConfirm(alice, tsA);
                 _con.setRemotePeer(alice);
                 if (_log.shouldLog(Log.DEBUG))
@@ -589,8 +608,10 @@ public class EstablishState {
     public byte[] getExtraBytes() { return _extra; }
     
     private void fail(String reason) { fail(reason, null); }
-    private void fail(String reason, Exception e) {
+    private void fail(String reason, Exception e) { fail(reason, e, false); }
+    private void fail(String reason, Exception e, boolean bySkew) {
         _corrupt = true;
+        _failedBySkew = bySkew;
         _err = reason;
         _e = e;
         if (_log.shouldLog(Log.WARN))

@@ -99,6 +99,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.multipleCloseOnRemove", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.outboundEstablishFailed", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.outboundFailedIOEImmediate", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.invalidOutboundSkew", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.prepBufCache", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.queuedRecv", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.read", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
@@ -336,7 +337,7 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_conLock) {
             for (Iterator iter = _conByIdent.values().iterator(); iter.hasNext(); ) {
                 NTCPConnection con = (NTCPConnection)iter.next();
-                if (con.getTimeSinceSend() <= 60*1000)
+                if ( (con.getTimeSinceSend() <= 60*1000) || (con.getTimeSinceReceive() <= 60*1000) )
                     active++;
             }
         }

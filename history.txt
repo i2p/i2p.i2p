@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.497 2006-07-26 20:04:59 jrandom Exp $
+$Id: history.txt,v 1.498 2006-07-27 01:20:25 jrandom Exp $
+
+2006-07-27  jrandom
+    * Cut down NTCP connection establishments once we know the peer is skewed
+      (rather than wait for full establishment before verifying)
+    * Removed a lock on the stats framework when accessing rates, which
+      shouldn't be a problem, assuming rates are created (pretty much) all at
+      once and merely updated during the lifetime of the jvm.
 
 2006-07-27  jrandom
     * Further NTCP write status cleanup
