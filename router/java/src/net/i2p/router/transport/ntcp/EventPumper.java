@@ -478,7 +478,7 @@ public class EventPumper implements Runnable {
                 }
             }
         } catch (CancelledKeyException cke) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("error writing", ioe);
+            if (_log.shouldLog(Log.WARN)) _log.warn("error writing", cke);
             _context.statManager().addRateData("ntcp.writeError", 1, 0);
             con.close();
         } catch (IOException ioe) {
