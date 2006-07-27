@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.495 2006-07-18 15:08:00 jrandom Exp $
+$Id: history.txt,v 1.496 2006-07-26 01:36:18 jrandom Exp $
+
+2006-07-26  jrandom
+    * When dropping a netDb router reference, only accept newer
+      references as part of the update check
+    * If we have been up for a while, don't accept really old
+      router references (published 2 or more days ago)
+    * Drop router references once they are no longer valid, even if
+      they were allowed in due to the lax restrictions on startup
 
 2006-07-26  jrandom
     * Every time we create a new router identity, add an entry to the
