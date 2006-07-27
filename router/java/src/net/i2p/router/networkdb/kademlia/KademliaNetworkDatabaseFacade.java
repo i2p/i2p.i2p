@@ -462,9 +462,22 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_initialized) return null;
         DataStructure ds = _ds.get(key);
         if (ds != null) {
-            if (ds instanceof RouterInfo)
+            if (ds instanceof RouterInfo) {
+                // more aggressive than perhaps is necessary, but makes sure we
+                // drop old references that we had accepted on startup (since 
+                // startup allows some lax rules).
+                boolean valid = true;
+                try {
+                    valid = (null == validate(key, (RouterInfo)ds));
+                } catch (IllegalArgumentException iae) {
+                    valid = false;
+                }
+                if (!valid) {
+                    fail(key);
+                    return null;
+                }
                 return (RouterInfo)ds;
-            else {
+            } else {
                 //_log.debug("Looking for a router [" + key + "] but it ISN'T a RouterInfo! " + ds, new Exception("Who thought that lease was a router?"));
                 return null;
             }
@@ -677,6 +690,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             String rv = "Peer " + key.toBase64() + " is from another network, not accepting it (id=" 
                         + routerInfo.getNetworkId() + ", want " + Router.NETWORK_ID + ")";
             return rv;
+        } else if ( (_context.router().getUptime() > 60*60*1000) && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
+            long age = _context.clock().now() - routerInfo.getPublished();
+            return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
         }
         return null;
     }

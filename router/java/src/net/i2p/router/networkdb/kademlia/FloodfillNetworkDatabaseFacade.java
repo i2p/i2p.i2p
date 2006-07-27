@@ -237,7 +237,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // entry locally, firing no job if it gets a reply with an updated value (meaning
         // we shouldn't drop them but instead use the new data), or if they all time out,
         // firing the dropLookupFailedJob, which actually removes out local reference
-        search(peer, null, new DropLookupFailedJob(_context, peer, info), 10*1000, false);
+        search(peer, new DropLookupFoundJob(_context, peer, info), new DropLookupFailedJob(_context, peer, info), 10*1000, false);
     }
     
     private class DropLookupFailedJob extends JobImpl {
@@ -252,6 +252,26 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         public String getName() { return "Lookup on failure of netDb peer timed out"; }
         public void runJob() {
             dropAfterLookupFailed(_peer, _info);
+        }
+    }
+    private class DropLookupFoundJob extends JobImpl {
+        private Hash _peer;
+        private RouterInfo _info;
+    
+        public DropLookupFoundJob(RouterContext ctx, Hash peer, RouterInfo info) {
+            super(ctx);
+            _peer = peer;
+            _info = info;
+        }
+        public String getName() { return "Lookup on failure of netDb peer matched"; }
+        public void runJob() {
+            RouterInfo updated = lookupRouterInfoLocally(_peer);
+            if ( (updated != null) && (updated.getPublished() > _info.getPublished()) ) {
+                // great, a legitimate update
+            } else {
+                // they just sent us what we already had.  kill 'em both
+                dropAfterLookupFailed(_peer, _info);
+            }
         }
     }
 }

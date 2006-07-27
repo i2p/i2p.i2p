@@ -44,6 +44,8 @@ public class TransportManager implements TransportEventListener {
     public TransportManager(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(TransportManager.class);
+        _context.statManager().createRateStat("transport.shitlistOnUnreachable", "Add a peer to the shitlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("transport.noBidsYetNotAllUnreachable", "Add a peer to the shitlist since none of the transports can reach them", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ArrayList();
     }
     
@@ -239,10 +241,16 @@ public class TransportManager implements TransportEventListener {
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " did not produce a bid");
+                if (t.isUnreachable(peer))
+                    unreachableTransports++;
             }
         }
-        if (unreachableTransports >= _transports.size())
+        if (unreachableTransports >= _transports.size()) {
+            _context.statManager().addRateData("transport.shitlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
             _context.shitlist().shitlistRouter(peer, "Unreachable on any transport");
+        } else if (rv == null) {
+            _context.statManager().addRateData("transport.noBidsYetNotAllUnreachable", unreachableTransports, msg.getLifetime());
+        }
         return rv;
     }
     
