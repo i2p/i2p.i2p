@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.498 2006-07-27 01:20:25 jrandom Exp $
+$Id: history.txt,v 1.499 2006-07-27 18:40:02 jrandom Exp $
+
+* 2006-07-27  0.6.1.23 released
 
 2006-07-27  jrandom
     * Cut down NTCP connection establishments once we know the peer is skewed
