@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.500 2006-07-27 22:34:59 jrandom Exp $
+$Id: history.txt,v 1.501 2006-07-28 20:11:52 jrandom Exp $
+
+2006-07-28  jrandom
+    * Don't try to reverify too many netDb entries at once (thanks
+      cervantes and Complication!)
 
 2006-07-28  jrandom
     * Actually fix the threading deadlock issue in the netDb (removing

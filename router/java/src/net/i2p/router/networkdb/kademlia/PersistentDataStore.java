@@ -363,16 +363,16 @@ class PersistentDataStore extends TransientDataStore {
                         }
                     }
                 } catch (DataFormatException dfe) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Error reading the routerInfo from " + _routerFile.getName(), dfe);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Error reading the routerInfo from " + _routerFile.getName(), dfe);
                     corrupt = true;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
                 if (corrupt) _routerFile.delete();
             } catch (IOException ioe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to read the router reference in " + _routerFile.getName(), ioe);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Unable to read the router reference in " + _routerFile.getName(), ioe);
             }
         }
     }

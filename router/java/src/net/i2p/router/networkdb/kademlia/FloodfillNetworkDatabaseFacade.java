@@ -233,6 +233,12 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
+        if (_context.jobQueue().getMaxLag() > 500) {
+            // don't try to overload ourselves (e.g. failing 3000 router refs at
+            // once, and then firing off 3000 netDb lookup tasks)
+            super.lookupBeforeDropping(peer, info);
+            return; 
+        }
         // this sends out the search to the floodfill peers even if we already have the
         // entry locally, firing no job if it gets a reply with an updated value (meaning
         // we shouldn't drop them but instead use the new data), or if they all time out,
