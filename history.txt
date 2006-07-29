@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.501 2006-07-28 20:11:52 jrandom Exp $
+$Id: history.txt,v 1.502 2006-07-28 23:43:04 jrandom Exp $
+
+* 2006-07-28  0.6.1.24 released
 
 2006-07-28  jrandom
     * Don't try to reverify too many netDb entries at once (thanks

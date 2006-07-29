@@ -317,8 +317,8 @@ public class NTCPTransport extends TransportImpl {
                 removed = (NTCPConnection)_conByIdent.remove(ident.calculateHash());
         }
         if ( (removed != null) && (removed != con) ) {// multiple cons, close 'em both
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Multiple connections on remove, closing " + removed + " (already closed " + con + ")");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Multiple connections on remove, closing " + removed + " (already closed " + con + ")");
             _context.statManager().addRateData("ntcp.multipleCloseOnRemove", removed.getUptime(), 0);
             removed.close();
         }
