@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.499 2006-07-27 18:40:02 jrandom Exp $
+$Id: history.txt,v 1.500 2006-07-27 22:34:59 jrandom Exp $
+
+2006-07-28  jrandom
+    * Actually fix the threading deadlock issue in the netDb (removing
+      the synchronized access to individual kbuckets while validating
+      individual entries) (thanks cervantes, postman, frosk, et al!)
 
 * 2006-07-27  0.6.1.23 released
 

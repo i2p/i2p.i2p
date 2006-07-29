@@ -28,6 +28,7 @@ class KBucketSet {
     private I2PAppContext _context;
     private Hash _us;
     private KBucket _buckets[];
+    private volatile int _size;
     
     public final static int BASE = 8; // must go into KEYSIZE_BITS evenly
     public final static int KEYSIZE_BITS = Hash.HASH_LENGTH * 8;
@@ -51,6 +52,8 @@ class KBucketSet {
         if (bucket >= 0) {
             int oldSize = _buckets[bucket].getKeyCount();
             int numInBucket = _buckets[bucket].add(peer);
+            if (numInBucket != oldSize)
+                _size++;
             if (numInBucket > BUCKET_SIZE) {
                 // perhaps queue up coalesce job?  naaahh.. lets let 'er grow for now
             }
@@ -62,17 +65,26 @@ class KBucketSet {
         }
     }
     
+    /**
+     * Not an exact count (due to concurrency issues) but generally correct
+     *
+     */
     public int size() {
+        return _size;
+        /*
         int size = 0;
         for (int i = 0; i < _buckets.length; i++)
             size += _buckets[i].getKeyCount();
         return size;
+         */
     }
     
     public boolean remove(Hash entry) {
         int bucket = pickBucket(entry);
         KBucket kbucket = getBucket(bucket);
         boolean removed = kbucket.remove(entry);
+        if (removed)
+            _size--;
         return removed;
     }
     
