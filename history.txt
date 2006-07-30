@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.502 2006-07-28 23:43:04 jrandom Exp $
+$Id: history.txt,v 1.503 2006-07-29 13:03:16 jrandom Exp $
+
+2006-07-29  Complication
+    * Treat NTP responses from unexpected stratums like failures
 
 * 2006-07-28  0.6.1.24 released
 

@@ -112,11 +112,19 @@ public class NtpClient {
 
             // Process response
             NtpMessage msg = new NtpMessage(packet.getData());
+
             double roundTripDelay = (destinationTimestamp-msg.originateTimestamp) -
                                     (msg.receiveTimestamp-msg.transmitTimestamp);
             double localClockOffset = ((msg.receiveTimestamp - msg.originateTimestamp) +
                                        (msg.transmitTimestamp - destinationTimestamp)) / 2;
             socket.close();
+
+            // Stratum must be between 1 (atomic) and 15 (maximum defined value)
+            // Anything else is right out, treat such responses like errors
+            if ((msg.stratum < 1) || (msg.stratum > 15)) {
+                //System.out.println("Response from NTP server of unacceptable stratum " + msg.stratum + ", failing.");
+                return(-1);
+            }
             
             long rv = (long)(System.currentTimeMillis() + localClockOffset*1000);
             //System.out.println("host: " + address.getHostAddress() + " rtt: " + roundTripDelay + " offset: " + localClockOffset + " seconds");
