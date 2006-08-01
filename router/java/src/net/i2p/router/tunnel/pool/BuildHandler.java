@@ -88,7 +88,7 @@ class BuildHandler {
                         handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
                 } else {
                     // drop any expired messages
-                    long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/2);
+                    long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
                     do {
                         BuildMessageState state = (BuildMessageState)_inboundBuildMessages.get(0);
                         if (state.recvTime <= dropBefore) {
@@ -640,7 +640,7 @@ class BuildHandler {
                         for (int i = 0; i < _inboundBuildMessages.size(); i++) {
                             BuildMessageState cur = (BuildMessageState)_inboundBuildMessages.get(i);
                             long age = System.currentTimeMillis() - cur.recvTime;
-                            if (age >= BuildRequestor.REQUEST_TIMEOUT/2) {
+                            if (age >= BuildRequestor.REQUEST_TIMEOUT/4) {
                                 _inboundBuildMessages.remove(i);
                                 i--;
                                 dropped++;

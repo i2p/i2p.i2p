@@ -372,7 +372,8 @@ public class Router {
     
     public void addCapabilities(RouterInfo ri) {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
-                             _context.bandwidthLimiter().getInboundKBytesPerSecond());
+                             _context.bandwidthLimiter().getOutboundKBytesPerSecond());
+        bwLim = (int)(((float)bwLim) * getSharePercentage());
         if (_log.shouldLog(Log.WARN))
             _log.warn("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         

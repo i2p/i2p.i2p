@@ -44,7 +44,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         _isLease = isLease;
         _lookupsRemaining = 0;
         _dead = false;
-        _out = new ArrayList(2);
+        _out = Collections.synchronizedList(new ArrayList(2));
         _replySelector = new FloodOnlyLookupSelector(getContext(), this);
         _onReply = new FloodOnlyLookupMatchJob(getContext(), this);
         _onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
