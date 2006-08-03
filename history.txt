@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.503 2006-07-29 13:03:16 jrandom Exp $
+$Id: history.txt,v 1.504 2006-07-30 00:08:20 complication Exp $
+
+2006-08-03  jrandom
+    * Decrease the recently modified tunnel building timeout, though keep
+      the scaling on their processing
+
+2006-07-31  jrandom
+    * Increase the tunnel building timeout
+    * Avoid a rare race (thanks bar!)
+    * Fix the bandwidth capacity publishing code to factor in share percentage
+      and outbound throttling (oops)
 
 2006-07-29  Complication
     * Treat NTP responses from unexpected stratums like failures
