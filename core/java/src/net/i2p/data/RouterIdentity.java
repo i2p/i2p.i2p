@@ -86,7 +86,7 @@ public class RouterIdentity extends DataStructureImpl {
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
-            throw new DataFormatException("Not enough data to format the destination");
+            throw new DataFormatException("Not enough data to format the router identity");
         _publicKey.writeBytes(out);
         _signingKey.writeBytes(out);
         _certificate.writeBytes(out);
