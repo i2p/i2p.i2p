@@ -89,8 +89,6 @@ class PeerCheckerTask extends TimerTask
             if (peer.isChoked())
               choked++;
 
-            // XXX - We should calculate the up/download rate a bit
-            // more intelligently
             long upload = peer.getUploaded();
             uploaded += upload;
             long download = peer.getDownloaded();
@@ -196,6 +194,10 @@ class PeerCheckerTask extends TimerTask
         // Put peers back at the end of the list that we removed earlier.
         coordinator.peers.addAll(removed);
         coordinator.peerCount = coordinator.peers.size();
+
+	// store the rates
+	coordinator.setRateHistory(uploaded, downloaded);
+
       }
     if (coordinator.halted()) {
         cancel();

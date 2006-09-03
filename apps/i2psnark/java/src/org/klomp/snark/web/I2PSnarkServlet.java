@@ -292,8 +292,13 @@ public class I2PSnarkServlet extends HttpServlet {
         long remaining = (long) snark.storage.needed() * (long) snark.meta.getPieceLength(0); 
         if (remaining > total)
             remaining = total;
-        int totalBps = 4096; // should probably grab this from the snark...
-        long remainingSeconds = remaining / totalBps;
+        long downBps = snark.coordinator.getDownloadRate();
+        long upBps = snark.coordinator.getUploadRate();
+        long remainingSeconds;
+	if (downBps > 0)
+	        remainingSeconds = remaining / downBps;
+	else
+	        remainingSeconds = -1;
         long uploaded = snark.coordinator.getUploaded();
         
         boolean isRunning = !snark.stopped;
@@ -339,17 +344,18 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0) {
             out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
-            // lets hold off on the ETA until we have rates sorted...
-            //out.write(" (eta " + DataHelper.formatDuration(remainingSeconds*1000) + ")"); // (eta 6h)
+	    if(isRunning && remainingSeconds > 0)    
+	        out.write(" (ETA " + DataHelper.formatDuration(remainingSeconds*1000) + ")"); // (eta 6h)
         } else {
             out.write(formatSize(total)); // 3GB
         }
         out.write("</td>\n\t");
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentUploaded " + rowClass 
                   + "\">" + formatSize(uploaded) + "</td>\n\t");
-        //out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentRate\">");
-        //out.write("n/a"); //2KBps/12KBps/4KBps
-        //out.write("</td>\n\t");
+        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentRate\">");
+	if(isRunning)    
+            out.write(formatSize(downBps) + "ps/" + formatSize(upBps) + "ps");
+        out.write("</td>\n\t");
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentAction " + rowClass + "\">");
         if (isRunning) {
             out.write("<a href=\"" + uri + "?action=Stop&nonce=" + _nonce 
@@ -574,7 +580,7 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"left\" valign=\"top\">Torrent</th>\n" +
                                                "    <th align=\"left\" valign=\"top\">Downloaded</th>\n" +
                                                "    <th align=\"left\" valign=\"top\">Uploaded</th>\n" +
-                                               //"    <th align=\"left\" valign=\"top\">Rate</th>\n" +
+                                               "    <th align=\"left\" valign=\"top\">Rate Down/Up</th>\n" +
                                                "    <th>&nbsp;</th></tr>\n" +
                                                "</thead>\n";
     

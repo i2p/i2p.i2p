@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.506 2006-08-21 00:55:34 complication Exp $
+$Id: history.txt,v 1.507 2006-09-03 01:37:46 complication Exp $
+
+2006-09-03  zzz
+    * Add rate reporting to i2psnark
 
 2006-09-03  Complication
     * Limit form size in SusiDNS to avoid exceeding a POST size limit on postback

@@ -50,6 +50,9 @@ public class PeerCoordinator implements PeerListener
 
   private long uploaded;
   private long downloaded;
+  final static int RATE_DEPTH = 6; // make following arrays RATE_DEPTH long
+  private long uploaded_old[] = {0,0,0,0,0,0};
+  private long downloaded_old[] = {0,0,0,0,0,0};
 
   // synchronize on this when changing peers or downloaders
   final List peers = new ArrayList();
@@ -140,6 +143,43 @@ public class PeerCoordinator implements PeerListener
   public long getDownloaded()
   {
     return downloaded;
+  }
+
+  /**
+   * Push the total uploaded/downloaded onto a RATE_DEPTH deep stack
+   */
+  public void setRateHistory(long up, long down)
+  {
+    for (int i = RATE_DEPTH-1; i > 0; i--){
+      uploaded_old[i] = uploaded_old[i-1];
+      downloaded_old[i] = downloaded_old[i-1];
+    }
+      uploaded_old[0] = up;
+      downloaded_old[0] = down;
+  }
+
+  /**
+   * Returns the 2-minute-average rate in Bps
+   */
+  public long getDownloadRate()
+  {
+    long rate = 0;
+    for (int i = 0; i < RATE_DEPTH; i++){
+      rate += downloaded_old[i];
+    }
+    return rate / (RATE_DEPTH * CHECK_PERIOD / 1000);
+  }
+
+  /**
+   * Returns the 2-minute-average rate in Bps
+   */
+  public long getUploadRate()
+  {
+    long rate = 0;
+    for (int i = 0; i < RATE_DEPTH; i++){
+      rate += uploaded_old[i];
+    }
+    return rate / (RATE_DEPTH * CHECK_PERIOD / 1000);
   }
 
   public MetaInfo getMetaInfo()
