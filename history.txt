@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.505 2006-08-03 17:34:25 jrandom Exp $
+$Id: history.txt,v 1.506 2006-08-21 00:55:34 complication Exp $
+
+2006-09-03  Complication
+    * Limit form size in SusiDNS to avoid exceeding a POST size limit on postback
+    * Print messages about addressbook size to give better overview
+    * Enable delete function in published addressbook
 
 2006-08-21  Complication
     * Fix error reporting discrepancy (thanks for helping notice, yojoe!)

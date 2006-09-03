@@ -19,7 +19,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.7 $
+ * $Revision: 1.1 $
  */
 
 package i2p.susi.dns;
@@ -99,7 +99,6 @@ public class AddressbookBean
 		return ConfigBean.addressbookPrefix + filename;
 	}
 	private Object[] entries;
-	
 	public Object[] getEntries()
 	{
 		return entries;
@@ -130,10 +129,59 @@ public class AddressbookBean
 	public void setSerial(String serial) {
 		this.serial = serial;
 	}
+	/** Load addressbook and apply filter, returning messages about this. */
+	public String getLoadBookMessages()
+	{
+		// Config and addressbook now loaded here, hence not needed in getMessages()
+		loadConfig();
+		addressbook = new Properties();
+		
+		String message = "";
+		
+		try {
+			addressbook.load( new FileInputStream( getFileName() ) );
+			LinkedList list = new LinkedList();
+			Enumeration e = addressbook.keys();
+			while( e.hasMoreElements() ) {
+				String name = (String)e.nextElement();
+				String destination = addressbook.getProperty( name );
+				if( filter != null && filter.length() > 0 ) {
+					if( filter.compareTo( "0-9" ) == 0 ) {
+						char first = name.charAt(0);
+						if( first < '0' || first > '9' )
+							continue;
+					}
+					else if( ! name.toLowerCase().startsWith( filter.toLowerCase() ) ) {
+						continue;
+					}
+				}
+				if( search != null && search.length() > 0 ) {
+					if( name.indexOf( search ) == -1 ) {
+						continue;
+					}
+				}
+				list.addLast( new AddressBean( name, destination ) );
+			}
+			// Format a message about filtered addressbook size, and the number of displayed entries
+			message = "Filtered list contains " + list.size() + " entries";
+			if (list.size() > 300) message += ", displaying the first 300."; else message += ".";
+
+			Object array[] = list.toArray();
+			Arrays.sort( array, sorter );
+			entries = array;
+		}
+		catch (Exception e) {
+			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+		}
+		
+		if( message.length() > 0 )
+			message = "<p>" + message + "</p>";
+		return message;
+	}
+	/** Perform actions, returning messages about this. */
 	public String getMessages()
 	{
-		loadConfig();
-		
+		// Loading config and addressbook moved into getLoadBookMessages()
 		String message = "";
 		
 		if( action != null ) {
@@ -175,42 +223,7 @@ public class AddressbookBean
 		}
 		
 		action = null;
-
-		addressbook = new Properties();
 		
-		try {
-			addressbook.load( new FileInputStream( getFileName() ) );
-			LinkedList list = new LinkedList();			
-			Enumeration e = addressbook.keys();
-			while( e.hasMoreElements() ) {
-				String name = (String)e.nextElement();
-				String destination = addressbook.getProperty( name );
-				if( filter != null && filter.length() > 0 ) {
-					if( filter.compareTo( "0-9" ) == 0 ) {
-						char first = name.charAt(0);
-						if( first < '0' || first > '9' )
-							continue;
-					}
-					else if( ! name.toLowerCase().startsWith( filter.toLowerCase() ) ) {
-						continue;
-					}
-				}
-				if( search != null && search.length() > 0 ) {
-					if( name.indexOf( search ) == -1 ) {
-						continue;
-					}
-				}
-				list.addLast( new AddressBean( name, destination ) );
-			}
-			
-			Object array[] = list.toArray();
-			Arrays.sort( array, sorter );
-			entries = array;
-		}
-		catch (Exception e) {
-			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
-		}
-				
 		if( message.length() > 0 )
 			message = "<p class=\"messages\">" + message + "</p>";
 		return message;
@@ -233,6 +246,10 @@ public class AddressbookBean
 	public boolean isRouter()
 	{
 		return getBook().compareToIgnoreCase( "router" ) == 0;
+	}
+	public boolean isPublished()
+	{
+		return getBook().compareToIgnoreCase( "published" ) == 0;
 	}
 	public void setFilter(String filter) {
 		if( filter != null && ( filter.length() == 0 || filter.compareToIgnoreCase( "none" ) == 0 ) ) {

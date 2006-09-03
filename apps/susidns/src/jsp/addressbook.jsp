@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  */
 %>
 <%@ page contentType="text/html"%>
@@ -59,6 +59,8 @@
 </div>
 
 <div id="messages">${book.messages}</div>
+
+<span>${book.loadBookMessages}</span>
 
 <div id="filter">
 <p>Filter: <a href="addressbook.jsp?filter=a">a</a>
@@ -115,16 +117,17 @@
 <table class="book" cellspacing="0" cellpadding="5">
 <tr class="head">
 
-<c:if test="${book.master || book.router}">
+<c:if test="${book.master || book.router || book.published}">
 <th>&nbsp;</th>
 </c:if>
 
 <th>Name</th>
 <th>Destination</th>
 </tr>
-<c:forEach items="${book.entries}" var="addr">
+<!-- limit iterator to 300, or "Form too large" may result on submit -->
+<c:forEach items="${book.entries}" var="addr" begin="0" end="299">
 <tr class="list${book.trClass}">
-<c:if test="${book.master || book.router}">
+<c:if test="${book.master || book.router || book.published}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" alt="Mark for deletion"></td>
 </c:if>
 <td class="names"><a href="http://${addr.name}/">${addr.name}</a> -
@@ -136,7 +139,7 @@
 </table>
 </div>
 
-<c:if test="${book.master || book.router}">
+<c:if test="${book.master || book.router || book.published}">
 <div id="buttons">
 <p class="buttons"><input type="image" name="action" value="delete" src="images/delete.png" alt="Delete checked" />
 </p>
