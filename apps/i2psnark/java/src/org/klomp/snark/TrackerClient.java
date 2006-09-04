@@ -43,6 +43,8 @@ public class TrackerClient extends I2PThread
   private static final String STOPPED_EVENT = "stopped";
 
   private final static int SLEEP = 5; // 5 minutes.
+  private final static int DELAY_MIN = 2000; // 2 secs.
+  private final static int DELAY_MUL = 1500; // 1.5 secs.
 
   private final MetaInfo meta;
   private final PeerCoordinator coordinator;
@@ -110,6 +112,7 @@ public class TrackerClient extends I2PThread
     long left = coordinator.getLeft();
 
     boolean completed = (left == 0);
+    int sleptTime = 0;
 
     try
       {
@@ -117,6 +120,7 @@ public class TrackerClient extends I2PThread
         boolean started = false;
         while (!started)
           {
+            sleptTime = 0;
             try
               {
                 // Send start.
@@ -125,18 +129,20 @@ public class TrackerClient extends I2PThread
                                              STARTED_EVENT);
                 Set peers = info.getPeers();
                 coordinator.trackerSeenPeers = peers.size();
+                coordinator.trackerProblems = null;
                 if (!completed) {
                     Iterator it = peers.iterator();
                     while (it.hasNext()) {
                       Peer cur = (Peer)it.next();
                       coordinator.addPeer(cur);
-                      int delay = 3000;
-                      int c = ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
-                      try { Thread.sleep(delay * c); } catch (InterruptedException ie) {}
+                      int delay = DELAY_MUL;
+                      delay *= ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                      delay += DELAY_MIN;
+                      sleptTime += delay;
+                      try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                     }
                 }
                 started = true;
-                coordinator.trackerProblems = null;
               }
             catch (IOException ioe)
               {
@@ -168,8 +174,15 @@ public class TrackerClient extends I2PThread
             try
               {
                 // Sleep some minutes...
-                int delay = SLEEP*60*1000 + r.nextInt(120*1000);
-                Thread.sleep(delay);
+                int delay;
+                if(coordinator.trackerProblems != null) {
+                  delay = 60*1000;
+                } else {
+                  delay = SLEEP*60*1000 + r.nextInt(120*1000);
+                  delay -= sleptTime;
+                }
+                if (delay > 0)
+                  Thread.sleep(delay);
               }
             catch(InterruptedException interrupt)
               {
@@ -206,6 +219,8 @@ public class TrackerClient extends I2PThread
                                                  uploaded, downloaded, left,
                                                  event);
 
+                    coordinator.trackerProblems = null;
+                    sleptTime = 0;
                     Set peers = info.getPeers();
                     coordinator.trackerSeenPeers = peers.size();
                     if ( (left > 0) && (!completed) ) {
@@ -216,10 +231,14 @@ public class TrackerClient extends I2PThread
                         Iterator it = ordered.iterator();
                         while (it.hasNext()) {
                           Peer cur = (Peer)it.next();
-                          coordinator.addPeer(cur);
-                          int delay = 3000;
-                          int c = ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
-                          try { Thread.sleep(delay * c); } catch (InterruptedException ie) {}
+                          // only delay if we actually make an attempt to add peer
+                          if(coordinator.addPeer(cur)) {
+                            int delay = DELAY_MUL;
+                            delay *= ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                            delay += DELAY_MIN;
+                            sleptTime += delay;
+                            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                          }
                         }
                     }
                   }
@@ -229,6 +248,7 @@ public class TrackerClient extends I2PThread
                     Snark.debug
                       ("WARNING: Could not contact tracker at '"
                        + announce + "': " + ioe, Snark.WARNING);
+                    coordinator.trackerProblems = ioe.getMessage();
                   }
               }
           }

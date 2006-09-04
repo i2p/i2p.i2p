@@ -39,7 +39,7 @@ public class PeerCoordinator implements PeerListener
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 20*1000; // 20 seconds
   final static int MAX_CONNECTIONS = 24;
-  final static int MAX_UPLOADERS = 12; // i2p: might as well balance it out
+  final static int MAX_UPLOADERS = 4;
 
   // Approximation of the number of current uploaders.
   // Resynced by PeerChecker once in a while.
@@ -154,8 +154,8 @@ public class PeerCoordinator implements PeerListener
       uploaded_old[i] = uploaded_old[i-1];
       downloaded_old[i] = downloaded_old[i-1];
     }
-      uploaded_old[0] = up;
-      downloaded_old[0] = down;
+    uploaded_old[0] = up;
+    downloaded_old[0] = down;
   }
 
   /**
@@ -275,12 +275,13 @@ public class PeerCoordinator implements PeerListener
     return null;
   }
 
-  public void addPeer(final Peer peer)
+// returns true if actual attempt to add peer occurs
+  public boolean addPeer(final Peer peer)
   {
     if (halted)
       {
         peer.disconnect(false);
-        return;
+        return false;
       }
 
     boolean need_more;
@@ -305,6 +306,7 @@ public class PeerCoordinator implements PeerListener
           };
         String threadName = peer.toString();
         new I2PThread(r, threadName).start();
+        return true;
       }
     else
       if (_log.shouldLog(Log.DEBUG)) {
@@ -314,6 +316,7 @@ public class PeerCoordinator implements PeerListener
           _log.info("MAX_CONNECTIONS = " + MAX_CONNECTIONS
                     + " not accepting extra peer: " + peer);
       }
+      return false;
   }
 
 
