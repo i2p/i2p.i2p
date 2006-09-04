@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.507 2006-09-03 01:37:46 complication Exp $
+$Id: history.txt,v 1.508 2006-09-03 04:12:23 zzz Exp $
+
+2006-09-04  zzz
+    * Enable pipelining in i2psnark
+    * Make i2psnark tunnel default be 1 + 0-1
 
 2006-09-03  zzz
     * Add rate reporting to i2psnark

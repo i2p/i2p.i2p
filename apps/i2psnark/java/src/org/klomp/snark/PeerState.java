@@ -62,7 +62,7 @@ class PeerState
   // If we have te resend outstanding requests (true after we got choked).
   private boolean resend = false;
 
-  private final static int MAX_PIPELINE = 1;
+  private final static int MAX_PIPELINE = 2;
   private final static int PARTSIZE = 64*1024; // default was 16K, i2p-bt uses 64KB
 
   PeerState(Peer peer, PeerListener listener, MetaInfo metainfo,
