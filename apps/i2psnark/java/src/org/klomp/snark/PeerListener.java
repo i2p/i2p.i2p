@@ -142,4 +142,22 @@ public interface PeerListener
    * we are no longer interested in the peer.
    */
   int wantPiece(Peer peer, BitField bitfield);
+
+  /**
+   * Called when the peer has disconnected and the peer task may have a partially
+   * downloaded piece that the PeerCoordinator can save
+   *
+   * @param state the PeerState for the peer
+   */
+  void savePeerPartial(PeerState state);
+
+  /**
+   * Called when a peer has connected and there may be a partially
+   * downloaded piece that the coordinatorator can give the peer task
+   *
+   * @param havePieces the have-pieces bitmask for the peer
+   *
+   * @return request (contains the partial data and valid length)
+   */
+  Request getPeerPartial(BitField havePieces);
 }

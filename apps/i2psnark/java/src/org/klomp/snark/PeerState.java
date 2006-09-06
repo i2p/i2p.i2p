@@ -221,6 +221,10 @@ class PeerState
     listener.uploaded(peer, size);
   }
 
+  // This is used to flag that we have to back up from the firstOutstandingRequest
+  // when calculating how far we've gotten
+  Request pendingRequest = null;
+
   /**
    * Called when a partial piece request has been handled by
    * PeerConnectionIn.
@@ -230,6 +234,8 @@ class PeerState
     int size = req.len;
     downloaded += size;
     listener.downloaded(peer, size);
+
+    pendingRequest = null;
 
     // Last chunk needed for this piece?
     if (getFirstOutstandingRequest(req.piece) == -1)
@@ -318,14 +324,8 @@ class PeerState
               {
                 Request dropReq = (Request)outstandingRequests.remove(0);
                 outstandingRequests.add(dropReq);
-                // We used to rerequest the missing chunks but that mostly
-                // just confuses the other side. So now we just keep
-                // waiting for them. They will be rerequested when we get
-                // choked/unchoked again.
-                /*
-                  if (!choked)
+                if (!choked)
                   out.sendRequest(dropReq);
-                */
                 if (_log.shouldLog(Log.WARN))
                   _log.warn("dropped " + dropReq + " with peer " + peer);
               }
@@ -336,8 +336,31 @@ class PeerState
     // Request more if necessary to keep the pipeline filled.
     addRequest();
 
+    pendingRequest = req;
     return req;
 
+  }
+
+  // get longest partial piece
+  Request getPartialRequest()
+  {
+    Request req = null;
+    for (int i = 0; i < outstandingRequests.size(); i++) {
+      Request r1 = (Request)outstandingRequests.get(i);
+      int j = getFirstOutstandingRequest(r1.piece);
+      if (j == -1)
+        continue;
+      Request r2 = (Request)outstandingRequests.get(j);
+      if (r2.off > 0 && ((req == null) || (r2.off > req.off)))
+        req = r2;
+    }
+    if (pendingRequest != null && req != null && pendingRequest.off < req.off) {
+      if (pendingRequest.off != 0)
+        req = pendingRequest;
+      else
+        req = null;
+    }
+    return req;
   }
 
   void cancelMessage(int piece, int begin, int length)
@@ -472,6 +495,15 @@ class PeerState
     // Check that we already know what the other side has.
     if (bitfield != null)
       {
+        // Check for adopting an orphaned partial piece
+        Request r = listener.getPeerPartial(bitfield);
+        if (r != null) {
+          outstandingRequests.add(r);
+          if (!choked)
+            out.sendRequest(r);
+          lastRequest = r;
+          return true;
+        }
         int nextPiece = listener.wantPiece(peer, bitfield);
         if (_log.shouldLog(Log.DEBUG))
           _log.debug(peer + " want piece " + nextPiece);
@@ -522,5 +554,10 @@ class PeerState
         choking = choke;
         out.sendChoke(choke);
       }
+  }
+
+  synchronized void keepAlive()
+  {
+        out.sendAlive();
   }
 }

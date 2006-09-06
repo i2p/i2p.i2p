@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.509 2006-09-04 01:01:54 zzz Exp $
+$Id: history.txt,v 1.510 2006-09-04 03:26:22 zzz Exp $
+
+2006-09-05  zzz
+    * i2psnark: Implement basic partial-piece saves across connections
+    * i2psnark: Implement keep-alive sending. This will keep non-i2psnark clients
+      from dropping us for inactivity but also renders the 2-minute transmit-inactivity
+      code in i2psnark ineffective. Will have to research why there is transmit but
+      not receive inactivity code. With the current connection limit of 24 peers
+      we aren't in any danger of keeping out new peers by keeping inactive ones.
+    * i2psnark: Increase CHECK_PERIOD from 20 to 40 since nothing happens in 20 seconds
+    * i2psnark: Fix dropped chunk handling
+    * i2psnark: Web rate report cleanup
 
 2006-09-04  zzz
     * i2psnark: Report cleared trackerErr immediately

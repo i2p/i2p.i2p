@@ -259,7 +259,13 @@ class PeerConnectionOut implements Runnable
   {
     Message m = new Message();
     m.type = Message.KEEP_ALIVE;
-    addMessage(m);
+//  addMessage(m);
+    synchronized(sendQueue)
+      {
+        if(sendQueue.isEmpty())
+          sendQueue.add(m);
+        sendQueue.notifyAll();
+      }
   }
 
   void sendChoke(boolean choke)

@@ -164,6 +164,7 @@ class PeerCheckerTask extends TimerTask
                     worstDownloader = peer;
                   }
               }
+            peer.keepAlive();
           }
 
         // Resync actual uploaders value

@@ -318,6 +318,12 @@ public class Peer implements Comparable
     PeerState s = state;
     if (s != null)
       {
+        // try to save partial piece
+        if (this.deregister) {
+          PeerListener p = state.listener;
+          if (p != null)
+            p.savePeerPartial(state);
+        }
         state = null;
 
         PeerConnectionIn in = s.in;
@@ -458,4 +464,15 @@ public class Peer implements Comparable
           return -1; //"no state";
       }
   }
+
+  /**
+   * Send keepalive
+   */
+  public void keepAlive()
+  {
+    PeerState s = state;
+    if (s != null)
+      s.keepAlive();
+  }
+
 }

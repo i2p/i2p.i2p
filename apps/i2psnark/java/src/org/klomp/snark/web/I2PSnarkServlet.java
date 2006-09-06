@@ -353,8 +353,12 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentUploaded " + rowClass 
                   + "\">" + formatSize(uploaded) + "</td>\n\t");
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentRate\">");
-	if(isRunning)    
-            out.write(formatSize(downBps) + "ps/" + formatSize(upBps) + "ps");
+        if(isRunning && remaining > 0)
+            out.write(formatSize(downBps) + "ps");
+        out.write("</td>\n\t");
+        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentRate\">");
+        if(isRunning)
+            out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentAction " + rowClass + "\">");
         if (isRunning) {
@@ -580,7 +584,8 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"left\" valign=\"top\">Torrent</th>\n" +
                                                "    <th align=\"left\" valign=\"top\">Downloaded</th>\n" +
                                                "    <th align=\"left\" valign=\"top\">Uploaded</th>\n" +
-                                               "    <th align=\"left\" valign=\"top\">Rate Down/Up</th>\n" +
+                                               "    <th align=\"left\" valign=\"top\">Down Rate</th>\n" +
+                                               "    <th align=\"left\" valign=\"top\">Up Rate</th>\n" +
                                                "    <th>&nbsp;</th></tr>\n" +
                                                "</thead>\n";
     

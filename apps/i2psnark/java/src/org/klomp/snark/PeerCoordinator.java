@@ -37,7 +37,7 @@ public class PeerCoordinator implements PeerListener
   final Snark snark;
 
   // package local for access by CheckDownLoadersTask
-  final static long CHECK_PERIOD = 20*1000; // 20 seconds
+  final static long CHECK_PERIOD = 40*1000; // 40 seconds
   final static int MAX_CONNECTIONS = 24;
   final static int MAX_UPLOADERS = 4;
 
@@ -159,7 +159,7 @@ public class PeerCoordinator implements PeerListener
   }
 
   /**
-   * Returns the 2-minute-average rate in Bps
+   * Returns the 4-minute-average rate in Bps
    */
   public long getDownloadRate()
   {
@@ -171,7 +171,7 @@ public class PeerCoordinator implements PeerListener
   }
 
   /**
-   * Returns the 2-minute-average rate in Bps
+   * Returns the 4-minute-average rate in Bps
    */
   public long getUploadRate()
   {
@@ -233,6 +233,8 @@ public class PeerCoordinator implements PeerListener
         Peer old = peerIDInList(peer.getPeerID(), peers);
         if ( (old != null) && (old.getInactiveTime() > 2*60*1000) ) {
             // idle for 2 minutes, kill the old con
+            if (_log.shouldLog(Log.WARN))
+              _log.warn("Remomving old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
             peers.remove(old);
             toDisconnect = old;
             old = null;
@@ -449,6 +451,14 @@ public class PeerCoordinator implements PeerListener
                     _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested 
                               + " wanted = " + wantedPieces + " peerHas = " + havePieces);
                 return -1; //If we still can't find a piece we want, so be it.
+            } else {
+                // Should be a lot smarter here - limit # of parallel attempts and
+                // share data rather than starting from 0 with each peer.
+                // And could share-as-we-go too.
+                // This is where the flaws of the snark data model are really exposed.
+                // Could also randomize within the duplicate set rather than strict rarest-first
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("parallel request (end game?) for " + peer + ": piece = " + piece);
             }
         }
         piece.setRequested(true);
@@ -625,4 +635,68 @@ public class PeerCoordinator implements PeerListener
           }
       } 
   }
+
+
+  /** Simple method to save a partial piece on peer disconnection
+   *  and hopefully restart it later.
+   *  Only one partial piece is saved at a time.
+   *  Replace it if a new one is bigger or the old one is too old.
+   *  Storage method is private so we can expand to save multiple partials
+   *  if we wish.
+   */
+  private Request savedRequest = null;
+  private long savedRequestTime = 0;
+  public void savePeerPartial(PeerState state)
+  {
+    Request req = state.getPartialRequest();
+    if (req == null)
+      return;
+    if (savedRequest == null ||
+        req.off > savedRequest.off ||
+        System.currentTimeMillis() > savedRequestTime + (15 * 60 * 1000)) {
+      savedRequest = req;
+      savedRequestTime = System.currentTimeMillis();
+      if (_log.shouldLog(Log.DEBUG))
+        _log.debug(" Saving orphaned partial piece " + req);
+      if (savedRequest != null)
+        if (_log.shouldLog(Log.DEBUG))
+          _log.debug(" (Discarding previously saved orphan) " + savedRequest);
+    } else {
+      if (req.piece != savedRequest.piece)
+        if (_log.shouldLog(Log.DEBUG))
+          _log.debug(" Discarding orphaned partial piece " + req);
+    }
+  }
+
+  /** Return partial piece if it's still wanted and peer has it.
+   */
+  public Request getPeerPartial(BitField havePieces) {
+    if (savedRequest == null)
+      return null;
+    if (! havePieces.get(savedRequest.piece)) {
+      if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Peer doesn't have orphaned piece " + savedRequest);
+      return null;
+    }
+    synchronized(wantedPieces)
+      {
+        for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
+          Piece piece = (Piece)iter.next();
+          if (piece.getId() == savedRequest.piece) {
+            Request req = savedRequest;
+            piece.setRequested(true);
+            if (_log.shouldLog(Log.DEBUG))
+              _log.debug("Restoring orphaned partial piece " + req);
+            savedRequest = null;
+            return req;
+          }
+        }
+      }
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug("We no longer want orphaned piece " + savedRequest);
+    savedRequest = null;
+    return null;
+  }
+
 }
+
