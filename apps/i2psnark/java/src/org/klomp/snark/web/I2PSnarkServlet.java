@@ -321,8 +321,10 @@ public class I2PSnarkServlet extends HttpServlet {
             else
                 statusString = "Complete";
         } else {
-            if (isRunning)
+            if (isRunning && curPeers > 0)
                 statusString = "OK (" + curPeers + "/" + knownPeers + " peers)";
+            else if (isRunning)
+                statusString = "No Peers (0/" + knownPeers + ")";
             else
                 statusString = "Stopped";
         }
@@ -341,22 +343,23 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("</a>");
         out.write("</td>\n\t");
         
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
-        if (remaining > 0) {
-            out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
-	    if(isRunning && remainingSeconds > 0)    
-	        out.write(" (ETA " + DataHelper.formatDuration(remainingSeconds*1000) + ")"); // (eta 6h)
-        } else {
-            out.write(formatSize(total)); // 3GB
-        }
+        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
+        if(isRunning && remainingSeconds > 0)
+            out.write(DataHelper.formatDuration(remainingSeconds*1000)); // (eta 6h)
         out.write("</td>\n\t");
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentUploaded " + rowClass 
+        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
+        if (remaining > 0)
+            out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
+        else
+            out.write(formatSize(total)); // 3GB
+        out.write("</td>\n\t");
+        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentUploaded " + rowClass 
                   + "\">" + formatSize(uploaded) + "</td>\n\t");
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentRate\">");
+        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentRate\">");
         if(isRunning && remaining > 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentRate\">");
+        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentRate\">");
         if(isRunning)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
@@ -550,7 +553,10 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "}\n" +
                                          "th {\n" +
                                          "	background-color: #C7D5D5;\n" +
-                                         "	margin: 0px 0px 0px 0px;\n" +
+                                         "	padding: 0px 7px 0px 3px;\n" +
+                                         "}\n" +
+                                         "td {\n" +
+                                         "	padding: 0px 7px 0px 3px;\n" +
                                          "}\n" +
                                          ".snarkTorrentEven {\n" +
                                          "	background-color: #E7E7E7;\n" +
@@ -578,20 +584,21 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "<body>\n";
 
 
-    private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\">\n" +
+    private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
                                                "<thead>\n" +
                                                "<tr><th align=\"left\" valign=\"top\">Status</th>\n" +
                                                "    <th align=\"left\" valign=\"top\">Torrent</th>\n" +
-                                               "    <th align=\"left\" valign=\"top\">Downloaded</th>\n" +
-                                               "    <th align=\"left\" valign=\"top\">Uploaded</th>\n" +
-                                               "    <th align=\"left\" valign=\"top\">Down Rate</th>\n" +
-                                               "    <th align=\"left\" valign=\"top\">Up Rate</th>\n" +
+                                               "    <th align=\"right\" valign=\"top\">ETA</th>\n" +
+                                               "    <th align=\"right\" valign=\"top\">Downloaded</th>\n" +
+                                               "    <th align=\"right\" valign=\"top\">Uploaded</th>\n" +
+                                               "    <th align=\"right\" valign=\"top\">Down Rate</th>\n" +
+                                               "    <th align=\"right\" valign=\"top\">Up Rate</th>\n" +
                                                "    <th>&nbsp;</th></tr>\n" +
                                                "</thead>\n";
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
                                               "<td class=\"snarkTorrentEven\" align=\"left\"" +
-                                              "    valign=\"top\" colspan=\"5\">No torrents</td></tr>\n";
+                                              "    valign=\"top\" colspan=\"8\">No torrents</td></tr>\n";
 
     private static final String TABLE_FOOTER = "</table>\n";
     

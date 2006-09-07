@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.510 2006-09-04 03:26:22 zzz Exp $
+$Id: history.txt,v 1.511 2006-09-06 01:32:54 zzz Exp $
+
+2006-09-07  zzz
+    * i2psnark: Increase output timeout from 2 min to 4 min
+    * i2psnark: Orphan debug msg cleanup
+    * i2psnark: More web rate report cleanup
 
 2006-09-05  zzz
     * i2psnark: Implement basic partial-piece saves across connections

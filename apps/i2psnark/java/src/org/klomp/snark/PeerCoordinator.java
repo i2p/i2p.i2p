@@ -231,8 +231,8 @@ public class PeerCoordinator implements PeerListener
     synchronized(peers)
       {
         Peer old = peerIDInList(peer.getPeerID(), peers);
-        if ( (old != null) && (old.getInactiveTime() > 2*60*1000) ) {
-            // idle for 2 minutes, kill the old con
+        if ( (old != null) && (old.getInactiveTime() > 4*60*1000) ) {
+            // idle for 4 minutes, kill the old con (64KB/4min = 273B/sec minimum for one block)
             if (_log.shouldLog(Log.WARN))
               _log.warn("Remomving old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
             peers.remove(old);
@@ -448,13 +448,13 @@ public class PeerCoordinator implements PeerListener
               }
             if (piece == null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested 
-                              + " wanted = " + wantedPieces + " peerHas = " + havePieces);
+                    _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested);
+                //  _log.warn("nothing to even rerequest from " + peer + ": requested = " + requested 
+                //            + " wanted = " + wantedPieces + " peerHas = " + havePieces);
                 return -1; //If we still can't find a piece we want, so be it.
             } else {
                 // Should be a lot smarter here - limit # of parallel attempts and
-                // share data rather than starting from 0 with each peer.
-                // And could share-as-we-go too.
+                // share blocks rather than starting from 0 with each peer.
                 // This is where the flaws of the snark data model are really exposed.
                 // Could also randomize within the duplicate set rather than strict rarest-first
                 if (_log.shouldLog(Log.DEBUG))
@@ -654,13 +654,15 @@ public class PeerCoordinator implements PeerListener
     if (savedRequest == null ||
         req.off > savedRequest.off ||
         System.currentTimeMillis() > savedRequestTime + (15 * 60 * 1000)) {
+      if (savedRequest == null || (req.piece != savedRequest.piece && req.off != savedRequest.off)) {
+        if (_log.shouldLog(Log.DEBUG)) {
+          _log.debug(" Saving orphaned partial piece " + req);
+          if (savedRequest != null)
+            _log.debug(" (Discarding previously saved orphan) " + savedRequest);
+        }
+      }
       savedRequest = req;
       savedRequestTime = System.currentTimeMillis();
-      if (_log.shouldLog(Log.DEBUG))
-        _log.debug(" Saving orphaned partial piece " + req);
-      if (savedRequest != null)
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug(" (Discarding previously saved orphan) " + savedRequest);
     } else {
       if (req.piece != savedRequest.piece)
         if (_log.shouldLog(Log.DEBUG))

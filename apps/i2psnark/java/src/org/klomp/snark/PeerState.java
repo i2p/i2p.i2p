@@ -556,7 +556,7 @@ class PeerState
       }
   }
 
-  synchronized void keepAlive()
+  void keepAlive()
   {
         out.sendAlive();
   }
