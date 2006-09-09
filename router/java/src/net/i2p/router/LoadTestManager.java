@@ -78,7 +78,11 @@ public class LoadTestManager {
     
     private static final boolean DEFAULT_ENABLE = false;
 
+    /** disable all load testing for the moment */
+    private static final boolean FORCE_DISABLE = true;
+
     public static boolean isEnabled(I2PAppContext ctx) { 
+        if (FORCE_DISABLE) return false;
         String enable = ctx.getProperty("router.enableLoadTesting");
         if ( (DEFAULT_ENABLE) && (enable != null) && (!Boolean.valueOf(enable).booleanValue()) )
             return false;
@@ -130,6 +134,7 @@ public class LoadTestManager {
      * Actually send the messages through the given tunnel
      */
     private void runTest(LoadTestTunnelConfig tunnel) {
+        if (!isEnabled(_context)) return;
         log(tunnel, "start");
         int peerMessages = getPeerMessages();
         if (_log.shouldLog(Log.DEBUG))
@@ -208,9 +213,17 @@ public class LoadTestManager {
             
             // this should take into consideration both the inbound and outbound tunnels
             // ... but it doesn't, yet.
-            _context.messageRegistry().registerPending(new Selector(tunnel, payloadMessage.getUniqueId()),
-                                                       new SendAgain(_context, tunnel, payloadMessage.getUniqueId(), true),
-                                                       new SendAgain(_context, tunnel, payloadMessage.getUniqueId(), false),
+            long uniqueId = -1;
+            if (payloadMessage != null) {
+                uniqueId = payloadMessage.getUniqueId();
+            } else {
+                tunnel.logComplete();
+                _active.remove(tunnel);
+                return;
+            }
+            _context.messageRegistry().registerPending(new Selector(tunnel, uniqueId),
+                                                       new SendAgain(_context, tunnel, uniqueId, true),
+                                                       new SendAgain(_context, tunnel, uniqueId, false),
                                                        10*1000);
             _context.tunnelDispatcher().dispatchOutbound(payloadMessage, outbound.getSendTunnelId(0),
                                                          inbound.getReceiveTunnelId(0),

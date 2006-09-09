@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.513 2006-09-07 18:22:12 zzz Exp $
+$Id: history.txt,v 1.514 2006-09-07 18:26:53 zzz Exp $
+
+2006-09-08  jrandom
+    * Tweak the PRNG logging so it only displays error messages if there are
+      problems
+    * Disable dynamic router keys for the time being, as they don't offer
+      meaningful security, may hurt the router, and makes it harder to
+      determine the network health.  The code to restart on SSU IP change is
+      still enabled however.
+    * Disable tunnel load testing, leaning back on the tiered selection for
+      the time being.
+    * Spattering of bugfixes
 
 2006-09-07  zzz
     * i2psnark: Increase output timeout from 2 min to 4 min

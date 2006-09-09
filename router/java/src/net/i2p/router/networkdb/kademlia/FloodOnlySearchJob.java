@@ -70,7 +70,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
             return;
         }
         OutNetMessage out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
-        _out.add(out);
+        synchronized (_out) { _out.add(out); }
 
         for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
             Hash peer = (Hash)floodfillPeers.get(i);
@@ -113,8 +113,10 @@ class FloodOnlySearchJob extends FloodSearchJob {
             if (_dead) return;
             _dead = true;
         }
-        for (int i = 0; i < _out.size(); i++) {
-            OutNetMessage out = (OutNetMessage)_out.get(i);
+        List outBuf = null;
+        synchronized (_out) { outBuf = new ArrayList(_out); }
+        for (int i = 0; i < outBuf.size(); i++) {
+            OutNetMessage out = (OutNetMessage)outBuf.get(i);
             getContext().messageRegistry().unregisterPending(out);
         }
         int timeRemaining = (int)(_origExpiration - getContext().clock().now());

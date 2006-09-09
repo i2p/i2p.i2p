@@ -240,8 +240,10 @@ public class Router {
         readConfig();
         
         setupHandlers();
-        if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
-            killKeys();
+        if (ALLOW_DYNAMIC_KEYS) {
+            if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+                killKeys();
+        }
 
         _context.messageValidator().startup();
         _context.tunnelDispatcher().startup();
@@ -815,11 +817,19 @@ public class Router {
         finalShutdown(exitCode);
     }
 
+    /**
+     * disable dynamic key functionality for the moment, as it may be harmful and doesn't
+     * add meaningful anonymity
+     */
+    private static final boolean ALLOW_DYNAMIC_KEYS = false;
+
     public void finalShutdown(int exitCode) {
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
-        if ("true".equalsIgnoreCase(_context.getProperty(PROP_DYNAMIC_KEYS, "false")))
-            killKeys();
+        if (ALLOW_DYNAMIC_KEYS) {
+            if ("true".equalsIgnoreCase(_context.getProperty(PROP_DYNAMIC_KEYS, "false")))
+                killKeys();
+        }
 
         File f = new File(getPingFile());
         f.delete();

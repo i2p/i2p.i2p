@@ -52,8 +52,8 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
             long before = System.currentTimeMillis();
             long waited = 0;
             while (status[nextBuf] != STATUS_FILLED) {
-                System.out.println(Thread.currentThread().getName() + ": Next PRNG buffer "
-                                   + nextBuf + " isn't ready (" + status[nextBuf] + ")");
+                //System.out.println(Thread.currentThread().getName() + ": Next PRNG buffer "
+                //                   + nextBuf + " isn't ready (" + status[nextBuf] + ")");
                 //new Exception("source").printStackTrace();
                 asyncBuffers.notifyAll();
                 try {
@@ -61,7 +61,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                 } catch (InterruptedException ie) {}
                 waited = System.currentTimeMillis()-before;
             }
-            if (waited > 0)
+            if (waited > 10*1000)
                 System.out.println(Thread.currentThread().getName() + ": Took " + waited
                                    + "ms for a full PRNG buffer to be found");
             //System.out.println(Thread.currentThread().getName() + ": Switching to prng buffer " + nextBuf);

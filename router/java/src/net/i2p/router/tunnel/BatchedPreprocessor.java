@@ -296,7 +296,13 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
             return;
         }
         
-        preprocess(preprocessed, offset);
+        try {
+            preprocess(preprocessed, offset);
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error preprocessing the messages (offset=" + offset + " start=" + startAt + " through=" + sendThrough + " pending=" + pending.size() + " preproc=" + preprocessed.length);
+            return;
+        }
         
         long msgId = sender.sendPreprocessed(preprocessed, rec);
         for (int i = 0; i < pending.size(); i++) {

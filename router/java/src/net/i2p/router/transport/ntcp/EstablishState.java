@@ -318,6 +318,8 @@ public class EstablishState {
                 }
             }
         }
+        if (_e_hXY_tsB == null) return; // !src.hasRemaining
+
         while (_received < _Y.length + _e_hXY_tsB.length && src.hasRemaining()) {
             int i = _received-_Y.length;
             _received++;

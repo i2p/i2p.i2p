@@ -171,6 +171,7 @@ public class OutboundMessageRegistry {
     }
     
     public void unregisterPending(OutNetMessage msg) {
+        if (msg == null) return;
         MessageSelector sel = msg.getReplySelector();
         boolean stillActive = false;
         synchronized (_selectorToMessage) { 
