@@ -396,9 +396,10 @@ public class PeerCoordinator implements PeerListener
           {
             Piece p = (Piece)it.next();
             int i = p.getId();
-            if (bitfield.get(i))
+            if (bitfield.get(i)) {
               p.addPeer(peer);
               return true;
+            }
           }
       }
     return false;

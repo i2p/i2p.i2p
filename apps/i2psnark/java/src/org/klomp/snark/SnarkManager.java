@@ -335,7 +335,7 @@ public class SnarkManager implements Snark.CompleteListener {
             return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it";
         } else if (info.getPieces() <= 0) {
             return "No pieces in " + info.getName() + "?  deleting it";
-        } else if (info.getPieceLength(0) > 10*1024*1024) {
+        } else if (info.getPieceLength(0) > 1*1024*1024) {
             return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB, deleting it";
         } else if (info.getTotalLength() > 10*1024*1024*1024l) {
             System.out.println("torrent info: " + info.toString());

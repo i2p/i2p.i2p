@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.515 2006-09-08 20:41:57 jrandom Exp $
+$Id: history.txt,v 1.516 2006-09-09 12:46:21 jrandom Exp $
+
+2006-09-09  zzz
+    * i2psnark: Fix bug where new peers would always be sent an "interested"
+      regardless of actual interest
+    * i2psnark: Reduce max piece size from 10MB to 1MB; larger may have severe
+      memory and efficiency problems
 
 * 2006-09-09  0.6.1.25 released
 
