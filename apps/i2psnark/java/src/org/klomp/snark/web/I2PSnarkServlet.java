@@ -43,6 +43,7 @@ public class I2PSnarkServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
+        long stats[] = {0,0,0,0};
         
         String nonce = req.getParameter("nonce");
         if ( (nonce != null) && (nonce.equals(String.valueOf(_nonce))) )
@@ -72,10 +73,18 @@ public class I2PSnarkServlet extends HttpServlet {
         String uri = req.getRequestURI();
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
-            displaySnark(out, snark, uri, i);
+            displaySnark(out, snark, uri, i, stats);
         }
         if (snarks.size() <= 0) {
             out.write(TABLE_EMPTY);
+        } else if (snarks.size() > 1) {
+            out.write(TABLE_TOTAL);
+            out.write("    <th align=\"right\" valign=\"top\">" + formatSize(stats[0]) + "</th>\n" +
+                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[1]) + "</th>\n" +
+                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[2]) + "ps</th>\n" +
+                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[3]) + "ps</th>\n" +
+                      "    <th>&nbsp;</th></tr>\n" +
+                      "</tfoot>\n");
         }
         
         out.write(TABLE_FOOTER);
@@ -279,9 +288,9 @@ public class I2PSnarkServlet extends HttpServlet {
         }
         return rv;
     }
-    
+
     private static final int MAX_DISPLAYED_FILENAME_LENGTH = 60;
-    private void displaySnark(PrintWriter out, Snark snark, String uri, int row) throws IOException {
+    private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[]) throws IOException {
         String filename = snark.torrent;
         File f = new File(filename);
         filename = f.getName(); // the torrent may be the canonical name, so lets just grab the local name
@@ -300,6 +309,10 @@ public class I2PSnarkServlet extends HttpServlet {
 	else
 	        remainingSeconds = -1;
         long uploaded = snark.coordinator.getUploaded();
+        stats[0] += snark.coordinator.getDownloaded();
+        stats[1] += uploaded;
+        stats[2] += downBps;
+        stats[3] += upBps;
         
         boolean isRunning = !snark.stopped;
         boolean isValid = snark.meta != null;
@@ -321,8 +334,10 @@ public class I2PSnarkServlet extends HttpServlet {
             else
                 statusString = "Complete";
         } else {
-            if (isRunning && curPeers > 0)
+            if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = "OK (" + curPeers + "/" + knownPeers + " peers)";
+            else if (isRunning && curPeers > 0)
+                statusString = "Stalled (" + curPeers + "/" + knownPeers + " peers)";
             else if (isRunning)
                 statusString = "No Peers (0/" + knownPeers + ")";
             else
@@ -595,6 +610,11 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"right\" valign=\"top\">Up Rate</th>\n" +
                                                "    <th>&nbsp;</th></tr>\n" +
                                                "</thead>\n";
+    
+    private static final String TABLE_TOTAL =  "<tfoot>\n" +
+                                               "<tr><th align=\"left\" valign=\"top\">Totals</th>\n" +
+                                               "    <th>&nbsp;</th>\n" +
+                                               "    <th>&nbsp;</th>\n";
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
                                               "<td class=\"snarkTorrentEven\" align=\"left\"" +

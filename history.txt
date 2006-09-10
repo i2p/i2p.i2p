@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.516 2006-09-09 12:46:21 jrandom Exp $
+$Id: history.txt,v 1.517 2006-09-09 17:15:06 zzz Exp $
+
+2006-09-09  zzz
+    * i2psnark: Add "Stalled" indication and stat totals on web page
 
 2006-09-09  zzz
     * i2psnark: Fix bug where new peers would always be sent an "interested"
