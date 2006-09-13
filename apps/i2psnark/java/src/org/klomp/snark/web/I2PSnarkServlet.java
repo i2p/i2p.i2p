@@ -294,6 +294,9 @@ public class I2PSnarkServlet extends HttpServlet {
         String filename = snark.torrent;
         File f = new File(filename);
         filename = f.getName(); // the torrent may be the canonical name, so lets just grab the local name
+        int i = filename.lastIndexOf(".torrent");
+        if (i > 0)
+            filename = filename.substring(0, i);
         if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH)
             filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "...";
         long total = snark.meta.getTotalLength();
@@ -304,17 +307,19 @@ public class I2PSnarkServlet extends HttpServlet {
         long downBps = snark.coordinator.getDownloadRate();
         long upBps = snark.coordinator.getUploadRate();
         long remainingSeconds;
-	if (downBps > 0)
-	        remainingSeconds = remaining / downBps;
-	else
-	        remainingSeconds = -1;
+        if (downBps > 0)
+            remainingSeconds = remaining / downBps;
+        else
+            remainingSeconds = -1;
         long uploaded = snark.coordinator.getUploaded();
+        boolean isRunning = !snark.stopped;
         stats[0] += snark.coordinator.getDownloaded();
         stats[1] += uploaded;
-        stats[2] += downBps;
-        stats[3] += upBps;
+        if (isRunning) {
+            stats[2] += downBps;
+            stats[3] += upBps;
+        }
         
-        boolean isRunning = !snark.stopped;
         boolean isValid = snark.meta != null;
         boolean singleFile = snark.meta.getFiles() == null;
         

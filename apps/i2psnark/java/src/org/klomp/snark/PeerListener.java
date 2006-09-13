@@ -160,4 +160,12 @@ public interface PeerListener
    * @return request (contains the partial data and valid length)
    */
   Request getPeerPartial(BitField havePieces);
+
+  /** Mark a peer's requested pieces unrequested when it is disconnected
+   *  This prevents premature end game
+   *
+   * @param peer the peer that is disconnecting
+   */
+  void markUnrequested(Peer peer);
+
 }

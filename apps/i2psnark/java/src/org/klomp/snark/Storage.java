@@ -48,6 +48,7 @@ public class Storage
 
   /** The default piece size. */
   private static int MIN_PIECE_SIZE = 256*1024;
+  private static int MAX_PIECE_SIZE = 1024*1024;
   /** The maximum number of pieces in a torrent. */
   private static long MAX_PIECES = 100*1024/20;
 
@@ -90,7 +91,7 @@ public class Storage
 
     piece_size = MIN_PIECE_SIZE;
     pieces = (int) ((total - 1)/piece_size) + 1;
-    while (pieces > MAX_PIECES)
+    while (pieces > MAX_PIECES && piece_size < MAX_PIECE_SIZE)
       {
         piece_size = piece_size*2;
         pieces = (int) ((total - 1)/piece_size) +1;

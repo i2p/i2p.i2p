@@ -438,6 +438,8 @@ public class PeerCoordinator implements PeerListener
         
         //Only request a piece we've requested before if there's no other choice.
         if (piece == null) {
+            // let's not all get on the same piece
+            Collections.shuffle(requested);
             Iterator it2 = requested.iterator();
             while (piece == null && it2.hasNext())
               {
@@ -701,5 +703,59 @@ public class PeerCoordinator implements PeerListener
     return null;
   }
 
+  /** Clear the requested flag for a piece if the peer
+   ** is the only one requesting it
+   */
+  private void markUnrequestedIfOnlyOne(Peer peer, int piece)
+  {
+    // see if anybody else is requesting
+    synchronized (peers)
+      {
+        Iterator it = peers.iterator();
+        while (it.hasNext()) {
+          Peer p = (Peer)it.next();
+          if (p.equals(peer))
+            continue;
+          if (p.state == null)
+            continue;
+          int[] arr = p.state.getRequestedPieces();
+          for (int i = 0; arr[i] >= 0; i++)
+            if(arr[i] == piece) {
+              if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Another peer is requesting piece " + piece);
+              return;
+            }
+        }
+      }
+
+    // nobody is, so mark unrequested
+    synchronized(wantedPieces)
+      {
+        Iterator it = wantedPieces.iterator();
+        while (it.hasNext()) {
+          Piece p = (Piece)it.next();
+          if (p.getId() == piece) {
+            p.setRequested(false);
+            if (_log.shouldLog(Log.DEBUG))
+              _log.debug("Removing from request list piece " + piece);
+            return;
+          }
+        }
+      }
+  }
+
+  /** Mark a peer's requested pieces unrequested when it is disconnected
+   ** Once for each piece
+   ** This is enough trouble, maybe would be easier just to regenerate
+   ** the requested list from scratch instead.
+   */
+  public void markUnrequested(Peer peer)
+  {
+    if (peer.state == null)
+      return;
+    int[] arr = peer.state.getRequestedPieces();
+    for (int i = 0; arr[i] >= 0; i++)
+      markUnrequestedIfOnlyOne(peer, arr[i]);
+  }
 }
 

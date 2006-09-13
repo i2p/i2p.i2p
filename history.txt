@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.517 2006-09-09 17:15:06 zzz Exp $
+$Id: history.txt,v 1.518 2006-09-09 20:55:38 zzz Exp $
+
+2006-09-10  zzz
+    * i2psnark: Mark a peer's requests as unrequested on disconnect,
+      preventing premature end game
+    * i2psnark: Randomize selection of next piece during end game
+    * i2psnark: Don't restore a partial piece to a peer that is already working on it
+    * i2psnark: strip ".torrent" on web page
+    * i2psnark: Limit piece size in generated torrent to 1MB max
 
 2006-09-09  zzz
     * i2psnark: Add "Stalled" indication and stat totals on web page

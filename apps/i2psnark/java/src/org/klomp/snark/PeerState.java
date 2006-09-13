@@ -363,6 +363,31 @@ class PeerState
     return req;
   }
 
+  // return array of pieces terminated by -1
+  // remove most duplicates
+  // but still could be some duplicates, not guaranteed
+  int[] getRequestedPieces()
+  {
+    int size = outstandingRequests.size();
+    int[] arr = new int[size+2];
+    int pc = -1;
+    int pos = 0;
+    if (pendingRequest != null) {
+      pc = pendingRequest.piece;
+      arr[pos++] = pc;
+    }
+    Request req = null;
+    for (int i = 0; i < size; i++) {
+      Request r1 = (Request)outstandingRequests.get(i);
+      if (pc != r1.piece) {
+        pc = r1.piece;
+        arr[pos++] = pc;
+      }
+    }
+    arr[pos] = -1;
+    return(arr);
+  }
+
   void cancelMessage(int piece, int begin, int length)
   {
     if (_log.shouldLog(Log.DEBUG))
@@ -498,11 +523,22 @@ class PeerState
         // Check for adopting an orphaned partial piece
         Request r = listener.getPeerPartial(bitfield);
         if (r != null) {
-          outstandingRequests.add(r);
-          if (!choked)
-            out.sendRequest(r);
-          lastRequest = r;
-          return true;
+          // Check that r not already in outstandingRequests
+          int[] arr = getRequestedPieces();
+          boolean found = false;
+          for (int i = 0; arr[i] >= 0; i++) {
+            if (arr[i] == r.piece) {
+              found = true;
+              break;
+            }
+          }
+          if (found) {
+            outstandingRequests.add(r);
+            if (!choked)
+              out.sendRequest(r);
+            lastRequest = r;
+            return true;
+          }
         }
         int nextPiece = listener.wantPiece(peer, bitfield);
         if (_log.shouldLog(Log.DEBUG))
