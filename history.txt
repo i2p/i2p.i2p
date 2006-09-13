@@ -1,6 +1,6 @@
-$Id: history.txt,v 1.518 2006-09-09 20:55:38 zzz Exp $
+$Id: history.txt,v 1.519 2006-09-13 18:02:08 zzz Exp $
 
-2006-09-10  zzz
+2006-09-13  zzz
     * i2psnark: Mark a peer's requests as unrequested on disconnect,
       preventing premature end game
     * i2psnark: Randomize selection of next piece during end game
