@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.519 2006-09-13 18:02:08 zzz Exp $
+$Id: history.txt,v 1.520 2006-09-13 18:24:14 zzz Exp $
+
+2006-09-13  zzz
+    * i2psnark: Fix restoral of partial pieces broken by last patch
 
 2006-09-13  zzz
     * i2psnark: Mark a peer's requests as unrequested on disconnect,

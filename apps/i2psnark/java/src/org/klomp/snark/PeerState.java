@@ -532,7 +532,7 @@ class PeerState
               break;
             }
           }
-          if (found) {
+          if (!found) {
             outstandingRequests.add(r);
             if (!choked)
               out.sendRequest(r);
