@@ -596,4 +596,10 @@ class PeerState
   {
         out.sendAlive();
   }
+
+  synchronized void retransmitRequests()
+  {
+      if (interesting && !choked)
+        out.retransmitRequests(outstandingRequests);
+  }
 }

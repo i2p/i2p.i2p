@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.520 2006-09-13 18:24:14 zzz Exp $
+$Id: history.txt,v 1.521 2006-09-13 21:37:33 zzz Exp $
+
+2006-09-16  zzz
+    * i2psnark: Implement retransmission of requests. This
+      eliminates one cause of complete stalls with a peer.
+      This problem is common on torrents with a small number of
+      active peers where there are no choke/unchokes to kickstart things.
 
 2006-09-13  zzz
     * i2psnark: Fix restoral of partial pieces broken by last patch

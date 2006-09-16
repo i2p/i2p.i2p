@@ -477,4 +477,14 @@ public class Peer implements Comparable
       s.keepAlive();
   }
 
+  /**
+   * Retransmit outstanding requests if necessary
+   */
+  public void retransmitRequests()
+  {
+    PeerState s = state;
+    if (s != null)
+      s.retransmitRequests();
+  }
+
 }

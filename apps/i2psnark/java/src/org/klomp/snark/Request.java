@@ -29,6 +29,7 @@ class Request
   final byte[] bs;
   final int off;
   final int len;
+  long sendTime;
 
   /**
    * Creates a new Request.

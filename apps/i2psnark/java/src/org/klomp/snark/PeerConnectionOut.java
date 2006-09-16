@@ -324,6 +324,23 @@ class PeerConnectionOut implements Runnable
     addMessage(m);
   }
 
+  /** reransmit requests not received in 7m */
+  private static final int REQ_TIMEOUT = (2 * SEND_TIMEOUT) + (60 * 1000);
+  void retransmitRequests(List requests)
+  {
+    long now = System.currentTimeMillis();
+    Iterator it = requests.iterator();
+    while (it.hasNext())
+      {
+        Request req = (Request)it.next();
+        if(now > req.sendTime + REQ_TIMEOUT) {
+          if (_log.shouldLog(Log.DEBUG))
+              _log.debug("Retransmit request " + req + " to peer " + peer);
+          sendRequest(req);
+        }
+      }
+  }
+
   void sendRequests(List requests)
   {
     Iterator it = requests.iterator();
@@ -336,12 +353,15 @@ class PeerConnectionOut implements Runnable
 
   void sendRequest(Request req)
   {
+    // should we check for duplicate requests to deal with fibrillating i2p-bt??
+    // or just send some cancels when we get an unwanted chunk??
     Message m = new Message();
     m.type = Message.REQUEST;
     m.piece = req.piece;
     m.begin = req.off;
     m.length = req.len;
     addMessage(m);
+    req.sendTime = System.currentTimeMillis();
   }
 
   void sendPiece(int piece, int begin, int length, byte[] bytes)
