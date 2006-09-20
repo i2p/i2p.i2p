@@ -353,8 +353,23 @@ class PeerConnectionOut implements Runnable
 
   void sendRequest(Request req)
   {
-    // should we check for duplicate requests to deal with fibrillating i2p-bt??
-    // or just send some cancels when we get an unwanted chunk??
+    // Check for duplicate requests to deal with fibrillating i2p-bt
+    // (multiple choke/unchokes received cause duplicate requests in the queue)
+    synchronized(sendQueue)
+      {
+        Iterator it = sendQueue.iterator();
+        while (it.hasNext())
+          {
+            Message m = (Message)it.next();
+            if (m.type == Message.REQUEST && m.piece == req.piece &&
+                m.begin == req.off && m.length == req.len)
+              {
+                if (_log.shouldLog(Log.DEBUG))
+                  _log.debug("Discarding duplicate request " + req + " to peer " + peer);
+                return;
+              }
+          }
+      }
     Message m = new Message();
     m.type = Message.REQUEST;
     m.piece = req.piece;

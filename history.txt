@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.521 2006-09-13 21:37:33 zzz Exp $
+$Id: history.txt,v 1.522 2006-09-16 16:07:30 zzz Exp $
+
+2006-09-20  zzz
+    * i2psnark: Eliminate duplicate requests caused by i2p-bt's
+      rapid choke/unchokes
+    * i2psnark: Truncate long TrackerErr messages on web page
 
 2006-09-16  zzz
     * i2psnark: Implement retransmission of requests. This

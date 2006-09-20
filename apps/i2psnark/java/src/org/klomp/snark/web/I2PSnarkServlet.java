@@ -290,6 +290,7 @@ public class I2PSnarkServlet extends HttpServlet {
     }
 
     private static final int MAX_DISPLAYED_FILENAME_LENGTH = 60;
+    private static final int MAX_DISPLAYED_ERROR_LENGTH = 30;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[]) throws IOException {
         String filename = snark.torrent;
         File f = new File(filename);
@@ -331,8 +332,11 @@ public class I2PSnarkServlet extends HttpServlet {
         if (err != null) {
             if (isRunning)
                 statusString = "TrackerErr (" + curPeers + "/" + knownPeers + " peers)";
-            else
+            else {
+                if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
+                    err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "...";
                 statusString = "TrackerErr (" + err + ")";
+            }
         } else if (remaining <= 0) {
             if (isRunning)
                 statusString = "Seeding (" + curPeers + "/" + knownPeers + " peers)";
