@@ -523,22 +523,25 @@ class PeerState
         // Check for adopting an orphaned partial piece
         Request r = listener.getPeerPartial(bitfield);
         if (r != null) {
-          // Check that r not already in outstandingRequests
-          int[] arr = getRequestedPieces();
-          boolean found = false;
-          for (int i = 0; arr[i] >= 0; i++) {
-            if (arr[i] == r.piece) {
-              found = true;
-              break;
+          synchronized(this)
+            {
+              // Check that r not already in outstandingRequests
+              int[] arr = getRequestedPieces();
+              boolean found = false;
+              for (int i = 0; arr[i] >= 0; i++) {
+                if (arr[i] == r.piece) {
+                  found = true;
+                  break;
+                }
+              }
+              if (!found) {
+                outstandingRequests.add(r);
+                if (!choked)
+                  out.sendRequest(r);
+                lastRequest = r;
+                return true;
+              }
             }
-          }
-          if (!found) {
-            outstandingRequests.add(r);
-            if (!choked)
-              out.sendRequest(r);
-            lastRequest = r;
-            return true;
-          }
         }
         int nextPiece = listener.wantPiece(peer, bitfield);
         if (_log.shouldLog(Log.DEBUG))

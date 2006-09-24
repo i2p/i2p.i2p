@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.522 2006-09-16 16:07:30 zzz Exp $
+$Id: history.txt,v 1.523 2006-09-20 17:39:26 zzz Exp $
+
+2006-09-24  zzz
+    * i2psnark: Add some synchronization to prevent rare problem
+      after restoring orphan piece
 
 2006-09-20  zzz
     * i2psnark: Eliminate duplicate requests caused by i2p-bt's
