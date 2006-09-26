@@ -55,4 +55,11 @@ public interface StorageListener
    *
    */
   void storageCompleted(Storage storage);
+
+  /** Reset the peer's wanted pieces table
+   *  Call after the storage double-check fails
+   *
+   * @param peer the peer
+   */
+  void setWantedPieces(Storage storage);
 }

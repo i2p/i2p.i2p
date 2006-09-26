@@ -693,6 +693,11 @@ public class Snark
         completeListener.torrentComplete(this);
   }
 
+  public void setWantedPieces(Storage storage)
+  {
+    coordinator.setWantedPieces();
+  }
+
   public void shutdown()
   {
     // Should not be necessary since all non-deamon threads should

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.523 2006-09-20 17:39:26 zzz Exp $
+$Id: history.txt,v 1.524 2006-09-24 13:30:23 zzz Exp $
+
+2006-09-25  zzz
+    * i2psnark: Paranoid copy before writing pieces,
+      recheck files on completion, redownload bad pieces
+    * i2psnark: Don't contact tracker as often when seeding
 
 2006-09-24  zzz
     * i2psnark: Add some synchronization to prevent rare problem

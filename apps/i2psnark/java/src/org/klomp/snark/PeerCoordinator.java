@@ -65,7 +65,7 @@ public class PeerCoordinator implements PeerListener
   private final byte[] id;
 
   // Some random wanted pieces
-  private final List wantedPieces;
+  private List wantedPieces;
 
   private boolean halted = false;
 
@@ -83,6 +83,15 @@ public class PeerCoordinator implements PeerListener
     this.listener = listener;
     this.snark = torrent;
 
+    setWantedPieces();
+
+    // Install a timer to check the uploaders.
+    timer.schedule(new PeerCheckerTask(this), CHECK_PERIOD, CHECK_PERIOD);
+  }
+  
+  // only called externally from Storage after the double-check fails
+  public void setWantedPieces()
+  {
     // Make a list of pieces
     wantedPieces = new ArrayList();
     BitField bitfield = storage.getBitField();
@@ -90,11 +99,8 @@ public class PeerCoordinator implements PeerListener
       if (!bitfield.get(i))
         wantedPieces.add(new Piece(i));
     Collections.shuffle(wantedPieces);
-
-    // Install a timer to check the uploaders.
-    timer.schedule(new PeerCheckerTask(this), CHECK_PERIOD, CHECK_PERIOD);
   }
-  
+
   public Storage getStorage() { return storage; }
   public CoordinatorListener getListener() { return listener; }
 

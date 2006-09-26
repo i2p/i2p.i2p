@@ -175,8 +175,10 @@ public class TrackerClient extends I2PThread
               {
                 // Sleep some minutes...
                 int delay;
-                if(coordinator.trackerProblems != null) {
+                if(coordinator.trackerProblems != null && !completed) {
                   delay = 60*1000;
+                } else if(completed) {
+                  delay = 3*SLEEP*60*1000 + r.nextInt(120*1000);
                 } else {
                   delay = SLEEP*60*1000 + r.nextInt(120*1000);
                   delay -= sleptTime;
@@ -209,6 +211,7 @@ public class TrackerClient extends I2PThread
               event = NO_EVENT;
             
             // Only do a request when necessary.
+            sleptTime = 0;
             if (event == COMPLETED_EVENT
                 || coordinator.needPeers()
                 || System.currentTimeMillis() > lastRequestTime + interval)
@@ -220,7 +223,6 @@ public class TrackerClient extends I2PThread
                                                  event);
 
                     coordinator.trackerProblems = null;
-                    sleptTime = 0;
                     Set peers = info.getPeers();
                     coordinator.trackerSeenPeers = peers.size();
                     if ( (left > 0) && (!completed) ) {

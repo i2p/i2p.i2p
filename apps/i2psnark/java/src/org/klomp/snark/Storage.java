@@ -39,7 +39,7 @@ public class Storage
 
   private final StorageListener listener;
 
-  private final BitField bitfield; // BitField to represent the pieces
+  private BitField bitfield; // BitField to represent the pieces
   private int needed; // Number of pieces needed
 
   // XXX - Not always set correctly
@@ -483,10 +483,11 @@ public class Storage
    * matches), otherwise false.
    * @exception IOException when some storage related error occurs.
    */
-  public boolean putPiece(int piece, byte[] bs) throws IOException
+  public boolean putPiece(int piece, byte[] ba) throws IOException
   {
     // First check if the piece is correct.
-    // If we were paranoia we could copy the array first.
+    // Copy the array first to be paranoid.
+    byte[] bs = (byte[]) ba.clone();
     int length = bs.length;
     boolean correctHash = metainfo.checkPiece(piece, bs, 0, length);
     if (listener != null)
@@ -505,6 +506,7 @@ public class Storage
             needed--;
             complete = needed == 0;
           }
+
       }
 
     // Early typecast, avoid possibly overflowing a temp integer
@@ -539,9 +541,25 @@ public class Storage
       }
 
     if (complete) {
-      listener.storageCompleted(this);
+//    listener.storageCompleted(this);
       // do we also need to close all of the files and reopen
       // them readonly?
+
+      // Do a complete check to be sure.
+      // Temporarily resets the 'needed' variable and 'bitfield', then call
+      // checkCreateFiles() which will set 'needed' and 'bitfield'
+      // and also call listener.storageCompleted() if the double-check
+      // was successful.
+      // Todo: set a listener variable so the web shows "checking" and don't
+      // have the user panic when completed amount goes to zero temporarily?
+      needed = metainfo.getPieces();
+      bitfield = new BitField(needed);
+      checkCreateFiles();
+      if (needed > 0) {
+        listener.setWantedPieces(this);
+        Snark.debug("WARNING: Not really done, missing " + needed
+                    + " pieces", Snark.WARNING);
+      }
     }
 
     return true;
