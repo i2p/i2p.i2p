@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.526 2006-09-26 23:02:13 complication Exp $
+$Id: history.txt,v 1.527 2006-09-26 23:31:34 complication Exp $
+
+2006-09-26  Complication
+    * Take back another inadverent logging change in NTCPConnection
 
 2006-09-26  Complication
     * Take back an accidental log level change

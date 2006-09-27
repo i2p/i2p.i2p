@@ -1011,11 +1011,10 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
 
     private void sendMeta() {
         byte encrypted[] = new byte[_meta.length];
-        long ts = _context.clock().now()/1000;
         synchronized (_meta) {
             _context.random().nextBytes(_meta); // randomize the uninterpreted, then overwrite w/ data
             DataHelper.toLong(_meta, 0, 2, 0);
-            DataHelper.toLong(_meta, 2, 4, ts);
+            DataHelper.toLong(_meta, 2, 4, _context.clock().now()/1000);
             Adler32 crc = new Adler32();
             crc.update(_meta, 0, _meta.length-4);
             DataHelper.toLong(_meta, _meta.length-4, 4, crc.getValue());
@@ -1024,7 +1023,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         System.arraycopy(encrypted, encrypted.length-16, _prevWriteEnd, 0, _prevWriteEnd.length);
         // perhaps this should skip the bw limiter to reduce clock skew issues?
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending NTCP metadata with timestamp " + ts);
+            _log.debug("Sending NTCP metadata");
         _sendingMeta = true;
         _transport.getPumper().wantsWrite(this, encrypted);
         // enqueueInfoMessage(); // this often?
