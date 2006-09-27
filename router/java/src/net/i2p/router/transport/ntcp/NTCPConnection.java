@@ -996,8 +996,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         } else {
             long newSkew = (ourTs - ts);
             if (Math.abs(newSkew*1000) > Router.CLOCK_FUDGE_FACTOR) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Peer's skew jumped too far (from " + _clockSkew + " s to " + newSkew + " s): " + toString());
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Peer's skew jumped too far (from " + _clockSkew + " s to " + newSkew + " s): " + toString());
                 _context.statManager().addRateData("ntcp.corruptSkew", newSkew, getUptime());
                 close();
                 return;

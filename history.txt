@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.525 2006-09-25 22:11:41 zzz Exp $
+$Id: history.txt,v 1.526 2006-09-26 23:02:13 complication Exp $
+
+2006-09-26  Complication
+    * Take back an accidental log level change
 
 2006-09-26  Complication
     * Subclass from Clock a RouterClock which can access router transports,
