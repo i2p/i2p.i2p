@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.524 2006-09-24 13:30:23 zzz Exp $
+$Id: history.txt,v 1.525 2006-09-25 22:11:41 zzz Exp $
+
+2006-09-26  Complication
+    * Subclass from Clock a RouterClock which can access router transports,
+      with the goal of developing it to second-guess NTP results
+    * Make transports report clock skew in seconds
+    * Adjust renderStatusHTML() methods accordingly
+    * Show average for NTCP clock skews too
+    * Give transports a getClockSkews() method to report clock skews
+    * Give transport manager a getClockSkews() method to aggregate results
+    * Give comm system facade a getMedianPeerClockSkew() method which RouterClock calls
+      (to observe results, add "net.i2p.router.transport.CommSystemFacadeImpl=WARN" to logging)
+    * Extra explicitness in NTCP classes to denote unit of time.
+    * Fix some places in NTCPConnection where milliseconds and seconds were confused
 
 2006-09-25  zzz
     * i2psnark: Paranoid copy before writing pieces,

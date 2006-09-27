@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import net.i2p.data.Hash;
 
 import net.i2p.data.RouterAddress;
@@ -40,6 +41,7 @@ public interface Transport {
     
     public int countActivePeers();    
     public int countActiveSendPeers();
+    public Vector getClockSkews();
     public List getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;

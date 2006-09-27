@@ -68,7 +68,7 @@ public class I2PAppContext {
     private LogManager _logManager;
     private HMACGenerator _hmac;
     private SHA256Generator _sha;
-    private Clock _clock;
+    protected Clock _clock; // overridden in RouterContext
     private DSAEngine _dsa;
     private RoutingKeyGenerator _routingKeyGenerator;
     private RandomSource _random;
@@ -83,7 +83,7 @@ public class I2PAppContext {
     private volatile boolean _logManagerInitialized;
     private volatile boolean _hmacInitialized;
     private volatile boolean _shaInitialized;
-    private volatile boolean _clockInitialized;
+    protected volatile boolean _clockInitialized; // used in RouterContext
     private volatile boolean _dsaInitialized;
     private volatile boolean _routingKeyGeneratorInitialized;
     private volatile boolean _randomInitialized;
@@ -411,11 +411,11 @@ public class I2PAppContext {
      * enable simulators to play with clock skew among different instances.
      *
      */
-    public Clock clock() { 
+    public Clock clock() { // overridden in RouterContext
         if (!_clockInitialized) initializeClock();
         return _clock;
     }
-    private void initializeClock() {
+    protected void initializeClock() { // overridden in RouterContext
         synchronized (this) {
             if (_clock == null)
                 _clock = new Clock(this);

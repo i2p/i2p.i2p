@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
@@ -148,6 +149,23 @@ public class TransportManager implements TransportEventListener {
             peers += ((Transport)_transports.get(i)).countActiveSendPeers();
         }
         return peers;
+    }
+    
+    /**
+     * Return our peer clock skews on all transports.
+     * Vector composed of Long, each element representing a peer skew in seconds.
+     * Note: this method returns them in whimsical order.
+     */
+    public Vector getClockSkews() {
+        Vector skews = new Vector();
+        for (int i = 0; i < _transports.size(); i++) {
+            Vector tempSkews = ((Transport)_transports.get(i)).getClockSkews();
+            if ((tempSkews == null) || (tempSkews.size() <= 0)) continue;
+            skews.addAll(tempSkews);
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Transport manager returning " + skews.size() + " peer clock skews.");
+        return skews;
     }
     
     public short getReachabilityStatus() { 

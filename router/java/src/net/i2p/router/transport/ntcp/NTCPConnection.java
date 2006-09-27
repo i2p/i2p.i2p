@@ -67,7 +67,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private boolean _closed;
     private NTCPAddress _remAddr;
     private RouterIdentity _remotePeer;
-    private long _clockSkew;
+    private long _clockSkew; // in seconds
     /**
      * pending unprepared OutNetMessage instances
      */
@@ -168,7 +168,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     public RouterIdentity getRemotePeer() { return _remotePeer; }
     public void setRemotePeer(RouterIdentity ident) { _remotePeer = ident; }
     /** 
-     * @param clockSkew alice's clock minus bob's clock (may be negative, obviously, but |val| should
+     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      */
     public void finishInboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
@@ -360,7 +360,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
     
     /** 
-     * @param clockSkew alice's clock minus bob's clock (may be negative, obviously, but |val| should
+     * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
      *                  be under 1 minute)
      */
     public void finishOutboundEstablishment(SessionKey key, long clockSkew, byte prevWriteEnd[], byte prevReadEnd[]) {
@@ -995,26 +995,27 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             return;
         } else {
             long newSkew = (ourTs - ts);
-            if ( (newSkew > Router.CLOCK_FUDGE_FACTOR) || (newSkew < 0-Router.CLOCK_FUDGE_FACTOR) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Peer's skew jumped too far (from " + _clockSkew + " to " + newSkew + "): " + toString());
+            if (Math.abs(newSkew*1000) > Router.CLOCK_FUDGE_FACTOR) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Peer's skew jumped too far (from " + _clockSkew + " s to " + newSkew + " s): " + toString());
                 _context.statManager().addRateData("ntcp.corruptSkew", newSkew, getUptime());
                 close();
                 return;
             }
             _context.statManager().addRateData("ntcp.receiveMeta", newSkew, getUptime());
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received NTCP metadata, old skew of " + _clockSkew + ", new skew of " + newSkew);
+                _log.debug("Received NTCP metadata, old skew of " + _clockSkew + " s, new skew of " + newSkew + "s.");
             _clockSkew = newSkew;
         }
     }
 
     private void sendMeta() {
         byte encrypted[] = new byte[_meta.length];
+        long ts = _context.clock().now()/1000;
         synchronized (_meta) {
             _context.random().nextBytes(_meta); // randomize the uninterpreted, then overwrite w/ data
             DataHelper.toLong(_meta, 0, 2, 0);
-            DataHelper.toLong(_meta, 2, 4, _context.clock().now()/1000);
+            DataHelper.toLong(_meta, 2, 4, ts);
             Adler32 crc = new Adler32();
             crc.update(_meta, 0, _meta.length-4);
             DataHelper.toLong(_meta, _meta.length-4, 4, crc.getValue());
@@ -1023,7 +1024,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         System.arraycopy(encrypted, encrypted.length-16, _prevWriteEnd, 0, _prevWriteEnd.length);
         // perhaps this should skip the bw limiter to reduce clock skew issues?
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending NTCP metadata");
+            _log.debug("Sending NTCP metadata with timestamp " + ts);
         _sendingMeta = true;
         _transport.getPumper().wantsWrite(this, encrypted);
         // enqueueInfoMessage(); // this often?

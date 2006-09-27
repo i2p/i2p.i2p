@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
+import java.util.Collections;
 
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
@@ -57,6 +59,35 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     public int countActivePeers() { return (_manager == null ? 0 : _manager.countActivePeers()); }
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
+
+    /**
+     * Median clock skew of connected peers in seconds, or null if we cannot answer.
+     */
+    public Long getMedianPeerClockSkew() {
+        if (_manager == null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Returning null for median peer clock skew (no transport manager)!");
+            return null;
+        }
+        Vector skews = _manager.getClockSkews();
+        if (skews == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Returning null for median peer clock skew (no data)!");
+            return null;
+        }
+        if (skews.size() < 5) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Returning null for median peer clock skew (only " + skews.size() + " peers)!");
+            return null;
+        }
+        // Going to calculate, let's sort them
+        Collections.sort(skews);
+        // Pick out median
+        Long medianPeerClockSkew = (Long) (skews.get(skews.size() / 2));
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Our median peer clock skew is " + medianPeerClockSkew + " s.");
+        return medianPeerClockSkew;
+    }
     
     public List getBids(OutNetMessage msg) {
         return _manager.getBids(msg);

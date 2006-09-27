@@ -13,12 +13,16 @@ import net.i2p.time.Timestamper;
  * between the local computer's current time and the time as known by some reference
  * (such as an NTP synchronized clock).
  *
+ * Protected members are used in the subclass RouterClock,
+ * which has access to a router's transports (particularly peer clock skews)
+ * to second-guess the sanity of clock adjustments.
+ *
  */
 public class Clock implements Timestamper.UpdateListener {
-    private I2PAppContext _context;
+    protected I2PAppContext _context;
     private Timestamper _timestamper;
-    private long _startedOn;
-    private boolean _statCreated;
+    protected long _startedOn;
+    protected boolean _statCreated;
     
     public Clock(I2PAppContext context) {
         _context = context;
@@ -36,10 +40,10 @@ public class Clock implements Timestamper.UpdateListener {
     public Timestamper getTimestamper() { return _timestamper; }
     
     /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
-    private Log getLog() { return _context.logManager().getLog(Clock.class); }
+    protected Log getLog() { return _context.logManager().getLog(Clock.class); }
     
-    private volatile long _offset;
-    private boolean _alreadyChanged;
+    protected volatile long _offset;
+    protected boolean _alreadyChanged;
     private Set _listeners;
 
     /** if the clock is skewed by 3+ days, fuck 'em */
@@ -132,7 +136,7 @@ public class Clock implements Timestamper.UpdateListener {
         }
     }
 
-    private void fireOffsetChanged(long delta) {
+    protected void fireOffsetChanged(long delta) {
         synchronized (_listeners) {
             for (Iterator iter = _listeners.iterator(); iter.hasNext();) {
                 ClockUpdateListener lsnr = (ClockUpdateListener) iter.next();

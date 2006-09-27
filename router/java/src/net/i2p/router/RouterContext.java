@@ -26,6 +26,8 @@ import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
 import net.i2p.router.tunnel.TunnelDispatcher;
+import net.i2p.util.Clock;
+import net.i2p.router.RouterClock;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to
@@ -59,13 +61,15 @@ public class RouterContext extends I2PAppContext {
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
+    private RouterClock _clock;
     private Calculator _isFailingCalc;
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
     private Calculator _reliabilityCalc;
     private Calculator _capacityCalc;
     private Calculator _oldSpeedCalc;
-    
+
+
     private static List _contexts = new ArrayList(1);
     
     public RouterContext(Router router) { this(router, null); }
@@ -323,4 +327,25 @@ public class RouterContext extends I2PAppContext {
         }
         return super.getProperty(propName, defaultVal);
     }
+
+    /**
+     * The context's synchronized clock, which is kept context specific only to
+     * enable simulators to play with clock skew among different instances.
+     *
+     * It wouldn't be necessary to override clock(), except for the reason
+     * that it triggers initializeClock() of which we definitely
+     * need the local version to run.
+     */
+    public Clock clock() {
+        if (!_clockInitialized) initializeClock();
+        return _clock;
+    }
+    protected void initializeClock() {
+        synchronized (this) {
+            if (_clock == null)
+                _clock = new RouterClock(this);
+            _clockInitialized = true;
+        }
+    }
+
 }

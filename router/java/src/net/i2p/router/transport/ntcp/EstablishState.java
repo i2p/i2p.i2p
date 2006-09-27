@@ -192,7 +192,7 @@ public class EstablishState {
                     System.arraycopy(_X, 0, xy, 0, _X.length);
                     System.arraycopy(_Y, 0, xy, _X.length, _Y.length);
                     Hash hxy = _context.sha().calculateHash(xy);
-                    _tsB = _context.clock().now()/1000l;
+                    _tsB = _context.clock().now()/1000l; // our (Bob's) timestamp in seconds
                     byte padding[] = new byte[12]; // the encrypted data needs an extra 12 bytes
                     _context.random().nextBytes(padding);
                     byte toEncrypt[] = new byte[hxy.getData().length+4+padding.length];
@@ -341,8 +341,8 @@ public class EstablishState {
                     fail("Invalid H(X+Y) - mitm attack attempted?");
                     return;
                 }
-                _tsB = DataHelper.fromLong(hXY_tsB, Hash.HASH_LENGTH, 4);
-                _tsA = _context.clock().now()/1000;
+                _tsB = DataHelper.fromLong(hXY_tsB, Hash.HASH_LENGTH, 4); // their (Bob's) timestamp in seconds
+                _tsA = _context.clock().now()/1000; // our (Alice's) timestamp in seconds
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"h(X+Y) is correct, tsA-tsB=" + (_tsA-_tsB));
                
@@ -352,11 +352,11 @@ public class EstablishState {
                 if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
                     _transport.markReachable(_con.getRemotePeer().calculateHash());
-                    _context.shitlist().shitlistRouter(_con.getRemotePeer().calculateHash(), "Outbound clock skew of " + diff);
-                    fail("Clocks too skewed (" + diff + ")", null, true);
+                    _context.shitlist().shitlistRouter(_con.getRemotePeer().calculateHash(), "Outbound clock skew of " + diff + " ms");
+                    fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug(prefix()+"Clock skew: " + diff);
+                    _log.debug(prefix()+"Clock skew: " + diff + " ms");
                 }
                 
                 // now prepare and send our response
@@ -455,7 +455,7 @@ public class EstablishState {
                         System.arraycopy(_prevEncrypted, _prevEncrypted.length-16, nextWriteIV, 0, 16);
                         byte nextReadIV[] = new byte[16];
                         System.arraycopy(_e_bobSig, _e_bobSig.length-16, nextReadIV, 0, nextReadIV.length);
-                        _con.finishOutboundEstablishment(_dh.getSessionKey(), 1000*(_tsA-_tsB), nextWriteIV, nextReadIV);
+                        _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, nextReadIV); // skew in seconds
                         return;
                     }
                 }
@@ -537,11 +537,11 @@ public class EstablishState {
                 if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
                     _transport.markReachable(alice.calculateHash());
-                    _context.shitlist().shitlistRouter(alice.calculateHash(), "Clock skew of " + diff);
-                    fail("Clocks too skewed (" + diff + ")", null, true);
+                    _context.shitlist().shitlistRouter(alice.calculateHash(), "Clock skew of " + diff + " ms");
+                    fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug(prefix()+"Clock skew: " + diff);
+                    _log.debug(prefix()+"Clock skew: " + diff + " ms");
                 }
 
                 sendInboundConfirm(alice, tsA);
@@ -550,7 +550,7 @@ public class EstablishState {
                     _log.debug(prefix()+"e_bobSig is " + _e_bobSig.length + " bytes long");
                 byte iv[] = new byte[16];
                 System.arraycopy(_e_bobSig, _e_bobSig.length-16, iv, 0, 16);
-                _con.finishInboundEstablishment(_dh.getSessionKey(), 1000*(tsA-_tsB), iv, _prevEncrypted);
+                _con.finishInboundEstablishment(_dh.getSessionKey(), (tsA-_tsB), iv, _prevEncrypted); // skew in seconds
                 if (_log.shouldLog(Log.INFO))
                     _log.info(prefix()+"Verified remote peer as " + alice.calculateHash().toBase64());
             } else {
@@ -670,7 +670,7 @@ public class EstablishState {
                 long skewSeconds = (ctx.clock().now()/1000)-now;
                 if (log.shouldLog(Log.INFO))
                     log.info("Check info received: our IP: " + ourIP + " our port: " + port 
-                             + " skew: " + skewSeconds);
+                             + " skew: " + skewSeconds + " s");
             } catch (UnknownHostException uhe) {
                 // ipSize is invalid
                 if (log.shouldLog(Log.WARN))

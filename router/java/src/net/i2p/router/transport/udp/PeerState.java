@@ -332,7 +332,7 @@ public class PeerState {
     /** when were the current cipher and MAC keys established/rekeyed? */
     public long getKeyEstablishedTime() { return _keyEstablishedTime; }
     /** how far off is the remote peer from our clock, in seconds? */
-    public short getClockSkew() { return _clockSkew; }
+    public short getClockSkew() { return ( (short) (_clockSkew / 1000)); }
     /** what is the current receive second, for congestion control? */
     public long getCurrentReceiveSecond() { return _currentReceiveSecond; }
     /** when did we last send them a packet? */

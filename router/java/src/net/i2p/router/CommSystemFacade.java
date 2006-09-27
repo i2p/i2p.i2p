@@ -34,6 +34,12 @@ public abstract class CommSystemFacade implements Service {
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
     /**
+     * Median clock skew of connected peers in seconds, or null if we cannot answer.
+     * CommSystemFacadeImpl overrides this.
+     */
+    public Long getMedianPeerClockSkew() { return null; }
+    
+    /**
      * Determine under what conditions we are remotely reachable.
      *
      */

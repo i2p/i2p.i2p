@@ -67,6 +67,13 @@ public abstract class TransportImpl implements Transport {
      */
     public int countActiveSendPeers() { return 0; }
     
+    /**
+     * Return our peer clock skews on a transport.
+     * Vector composed of Long, each element representing a peer skew in seconds.
+     * Dummy version. Transports override it.
+     */
+    public Vector getClockSkews() { return new Vector(); }
+    
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     /**
      * Nonblocking call to pull the next outbound message

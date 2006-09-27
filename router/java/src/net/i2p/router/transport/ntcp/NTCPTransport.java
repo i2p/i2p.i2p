@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.Vector;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -344,6 +345,28 @@ public class NTCPTransport extends TransportImpl {
         return active;
     }
     
+    /**
+     * Return our peer clock skews on this transport.
+     * Vector composed of Long, each element representing a peer skew in seconds.
+     */
+    public Vector getClockSkews() {
+
+        Vector peers = new Vector();
+        Vector skews = new Vector();
+
+        synchronized (_conLock) {
+            peers.addAll(_conByIdent.values());
+        }
+
+        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
+            NTCPConnection con = (NTCPConnection)iter.next();
+            skews.addElement(new Long (con.getClockSkew()));
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");
+        return skews;
+    }
+    
     private static final int NUM_CONCURRENT_READERS = 3;
     private static final int NUM_CONCURRENT_WRITERS = 3;
     
@@ -565,8 +588,9 @@ public class NTCPTransport extends TransportImpl {
                 buf.append("</td><td>For ").append(DataHelper.formatDuration(readTime));
                 readingPeers++;
             }
-            buf.append("</td><td>").append(DataHelper.formatDuration(con.getClockSkew()));
-            buf.append("</td></tr>\n");
+            offsetTotal = offsetTotal + con.getClockSkew();
+            buf.append("</td><td>").append(con.getClockSkew());
+            buf.append("s</td></tr>\n");
             out.write(buf.toString());
             buf.setLength(0);
         }
@@ -576,8 +600,9 @@ public class NTCPTransport extends TransportImpl {
             buf.append("<tr><td>").append(peers.size()).append(" peers</td><td>&nbsp;</td><td>").append(DataHelper.formatDuration(totalUptime/peers.size()));
             buf.append("</td><td>&nbsp;</td><td>").append(totalSend).append("</td><td>").append(totalRecv);
             buf.append("</td><td>").append(formatRate(bpsSend/1024)).append("/").append(formatRate(bpsRecv/1024)).append("KBps");
-            buf.append("</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
-            buf.append("</tr>\n");
+            buf.append("</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;");
+            buf.append("</td><td>").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
+            buf.append("</td></tr>\n");
         }
                 
         buf.append("</table>\n");

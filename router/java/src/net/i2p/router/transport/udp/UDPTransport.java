@@ -1207,6 +1207,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
+    /**
+     * Return our peer clock skews on this transport.
+     * Vector composed of Long, each element representing a peer skew in seconds.
+     */
+    public Vector getClockSkews() {
+
+        Vector skews = new Vector();
+        Vector peers = new Vector();
+
+        synchronized (_peersByIdent) {
+            peers.addAll(_peersByIdent.values());
+        }
+
+        long now = _context.clock().now();
+        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
+            PeerState peer = (PeerState)iter.next();
+            if (now-peer.getLastReceiveTime() > 60*60*1000) continue; // skip old peers
+            skews.addElement(new Long (peer.getClockSkew()));
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("UDP transport returning " + skews.size() + " peer clock skews.");
+        return skews;
+    }
+    
     private static UDPTransport __instance;
     /** **internal, do not use** */
     public static final UDPTransport _instance() { return __instance; }
@@ -1686,7 +1710,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</code></td>");
             
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getClockSkew()/1000);
+            buf.append(peer.getClockSkew());
             buf.append("s</code></td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
@@ -1783,7 +1807,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(formatKBps(bpsIn)).append("KBps/").append(formatKBps(bpsOut));
         buf.append("KBps</td>");
         buf.append("     <td>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
-        buf.append("</td><td>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal/numPeers) : "0ms").append("</td>\n");
+        buf.append("</td><td>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal*1000/numPeers) : "0ms").append("</td>\n");
         buf.append("     <td>");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
         buf.append("</td><td>&nbsp;</td>\n");
