@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.527 2006-09-26 23:31:34 complication Exp $
+$Id: history.txt,v 1.528 2006-09-26 23:44:13 complication Exp $
+
+2006-09-27  jrandom
+    * added HMAC-SHA256
+    * properly use CRLF with EepPost
+    * suppress jbigi/jcpuid messages if jbigi.dontLog/jcpuid.dontLog is set
+    * PBE session key generation (with 1000 rounds of SHA256)
+    * misc SDK helper functions
 
 2006-09-26  Complication
     * Take back another inadverent logging change in NTCPConnection

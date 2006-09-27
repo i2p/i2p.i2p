@@ -13,6 +13,7 @@ import net.i2p.util.Log;
 public class EepPost {
     private I2PAppContext _context;
     private Log _log;
+    private static final String CRLF = "\r\n";
     
     public EepPost() {
         this(I2PAppContext.getGlobalContext());
@@ -65,6 +66,7 @@ public class EepPost {
             _onCompletion = onCompletion;
         }
         public void run() {
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("Running the post task");
             Socket s = null;
             try {
                 URL u = new URL(_url);
@@ -81,17 +83,20 @@ public class EepPost {
                     _proxyPort = p;
                 }
 
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Connecting to the server/proxy...");
                 s = new Socket(_proxyHost, _proxyPort);
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Connected");
                 OutputStream out = s.getOutputStream();
                 String sep = getSeparator();
                 long length = calcContentLength(sep, _fields);
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Separator: " + sep + " content length: " + length);
                 String header = getHeader(isProxy, path, h, p, sep, length);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Header: \n" + header);
                 out.write(header.getBytes());
                 out.flush();
                 if (false) {
-                    out.write(("--" + sep + "\ncontent-disposition: form-data; name=\"field1\"\n\nStuff goes here\n--" + sep + "--\n").getBytes()); 
+                    out.write(("--" + sep + CRLF + "content-disposition: form-data; name=\"field1\"" + CRLF + CRLF + "Stuff goes here" + CRLF + "--" + sep + "--" + CRLF).getBytes()); 
                 } else {
                     sendFields(out, sep, _fields);
                 }
@@ -121,18 +126,18 @@ public class EepPost {
             Object val = fields.get(key);
             if (val instanceof File) {
                 File f = (File)val;
-                len += ("--" + sep + "\nContent-Disposition: form-data; name=\"" + key + "\"; filename=\"" + f.getName() + "\"\n").length();
+                len += ("--" + sep + CRLF + "Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + f.getName() + "\"" + CRLF).length();
                 //len += ("Content-length: " + f.length() + "\n").length();
-                len += ("Content-Type: application/octet-stream\n\n").length();
+                len += ("Content-Type: application/octet-stream" + CRLF + CRLF).length();
                 len += f.length();
-                len += 1; // nl
+                len += CRLF.length(); // nl
             } else {
-                len += ("--" + sep + "\nContent-Disposition: form-data; name=\"" + key + "\"\n\n").length();
+                len += ("--" + sep + CRLF + "Content-Disposition: form-data; name=\"" + key + "\"" + CRLF + CRLF).length();
                 len += val.toString().length();
-                len += 1; // nl
+                len += CRLF.length(); // nl
             }
         }
-        len += 2 + sep.length() + 2;
+        len += 2 + sep.length() + 2 + CRLF.length(); //2 + sep.length() + 2;
         //len += 2;
         return len;
     }
@@ -145,29 +150,29 @@ public class EepPost {
             else
                 sendField(out, separator, field, val.toString());
         }
-        out.write(("--" + separator + "--\n").getBytes());
+        out.write(("--" + separator + "--" + CRLF).getBytes());
     }
     
     private void sendFile(OutputStream out, String separator, String field, File file) throws IOException {
         long len = file.length();
-        out.write(("--" + separator + "\n").getBytes());
-        out.write(("Content-Disposition: form-data; name=\"" + field + "\"; filename=\"" + file.getName() + "\"\n").getBytes());
+        out.write(("--" + separator + CRLF).getBytes());
+        out.write(("Content-Disposition: form-data; name=\"" + field + "\"; filename=\"" + file.getName() + "\"" + CRLF).getBytes());
         //out.write(("Content-length: " + len + "\n").getBytes());
-        out.write(("Content-Type: application/octet-stream\n\n").getBytes());
+        out.write(("Content-Type: application/octet-stream" + CRLF + CRLF).getBytes());
         FileInputStream in = new FileInputStream(file);
         byte buf[] = new byte[1024];
         int read = -1;
         while ( (read = in.read(buf)) != -1)
             out.write(buf, 0, read);
-        out.write("\n".getBytes());
+        out.write(CRLF.getBytes());
         in.close();
     }
     
     private void sendField(OutputStream out, String separator, String field, String val) throws IOException {
-        out.write(("--" + separator + "\n").getBytes());
-        out.write(("Content-Disposition: form-data; name=\"" + field + "\"\n\n").getBytes());
+        out.write(("--" + separator + CRLF).getBytes());
+        out.write(("Content-Disposition: form-data; name=\"" + field + "\"" + CRLF + CRLF).getBytes());
         out.write(val.getBytes());
-        out.write("\n".getBytes());
+        out.write(CRLF.getBytes());
     }
     
     private String getHeader(boolean isProxy, String path, String host, int port, String separator, long length) {
@@ -179,16 +184,16 @@ public class EepPost {
                 buf.append(":").append(port);
         }
         buf.append(path);
-        buf.append(" HTTP/1.1\n");
+        buf.append(" HTTP/1.1" + CRLF);
         buf.append("Host: ").append(host);
         if (port != 80)
             buf.append(":").append(port);
-        buf.append("\n");
-        buf.append("Connection: close\n");
-        buf.append("Content-length: ").append(length).append("\n");
+        buf.append(CRLF);
+        buf.append("Connection: close" + CRLF);
+        buf.append("Content-length: ").append(length).append(CRLF);
         buf.append("Content-type: multipart/form-data, boundary=").append(separator);
-        buf.append("\n");
-        buf.append("\n");
+        buf.append(CRLF);
+        buf.append(CRLF);
         return buf.toString();
     }
     

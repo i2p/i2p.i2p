@@ -91,7 +91,7 @@ public class NativeBigInteger extends BigInteger {
      * initialization?  this would otherwise use the Log component, but this makes
      * it easier for other systems to reuse this class
      */
-    private static final boolean _doLog = true;
+    private static final boolean _doLog = System.getProperty("jbigi.dontLog") == null;
     
     private final static String JBIGI_OPTIMIZATION_K6         = "k6";
     private final static String JBIGI_OPTIMIZATION_K6_2       = "k62";

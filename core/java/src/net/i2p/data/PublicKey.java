@@ -31,6 +31,11 @@ public class PublicKey extends DataStructureImpl {
     public PublicKey() {
         setData(null);
     }
+    public PublicKey(byte data[]) {
+        if ( (data == null) || (data.length != KEYSIZE_BYTES) )
+            throw new IllegalArgumentException("Data must be specified, and the correct size");
+        setData(data);
+    }
 
     /** constructs from base64
      * @param base64Data a string of base64 data (the output of .toBase64() called

@@ -32,6 +32,7 @@ public class PrivateKey extends DataStructureImpl {
     public PrivateKey() {
         setData(null);
     }
+    public PrivateKey(byte data[]) { setData(data); }
 
     /** constructs from base64
      * @param base64Data a string of base64 data (the output of .toBase64() called

@@ -9,6 +9,7 @@ package net.i2p.data;
  *
  */
 
+import gnu.crypto.hash.Sha256Standalone;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -770,9 +771,11 @@ public class DataHelper {
      * Read a newline delimited line from the stream, returning the line (without
      * the newline), or null if EOF reached before the newline was found
      */
-    public static String readLine(InputStream in) throws IOException {
+    public static String readLine(InputStream in) throws IOException { return readLine(in, (Sha256Standalone)null); }
+    /** update the hash along the way */
+    public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
         StringBuffer buf = new StringBuffer(128);
-        boolean ok = readLine(in, buf);
+        boolean ok = readLine(in, buf, hash);
         if (ok)
             return buf.toString();
         else
@@ -785,8 +788,13 @@ public class DataHelper {
      *              newline was found
      */
     public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
+        return readLine(in, buf, null);
+    }
+    /** update the hash along the way */
+    public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
         int c = -1;
         while ( (c = in.read()) != -1) {
+            if (hash != null) hash.update((byte)c);
             if (c == '\n')
                 break;
             buf.append((char)c);
@@ -797,6 +805,10 @@ public class DataHelper {
             return true;
     }
     
+    public static void write(OutputStream out, byte data[], Sha256Standalone hash) throws IOException {
+        hash.update(data);
+        out.write(data);
+    }
 
     public static List sortStructures(Collection dataStructures) {
         if (dataStructures == null) return new ArrayList();

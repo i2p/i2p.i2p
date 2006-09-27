@@ -32,7 +32,7 @@ public class CPUID {
      * initialization?  this would otherwise use the Log component, but this makes
      * it easier for other systems to reuse this class
      */
-    private static final boolean _doLog = true;
+    private static final boolean _doLog = System.getProperty("jcpuid.dontLog") == null;
 
     //.matches() is a java 1.4+ addition, using a simplified version for 1.3+
     //private static final boolean isX86 = System.getProperty("os.arch").toLowerCase().matches("i?[x0-9]86(_64)?");

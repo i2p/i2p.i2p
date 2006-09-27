@@ -14,6 +14,7 @@ import net.i2p.crypto.DummyElGamalEngine;
 import net.i2p.crypto.DummyPooledRandomSource;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
+import net.i2p.crypto.HMAC256Generator;
 import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.PersistentSessionKeyManager;
@@ -67,6 +68,7 @@ public class I2PAppContext {
     private AESEngine _AESEngine;
     private LogManager _logManager;
     private HMACGenerator _hmac;
+    private HMAC256Generator _hmac256;
     private SHA256Generator _sha;
     protected Clock _clock; // overridden in RouterContext
     private DSAEngine _dsa;
@@ -82,6 +84,7 @@ public class I2PAppContext {
     private volatile boolean _AESEngineInitialized;
     private volatile boolean _logManagerInitialized;
     private volatile boolean _hmacInitialized;
+    private volatile boolean _hmac256Initialized;
     private volatile boolean _shaInitialized;
     protected volatile boolean _clockInitialized; // used in RouterContext
     private volatile boolean _dsaInitialized;
@@ -351,6 +354,19 @@ public class I2PAppContext {
                 _hmac= new HMACGenerator(this);
             }
             _hmacInitialized = true;
+        }
+    }
+
+    public HMAC256Generator hmac256() {
+        if (!_hmac256Initialized) initializeHMAC256();
+        return _hmac256;
+    }
+    private void initializeHMAC256() {
+        synchronized (this) {
+            if (_hmac256 == null) {
+                _hmac256 = new HMAC256Generator(this);
+            }
+            _hmac256Initialized = true;
         }
     }
     

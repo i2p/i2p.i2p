@@ -9,10 +9,13 @@ package net.i2p.crypto;
  *
  */
 
+import gnu.crypto.hash.Sha256Standalone;
 import java.math.BigInteger;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -51,6 +54,18 @@ public class KeyGenerator {
         _context.random().nextBytes(data);
         key.setData(data);
         return key;
+    }
+    
+    private static final int PBE_ROUNDS = 1000;
+    /** PBE the passphrase with the salt */
+    public SessionKey generateSessionKey(byte salt[], byte passphrase[]) {
+        byte salted[] = new byte[16+passphrase.length];
+        System.arraycopy(salt, 0, salted, 0, Math.min(salt.length, 16));
+        System.arraycopy(passphrase, 0, salted, 16, passphrase.length);
+        byte h[] = _context.sha().calculateHash(salted).getData();
+        for (int i = 1; i < PBE_ROUNDS; i++)
+            _context.sha().calculateHash(h, 0, Hash.HASH_LENGTH, h, 0);
+        return new SessionKey(h);
     }
     
     /** standard exponent size */
@@ -95,7 +110,7 @@ public class KeyGenerator {
      * @return the corresponding PublicKey object
      */
     public static PublicKey getPublicKey(PrivateKey priv) {
-        BigInteger a = new NativeBigInteger(priv.toByteArray());
+        BigInteger a = new NativeBigInteger(1, priv.toByteArray());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
         PublicKey pub = new PublicKey();
         byte [] pubBytes = aalpha.toByteArray();
@@ -132,7 +147,7 @@ public class KeyGenerator {
      * @return a SigningPublicKey object
      */
     public static SigningPublicKey getSigningPublicKey(SigningPrivateKey priv) {
-        BigInteger x = new NativeBigInteger(priv.toByteArray());
+        BigInteger x = new NativeBigInteger(1, priv.toByteArray());
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         SigningPublicKey pub = new SigningPublicKey();
         byte [] pubBytes = padBuffer(y.toByteArray(), SigningPublicKey.KEYSIZE_BYTES);

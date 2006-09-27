@@ -20,7 +20,7 @@ import org.bouncycastle.crypto.macs.HMac;
 public class HMACGenerator {
     private I2PAppContext _context;
     /** set of available HMAC instances for calculate */
-    private List _available;
+    protected List _available;
     /** set of available byte[] buffers for verify */
     private List _availableTmp;
     
@@ -85,7 +85,7 @@ public class HMACGenerator {
         return eq;
     }
     
-    private HMac acquire() {
+    protected HMac acquire() {
         synchronized (_available) {
             if (_available.size() > 0)
                 return (HMac)_available.remove(0);
