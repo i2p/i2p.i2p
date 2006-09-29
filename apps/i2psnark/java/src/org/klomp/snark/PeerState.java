@@ -462,16 +462,12 @@ class PeerState
   /**
    * Adds a new request to the outstanding requests list.
    */
-  private void addRequest()
+  synchronized private void addRequest()
   {
     boolean more_pieces = true;
     while (more_pieces)
       {
-        synchronized(this)
-          {
-            more_pieces = outstandingRequests.size() < MAX_PIPELINE;
-          }
-        
+        more_pieces = outstandingRequests.size() < MAX_PIPELINE;
         // We want something and we don't have outstanding requests?
         if (more_pieces && lastRequest == null)
           more_pieces = requestNextPiece();
@@ -479,19 +475,14 @@ class PeerState
           {
             int pieceLength;
             boolean isLastChunk;
-            synchronized(this)
-              {
-                pieceLength = metainfo.getPieceLength(lastRequest.piece);
-                isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
-              }
+            pieceLength = metainfo.getPieceLength(lastRequest.piece);
+            isLastChunk = lastRequest.off + lastRequest.len == pieceLength;
 
             // Last part of a piece?
             if (isLastChunk)
               more_pieces = requestNextPiece();
             else
               {
-                synchronized(this)
-                  {
                     int nextPiece = lastRequest.piece;
                     int nextBegin = lastRequest.off + PARTSIZE;
                     byte[] bs = lastRequest.bs;
@@ -504,7 +495,6 @@ class PeerState
                     if (!choked)
                       out.sendRequest(req);
                     lastRequest = req;
-                  }
               }
           }
       }
@@ -523,8 +513,6 @@ class PeerState
         // Check for adopting an orphaned partial piece
         Request r = listener.getPeerPartial(bitfield);
         if (r != null) {
-          synchronized(this)
-            {
               // Check that r not already in outstandingRequests
               int[] arr = getRequestedPieces();
               boolean found = false;
@@ -541,13 +529,10 @@ class PeerState
                 lastRequest = r;
                 return true;
               }
-            }
         }
         int nextPiece = listener.wantPiece(peer, bitfield);
         if (_log.shouldLog(Log.DEBUG))
           _log.debug(peer + " want piece " + nextPiece);
-        synchronized(this)
-          {
             if (nextPiece != -1
                 && (lastRequest == null || lastRequest.piece != nextPiece))
               {
@@ -562,7 +547,6 @@ class PeerState
                 lastRequest = req;
                 return true;
               }
-          }
       }
 
     return false;

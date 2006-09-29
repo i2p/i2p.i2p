@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.528 2006-09-26 23:44:13 complication Exp $
+$Id: history.txt,v 1.529 2006-09-27 01:00:33 jrandom Exp $
+
+2006-09-29  zzz
+    * i2psnark: Second try at synchronization fix - synch addRequest()
+      completely rather than just portions of it and requestNextPiece()
 
 2006-09-27  jrandom
     * added HMAC-SHA256
