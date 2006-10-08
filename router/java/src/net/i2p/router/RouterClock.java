@@ -12,8 +12,8 @@ import net.i2p.util.Clock;
  * (such as an NTP synchronized clock).
  *
  * RouterClock is a subclass of Clock with access to router transports.
- * TODO: RouterClock is intended to become capable of second-guessing
- * the sanity of clock adjustments.
+ * Configuration permitting, it will block clock offset changes
+ * which would increase peer clock skew.
  */
 public class RouterClock extends Clock {
 
