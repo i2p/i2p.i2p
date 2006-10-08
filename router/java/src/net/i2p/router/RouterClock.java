@@ -31,9 +31,6 @@ public class RouterClock extends Clock {
      */
     public void setOffset(long offsetMs, boolean force) {
 
-        // To test new routines, calculate median peer clock skew
-        Long medianPeerClockSkew = _context.commSystem().getMedianPeerClockSkew();
-
         if (false) return;
         long delta = offsetMs - _offset;
         if (!force) {
@@ -56,7 +53,36 @@ public class RouterClock extends Clock {
                 _alreadyChanged = true;
                 return;
             }
+
+            // If so configured, check sanity of proposed clock offset
+            if (Boolean.valueOf(_context.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() == true) {
+
+                // Try calculating peer clock skew
+                Long peerClockSkew = _context.commSystem().getFramedAveragePeerClockSkew(50);
+
+                if (peerClockSkew != null) {
+
+                    // Predict the effect of applying the proposed clock offset
+                    long currentPeerClockSkew = peerClockSkew.longValue();
+                    long predictedPeerClockSkew = currentPeerClockSkew + (delta / 1000l);
+
+                    // Fail sanity check if applying the offset would increase peer clock skew
+                    if ((Math.abs(predictedPeerClockSkew) > (Math.abs(currentPeerClockSkew) + 5)) ||
+                        (Math.abs(predictedPeerClockSkew) > 20)) {
+
+                        getLog().error("Ignoring clock offset " + offsetMs + "ms (current " + _offset +
+                                       "ms) since it would increase peer clock skew from " + currentPeerClockSkew +
+                                       "s to " + predictedPeerClockSkew + "s. Broken server in pool.ntp.org?");
+                        return;
+                    } else {
+                        getLog().debug("Approving clock offset " + offsetMs + "ms (current " + _offset +
+                                       "ms) since it would decrease peer clock skew from " + currentPeerClockSkew +
+                                       "s to " + predictedPeerClockSkew + "s.");
+                    }
+                }
+            } // check sanity
         }
+
         if (_alreadyChanged) {
             if (delta > 15*1000)
                 getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");

@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.529 2006-09-27 01:00:33 jrandom Exp $
+$Id: history.txt,v 1.530 2006-09-29 18:54:19 zzz Exp $
+
+2006-10-08  Complication
+    * Add a framed average peer clock skew calculator
+    * Add config property "router.clockOffsetSanityCheck" to determine
+      if NTP-suggested clock offsets get sanity checked (default "true")
+    * Reject NTP-suggested clock offsets if they'd increase peer clock skew
+      by more than 5 seconds, or make it more than 20 seconds total
+    * Decrease log level in getMedianPeerClockSkew()
 
 2006-09-29  zzz
     * i2psnark: Second try at synchronization fix - synch addRequest()

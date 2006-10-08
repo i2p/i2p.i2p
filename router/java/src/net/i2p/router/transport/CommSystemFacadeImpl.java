@@ -84,9 +84,51 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         Collections.sort(skews);
         // Pick out median
         Long medianPeerClockSkew = (Long) (skews.get(skews.size() / 2));
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Our median peer clock skew is " + medianPeerClockSkew + " s.");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Our median peer clock skew is " + medianPeerClockSkew + " s.");
         return medianPeerClockSkew;
+    }
+    
+    /**
+     * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
+     * Average is calculated over the middle "percentToInclude" peers.
+     */
+    public Long getFramedAveragePeerClockSkew(int percentToInclude) {
+        if (_manager == null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Returning null for framed averege peer clock skew (no transport manager)!");
+            return null;
+        }
+        Vector skews = _manager.getClockSkews();
+        if (skews == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Returning null for framed average peer clock skew (no data)!");
+            return null;
+        }
+        if (skews.size() < 5) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Returning null for framed average peer clock skew (only " + skews.size() + " peers)!");
+            return null;
+        }
+        // Going to calculate, sort them
+        Collections.sort(skews);
+        // Calculate frame size
+        int frameSize = (skews.size() * percentToInclude / 100);
+        int first = (skews.size() / 2) - (frameSize / 2);
+        int last = (skews.size() / 2) + (frameSize / 2);
+        // Sum skew values
+        long sum = 0;
+        for (int i = first; i < last; i++) {
+            long value = ((Long) (skews.get(i))).longValue();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Adding clock skew " + i + " valued " + value + " s.");
+            sum = sum + value;
+        }
+        // Calculate average
+        Long framedAverageClockSkew = new Long(sum / frameSize);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Our framed average peer clock skew is " + framedAverageClockSkew + " s.");
+        return framedAverageClockSkew;
     }
     
     public List getBids(OutNetMessage msg) {
