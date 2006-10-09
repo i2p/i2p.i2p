@@ -13,8 +13,8 @@
  <b>Ident:</b> <jsp:getProperty name="helper" property="ident" /><br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
- <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><%
+ <b>Now:</b> <jsp:getProperty name="helper" property="time" /><!--<br />
+ <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a>--><%
     if (helper.updateAvailable()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
             out.print("<br />" + update.getStatus());

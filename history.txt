@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.530 2006-09-29 18:54:19 zzz Exp $
+$Id: history.txt,v 1.531 2006-10-08 17:52:59 complication Exp $
+
+* 2006-10-10  0.6.1.26 released
+
+2006-10-10  jrandom
+    * Removed the status display from the console, as its more confusing
+      than informative (though the content is still displayed in the HTML)
 
 2006-10-08  Complication
     * Add a framed average peer clock skew calculator

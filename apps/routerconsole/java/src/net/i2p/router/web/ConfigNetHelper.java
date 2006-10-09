@@ -50,8 +50,16 @@ public class ConfigNetHelper {
     }
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
-    public String getNtcphostname() { return _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); }
-    public String getNtcpport() { return _context.getProperty(PROP_I2NP_NTCP_PORT); }
+    public String getNtcphostname() {
+        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
+        if (hostname == null) return "";
+        return hostname;
+    }
+    public String getNtcpport() { 
+        String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
+        if (port == null) return "";
+        return port;
+    }
     
     public String getUdpAddress() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
