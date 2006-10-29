@@ -59,35 +59,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     public int countActivePeers() { return (_manager == null ? 0 : _manager.countActivePeers()); }
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
-
-    /**
-     * Median clock skew of connected peers in seconds, or null if we cannot answer.
-     */
-    public Long getMedianPeerClockSkew() {
-        if (_manager == null) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Returning null for median peer clock skew (no transport manager)!");
-            return null;
-        }
-        Vector skews = _manager.getClockSkews();
-        if (skews == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Returning null for median peer clock skew (no data)!");
-            return null;
-        }
-        if (skews.size() < 5) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Returning null for median peer clock skew (only " + skews.size() + " peers)!");
-            return null;
-        }
-        // Going to calculate, let's sort them
-        Collections.sort(skews);
-        // Pick out median
-        Long medianPeerClockSkew = (Long) (skews.get(skews.size() / 2));
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Our median peer clock skew is " + medianPeerClockSkew + " s.");
-        return medianPeerClockSkew;
-    }
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
@@ -105,9 +76,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 _log.error("Returning null for framed average peer clock skew (no data)!");
             return null;
         }
-        if (skews.size() < 5) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Returning null for framed average peer clock skew (only " + skews.size() + " peers)!");
+        if (skews.size() < 20) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Returning null for framed average peer clock skew (only " + skews.size() + " peers)!");
             return null;
         }
         // Going to calculate, sort them

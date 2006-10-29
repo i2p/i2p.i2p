@@ -26,7 +26,7 @@ public class Timestamper implements Runnable {
     private boolean _initialized;
     
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
-    private static final String DEFAULT_SERVER_LIST = "pool.ntp.org, pool.ntp.org, pool.ntp.org";
+    private static final String DEFAULT_SERVER_LIST = "0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org";
     private static final boolean DEFAULT_DISABLED = true;
     /** how many times do we have to query if we are changing the clock? */
     private static final int DEFAULT_CONCURRING_SERVERS = 3;

@@ -1,6 +1,14 @@
-$Id: history.txt,v 1.531 2006-10-08 17:52:59 complication Exp $
+$Id: history.txt,v 1.532 2006-10-08 20:44:47 jrandom Exp $
 
 * 2006-10-10  0.6.1.26 released
+
+2006-10-29  Complication
+    * Ensure we get NTP samples from more diverse sources
+      (0.pool.ntp.org, 1.pool.ntp.org, etc)
+    * Discard median-based peer skew calculator as framed average works,
+      and adjusting its percentage can make it behave median-like
+    * Require more data points (from at least 20 peers)
+      before considering a peer skew measurement reliable
 
 2006-10-10  jrandom
     * Removed the status display from the console, as its more confusing
