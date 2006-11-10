@@ -153,7 +153,10 @@ public class TrackerClient extends I2PThread
                 coordinator.trackerProblems = ioe.getMessage();
               }
 
-            if (!started && !stop)
+            if (stop)
+              break;
+       
+            if (!started)
               {
                 Snark.debug("         Retrying in one minute...", Snark.DEBUG);
                 try

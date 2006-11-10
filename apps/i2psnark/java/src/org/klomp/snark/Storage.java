@@ -219,6 +219,8 @@ public class Storage
       {
         File f = (File)it.next();
         names[i] = f.getPath();
+	if (base.isDirectory() && names[i].startsWith(base.getPath()))
+          names[i] = names[i].substring(base.getPath().length() + 1);
         lengths[i] = f.length();
         rafs[i] = new RandomAccessFile(f, "r");
         i++;

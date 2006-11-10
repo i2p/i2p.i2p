@@ -249,7 +249,9 @@ public class I2PSnarkServlet extends HttpServlet {
                 if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
                     announceURL = announceURLOther;
 
-                if (baseFile.exists() && baseFile.isFile()) {
+                if (announceURL == null || announceURL.length() <= 0)
+                    _manager.addMessage("Error creating torrent - you must select a tracker");
+                else if (baseFile.exists()) {
                     try {
                         Storage s = new Storage(baseFile, announceURL, null);
                         s.create();
@@ -267,10 +269,8 @@ public class I2PSnarkServlet extends HttpServlet {
                     } catch (IOException ioe) {
                         _manager.addMessage("Error creating a torrent for " + baseFile.getAbsolutePath() + ": " + ioe.getMessage());
                     }
-                } else if (baseFile.exists()) {
-                    _manager.addMessage("I2PSnark doesn't yet support creating multifile torrents");
                 } else {
-                    _manager.addMessage("Cannot create a torrent for the nonexistant data: " + baseFile.getAbsolutePath());
+                    _manager.addMessage("Cannot create a torrent for the nonexistent data: " + baseFile.getAbsolutePath());
                 }
             }
         }
@@ -418,7 +418,8 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("From URL&nbsp;: <input type=\"text\" name=\"newURL\" size=\"50\" value=\"" + newURL + "\" /> \n");
+        out.write("<span class=\"snarkConfigTitle\">Add Torrent:</span><br />\n");
+        out.write("From URL&nbsp;: <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" /> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
         out.write("<input type=\"submit\" value=\"Add torrent\" name=\"action\" /><br />\n");
@@ -433,10 +434,11 @@ public class I2PSnarkServlet extends HttpServlet {
         if (baseFile == null)
             baseFile = "";
         
-        out.write("<span class=\"snarkNewTorrent\">\n");
+        out.write("<span class=\"snarkNewTorrent\"><hr />\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
+        out.write("<span class=\"snarkConfigTitle\">Create Torrent:</span><br />\n");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
         out.write("Data to seed: " + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
                   + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
@@ -517,7 +519,7 @@ public class I2PSnarkServlet extends HttpServlet {
             String val = (String)options.get(key);
             opts.append(key).append('=').append(val).append(' ');
         }
-        out.write("I2CP opts: <input type=\"text\" name=\"i2cpOpts\" size=\"40\" value=\""
+        out.write("I2CP opts: <input type=\"text\" name=\"i2cpOpts\" size=\"80\" value=\""
                   + opts.toString() + "\" /><br />\n");
         out.write("<input type=\"submit\" value=\"Save configuration\" name=\"action\" />\n");
         out.write("</span>\n");
@@ -590,8 +592,6 @@ public class I2PSnarkServlet extends HttpServlet {
                                          "}\n" +
                                          ".snarkNewTorrent {\n" +
                                          "	font-size: 10pt;\n" +
-                                         "	font-family: monospace;\n" +
-                                         "	background-color: #ADAE9;\n" +
                                          "}\n" +
                                          ".snarkAddInfo {\n" +
                                          "	font-size: 10pt;\n" +

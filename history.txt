@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.532 2006-10-08 20:44:47 jrandom Exp $
+$Id: history.txt,v 1.533 2006-10-29 14:29:50 complication Exp $
+
+2006-10-29  zzz
+    * i2psnark: Fix and enable generation of multifile torrents,
+      print error if no tracker selected at create-torrent,
+      fix stopping a torrent that hasn't started successfully,
+      add eBook and GayTorrents trackers to form,
+      web page formatting tweaks
 
 * 2006-10-10  0.6.1.26 released
 
