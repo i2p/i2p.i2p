@@ -537,7 +537,14 @@ class PeerState
                 && (lastRequest == null || lastRequest.piece != nextPiece))
               {
                 int piece_length = metainfo.getPieceLength(nextPiece);
-                byte[] bs = new byte[piece_length];
+                //Catch a common place for OOMs esp. on 1MB pieces
+                byte[] bs;
+                try {
+                  bs = new byte[piece_length];
+                } catch (OutOfMemoryError oom) {
+                  _log.warn("Out of memory, can't request piece " + nextPiece, oom);
+                  return false;
+                }
                 
                 int length = Math.min(piece_length, PARTSIZE);
                 Request req = new Request(nextPiece, bs, 0, length);

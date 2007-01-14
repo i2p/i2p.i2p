@@ -48,10 +48,7 @@ class PeerCheckerTask extends TimerTask
         int peers = 0;
         int uploaders = 0;
         int downloaders = 0;
-        int interested = 0;
-        int interesting = 0;
-        int choking = 0;
-        int choked = 0;
+        int removedCount = 0;
 
         long uploaded = 0;
         long downloaded = 0;
@@ -80,14 +77,6 @@ class PeerCheckerTask extends TimerTask
               uploaders++;
             if (!peer.isChoked() && peer.isInteresting())
               downloaders++;
-            if (peer.isInterested())
-              interested++;
-            if (peer.isInteresting())
-              interesting++;
-            if (peer.isChoking())
-              choking++;
-            if (peer.isChoked())
-              choked++;
 
             long upload = peer.getUploaded();
             uploaded += upload;
@@ -111,7 +100,7 @@ class PeerCheckerTask extends TimerTask
             // interested peers try to make some room.
             // (Note use of coordinator.uploaders)
             if (coordinator.uploaders >= PeerCoordinator.MAX_UPLOADERS
-                && interested > PeerCoordinator.MAX_UPLOADERS
+                && coordinator.interestedAndChoking > 0
                 && !peer.isChoking())
               {
                 // Check if it still wants pieces from us.
@@ -128,7 +117,7 @@ class PeerCheckerTask extends TimerTask
                     it.remove();
                     removed.add(peer);
                   }
-                else if (peer.isChoked())
+                else if (peer.isInteresting() && peer.isChoked())
                   {
                     // If they are choking us make someone else a downloader
                     if (Snark.debug >= Snark.DEBUG)
@@ -136,6 +125,7 @@ class PeerCheckerTask extends TimerTask
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
+                    removedCount++;
                     
                     // Put it at the back of the list
                     it.remove();
@@ -152,15 +142,23 @@ class PeerCheckerTask extends TimerTask
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
+                    removedCount++;
                     
                     // Put it at the back of the list
                     it.remove();
                     removed.add(peer);
                   }
-                else if (!peer.isChoking() && download < worstdownload)
+                else if (peer.isInteresting() && !peer.isChoked() &&
+                         download < worstdownload)
                   {
                     // Make sure download is good if we are uploading
                     worstdownload = download;
+                    worstDownloader = peer;
+                  }
+                else if (upload < worstdownload && coordinator.completed())
+                  {
+                    // Make sure upload is good if we are seeding
+                    worstdownload = upload;
                     worstDownloader = peer;
                   }
               }
@@ -172,9 +170,9 @@ class PeerCheckerTask extends TimerTask
         // (can shift a bit by disconnecting peers)
         coordinator.uploaders = uploaders;
 
-        // Remove the worst downloader if needed.
+        // Remove the worst downloader if needed. (uploader if seeding)
         if (uploaders >= PeerCoordinator.MAX_UPLOADERS
-            && interested > PeerCoordinator.MAX_UPLOADERS
+            && coordinator.interestedAndChoking > 0
             && worstDownloader != null)
           {
             if (Snark.debug >= Snark.DEBUG)
@@ -183,6 +181,7 @@ class PeerCheckerTask extends TimerTask
 
             worstDownloader.setChoking(true);
             coordinator.uploaders--;
+            removedCount++;
 
             // Put it at the back of the list
             coordinator.peers.remove(worstDownloader);
@@ -196,6 +195,7 @@ class PeerCheckerTask extends TimerTask
         // Put peers back at the end of the list that we removed earlier.
         coordinator.peers.addAll(removed);
         coordinator.peerCount = coordinator.peers.size();
+        coordinator.interestedAndChoking += removedCount;
 
 	// store the rates
 	coordinator.setRateHistory(uploaded, downloaded);

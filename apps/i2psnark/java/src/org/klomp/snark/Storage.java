@@ -473,7 +473,14 @@ public class Storage
     if (!bitfield.get(piece))
       return null;
 
-    byte[] bs = new byte[metainfo.getPieceLength(piece)];
+    //Catch a common place for OOMs esp. on 1MB pieces
+    byte[] bs;
+    try {
+      bs = new byte[metainfo.getPieceLength(piece)];
+    } catch (OutOfMemoryError oom) {
+      I2PSnarkUtil.instance().debug("Out of memory, can't honor request for piece " + piece, Snark.WARNING, oom);
+      return null;
+    }
     getUncheckedPiece(piece, bs, 0);
     return bs;
   }

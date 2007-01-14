@@ -44,6 +44,7 @@ public class PeerCoordinator implements PeerListener
   // Approximation of the number of current uploaders.
   // Resynced by PeerChecker once in a while.
   int uploaders = 0;
+  int interestedAndChoking = 0;
 
   // final static int MAX_DOWNLOADERS = MAX_CONNECTIONS;
   // int downloaders = 0;
@@ -132,7 +133,7 @@ public class PeerCoordinator implements PeerListener
   public long getLeft()
   {
     // XXX - Only an approximation.
-    return storage.needed() * metainfo.getPieceLength(0);
+    return ((long) storage.needed()) * metainfo.getPieceLength(0);
   }
 
   /**
@@ -336,19 +337,22 @@ public class PeerCoordinator implements PeerListener
     // other peer that are interested, but are choking us.
     List interested = new LinkedList();
     synchronized (peers) {
+        int count = 0;
         Iterator it = peers.iterator();
         while (it.hasNext())
           {
             Peer peer = (Peer)it.next();
             boolean remove = false;
-            if (uploaders < MAX_UPLOADERS
-                && peer.isChoking()
-                && peer.isInterested())
+            if (peer.isChoking() && peer.isInterested())
               {
-                if (!peer.isChoked())
-                  interested.add(0, peer);
-                else
-                  interested.add(peer);
+                count++;
+                if (uploaders < MAX_UPLOADERS)
+                  {
+                    if (!peer.isChoked())
+                      interested.add(0, peer);
+                    else
+                      interested.add(peer);
+                  }
               }
           }
 
@@ -359,11 +363,13 @@ public class PeerCoordinator implements PeerListener
               _log.debug("Unchoke: " + peer);
             peer.setChoking(false);
             uploaders++;
+            count--;
             // Put peer back at the end of the list.
             peers.remove(peer);
             peers.add(peer);
             peerCount = peers.size();
           }
+        interestedAndChoking = count;
     }
   }
 

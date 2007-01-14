@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.533 2006-10-29 14:29:50 complication Exp $
+$Id: history.txt,v 1.534 2006-11-09 20:44:36 zzz Exp $
+
+2007-01-14  zzz
+    * i2psnark: Improvements for torrents with > 4 leechers:
+      choke based on upload rate when seeding, and
+      be smarter and fairer about rotating choked peers.
+    * Handle two common i2psnark OOM situations rather
+      than shutting down the whole thing.
+    * Fix reporting to tracker of remaining bytes for
+      torrents > 4GB (but ByteMonsoon still has a bug)
 
 2006-10-29  zzz
     * i2psnark: Fix and enable generation of multifile torrents,
