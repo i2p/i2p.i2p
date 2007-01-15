@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.534 2006-11-09 20:44:36 zzz Exp $
+$Id: history.txt,v 1.535 2007-01-14 14:49:35 zzz Exp $
+
+2007-01-15  zzz
+    * i2psnark: Add 'Stop All' link on web page
+    * Add some links to trackers and forum on web page
+    * Don't start tunnel if 'Autostart' unchecked
+    * Fix torrent restart bug by reopening file descriptors
 
 2007-01-14  zzz
     * i2psnark: Improvements for torrents with > 4 leechers:

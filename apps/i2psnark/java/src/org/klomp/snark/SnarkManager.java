@@ -39,7 +39,7 @@ public class SnarkManager implements Snark.CompleteListener {
         _messages = new ArrayList(16);
         loadConfig("i2psnark.config");
         int minutes = getStartupDelayMinutes();
-        _messages.add("Starting up torrents in " + minutes + (minutes == 1 ? " minute" : " minutes"));
+        _messages.add("Adding torrents in " + minutes + (minutes == 1 ? " minute" : " minutes"));
         I2PThread monitor = new I2PThread(new DirMonitor(), "Snark DirMonitor");
         monitor.setDaemon(true);
         monitor.start();
@@ -269,7 +269,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Snark getTorrent(String filename) { synchronized (_snarks) { return (Snark)_snarks.get(filename); } }
     public void addTorrent(String filename) { addTorrent(filename, false); }
     public void addTorrent(String filename, boolean dontAutoStart) {
-        if (!I2PSnarkUtil.instance().connected()) {
+        if ((!dontAutoStart) && !I2PSnarkUtil.instance().connected()) {
             addMessage("Connecting to I2P");
             boolean ok = I2PSnarkUtil.instance().connect();
             if (!ok) {
@@ -446,10 +446,9 @@ public class SnarkManager implements Snark.CompleteListener {
             if (existingNames.contains(foundNames.get(i))) {
                 // already known.  noop
             } else {
-                if (I2PSnarkUtil.instance().connect())
-                    addTorrent((String)foundNames.get(i));
-                else
+                if (shouldAutoStart() && !I2PSnarkUtil.instance().connect())
                     addMessage("Unable to connect to I2P");
+                addTorrent((String)foundNames.get(i), !shouldAutoStart());
             }
         }
         // now lets see which ones have been removed...

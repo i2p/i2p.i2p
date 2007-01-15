@@ -283,6 +283,11 @@ public class Snark
 
     int port;
     IOException lastException = null;
+/*
+ * Don't start a tunnel if the torrent isn't going to be started.
+ * If we are starting,
+ * startTorrent() will call trackerclient.start() which will force a connect.
+ *
     boolean ok = I2PSnarkUtil.instance().connect();
     if (!ok) fatal("Unable to connect to I2P");
     I2PServerSocket serversocket = I2PSnarkUtil.instance().getServerSocket();
@@ -292,6 +297,7 @@ public class Snark
         Destination d = serversocket.getManager().getSession().getMyDestination();
         debug("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64(), NOTICE);
     }
+*/
 
     // Figure out what the torrent argument represents.
     meta = null;
@@ -371,12 +377,17 @@ public class Snark
           }
       }
 
+
     activity = "Collecting pieces";
     coordinator = new PeerCoordinator(id, meta, storage, clistener, this);
     PeerCoordinatorSet set = PeerCoordinatorSet.instance();
     set.add(coordinator);
+/*
+ * see comment above
+ *
     ConnectionAcceptor acceptor = ConnectionAcceptor.instance();
     acceptor.startAccepting(set, serversocket);
+*/
     
     trackerclient = new TrackerClient(meta, coordinator);
     if (start)
@@ -402,6 +413,17 @@ public class Snark
     if (!trackerclient.started() && !coordinatorChanged) {
         trackerclient.start();
     } else if (trackerclient.halted() || coordinatorChanged) {
+        try
+          {
+            storage.reopen(rootDataDir);
+          }
+        catch (IOException ioe)
+          {
+            try { storage.close(); } catch (IOException ioee) {
+                ioee.printStackTrace();
+            }
+            fatal("Could not reopen storage", ioe);
+          }
         TrackerClient newClient = new TrackerClient(coordinator.getMetaInfo(), coordinator);
         if (!trackerclient.halted())
             trackerclient.halt();

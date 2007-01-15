@@ -56,10 +56,17 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(HEADER);
         
         out.write("<table border=\"0\" width=\"100%\">\n");
-        out.write("<tr><td width=\"5%\" class=\"snarkTitle\" valign=\"top\" align=\"left\">");
+        out.write("<tr><td width=\"20%\" class=\"snarkTitle\" valign=\"top\" align=\"left\">");
         out.write("I2PSnark<br />\n");
-        out.write("<a href=\"" + req.getRequestURI() + "\" class=\"snarkRefresh\">Refresh</a>\n");
-        out.write("</td><td width=\"95%\" class=\"snarkMessages\" valign=\"top\" align=\"left\"><pre>");
+        out.write("<table border=\"0\" width=\"100%\">\n");
+        out.write("<tr><td><a href=\"" + req.getRequestURI() + "\" class=\"snarkRefresh\">Refresh</a><br />\n");
+        out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a><br />\n");
+        out.write("<tr><td><a href=\"http://de-ebook-archiv.i2p/pub/bt/\" class=\"snarkRefresh\">eBook</a><br />\n");
+        out.write("<td><a href=\"http://gaytorrents.i2p/\" class=\"snarkRefresh\">GayTorrents</a><br />\n");
+        out.write("<tr><td><a href=\"http://orion.i2p/bt/\" class=\"snarkRefresh\">Orion</a><br />\n");
+        out.write("<td><a href=\"http://tracker.postman.i2p/\" class=\"snarkRefresh\">Postman</a><br />\n");
+        out.write("</table>\n");
+        out.write("</td><td width=\"80%\" class=\"snarkMessages\" valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
@@ -67,10 +74,16 @@ public class I2PSnarkServlet extends HttpServlet {
         }
         out.write("</pre></td></tr></table>\n");
 
-        out.write(TABLE_HEADER);
-
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
+        out.write(TABLE_HEADER);
+        out.write("<th align=\"left\" valign=\"top\">");
+        if (I2PSnarkUtil.instance().connected())
+            out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
+                      "\" title=\"Stop all torrents and the i2p tunnel\">Stop All</a>");
+        else
+            out.write("&nbsp;");
+        out.write("</th></tr></thead>\n");
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
             displaySnark(out, snark, uri, i, stats);
@@ -272,6 +285,18 @@ public class I2PSnarkServlet extends HttpServlet {
                 } else {
                     _manager.addMessage("Cannot create a torrent for the nonexistent data: " + baseFile.getAbsolutePath());
                 }
+            }
+        } else if ("StopAll".equals(action)) {
+            _manager.addMessage("Stopping all torrents and closing the I2P tunnel");
+            List snarks = getSortedSnarks(req);
+            for (int i = 0; i < snarks.size(); i++) {
+                Snark snark = (Snark)snarks.get(i);
+                if (!snark.stopped)
+                    _manager.stopTorrent(snark.torrent, false);
+            }
+            if (I2PSnarkUtil.instance().connected()) {
+                I2PSnarkUtil.instance().disconnect();
+                _manager.addMessage("I2P tunnel closed");
             }
         }
     }
@@ -616,9 +641,7 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"right\" valign=\"top\">Downloaded</th>\n" +
                                                "    <th align=\"right\" valign=\"top\">Uploaded</th>\n" +
                                                "    <th align=\"right\" valign=\"top\">Down Rate</th>\n" +
-                                               "    <th align=\"right\" valign=\"top\">Up Rate</th>\n" +
-                                               "    <th>&nbsp;</th></tr>\n" +
-                                               "</thead>\n";
+                                               "    <th align=\"right\" valign=\"top\">Up Rate</th>\n";
     
     private static final String TABLE_TOTAL =  "<tfoot>\n" +
                                                "<tr><th align=\"left\" valign=\"top\">Totals</th>\n" +

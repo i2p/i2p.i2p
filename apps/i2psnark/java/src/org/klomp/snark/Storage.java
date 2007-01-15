@@ -338,6 +338,49 @@ public class Storage
   }
 
   /**
+   * Reopen the file descriptors for a restart
+   * Do existence check but no length check or data reverification
+   */
+  public void reopen(String rootDir) throws IOException
+  {
+    File base = new File(rootDir, filterName(metainfo.getName()));
+
+    List files = metainfo.getFiles();
+    if (files == null)
+      {
+        // Reopen base as file.
+        Snark.debug("Reopening file: " + base, Snark.NOTICE);
+        if (!base.exists())
+          throw new IOException("Could not reopen file " + base);
+
+        if (!base.canWrite())  // hope we can get away with this, if we are only seeding...
+            rafs[0] = new RandomAccessFile(base, "r");
+        else
+            rafs[0] = new RandomAccessFile(base, "rw");
+      }
+    else
+      {
+        // Reopen base as dir.
+        Snark.debug("Reopening directory: " + base, Snark.NOTICE);
+        if (!base.isDirectory())
+          throw new IOException("Could not reopen directory " + base);
+
+        int size = files.size();
+        for (int i = 0; i < size; i++)
+          {
+            File f = createFileFromNames(base, (List)files.get(i));
+            if (!f.exists())
+                throw new IOException("Could not reopen file " + f);
+            if (!f.canWrite()) // see above re: only seeding
+                rafs[i] = new RandomAccessFile(f, "r");
+            else
+                rafs[i] = new RandomAccessFile(f, "rw");
+          }
+
+      }
+  }
+
+  /**
    * Removes 'suspicious' characters from the give file name.
    */
   private String filterName(String name)
