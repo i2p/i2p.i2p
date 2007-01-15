@@ -247,6 +247,7 @@ public class Connection {
         }
         long now = _context.clock().now();
         if (_resetSentOn + 10*1000 > now) return; // don't send resets too fast
+        if (_resetReceived) return;
         _resetSent = true;
         if (_resetSentOn <= 0)
             _resetSentOn = now;

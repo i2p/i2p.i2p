@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.535 2007-01-14 14:49:35 zzz Exp $
+$Id: history.txt,v 1.536 2007-01-14 23:36:06 zzz Exp $
+
+2007-01-15  jrandom
+    * small guard against unnecessary streaming lib reset packets
+      (thanks Complication!)
 
 2007-01-15  zzz
     * i2psnark: Add 'Stop All' link on web page
