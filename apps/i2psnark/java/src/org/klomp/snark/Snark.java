@@ -234,6 +234,7 @@ public class Snark
   public String rootDataDir = ".";
   public CompleteListener completeListener;
   public boolean stopped;
+  byte[] id;
 
   Snark(String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener) { 
@@ -268,7 +269,7 @@ public class Snark
     // zeros bytes, then three bytes filled with snark and then
     // sixteen random bytes.
     byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
-    byte[] id = new byte[20];
+    id = new byte[20];
     Random random = new Random();
     int i;
     for (i = 0; i < 9; i++)
@@ -378,18 +379,18 @@ public class Snark
       }
 
 
+/*
+ * see comment above
+ *
     activity = "Collecting pieces";
     coordinator = new PeerCoordinator(id, meta, storage, clistener, this);
     PeerCoordinatorSet set = PeerCoordinatorSet.instance();
     set.add(coordinator);
-/*
- * see comment above
- *
     ConnectionAcceptor acceptor = ConnectionAcceptor.instance();
     acceptor.startAccepting(set, serversocket);
+    trackerclient = new TrackerClient(meta, coordinator);
 */
     
-    trackerclient = new TrackerClient(meta, coordinator);
     if (start)
         startTorrent();
   }
@@ -397,6 +398,24 @@ public class Snark
    * Start up contacting peers and querying the tracker
    */
   public void startTorrent() {
+    if (coordinator == null) {
+        I2PServerSocket serversocket = I2PSnarkUtil.instance().getServerSocket();
+        if (serversocket == null)
+            fatal("Unable to listen for I2P connections");
+        else {
+            Destination d = serversocket.getManager().getSession().getMyDestination();
+            debug("Listening on I2P destination " + d.toBase64() + " / " + d.calculateHash().toBase64(), NOTICE);
+        }
+        debug("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient", NOTICE);
+        activity = "Collecting pieces";
+        coordinator = new PeerCoordinator(id, meta, storage, this, this);
+        PeerCoordinatorSet set = PeerCoordinatorSet.instance();
+        set.add(coordinator);
+        ConnectionAcceptor acceptor = ConnectionAcceptor.instance();
+        acceptor.startAccepting(set, serversocket);
+        trackerclient = new TrackerClient(meta, coordinator);
+    }
+
     stopped = false;
     boolean coordinatorChanged = false;
     if (coordinator.halted()) {

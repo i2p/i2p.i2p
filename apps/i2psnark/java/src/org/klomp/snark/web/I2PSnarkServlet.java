@@ -330,16 +330,23 @@ public class I2PSnarkServlet extends HttpServlet {
         long remaining = (long) snark.storage.needed() * (long) snark.meta.getPieceLength(0); 
         if (remaining > total)
             remaining = total;
-        long downBps = snark.coordinator.getDownloadRate();
-        long upBps = snark.coordinator.getUploadRate();
+        long downBps = 0;
+        long upBps = 0;
+        if (snark.coordinator != null) {
+            downBps = snark.coordinator.getDownloadRate();
+            upBps = snark.coordinator.getUploadRate();
+        }
         long remainingSeconds;
         if (downBps > 0)
             remainingSeconds = remaining / downBps;
         else
             remainingSeconds = -1;
-        long uploaded = snark.coordinator.getUploaded();
         boolean isRunning = !snark.stopped;
-        stats[0] += snark.coordinator.getDownloaded();
+        long uploaded = 0;
+        if (snark.coordinator != null) {
+            uploaded = snark.coordinator.getUploaded();
+            stats[0] += snark.coordinator.getDownloaded();
+        }
         stats[1] += uploaded;
         if (isRunning) {
             stats[2] += downBps;
@@ -349,9 +356,14 @@ public class I2PSnarkServlet extends HttpServlet {
         boolean isValid = snark.meta != null;
         boolean singleFile = snark.meta.getFiles() == null;
         
-        String err = snark.coordinator.trackerProblems;
-        int curPeers = snark.coordinator.getPeerCount();
-        int knownPeers = snark.coordinator.trackerSeenPeers;
+        String err = null;
+        int curPeers = 0;
+        int knownPeers = 0;
+        if (snark.coordinator != null) {
+            err = snark.coordinator.trackerProblems;
+            curPeers = snark.coordinator.getPeerCount();
+            knownPeers = snark.coordinator.trackerSeenPeers;
+        }
         
         String statusString = "Unknown";
         if (err != null) {

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.536 2007-01-14 23:36:06 zzz Exp $
+$Id: history.txt,v 1.537 2007-01-15 01:35:59 jrandom Exp $
+
+2007-01-16  zzz
+    * i2psnark: Fix bug caused by last i2psnark checkin
+      (ConnectionAcceptor not started)
+    * Don't start PeerCoordinator, ConnectionAcceptor,
+      and TrackerClient unless starting torrent
 
 2007-01-15  jrandom
     * small guard against unnecessary streaming lib reset packets
