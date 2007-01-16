@@ -398,6 +398,8 @@ public class Snark
    * Start up contacting peers and querying the tracker
    */
   public void startTorrent() {
+    boolean ok = I2PSnarkUtil.instance().connect();
+    if (!ok) fatal("Unable to connect to I2P");
     if (coordinator == null) {
         I2PServerSocket serversocket = I2PSnarkUtil.instance().getServerSocket();
         if (serversocket == null)

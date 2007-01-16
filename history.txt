@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.537 2007-01-15 01:35:59 jrandom Exp $
+$Id: history.txt,v 1.538 2007-01-15 23:47:59 zzz Exp $
+
+2007-01-17  zzz
+    * i2psnark: Fix crash when autostart off and
+      tcrrent started manually
 
 2007-01-16  zzz
     * i2psnark: Fix bug caused by last i2psnark checkin
