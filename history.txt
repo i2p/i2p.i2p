@@ -1,6 +1,9 @@
-$Id: history.txt,v 1.538 2007-01-15 23:47:59 zzz Exp $
+$Id: history.txt,v 1.539 2007-01-16 01:20:23 zzz Exp $
 
 2007-01-17  zzz
+    * Add note on Syndie index.html steering people to new Syndie
+
+2007-01-16  zzz
     * i2psnark: Fix crash when autostart off and
       tcrrent started manually
 
