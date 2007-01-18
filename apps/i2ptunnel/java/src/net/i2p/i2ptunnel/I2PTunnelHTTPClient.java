@@ -112,6 +112,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "or naming one of them differently.<P/>")
          .getBytes();
     
+    private final static byte[] ERR_BAD_PROTOCOL =
+        ("HTTP/1.1 403 Bad Protocol\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: NON-HTTP PROTOCOL</H1>"+
+         "The request uses a bad protocol. "+
+         "The I2P HTTP Proxy supports http:// requests ONLY. Other protocols such as https:// and ftp:// are not allowed.<BR>")
+        .getBytes();
+    
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
@@ -483,7 +493,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             if (method == null || destination == null) {
                 l.log("No HTTP method found in the request.");
                 if (out != null) {
-                    out.write(ERR_REQUEST_DENIED);
+                    if ("http://".equalsIgnoreCase(protocol))
+                        out.write(ERR_REQUEST_DENIED);
+                    else
+                        out.write(ERR_BAD_PROTOCOL);
                     out.write("<p /><i>Generated on: ".getBytes());
                     out.write(new Date().toString().getBytes());
                     out.write("</i></body></html>\n".getBytes());
