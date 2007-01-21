@@ -338,6 +338,7 @@ public class PeerCoordinator implements PeerListener
     List interested = new LinkedList();
     synchronized (peers) {
         int count = 0;
+        int unchokedCount = 0;
         Iterator it = peers.iterator();
         while (it.hasNext())
           {
@@ -349,7 +350,7 @@ public class PeerCoordinator implements PeerListener
                 if (uploaders < MAX_UPLOADERS)
                   {
                     if (!peer.isChoked())
-                      interested.add(0, peer);
+                      interested.add(unchokedCount++, peer);
                     else
                       interested.add(peer);
                   }
@@ -485,14 +486,14 @@ public class PeerCoordinator implements PeerListener
    * Returns a byte array containing the requested piece or null of
    * the piece is unknown.
    */
-  public byte[] gotRequest(Peer peer, int piece)
+  public byte[] gotRequest(Peer peer, int piece, int off, int len)
   {
     if (halted)
       return null;
 
     try
       {
-        return storage.getPiece(piece);
+        return storage.getPiece(piece, off, len);
       }
     catch (IOException ioe)
       {

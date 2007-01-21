@@ -387,7 +387,7 @@ class PeerConnectionOut implements Runnable
     m.begin = begin;
     m.length = length;
     m.data = bytes;
-    m.off = begin;
+    m.off = 0;
     m.len = length;
     addMessage(m);
   }

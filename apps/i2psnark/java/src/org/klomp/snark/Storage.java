@@ -156,7 +156,7 @@ public class Storage
     byte[] piece = new byte[piece_size];
     for (int i = 0; i < pieces; i++)
       {
-        int length = getUncheckedPiece(i, piece, 0);
+        int length = getUncheckedPiece(i, piece);
         digest.update(piece, 0, length);
         byte[] hash = digest.digest();
         for (int j = 0; j < 20; j++)
@@ -184,7 +184,7 @@ public class Storage
     byte[] piece = new byte[piece_size];
     for (int i = 0; i < pieces; i++)
       {
-        int length = getUncheckedPiece(i, piece, 0);
+        int length = getUncheckedPiece(i, piece);
         digest.update(piece, 0, length);
         byte[] hash = digest.digest();
         for (int j = 0; j < 20; j++)
@@ -445,7 +445,7 @@ public class Storage
         byte[] piece = new byte[metainfo.getPieceLength(0)];
         for (int i = 0; i < pieces; i++)
           {
-            int length = getUncheckedPiece(i, piece, 0);
+            int length = getUncheckedPiece(i, piece);
             boolean correctHash = metainfo.checkPiece(i, piece, 0, length);
             if (correctHash)
               {
@@ -508,10 +508,10 @@ public class Storage
   }
 
   /**
-   * Returns a byte array containing the requested piece or null if
+   * Returns a byte array containing a portion of the requested piece or null if
    * the storage doesn't contain the piece yet.
    */
-  public byte[] getPiece(int piece) throws IOException
+  public byte[] getPiece(int piece, int off, int len) throws IOException
   {
     if (!bitfield.get(piece))
       return null;
@@ -519,12 +519,12 @@ public class Storage
     //Catch a common place for OOMs esp. on 1MB pieces
     byte[] bs;
     try {
-      bs = new byte[metainfo.getPieceLength(piece)];
+      bs = new byte[len];
     } catch (OutOfMemoryError oom) {
       I2PSnarkUtil.instance().debug("Out of memory, can't honor request for piece " + piece, Snark.WARNING, oom);
       return null;
     }
-    getUncheckedPiece(piece, bs, 0);
+    getUncheckedPiece(piece, bs, off, len);
     return bs;
   }
 
@@ -617,15 +617,20 @@ public class Storage
     return true;
   }
 
-  private int getUncheckedPiece(int piece, byte[] bs, int off)
+  private int getUncheckedPiece(int piece, byte[] bs)
+    throws IOException
+  {
+      return getUncheckedPiece(piece, bs, 0, metainfo.getPieceLength(piece));
+  }
+
+  private int getUncheckedPiece(int piece, byte[] bs, int off, int length)
     throws IOException
   {
     // XXX - copy/paste code from putPiece().
 
     // Early typecast, avoid possibly overflowing a temp integer
-    long start = (long) piece * (long) metainfo.getPieceLength(0);
+    long start = ((long) piece * (long) metainfo.getPieceLength(0)) + off;
 
-    int length = metainfo.getPieceLength(piece);
     int i = 0;
     long raflen = lengths[i];
     while (start > raflen)
@@ -643,7 +648,7 @@ public class Storage
         synchronized(rafs[i])
           {
             rafs[i].seek(start);
-            rafs[i].readFully(bs, off + read, len);
+            rafs[i].readFully(bs, read, len);
           }
         read += len;
         if (need - len > 0)

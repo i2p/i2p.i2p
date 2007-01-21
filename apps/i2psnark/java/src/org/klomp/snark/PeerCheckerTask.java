@@ -131,6 +131,20 @@ class PeerCheckerTask extends TimerTask
                     it.remove();
                     removed.add(peer);
                   }
+                else if (!peer.isInteresting() && !coordinator.completed())
+                  {
+                    // If they aren't interesting make someone else a downloader
+                    if (Snark.debug >= Snark.DEBUG)
+                      Snark.debug("Choke uninteresting peer: " + peer, Snark.DEBUG);
+                    peer.setChoking(true);
+                    uploaders--;
+                    coordinator.uploaders--;
+                    removedCount++;
+                    
+                    // Put it at the back of the list
+                    it.remove();
+                    removed.add(peer);
+                  }
                 else if (peer.isInteresting()
                          && !peer.isChoked()
                          && download == 0)

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.540 2007-01-17 00:13:28 zzz Exp $
+$Id: history.txt,v 1.541 2007-01-17 20:42:14 zzz Exp $
+
+2007-01-20  zzz
+    * i2psnark: More choking rotation tweaks
+    * Improve performance by not reading in the whole
+      piece from disk for each request. A huge memory savings
+      on 1MB torrents with many peers.
 
 2007-01-17  zzz
     * Add new HTTP Proxy error message for non-http protocols

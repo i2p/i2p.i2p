@@ -107,11 +107,13 @@ public interface PeerListener
    *
    * @param peer the Peer that wants the piece.
    * @param piece the piece number requested.
+   * @param off byte offset into the piece.
+   * @param len length of the chunk requested.
    *
    * @return a byte array containing the piece or null when the piece
    * is not available (which is a protocol error).
    */
-  byte[] gotRequest(Peer peer, int piece);
+  byte[] gotRequest(Peer peer, int piece, int off, int len);
 
   /**
    * Called when a (partial) piece has been downloaded from the peer.
@@ -167,5 +169,4 @@ public interface PeerListener
    * @param peer the peer that is disconnecting
    */
   void markUnrequested(Peer peer);
-
 }
