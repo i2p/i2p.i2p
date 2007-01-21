@@ -184,7 +184,7 @@ class PeerState
         return;
       }
 
-    byte[] pieceBytes = listener.gotRequest(peer, piece);
+    byte[] pieceBytes = listener.gotRequest(peer, piece, begin, length);
     if (pieceBytes == null)
       {
         // XXX - Protocol error-> diconnect?
@@ -194,7 +194,7 @@ class PeerState
       }
 
     // More sanity checks
-    if (begin >= pieceBytes.length || begin + length > pieceBytes.length)
+    if (length != pieceBytes.length)
       {
         // XXX - Protocol error-> disconnect?
         if (_log.shouldLog(Log.WARN))
