@@ -62,7 +62,6 @@ public class ConfigNetHandler extends FormHandler {
         }
     }
     
-    /* Complication messing around: public void setReseed(String moo) { _reseedRequested = true; } */
     public void setSave(String moo) { _saveRequested = true; }
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }

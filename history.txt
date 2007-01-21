@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.542 2007-01-20 19:35:11 zzz Exp $
+$Id: history.txt,v 1.543 2007-01-20 22:35:49 complication Exp $
+
+2007-01-20  Complication
+    * Drop overlooked comment
 
 2007-01-20  Complication
     * Modify ReseedHandler to query the "i2p.reseedURL" property from I2PAppContext
