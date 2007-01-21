@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.541 2007-01-17 20:42:14 zzz Exp $
+$Id: history.txt,v 1.542 2007-01-20 19:35:11 zzz Exp $
+
+2007-01-20  Complication
+    * Modify ReseedHandler to query the "i2p.reseedURL" property from I2PAppContext
+      instead of System, so setting a reseed URL in advanced configuration has effect.
+    * Clean out obsolete reseed code from ConfigNetHandler.
 
 2007-01-20  zzz
     * i2psnark: More choking rotation tweaks

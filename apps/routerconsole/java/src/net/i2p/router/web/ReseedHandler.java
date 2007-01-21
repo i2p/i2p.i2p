@@ -22,6 +22,7 @@ import net.i2p.util.I2PThread;
  *
  */
 public class ReseedHandler {
+
     private static ReseedRunner _reseedRunner = new ReseedRunner();
     
     public void setReseedNonce(String nonce) { 
@@ -66,7 +67,7 @@ public class ReseedHandler {
      *
      */
     private static void reseed(boolean echoStatus) {
-        String seedURL = System.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
+        String seedURL = I2PAppContext.getGlobalContext().getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
         if ( (seedURL == null) || (seedURL.trim().length() <= 0) ) 
             seedURL = DEFAULT_SEED_URL;
         try {

@@ -53,9 +53,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _ratesOnly;
     
     protected void processForm() {
-        if (_reseedRequested) {
-            reseed();
-        } else if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
+        if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
             saveChanges();
         } else if (_recheckReachabilityRequested) {
             recheckReachability();
@@ -64,7 +62,7 @@ public class ConfigNetHandler extends FormHandler {
         }
     }
     
-    public void setReseed(String moo) { _reseedRequested = true; }
+    /* Complication messing around: public void setReseed(String moo) { _reseedRequested = true; } */
     public void setSave(String moo) { _saveRequested = true; }
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
@@ -107,94 +105,8 @@ public class ConfigNetHandler extends FormHandler {
     public void setOutboundburstfactor(String factor) { 
         _outboundBurst = (factor != null ? factor.trim() : null); 
     }
-    public void setReseedfrom(String url) { 
-        _reseedFrom = (url != null ? url.trim() : null); 
-    }
     public void setSharePercentage(String pct) {
         _sharePct = (pct != null ? pct.trim() : null);
-    }
-
-
-    private static final String DEFAULT_SEED_URL = ReseedHandler.DEFAULT_SEED_URL;
-    /**
-     * Reseed has been requested, so lets go ahead and do it.  Fetch all of
-     * the routerInfo-*.dat files from the specified URL (or the default) and
-     * save them into this router's netDb dir.
-     *
-     */
-    private void reseed() {
-        String seedURL = DEFAULT_SEED_URL;
-        if (_reseedFrom != null)
-            seedURL = _reseedFrom;
-        try {
-            URL dir = new URL(seedURL);
-            String content = new String(readURL(dir));
-            Set urls = new HashSet();
-            int cur = 0;
-            while (true) {
-                int start = content.indexOf("href=\"routerInfo-", cur);
-                if (start < 0)
-                    break;
-
-                int end = content.indexOf(".dat\">", start);
-                String name = content.substring(start+"href=\"routerInfo-".length(), end);
-                urls.add(name);
-                cur = end + 1;
-            }
-
-            int fetched = 0;
-            int errors = 0;
-            for (Iterator iter = urls.iterator(); iter.hasNext(); ) {
-                try {
-                    fetchSeed(seedURL, (String)iter.next());
-                    fetched++;
-                } catch (Exception e) {
-                    errors++;
-                }
-            }
-            addFormNotice("Reseeded with " + fetched + " peers (and " + errors + " failures)");
-        } catch (Throwable t) {
-            _context.logManager().getLog(ConfigNetHandler.class).error("Error reseeding", t);
-            addFormError("Error reseeding (RESEED_EXCEPTION)");
-        }
-    }
-    
-    private void fetchSeed(String seedURL, String peer) throws Exception {
-        URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
-
-        byte data[] = readURL(url);
-        writeSeed(peer, data);
-    }
-    
-    private byte[] readURL(URL url) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-        URLConnection con = url.openConnection();
-        InputStream in = con.getInputStream();
-        byte buf[] = new byte[1024];
-        while (true) {
-            int read = in.read(buf);
-            if (read < 0)
-                break;
-            baos.write(buf, 0, read);
-        }
-        in.close();
-        return baos.toByteArray();
-    }
-    
-    private void writeSeed(String name, byte data[]) throws Exception {
-        // props taken from KademliaNetworkDatabaseFacade...
-        String dirName = _context.getProperty("router.networkDatabase.dbDir", "netDb");
-        File netDbDir = new File(dirName);
-        if (!netDbDir.exists()) {
-            boolean ok = netDbDir.mkdirs();
-            if (ok)
-                addFormNotice("Network database directory created: " + dirName);
-            else
-                addFormNotice("Error creating network database directory: " + dirName);
-        }
-        FileOutputStream fos = new FileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
-        fos.write(data);
-        fos.close();
     }
     
     private void recheckReachability() {
