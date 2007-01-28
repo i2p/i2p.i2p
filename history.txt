@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.543 2007-01-20 22:35:49 complication Exp $
+$Id: history.txt,v 1.544 2007-01-20 22:49:41 complication Exp $
+
+2007-01-27  zzz
+    * i2psnark: Fix orphaned Snark reader tasks leading to OOMs
 
 2007-01-20  Complication
     * Drop overlooked comment

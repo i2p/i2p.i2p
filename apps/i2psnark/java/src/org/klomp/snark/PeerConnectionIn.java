@@ -33,7 +33,7 @@ class PeerConnectionIn implements Runnable
   private final DataInputStream din;
 
   private Thread thread;
-  private boolean quit;
+  private volatile boolean quit;
 
   public PeerConnectionIn(Peer peer, DataInputStream din)
   {
@@ -51,6 +51,13 @@ class PeerConnectionIn implements Runnable
     Thread t = thread;
     if (t != null)
       t.interrupt();
+    if (din != null) {
+        try {
+            din.close();
+        } catch (IOException ioe) {
+            _log.warn("Error closing the stream from " + peer, ioe);
+        }
+    }
   }
 
   public void run()
