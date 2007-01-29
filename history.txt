@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.544 2007-01-20 22:49:41 complication Exp $
+$Id: history.txt,v 1.545 2007-01-27 21:30:07 zzz Exp $
+
+2007-01-28  zzz
+    * i2psnark: Don't hold sendQueue lock while flushing output,
+      to make everything run smoother
 
 2007-01-27  zzz
     * i2psnark: Fix orphaned Snark reader tasks leading to OOMs

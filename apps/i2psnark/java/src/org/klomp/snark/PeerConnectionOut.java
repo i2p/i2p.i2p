@@ -72,6 +72,16 @@ class PeerConnectionOut implements Runnable
           {
             Message m = null;
             PeerState state = null;
+            boolean shouldFlush;
+            synchronized(sendQueue)
+              {
+                shouldFlush = !quit && peer.isConnected() && sendQueue.isEmpty();
+              }
+            if (shouldFlush)
+                // Make sure everything will reach the other side.
+                // flush while not holding lock, could take a long time
+                dout.flush();
+
             synchronized(sendQueue)
               {
                 while (!quit && peer.isConnected() && sendQueue.isEmpty())
@@ -79,7 +89,8 @@ class PeerConnectionOut implements Runnable
                     try
                       {
                         // Make sure everything will reach the other side.
-                        dout.flush();
+                        // don't flush while holding lock, could take a long time
+                        // dout.flush();
                         
                         // Wait till more data arrives.
                         sendQueue.wait(60*1000);
