@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.546 2007-01-28 23:03:37 zzz Exp $
+$Id: history.txt,v 1.547 2007-01-29 23:05:23 zzz Exp $
+
+2007-01-30  zzz
+    * i2psnark: Don't hold _snarks lock while checking a snark,
+      so web page is responsive at startup
 
 2007-01-29  zzz
     * i2psnark: Add NickyB tracker

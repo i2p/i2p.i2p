@@ -16,6 +16,7 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** map of (canonical) filename to Snark instance (unsynchronized) */
     private Map _snarks;
+    private Object _addSnarkLock;
     private String _configFile;
     private Properties _config;
     private I2PAppContext _context;
@@ -34,6 +35,7 @@ public class SnarkManager implements Snark.CompleteListener {
     
     private SnarkManager() {
         _snarks = new HashMap();
+        _addSnarkLock = new Object();
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new ArrayList(16);
@@ -289,7 +291,16 @@ public class SnarkManager implements Snark.CompleteListener {
         Snark torrent = null;
         synchronized (_snarks) {
             torrent = (Snark)_snarks.get(filename);
-            if (torrent == null) {
+        }
+        // don't hold the _snarks lock while verifying the torrent
+        if (torrent == null) {
+            synchronized (_addSnarkLock) {
+                // double-check
+                synchronized (_snarks) {
+                    if(_snarks.get(filename) != null)
+                        return;
+                }
+
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(sfile);
@@ -305,7 +316,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     } else {
                         torrent = new Snark(filename, null, -1, null, null, false, dataDir.getPath());
                         torrent.completeListener = this;
-                        _snarks.put(filename, torrent);
+                        synchronized (_snarks) {
+                            _snarks.put(filename, torrent);
+                        }
                     }
                 } catch (IOException ioe) {
                     addMessage("Torrent in " + sfile.getName() + " is invalid: " + ioe.getMessage());
@@ -315,9 +328,9 @@ public class SnarkManager implements Snark.CompleteListener {
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
-            } else {
-                return;
             }
+        } else {
+            return;
         }
         // ok, snark created, now lets start it up or configure it further
         File f = new File(filename);
