@@ -63,8 +63,10 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a><br />\n");
         out.write("<tr><td><a href=\"http://de-ebook-archiv.i2p/pub/bt/\" class=\"snarkRefresh\">eBook</a><br />\n");
         out.write("<td><a href=\"http://gaytorrents.i2p/\" class=\"snarkRefresh\">GayTorrents</a><br />\n");
-        out.write("<tr><td><a href=\"http://orion.i2p/bt/\" class=\"snarkRefresh\">Orion</a><br />\n");
-        out.write("<td><a href=\"http://tracker.postman.i2p/\" class=\"snarkRefresh\">Postman</a><br />\n");
+        out.write("<tr><td><a href=\"http://nickyb.i2p/bittorrent/\" class=\"snarkRefresh\">NickyB</a><br />\n");
+        out.write("<td><a href=\"http://orion.i2p/bt/\" class=\"snarkRefresh\">Orion</a><br />\n");
+        out.write("<tr><td><a href=\"http://tracker.postman.i2p/\" class=\"snarkRefresh\">Postman</a><br />\n");
+        out.write("<td>&nbsp;\n");
         out.write("</table>\n");
         out.write("</td><td width=\"80%\" class=\"snarkMessages\" valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
