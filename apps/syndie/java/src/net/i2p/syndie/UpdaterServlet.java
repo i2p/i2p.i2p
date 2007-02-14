@@ -28,10 +28,13 @@ public class UpdaterServlet extends GenericServlet {
             super.init(config);
         } catch (ServletException exp) {
         }
+        /*
         UpdaterThread thread = new UpdaterThread();
         thread.setDaemon(true);
         thread.start();
         System.out.println("INFO: Starting Syndie Updater " + Updater.VERSION);
+         */
+        System.out.println("INFO: Syndie Updater DISABLED.  Use the new Syndie from http://syndie.i2p.net/");
     }
 
 }

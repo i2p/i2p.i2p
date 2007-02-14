@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.547 2007-01-29 23:05:23 zzz Exp $
+$Id: history.txt,v 1.548 2007-01-30 03:58:21 zzz Exp $
+
+2007-02-13  jrandom
+    * Tell our peers about who we know in the floodfill netDb every
+      6 hours or so, mitigating the situation where peers lose track
+      of floodfill routers.
+    * Disable the Syndie updater (people should use the new Syndie,
+      not this one)
+    * Disable the eepsite tunnel by default
 
 2007-01-30  zzz
     * i2psnark: Don't hold _snarks lock while checking a snark,

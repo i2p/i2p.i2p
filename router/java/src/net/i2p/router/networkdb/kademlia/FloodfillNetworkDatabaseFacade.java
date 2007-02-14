@@ -227,7 +227,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     /** list of the Hashes of currently known floodfill peers */
-    List getFloodfillPeers() {
+    public List getFloodfillPeers() {
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         return sel.selectFloodfillParticipants(getKBuckets());
     }

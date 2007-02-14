@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.zip.Adler32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -21,6 +22,7 @@ import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.Log;
 
@@ -350,12 +352,44 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             infoMsg.beginSend();
             _context.statManager().addRateData("ntcp.infoMessageEnqueued", 1, 0);
             send(infoMsg);
+            
+            enqueueFloodfillMessage(target);
         } else {
             if (_isInbound) {
                 // ok, we shouldn't have enqueued it yet, as we havent received their info
             } else {
                 // how did we make an outbound connection to someone we don't know about?
             }
+        }
+    }
+
+    /**
+     * to prevent people from losing track of the floodfill peers completely, lets periodically
+     * send those we are connected to references to the floodfill peers that we know
+     */
+    private void enqueueFloodfillMessage(RouterInfo target) {
+        FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)_context.netDb();
+        List peers = fac.getFloodfillPeers();
+        for (int i = 0; i < peers.size(); i++) {
+            Hash peer = (Hash)peers.get(i);
+            
+            // we already sent our own info, and no need to tell them about themselves
+            if (peer.equals(_context.routerHash()) || peer.equals(target.calculateHash()))
+                continue;
+            
+            RouterInfo info = fac.lookupRouterInfoLocally(peer);
+
+            OutNetMessage infoMsg = new OutNetMessage(_context);
+            infoMsg.setExpiration(_context.clock().now()+10*1000);
+            DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
+            dsm.setKey(peer);
+            dsm.setRouterInfo(info);
+            infoMsg.setMessage(dsm);
+            infoMsg.setPriority(100);
+            infoMsg.setTarget(target);
+            infoMsg.beginSend();
+            _context.statManager().addRateData("ntcp.floodInfoMessageEnqueued", 1, 0);
+            send(infoMsg);
         }
     }
     
