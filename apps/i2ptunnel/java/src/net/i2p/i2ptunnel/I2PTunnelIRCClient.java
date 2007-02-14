@@ -282,6 +282,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "PART",
                 "WALLOPS",
                 "ERROR",
+                "KICK",
+                "H", // "hide operator status" (after kicking an op)
                 "TOPIC"
         };
         

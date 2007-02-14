@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.548 2007-01-30 03:58:21 zzz Exp $
+$Id: history.txt,v 1.549 2007-02-13 23:33:36 jrandom Exp $
+
+2007-02-14  jrandom
+    * Don't filter out KICK and H(ide oper status) IRC messages
+      (thanks Takk and postman!)
 
 2007-02-13  jrandom
     * Tell our peers about who we know in the floodfill netDb every
