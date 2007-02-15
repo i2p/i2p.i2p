@@ -363,6 +363,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
     }
 
+    private static final int PEERS_TO_FLOOD = 3;
+
     /**
      * to prevent people from losing track of the floodfill peers completely, lets periodically
      * send those we are connected to references to the floodfill peers that we know
@@ -370,7 +372,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private void enqueueFloodfillMessage(RouterInfo target) {
         FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)_context.netDb();
         List peers = fac.getFloodfillPeers();
-        for (int i = 0; i < peers.size(); i++) {
+        Collections.shuffle(peers);
+        for (int i = 0; i < peers.size() && i < PEERS_TO_FLOOD; i++) {
             Hash peer = (Hash)peers.get(i);
             
             // we already sent our own info, and no need to tell them about themselves

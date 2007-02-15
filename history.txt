@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.549 2007-02-13 23:33:36 jrandom Exp $
+$Id: history.txt,v 1.550 2007-02-14 16:35:43 jrandom Exp $
+
+* 2007-02-15  0.6.1.27 released
+
+2007-02-15  jrandom
+    * Limit the whispering floodfill sends to at most 3 randomly
+      chosen from the known floodfill peers
 
 2007-02-14  jrandom
     * Don't filter out KICK and H(ide oper status) IRC messages
