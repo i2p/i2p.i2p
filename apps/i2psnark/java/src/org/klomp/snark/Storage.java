@@ -76,7 +76,6 @@ public class Storage
     throws IOException
   {
     this.listener = listener;
-
     // Create names, rafs and lengths arrays.
     getFiles(baseFile);
     
@@ -132,13 +131,14 @@ public class Storage
   // Creates piece hases for a new storage.
   public void create() throws IOException
   {
-    if (true) {
+//    if (true) {
         fast_digestCreate();
-    } else {
-        orig_digestCreate();
-    }
+//    } else {
+//        orig_digestCreate();
+//    }
   }
   
+/*
   private void orig_digestCreate() throws IOException {
     // Calculate piece_hashes
     MessageDigest digest = null;
@@ -174,6 +174,7 @@ public class Storage
     // Reannounce to force recalculating the info_hash.
     metainfo = metainfo.reannounce(metainfo.getAnnounce());
   }
+*/
 
   private void fast_digestCreate() throws IOException {
     // Calculate piece_hashes
@@ -368,7 +369,7 @@ public class Storage
         int size = files.size();
         for (int i = 0; i < size; i++)
           {
-            File f = createFileFromNames(base, (List)files.get(i));
+            File f = getFileFromNames(base, (List)files.get(i));
             if (!f.exists())
                 throw new IOException("Could not reopen file " + f);
             if (!f.canWrite()) // see above re: only seeding
@@ -413,6 +414,17 @@ public class Storage
           }
       }
     return f;
+  }
+
+  private File getFileFromNames(File base, List names) throws IOException
+  {
+    Iterator it = names.iterator();
+    while (it.hasNext())
+      {
+        String name = filterName((String)it.next());
+        base = new File(base, name);
+      }
+    return base;
   }
 
   private void checkCreateFiles() throws IOException

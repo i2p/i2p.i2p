@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.551 2007-02-15 18:25:04 jrandom Exp $
+$Id: history.txt,v 1.552 2007-02-28 21:22:16 zzz Exp $
+
+2007-02-28  zzz
+    * i2psnark: File reopen cleanup
 
 2007-02-28  zzz
     * i2psnark: Add peer details to web page
