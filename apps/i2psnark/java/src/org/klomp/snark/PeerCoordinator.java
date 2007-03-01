@@ -105,6 +105,15 @@ public class PeerCoordinator implements PeerListener
   public Storage getStorage() { return storage; }
   public CoordinatorListener getListener() { return listener; }
 
+  // for web page detailed stats
+  public List peerList()
+  {
+    synchronized(peers)
+      {
+        return new ArrayList(peers);
+      }
+  }
+
   public byte[] getID()
   {
     return id;
@@ -157,12 +166,17 @@ public class PeerCoordinator implements PeerListener
    */
   public void setRateHistory(long up, long down)
   {
-    for (int i = RATE_DEPTH-1; i > 0; i--){
-      uploaded_old[i] = uploaded_old[i-1];
-      downloaded_old[i] = downloaded_old[i-1];
+    setRate(up, uploaded_old);
+    setRate(down, downloaded_old);
+  }
+
+  private void setRate(long val, long array[])
+  {
+    synchronized(array) {
+      for (int i = RATE_DEPTH-1; i > 0; i--)
+        array[i] = array[i-1];
+      array[0] = val;
     }
-    uploaded_old[0] = up;
-    downloaded_old[0] = down;
   }
 
   /**
@@ -170,21 +184,20 @@ public class PeerCoordinator implements PeerListener
    */
   public long getDownloadRate()
   {
-    long rate = 0;
-    for (int i = 0; i < RATE_DEPTH; i++){
-      rate += downloaded_old[i];
-    }
-    return rate / (RATE_DEPTH * CHECK_PERIOD / 1000);
+    return getRate(downloaded_old);
   }
 
-  /**
-   * Returns the 4-minute-average rate in Bps
-   */
   public long getUploadRate()
   {
+    return getRate(uploaded_old);
+  }
+
+  private long getRate(long array[])
+  {
     long rate = 0;
-    for (int i = 0; i < RATE_DEPTH; i++){
-      rate += uploaded_old[i];
+    synchronized(array) {
+      for (int i = 0; i < RATE_DEPTH; i++)
+        rate += array[i];
     }
     return rate / (RATE_DEPTH * CHECK_PERIOD / 1000);
   }

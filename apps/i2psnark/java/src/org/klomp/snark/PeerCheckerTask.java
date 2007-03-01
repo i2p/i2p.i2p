@@ -82,6 +82,7 @@ class PeerCheckerTask extends TimerTask
             uploaded += upload;
             long download = peer.getDownloaded();
             downloaded += download;
+	    peer.setRateHistory(upload, download);
             peer.resetCounters();
 
             if (Snark.debug >= Snark.DEBUG)

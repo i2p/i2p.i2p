@@ -54,6 +54,10 @@ public class Peer implements Comparable
   private boolean deregister = true;
   private static long __id;
   private long _id;
+  final static long CHECK_PERIOD = 40*1000; // 40 seconds
+  final static int RATE_DEPTH = 6; // make following arrays RATE_DEPTH long
+  private long uploaded_old[] = {-1,-1,-1,-1,-1,-1};
+  private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
 
   /**
    * Creates a disconnected peer given a PeerID, your own id and the
@@ -485,6 +489,69 @@ public class Peer implements Comparable
     PeerState s = state;
     if (s != null)
       s.retransmitRequests();
+  }
+
+  /**
+   * Return how much the peer has
+   * Quite inefficient - a byte lookup table or counter in Bitfield would be much better
+   */
+  public int completed()
+  {
+    PeerState s = state;
+    if (s == null || s.bitfield == null)
+        return 0;
+    int count = 0;
+    for (int i = 0; i < s.bitfield.size(); i++)
+         if (s.bitfield.get(i))
+             count++;
+    return count;
+  }
+
+  /**
+   * Push the total uploaded/downloaded onto a RATE_DEPTH deep stack
+   */
+  public void setRateHistory(long up, long down)
+  {
+    setRate(up, uploaded_old);
+    setRate(down, downloaded_old);
+  }
+
+  private void setRate(long val, long array[])
+  {
+    synchronized(array) {
+      for (int i = RATE_DEPTH-1; i > 0; i--)
+        array[i] = array[i-1];
+      array[0] = val;
+    }
+  }
+
+  /**
+   * Returns the 4-minute-average rate in Bps
+   */
+  public long getUploadRate()
+  {
+    return getRate(uploaded_old);
+  }
+
+  public long getDownloadRate()
+  {
+    return getRate(downloaded_old);
+  }
+
+  private long getRate(long array[])
+  {
+    long rate = 0;
+    int i = 0;
+    synchronized(array) {
+      for ( ; i < RATE_DEPTH; i++){
+        if (array[i] < 0)
+            break;
+        rate += array[i];
+      }
+    }
+    if (i == 0)
+        return 0;
+    return rate / (i * CHECK_PERIOD / 1000);
   }
 
 }
