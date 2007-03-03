@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.552 2007-02-28 21:22:16 zzz Exp $
+$Id: history.txt,v 1.553 2007-02-28 21:29:12 zzz Exp $
+
+2007-03-03  zzz
+    * Implement priority sending for NTCP
+    * Disable trimForOverload() in tunnel BuildExecutor which
+      was preventing tunnel builds when outbound traffic was high
+      (i.e. most of the time when running i2psnark)
 
 2007-02-28  zzz
     * i2psnark: File reopen cleanup

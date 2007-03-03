@@ -156,7 +156,8 @@ class BuildExecutor implements Runnable {
         
         // Trim the number of allowed tunnels for overload,
         // initiate a tunnel drop on severe overload
-        allowed = trimForOverload(allowed,concurrent);
+        // tunnel building is high priority, don't do this
+        // allowed = trimForOverload(allowed,concurrent);
 
         return allowed;
     }
@@ -168,6 +169,7 @@ class BuildExecutor implements Runnable {
     /**
      * Don't even try to build tunnels if we're saturated
      */
+/*
     private int trimForOverload(int allowed, int concurrent) {
 
         // dont include the inbound rates when throttling tunnel building, since
@@ -221,7 +223,7 @@ class BuildExecutor implements Runnable {
         // No overload, allow as requested
         return(allowed);
     }
-
+*/
 
     public void run() {
         _isRunning = true;

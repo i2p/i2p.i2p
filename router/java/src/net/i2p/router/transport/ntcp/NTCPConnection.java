@@ -582,12 +582,22 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 return;
             }
                 //throw new RuntimeException("We should not be preparing a write while we still have one pending");
-            if (_outbound.size() > 0) {
+            if (queueTime() > 3*1000) {  // don't stall low-priority messages
                 msg = (OutNetMessage)_outbound.remove(0);
-                _currentOutbound = msg;
             } else {
-                return;
+                Iterator it = _outbound.iterator();
+                for (int i = 0; it.hasNext() && i < 75; i++) {  //arbitrary bound
+                    OutNetMessage mmsg = (OutNetMessage) it.next();
+                    if (msg == null || mmsg.getPriority() > msg.getPriority())
+                        msg = mmsg;
+                }
+                if (msg == null)
+                    return;
+                // if (_outbound.indexOf(msg) > 0)
+                //     _log.debug("Priority message sent, pri = " + msg.getPriority() + " pos = " + _outbound.indexOf(msg) + "/" +_outbound.size());
+                _outbound.remove(msg);
             }
+            _currentOutbound = msg;
         }
         
         msg.beginTransmission();
