@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.553 2007-02-28 21:29:12 zzz Exp $
+$Id: history.txt,v 1.554 2007-03-03 15:11:07 zzz Exp $
+
+2007-03-03  zzz
+    * Upgrade from Jetty 5.1.6 to 5.1.12 which fixes spaces in URL
+    * Add a updaterWithJetty build target
 
 2007-03-03  zzz
     * Implement priority sending for NTCP

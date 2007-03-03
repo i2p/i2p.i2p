@@ -7,6 +7,7 @@
         <echo message="  installer: build the GUI installer" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
@@ -292,6 +293,9 @@
     <target name="updater" depends="prepupdate">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
+    <target name="updaterWithJetty" depends="prepjupdate">
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
     <target name="updateTest" depends="prepupdate">
         <ant dir="core/java/" target="jarTest" />    
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
@@ -352,6 +356,16 @@
 	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
 	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
 	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
+    </target>
+    <target name="prepjupdate" depends="prepupdate, buildWEB">
+        <copy file="build/ant.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
+        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
     </target>
     <target name="installer" depends="preppkg">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
