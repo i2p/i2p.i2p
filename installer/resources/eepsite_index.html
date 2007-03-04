@@ -6,16 +6,21 @@
  <h1>Welcome to your eepsite</h1>
 
  <p>This is your eepsite - simply edit the files under ./eepsite/docroot/ 
- and they'll be reachable.  The 'key' to your eepsite that you need to
- give to other people is shown on the eepsite's I2PTunnel
- <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">configuration page</a>). </p>
+ and they'll be reachable by others once you follow the instructions below.
+ In I2P, eepsites are addressed using a 'key', which is represented as a really long Base64 string.
+ (The 'key' is somewhat analogous to an IP address, and
+ is shown on the eepsite's I2PTunnel
+ <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">configuration page</a>).
+ The instructions below detail how to assign a name like "mysite.i2p" to your key and
+ start up your eepsite.</p>
  <p>You can also reach your eepsite locally through 
  <a href="http://localhost:7658/">http://localhost:7658/</a>.  If you 
  want to change the port number, edit the file ./eepsite/jetty.xml and 
  update the I2PTunnel configuration accordingly.</p>
 
- <h2>Step-by-step instructions for announcing your new eepsite to the I2P community</h2>
- Your eepsite is up and running but it will be hard for other people to find because it
+ <h2>Step-by-step instructions for starting your new eepsite and announcing it to the I2P community</h2>
+ Your eepsite is stopped by default.
+ After you start it, it will be difficult for other people to find because it
  doesn't have a name and they don't have your really long Base64 key.
  You could just tell people that really long key but thankfully i2p has an address book
  and several easy ways to tell people about your eepsite. Here's detailed instructions.
@@ -27,7 +32,13 @@
      Enter the new name for your eepsite on the
      <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
      where it says "Website name". This will replace the default "mysite.i2p".
+     Also, check the "Auto Start" box. Your eepsite will now start every time you start your router.
      Be sure and click "Save".
+ <li>Click the start button for your eepsite on the
+     <a href="http://localhost:7657/i2ptunnel/index.jsp">main i2ptunnel configuration page</a>.
+     You should now see "eepsite" listed under "Local Destinations" on the left side of the
+     <a href="http://localhost:7657/index.jsp">I2P Router Console</a>.
+     Your eepsite is now running.
  <li>Highlight the entire "Local destination" key on the
      <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
      and copy it for
@@ -61,8 +72,7 @@
      <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
          on <a href="http://forum.i2p/">forum.i2p</a>.
      <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.
-     <li>Put it in <a href="http://localhost:7657/syndie/post.jsp">new post</a> on
-                   <a href="http://localhost:7657/syndie/">Syndie</a>.
+     <li>Put it in a new post on <a href="syndie.i2p.net">the new Syndie</a>.
      <li>Put it in <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
      </ul>
      Note that some sites recommend pasting in that really long destination key.
