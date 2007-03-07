@@ -57,7 +57,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     static final int INITIAL_WINDOW_SIZE = 12;
     static final int DEFAULT_MAX_SENDS = 8;
     
-    static final int MIN_WINDOW_SIZE = INITIAL_WINDOW_SIZE;
+    static final int MIN_WINDOW_SIZE = 1;
     
     public ConnectionOptions() {
         super();
@@ -206,7 +206,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public void setRTT(int ms) { 
         if (_rto == 0) {
             _rttDev = ms;
-            _rto = (int)Connection.MAX_RESEND_DELAY;
+            _rto = ms + ms / 2;
         }
         synchronized (_trend) {
             _trend[0] = _trend[1];

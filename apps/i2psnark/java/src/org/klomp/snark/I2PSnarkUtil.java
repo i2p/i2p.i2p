@@ -97,6 +97,10 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.inactivityTimeout", "90000");
             if (opts.getProperty("i2p.streaming.inactivityAction") == null)
                 opts.setProperty("i2p.streaming.inactivityAction", "2"); // 1 == disconnect, 2 == ping
+            if (opts.getProperty("i2p.streaming.initialWindowSize") == null)
+                opts.setProperty("i2p.streaming.initialWindowSize", "1");
+            if (opts.getProperty("i2p.streaming.slowStartGrowthRateFactor") == null)
+                opts.setProperty("i2p.streaming.slowStartGrowthRateFactor", "1");
             //if (opts.getProperty("i2p.streaming.writeTimeout") == null)
             //    opts.setProperty("i2p.streaming.writeTimeout", "90000");
             //if (opts.getProperty("i2p.streaming.readTimeout") == null)

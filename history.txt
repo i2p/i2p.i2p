@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.554 2007-03-03 15:11:07 zzz Exp $
+$Id: history.txt,v 1.555 2007-03-03 15:30:52 zzz Exp $
+
+2007-03-07  zzz
+    * Streaming lib changes to improve upstream performance during congestion:
+    *   Change min window size from 12 to 1
+    *   Change max timeout from 10 to 45 sec
+    *   Change initial timeout from 10 to 15 sec
+    *   Change intial window size for i2psnark from 12 to 1
+    *   Change slow start growth rate for i2psnark from 1/2 to 1
+
+2007-03-04  zzz
+    * Update eepsite_index.html
 
 2007-03-03  zzz
     * Upgrade from Jetty 5.1.6 to 5.1.12 which fixes spaces in URL
