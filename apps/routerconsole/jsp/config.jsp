@@ -80,6 +80,7 @@
  <p><b>Note: changing this setting will terminate all of your connections and effectively
     restart your router.</b>
  <hr />
+<!--
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
  <p>
@@ -97,6 +98,7 @@
  though such would likely already be the case anyway, since the IP address changed.
  </p>
  <hr />
+-->
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  </form>
 </div>
