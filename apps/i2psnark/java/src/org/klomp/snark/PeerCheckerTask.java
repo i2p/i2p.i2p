@@ -41,6 +41,17 @@ class PeerCheckerTask extends TimerTask
   {
     synchronized(coordinator.peers)
       {
+        Iterator it = coordinator.peers.iterator();
+        if ((!it.hasNext()) || coordinator.halted()) {
+          coordinator.peerCount = 0;
+          coordinator.interestedAndChoking = 0;
+          coordinator.setRateHistory(0, 0);
+          coordinator.uploaders = 0;
+          if (coordinator.halted())
+            cancel();
+          return;
+        }
+
         // Calculate total uploading and worst downloader.
         long worstdownload = Long.MAX_VALUE;
         Peer worstDownloader = null;
@@ -56,8 +67,7 @@ class PeerCheckerTask extends TimerTask
         // Keep track of peers we remove now,
         // we will add them back to the end of the list.
         List removed = new ArrayList();
-
-        Iterator it = coordinator.peers.iterator();
+        int uploadLimit = coordinator.allowedUploaders();
         while (it.hasNext())
           {
             Peer peer = (Peer)it.next();
@@ -100,8 +110,9 @@ class PeerCheckerTask extends TimerTask
             // If we are at our max uploaders and we have lots of other
             // interested peers try to make some room.
             // (Note use of coordinator.uploaders)
-            if (coordinator.uploaders >= PeerCoordinator.MAX_UPLOADERS
-                && coordinator.interestedAndChoking > 0
+            if (((coordinator.uploaders == uploadLimit
+                && coordinator.interestedAndChoking > 0)
+                || coordinator.uploaders > uploadLimit)
                 && !peer.isChoking())
               {
                 // Check if it still wants pieces from us.
@@ -186,8 +197,9 @@ class PeerCheckerTask extends TimerTask
         coordinator.uploaders = uploaders;
 
         // Remove the worst downloader if needed. (uploader if seeding)
-        if (uploaders >= PeerCoordinator.MAX_UPLOADERS
-            && coordinator.interestedAndChoking > 0
+        if (((uploaders == uploadLimit
+            && coordinator.interestedAndChoking > 0)
+            || uploaders > uploadLimit)
             && worstDownloader != null)
           {
             if (Snark.debug >= Snark.DEBUG)
@@ -216,8 +228,5 @@ class PeerCheckerTask extends TimerTask
 	coordinator.setRateHistory(uploaded, downloaded);
 
       }
-    if (coordinator.halted()) {
-        cancel();
-    }
   }
 }

@@ -208,10 +208,12 @@ class PeerConnectionOut implements Runnable
   /**
    * Adds a message to the sendQueue and notifies the method waiting
    * on the sendQueue to change.
+   * If a PIECE message only, add a timeout.
    */
   private void addMessage(Message m)
   {
-    SimpleTimer.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
+    if (m.type == Message.PIECE)
+      SimpleTimer.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     synchronized(sendQueue)
       {
         sendQueue.add(m);

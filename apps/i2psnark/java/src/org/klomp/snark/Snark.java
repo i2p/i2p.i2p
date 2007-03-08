@@ -287,7 +287,7 @@ public class Snark
 /*
  * Don't start a tunnel if the torrent isn't going to be started.
  * If we are starting,
- * startTorrent() will call trackerclient.start() which will force a connect.
+ * startTorrent() will force a connect.
  *
     boolean ok = I2PSnarkUtil.instance().connect();
     if (!ok) fatal("Unable to connect to I2P");
@@ -368,6 +368,9 @@ public class Snark
             activity = "Checking storage";
             storage = new Storage(meta, slistener);
             storage.check(rootDataDir);
+            // have to figure out when to reopen
+            // if (!start)
+            //    storage.close();
           }
         catch (IOException ioe)
           {
@@ -750,5 +753,23 @@ public class Snark
   
   public interface CompleteListener {
     public void torrentComplete(Snark snark);
+  }
+
+  /** Maintain a total uploader cap
+   ** This should be configurable
+   */
+  private final static int MAX_TOTAL_UPLOADERS = 10;
+  public static boolean overUploadLimit(int uploaders) {
+    PeerCoordinatorSet coordinators = PeerCoordinatorSet.instance();
+    if (coordinators == null || uploaders <= 0)
+      return false;
+    int totalUploaders = 0;
+    for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
+      PeerCoordinator c = (PeerCoordinator)iter.next();
+      if (!c.halted())
+        totalUploaders += c.uploaders;
+    }
+    Snark.debug("Total uploaders: " + totalUploaders, Snark.DEBUG);
+    return totalUploaders > MAX_TOTAL_UPLOADERS;
   }
 }

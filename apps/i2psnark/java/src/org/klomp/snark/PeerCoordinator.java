@@ -170,7 +170,7 @@ public class PeerCoordinator implements PeerListener
     setRate(down, downloaded_old);
   }
 
-  private void setRate(long val, long array[])
+  private static void setRate(long val, long array[])
   {
     synchronized(array) {
       for (int i = RATE_DEPTH-1; i > 0; i--)
@@ -352,6 +352,7 @@ public class PeerCoordinator implements PeerListener
     synchronized (peers) {
         int count = 0;
         int unchokedCount = 0;
+        int maxUploaders = allowedUploaders();
         Iterator it = peers.iterator();
         while (it.hasNext())
           {
@@ -360,7 +361,7 @@ public class PeerCoordinator implements PeerListener
             if (peer.isChoking() && peer.isInterested())
               {
                 count++;
-                if (uploaders < MAX_UPLOADERS)
+                if (uploaders < maxUploaders)
                   {
                     if (!peer.isChoked())
                       interested.add(unchokedCount++, peer);
@@ -370,7 +371,7 @@ public class PeerCoordinator implements PeerListener
               }
           }
 
-        while (uploaders < MAX_UPLOADERS && interested.size() > 0)
+        while (uploaders < maxUploaders && interested.size() > 0)
           {
             Peer peer = (Peer)interested.remove(0);
             if (_log.shouldLog(Log.DEBUG))
@@ -586,14 +587,27 @@ public class PeerCoordinator implements PeerListener
       }
 
     // Announce to the world we have it!
+    // Disconnect from other seeders when we get the last piece
     synchronized(peers)
       {
+        List toDisconnect = new ArrayList(); 
         Iterator it = peers.iterator();
         while (it.hasNext())
           {
             Peer p = (Peer)it.next();
             if (p.isConnected())
-              p.have(piece);
+              {
+                  if (completed() && p.isCompleted())
+                      toDisconnect.add(p);
+                  else
+                      p.have(piece);
+              }
+          }
+        it = toDisconnect.iterator();
+        while (it.hasNext())
+          {
+            Peer p = (Peer)it.next();
+            p.disconnect(true);
           }
       }
     
@@ -615,7 +629,7 @@ public class PeerCoordinator implements PeerListener
       {
         synchronized(peers)
           {
-            if (uploaders < MAX_UPLOADERS)
+            if (uploaders < allowedUploaders())
               {
                 if(peer.isChoking())
                   {
@@ -782,6 +796,21 @@ public class PeerCoordinator implements PeerListener
     int[] arr = peer.state.getRequestedPieces();
     for (int i = 0; arr[i] >= 0; i++)
       markUnrequestedIfOnlyOne(peer, arr[i]);
+  }
+
+  /** Return number of allowed uploaders for this torrent.
+   ** Check with Snark to see if we are over the total upload limit.
+   */
+  public int allowedUploaders()
+  {
+    if (Snark.overUploadLimit(uploaders)) {
+        if (_log.shouldLog(Log.DEBUG))
+          _log.debug("Over limit, uploaders was: " + uploaders);
+        return uploaders - 1;
+    } else if (uploaders < MAX_UPLOADERS)
+        return uploaders + 1;
+    else
+        return MAX_UPLOADERS;
   }
 }
 

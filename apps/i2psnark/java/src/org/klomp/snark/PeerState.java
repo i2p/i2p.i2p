@@ -63,7 +63,8 @@ class PeerState
   private boolean resend = false;
 
   private final static int MAX_PIPELINE = 2;
-  private final static int PARTSIZE = 64*1024; // default was 16K, i2p-bt uses 64KB
+  private final static int PARTSIZE = 32*1024; // Snark was 16K, i2p-bt uses 64KB
+  private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
 
   PeerState(Peer peer, PeerListener listener, MetaInfo metainfo,
             PeerConnectionIn in, PeerConnectionOut out)
@@ -173,7 +174,7 @@ class PeerState
         || begin < 0
         || begin > metainfo.getPieceLength(piece)
         || length <= 0
-        || length > 4*PARTSIZE)
+        || length > MAX_PARTSIZE)
       {
         // XXX - Protocol error -> disconnect?
         if (_log.shouldLog(Log.WARN))

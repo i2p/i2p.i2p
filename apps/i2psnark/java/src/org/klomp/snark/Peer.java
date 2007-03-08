@@ -508,6 +508,21 @@ public class Peer implements Comparable
   }
 
   /**
+   * Return if a peer is a seeder
+   * Quite inefficient - a byte lookup table or counter in Bitfield would be much better
+   */
+  public boolean isCompleted()
+  {
+    PeerState s = state;
+    if (s == null || s.bitfield == null)
+        return false;
+    for (int i = 0; i < s.bitfield.size(); i++)
+         if (!s.bitfield.get(i))
+             return false;
+    return true;
+  }
+
+  /**
    * Push the total uploaded/downloaded onto a RATE_DEPTH deep stack
    */
   public void setRateHistory(long up, long down)

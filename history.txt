@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.555 2007-03-03 15:30:52 zzz Exp $
+$Id: history.txt,v 1.556 2007-03-07 00:11:46 zzz Exp $
+
+2007-03-08  zzz
+    * i2psnark changes to improve upload performance:
+    *  Implement total uploader limit (10)
+    *  Don't timeout non-piece messages out
+    *  Change chunk size to 32K (was 64K)
+    *  Change request limit to 64K (was 256K)
+    * i2psnark: Disconnect from seeds when complete
+
+2007-03-07  zzz
+    * Remove dynamic router keys from config.jsp
 
 2007-03-07  zzz
     * Streaming lib changes to improve upstream performance during congestion:
