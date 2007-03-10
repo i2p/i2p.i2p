@@ -205,7 +205,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getRTT() { return _rtt; }
     public void setRTT(int ms) { 
         if (_rto == 0) {
-            _rttDev = ms;
+            _rttDev = ms / 2;
             _rto = ms + ms / 2;
         }
         synchronized (_trend) {

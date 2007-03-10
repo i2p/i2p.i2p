@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.556 2007-03-07 00:11:46 zzz Exp $
+$Id: history.txt,v 1.557 2007-03-08 13:55:18 zzz Exp $
+
+2007-03-10  zzz
+    * Streaming lib: Change initial RTT deviation from RTT to RTT/2
+      (RFC 2988) to reduce early RTO values
 
 2007-03-08  zzz
     * i2psnark changes to improve upload performance:
