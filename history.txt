@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.557 2007-03-08 13:55:18 zzz Exp $
+$Id: history.txt,v 1.558 2007-03-10 03:45:28 zzz Exp $
+
+2007-03-12  jrandom
+    * dodge a race on startup (thanks zzz!)
 
 2007-03-10  zzz
     * Streaming lib: Change initial RTT deviation from RTT to RTT/2

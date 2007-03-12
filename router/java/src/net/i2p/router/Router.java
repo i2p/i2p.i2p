@@ -225,7 +225,10 @@ public class Router {
     
     public long getWhenStarted() { return _started; }
     /** wall clock uptime */
-    public long getUptime() { return _context.clock().now() - _context.clock().getOffset() - _started; }
+    public long getUptime() { 
+        if ( (_context == null) || (_context.clock() == null) ) return 1; // racing on startup
+        return _context.clock().now() - _context.clock().getOffset() - _started;
+    }
     
     public RouterContext getContext() { return _context; }
     
