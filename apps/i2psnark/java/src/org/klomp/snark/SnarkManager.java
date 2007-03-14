@@ -28,6 +28,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_I2CP_OPTS = "i2psnark.i2cpOptions";
     public static final String PROP_EEP_HOST = "i2psnark.eepHost";
     public static final String PROP_EEP_PORT = "i2psnark.eepPort";
+    public static final String PROP_UPLOADERS_TOTAL = "i2psnark.uploaders.total";
     public static final String PROP_DIR = "i2psnark.dir";
 
     public static final String PROP_AUTO_START = "i2snark.autoStart";
@@ -99,6 +100,8 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_EEP_HOST, "localhost");
         if (!_config.containsKey(PROP_EEP_PORT))
             _config.setProperty(PROP_EEP_PORT, "4444");
+        if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
+            _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
@@ -129,6 +132,7 @@ public class SnarkManager implements Snark.CompleteListener {
         int eepPort = getInt(PROP_EEP_PORT, 4444);
         if (eepHost != null)
             I2PSnarkUtil.instance().setProxy(eepHost, eepPort);
+        I2PSnarkUtil.instance().setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
         getDataDir().mkdirs();
     }
     
@@ -144,7 +148,8 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     public void updateConfig(String dataDir, boolean autoStart, String seedPct, String eepHost, 
-                             String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts) {
+                             String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
+                             String upLimit) {
         boolean changed = false;
         if (eepHost != null) {
             int port = I2PSnarkUtil.instance().getEepProxyPort();
@@ -157,6 +162,20 @@ public class SnarkManager implements Snark.CompleteListener {
                 _config.setProperty(PROP_EEP_HOST, eepHost);
                 _config.setProperty(PROP_EEP_PORT, eepPort+"");
                 addMessage("EepProxy location changed to " + eepHost + ":" + port);
+            }
+        }
+        if (upLimit != null) {
+            int limit = I2PSnarkUtil.instance().getMaxUploaders();
+            try { limit = Integer.parseInt(upLimit); } catch (NumberFormatException nfe) {}
+            if ( limit != I2PSnarkUtil.instance().getEepProxyPort()) {
+                if ( limit >= Snark.MIN_TOTAL_UPLOADERS ) {
+                    I2PSnarkUtil.instance().setMaxUploaders(limit);
+                    changed = true;
+                    _config.setProperty(PROP_UPLOADERS_TOTAL, "" + limit);
+                    addMessage("Total uploaders limit changed to " + limit);
+                } else {
+                    addMessage("Minimum total uploaders limit is " + Snark.MIN_TOTAL_UPLOADERS);
+                }
             }
         }
         if (i2cpHost != null) {

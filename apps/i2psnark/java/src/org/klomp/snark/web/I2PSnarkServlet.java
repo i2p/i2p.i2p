@@ -271,7 +271,8 @@ public class I2PSnarkServlet extends HttpServlet {
             String i2cpHost = req.getParameter("i2cpHost");
             String i2cpPort = req.getParameter("i2cpPort");
             String i2cpOpts = req.getParameter("i2cpOpts");
-            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts);
+            String upLimit = req.getParameter("upLimit");
+            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit);
         } else if ("Create torrent".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null) {
@@ -607,7 +608,7 @@ public class I2PSnarkServlet extends HttpServlet {
         String uri = req.getRequestURI();
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean autoStart = _manager.shouldAutoStart();
-        int seedPct = 0;
+        //int seedPct = 0;
        
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<span class=\"snarkConfig\"><hr />\n");
@@ -621,6 +622,7 @@ public class I2PSnarkServlet extends HttpServlet {
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
         //Auto stop: <input type="checkbox" name="autoStop" value="true" title="If true, automatically stop torrents that are removed from the data directory" />
         //out.write("<br />\n");
+/*
         out.write("Seed percentage: <select name=\"seedPct\" disabled=\"true\" >\n\t");
         if (seedPct <= 0)
             out.write("<option value=\"0\" selected=\"true\">Unlimited</option>\n\t");
@@ -635,6 +637,9 @@ public class I2PSnarkServlet extends HttpServlet {
         else
             out.write("<option value=\"150\">150%</option>\n\t");
         out.write("</select><br />\n");
+*/
+        out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
+                  + I2PSnarkUtil.instance().getMaxUploaders() + "\" size=\"3\" /><br />\n");
         
         //out.write("<hr />\n");
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""

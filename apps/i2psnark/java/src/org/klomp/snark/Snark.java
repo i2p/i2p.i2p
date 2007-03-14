@@ -755,10 +755,10 @@ public class Snark
     public void torrentComplete(Snark snark);
   }
 
-  /** Maintain a total uploader cap
-   ** This should be configurable
+  /** Maintain a configurable total uploader cap
    */
-  private final static int MAX_TOTAL_UPLOADERS = 10;
+  final static int MIN_TOTAL_UPLOADERS = 4;
+  final static int MAX_TOTAL_UPLOADERS = 10;
   public static boolean overUploadLimit(int uploaders) {
     PeerCoordinatorSet coordinators = PeerCoordinatorSet.instance();
     if (coordinators == null || uploaders <= 0)
@@ -769,7 +769,8 @@ public class Snark
       if (!c.halted())
         totalUploaders += c.uploaders;
     }
-    Snark.debug("Total uploaders: " + totalUploaders, Snark.DEBUG);
-    return totalUploaders > MAX_TOTAL_UPLOADERS;
+    int limit = I2PSnarkUtil.instance().getMaxUploaders();
+    Snark.debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
+    return totalUploaders > limit;
   }
 }

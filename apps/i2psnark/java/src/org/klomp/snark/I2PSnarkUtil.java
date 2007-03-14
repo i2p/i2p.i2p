@@ -33,6 +33,7 @@ public class I2PSnarkUtil {
     private I2PSocketManager _manager;
     private boolean _configured;
     private Set _shitlist;
+    private int _maxUploaders;
     
     private I2PSnarkUtil() {
         _context = I2PAppContext.getGlobalContext();
@@ -42,6 +43,7 @@ public class I2PSnarkUtil {
         setI2CPConfig("127.0.0.1", 7654, null);
         _shitlist = new HashSet(64);
         _configured = false;
+        _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
     }
     
     /**
@@ -72,12 +74,18 @@ public class I2PSnarkUtil {
         _configured = true;
     }
     
+    public void setMaxUploaders(int limit) {
+        _maxUploaders = limit;
+        _configured = true;
+    }
+    
     public String getI2CPHost() { return _i2cpHost; }
     public int getI2CPPort() { return _i2cpPort; }
     public Map getI2CPOptions() { return _opts; }
     public String getEepProxyHost() { return _proxyHost; }
     public int getEepProxyPort() { return _proxyPort; }
     public boolean getEepProxySet() { return _shouldProxy; }
+    public int getMaxUploaders() { return _maxUploaders; }
     
     /**
      * Connect to the router, if we aren't already

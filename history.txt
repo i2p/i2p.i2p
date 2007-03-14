@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.558 2007-03-10 03:45:28 zzz Exp $
+$Id: history.txt,v 1.559 2007-03-12 13:20:01 jrandom Exp $
+
+2007-03-13  zzz
+    * i2psnark: Make max total uploaders configurable (thanks Amiga4000!)
 
 2007-03-12  jrandom
     * dodge a race on startup (thanks zzz!)
