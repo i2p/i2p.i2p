@@ -639,7 +639,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("</select><br />\n");
 */
         out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
-                  + I2PSnarkUtil.instance().getMaxUploaders() + "\" size=\"3\" /><br />\n");
+                  + I2PSnarkUtil.instance().getMaxUploaders() + "\" size=\"3\" /> peers<br />\n");
         
         //out.write("<hr />\n");
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
