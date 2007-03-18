@@ -54,8 +54,8 @@ public class Peer implements Comparable
   private boolean deregister = true;
   private static long __id;
   private long _id;
-  final static long CHECK_PERIOD = 40*1000; // 40 seconds
-  final static int RATE_DEPTH = 6; // make following arrays RATE_DEPTH long
+  final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD; // 40 seconds
+  final static int RATE_DEPTH = PeerCoordinator.RATE_DEPTH; // make following arrays RATE_DEPTH long
   private long uploaded_old[] = {-1,-1,-1,-1,-1,-1};
   private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
 
@@ -493,33 +493,24 @@ public class Peer implements Comparable
 
   /**
    * Return how much the peer has
-   * Quite inefficient - a byte lookup table or counter in Bitfield would be much better
    */
   public int completed()
   {
     PeerState s = state;
     if (s == null || s.bitfield == null)
         return 0;
-    int count = 0;
-    for (int i = 0; i < s.bitfield.size(); i++)
-         if (s.bitfield.get(i))
-             count++;
-    return count;
+    return s.bitfield.count();
   }
 
   /**
    * Return if a peer is a seeder
-   * Quite inefficient - a byte lookup table or counter in Bitfield would be much better
    */
   public boolean isCompleted()
   {
     PeerState s = state;
     if (s == null || s.bitfield == null)
         return false;
-    for (int i = 0; i < s.bitfield.size(); i++)
-         if (!s.bitfield.get(i))
-             return false;
-    return true;
+    return s.bitfield.complete();
   }
 
   /**

@@ -32,6 +32,7 @@ public class BitField
 
   private final byte[] bitfield;
   private final int size;
+  private int count;
 
   /**
    * Creates a new BitField that represents <code>size</code> unset bits.
@@ -41,6 +42,7 @@ public class BitField
     this.size = size;
     int arraysize = ((size-1)/8)+1;
     bitfield = new byte[arraysize];
+    this.count = 0;
   }
 
   /**
@@ -60,6 +62,11 @@ public class BitField
     // XXX - More correct would be to check that unused bits are
     // cleared or clear them explicitly ourselves.
     System.arraycopy(bitfield, 0, this.bitfield, 0, arraysize);
+
+    this.count = 0;
+    for (int i = 0; i < size; i++)
+      if (get(i))
+        this.count++;
   }
 
   /**
@@ -95,7 +102,10 @@ public class BitField
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     int index = bit/8;
     int mask = 128 >> (bit % 8);
-    bitfield[index] |= mask;
+    if ((bitfield[index] & mask) == 0) {
+      count++;
+      bitfield[index] |= mask;
+    }
   }
 
   /**
@@ -114,6 +124,22 @@ public class BitField
     return (bitfield[index] & mask) != 0;
   }
 
+  /**
+   * Return the number of set bits.
+   */
+  public int count()
+  {
+    return count;
+  }
+
+  /**
+   * Return true if all bits are set.
+   */
+  public boolean complete()
+  {
+    return count >= size;
+  }
+
   public String toString()
   {
     // Not very efficient
@@ -129,4 +155,5 @@ public class BitField
 
     return sb.toString();
   }
+
 }
