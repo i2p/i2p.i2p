@@ -3,6 +3,7 @@ package org.klomp.snark;
 import java.io.*;
 import java.util.*;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -30,6 +31,8 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_EEP_PORT = "i2psnark.eepPort";
     public static final String PROP_UPLOADERS_TOTAL = "i2psnark.uploaders.total";
     public static final String PROP_DIR = "i2psnark.dir";
+    public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
+    public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
 
     public static final String PROP_AUTO_START = "i2snark.autoStart";
     public static final String DEFAULT_AUTO_START = "false";
@@ -271,7 +274,9 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public void saveConfig() {
         try {
-            DataHelper.storeProps(_config, new File(_configFile));
+            synchronized (_configFile) {
+                DataHelper.storeProps(_config, new File(_configFile));
+            }
         } catch (IOException ioe) {
             addMessage("Unable to save the config to '" + _configFile + "'");
         }
@@ -361,6 +366,91 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
     
+    /**
+     * Get the timestamp for a torrent from the config file
+     */
+    public long getSavedTorrentTime(MetaInfo metainfo) {
+        byte[] ih = metainfo.getInfoHash();
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        String time = _config.getProperty(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX);
+        if (time == null)
+            return 0;
+        int comma = time.indexOf(',');
+        if (comma <= 0)
+            return 0;
+        time = time.substring(0, comma);
+        try { return Long.parseLong(time); } catch (NumberFormatException nfe) {}
+        return 0;
+    }
+    
+    /**
+     * Get the saved bitfield for a torrent from the config file.
+     * Convert "." to a full bitfield.
+     */
+    public BitField getSavedTorrentBitField(MetaInfo metainfo) {
+        byte[] ih = metainfo.getInfoHash();
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        String bf = _config.getProperty(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX);
+        if (bf == null)
+            return null;
+        int comma = bf.indexOf(',');
+        if (comma <= 0)
+            return null;
+        bf = bf.substring(comma + 1).trim();
+        int len = metainfo.getPieces();
+        if (bf.equals(".")) {
+            BitField bitfield = new BitField(len);
+            for (int i = 0; i < len; i++)
+                 bitfield.set(i);
+            return bitfield;
+        }
+        byte[] bitfield = Base64.decode(bf);
+        if (bitfield == null)
+            return null;
+        if (bitfield.length * 8 < len)
+            return null;
+        return new BitField(bitfield, len);
+    }
+    
+    /**
+     * Save the completion status of a torrent and the current time in the config file
+     * in the form "i2psnark.zmeta.$base64infohash=$time,$base64bitfield".
+     * The config file property key is appended with the Base64 of the infohash,
+     * with the '=' changed to '$' since a key can't contain '='.
+     * The time is a standard long converted to string.
+     * The status is either a bitfield converted to Base64 or "." for a completed
+     * torrent to save space in the config file and in memory.
+     */
+    public void saveTorrentStatus(MetaInfo metainfo, BitField bitfield) {
+        byte[] ih = metainfo.getInfoHash();
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        String now = "" + System.currentTimeMillis();
+        String bfs;
+        if (bitfield.complete()) {
+          bfs = ".";
+        } else {
+          byte[] bf = bitfield.getFieldBytes();
+          bfs = Base64.encode(bf);
+        }
+        _config.setProperty(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX, now + "," + bfs);
+        saveConfig();
+    }
+    
+    /**
+     * Remove the status of a torrent from the config file.
+     * This may help the config file from growing too big.
+     */
+    public void removeTorrentStatus(MetaInfo metainfo) {
+        byte[] ih = metainfo.getInfoHash();
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        _config.remove(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX);
+        saveConfig();
+    }
+    
     private String locked_validateTorrent(MetaInfo info) throws IOException {
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
@@ -426,6 +516,8 @@ public class SnarkManager implements Snark.CompleteListener {
         if (torrent != null) {
             File torrentFile = new File(filename);
             torrentFile.delete();
+            if (torrent.storage != null)
+                removeTorrentStatus(torrent.storage.getMetaInfo());
             addMessage("Torrent removed: '" + torrentFile.getName() + "'");
         }
     }

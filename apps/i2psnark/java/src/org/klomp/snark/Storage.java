@@ -45,6 +45,7 @@ public class Storage
   // XXX - Not always set correctly
   int piece_size;
   int pieces;
+  boolean changed;
 
   /** The default piece size. */
   private static int MIN_PIECE_SIZE = 256*1024;
@@ -285,6 +286,10 @@ public class Storage
   public void check(String rootDir) throws IOException
   {
     File base = new File(rootDir, filterName(metainfo.getName()));
+    // look for saved bitfield and timestamp in the config file
+    long savedTime = SnarkManager.instance().getSavedTorrentTime(metainfo);
+    BitField savedBitField = SnarkManager.instance().getSavedTorrentBitField(metainfo);
+    boolean useSavedBitField = savedTime > 0 && savedBitField != null;
 
     List files = metainfo.getFiles();
     if (files == null)
@@ -298,6 +303,11 @@ public class Storage
         rafs = new RandomAccessFile[1];
         names = new String[1];
         lengths[0] = metainfo.getTotalLength();
+        if (useSavedBitField) {
+            long lm = base.lastModified();
+            if (lm <= 0 || lm > savedTime)
+                useSavedBitField = false;
+        }
         if (base.exists() && !base.canWrite())  // hope we can get away with this, if we are only seeding...
             rafs[0] = new RandomAccessFile(base, "r");
         else
@@ -322,6 +332,11 @@ public class Storage
             File f = createFileFromNames(base, (List)files.get(i));
             lengths[i] = ((Long)ls.get(i)).longValue();
             total += lengths[i];
+            if (useSavedBitField) {
+                long lm = base.lastModified();
+                if (lm <= 0 || lm > savedTime)
+                    useSavedBitField = false;
+            }
             if (f.exists() && !f.canWrite()) // see above re: only seeding
                 rafs[i] = new RandomAccessFile(f, "r");
             else
@@ -335,7 +350,14 @@ public class Storage
           throw new IOException("File lengths do not add up "
                                 + total + " != " + metalength);
       }
-    checkCreateFiles();
+    if (useSavedBitField) {
+      bitfield = savedBitField;
+      needed = metainfo.getPieces() - bitfield.count();
+      Snark.debug("Found saved state and files unchanged, skipping check", Snark.NOTICE);
+    } else {
+      checkCreateFiles();
+      SnarkManager.instance().saveTorrentStatus(metainfo, bitfield);
+    }
   }
 
   /**
@@ -354,7 +376,7 @@ public class Storage
         if (!base.exists())
           throw new IOException("Could not reopen file " + base);
 
-        if (!base.canWrite())  // hope we can get away with this, if we are only seeding...
+        if (complete() || !base.canWrite())  // hope we can get away with this, if we are only seeding...
             rafs[0] = new RandomAccessFile(base, "r");
         else
             rafs[0] = new RandomAccessFile(base, "rw");
@@ -372,7 +394,7 @@ public class Storage
             File f = getFileFromNames(base, (List)files.get(i));
             if (!f.exists())
                 throw new IOException("Could not reopen file " + f);
-            if (!f.canWrite()) // see above re: only seeding
+            if (complete() || !f.canWrite()) // see above re: only seeding
                 rafs[i] = new RandomAccessFile(f, "r");
             else
                 rafs[i] = new RandomAccessFile(f, "rw");
@@ -517,6 +539,7 @@ public class Storage
             // gobble gobble
         }
       }
+    changed = false;
   }
 
   /**
@@ -604,6 +627,7 @@ public class Storage
           }
       }
 
+    changed = true;
     if (complete) {
 //    listener.storageCompleted(this);
       // do we also need to close all of the files and reopen
@@ -623,6 +647,8 @@ public class Storage
         listener.setWantedPieces(this);
         Snark.debug("WARNING: Not really done, missing " + needed
                     + " pieces", Snark.WARNING);
+      } else {
+        SnarkManager.instance().saveTorrentStatus(metainfo, bitfield);
       }
     }
 

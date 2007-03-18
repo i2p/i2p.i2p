@@ -468,6 +468,8 @@ public class Snark
         pc.halt();
     Storage st = storage;
     if (st != null) {
+        if (storage.changed)
+            SnarkManager.instance().saveTorrentStatus(storage.getMetaInfo(), storage.getBitField());
         try { 
             storage.close(); 
         } catch (IOException ioe) {
