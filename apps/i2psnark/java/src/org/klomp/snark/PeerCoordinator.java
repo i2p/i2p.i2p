@@ -237,6 +237,8 @@ public class PeerCoordinator implements PeerListener
         peer.disconnect();
         removePeerFromPieces(peer);
     }
+    // delete any saved orphan partial piece
+    savedRequest = null;
   }
 
   public void connected(Peer peer)
@@ -263,6 +265,7 @@ public class PeerCoordinator implements PeerListener
           {
             if (_log.shouldLog(Log.WARN))
               _log.warn("Already connected to: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
+            // toDisconnect = peer to get out of synchronized(peers)
             peer.disconnect(false); // Don't deregister this connection/peer.
           }
         else
@@ -357,7 +360,6 @@ public class PeerCoordinator implements PeerListener
         while (it.hasNext())
           {
             Peer peer = (Peer)it.next();
-            boolean remove = false;
             if (peer.isChoking() && peer.isInterested())
               {
                 count++;
@@ -691,6 +693,8 @@ public class PeerCoordinator implements PeerListener
   private long savedRequestTime = 0;
   public void savePeerPartial(PeerState state)
   {
+    if (halted)
+      return;
     Request req = state.getPartialRequest();
     if (req == null)
       return;
@@ -791,7 +795,7 @@ public class PeerCoordinator implements PeerListener
    */
   public void markUnrequested(Peer peer)
   {
-    if (peer.state == null)
+    if (halted || peer.state == null)
       return;
     int[] arr = peer.state.getRequestedPieces();
     for (int i = 0; arr[i] >= 0; i++)
