@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.561 2007-03-17 16:18:12 jrandom Exp $
+$Id: history.txt,v 1.562 2007-03-17 16:19:37 jrandom Exp $
+
+2007-03-18  zzz
+    * i2psnark: Cleanup some handling of saved partial pieces
+    * i2psnark: Put bit counting in Bitfield.java for efficiency
+    * i2psnark: Save torrent completion state in i2psnark.config
 
 * 2007-03-17  0.6.1.28 released
 
