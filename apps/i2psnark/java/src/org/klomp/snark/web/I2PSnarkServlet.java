@@ -67,14 +67,23 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<tr><td width=\"20%\" class=\"snarkTitle\" valign=\"top\" align=\"left\">");
         out.write("I2PSnark<br />\n");
         out.write("<table border=\"0\" width=\"100%\">\n");
-        out.write("<tr><td><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a><br />\n");
-        out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a><br />\n");
-        out.write("<tr><td><a href=\"http://de-ebook-archiv.i2p/pub/bt/\" class=\"snarkRefresh\">eBook</a><br />\n");
-        out.write("<td><a href=\"http://gaytorrents.i2p/\" class=\"snarkRefresh\">GayTorrents</a><br />\n");
-        out.write("<tr><td><a href=\"http://nickyb.i2p/bittorrent/\" class=\"snarkRefresh\">NickyB</a><br />\n");
-        out.write("<td><a href=\"http://orion.i2p/bt/\" class=\"snarkRefresh\">Orion</a><br />\n");
-        out.write("<tr><td><a href=\"http://tracker.postman.i2p/\" class=\"snarkRefresh\">Postman</a><br />\n");
-        out.write("<td>&nbsp;\n");
+        out.write("<tr><td><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>\n");
+        out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
+        int count = 0;
+        Map trackers = _manager.getTrackers();
+        for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            String baseURL = (String)trackers.get(name);
+            int e = baseURL.indexOf('=');
+            if (e < 0)
+                continue;
+            baseURL = baseURL.substring(e + 1);
+            if (count++ % 2 == 0)
+                out.write("<tr>");
+            out.write("<td><a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>\n");
+        }
+        if (count % 2 == 1)
+            out.write("<td>&nbsp;\n");
         out.write("</table>\n");
         out.write("</td><td width=\"80%\" class=\"snarkMessages\" valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
@@ -335,7 +344,7 @@ public class I2PSnarkServlet extends HttpServlet {
     }
 
     private static final int MAX_DISPLAYED_FILENAME_LENGTH = 60;
-    private static final int MAX_DISPLAYED_ERROR_LENGTH = 30;
+    private static final int MAX_DISPLAYED_ERROR_LENGTH = 40;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers) throws IOException {
         String filename = snark.torrent;
         File f = new File(filename);
@@ -388,15 +397,15 @@ public class I2PSnarkServlet extends HttpServlet {
         String statusString = "Unknown";
         if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "TrackerErr (" +
+                statusString = "<a title=\"" + err + "\">TrackerErr</a> (" +
                                curPeers + "/" + knownPeers +
                                " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">peers</a>)";
             else if (isRunning)
-                statusString = "TrackerErr (" + curPeers + "/" + knownPeers + " peers)";
+                statusString = "<a title=\"" + err + "\">TrackerErr (" + curPeers + "/" + knownPeers + " peers)";
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "...";
-                statusString = "TrackerErr (" + err + ")";
+                statusString = "TrackerErr<br />(" + err + ")";
             }
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
@@ -438,6 +447,12 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(filename);
         if (remaining == 0)
             out.write("</a>");
+        // temporarily hardcoded for postman, requires bytemonsoon patch for lookup by info_hash
+        if (snark.meta.getAnnounce().startsWith("http://YRgrgTLG")) {
+            out.write("&nbsp;&nbsp;&nbsp;(<a href=\"http://tracker.postman.i2p/details.php?dllist=1&filelist=1&info_hash=");
+            out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
+            out.write("\" title=\"Postman Tracker\">Details</a>)");
+        }
         out.write("</td>\n\t");
         
         out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
@@ -500,7 +515,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Azureus";
                 else
                     client = "Unknown";
-                out.write("<font size=-1>" + client + "</font> <tt>" + peer.toString().substring(5, 9) + "</tt>");
+                out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
@@ -578,30 +593,20 @@ public class I2PSnarkServlet extends HttpServlet {
                   + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
                   + "\" title=\"File to seed (must be within the specified path)\" /><br />\n");
         out.write("Tracker: <select name=\"announceURL\"><option value=\"\">Select a tracker</option>\n");
-        Map trackers = sort(_manager.getTrackers());
+        Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             String announceURL = (String)trackers.get(name);
-            // we inject whitespace in sort(...) to guarantee uniqueness, but we can strip it off here
-            out.write("\t<option value=\"" + announceURL + "\">" + name.trim() + "</option>\n");
+            int e = announceURL.indexOf('=');
+            if (e > 0)
+                announceURL = announceURL.substring(0, e);
+            out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
         out.write("or <input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
                   "title=\"Custom tracker URL\" /> ");
         out.write("<input type=\"submit\" value=\"Create torrent\" name=\"action\" />\n");
         out.write("</form>\n</span>\n");        
-    }
-    
-    private Map sort(Map trackers) {
-        TreeMap rv = new TreeMap();
-        for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
-            String url = (String)iter.next();
-            String name = (String)trackers.get(url);
-            while (rv.containsKey(name))
-                name = name + " ";
-            rv.put(name, url);
-        }
-        return rv;
     }
     
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {

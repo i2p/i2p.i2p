@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.562 2007-03-17 16:19:37 jrandom Exp $
+$Id: history.txt,v 1.563 2007-03-18 16:57:03 zzz Exp $
+
+2007-03-22  zzz
+    * i2psnark tracker handling tweaks:
+    -   Add link to tracker details page (Postman only for now, requires bytemonsoon patch)
+    -   Add Base URL to tracker list configuration
+    -   Web page links built from tracker list Base URLs
+    -   Only build and sort tracker list once
+    -   Add anonymityWeb tracker to default list
+    -   Add tooltip info for TrackerErrs
+    -   Stop torrent if not registered with tracker
+    -   Mark temp files as delete on exit
 
 2007-03-18  zzz
     * i2psnark: Cleanup some handling of saved partial pieces

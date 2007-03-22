@@ -41,6 +41,7 @@ public class TrackerClient extends I2PThread
   private static final String STARTED_EVENT = "started";
   private static final String COMPLETED_EVENT = "completed";
   private static final String STOPPED_EVENT = "stopped";
+  private static final String NOT_REGISTERED  = "torrent not registered"; //bytemonsoon
 
   private final static int SLEEP = 5; // 5 minutes.
   private final static int DELAY_MIN = 2000; // 2 secs.
@@ -151,6 +152,10 @@ public class TrackerClient extends I2PThread
                   ("WARNING: Could not contact tracker at '"
                    + announce + "': " + ioe, Snark.WARNING);
                 coordinator.trackerProblems = ioe.getMessage();
+                if (coordinator.trackerProblems.toLowerCase().startsWith(NOT_REGISTERED)) {
+                  stop = true;
+                  coordinator.snark.stopTorrent();
+                }
               }
 
             if (stop)
@@ -254,6 +259,10 @@ public class TrackerClient extends I2PThread
                       ("WARNING: Could not contact tracker at '"
                        + announce + "': " + ioe, Snark.WARNING);
                     coordinator.trackerProblems = ioe.getMessage();
+                    if (coordinator.trackerProblems.toLowerCase().startsWith(NOT_REGISTERED)) {
+                      stop = true;
+                      coordinator.snark.stopTorrent();
+                    }
                   }
               }
           }
@@ -298,6 +307,7 @@ public class TrackerClient extends I2PThread
     if (fetched == null) {
         throw new IOException("Error fetching " + s);
     }
+    fetched.deleteOnExit();
     
     InputStream in = null;
     try {
@@ -325,7 +335,7 @@ public class TrackerClient extends I2PThread
    * Very lazy byte[] to URL encoder.  Just encodes everything, even
    * "normal" chars.
    */
-  static String urlencode(byte[] bs)
+  public static String urlencode(byte[] bs)
   {
     StringBuffer sb = new StringBuffer(bs.length*3);
     for (int i = 0; i < bs.length; i++)
