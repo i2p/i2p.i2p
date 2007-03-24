@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.563 2007-03-18 16:57:03 zzz Exp $
+$Id: history.txt,v 1.564 2007-03-22 00:21:27 zzz Exp $
+
+2007-03-24  zzz
+    * Remove Syndie from build targets and navbar
 
 2007-03-22  zzz
     * i2psnark tracker handling tweaks:

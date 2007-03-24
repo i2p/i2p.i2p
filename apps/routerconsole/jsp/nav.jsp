@@ -24,7 +24,7 @@
  <!-- Could not find docs/toolbar.html! -->
  <a href="susimail/susimail">Susimail</a> |
  <a href="susidns/index.jsp">SusiDNS</a> |
- <a href="syndie/">Syndie</a> |
+ <!-- <a href="syndie/">Syndie</a> | -->
  <a href="i2psnark/">I2PSnark</a> |
  <a href="http://localhost:7658/">My Eepsite</a> <br>
  <a href="i2ptunnel/index.jsp">I2PTunnel</a> |

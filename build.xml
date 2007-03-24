@@ -30,7 +30,7 @@
         <ant dir="apps/addressbook/" target="war" />
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
-        <ant dir="apps/syndie/java/" target="jar" />
+        <!-- <ant dir="apps/syndie/java/" target="jar" /> -->
         <ant dir="apps/i2psnark/java/" target="standalone" />
     </target>
     <target name="buildrouter">
@@ -103,9 +103,11 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
+        <!--
         <copy file="apps/syndie/syndie.war" todir="build/" />
         <copy file="apps/syndie/java/build/syndie.jar" todir="build/" />
         <copy file="apps/syndie/java/build/sucker.jar" todir="build/" />
+        -->
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
         <copy file="apps/jdom/jdom.jar" todir="build/" />
@@ -209,7 +211,7 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
-        <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
+        <!-- <copy file="build/syndie.war" todir="pkg-temp/webapps/" /> -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
@@ -279,11 +281,13 @@
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
+        <!--
 	<mkdir dir="pkg-temp/syndie" />
 	<mkdir dir="pkg-temp/syndie/archive" />
 	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
 	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
 	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
+        -->
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -320,7 +324,7 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
-        <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
+        <!-- <copy file="build/syndie.war" todir="pkg-temp/webapps/" /> -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <!-- <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" /> -->
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
@@ -351,11 +355,13 @@
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
+        <!--
 	<mkdir dir="pkg-temp/syndie" />
 	<mkdir dir="pkg-temp/syndie/archive" />
 	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
 	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
 	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
+        -->
     </target>
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy file="build/ant.jar" todir="pkg-temp/lib/" />
