@@ -597,6 +597,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
     
+    private static String jumpServers[] = {"http://orion.i2p/jump/",
+                                           "http://trevorreznik.i2p/cgi-bin/jump.php?hostname="
+                                          };
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
                                           boolean usingWWWProxy, String wwwProxy, boolean showAddrHelper) throws IOException {
         if (out != null) {
@@ -615,11 +618,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 out.write("</a>".getBytes());
                 if (usingWWWProxy) out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
                 if (showAddrHelper) {
-                    out.write("<br><br>Click below to try an address helper link:<br><br><a href=\"http://orion.i2p/jump/".getBytes());
-                    out.write(uri.getBytes());
-                    out.write("\">http://orion.i2p/jump/".getBytes());
-                    out.write(uri.getBytes());
-                    out.write("</a>".getBytes());
+                    out.write("<br><br>Click a link below to look for an address helper by using a \"jump\" service:<br>".getBytes());
+                    for (int i = 0; i < jumpServers.length; i++) {
+                        out.write("<br><a href=\"".getBytes());
+                        out.write(jumpServers[i].getBytes());
+                        out.write(uri.getBytes());
+                        out.write("\">".getBytes());
+                        out.write(jumpServers[i].getBytes());
+                        out.write(uri.getBytes());
+                        out.write("</a>".getBytes());
+                    }
                 }
             }
             out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());

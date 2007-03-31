@@ -447,11 +447,24 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(filename);
         if (remaining == 0)
             out.write("</a>");
-        // temporarily hardcoded for postman, requires bytemonsoon patch for lookup by info_hash
-        if (snark.meta.getAnnounce().startsWith("http://YRgrgTLG")) {
-            out.write("&nbsp;&nbsp;&nbsp;(<a href=\"http://tracker.postman.i2p/details.php?dllist=1&filelist=1&info_hash=");
-            out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
-            out.write("\" title=\"Postman Tracker\">Details</a>)");
+        // temporarily hardcoded for postman and anonymity, requires bytemonsoon patch for lookup by info_hash
+        String announce = snark.meta.getAnnounce();
+        if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr")) {
+            Map trackers = _manager.getTrackers();
+            for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
+                String name = (String)iter.next();
+                String baseURL = (String)trackers.get(name);
+                if (!baseURL.startsWith(announce))
+                    continue;
+                int e = baseURL.indexOf('=');
+                if (e < 0)
+                    continue;
+                baseURL = baseURL.substring(e + 1);
+                out.write("&nbsp;&nbsp;&nbsp;(<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
+                out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
+                out.write("\" title=\"" + name + " Tracker\">Details</a>)");
+                break;
+            }
         }
         out.write("</td>\n\t");
         

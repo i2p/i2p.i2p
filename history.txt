@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.564 2007-03-22 00:21:27 zzz Exp $
+$Id: history.txt,v 1.565 2007-03-24 02:57:39 zzz Exp $
+
+2007-03-31  zzz
+    * Add trevorreznik jump server to the http proxy error page
+    * Add anonymity to the trackers supporting details links in i2psnark
 
 2007-03-24  zzz
     * Remove Syndie from build targets and navbar
