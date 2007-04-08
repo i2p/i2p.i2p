@@ -1,4 +1,4 @@
-<i2p.news date="$Date: 2007-03-25 17:58:18 $">
+<i2p.news date="$Date: 2007-04-05 01:11:21 $">
  <i2p.release version="0.6.1.28" date="2007/02/15" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
@@ -19,10 +19,8 @@ improvements, and priority operation within the router.
 &#149;
 2007-03-27:
 <a href="http://dev.i2p/pipermail/i2p/2007-March/001342.html">status notes</a>
-<!--
 and
 <a href="http://www.i2p/meeting204">meeting log</a>
--->
 <br />
 &#149;
 2007-04-03:
