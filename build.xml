@@ -197,7 +197,7 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
-        <copy file="build/sucker.jar" todir="pkg-temp/lib" />
+        <!-- <copy file="build/sucker.jar" todir="pkg-temp/lib" /> -->
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.565 2007-03-24 02:57:39 zzz Exp $
+$Id: history.txt,v 1.566 2007-03-31 16:50:52 zzz Exp $
+
+2007-05-06  Complication
+    * Fix the build.xml file, so the preppkg build target won't try copying files
+      which became deprecated with the old Syndie (thank for alerting, itsu!)
 
 2007-03-31  zzz
     * Add trevorreznik jump server to the http proxy error page
