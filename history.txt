@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.567 2007-05-06 14:52:39 complication Exp $
+$Id: history.txt,v 1.568 2007-05-06 15:02:04 complication Exp $
+
+2007-06-16  Complication
+    * First pass on EepGet and ReseedHandler improvements,
+      please avoid use on routers which matter!
+    * Give EepGet ability of downloading into an OutputStream,
+      such as the ByteArrayOutputStream of ReseedHandler.
+    * Detect failure to reseed better, report it persistently
+      and more verbosely, provide a link to logs
+      and suggest manual reseed.
 
 2007-05-06  Complication
     * Fix the build.xml file, so the preppkg build target won't try copying files

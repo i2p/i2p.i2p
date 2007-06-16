@@ -34,6 +34,7 @@ public class EepGet {
     private int _proxyPort;
     private int _numRetries;
     private String _outputFile;
+    private OutputStream _outputStream;
     private String _url;
     private String _postData;
     private boolean _allowCaching;
@@ -53,35 +54,46 @@ public class EepGet {
     private boolean _notModified;
     private String _contentType;
     
+    // Constructor 7, calls 3 with: do proxy
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
     }
+    // Constructor 6, calls 1 with: do proxy, no etag
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url, allowCaching, null);
     }
+    // Constructor 5, calls 3 with: no proxy
     public EepGet(I2PAppContext ctx, int numRetries, String outputFile, String url) {
         this(ctx, false, null, -1, numRetries, outputFile, url);
     }
+    // Constructor 4, calls 1 with: no proxy, no etag
     public EepGet(I2PAppContext ctx, int numRetries, String outputFile, String url, boolean allowCaching) {
         this(ctx, false, null, -1, numRetries, outputFile, url, allowCaching, null);
     }
+    // Constructor 3, calls 1 with: do caching, no etag
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true, null);
     }
+    // Constructor 2, calls 0 with: no output buffer, do caching, no etag
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, String postData) {
-        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true, null, postData);
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, null, url, true, null, postData);
     }
+    // Constructor 1, calls 0 with: no output buffer, no postdata
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
-        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, allowCaching, etag, null);
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, null, url, allowCaching, etag, null);
     }
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag, String postData) {
+    // Constructor 0, real constructor
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries,
+                  String outputFile, OutputStream outputStream, String url, boolean allowCaching,
+                  String etag, String postData) {
         _context = ctx;
         _log = ctx.logManager().getLog(EepGet.class);
         _shouldProxy = shouldProxy;
         _proxyHost = proxyHost;
         _proxyPort = proxyPort;
         _numRetries = numRetries;
-        _outputFile = outputFile;
+        _outputFile = outputFile;     // if outputFile is set, outputStream must be null
+        _outputStream = outputStream; // if both are set, outputStream overrides outputFile
         _url = url;
         _postData = postData;
         _alreadyTransferred = 0;
@@ -352,7 +364,7 @@ public class EepGet {
         return false;
     }
 
-    /** return true if the URL was completely retrieved */
+    /** a single fetch attempt */
     private void doFetch() throws IOException {
         readHeaders();
         if (_log.shouldLog(Log.DEBUG))
@@ -371,6 +383,11 @@ public class EepGet {
                 break;
             _out.write(buf, 0, read);
             _bytesTransferred += read;
+            // This seems necessary to properly resume a partial download into a stream,
+            // as nothing else increments _alreadyTransferred, and there's no file length to check.
+            // Hopefully this won't break compatibility with existing status listeners
+            // (cause them to behave weird, or show weird numbers).
+            _alreadyTransferred += read;
             remaining -= read;
             if (remaining==0 && _encodingChunked) {
                 if(_proxyIn.read()=='\r' && _proxyIn.read()=='\n') {
@@ -419,12 +436,14 @@ public class EepGet {
         boolean rcOk = false;
         switch (responseCode) {
             case 200: // full
-                _out = new FileOutputStream(_outputFile, false);
+                if (_outputStream != null) _out = _outputStream;
+                    else _out = new FileOutputStream(_outputFile, false);
                 _alreadyTransferred = 0;
                 rcOk = true;
                 break;
             case 206: // partial
-                _out = new FileOutputStream(_outputFile, true);
+                if (_outputStream != null) _out = _outputStream;
+                    else _out = new FileOutputStream(_outputFile, true);
                 rcOk = true;
                 break;
             case 304: // not modified
@@ -588,9 +607,16 @@ public class EepGet {
     private boolean isNL(byte b) { return (b == NL); }
 
     private void sendRequest() throws IOException {
-        File outFile = new File(_outputFile);
-        if (outFile.exists())
-            _alreadyTransferred = outFile.length();
+        if (_outputStream != null) {
+            // We are reading into a stream supplied by a caller,
+            // for which we cannot easily determine how much we've written.
+            // Assume that _alreadyTransferred holds the right value
+            // (we should never be restarted to work on an old stream).
+        } else {
+            File outFile = new File(_outputFile);
+            if (outFile.exists())
+                _alreadyTransferred = outFile.length();
+        }
 
         String req = getRequest();
 

@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.net.Socket;
@@ -13,11 +12,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.EepGet;
 
 /**
  * Handler to deal with reseed requests.  This reseed from the URL
- * http://dev.i2p.net/i2pdb2/ unless the java env property "i2p.reseedURL" is
+ * http://dev.i2p.net/i2pdb2/ unless the I2P configuration property "i2p.reseedURL" is
  * set.  It always writes to ./netDb/, so don't mess with that.
  *
  */
@@ -67,13 +68,24 @@ public class ReseedHandler {
      *
      */
     private static void reseed(boolean echoStatus) {
-        String seedURL = I2PAppContext.getGlobalContext().getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        Log log = context.logManager().getLog(ReseedHandler.class);
+        
+        String seedURL = context.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
         if ( (seedURL == null) || (seedURL.trim().length() <= 0) ) 
             seedURL = DEFAULT_SEED_URL;
+        System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
         try {
             URL dir = new URL(seedURL);
             byte contentRaw[] = readURL(dir);
-            if (contentRaw == null) return;
+            if (contentRaw == null) {
+                System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
+                    "Last reseed failed fully (failed reading seed URL). " +
+                    "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
+                    "and if nothing helps, read FAQ about reseeding manually.");
+                log.error("Failed reading seed URL: " + seedURL);
+                return;
+            }
             String content = new String(contentRaw);
             Set urls = new HashSet();
             int cur = 0;
@@ -86,6 +98,14 @@ public class ReseedHandler {
                 String name = content.substring(start+"href=\"routerInfo-".length(), end);
                 urls.add(name);
                 cur = end + 1;
+            }
+            if (urls.size() <= 0) {
+                log.error("Read " + contentRaw.length + " bytes from seed " + seedURL + ", but found no routerInfo URLs.");
+                System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
+                    "Last reseed failed fully (no routerInfo URLs at seed URL). " +
+                    "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
+                    "and if nothing helps, read FAQ about reseeding manually.");
+                return;
             }
 
             int fetched = 0;
@@ -104,75 +124,47 @@ public class ReseedHandler {
                 }
             }
             if (echoStatus) System.out.println();
+            if (errors > 0) {
+                System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
+                    "Last reseed failed partly (" + errors + " of " + urls.size() + "). " +
+                    "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
+                    "and if nothing helps, read FAQ about reseeding manually.");
+            }
         } catch (Throwable t) {
-            I2PAppContext.getGlobalContext().logManager().getLog(ReseedHandler.class).error("Error reseeding", t);
+            System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
+                "Last reseed failed fully (exception caught). " +
+                "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
+                "and if nothing helps, read FAQ about reseeding manually.");
+            log.error("Error reseeding", t);
         }
     }
     
+    /* Since we don't return a value, we should always throw an exception if something fails. */
     private static void fetchSeed(String seedURL, String peer) throws Exception {
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(ReseedHandler.class);
         URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
 
         byte data[] = readURL(url);
+        if (data == null) {
+            log.error("Failed fetching seed: " + url.toString());
+            throw new Exception ("Failed fetching seed.");
+        }
+        if (data.length < 1024) {
+            log.error("Fetched data too small to contain a routerInfo: " + url.toString());
+            throw new Exception ("Fetched data too small.");
+        }
         //System.out.println("read: " + (data != null ? data.length : -1));
         writeSeed(peer, data);
     }
     
     private static byte[] readURL(URL url) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
-        String hostname = url.getHost();
-        int port = url.getPort();
-        if (port < 0)
-            port = 80;
-        Socket s = new Socket(hostname, port);
-        OutputStream out = s.getOutputStream();
-        InputStream in = s.getInputStream();
-        String request = getRequest(url);
-        //System.out.println("Sending to " + hostname +":"+ port + ": " + request);
-        out.write(request.getBytes());
-        out.flush();
-        // skip the HTTP response headers
-        // (if we were smart, we'd check for HTTP 200, content-length, etc)
-        int consecutiveNL = 0;
-        while (true) {
-            int cur = in.read();
-            switch (cur) {
-                case -1: 
-                    return null;
-                case '\n':
-                case '\r':
-                    consecutiveNL++;
-                    break;
-                default:
-                    consecutiveNL = 0;
-            }
-            if (consecutiveNL == 4)
-                break;
-        }
-        // ok, past the headers, grab the goods
-        byte buf[] = new byte[1024];
-        while (true) {
-            int read = in.read(buf);
-            if (read < 0)
-                break;
-            baos.write(buf, 0, read);
-        }
-        in.close();
-        s.close();
-        return baos.toByteArray();
-    }
-    
-    private static String getRequest(URL url) {
-        StringBuffer buf = new StringBuffer(512);
-        String path = url.getPath();
-        if ("".equals(path))
-            path = "/";
-        buf.append("GET ").append(path).append(" HTTP/1.0\n");
-        buf.append("Host: ").append(url.getHost());
-        int port = url.getPort();
-        if ( (port > 0) && (port != 80) )
-            buf.append(":").append(port);
-        buf.append("\nConnection: close\n\n");
-        return buf.toString();
+        
+        // Do a non-proxied eepget into our ByteArrayOutputStream with 0 retries
+        EepGet get = new EepGet( I2PAppContext.getGlobalContext(), false, null, -1, 0,
+            null, baos, url.toString(), false, null, null);
+
+        if (get.fetch()) return baos.toByteArray(); else return null;
     }
     
     private static void writeSeed(String name, byte data[]) throws Exception {

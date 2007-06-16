@@ -43,12 +43,12 @@
  <b>Failing:</b> <jsp:getProperty name="helper" property="failingPeers" /><br />
  <!-- <b>Shitlisted:</b> <jsp:getProperty name="helper" property="shitlistedPeers" /><br /> -->
  <b>Known:</b> <jsp:getProperty name="helper" property="allPeers" /><br /><%
-     if (helper.getActivePeers() <= 0) {
+    if (helper.getActivePeers() <= 0) {
         %><b><a href="config.jsp">check your NAT/firewall</a></b><br /><%
-     }
+    }
     if (helper.allowReseed()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
-            out.print(" <i>reseeding</i>");
+            out.print(" <i>reseeding</i><br />");
         } else {
             long nonce = new java.util.Random().nextLong();
             String prev = System.getProperty("net.i2p.router.web.ReseedHandler.nonce");
@@ -59,7 +59,14 @@
                 uri = uri + "&reseedNonce=" + nonce;
             else
                 uri = uri + "?reseedNonce=" + nonce;
-            out.print(" <a href=\"" + uri + "\">reseed</a>");
+            out.print(" <a href=\"" + uri + "\">reseed</a><br />");
+        }
+    }
+    // If a new reseed ain't running, show how the last reseed finished
+    if ("false".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
+        String reseedErrorMessage = System.getProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
+        if (reseedErrorMessage.length() > 0) {
+            out.print("<i>" + reseedErrorMessage + "</i><br />");
         }
     }
  %><hr />
