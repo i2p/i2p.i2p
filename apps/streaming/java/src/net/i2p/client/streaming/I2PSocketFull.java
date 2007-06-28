@@ -29,9 +29,15 @@ public class I2PSocketFull implements I2PSocket {
         if (c == null) return;
         if (c.getIsConnected()) {
             OutputStream out = c.getOutputStream();
-            if (out != null)
-                out.close();
-            c.disconnect(true);
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ioe) {
+                    // ignore any write error, as we want to keep on and kill the
+                    // con (thanks Complication!)
+                }
+            }
+	    c.disconnect(true);
         } else {
             //throw new IOException("Not connected");
         }

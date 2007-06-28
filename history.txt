@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.568 2007-05-06 15:02:04 complication Exp $
+$Id: history.txt,v 1.569 2007-06-16 18:15:49 complication Exp $
+
+2007-06-27  jrandom
+    * fix for a streaming lib bug that could leave a thread waiting
+      indefinitely (thanks Complication!)
 
 2007-06-16  Complication
     * First pass on EepGet and ReseedHandler improvements,
