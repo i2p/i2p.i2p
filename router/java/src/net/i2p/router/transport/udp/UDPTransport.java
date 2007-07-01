@@ -73,9 +73,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /** shared fast bid for connected peers */
     private TransportBid _fastBid;
-    /** shared slow bid for unconnected peers */
-    private TransportBid _slowBid;
     /** shared slow bid for unconnected peers when we want to prefer UDP */
+    private TransportBid _slowBid;
+    /** shared slow bid for unconnected peers */
+    private TransportBid _slowestBid;
+    /** shared fast bid for unconnected peers when we want to prefer UDP */
+    private TransportBid _fastPreferredBid;
+    /** shared slow bid for unconnected peers when we want to always prefer UDP */
     private TransportBid _slowPreferredBid;
     
     /** list of RemoteHostId for peers whose packets we want to drop outright */
@@ -92,14 +96,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** define this to explicitly set an external port */
     public static final String PROP_EXTERNAL_PORT = "i2np.udp.port";
     /** 
-     * If i2np.udp.alwaysPreferred is set, the UDP bids will always be under 
+     * If i2np.udp.preferred is set to "always", the UDP bids will always be under 
      * the bid from the TCP transport - even if a TCP connection already 
-     * exists.  If this is true (the default), it will always prefer UDP, otherwise
+     * exists.  If it is set to "true",
      * it will prefer UDP unless no UDP session exists and a TCP connection 
      * already exists.
+     * If it is set to "false" (the default),
+     * it will prefer TCP unless no TCP session exists and a UDP connection 
+     * already exists.
      */
-    public static final String PROP_ALWAYS_PREFER_UDP = "i2np.udp.alwaysPreferred";
-    private static final String DEFAULT_ALWAYS_PREFER_UDP = "true";
+    public static final String PROP_PREFER_UDP = "i2np.udp.preferred";
+    private static final String DEFAULT_PREFER_UDP = "false";
     
     public static final String PROP_FIXED_PORT = "i2np.udp.fixedPort";
     private static final String DEFAULT_FIXED_PORT = "true";
@@ -139,8 +146,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _activeThrottle = mq;
 
         _fastBid = new SharedBid(50);
-        _slowBid = new SharedBid(1000);
-        _slowPreferredBid = new SharedBid(75);
+        _slowBid = new SharedBid(65);
+        _fastPreferredBid = new SharedBid(15);
+        _slowPreferredBid = new SharedBid(20);
+        _slowestBid = new SharedBid(1000);
         
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
@@ -843,7 +852,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (peer != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an established peer: " + peer);
-            return _fastBid;
+            if (preferUDP())
+                return _fastPreferredBid;
+            else
+                return _fastBid;
         } else {
             if (null == toAddress.getTargetAddress(STYLE))
                 return null;
@@ -852,14 +864,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
             if (alwaysPreferUDP())
                 return _slowPreferredBid;
-            else
+            else if (preferUDP())
                 return _slowBid;
+            else
+                return _slowestBid;
         }
     }
 
+    private boolean preferUDP() {
+        String pref = _context.getProperty(PROP_PREFER_UDP, DEFAULT_PREFER_UDP);
+        return (pref != null) && ! "false".equals(pref);
+    }
+    
     private boolean alwaysPreferUDP() {
-        String pref = _context.getProperty(PROP_ALWAYS_PREFER_UDP, DEFAULT_ALWAYS_PREFER_UDP);
-        return (pref != null) && "true".equals(pref);
+        String pref = _context.getProperty(PROP_PREFER_UDP, DEFAULT_PREFER_UDP);
+        return (pref != null) && "always".equals(pref);
     }
     
     private static final int MAX_IDLE_TIME = 5*60*1000;

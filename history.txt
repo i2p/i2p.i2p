@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.569 2007-06-16 18:15:49 complication Exp $
+$Id: history.txt,v 1.570 2007-06-27 20:51:16 jrandom Exp $
+
+2007-07-01  zzz
+    * Replace broken option i2np.udp.alwaysPreferred with
+      i2np.udp.preferred and adjust UDP bids; possible settings are
+      "false" (default), "true", and "always".
+      Default setting results in same behavior as before
+      (NTCP is preferred unless it isn't established and UDP is established).
+      Use to compare NTCP and UDP transports.
 
 2007-06-27  jrandom
     * fix for a streaming lib bug that could leave a thread waiting
