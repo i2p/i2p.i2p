@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.570 2007-06-27 20:51:16 jrandom Exp $
+$Id: history.txt,v 1.571 2007-07-01 17:07:53 zzz Exp $
+
+2007-07-04  zzz
+    * Display calculated share bandwidth and remove load testing
+      on config.jsp
 
 2007-07-01  zzz
     * Replace broken option i2np.udp.alwaysPreferred with

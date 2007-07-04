@@ -236,4 +236,23 @@ public class ConfigNetHelper {
         buf.append("</select>\n");
         return buf.toString();
     }
+
+    public int getShareBandwidth() {
+        String irate = _context.getProperty(PROP_INBOUND_KBPS);
+        String orate = _context.getProperty(PROP_OUTBOUND_KBPS);
+        String pctStr = _context.getProperty(PROP_SHARE_PERCENTAGE);
+        if ( (irate != null) && (orate != null) && (pctStr != null)) {
+            try {
+                int irateKBps = Integer.parseInt(irate);
+                int orateKBps = Integer.parseInt(orate);
+                if (irateKBps < 0 || orateKBps < 0)
+                    return 0;
+                int pct = Integer.parseInt(pctStr);
+                return (int) (((float) pct) * Math.min(irateKBps, orateKBps) / 100);
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+        }
+        return 0;
+    }
 }

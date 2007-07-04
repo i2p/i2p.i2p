@@ -43,9 +43,20 @@
     A negative rate means a default limit of 16KBytes per second.</i><br />
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
- Sharing a higher percentage will improve your anonymity and help the network<br />
+ <% int share = nethelper.getShareBandwidth();
+    if (share <= 16) {
+        out.print("<b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
+        out.print("I2P requires over 16KBps to enable sharing. ");
+        out.print("Please enable sharing by configuring greater than 16 KBps to improve your anonymity and help the network.<br />");
+    } else {
+        out.print("You have configured I2P to share " + share + "KBps. ");
+        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<br />");
+    }
+ %>
+ <p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
+<!--
  <b>Enable load testing: </b>
 <input type="checkbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
  <p>If enabled, your router will periodically anonymously probe some of your peers
@@ -54,6 +65,7 @@
  load testing is fed into the profiles as well as the 
  <a href="oldstats.jsp#test.rtt">test.rtt</a> and related stats.</p>
  <hr />
+-->
  <b>External UDP address:</b> <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
  <b>Require SSU introductions? </b>
 <input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> /><br />
