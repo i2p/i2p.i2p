@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.571 2007-07-01 17:07:53 zzz Exp $
+$Id: history.txt,v 1.572 2007-07-04 17:58:50 zzz Exp $
+
+2007-07-07  zzz
+    * Add auto-detect IP/Port to NTCP. When enabled on config.jsp,
+      SSU will notify/restart NTCP when the external address changes.
+      Now you can enable inbound TCP without a static IP or dyndns service.
 
 2007-07-04  zzz
     * Display calculated share bandwidth and remove load testing

@@ -50,6 +50,8 @@ public class ConfigNetHelper {
     }
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
+    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoip";
+    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoport";
     public String getNtcphostname() {
         String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
         if (hostname == null) return "";
@@ -69,6 +71,26 @@ public class ConfigNetHelper {
         return ua.toString();
     }
     
+    public String getUdpIP() {
+        RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
+        if (addr == null)
+            return "unknown";
+        UDPAddress ua = new UDPAddress(addr);
+        if (ua.getHost() == null)
+            return "unknown";
+        return ua.getHost();
+    }
+
+    public String getUdpPort() {
+        RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
+        if (addr == null)
+            return "unknown";
+        UDPAddress ua = new UDPAddress(addr);
+        if (ua.getPort() <= 0)
+            return "unknown";
+        return "" + ua.getPort();
+    }
+
     public String getEnableTimeSyncChecked() {
         String disabled = _context.getProperty(Timestamper.PROP_DISABLED, "false");
         if ( (disabled != null) && ("true".equalsIgnoreCase(disabled)) )
@@ -87,6 +109,22 @@ public class ConfigNetHelper {
 
     public String getDynamicKeysChecked() {
         String enabled = _context.getProperty(Router.PROP_DYNAMIC_KEYS, "false");
+        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
+            return " checked ";
+        else
+            return "";
+    }
+
+    public String getTcpAutoPortChecked() {
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
+        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
+            return " checked ";
+        else
+            return "";
+    }
+
+    public String getTcpAutoIPChecked() {
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
         if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
             return " checked ";
         else

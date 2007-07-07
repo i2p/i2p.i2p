@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.i2p.data.RouterAddress;
 
 /**
  * Manages the communication subsystem between peers, including connections, 
@@ -52,6 +53,10 @@ public abstract class CommSystemFacade implements Service {
     public short getReachabilityStatus() { return STATUS_OK; }
     public void recheckReachability() {}
     
+    /** 
+     * Tell other transports our address changed
+     */
+    public void notifyReplaceAddress(RouterAddress UDPAddr) {}
     /** 
      * We are able to receive unsolicited connections
      */

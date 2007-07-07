@@ -26,6 +26,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.tcp.TCPTransport;
+import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.util.Log;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
@@ -194,6 +195,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
+    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoip";
+    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoport";
     
     public static RouterAddress createNTCPAddress(RouterContext ctx) {
         if (!TransportManager.enableNTCP(ctx)) return null;
@@ -235,4 +238,80 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //}
         return addr;
     }
+
+    /**
+     * UDP changed addresses, tell NTCP and restart
+     */
+    public void notifyReplaceAddress(RouterAddress UDPAddr) {
+        if (UDPAddr == null)
+            return;
+        NTCPTransport t = (NTCPTransport) _manager.getNTCPTransport();
+        if (t == null)
+            return;
+        Properties UDPProps = UDPAddr.getOptions();
+        if (UDPProps == null)
+            return;
+        Properties newProps;
+        RouterAddress oldAddr = t.getCurrentAddress();
+        //_log.warn("Changing NTCP Address? was " + oldAddr);
+        RouterAddress newAddr = oldAddr;
+        if (newAddr == null) {
+            newAddr = new RouterAddress();
+            newAddr.setCost(10);
+            newAddr.setExpiration(null);
+            newAddr.setTransportStyle(NTCPTransport.STYLE);
+            newProps = new Properties();
+        } else {
+            newProps = newAddr.getOptions();
+            if (newProps == null)
+                newProps = new Properties();
+        }
+
+        boolean changed = false;
+        String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
+        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) ) {
+            String nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
+            if (nport == null || nport.length() <= 0)
+                return;
+            if (oport == null || ! oport.equals(nport)) {
+                newProps.setProperty(NTCPAddress.PROP_PORT, nport);
+                changed = true;
+            }
+        } else if (oport == null || oport.length() <= 0) {
+            return;
+        }
+
+        String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
+        enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
+        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) ) {
+            String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
+            if (nhost == null || nhost.length() <= 0)
+                return;
+            if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
+                newProps.setProperty(NTCPAddress.PROP_HOST, nhost);
+                changed = true;
+            }
+        } else if (ohost == null || ohost.length() <= 0) {
+            return;
+        }
+
+        if (!changed) {
+            //_log.warn("No change to NTCP Address");
+            return;
+        }
+
+        // stopListening stops the pumper, readers, and writers, so required even if
+        // oldAddr == null since startListening starts them all again
+        _log.warn("Halting NTCP to change address");
+        t.stopListening();
+        newAddr.setOptions(newProps);
+        // Give NTCP Pumper time to stop so we don't end up with two...
+        // Need better way
+        try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        t.restartListening(newAddr);
+        _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
+        return;     	
+    }
+    
 }

@@ -124,6 +124,15 @@ public class TransportManager implements TransportEventListener {
         _transports.clear();
     }
     
+    public Transport getNTCPTransport() {
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            if("NTCP".equals(t.getStyle()))
+                return t;
+        }
+        return null;
+    }
+    
     int getTransportCount() { return _transports.size(); }
     
     private boolean isSupported(Set addresses, Transport t) {

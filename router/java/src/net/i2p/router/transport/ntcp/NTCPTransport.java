@@ -379,7 +379,21 @@ public class NTCPTransport extends TransportImpl {
         _writer.startWriting(NUM_CONCURRENT_WRITERS);
         
         configureLocalAddress();
+        return bindAddress();
+    }
 
+    public RouterAddress restartListening(RouterAddress addr) {
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("Restarting ntcp transport listening");
+        _pumper.startPumping();
+        
+        _reader.startReading(NUM_CONCURRENT_READERS);
+        _writer.startWriting(NUM_CONCURRENT_WRITERS);
+        
+        _myAddress = new NTCPAddress(addr);
+        return bindAddress();
+    }
+
+    private RouterAddress bindAddress() {
         if (_myAddress != null) {
             try {
                 ServerSocketChannel chan = ServerSocketChannel.open();
