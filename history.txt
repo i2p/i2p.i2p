@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.572 2007-07-04 17:58:50 zzz Exp $
+$Id: history.txt,v 1.573 2007-07-07 15:03:52 zzz Exp $
+
+2007-07-09  zzz
+    * i2psnark: give a better error message for a non-i2p torrent
 
 2007-07-07  zzz
     * Add auto-detect IP/Port to NTCP. When enabled on config.jsp,
