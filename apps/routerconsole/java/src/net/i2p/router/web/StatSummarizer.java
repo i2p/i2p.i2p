@@ -142,16 +142,17 @@ public class StatSummarizer implements Runnable {
     }
     
     public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
-        long end = _context.clock().now();
+        long end = _context.clock().now() - 60*1000;
         if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
         if (periodCount > SummaryListener.PERIODS)
             periodCount = SummaryListener.PERIODS;
         long period = 60*1000;
         long start = end - period*periodCount;
-        long begin = System.currentTimeMillis();
+        //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimePeriod(start/1000, end/1000);
+            def.setBaseValue(1024);
             String title = "Bandwidth usage";
             if (!hideTitle)
                 def.setTitle(title);
@@ -159,15 +160,15 @@ public class StatSummarizer implements Runnable {
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
             def.datasource(sendName, sendName, sendName, "AVERAGE", "MEMORY");
             def.datasource(recvName, recvName, recvName, "AVERAGE", "MEMORY");
-            def.area(sendName, Color.BLUE, "Outbound bytes/second");
-            //def.line(sendName, Color.BLUE, "Outbound bytes/second", 3);
-            //def.line(recvName, Color.RED, "Inbound bytes/second@r", 3);
-            def.area(recvName, Color.RED, "Inbound bytes/second@r");
+            def.area(sendName, Color.BLUE, "Outbound bytes/sec");
+            //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
+            def.line(recvName, Color.RED, "Inbound bytes/sec@r", 3);
+            //def.area(recvName, Color.RED, "Inbound bytes/sec@r");
             if (!hideLegend) {
-                def.gprint(sendName, "AVERAGE", "outbound average: @2@sbytes/second");
-                def.gprint(sendName, "MAX", " max: @2@sbytes/second@r");
-                def.gprint(recvName, "AVERAGE", "inbound average: @2bytes/second@s");
-                def.gprint(recvName, "MAX", " max: @2@sbytes/second@r");
+                def.gprint(sendName, "AVERAGE", "out average: @2@sbytes/sec");
+                def.gprint(sendName, "MAX", " max: @2@sbytes/sec@r");
+                def.gprint(recvName, "AVERAGE", "in average:  @2@sbytes/sec");
+                def.gprint(recvName, "MAX", " max: @2@sbytes/sec@r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
@@ -188,7 +189,7 @@ public class StatSummarizer implements Runnable {
                 data = graph.getPNGBytes();
             else
                 data = graph.getPNGBytes(width, height);
-            long timeToPlot = System.currentTimeMillis() - begin;
+            //long timeToPlot = System.currentTimeMillis() - begin;
             out.write(data);
             //File t = File.createTempFile("jrobinData", ".xml");
             //_listener.getData().dumpXml(new FileOutputStream(t));
@@ -201,6 +202,9 @@ public class StatSummarizer implements Runnable {
         } catch (IOException ioe) {
             _log.error("Error rendering", ioe);
             throw ioe;
+        } catch (OutOfMemoryError oom) {
+            _log.error("Error rendering", oom);
+            throw new IOException("Error plotting: " + oom.getMessage());
         }
     }
     

@@ -184,6 +184,7 @@ public class Rate {
     private static final int SLACK = 2000;
     public void coalesce() {
         long now = now();
+        double correctedTotalValue; // for summaryListener which divides by rounded EventCount
         synchronized (_lock) {
             long measuredPeriod = now - _lastCoalesceDate;
             if (measuredPeriod < _period - SLACK) {
@@ -198,9 +199,11 @@ public class Rate {
             // how much were we off by?  (so that we can sample down the measured values)
             double periodFactor = measuredPeriod / (double)_period;
             _lastTotalValue = _currentTotalValue / periodFactor;
-            _lastEventCount = (long) ( (_currentEventCount + periodFactor - 1) / periodFactor);
+            _lastEventCount = (long) (0.499999 + (_currentEventCount / periodFactor));
             _lastTotalEventTime = (long) (_currentTotalEventTime / periodFactor);
             _lastCoalesceDate = now;
+            correctedTotalValue = _currentTotalValue *
+                                  (_lastEventCount / (double) _currentEventCount);
 
             if (_lastTotalValue > _extremeTotalValue) {
                 _extremeTotalValue = _lastTotalValue;
@@ -213,7 +216,7 @@ public class Rate {
             _currentTotalEventTime = 0;
         }
         if (_summaryListener != null)
-            _summaryListener.add(_lastTotalValue, _lastEventCount, _lastTotalEventTime, _period);
+            _summaryListener.add(correctedTotalValue, _lastEventCount, _lastTotalEventTime, _period);
     }
 
     public void setSummaryListener(RateSummaryListener listener) { _summaryListener = listener; }

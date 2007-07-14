@@ -55,10 +55,13 @@ public class GraphHelper {
     
     public String getImages() { 
         try {
-            _out.write("<img src=\"viewstat.jsp?stat=bw.combined"
+            if (!_showEvents)
+                _out.write("<img width=\""
+                           + (_width + 83) + "\" height=\"" + (_height + 92)
+                           + "\" src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
                            + "&amp;width=" + _width
-                           + "&amp;height=" + _height
+                           + "&amp;height=" + (_height - 14)
                            + "\" title=\"Combined bandwidth graph\" />\n");
             
             List listeners = StatSummarizer.instance().getListeners();
@@ -68,7 +71,10 @@ public class GraphHelper {
                 SummaryListener lsnr = (SummaryListener)iter.next();
                 Rate r = lsnr.getRate();
                 String title = r.getRateStat().getName() + " for " + DataHelper.formatDuration(_periodCount * r.getPeriod());
-                _out.write("<img src=\"viewstat.jsp?stat=" + r.getRateStat().getName() 
+                _out.write("<img width=\""
+                           + (_width + 83) + "\" height=\"" + (_height + 92)
+                           + "\" src=\"viewstat.jsp?stat="
+                           + r.getRateStat().getName() 
                            + "&amp;showEvents=" + _showEvents
                            + "&amp;period=" + r.getPeriod() 
                            + "&amp;periodCount=" + _periodCount 

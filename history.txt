@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.573 2007-07-07 15:03:52 zzz Exp $
+$Id: history.txt,v 1.574 2007-07-09 20:20:38 zzz Exp $
+
+2007-07-14  zzz
+    * Clean up graphs.jsp - set K=1024 where appropriate,
+      output image sizes in html, catch ooms, other minor tweaks
+    * Fix current event count truncation which fixes graphs with low
+      60-sec event counts displaying high values
+      (bw.* and router.* graphs for example were 1.5x too high)
+      Affects all "events per period" (non-lifetime) counts.
 
 2007-07-09  zzz
     * i2psnark: give a better error message for a non-i2p torrent

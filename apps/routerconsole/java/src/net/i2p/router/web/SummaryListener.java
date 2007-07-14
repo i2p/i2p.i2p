@@ -154,7 +154,7 @@ class SummaryRenderer {
      *
      */
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
-        long end = ctx.clock().now();
+        long end = ctx.clock().now() - 60*1000;
         long start = end - 60*1000*SummaryListener.PERIODS;
         long begin = System.currentTimeMillis();
         try {
@@ -174,16 +174,19 @@ class SummaryRenderer {
     }
     public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1, true); }
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
-        long end = _listener.now();
+        long end = _listener.now() - 60*1000;
         if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
         if (periodCount > SummaryListener.PERIODS)
             periodCount = SummaryListener.PERIODS;
         long start = end - _listener.getRate().getPeriod()*periodCount;
-        long begin = System.currentTimeMillis();
+        //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimePeriod(start/1000, end/1000);
-            String title = _listener.getRate().getRateStat().getName() + " averaged for " 
+            String name = _listener.getRate().getRateStat().getName();
+            if ((name.startsWith("bw.") || name.endsWith("PacketSize")) && !showEvents)
+                def.setBaseValue(1024);
+            String title = name + " averaged for " 
                            + DataHelper.formatDuration(_listener.getRate().getPeriod());
             if (!hideTitle)
                 def.setTitle(title);
@@ -233,7 +236,7 @@ class SummaryRenderer {
                 data = graph.getPNGBytes();
             else
                 data = graph.getPNGBytes(width, height);
-            long timeToPlot = System.currentTimeMillis() - begin;
+            //long timeToPlot = System.currentTimeMillis() - begin;
             out.write(data);
             //File t = File.createTempFile("jrobinData", ".xml");
             //_listener.getData().dumpXml(new FileOutputStream(t));
@@ -245,6 +248,9 @@ class SummaryRenderer {
         } catch (IOException ioe) {
             _log.error("Error rendering", ioe);
             throw ioe;
+        } catch (OutOfMemoryError oom) {
+            _log.error("Error rendering", oom);
+            throw new IOException("Error plotting: " + oom.getMessage());
         }
     }
 }
