@@ -33,6 +33,8 @@ public class EepGet {
     private String _proxyHost;
     private int _proxyPort;
     private int _numRetries;
+    private long _minSize; // minimum and maximum acceptable response size, -1 signifies unlimited,
+    private long _maxSize; // applied both against whole responses and chunks
     private String _outputFile;
     private OutputStream _outputStream;
     private String _url;
@@ -76,14 +78,14 @@ public class EepGet {
     }
     // Constructor 2, calls 0 with: no output buffer, do caching, no etag
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, String postData) {
-        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, null, url, true, null, postData);
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, true, null, postData);
     }
     // Constructor 1, calls 0 with: no output buffer, no postdata
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
-        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, null, url, allowCaching, etag, null);
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, allowCaching, etag, null);
     }
     // Constructor 0, real constructor
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries,
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize,
                   String outputFile, OutputStream outputStream, String url, boolean allowCaching,
                   String etag, String postData) {
         _context = ctx;
@@ -92,6 +94,8 @@ public class EepGet {
         _proxyHost = proxyHost;
         _proxyPort = proxyPort;
         _numRetries = numRetries;
+        _minSize = minSize;
+        _maxSize = maxSize;
         _outputFile = outputFile;     // if outputFile is set, outputStream must be null
         _outputStream = outputStream; // if both are set, outputStream overrides outputFile
         _url = url;
@@ -371,7 +375,13 @@ public class EepGet {
             _log.debug("Headers read completely, reading " + _bytesRemaining);
         
         boolean strictSize = (_bytesRemaining >= 0);
-            
+
+        // If minimum or maximum size defined, ensure they aren't exceeded
+        if ((_minSize > -1) && (_bytesRemaining < _minSize))
+            throw new IOException("HTTP response size " + _bytesRemaining + " violates minimum of " + _minSize + " bytes");
+        if ((_maxSize > -1) && (_bytesRemaining > _maxSize))
+            throw new IOException("HTTP response size " + _bytesRemaining + " violates maximum of " + _maxSize + " bytes");
+
         int remaining = (int)_bytesRemaining;
         byte buf[] = new byte[1024];
         while (_keepFetching && ( (remaining > 0) || !strictSize )) {

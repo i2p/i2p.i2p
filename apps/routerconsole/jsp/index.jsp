@@ -5,6 +5,7 @@
 <html><head>
 <title>I2P Router Console - home</title>
 <link rel="stylesheet" href="default.css" type="text/css" />
+<link rel="shortcut icon" href="favicon.ico" />
 </head><body>
 <%
 if (System.getProperty("router.consoleNonce") == null) {

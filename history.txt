@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.574 2007-07-09 20:20:38 zzz Exp $
+$Id: history.txt,v 1.575 2007-07-14 13:44:11 zzz Exp $
+
+2007-07-14  Complication
+    * Take the post-download routerInfo size check back out of ReseedHandler,
+      since it wasn't helpful, and a lower limit caused false warnings.
+    * Give EepGet ability to enforce a min/max HTTP response size.
+    * Enforce a maximum response size of 8 MB when ReseedHandler
+      downloads into a ByteArrayOutputStream.
+    * Refactor ReseedHandler/ReseedRunner from static to ordinary classes,
+      change invocation from RouterConsoleRunner accordingly.
+    * Add an EepGet status listener to ReseedHandler to log causes of reseed failure,
+      provide status reports to indicate the progress of reseeding.
+    * Enable icon for default eepsite, and the index page
+      of the router console (more later).
 
 2007-07-14  zzz
     * Clean up graphs.jsp - set K=1024 where appropriate,

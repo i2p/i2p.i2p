@@ -88,7 +88,8 @@ public class RouterConsoleRunner {
             // get i2p started - they can reseed later in the web console)
             String names[] = (netDb.exists() ? netDb.list() : null);
             if ( (names == null) || (names.length < 15) ) {
-                ReseedHandler.requestReseed();
+                ReseedHandler reseedHandler = new ReseedHandler();
+                reseedHandler.requestReseed();
             }
         }
         

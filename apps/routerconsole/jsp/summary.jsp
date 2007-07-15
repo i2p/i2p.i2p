@@ -46,10 +46,13 @@
     if (helper.getActivePeers() <= 0) {
         %><b><a href="config.jsp">check your NAT/firewall</a></b><br /><%
     }
+    // If showing the reseed link is allowed
     if (helper.allowReseed()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
-            out.print(" <i>reseeding</i><br />");
+            // While reseed occurring, show status message instead
+            out.print("<i>" + System.getProperty("net.i2p.router.web.ReseedHandler.statusMessage","") + "</i><br />");
         } else {
+            // While no reseed occurring, show reseed link
             long nonce = new java.util.Random().nextLong();
             String prev = System.getProperty("net.i2p.router.web.ReseedHandler.nonce");
             if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
@@ -62,7 +65,7 @@
             out.print(" <a href=\"" + uri + "\">reseed</a><br />");
         }
     }
-    // If a new reseed ain't running, show how the last reseed finished
+    // If a new reseed ain't running, and the last reseed had errors, show error message
     if ("false".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
         String reseedErrorMessage = System.getProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
         if (reseedErrorMessage.length() > 0) {
