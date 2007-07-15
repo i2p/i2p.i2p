@@ -202,8 +202,11 @@ public class Rate {
             _lastEventCount = (long) (0.499999 + (_currentEventCount / periodFactor));
             _lastTotalEventTime = (long) (_currentTotalEventTime / periodFactor);
             _lastCoalesceDate = now;
-            correctedTotalValue = _currentTotalValue *
-                                  (_lastEventCount / (double) _currentEventCount);
+            if (_currentEventCount == 0)
+                correctedTotalValue = 0;
+            else
+                correctedTotalValue = _currentTotalValue *
+                                      (_lastEventCount / (double) _currentEventCount);
 
             if (_lastTotalValue > _extremeTotalValue) {
                 _extremeTotalValue = _lastTotalValue;

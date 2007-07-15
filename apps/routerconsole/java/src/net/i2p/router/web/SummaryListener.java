@@ -182,12 +182,16 @@ class SummaryRenderer {
         //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
-            def.setTimePeriod(start/1000, end/1000);
+            def.setTimePeriod(start/1000, 0);
             String name = _listener.getRate().getRateStat().getName();
             if ((name.startsWith("bw.") || name.endsWith("PacketSize")) && !showEvents)
                 def.setBaseValue(1024);
-            String title = name + " averaged for " 
-                           + DataHelper.formatDuration(_listener.getRate().getPeriod());
+            String title = name;
+            if (showEvents)
+                title = title + " events in ";
+            else
+                title = title + " averaged for ";
+            title = title + DataHelper.formatDuration(_listener.getRate().getPeriod());
             if (!hideTitle)
                 def.setTitle(title);
             String path = _listener.getData().getPath();
@@ -206,8 +210,9 @@ class SummaryRenderer {
             def.datasource(plotName, path, plotName, "AVERAGE", "MEMORY");
             def.area(plotName, Color.BLUE, descr + "@r");
             if (!hideLegend) {
-                def.gprint(plotName, "AVERAGE", "average: @2@s");
-                def.gprint(plotName, "MAX", " max: @2@s@r");
+                def.gprint(plotName, "AVERAGE", "avg: @2@s");
+                def.gprint(plotName, "MAX", " max: @2@s");
+                def.gprint(plotName, "LAST", " now: @2@s@r");
             }
             if (!showCredit)
                 def.setShowSignature(false);

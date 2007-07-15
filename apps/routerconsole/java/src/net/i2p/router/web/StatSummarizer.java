@@ -151,7 +151,7 @@ public class StatSummarizer implements Runnable {
         //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
-            def.setTimePeriod(start/1000, end/1000);
+            def.setTimePeriod(start/1000, 0);
             def.setBaseValue(1024);
             String title = "Bandwidth usage";
             if (!hideTitle)
