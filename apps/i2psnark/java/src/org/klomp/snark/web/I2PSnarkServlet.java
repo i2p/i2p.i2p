@@ -547,20 +547,32 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("</td>\n\t");
                 out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (remaining > 0) {
-                    if (peer.isInteresting() && !peer.isChoked())
+                    if (peer.isInteresting() && !peer.isChoked()) {
                         out.write("<font color=#008000>");
-                    else
-                        out.write("<font color=#a00000>");
-                    out.write("<font size=-1>" + formatSize(peer.getDownloadRate()) + "ps</font></font>");
+                        out.write("<font size=-1>" + formatSize(peer.getDownloadRate()) + "ps</font></font>");
+                    } else {
+                        out.write("<font color=#a00000><font size=-1><a title=\"");
+                        if (!peer.isInteresting())
+                            out.write("Uninteresting\">");
+                        else
+                            out.write("Choked\">");
+                        out.write(formatSize(peer.getDownloadRate()) + "ps</a></font></font>");
+                    }
                 }
                 out.write("</td>\n\t");
                 out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (pct != 100.0) {
-                    if (peer.isInterested() && !peer.isChoking())
+                    if (peer.isInterested() && !peer.isChoking()) {
                         out.write("<font color=#008000>");
-                    else
-                        out.write("<font color=#a00000>");
-                    out.write("<font size=-1>" + formatSize(peer.getUploadRate()) + "ps</font></font>");
+                        out.write("<font size=-1>" + formatSize(peer.getUploadRate()) + "ps</font></font>");
+                    } else {
+                        out.write("<font color=#a00000><font size=-1><a title=\"");
+                        if (!peer.isInterested())
+                            out.write("Uninterested\">");
+                        else
+                            out.write("Choking\">");
+                        out.write(formatSize(peer.getUploadRate()) + "ps</a></font></font>");
+                    }
                 }
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");

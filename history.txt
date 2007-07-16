@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.577 2007-07-15 13:34:33 zzz Exp $
+$Id: history.txt,v 1.578 2007-07-16 15:47:57 zzz Exp $
+
+2007-07-16  zzz
+    * i2psnark: Add tooltip info for choked/uninterested
 
 2007-07-16  zzz
     * Make selection of graphed data configurable via configstats.jsp,
