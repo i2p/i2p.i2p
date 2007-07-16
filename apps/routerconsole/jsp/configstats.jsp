@@ -78,22 +78,26 @@ function toggleAll(category)
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
- <tr><td valign="top" align="left" colspan="2">
+ <tr><td valign="top" align="left" colspan="3">
      <b><%=statshelper.getCurrentGroupName()%></b>
      (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)
-     </td></tr><%
+     </td></tr><tr><td>Log</td><td>Graph</td><td></td></tr><%
      } // end iterating over required groups for the current stat %>
  <tr><td valign="top" align="left">
      <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
      if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
+     <td valign="top" align="left">
+     <% if (statshelper.getCurrentCanBeGraphed()) { %>
+       <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <% 
+       if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %>/><% } %></td>
      <td valign="top" align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br />
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats %>
- <tr><td colspan="2"><hr /></td></tr>
+ <tr><td colspan="3"><hr /></td></tr>
  <tr><td><input type="checkbox" name="explicitFilter" /></td>
-     <td>Advanced filter: 
+     <td colspan="2">Advanced filter: 
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
- <tr><td colspan="2"><hr /></td></tr>
+ <tr><td colspan="3"><hr /></td></tr>
  <tr><td><input type="submit" name="shouldsave" value="Save changes" /> </td>
      <td><input type="reset" value="Cancel" /></td></tr>
  </form>

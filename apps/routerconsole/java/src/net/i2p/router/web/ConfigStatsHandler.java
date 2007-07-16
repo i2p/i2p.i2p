@@ -17,6 +17,7 @@ import net.i2p.stat.StatManager;
 public class ConfigStatsHandler extends FormHandler {
     private String _filename;
     private List _stats;
+    private String _graphs;
     private boolean _explicitFilter;
     private String _explicitFilterValue;
     
@@ -46,6 +47,25 @@ public class ConfigStatsHandler extends FormHandler {
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Updated stats: " + _stats);
+    }
+
+    public void setGraphList(String stats[]) {
+        if (stats != null) {
+            String s = "";
+            for (int i = 0; i < stats.length; i++) {
+                String cur = stats[i].trim();
+                if (cur.length() > 0) {
+                    if (s.length() > 0)
+                        s = s + ",";
+                    s = s + cur;
+                }
+            }
+            _graphs = s;
+        } else {
+            _graphs = "";
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Updated graphs: " + _graphs);
     }
 
     public void setExplicitFilter(String foo) { _explicitFilter = true; }
@@ -88,11 +108,13 @@ public class ConfigStatsHandler extends FormHandler {
         }
             
         _context.router().setConfigSetting(StatManager.PROP_STAT_FILTER, stats.toString());
+        _context.router().setConfigSetting("stat.summaries", _graphs);
         boolean ok = _context.router().saveConfig();
         if (ok) 
             addFormNotice("Stat filter and location updated successfully to: " + stats.toString());
         else
             addFormError("Failed to update the stat filter and location");
+        addFormNotice("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>");
     }
     
 }

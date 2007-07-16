@@ -184,7 +184,9 @@ class SummaryRenderer {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimePeriod(start/1000, 0);
             String name = _listener.getRate().getRateStat().getName();
-            if ((name.startsWith("bw.") || name.endsWith("PacketSize")) && !showEvents)
+            // heuristic to set K=1024
+            if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0)
+                && !showEvents)
                 def.setBaseValue(1024);
             String title = name;
             if (showEvents)

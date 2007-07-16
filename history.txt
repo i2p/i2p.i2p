@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.576 2007-07-14 19:56:18 complication Exp $
+$Id: history.txt,v 1.577 2007-07-15 13:34:33 zzz Exp $
+
+2007-07-16  zzz
+    * Make selection of graphed data configurable via configstats.jsp,
+      remove most of the default graphs to save some memory
 
 2007-07-15  zzz
     * Add current values to graph legends

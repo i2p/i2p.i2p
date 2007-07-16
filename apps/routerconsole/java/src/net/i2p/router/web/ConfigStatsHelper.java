@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.FrequencyStat;
 import net.i2p.router.RouterContext;
@@ -20,12 +21,15 @@ public class ConfigStatsHelper {
     /** list of names of stats which are remaining, ordered by nested groups */
     private List _stats;
     private String _currentStatName;
+    private String _currentGraphName;
     private String _currentStatDescription;
     private String _currentGroup;
     /** true if the current stat is the first in the group */
     private boolean _currentIsFirstInGroup;
     /** true if the stat is being logged */
     private boolean _currentIsLogged;
+    private boolean _currentIsGraphed;
+    private boolean _currentCanBeGraphed;
     
     /**
      * Configure this bean to query a particular router context
@@ -71,6 +75,7 @@ public class ConfigStatsHelper {
     public boolean hasMoreStats() {
         if (_stats.size() <= 0)
             return false;
+        _currentIsGraphed = false;
         _currentStatName = (String)_stats.remove(0);
         RateStat rs = _context.statManager().getRate(_currentStatName);
         if (rs != null) {
@@ -82,6 +87,16 @@ public class ConfigStatsHelper {
             else
                 _currentIsFirstInGroup = false;
             _currentGroup = rs.getGroupName();
+            long period = rs.getPeriods()[0]; // should be the minimum
+            if (period <= 10*60*1000) {
+                Rate r = rs.getRate(period);
+                _currentCanBeGraphed = r != null;
+                if (_currentCanBeGraphed)
+                    _currentIsGraphed = r.getSummaryListener() != null;
+                    _currentGraphName = _currentStatName + "." + period;
+            } else {
+                _currentCanBeGraphed = false;
+            }
         } else {
             FrequencyStat fs = _context.statManager().getFrequency(_currentStatName);
             if (fs != null) {
@@ -93,6 +108,7 @@ public class ConfigStatsHelper {
                 else
                     _currentIsFirstInGroup = false;
                 _currentGroup = fs.getGroupName();
+                _currentCanBeGraphed = false;
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Stat does not exist?!  [" + _currentStatName + "]");
@@ -119,7 +135,10 @@ public class ConfigStatsHelper {
     /** What group is the current stat in */
     public String getCurrentGroupName() { return _currentGroup; }
     public String getCurrentStatName() { return _currentStatName; }
+    public String getCurrentGraphName() { return _currentGraphName; }
     public String getCurrentStatDescription() { return _currentStatDescription; }
     public boolean getCurrentIsLogged() { return _currentIsLogged; }
+    public boolean getCurrentIsGraphed() { return _currentIsGraphed; }
+    public boolean getCurrentCanBeGraphed() { return _currentCanBeGraphed; }
     public String getExplicitFilter() { return _filter; }
 }

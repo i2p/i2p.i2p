@@ -45,27 +45,27 @@ public class StatSummarizer implements Runnable {
     
     private static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
                                                     ",bw.recvRate.60000" +
-                                                    ",tunnel.testSuccessTime.60000" +
-                                                    ",udp.outboundActiveCount.60000" +
-                                                    ",udp.receivePacketSize.60000" +
-                                                    ",udp.receivePacketSkew.60000" +
-                                                    ",udp.sendConfirmTime.60000" +
-                                                    ",udp.sendPacketSize.60000" +
-                                                    ",router.activePeers.60000" +
-                                                    ",router.activeSendPeers.60000" +
-                                                    ",tunnel.acceptLoad.60000" +
-                                                    ",tunnel.dropLoadProactive.60000" +
-                                                    ",tunnel.buildExploratorySuccess.60000" +
-                                                    ",tunnel.buildExploratoryReject.60000" +
-                                                    ",tunnel.buildExploratoryExpire.60000" +
-                                                    ",client.sendAckTime.60000" +
-                                                    ",client.dispatchNoACK.60000" +
-                                                    ",ntcp.sendTime.60000" +
-                                                    ",ntcp.transmitTime.60000" +
-                                                    ",ntcp.sendBacklogTime.60000" +
-                                                    ",ntcp.receiveTime.60000" +
-                                                    ",transport.sendMessageFailureLifetime.60000" +
-                                                    ",transport.sendProcessingTime.60000";
+//                                                  ",tunnel.testSuccessTime.60000" +
+//                                                  ",udp.outboundActiveCount.60000" +
+//                                                  ",udp.receivePacketSize.60000" +
+//                                                  ",udp.receivePacketSkew.60000" +
+//                                                  ",udp.sendConfirmTime.60000" +
+//                                                  ",udp.sendPacketSize.60000" +
+                                                    ",router.activePeers.60000";
+//                                                  ",router.activeSendPeers.60000" +
+//                                                  ",tunnel.acceptLoad.60000" +
+//                                                  ",tunnel.dropLoadProactive.60000" +
+//                                                  ",tunnel.buildExploratorySuccess.60000" +
+//                                                  ",tunnel.buildExploratoryReject.60000" +
+//                                                  ",tunnel.buildExploratoryExpire.60000" +
+//                                                  ",client.sendAckTime.60000" +
+//                                                  ",client.dispatchNoACK.60000" +
+//                                                  ",ntcp.sendTime.60000" +
+//                                                  ",ntcp.transmitTime.60000" +
+//                                                  ",ntcp.sendBacklogTime.60000" +
+//                                                  ",ntcp.receiveTime.60000" +
+//                                                  ",transport.sendMessageFailureLifetime.60000" +
+//                                                  ",transport.sendProcessingTime.60000";
     
     private String adjustDatabases(String oldSpecs) {
         String spec = _context.getProperty("stat.summaries", DEFAULT_DATABASES);

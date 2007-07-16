@@ -55,7 +55,21 @@ public class GraphHelper {
     
     public String getImages() { 
         try {
-            if (!_showEvents)
+            List listeners = StatSummarizer.instance().getListeners();
+            TreeSet ordered = new TreeSet(new AlphaComparator());
+            ordered.addAll(listeners);
+
+            // go to some trouble to see if we have the data for the combined bw graph
+            boolean hasTx = false;
+            boolean hasRx = false;
+            for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
+                SummaryListener lsnr = (SummaryListener)iter.next();
+                String title = lsnr.getRate().getRateStat().getName();
+                if (title.equals("bw.sendRate")) hasTx = true;
+                else if (title.equals("bw.recvRate")) hasRx = true;
+            }
+
+            if (hasTx && hasRx && !_showEvents)
                 _out.write("<img width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat=bw.combined"
@@ -64,9 +78,6 @@ public class GraphHelper {
                            + "&amp;height=" + (_height - 14)
                            + "\" title=\"Combined bandwidth graph\" />\n");
             
-            List listeners = StatSummarizer.instance().getListeners();
-            TreeSet ordered = new TreeSet(new AlphaComparator());
-            ordered.addAll(listeners);
             for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
                 SummaryListener lsnr = (SummaryListener)iter.next();
                 Rate r = lsnr.getRate();
@@ -92,6 +103,7 @@ public class GraphHelper {
     }
     public String getForm() { 
         try {
+            _out.write("<p /><a href=\"configstats.jsp\">Select Stats to Graph</a><p />");
             _out.write("<form action=\"graphs.jsp\" method=\"GET\">");
             _out.write("Periods: <input size=\"3\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\" /><br />\n");
             _out.write("Plot averages: <input type=\"radio\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + " /> ");
