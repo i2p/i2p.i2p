@@ -535,14 +535,14 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (info != null) {
             String caps = info.getCapabilities();
-            if (caps.indexOf(Router.CAPABILITY_BW16) >= 0) {
-                return "[&lt;16&nbsp;]";
+            if (caps.indexOf(Router.CAPABILITY_BW12) >= 0) {
+                return "[&lt;12&nbsp;]";
             } else if (caps.indexOf(Router.CAPABILITY_BW32) >= 0) {
-                return "[&lt;32&nbsp;]";
+                return "[&lt;=32&nbsp;]";
             } else if (caps.indexOf(Router.CAPABILITY_BW64) >= 0) {
-                return "[&lt;64&nbsp;]";
+                return "[&lt;=64&nbsp;]";
             } else if (caps.indexOf(Router.CAPABILITY_BW128) >= 0) {
-                return "<b>[&lt;128]</b>";
+                return "<b>[&lt;=128]</b>";
             } else if (caps.indexOf(Router.CAPABILITY_BW256) >= 0) {
                 return "<b>[&gt;128]</b>";
             } else {

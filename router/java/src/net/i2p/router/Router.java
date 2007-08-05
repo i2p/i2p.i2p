@@ -363,7 +363,7 @@ public class Router {
     
     // publicize our ballpark capacity - this does not affect anything at
     // the moment
-    public static final char CAPABILITY_BW16 = 'K';
+    public static final char CAPABILITY_BW12 = 'K';
     public static final char CAPABILITY_BW32 = 'L';
     public static final char CAPABILITY_BW64 = 'M';
     public static final char CAPABILITY_BW128 = 'N';
@@ -382,8 +382,8 @@ public class Router {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         
-        if (bwLim <= 16) {
-            ri.addCapability(CAPABILITY_BW16);
+        if (bwLim < 12) {
+            ri.addCapability(CAPABILITY_BW12);
         } else if (bwLim <= 32) {
             ri.addCapability(CAPABILITY_BW32);
         } else if (bwLim <= 64) {

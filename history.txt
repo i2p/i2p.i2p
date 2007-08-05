@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.578 2007-07-16 15:47:57 zzz Exp $
+$Id: history.txt,v 1.579 2007-07-16 16:15:51 zzz Exp $
+
+2007-08-04  Complication
+    * Lower the threshold between the K and L bandwidth class,
+      so that K is now < 12 KB/s, instead of <= 16 KB/s.
+      Hopefully this lets people with 128 kbit/s (16 KB/s) upload lines
+      participate in routing, if they keep the default share percentage.
 
 2007-07-16  zzz
     * i2psnark: Add tooltip info for choked/uninterested

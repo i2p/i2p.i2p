@@ -277,7 +277,7 @@ public abstract class TunnelPeerSelector {
     
     private static char[] getExcludeCaps(RouterContext ctx) {
         String excludeCaps = ctx.getProperty("router.excludePeerCaps", 
-                                             String.valueOf(Router.CAPABILITY_BW16));
+                                             String.valueOf(Router.CAPABILITY_BW12));
         Set peers = new HashSet();
         if (excludeCaps != null) {
             char excl[] = excludeCaps.toCharArray();
