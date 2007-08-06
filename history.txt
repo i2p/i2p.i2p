@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.579 2007-07-16 16:15:51 zzz Exp $
+$Id: history.txt,v 1.580 2007-08-04 22:25:30 complication Exp $
+
+2007-08-05  Complication
+    * Update the sharing calculator on config.jsp
+      and explain the trade-off even more thoroughly.
 
 2007-08-04  Complication
     * Lower the threshold between the K and L bandwidth class,

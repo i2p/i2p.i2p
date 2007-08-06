@@ -44,10 +44,11 @@
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
  <% int share = nethelper.getShareBandwidth();
-    if (share <= 16) {
+    if (share < 12) {
         out.print("<b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
-        out.print("I2P requires over 16KBps to enable sharing. ");
-        out.print("Please enable sharing by configuring greater than 16 KBps to improve your anonymity and help the network.<br />");
+        out.print("I2P requires at least 12KBps to enable sharing. ");
+        out.print("Please enable sharing (participating in tunnels) by configuring more bandwidth. ");
+        out.print("It improves your anonymity by creating cover traffic, and helps the network.<br />");
     } else {
         out.print("You have configured I2P to share " + share + "KBps. ");
         out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<br />");
