@@ -34,6 +34,9 @@ public class TunnelPool {
     private long _lastSelectionPeriod;
     private int _expireSkew;
     private long _started;
+    private long _lastRateUpdate;
+    private long _lastLifetimeProcessed;
+    private String _rateName;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -48,12 +51,19 @@ public class TunnelPool {
         _lifetimeProcessed = 0;
         _expireSkew = _context.random().nextInt(90*1000);
         _started = System.currentTimeMillis();
+        _lastRateUpdate = _started;
+        _lastLifetimeProcessed = 0;
+        _rateName = "tunnel.Bps." +
+                    (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
+                    (_settings.isInbound() ? ".in" : ".out");
         refreshSettings();
     }
     
     public void startup() {
         _alive = true;
         _started = System.currentTimeMillis();
+        _lastRateUpdate = _started;
+        _lastLifetimeProcessed = 0;
         _manager.getExecutor().repoll();
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             // we just reconnected and didn't require any new tunnel builders.
@@ -66,6 +76,9 @@ public class TunnelPool {
             if (ls != null)
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
         }
+        _context.statManager().createRateStat(_rateName,
+                               "Tunnel Bandwidth", "Tunnels", 
+                               new long[] { 5*60*1000l });
     }
     
     public void shutdown() {
@@ -249,6 +262,7 @@ public class TunnelPool {
         _manager.getExecutor().repoll();
             
         _lifetimeProcessed += info.getProcessedMessagesCount();
+        updateRate();
         
         long lifetimeConfirmed = info.getVerifiedBytesTransferred();
         long lifetime = 10*60*1000;
@@ -295,11 +309,23 @@ public class TunnelPool {
         _manager.tunnelFailed();
         
         _lifetimeProcessed += cfg.getProcessedMessagesCount();
+        updateRate();
         
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
             }
+        }
+    }
+
+    void updateRate() {
+        long now = _context.clock().now();
+        long et = now - _lastRateUpdate;
+        if (et > 2*60*1000) {
+            long bw = 1024 * (_lifetimeProcessed - _lastLifetimeProcessed) * 1000 / et;   // Bps
+            _context.statManager().addRateData(_rateName, bw, 0);
+            _lastRateUpdate = now;
+            _lastLifetimeProcessed = _lifetimeProcessed;
         }
     }
 

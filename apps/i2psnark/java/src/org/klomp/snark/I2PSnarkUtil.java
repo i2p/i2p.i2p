@@ -101,6 +101,8 @@ public class I2PSnarkUtil {
             }
             if (opts.getProperty("inbound.nickname") == null)
                 opts.setProperty("inbound.nickname", "I2PSnark");
+            if (opts.getProperty("outbound.nickname") == null)
+                opts.setProperty("outbound.nickname", "I2PSnark");
             if (opts.getProperty("i2p.streaming.inactivityTimeout") == null)
                 opts.setProperty("i2p.streaming.inactivityTimeout", "90000");
             if (opts.getProperty("i2p.streaming.inactivityAction") == null)

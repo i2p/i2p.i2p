@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.580 2007-08-04 22:25:30 complication Exp $
+$Id: history.txt,v 1.581 2007-08-05 22:35:42 complication Exp $
+
+2007-08-11  zzz
+    * Add stats for individual tunnel rates (nice when graphed)
+    * i2psnark: Fix outbound tunnel nickname
 
 2007-08-05  Complication
     * Update the sharing calculator on config.jsp
