@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.581 2007-08-05 22:35:42 complication Exp $
+$Id: history.txt,v 1.582 2007-08-11 15:48:14 zzz Exp $
+
+2007-08-12  zzz
+    * readme.html - Add inproxy.tino.i2p, replace search.i2p with eepsites.i2p,
+      tweak the eepsite and troubleshooting sections
 
 2007-08-11  zzz
     * Add stats for individual tunnel rates (nice when graphed)
