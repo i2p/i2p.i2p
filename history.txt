@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.582 2007-08-11 15:48:14 zzz Exp $
+$Id: history.txt,v 1.583 2007-08-13 14:42:59 zzz Exp $
+
+* 2007-08-23  0.6.1.29 released
 
 2007-08-12  zzz
     * readme.html - Add inproxy.tino.i2p, replace search.i2p with eepsites.i2p,
