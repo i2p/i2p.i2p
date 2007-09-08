@@ -107,6 +107,7 @@ public class ReseedHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {}
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {}
         public void headerReceived(String url, int attemptNum, String key, String val) {}
+        public void attempting(String url) {}
         // End of EepGet status listeners
 
         /**

@@ -225,4 +225,5 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         temp.delete();
     }
     public void headerReceived(String url, int attemptNum, String key, String val) {}
+    public void attempting(String url) {}
 }

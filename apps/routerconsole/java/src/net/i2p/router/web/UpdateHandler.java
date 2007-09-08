@@ -169,6 +169,7 @@ public class UpdateHandler {
             System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
         }
         public void headerReceived(String url, int attemptNum, String key, String val) {}
+        public void attempting(String url) {}
     }
     
     private void restart() {

@@ -36,7 +36,8 @@ public class EepGetScheduler implements EepGet.StatusListener {
     public void fetch(boolean shouldBlock) {
         //Checking for a valid index is done in fetchNext, so we don't have to worry about it.
         if (shouldBlock) {
-            fetchNext();
+            while (_curURL < _urls.size())
+                fetchNext();
         } else {
             fetch();
         }
@@ -77,6 +78,7 @@ public class EepGetScheduler implements EepGet.StatusListener {
         _listener.transferFailed(url, bytesTransferred, bytesRemaining, currentAttempt);
         fetchNext();
     }
+    public void attempting(String url) { _listener.attempting(url); }
     
     public void headerReceived(String url, int attemptNum, String key, String val) {}
 }
