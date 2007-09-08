@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.SocketTimeout;
 
 /**
  * EepGet [-p localhost:4444] 

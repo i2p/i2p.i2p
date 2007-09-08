@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.583 2007-08-13 14:42:59 zzz Exp $
+$Id: history.txt,v 1.584 2007-08-23 19:33:28 jrandom Exp $
+
+2007-09-08  zzz
+    * eepget: Copy over SocketTimeout.java file from syndie
+
+2007-09-07  jrandom
+    * eepget: Merge timeout support from syndie
 
 * 2007-08-23  0.6.1.29 released
 
