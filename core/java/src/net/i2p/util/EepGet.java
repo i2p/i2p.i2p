@@ -56,6 +56,7 @@ public class EepGet {
     private long _bytesRemaining;
     private int _currentAttempt;
     private String _etag;
+    private String _lastModified;
     private boolean _encodingChunked;
     private boolean _notModified;
     private String _contentType;
@@ -89,9 +90,15 @@ public class EepGet {
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, allowCaching, etag, null);
     }
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag, String lastModified) {
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, -1, -1, outputFile, null, url, allowCaching, etag, lastModified, null);
+    }
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, minSize, maxSize, outputFile, outputStream, url, allowCaching, etag, null, postData);
+    }
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize,
                   String outputFile, OutputStream outputStream, String url, boolean allowCaching,
-                  String etag, String postData) {
+                  String etag, String lastModified, String postData) {
         _context = ctx;
         _log = ctx.logManager().getLog(EepGet.class);
         _shouldProxy = (proxyHost != null) && (proxyHost.length() > 0) && (proxyPort > 0) && shouldProxy;
@@ -115,6 +122,7 @@ public class EepGet {
         _fetchHeaderTimeout = 30*1000;
         _listeners = new ArrayList(1);
         _etag = etag;
+        _lastModified = lastModified;
     }
    
     /**
@@ -730,6 +738,8 @@ public class EepGet {
             }
         } else if (key.equalsIgnoreCase("ETag")) {
             _etag = val.trim();
+        } else if (key.equalsIgnoreCase("Last-Modified")) {
+            _lastModified = val.trim();
         } else if (key.equalsIgnoreCase("Transfer-encoding")) {
             if (val.indexOf("chunked") != -1)
                 _encodingChunked = true;
@@ -847,6 +857,11 @@ public class EepGet {
             buf.append(_etag);
             buf.append("\r\n");
         }
+        if (_lastModified != null) {
+            buf.append("If-Modified-Since: ");
+            buf.append(_lastModified);
+            buf.append("\r\n");
+        }
         if (post)
             buf.append("Content-length: ").append(_postData.length()).append("\r\n");
         buf.append("Connection: close\r\n\r\n");
@@ -859,6 +874,10 @@ public class EepGet {
 
     public String getETag() {
         return _etag;
+    }
+    
+    public String getLastModified() {
+        return _lastModified;
     }
     
     public boolean getNotModified() {

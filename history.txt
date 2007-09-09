@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.584 2007-08-23 19:33:28 jrandom Exp $
+$Id: history.txt,v 1.585 2007-09-08 15:21:16 zzz Exp $
+
+2007-09-09  zzz
+    * eepget: Add support for Last-Modified and If-Modified-Since
+    * addressbook: Finish incomplete support for Last-Modified
 
 2007-09-08  zzz
     * eepget: Copy over SocketTimeout.java file from syndie

@@ -92,9 +92,10 @@ public class AddressBook {
         this.location = subscription.getLocation();
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
                 proxyHost, proxyPort, 0, "addressbook.tmp", 
-                subscription.getLocation(), true, subscription.getEtag());
+                subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified());
         get.fetch();
         subscription.setEtag(get.getETag());
+        subscription.setLastModified(get.getLastModified());
         try {            
             this.addresses = ConfigParser.parse(new File("addressbook.tmp"));
         } catch (IOException exp) {
