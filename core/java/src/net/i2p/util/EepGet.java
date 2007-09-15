@@ -119,7 +119,7 @@ public class EepGet {
         _transferFailed = false;
         _headersRead = false;
         _aborted = false;
-        _fetchHeaderTimeout = 30*1000;
+        _fetchHeaderTimeout = 45*1000;
         _listeners = new ArrayList(1);
         _etag = etag;
         _lastModified = lastModified;

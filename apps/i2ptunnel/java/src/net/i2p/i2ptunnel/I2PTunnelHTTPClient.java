@@ -122,6 +122,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "The I2P HTTP Proxy supports http:// requests ONLY. Other protocols such as https:// and ftp:// are not allowed.<BR>")
         .getBytes();
     
+    private final static byte[] ERR_LOCALHOST =
+        ("HTTP/1.1 403 Access Denied\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
+         "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
+        .getBytes();
+    
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
@@ -394,6 +403,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         usingWWWProxy = true;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(getPrefix(requestId) + "Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
+                    } else if (host.toLowerCase().startsWith("localhost:")) {
+                        if (out != null) {
+                            out.write(ERR_LOCALHOST);
+                            out.write("<p /><i>Generated on: ".getBytes());
+                            out.write(new Date().toString().getBytes());
+                            out.write("</i></body></html>\n".getBytes());
+                            out.flush();
+                        }
+                        s.close();
+                        return;
                     } else {
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");

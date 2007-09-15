@@ -14,8 +14,8 @@ import net.i2p.util.Log;
 public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
     private TestJob _testJob;
-    private Job _expireJob;
-    private TunnelInfo _pairedTunnel;
+    // private Job _expireJob;
+    // private TunnelInfo _pairedTunnel;
     private boolean _live;
     
     /** Creates a new instance of PooledTunnelCreatorConfig */
@@ -68,8 +68,9 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public TunnelPool getTunnelPool() { return _pool; }
     
     public void setTestJob(TestJob job) { _testJob = job; }
-    public void setExpireJob(Job job) { _expireJob = job; }
+    public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
-    public void setPairedTunnel(TunnelInfo tunnel) { _pairedTunnel = tunnel; }
-    public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
+    // Fix memory leaks caused by references if you need to use pairedTunnel
+    public void setPairedTunnel(TunnelInfo tunnel) { /* _pairedTunnel = tunnel; */}
+    // public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
 }
