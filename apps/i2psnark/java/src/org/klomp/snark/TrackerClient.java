@@ -300,8 +300,7 @@ public class TrackerClient extends I2PThread
       + "&downloaded=" + downloaded
       + "&left=" + left
       + ((event != NO_EVENT) ? ("&event=" + event) : "");
-    if (Snark.debug >= Snark.INFO)
-      Snark.debug("Sending TrackerClient request: " + s, Snark.INFO);
+    Snark.debug("Sending TrackerClient request: " + s, Snark.INFO);
       
     File fetched = I2PSnarkUtil.instance().get(s);
     if (fetched == null) {
@@ -315,8 +314,7 @@ public class TrackerClient extends I2PThread
 
         TrackerInfo info = new TrackerInfo(in, coordinator.getID(),
                                            coordinator.getMetaInfo());
-        if (Snark.debug >= Snark.INFO)
-          Snark.debug("TrackerClient response: " + info, Snark.INFO);
+        Snark.debug("TrackerClient response: " + info, Snark.INFO);
         lastRequestTime = System.currentTimeMillis();
 
         String failure = info.getFailureReason();

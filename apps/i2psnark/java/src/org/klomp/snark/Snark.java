@@ -63,7 +63,7 @@ public class Snark
   /**
    * What level of debug info to show.
    */
-  public static int debug = NOTICE;
+  //public static int debug = NOTICE;
 
   // Whether or not to ask the user for commands while sharing
   private static boolean command_interpreter = true;
@@ -505,6 +505,7 @@ public class Snark
     int i = 0;
     while (i < args.length)
       {
+/*
         if (args[i].equals("--debug"))
           {
             debug = INFO;
@@ -525,7 +526,7 @@ public class Snark
                 catch (NumberFormatException nfe) { }
               }
           }
-        else if (args[i].equals("--port"))
+        else */ if (args[i].equals("--port"))
           {
             if (args.length - 1 < i + 1)
               usage("--port needs port number to listen on");
@@ -772,7 +773,7 @@ public class Snark
         totalUploaders += c.uploaders;
     }
     int limit = I2PSnarkUtil.instance().getMaxUploaders();
-    Snark.debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
+    // Snark.debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
     return totalUploaders > limit;
   }
 }

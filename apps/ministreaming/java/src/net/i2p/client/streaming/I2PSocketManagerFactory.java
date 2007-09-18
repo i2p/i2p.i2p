@@ -138,8 +138,6 @@ public class I2PSocketManagerFactory {
             I2PSession session = client.createSession(myPrivateKeyStream, opts);
             session.connect();
             I2PSocketManager sockMgr = createManager(session, opts, "manager");
-            if (sockMgr != null)
-                sockMgr.setDefaultOptions(sockMgr.buildOptions(opts));
             return sockMgr;
         } catch (I2PSessionException ise) {
             _log.error("Error creating session for socket manager", ise);

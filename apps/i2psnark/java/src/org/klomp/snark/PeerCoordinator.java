@@ -313,6 +313,9 @@ public class PeerCoordinator implements PeerListener
     synchronized(peers)
       {
         need_more = !peer.isConnected() && peers.size() < MAX_CONNECTIONS;
+        // Check if we already have this peer before we build the connection
+        Peer old = peerIDInList(peer.getPeerID(), peers);
+        need_more = need_more && ((old == null) || (old.getInactiveTime() > 4*60*1000));
       }
 
     if (need_more)
@@ -808,8 +811,8 @@ public class PeerCoordinator implements PeerListener
   public int allowedUploaders()
   {
     if (Snark.overUploadLimit(uploaders)) {
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug("Over limit, uploaders was: " + uploaders);
+        // if (_log.shouldLog(Log.DEBUG))
+        //   _log.debug("Over limit, uploaders was: " + uploaders);
         return uploaders - 1;
     } else if (uploaders < MAX_UPLOADERS)
         return uploaders + 1;

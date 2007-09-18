@@ -95,17 +95,14 @@ class PeerCheckerTask extends TimerTask
 	    peer.setRateHistory(upload, download);
             peer.resetCounters();
 
-            if (Snark.debug >= Snark.DEBUG)
-              {
-                Snark.debug(peer + ":", Snark.DEBUG);
-                Snark.debug(" ul: " + upload/KILOPERSECOND
-                            + " dl: " + download/KILOPERSECOND
-                            + " i: " + peer.isInterested()
-                            + " I: " + peer.isInteresting()
-                            + " c: " + peer.isChoking()
-                            + " C: " + peer.isChoked(),
-                            Snark.DEBUG);
-              }
+            Snark.debug(peer + ":", Snark.DEBUG);
+            Snark.debug(" ul: " + upload/KILOPERSECOND
+                        + " dl: " + download/KILOPERSECOND
+                        + " i: " + peer.isInterested()
+                        + " I: " + peer.isInteresting()
+                        + " c: " + peer.isChoking()
+                        + " C: " + peer.isChoked(),
+                        Snark.DEBUG);
 
             // If we are at our max uploaders and we have lots of other
             // interested peers try to make some room.
@@ -118,9 +115,8 @@ class PeerCheckerTask extends TimerTask
                 // Check if it still wants pieces from us.
                 if (!peer.isInterested())
                   {
-                    if (Snark.debug >= Snark.INFO)
-                      Snark.debug("Choke uninterested peer: " + peer,
-                                  Snark.INFO);
+                    Snark.debug("Choke uninterested peer: " + peer,
+                                Snark.INFO);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -132,8 +128,7 @@ class PeerCheckerTask extends TimerTask
                 else if (peer.isInteresting() && peer.isChoked())
                   {
                     // If they are choking us make someone else a downloader
-                    if (Snark.debug >= Snark.DEBUG)
-                      Snark.debug("Choke choking peer: " + peer, Snark.DEBUG);
+                    Snark.debug("Choke choking peer: " + peer, Snark.DEBUG);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -146,8 +141,7 @@ class PeerCheckerTask extends TimerTask
                 else if (!peer.isInteresting() && !coordinator.completed())
                   {
                     // If they aren't interesting make someone else a downloader
-                    if (Snark.debug >= Snark.DEBUG)
-                      Snark.debug("Choke uninteresting peer: " + peer, Snark.DEBUG);
+                    Snark.debug("Choke uninteresting peer: " + peer, Snark.DEBUG);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -162,9 +156,8 @@ class PeerCheckerTask extends TimerTask
                          && download == 0)
                   {
                     // We are downloading but didn't receive anything...
-                    if (Snark.debug >= Snark.DEBUG)
-                      Snark.debug("Choke downloader that doesn't deliver:"
-                                  + peer, Snark.DEBUG);
+                    Snark.debug("Choke downloader that doesn't deliver:"
+                                + peer, Snark.DEBUG);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -202,9 +195,8 @@ class PeerCheckerTask extends TimerTask
             || uploaders > uploadLimit)
             && worstDownloader != null)
           {
-            if (Snark.debug >= Snark.DEBUG)
-              Snark.debug("Choke worst downloader: " + worstDownloader,
-                          Snark.DEBUG);
+            Snark.debug("Choke worst downloader: " + worstDownloader,
+                        Snark.DEBUG);
 
             worstDownloader.setChoking(true);
             coordinator.uploaders--;

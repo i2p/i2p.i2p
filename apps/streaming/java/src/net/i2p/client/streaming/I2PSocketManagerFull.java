@@ -129,7 +129,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public long getAcceptTimeout() { return _acceptTimeout; }
 
     public void setDefaultOptions(I2PSocketOptions options) {
-        _defaultOptions = new ConnectionOptions(options);
+        _defaultOptions = new ConnectionOptions((ConnectionOptions) options);
     }
 
     public I2PSocketOptions getDefaultOptions() {

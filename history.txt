@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.586 2007-09-09 12:38:54 zzz Exp $
+$Id: history.txt,v 1.587 2007-09-14 20:58:30 zzz Exp $
+
+2007-09-18  zzz
+    * eepsite_index.html: Add links to trevorreznik address book
+    * streaming lib: Fix SocketManagerFactory to honor options on outbound connections
+    * streaming lib: Fix setDefaultOptions() when called with a ConnectionOptions parameter
+    * i2psnark: Don't make outbound connections to already-connected peers
+    * i2psnark: Debug logging cleanup
 
 2007-09-14  zzz
     * eepget: Increase header timeout to 45s

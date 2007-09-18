@@ -52,22 +52,32 @@
  <li>Before you tell the world about your new eepsite, you should add some content.
      Go to i2p/eepsite/docroot and copy this document (index.html) to help.html so you can refer to it later.
      Now edit index.html and add content, pictures, and whatever you would like to share.
- <li>Now it's time to add your eepsite to I2P's most popular address book.
-     To do that, you must to tell <a href="http://orion.i2p/">orion.i2p</a>
-     what your eepsite name and key are. Orion has a web interface where you can add a key to the address book.
-     The key entry form is <a href="http://orion.i2p/list/">here</a>.
+ <li>Now it's time to add your eepsite to an I2P address book
+     such as <a href="http://orion.i2p/">orion.i2p</a> or
+     <a href="http://trevorreznik.i2p/">trevorreznik.i2p</a>.
+     That is, you must enter
+     your eepsite name and key into a web interface on one or more of these sites.
+     Here is <a href="http://orion.i2p/list/">the key entry form at orion.i2p</a> and
+     here is <a href="http://trevorreznik.i2p/host-database/">the key entry form at trevorreznik.i2p</a>.
      Again, your key is the entire "Local destination" key on the
      <a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
      Be sure you get the whole thing, ending with "AAAA".
      Don't forget to click "add a key".
      Check to see if it reports the key was added.
-     Since most routers periodically get address book updates from orion, within several hours others will be able to find your
+     Since many routers periodically get address book updates from orion or trevorreznik, within several hours others will be able to find your
      website by simply typing <i>something</i>.i2p into their browser.
- <li>If you are in a hurry and can't wait a few hours, you can tell people to use orion's "jump" address helper redirection service.
-     This will work within a few minutes of your entering the key to orion.i2p.
-     Test it yourself first by entering http://orion.i2p/jump/<i>something</i>.i2p into your browser.
+ <li>Speaking of address book updates, this would be a good time to add orion, trevorreznik, or both
+     to your own subscription list. Go to your <a href="http://localhost:7657/susidns/subscriptions.jsp">subscriptions configuration page</a>
+     and add <a href="http://orion.i2p/hosts.txt">http://orion.i2p/hosts.txt</a> and/or
+     <a href="http://trevorreznik.i2p/hosts.txt">http://trevorreznik.i2p/hosts.txt</a> to the list and hit "Save".
+     Now you will get updates too!
+ <li>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service.
+     This will work within a few minutes of your entering the key to an address book.
+     Test it yourself first by entering http://orion.i2p/jump/<i>something</i>.i2p
+     or http://trevorreznik.i2p/cgi-bin/jump.php?hostname=<i>something</i>.i2p/ into your browser.
      Once it's working, then you can tell others to use it.
- <li>Some people check <a href="http://orion.i2p/list/">orion.i2p/list/</a> for new eepsites, so you may start getting
+ <li>Some people check <a href="http://orion.i2p/list/">orion.i2p/list/</a> and
+     <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> for new eepsites, so you may start getting
      a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:
      <ul>
      <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
@@ -78,9 +88,10 @@
      </ul>
      Note that some sites recommend pasting in that really long destination key.
      You can if you want - but
-     if you have successfully posted your key on the <a href="http://orion.i2p/list/">orion page here</a>,
-     tested it using http://orion.i2p/jump/<i>something</i>.i2p, and waited 24 hours for orion's
-     address book to propagate to others, that shouldn't be necessary.
+     if you have successfully posted your key at <a href="http://orion.i2p/list/">orion</a> or
+     <a href="http://trevorreznik.i2p/host-database/">trevorreznik</a>,
+     tested it using a jump service, and waited 24 hours for the
+     address book update to propagate to others, that shouldn't be necessary.
  <li>If you have any questions try IRC #i2p or the
      <a href="http://forum.i2p/viewforum.php?f=10">technical problems section</a> on
      <a href="http://forum.i2p/">forum.i2p</a>.
