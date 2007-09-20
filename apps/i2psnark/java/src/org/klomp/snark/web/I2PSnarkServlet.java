@@ -248,23 +248,31 @@ public class I2PSnarkServlet extends HttpServlet {
                             _manager.addMessage("Torrent file deleted: " + f.getAbsolutePath());
                             List files = snark.meta.getFiles();
                             String dataFile = snark.meta.getName();
-                            for (int i = 0; files != null && i < files.size(); i++) {
-                                // multifile torrents have the getFiles() return lists of lists of filenames, but
-                                // each of those lists just contain a single file afaict...
-                                File df = new File(_manager.getDataDir(), files.get(i).toString());
-                                boolean deleted = FileUtil.rmdir(df, false);
-                                if (deleted)
-                                    _manager.addMessage("Data dir deleted: " + df.getAbsolutePath());
-                                else
-                                    _manager.addMessage("Data dir could not be deleted: " + df.getAbsolutePath());
-                            }
-                            if (dataFile != null) {
-                                f = new File(_manager.getDataDir(), dataFile);
-                                boolean deleted = f.delete();
-                                if (deleted)
+                            f = new File(_manager.getDataDir(), dataFile);
+                            if (files == null) { // single file torrent
+                                if (f.delete())
                                     _manager.addMessage("Data file deleted: " + f.getAbsolutePath());
                                 else
                                     _manager.addMessage("Data file could not be deleted: " + f.getAbsolutePath());
+                                break;
+                            }
+                            for (int i = 0; i < files.size(); i++) { // pass 1 delete files
+                                // multifile torrents have the getFiles() return lists of lists of filenames, but
+                                // each of those lists just contain a single file afaict...
+                                File df = Storage.getFileFromNames(f, (List) files.get(i));
+                                if (df.delete())
+                                    _manager.addMessage("Data file deleted: " + df.getAbsolutePath());
+                                else
+                                    _manager.addMessage("Data file could not be deleted: " + df.getAbsolutePath());
+                            }
+                            for (int i = files.size() - 1; i >= 0; i--) { // pass 2 delete dirs - not foolproof,
+                                                                          // we could sort and do a strict bottom-up
+                                File df = Storage.getFileFromNames(f, (List) files.get(i));
+                                df = df.getParentFile();
+                                if (df == null || !df.exists())
+                                    continue;
+                                if(df.delete())
+                                    _manager.addMessage("Data dir deleted: " + df.getAbsolutePath());
                             }
                             break;
                         }
@@ -297,16 +305,19 @@ public class I2PSnarkServlet extends HttpServlet {
                     try {
                         Storage s = new Storage(baseFile, announceURL, null);
                         s.create();
+                        s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(baseFile.getParent(), baseFile.getName() + ".torrent");
                         if (torrentFile.exists())
                             throw new IOException("Cannot overwrite an existing .torrent file: " + torrentFile.getPath());
+                        _manager.saveTorrentStatus(info, s.getBitField()); // so addTorrent won't recheck
+                        // DirMonitor could grab this first, maybe hold _snarks lock?
                         FileOutputStream out = new FileOutputStream(torrentFile);
                         out.write(info.getTorrentData());
                         out.close();
                         _manager.addMessage("Torrent created for " + baseFile.getName() + ": " + torrentFile.getAbsolutePath());
                         // now fire it up, but don't automatically seed it
-                        _manager.addTorrent(torrentFile.getCanonicalPath(), false);
+                        _manager.addTorrent(torrentFile.getCanonicalPath(), true);
                         _manager.addMessage("Many I2P trackers require you to register new torrents before seeding - please do so before starting " + baseFile.getName());
                     } catch (IOException ioe) {
                         _manager.addMessage("Error creating a torrent for " + baseFile.getAbsolutePath() + ": " + ioe.getMessage());

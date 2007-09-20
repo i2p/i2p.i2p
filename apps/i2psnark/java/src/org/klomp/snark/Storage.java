@@ -117,7 +117,8 @@ public class Storage
       }
 
     String name = baseFile.getName();
-    if (files.size() == 1)
+    if (files.size() == 1) // FIXME: ...and if base file not a directory or should this be the only check?
+                           // this makes a bad metainfo if the directory has only one file in it
       {
         files = null;
         lengthsList = null;
@@ -406,7 +407,7 @@ public class Storage
   /**
    * Removes 'suspicious' characters from the give file name.
    */
-  private String filterName(String name)
+  private static String filterName(String name)
   {
     // XXX - Is this enough?
     return name.replace(File.separatorChar, '_');
@@ -438,7 +439,7 @@ public class Storage
     return f;
   }
 
-  private File getFileFromNames(File base, List names) throws IOException
+  public static File getFileFromNames(File base, List names)
   {
     Iterator it = names.iterator();
     while (it.hasNext())

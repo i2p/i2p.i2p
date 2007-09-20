@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.587 2007-09-14 20:58:30 zzz Exp $
+$Id: history.txt,v 1.588 2007-09-18 14:09:21 zzz Exp $
+
+2007-09-19  zzz
+    * i2psnark: Fix broken multifile torrent Delete;
+        cleanup Storage resources in AddTorrent;
+        don't autostart torrent after Create
 
 2007-09-18  zzz
     * eepsite_index.html: Add links to trevorreznik address book
