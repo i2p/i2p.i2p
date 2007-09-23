@@ -187,6 +187,19 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return true; 
     }
     
+    public boolean isValidTunnel(Hash client, TunnelInfo tunnel) {
+        if (tunnel.getExpiration() < _context.clock().now())
+            return false;
+        TunnelPool pool;
+        if (tunnel.isInbound())
+            pool = (TunnelPool)_clientInboundPools.get(client); 
+        else
+            pool = (TunnelPool)_clientOutboundPools.get(client); 
+        if (pool == null)
+            return false;
+        return pool.listTunnels().contains(tunnel);
+    }
+
     public TunnelPoolSettings getInboundSettings() { return _inboundExploratory.getSettings(); }
     public TunnelPoolSettings getOutboundSettings() { return _outboundExploratory.getSettings(); }
     public void setInboundSettings(TunnelPoolSettings settings) { _inboundExploratory.setSettings(settings); }
@@ -498,7 +511,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 String cap = getCapacity(peer);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
                 if (_context.routerHash().equals(peer))
-                    out.write("<td><i>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + "</i>" + cap + "</td>");
+                    out.write("<td>" + (id == null ? "" : "" + id) + "</td>");
                 else
                     out.write("<td>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + cap + "</td>");                
             }

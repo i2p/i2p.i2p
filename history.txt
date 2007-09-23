@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.588 2007-09-18 14:09:21 zzz Exp $
+$Id: history.txt,v 1.589 2007-09-19 20:44:05 zzz Exp $
+
+2007-09-22  zzz
+    * Send messages for the same destination out the same outbound
+      tunnel to reduce out-of-order delivery.
 
 2007-09-19  zzz
     * i2psnark: Fix broken multifile torrent Delete;

@@ -41,6 +41,9 @@ public interface TunnelManagerFacade extends Service {
      *
      */
     boolean isInUse(Hash peer);
+
+    /** Is a tunnel a valid member of the pool? */
+    public boolean isValidTunnel(Hash client, TunnelInfo tunnel);
     
     /** how many tunnels are we participating in? */
     public int getParticipatingCount();
@@ -85,6 +88,7 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public TunnelInfo selectOutboundTunnel() { return null; }
     public TunnelInfo selectOutboundTunnel(Hash destination) { return null; }
     public boolean isInUse(Hash peer) { return false; }
+    public boolean isValidTunnel(Hash client, TunnelInfo tunnel) { return false; }
     public int getParticipatingCount() { return 0; }
     public int getFreeTunnelCount() { return 0; }
     public int getOutboundTunnelCount() { return 0; }

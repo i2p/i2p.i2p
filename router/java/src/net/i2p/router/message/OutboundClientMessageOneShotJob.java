@@ -2,6 +2,7 @@ package net.i2p.router.message;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -378,7 +379,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                        + _lease.getTunnelId() + " on " 
                        + _lease.getGateway().toBase64());
         
-        _outTunnel = selectOutboundTunnel();
+        _outTunnel = selectOutboundTunnel(_to);
         if (_outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Sending tunnel message out " + _outTunnel.getSendTunnelId(0) + " to " 
@@ -434,6 +435,45 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
     }
     
+
+    /**
+     * Use the same outbound tunnel as we did for the same destination previously,
+     * if possible, to keep the streaming lib happy
+     *
+     */
+    private static HashMap _tunnelCache = new HashMap();
+    private static long _cleanTime = 0;
+    private TunnelInfo selectOutboundTunnel(Destination to) {
+        TunnelInfo tunnel;
+        long now = getContext().clock().now();
+        synchronized (_tunnelCache) {
+            if (now - _cleanTime > 5*60*1000) {  // clean out periodically
+                List deleteList = new ArrayList();
+                for (Iterator iter = _tunnelCache.keySet().iterator(); iter.hasNext(); ) {
+                    Destination dest = (Destination) iter.next();
+                    tunnel = (TunnelInfo) _tunnelCache.get(dest);
+                    if (!getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel))
+                        deleteList.add(dest);
+                }
+                for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
+                    Destination dest = (Destination) iter.next();
+                    _tunnelCache.remove(dest);
+                }
+                _cleanTime = now;
+            }
+            tunnel = (TunnelInfo) _tunnelCache.get(to);
+            if (tunnel != null) {
+                if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel))
+                    return(tunnel);
+                else
+                    _tunnelCache.remove(to);
+            }
+            tunnel = selectOutboundTunnel();
+            if (tunnel != null)
+                _tunnelCache.put(to, tunnel);
+        }
+        return tunnel;
+    }
     /**
      * Pick an arbitrary outbound tunnel to send the message through, or null if
      * there aren't any around
