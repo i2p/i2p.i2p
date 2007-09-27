@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.Collections;
 
+import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
@@ -118,6 +119,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
         //j.runJob();
         GetBidsJob.getBids(_context, this, msg);
+    }
+    
+    public boolean isBacklogged(Hash dest) { 
+        return _manager.isBacklogged(dest); 
     }
     
     public List getMostRecentErrorMessages() { 

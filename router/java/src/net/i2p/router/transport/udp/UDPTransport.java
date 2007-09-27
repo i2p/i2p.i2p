@@ -1356,7 +1356,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final IdleInComparator _instance = new IdleInComparator();
         public static final IdleInComparator instance() { return _instance; }
         protected int compare(PeerState l, PeerState r) {
-            long rv = l.getLastReceiveTime() - r.getLastReceiveTime();
+            long rv = r.getLastReceiveTime() - l.getLastReceiveTime();
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
@@ -1367,7 +1367,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final IdleOutComparator _instance = new IdleOutComparator();
         public static final IdleOutComparator instance() { return _instance; }
         protected int compare(PeerState l, PeerState r) {
-            long rv = l.getLastSendTime() - r.getLastSendTime();
+            long rv = r.getLastSendTime() - l.getLastSendTime();
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
@@ -1400,7 +1400,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final UptimeComparator _instance = new UptimeComparator();
         public static final UptimeComparator instance() { return _instance; }
         protected int compare(PeerState l, PeerState r) {
-            long rv = l.getKeyEstablishedTime() - r.getKeyEstablishedTime();
+            long rv = r.getKeyEstablishedTime() - l.getKeyEstablishedTime();
             if (rv == 0) // fallback on alpha
                 return super.compare(l, r);
             else
@@ -1537,7 +1537,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         protected int compare(PeerState l, PeerState r) {
             // base64 retains binary ordering
-            return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
+            return l.getRemotePeer().toBase64().compareTo(r.getRemotePeer().toBase64());
         }
     }
     private static class InverseComparator implements Comparator {
@@ -1646,7 +1646,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("<a href=\"netdb.jsp#");
             buf.append(name);
             buf.append("\">");
-            buf.append(name).append("@");
+            buf.append(name);
+/*
+            buf.append("@");
             byte ip[] = peer.getRemoteIP();
             for (int j = 0; j < ip.length; j++) {
                 int num = ip[j] & 0xFF;
@@ -1669,7 +1671,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else if (port < 10000)
                 buf.append("0");
             buf.append(port);
-            buf.append("</a>");
+*/
+            buf.append("</a>&nbsp;");
             if (peer.getWeRelayToThemAs() > 0)
                 buf.append("&gt;");
             else
@@ -1702,7 +1705,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (idleIn < 0) idleIn = 0;
             if (idleOut < 0) idleOut = 0;
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(idleIn);
             buf.append("s/");
             buf.append(idleOut);
@@ -1711,9 +1714,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int recvBps = (idleIn > 2 ? 0 : peer.getReceiveBps());
             int sendBps = (idleOut > 2 ? 0 : peer.getSendBps());
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(formatKBps(recvBps));
-            buf.append("KBps/");
+            buf.append("/");
             buf.append(formatKBps(sendBps));
             buf.append("KBps ");
             //buf.append(formatKBps(peer.getReceiveACKBps()));
@@ -1724,18 +1727,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             long uptime = now - peer.getKeyEstablishedTime();
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(DataHelper.formatDuration(uptime));
             buf.append("</code></td>");
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(peer.getClockSkew());
             buf.append("s</code></td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
             long sendWindow = peer.getSendWindowBytes();
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(sendWindow/1024);
             buf.append("K");
             buf.append("/").append(peer.getConcurrentSends());
@@ -1743,26 +1746,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("/").append(peer.getConsecutiveSendRejections());
             buf.append("</code></td>");
 
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(peer.getSlowStartThreshold()/1024);
             buf.append("K</code></td>");
 
             int rtt = peer.getRTT();
             int rto = peer.getRTO();
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(rtt);
             buf.append("</code></td>");
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(peer.getRTTDeviation());
             buf.append("</code></td>");
 
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(rto);
             buf.append("</code></td>");
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(peer.getMTU()).append("/").append(peer.getReceiveMTU());
             
             //.append('/');
@@ -1773,11 +1776,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long sent = peer.getPacketsTransmitted();
             long recv = peer.getPacketsReceived();
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(sent);
             buf.append("</code></td>");
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(recv);
             buf.append("</code></td>");
             
@@ -1789,14 +1792,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long resent = peer.getPacketsRetransmitted();
             long dupRecv = peer.getPacketsReceivedDuplicate();
             
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             //buf.append(formatPct(sendLostPct));
             buf.append(resent); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
             //buf.append(peer.getPacketRetransmissionRate());
             buf.append("</code></td>");
             
             double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
-            buf.append("<td valign=\"top\" ><code>");
+            buf.append("<td valign=\"top\" align=\"right\" ><code>");
             buf.append(dupRecv); //formatPct(recvDupPct));
             buf.append("</code></td>");
 
@@ -1822,22 +1825,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         buf.append("<tr><td colspan=\"15\"><hr /></td></tr>\n");
         buf.append(" <tr><td colspan=\"2\"><b>Total</b></td>");
-        buf.append("     <td>");
-        buf.append(formatKBps(bpsIn)).append("KBps/").append(formatKBps(bpsOut));
+        buf.append("     <td align=\"right\">");
+        buf.append(formatKBps(bpsIn)).append("/").append(formatKBps(bpsOut));
         buf.append("KBps</td>");
-        buf.append("     <td>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
-        buf.append("</td><td>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal*1000/numPeers) : "0ms").append("</td>\n");
-        buf.append("     <td>");
+        buf.append("     <td align=\"right\">").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
+        buf.append("</td><td align=\"right\">").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal*1000/numPeers) : "0ms").append("</td>\n");
+        buf.append("     <td align=\"right\">");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
         buf.append("</td><td>&nbsp;</td>\n");
-        buf.append("     <td>");
+        buf.append("     <td align=\"right\">");
         buf.append(numPeers > 0 ? rttTotal/numPeers : 0);
-        buf.append("</td><td>&nbsp;</td><td>");
+        buf.append("</td><td align=\"right\">&nbsp;</td><td align=\"right\">");
         buf.append(numPeers > 0 ? rtoTotal/numPeers : 0);
-        buf.append("</td>\n     <td>&nbsp;</td><td>");
-        buf.append(sendTotal).append("</td><td>").append(recvTotal).append("</td>\n");
-        buf.append("     <td>").append(resentTotal);
-        buf.append("</td><td>").append(dupRecvTotal).append("</td>\n");
+        buf.append("</td>\n     <td>&nbsp;</td><td align=\"right\">");
+        buf.append(sendTotal).append("</td><td align=\"right\">").append(recvTotal).append("</td>\n");
+        buf.append("     <td align=\"right\">").append(resentTotal);
+        buf.append("</td><td align=\"right\">").append(dupRecvTotal).append("</td>\n");
         buf.append(" </tr>\n");
         buf.append("<tr><td colspan=\"15\" valign=\"top\" align=\"left\">");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();

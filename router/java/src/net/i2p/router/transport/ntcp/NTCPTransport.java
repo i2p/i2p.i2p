@@ -311,6 +311,13 @@ public class NTCPTransport extends TransportImpl {
         }
     }
     
+    public boolean isBacklogged(Hash dest) {
+        synchronized (_conLock) {
+            NTCPConnection con = (NTCPConnection)_conByIdent.get(dest);
+            return (con != null) && con.isEstablished() && con.tooBacklogged();
+        }
+    }
+    
     void removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
         synchronized (_conLock) {
@@ -541,82 +548,85 @@ public class NTCPTransport extends TransportImpl {
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b>peer</b></td>");
+        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td>");
         buf.append("     <td><b>dir</b></td>");
-        buf.append("     <td><b>uptime</b></td>");
-        buf.append("     <td><b>idle</b></td>");
-        buf.append("     <td><b>sent</b></td>");
-        buf.append("     <td><b>received</b></td>");
-        buf.append("     <td><b>out/in</b></td>");
+        buf.append("     <td align=\"right\"><b><a href=\"#def.idle\">idle</a></b></td>");
+        buf.append("     <td align=\"right\"><b><a href=\"#def.rate\">in/out</a></b></td>");
+        buf.append("     <td align=\"right\"><b><a href=\"#def.up\">up</a></b></td>");
+        buf.append("     <td align=\"right\"><b><a href=\"#def.skew\">skew</a></b></td>");
+        buf.append("     <td align=\"right\"><b><a href=\"#def.send\">send</a></b></td>");
+        buf.append("     <td align=\"right\"><b><a href=\"#def.recv\">recv</a></b></td>");
         buf.append("     <td><b>out queue</b></td>");
         buf.append("     <td><b>backlogged?</b></td>");
         buf.append("     <td><b>reading?</b></td>");
-        buf.append("     <td><b>skew</b></td>");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
-            buf.append("<tr><td>").append(con.getRemotePeer().calculateHash().toBase64().substring(0,8));
-            buf.append("</td><td>");
+            String name = con.getRemotePeer().calculateHash().toBase64().substring(0,6);
+            buf.append("<tr><td><code><a href=\"netdb.jsp#").append(name).append("\">").append(name);
+            buf.append("</code></td><td align=\"center\"><code>");
             if (con.getIsInbound())
                 buf.append("in");
             else
                 buf.append("out");
-            buf.append("</td><td>").append(DataHelper.formatDuration(con.getUptime()));
-            totalUptime += con.getUptime();
-            buf.append("</td><td>").append(con.getTimeSinceSend()/1000);
-            buf.append("s/").append(con.getTimeSinceReceive()/1000);
-            buf.append("s</td><td>").append(con.getMessagesSent());
-            totalSend += con.getMessagesSent();
-            buf.append("</td><td>").append(con.getMessagesReceived());
-            totalRecv += con.getMessagesReceived();
-            buf.append("</td><td>");
-            if (con.getTimeSinceSend() < 10*1000) {
-                buf.append(formatRate(con.getSendRate()/1024));
-                bpsSend += con.getSendRate();
-            } else {
-                buf.append(formatRate(0));
-            }
-            buf.append("/");
+            buf.append("</code></td><td align=\"right\"><code>");
+            buf.append(con.getTimeSinceReceive()/1000);
+            buf.append("s/").append(con.getTimeSinceSend()/1000);
+            buf.append("s</code></td><td align=\"right\"><code>");
             if (con.getTimeSinceReceive() < 10*1000) {
                 buf.append(formatRate(con.getRecvRate()/1024));
                 bpsRecv += con.getRecvRate();
             } else {
                 buf.append(formatRate(0));
             }
+            buf.append("/");
+            if (con.getTimeSinceSend() < 10*1000) {
+                buf.append(formatRate(con.getSendRate()/1024));
+                bpsSend += con.getSendRate();
+            } else {
+                buf.append(formatRate(0));
+            }
             buf.append("KBps");
+            buf.append("</code></td><td align=\"right\"><code>").append(DataHelper.formatDuration(con.getUptime()));
+            totalUptime += con.getUptime();
+            offsetTotal = offsetTotal + con.getClockSkew();
+            buf.append("</code></td><td align=\"right\"><code>").append(con.getClockSkew());
+            buf.append("s</code></td><td align=\"right\"><code>").append(con.getMessagesSent());
+            totalSend += con.getMessagesSent();
+            buf.append("</code></td><td align=\"right\"><code>").append(con.getMessagesReceived());
+            totalRecv += con.getMessagesReceived();
             long outQueue = con.getOutboundQueueSize();
             if (outQueue <= 0) {
-                buf.append("</td><td>No messages");
+                buf.append("</code></td><td align=\"right\"><code>No messages");
             } else {
-                buf.append("</td><td>").append(outQueue).append(" message");
+                buf.append("</code></td><td align=\"right\"><code>").append(outQueue).append(" message");
                 if (outQueue > 1)
                     buf.append("s");
                 writingPeers++;
             }
-            buf.append("</td><td>").append(con.getConsecutiveBacklog() > 0 ? "true" : "false");
+            buf.append("</code></td><td align=\"center\"><code>").append(con.getConsecutiveBacklog() > 0 ? "true" : "false");
             long readTime = con.getReadTime();
             if (readTime <= 0) {
-                buf.append("</td><td>No");
+                buf.append("</code></td><td align=\"center\"><code>No");
             } else {
-                buf.append("</td><td>For ").append(DataHelper.formatDuration(readTime));
+                buf.append("</code></td><td><code>For ").append(DataHelper.formatDuration(readTime));
                 readingPeers++;
             }
-            offsetTotal = offsetTotal + con.getClockSkew();
-            buf.append("</td><td>").append(con.getClockSkew());
-            buf.append("s</td></tr>\n");
+            buf.append("</code></td></tr>\n");
             out.write(buf.toString());
             buf.setLength(0);
         }
 
         if (peers.size() > 0) {
             buf.append("<tr><td colspan=\"11\"><hr /></td></tr>\n");
-            buf.append("<tr><td>").append(peers.size()).append(" peers</td><td>&nbsp;</td><td>").append(DataHelper.formatDuration(totalUptime/peers.size()));
-            buf.append("</td><td>&nbsp;</td><td>").append(totalSend).append("</td><td>").append(totalRecv);
-            buf.append("</td><td>").append(formatRate(bpsSend/1024)).append("/").append(formatRate(bpsRecv/1024)).append("KBps");
+            buf.append("<tr><td>").append(peers.size()).append(" peers</td><td>&nbsp;</td><td>&nbsp;");
+            buf.append("</td><td align=\"right\">").append(formatRate(bpsRecv/1024)).append("/").append(formatRate(bpsSend/1024)).append("KBps");
+            buf.append("</td><td align=\"right\">").append(DataHelper.formatDuration(totalUptime/peers.size()));
+            buf.append("</td><td align=\"right\">").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
+            buf.append("</td><td align=\"right\">").append(totalSend).append("</td><td align=\"right\">").append(totalRecv);
             buf.append("</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;");
-            buf.append("</td><td>").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
             buf.append("</td></tr>\n");
         }
                 
@@ -627,7 +637,7 @@ public class NTCPTransport extends TransportImpl {
         buf.setLength(0);
     }
     
-    private static NumberFormat _rateFmt = new DecimalFormat("#,#00.00");
+    private static NumberFormat _rateFmt = new DecimalFormat("#,#0.00");
     private static String formatRate(float rate) {
         synchronized (_rateFmt) { return _rateFmt.format(rate); }
     }
@@ -661,7 +671,7 @@ public class NTCPTransport extends TransportImpl {
         }
         protected int compare(NTCPConnection l, NTCPConnection r) {
             // base64 retains binary ordering
-            return DataHelper.compareTo(l.getRemotePeer().calculateHash().getData(), r.getRemotePeer().calculateHash().getData());
+            return l.getRemotePeer().calculateHash().toBase64().compareTo(r.getRemotePeer().calculateHash().toBase64());
         }
     }
     

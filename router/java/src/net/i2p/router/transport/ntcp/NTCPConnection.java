@@ -304,7 +304,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
         return queueTime;
     }
-    private boolean tooBacklogged() {
+    public boolean tooBacklogged() {
         long queueTime = queueTime();
         if (queueTime <= 0) return false;
         int size = 0;

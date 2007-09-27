@@ -382,6 +382,7 @@ public abstract class TransportImpl implements Transport {
     public RouterContext getContext() { return _context; }
     public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
     public void recheckReachability() {}
+    public boolean isBacklogged(Hash dest) { return false; }
     
     private static final long UNREACHABLE_PERIOD = 5*60*1000;
     public boolean isUnreachable(Hash peer) {

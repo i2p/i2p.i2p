@@ -193,7 +193,14 @@ public class TransportManager implements TransportEventListener {
             ((Transport)_transports.get(i)).recheckReachability();
     }
 
-    
+    public boolean isBacklogged(Hash dest) {
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            if (t.isBacklogged(dest))
+                return true;
+        }
+        return false;
+    }    
     
     Map getAddresses() {
         Map rv = new HashMap(_transports.size());

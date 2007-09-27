@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.589 2007-09-19 20:44:05 zzz Exp $
+$Id: history.txt,v 1.590 2007-09-22 21:44:36 zzz Exp $
+
+2007-09-27  zzz
+    * Implement pushback of NTCP transport backlog to the outbound tunnel selection code
+    * Clean up the NTCP and UDP tables on peers.jsp to be consistent,
+      fix some of the sorting
 
 2007-09-22  zzz
     * Send messages for the same destination out the same outbound

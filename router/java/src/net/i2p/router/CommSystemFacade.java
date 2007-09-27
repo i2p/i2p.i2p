@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 
 /**
@@ -52,6 +53,7 @@ public abstract class CommSystemFacade implements Service {
      */
     public short getReachabilityStatus() { return STATUS_OK; }
     public void recheckReachability() {}
+    public boolean isBacklogged(Hash dest) { return false; }
     
     /** 
      * Tell other transports our address changed

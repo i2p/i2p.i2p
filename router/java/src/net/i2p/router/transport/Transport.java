@@ -47,6 +47,7 @@ public interface Transport {
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException;
     public short getReachabilityStatus();
     public void recheckReachability();
+    public boolean isBacklogged(Hash dest);
     
     public boolean isUnreachable(Hash peer);
 }
