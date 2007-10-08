@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.591 2007-09-26 22:52:34 zzz Exp $
+$Id: history.txt,v 1.592 2007-10-07 21:36:17 complication Exp $
+
+* 2007-10-07  0.6.1.30 released
 
 2007-10-07  Complication
     * Fix an issue in EepGet whereby sending of "etag" and "lastModified" headers
