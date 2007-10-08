@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.590 2007-09-22 21:44:36 zzz Exp $
+$Id: history.txt,v 1.591 2007-09-26 22:52:34 zzz Exp $
+
+2007-10-07  Complication
+    * Fix an issue in EepGet whereby sending of "etag" and "lastModified" headers
+      broke retrying.
 
 2007-09-27  zzz
     * Implement pushback of NTCP transport backlog to the outbound tunnel selection code

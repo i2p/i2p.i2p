@@ -573,7 +573,6 @@ public class EepGet {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("rc: " + responseCode + " for " + _actualURL);
-
         boolean rcOk = false;
         switch (responseCode) {
             case 200: // full
@@ -852,12 +851,12 @@ public class EepGet {
             buf.append("Cache-control: no-cache\r\n");
             buf.append("Pragma: no-cache\r\n");
         }
-        if (_etag != null) {
+        if ((_etag != null) && (_alreadyTransferred <= 0)) {
             buf.append("If-None-Match: ");
             buf.append(_etag);
             buf.append("\r\n");
         }
-        if (_lastModified != null) {
+        if ((_lastModified != null) && (_alreadyTransferred <= 0)) {
             buf.append("If-Modified-Since: ");
             buf.append(_lastModified);
             buf.append("\r\n");
