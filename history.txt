@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.592 2007-10-07 21:36:17 complication Exp $
+$Id: history.txt,v 1.593 2007-10-07 22:01:47 jrandom Exp $
+
+2007-10-07  jrandom
+    * back out the NTCP backlog pushback, as it could be used to mount an
+      active anonymity attack.
 
 * 2007-10-07  0.6.1.30 released
 

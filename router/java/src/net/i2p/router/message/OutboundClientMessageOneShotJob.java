@@ -463,8 +463,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
             tunnel = (TunnelInfo) _tunnelCache.get(to);
             if (tunnel != null) {
-                if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel) &&
-                    (tunnel.getLength() <= 1 || !getContext().commSystem().isBacklogged(tunnel.getPeer(1))))
+                if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel))
                     return(tunnel);
                 else
                     _tunnelCache.remove(to);
