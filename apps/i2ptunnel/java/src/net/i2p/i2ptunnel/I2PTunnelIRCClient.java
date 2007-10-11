@@ -272,7 +272,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         int idx=0;
         final String[] allowedCommands =
         {
-                "NOTICE",
+                // "NOTICE", // can contain CTCP
                 //"PING",
                 //"PONG",
                 "MODE",
@@ -306,9 +306,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         } catch(NumberFormatException nfe){}
 
         
-	if ("PING".equals(command))
+	if ("PING".equalsIgnoreCase(command))
             return "PING 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
-	if ("PONG".equals(command)) {
+	if ("PONG".equalsIgnoreCase(command)) {
             // Turn the received ":irc.freshcoffee.i2p PONG irc.freshcoffee.i2p :127.0.0.1"
             // into ":127.0.0.1 PONG 127.0.0.1 " so that the caller can append the client's extra parameter
             // though, does 127.0.0.1 work for irc clients connecting remotely?  and for all of them?  sure would
@@ -322,18 +322,17 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         
         // Allow all allowedCommands
         for(int i=0;i<allowedCommands.length;i++) {
-            if(allowedCommands[i].equals(command))
+            if(allowedCommands[i].equalsIgnoreCase(command))
                 return s;
         }
         
         // Allow PRIVMSG, but block CTCP.
-        if("PRIVMSG".equals(command))
+        if("PRIVMSG".equalsIgnoreCase(command) || "NOTICE".equalsIgnoreCase(command))
         {
             String msg;
             msg = field[idx++];
         
-            byte[] bytes = msg.getBytes();
-            if(bytes[1]==0x01)
+            if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
                 // CTCP
                 msg=msg.substring(2);
@@ -356,7 +355,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         String command;
         final String[] allowedCommands =
         {
-                "NOTICE",
+                // "NOTICE", // can contain CTCP
                 "MODE",
                 "JOIN",
                 "NICK",
@@ -387,7 +386,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         
         command = field[0].toUpperCase();
 
-	if ("PING".equals(command)) {
+	if ("PING".equalsIgnoreCase(command)) {
             // Most clients just send a PING and are happy with any old PONG.  Others,
             // like BitchX, actually expect certain behavior.  It sends two different pings:
             // "PING :irc.freshcoffee.i2p" and "PING 1234567890 127.0.0.1" (where the IP is the proxy)
@@ -421,24 +420,23 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             
             return rv;
         }
-	if ("PONG".equals(command))
+	if ("PONG".equalsIgnoreCase(command))
             return "PONG 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
 
         // Allow all allowedCommands
         for(int i=0;i<allowedCommands.length;i++)
         {
-            if(allowedCommands[i].equals(command))
+            if(allowedCommands[i].equalsIgnoreCase(command))
                 return s;
         }
         
         // Allow PRIVMSG, but block CTCP (except ACTION).
-        if("PRIVMSG".equals(command))
+        if("PRIVMSG".equalsIgnoreCase(command) || "NOTICE".equalsIgnoreCase(command))
         {
             String msg;
             msg = field[2];
         
-            byte[] bytes = msg.getBytes();
-            if(bytes[1]==0x01)
+            if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
                     // CTCP
                 msg=msg.substring(2);
@@ -451,14 +449,14 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             return s;
         }
         
-        if("USER".equals(command)) {
+        if("USER".equalsIgnoreCase(command)) {
             int idx = field[2].lastIndexOf(":");
             if(idx<0)
                 return "USER user hostname localhost :realname";
             String realname = field[2].substring(idx+1);
             String ret = "USER "+field[1]+" hostname localhost :"+realname;
             return ret;
-        } else if ("QUIT".equals(command)) {
+        } else if ("QUIT".equalsIgnoreCase(command)) {
             return "QUIT :leaving";
         }
         

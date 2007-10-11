@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.593 2007-10-07 22:01:47 jrandom Exp $
+$Id: history.txt,v 1.594 2007-10-07 23:11:36 jrandom Exp $
+
+2007-10-11 zzz
+    * IRC Proxy: Fix several possible anonymity holes:
+      - Block CTCP in NOTICE messages
+      - Block CTCP anywhere in PRIVMSG and NOTICE, not just at first character
+      - Check for lower case commands
+    (Thanks sponge!)
 
 2007-10-07  jrandom
     * back out the NTCP backlog pushback, as it could be used to mount an
