@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.594 2007-10-07 23:11:36 jrandom Exp $
+$Id: history.txt,v 1.595 2007-10-11 01:03:22 zzz Exp $
+
+2007-11-06 jrandom
+    * add i2phost.i2p to the jump list
 
 2007-10-11 zzz
     * IRC Proxy: Fix several possible anonymity holes:
