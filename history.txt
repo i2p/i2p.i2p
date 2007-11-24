@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.595 2007-10-11 01:03:22 zzz Exp $
+$Id: history.txt,v 1.596 2007-11-06 06:26:01 jrandom Exp $
+
+2007-11-24 zzz
+    * i2psnark: increase streaming lib write timeout to 240 sec and change
+      timeout action from "ping" to "disconect", as the fix in .30 to
+      honor options on outbound connections led to hung outbound connections
+      (bitfield never transmitted, connection never dropped)
 
 2007-11-06 jrandom
     * add i2phost.i2p to the jump list
