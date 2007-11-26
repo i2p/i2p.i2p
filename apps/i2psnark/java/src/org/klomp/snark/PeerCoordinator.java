@@ -253,8 +253,8 @@ public class PeerCoordinator implements PeerListener
     synchronized(peers)
       {
         Peer old = peerIDInList(peer.getPeerID(), peers);
-        if ( (old != null) && (old.getInactiveTime() > 4*60*1000) ) {
-            // idle for 4 minutes, kill the old con (64KB/4min = 273B/sec minimum for one block)
+        if ( (old != null) && (old.getInactiveTime() > 8*60*1000) ) {
+            // idle for 8 minutes, kill the old con (32KB/8min = 68B/sec minimum for one block)
             if (_log.shouldLog(Log.WARN))
               _log.warn("Remomving old peer: " + peer + ": " + old + ", inactive for " + old.getInactiveTime());
             peers.remove(old);
@@ -315,7 +315,7 @@ public class PeerCoordinator implements PeerListener
         need_more = !peer.isConnected() && peers.size() < MAX_CONNECTIONS;
         // Check if we already have this peer before we build the connection
         Peer old = peerIDInList(peer.getPeerID(), peers);
-        need_more = need_more && ((old == null) || (old.getInactiveTime() > 4*60*1000));
+        need_more = need_more && ((old == null) || (old.getInactiveTime() > 8*60*1000));
       }
 
     if (need_more)

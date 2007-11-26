@@ -35,10 +35,13 @@ class PeerConnectionIn implements Runnable
   private Thread thread;
   private volatile boolean quit;
 
+  long lastRcvd;
+
   public PeerConnectionIn(Peer peer, DataInputStream din)
   {
     this.peer = peer;
     this.din = din;
+    lastRcvd = System.currentTimeMillis();
     quit = false;
   }
 
@@ -76,6 +79,7 @@ class PeerConnectionIn implements Runnable
             // Wait till we hear something...
             // The length of a complete message in bytes.
             int i = din.readInt();
+            lastRcvd = System.currentTimeMillis();
             if (i < 0)
               throw new IOException("Unexpected length prefix: " + i);
 

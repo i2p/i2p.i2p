@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.596 2007-11-06 06:26:01 jrandom Exp $
+$Id: history.txt,v 1.597 2007-11-24 15:22:46 zzz Exp $
+
+2007-11-26 zzz
+    * i2psnark: add timeout for receive inactivity
 
 2007-11-24 zzz
     * i2psnark: increase streaming lib write timeout to 240 sec and change

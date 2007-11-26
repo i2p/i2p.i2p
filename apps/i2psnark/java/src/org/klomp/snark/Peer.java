@@ -461,10 +461,12 @@ public class Peer implements Comparable
   public long getInactiveTime() {
       PeerState s = state;
       if (s != null) {
+          PeerConnectionIn in = s.in;
           PeerConnectionOut out = s.out;
-          if (out != null)
-            return System.currentTimeMillis() - out.lastSent;
-          else
+          if (in != null && out != null) {
+            long now = System.currentTimeMillis();
+            return Math.max(now - out.lastSent, now - in.lastRcvd);
+          } else
             return -1; //"state, no out";
       } else {
           return -1; //"no state";
