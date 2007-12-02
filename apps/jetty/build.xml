@@ -3,15 +3,19 @@
         
     <target name="all" depends="build" />
     <target name="fetchJettylib" >
-        <available property="jetty.available" file="jetty-5.1.12.zip" />
+        <available property="jetty.zip.available" file="jetty-5.1.12.zip" type="file" />
+        <available property="jetty.zip.extracted" file="jettylib" type="dir" />
         <ant target="doFetchJettylib" />
+        <ant target="doExtractJettylib" />
     </target>
-    <target name="doFetchJettylib" unless="jetty.available" >
+    <target name="doFetchJettylib" unless="jetty.zip.available" >
         <echo message="The libraries contained within the fetched file are from Jetty's 5.1.12" />
         <echo message="distribution (http://jetty.mortbay.org/).  These are not " />
         <echo message="necessary for using I2P, but are used by some applications on top of I2P," />
         <echo message="such as the routerconsole." />
         <get src="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.12.zip" verbose="true" dest="jetty-5.1.12.zip" />
+    </target>
+    <target name="doExtractJettylib" unless="jetty.zip.extracted" >
         <ant target="doExtract" />
     </target>
     <target name="doExtract">

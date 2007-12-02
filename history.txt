@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.597 2007-11-24 15:22:46 zzz Exp $
+$Id: history.txt,v 1.598 2007-11-26 16:54:00 zzz Exp $
+
+2007-12-01 Complication
+    * Separate the checks "does Jetty .zip file need downloading"
+      and "does Jetty .zip file need extracting" in the Jetty buildfile.
+      First download (unless already done), then extract (unless done).
 
 2007-11-26 zzz
     * i2psnark: add timeout for receive inactivity
