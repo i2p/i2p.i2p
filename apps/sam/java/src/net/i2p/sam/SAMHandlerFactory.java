@@ -112,12 +112,15 @@ public class SAMHandlerFactory {
             case 1:
                 handler = new SAMv1Handler(s, verMajor, verMinor, i2cpProps);
                 break;
+            case 2:
+                handler = new SAMv2Handler(s, verMajor, verMinor, i2cpProps);
+                break;
             default:
                 _log.error("BUG! Trying to initialize the wrong SAM version!");
                 throw new SAMException("BUG! (in handler instantiation)");
             }
         } catch (IOException e) {
-            _log.error("Error creating the v1 handler", e);
+            _log.error("Error creating the handler for version "+verMajor, e);
             throw new SAMException("IOException caught during SAM handler instantiation");
         }
         return handler;
@@ -133,15 +136,16 @@ public class SAMHandlerFactory {
             || (maxMajor == -1) || (maxMinor == -1)) {
             return null;
         }
-        if (minMajor > maxMajor) {
-            return null;
-        } else if ((minMajor == maxMajor) && (minMinor > maxMinor)) {
-            return null;
-        }
 
-        if ((minMajor >= 1) && (minMinor >= 0)) {
-            return "1.0";
-        }
+	if ((minMinor >= 10) || (maxMinor >= 10)) return null ;
+	
+	float fminVer = (float) minMajor + (float) minMinor / 10 ;
+	float fmaxVer = (float) maxMajor + (float) maxMinor / 10 ;
+	
+
+	if ( ( fminVer <=  2.0 ) && ( fmaxVer >= 2.0 ) ) return "2.0" ;
+	
+	if ( ( fminVer <=  1.0 ) && ( fmaxVer >= 1.0 ) ) return "1.0" ;
         
         return null;
     }

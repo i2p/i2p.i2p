@@ -15,14 +15,31 @@ import net.i2p.data.Destination;
 /**
  * Interface for sending streaming data to a SAM client
  */
+
 public interface SAMStreamReceiver {
+    /**
+     * Sends the result of a stream send operation
+     */
+    public void streamSendAnswer( int id, String result, String bufferState ) throws IOException;
+	
+    /**
+     * Notifies that the outwards buffer is free for writing
+     */
+    public void notifyStreamSendBufferFree( int id ) throws IOException;
 
     /**
      * Notify about a new incoming connection
      *
      * @param id New connection id
      */
-    public void notifyStreamConnection(int id, Destination dest) throws IOException;
+    public void notifyStreamIncomingConnection ( int id, Destination dest ) throws IOException;
+
+    /**
+     * Notify about a new outgoing connection
+     *
+     * @param id New connection id
+     */
+    public void notifyStreamOutgoingConnection(int id, String result, String msg) throws IOException;
 
     /**
      * Send a byte array to a SAM client.

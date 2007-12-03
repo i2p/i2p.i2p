@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.598 2007-11-26 16:54:00 zzz Exp $
+$Id: history.txt,v 1.599 2007-12-01 22:13:15 complication Exp $
+
+2007-12-02 Complication
+    * Commit SAM v2 patch from mkvore (thank you!)
+    * Minor reformatting to preserve consistent whitespace
+      in old SAM classes (new classes unaltered)
 
 2007-12-01 Complication
     * Separate the checks "does Jetty .zip file need downloading"
