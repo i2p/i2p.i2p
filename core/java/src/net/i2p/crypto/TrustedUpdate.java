@@ -180,6 +180,7 @@ jP69nPbh4KLGhF+SD0+0bW4=
     private static final void genKeysCLI(String publicKeyFile, String privateKeyFile) {
         FileOutputStream fileOutputStream = null;
 
+        _context = I2PAppContext.getGlobalContext();
         try {
             Object signingKeypair[] = _context.keyGenerator().generateSigningKeypair();
             SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
