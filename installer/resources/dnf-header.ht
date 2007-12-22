@@ -35,9 +35,8 @@ div.logo {
  [<a href="http://localhost:7657/config.jsp">configuration</a> | <a href="http://localhost:7657/help.jsp">help</a>]
 </div>
 <div class=warning id=warning>
-The eepsite was not reachable. Perhaps 
-the link you are following is 
-bad. The eepsite could also 
-be temporarily offline.  You may want to 
+The eepsite was not reachable.
+The eepsite is temporarily offline, or there is network congestion.
+You may want to 
 <a href="javascript: window.location.reload()">retry</a>. 
 <BR><BR>Could not find the following destination:<BR><BR>
