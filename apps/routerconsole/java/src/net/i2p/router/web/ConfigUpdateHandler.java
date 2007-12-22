@@ -24,11 +24,12 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
     public static final String DEFAULT_REFRESH_FREQUENCY = 12*60*60*1000 + "";
     public static final String PROP_UPDATE_URL = "router.updateURL";
-    public static final String DEFAULT_UPDATE_URL = "http://dev.i2p.net/i2p/i2pupdate.sud";
+//  public static final String DEFAULT_UPDATE_URL = "http://dev.i2p.net/i2p/i2pupdate.sud";
+    public static final String DEFAULT_UPDATE_URL = "http://amiga.i2p/i2p/i2pupdate.sud,http://stats.i2p/i2p/i2pupdate.sud,http://complication.i2p/i2p/i2pupdate.sud";
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
     public static final String DEFAULT_UPDATE_POLICY = "notify";
     public static final String PROP_SHOULD_PROXY = "router.updateThroughProxy";
-    public static final String DEFAULT_SHOULD_PROXY = Boolean.FALSE.toString();
+    public static final String DEFAULT_SHOULD_PROXY = Boolean.TRUE.toString();
     public static final String PROP_PROXY_HOST = "router.updateProxyHost";
     public static final String DEFAULT_PROXY_HOST = "localhost";
     public static final String PROP_PROXY_PORT = "router.updateProxyPort";

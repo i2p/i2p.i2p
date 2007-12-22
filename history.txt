@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.600 2007-12-02 23:19:25 complication Exp $
+$Id: history.txt,v 1.601 2007-12-10 17:23:00 zzz Exp $
+
+2007-12-22 zzz
+    * Add support for multiple update URLs
+    * Change default for update to use i2p proxy,
+      add several URLs as defaults
+    * Enable trusted key form on configupdate.jsp
+    * Clarify the 'destination not found' error page
+
+2007-12-16 zzz
+    * i2psnark: remove anonymitytracker from default list
 
 2007-12-10 zzz
     * Fix NPE in CLI TrustedUpdate keygen
@@ -23,7 +33,7 @@ $Id: history.txt,v 1.600 2007-12-02 23:19:25 complication Exp $
       (bitfield never transmitted, connection never dropped)
 
 2007-11-06 jrandom
-    * add i2phost.i2p to the jump list
+    * add i2host.i2p to the jump list
 
 2007-10-11 zzz
     * IRC Proxy: Fix several possible anonymity holes:

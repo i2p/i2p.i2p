@@ -2,6 +2,9 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
@@ -102,7 +105,7 @@ public class UpdateHandler {
         private void update() {
             _startedOn = -1;
             _status = "<b>Updating</b><br />";
-            String updateURL = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
+            String updateURL = selectUpdateURL();
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
@@ -162,7 +165,7 @@ public class UpdateHandler {
             }
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
-            _log.log(Log.CRIT, "Update did not download completely (" + bytesTransferred + " with " 
+            _log.log(Log.CRIT, "Update from " + url + " did not download completely (" + bytesTransferred + " with " 
                                + bytesRemaining + " after " + currentAttempt + " tries)");
 
             _status = "<b>Transfer failed</b><br />";
@@ -175,5 +178,20 @@ public class UpdateHandler {
     private void restart() {
         _context.router().addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+    }
+
+    private String selectUpdateURL() {
+        String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
+        StringTokenizer tok = new StringTokenizer(URLs, ",");
+        List URLList = new ArrayList();
+        while (tok.hasMoreTokens())
+            URLList.add(tok.nextToken().trim());
+        int size = URLList.size();
+        if (size <= 0) {
+            _log.log(Log.WARN, "Update list is empty - no update available");
+            return null;
+        }
+        int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+        return (String) URLList.get(index);
     }
 }

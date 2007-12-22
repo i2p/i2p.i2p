@@ -32,8 +32,8 @@
  <input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"><br />
  Refresh frequency:
  <jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /><br />
- Update URL:
- <input type="text" size="60" name="updateURL" value="<jsp:getProperty name="updatehelper" property="updateURL" />"><br />
+ Update URLs:
+ <input type="text" size="90" name="updateURL" value="<jsp:getProperty name="updatehelper" property="updateURL" />"><br />
  Update policy:
  <jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /><br />
 Update through the eepProxy?
@@ -42,7 +42,8 @@ Update through the eepProxy?
  eepProxy port: <input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /><br />
  <!-- prompt for the eepproxy -->
  Trusted keys:
- <textarea name="trustedKeys" disabled="true" cols="60" rows="2"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
+ <textarea name="trustedKeys" cols="60" rows="2"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
+ <br /><br />
  <input type="submit" name="action" value="Save" />
  </form>
 </div>
