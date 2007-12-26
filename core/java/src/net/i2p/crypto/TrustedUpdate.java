@@ -92,7 +92,7 @@ jP69nPbh4KLGhF+SD0+0bW4=
         String propertyTrustedKeys = context.getProperty(PROP_TRUSTED_KEYS);
 
         if ( (propertyTrustedKeys != null) && (propertyTrustedKeys.length() > 0) ) {
-            StringTokenizer propertyTrustedKeysTokens = new StringTokenizer(propertyTrustedKeys, ",");
+            StringTokenizer propertyTrustedKeysTokens = new StringTokenizer(propertyTrustedKeys, "\r\n");
 
             while (propertyTrustedKeysTokens.hasMoreTokens())
                 _trustedKeys.add(propertyTrustedKeysTokens.nextToken().trim());
@@ -100,6 +100,8 @@ jP69nPbh4KLGhF+SD0+0bW4=
         } else {
             _trustedKeys.add(DEFAULT_TRUSTED_KEY);
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
     }
 
     /**
@@ -274,7 +276,26 @@ jP69nPbh4KLGhF+SD0+0bW4=
     public ArrayList getTrustedKeys() {
         return _trustedKeys;
     }
+    
+    
+    /**
+     * Fetches the trusted keys for the current instance.
+     * 
+     * @return A <code>String</code> containing the trusted keys,
+     * delimited by CR LF line breaks.
+     */
+    public String getTrustedKeysString() {
+        StringBuffer buf = new StringBuffer(1024);
+        for (int i = 0; i < _trustedKeys.size(); i++) {
+            // If something already buffered, first add line break.
+            if (buf.length() > 0) buf.append("\r\n");
+            buf.append((String) _trustedKeys.get(i));
+        }
+            
+        return buf.toString();
+    }
 
+    
     /**
      * Reads the version string from a signed update file.
      * 

@@ -106,6 +106,8 @@ public class UpdateHandler {
             _startedOn = -1;
             _status = "<b>Updating</b><br />";
             String updateURL = selectUpdateURL();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Selected update URL: " + updateURL);
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
@@ -182,16 +184,18 @@ public class UpdateHandler {
 
     private String selectUpdateURL() {
         String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
-        StringTokenizer tok = new StringTokenizer(URLs, ",");
+        StringTokenizer tok = new StringTokenizer(URLs, "\r\n");
         List URLList = new ArrayList();
         while (tok.hasMoreTokens())
             URLList.add(tok.nextToken().trim());
         int size = URLList.size();
+        _log.log(Log.DEBUG, "Picking update source from " + size + " candidates.");
         if (size <= 0) {
             _log.log(Log.WARN, "Update list is empty - no update available");
             return null;
         }
         int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+        _log.log(Log.DEBUG, "Picked update source " + index + ".");
         return (String) URLList.get(index);
     }
 }

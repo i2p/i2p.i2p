@@ -939,6 +939,10 @@ public class Router {
                 for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
                     String key = (String)iter.next();
                     String val = _config.getProperty(key);
+                    // Escape line breaks before saving.
+                    // Remember: "\" needs escaping both for regex and string.
+                    val = val.replaceAll("\\r","\\\\r");
+                    val = val.replaceAll("\\n","\\\\n");
                     buf.append(key).append('=').append(val).append('\n');
                 }
             }

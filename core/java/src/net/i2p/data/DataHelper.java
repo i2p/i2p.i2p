@@ -236,6 +236,10 @@ public class DataHelper {
                 if (split <= 0) continue;
                 String key = line.substring(0, split);
                 String val = line.substring(split+1);
+                // Unescape line breaks after loading.
+                // Remember: "\" needs escaping both for regex and string.
+                val = val.replaceAll("\\\\r","\r");
+                val = val.replaceAll("\\\\n","\n");
                 if ( (key.length() > 0) && (val.length() > 0) )
                     if (forceLowerCase)
                         props.setProperty(key.toLowerCase(), val);

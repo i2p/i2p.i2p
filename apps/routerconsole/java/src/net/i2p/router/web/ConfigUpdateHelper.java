@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.util.List;
 import net.i2p.data.DataHelper;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.router.RouterContext;
@@ -113,11 +112,6 @@ public class ConfigUpdateHelper {
     }
     
     public String getTrustedKeys() {
-        StringBuffer buf = new StringBuffer(1024);
-        TrustedUpdate up = new TrustedUpdate(_context);
-        List keys = up.getTrustedKeys();
-        for (int i = 0; i < keys.size(); i++) 
-            buf.append((String)keys.get(i)).append('\n');
-        return buf.toString();
+        return new TrustedUpdate(_context).getTrustedKeysString();
     }
 }

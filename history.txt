@@ -1,4 +1,19 @@
-$Id: history.txt,v 1.601 2007-12-10 17:23:00 zzz Exp $
+$Id: history.txt,v 1.602 2007-12-22 18:58:48 zzz Exp $
+
+2007-12-26 Complication
+    * Escape both CR, LF and CR LF line breaks in Router.saveConfig()
+      and unescape them in DataHelper.loadProps() to support
+      saving and loading config properties with line breaks
+    * Change the update URLs textbox into a textarea like keys have,
+      so different URLs go on different lines
+    * Modify TrustedUpdate to provide a method which supplies a key list
+      delimited with CR LF line breaks
+    * Modify DEFAULT_UPDATE_URL to supply a default URL list
+      delimited with CR LF line breaks
+    * Modify selectUpdateURL() to handle URL lists
+      delimited by any kind of line breaks
+    * Start saving trusted update keys
+    * Improve formatting on configupdate.jsp
 
 2007-12-22 zzz
     * Add support for multiple update URLs
