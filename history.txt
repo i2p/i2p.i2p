@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.602 2007-12-22 18:58:48 zzz Exp $
+$Id: history.txt,v 1.603 2007-12-26 03:14:54 complication Exp $
+
+2007-12-26 Complication
+    * Improve reseed handler (less repetitive code,
+      avoid reporting errors when less than 10% of fetches fail)
 
 2007-12-26 Complication
     * Escape both CR, LF and CR LF line breaks in Router.saveConfig()

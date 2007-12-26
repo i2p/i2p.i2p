@@ -116,6 +116,10 @@ public class ReseedHandler {
         * save them into this router's netDb dir.
         *
         */
+        private static final String RESEED_TIPS =
+        "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
+        "and if nothing helps, read FAQ about reseeding manually.";
+        
         private void reseed(boolean echoStatus) {
 
             String seedURL = _context.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
@@ -129,8 +133,7 @@ public class ReseedHandler {
                 if (contentRaw == null) {
                     System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
                         "Last reseed failed fully (failed reading seed URL). " +
-                        "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
-                        "and if nothing helps, read FAQ about reseeding manually.");
+                        RESEED_TIPS);
                     // Logging deprecated here since attemptFailed() provides better info
                     _log.debug("Failed reading seed URL: " + seedURL);
                     return;
@@ -152,8 +155,7 @@ public class ReseedHandler {
                     _log.error("Read " + contentRaw.length + " bytes from seed " + seedURL + ", but found no routerInfo URLs.");
                     System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
                         "Last reseed failed fully (no routerInfo URLs at seed URL). " +
-                        "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
-                        "and if nothing helps, read FAQ about reseeding manually.");
+                        RESEED_TIPS);
                     return;
                 }
 
@@ -177,17 +179,25 @@ public class ReseedHandler {
                     }
                 }
                 if (echoStatus) System.out.println();
-                if (errors > 0) {
+                
+                int failPercent = 100 * errors / urls.size();
+                
+                // Less than 10% of failures is considered success,
+                // because some routerInfos will always fail.
+                if ((failPercent >= 10) && (failPercent < 90)) {
                     System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
-                        "Last reseed failed partly (" + errors + " of " + urls.size() + "). " +
-                        "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
-                        "and if nothing helps, read FAQ about reseeding manually.");
+                        "Last reseed failed partly (" + failPercent + "% of " + urls.size() + "). " +
+                        RESEED_TIPS);
+                }
+                if (failPercent >= 90) {
+                    System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
+                        "Last reseed failed (" + failPercent + "% of " + urls.size() + "). " +
+                        RESEED_TIPS);
                 }
             } catch (Throwable t) {
                 System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
                     "Last reseed failed fully (exception caught). " +
-                    "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
-                    "and if nothing helps, read FAQ about reseeding manually.");
+                    RESEED_TIPS);
                 _log.error("Error reseeding", t);
             }
         }
