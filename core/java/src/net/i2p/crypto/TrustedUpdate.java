@@ -60,6 +60,12 @@ jP69nPbh4KLGhF+SD0+0bW4=
 =npPe
 -----END PGP SIGNATURE-----
 */
+    /* zzz's key */
+    private static final String DEFAULT_TRUSTED_KEY2 =
+        "lT54eq3SH0TWWwQ1wgH6XPelIno7wH7UfiZOpQg-ZuxdNhc4UjjrohKdK" +
+        "Zqfswt1ANPnmOlMewLGBESl7kJB9c5sByz~IOlNyz5BMLRC~R~ZC9QI4W" +
+        "XwUBYW8BhYO2mkvtdOrcy690lDkwzdf5xLxlCBpQlTaLYzQVjVWBcvbCA=";
+
     private static final String VALID_VERSION_CHARS = "0123456789.";
     private static final int    VERSION_BYTES       = 16;
     private static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
@@ -99,6 +105,7 @@ jP69nPbh4KLGhF+SD0+0bW4=
 
         } else {
             _trustedKeys.add(DEFAULT_TRUSTED_KEY);
+            _trustedKeys.add(DEFAULT_TRUSTED_KEY2);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");

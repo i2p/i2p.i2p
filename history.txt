@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.603 2007-12-26 03:14:54 complication Exp $
+$Id: history.txt,v 1.604 2007-12-26 15:55:07 complication Exp $
+
+2007-12-28 zzz
+    * Add zzz's update signing key
 
 2007-12-26 Complication
     * Improve reseed handler (less repetitive code,
