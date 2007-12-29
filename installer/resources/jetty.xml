@@ -25,7 +25,7 @@
         </Arg>
         <Set name="MinThreads">3</Set>
         <Set name="MaxThreads">10</Set>
-        <Set name="MaxIdleTimeMs">30000</Set>
+        <Set name="MaxIdleTimeMs">60000</Set>
         <Set name="LowResourcePersistTimeMs">1000</Set>
         <Set name="ConfidentialPort">8443</Set>
         <Set name="IntegralPort">8443</Set>

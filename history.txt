@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.604 2007-12-26 15:55:07 complication Exp $
+$Id: history.txt,v 1.605 2007-12-28 15:27:20 zzz Exp $
+
+2007-12-29 zzz
+    * Change jetty timeout from 30 to 60 sec (thanks sponge!)
 
 2007-12-28 zzz
     * Add zzz's update signing key
