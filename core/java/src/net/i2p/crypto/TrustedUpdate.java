@@ -98,7 +98,7 @@ jP69nPbh4KLGhF+SD0+0bW4=
         String propertyTrustedKeys = context.getProperty(PROP_TRUSTED_KEYS);
 
         if ( (propertyTrustedKeys != null) && (propertyTrustedKeys.length() > 0) ) {
-            StringTokenizer propertyTrustedKeysTokens = new StringTokenizer(propertyTrustedKeys, "\r\n");
+            StringTokenizer propertyTrustedKeysTokens = new StringTokenizer(propertyTrustedKeys, " ,\r\n");
 
             while (propertyTrustedKeysTokens.hasMoreTokens())
                 _trustedKeys.add(propertyTrustedKeysTokens.nextToken().trim());

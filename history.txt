@@ -1,6 +1,7 @@
-$Id: history.txt,v 1.606 2007-12-29 16:08:31 zzz Exp $
+$Id: history.txt,v 1.607 2007-12-29 17:15:14 zzz Exp $
 
 2007-12-29 zzz
+    * Allow commas in router.trustedUpdateKeys and router.updateURL again
     * Change default news host from dev.i2p.net to dev.i2p
     * Change jetty timeout from 30 to 60 sec (thanks sponge!)
 

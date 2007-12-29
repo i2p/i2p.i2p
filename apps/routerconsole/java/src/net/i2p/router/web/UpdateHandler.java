@@ -184,7 +184,7 @@ public class UpdateHandler {
 
     private String selectUpdateURL() {
         String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
-        StringTokenizer tok = new StringTokenizer(URLs, "\r\n");
+        StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
         List URLList = new ArrayList();
         while (tok.hasMoreTokens())
             URLList.add(tok.nextToken().trim());
