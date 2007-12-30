@@ -1,6 +1,7 @@
-$Id: history.txt,v 1.607 2007-12-29 17:15:14 zzz Exp $
+$Id: history.txt,v 1.608 2007-12-29 18:59:26 zzz Exp $
 
 2007-12-29 zzz
+    * Tweak IRC inbound PONG filtering to fix xchat/BitchX lagometers
     * Allow commas in router.trustedUpdateKeys and router.updateURL again
     * Change default news host from dev.i2p.net to dev.i2p
     * Change jetty timeout from 30 to 60 sec (thanks sponge!)

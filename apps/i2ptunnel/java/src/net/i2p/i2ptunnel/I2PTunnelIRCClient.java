@@ -315,7 +315,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             // be great if irc clients actually followed the RFCs here, but i guess thats too much to ask.
             // If we haven't PINGed them, or the PING we sent isn't something we know how to filter, this 
             // is blank.
-            String pong = expectedPong.length() > 0 ? expectedPong.toString() : null;
+            //
+            // String pong = expectedPong.length() > 0 ? expectedPong.toString() : null;
+            // If we aren't going to rewrite it, pass it through
+            String pong = expectedPong.length() > 0 ? expectedPong.toString() : s;
             expectedPong.setLength(0);
             return pong;
         }
@@ -402,13 +405,15 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             expectedPong.setLength(0);
             if (field.length == 1) { // PING
                 rv = "PING";
-                expectedPong.append("PONG 127.0.0.1");
+                // If we aren't rewriting the PING don't rewrite the PONG
+                // expectedPong.append("PONG 127.0.0.1");
             } else if (field.length == 2) { // PING nonce
                 rv = "PING " + field[1];
-                expectedPong.append("PONG ").append(field[1]);
+                // If we aren't rewriting the PING don't rewrite the PONG
+                // expectedPong.append("PONG ").append(field[1]);
             } else if (field.length == 3) { // PING nonce serverLocation
                 rv = "PING " + field[1];
-                expectedPong.append("PONG ").append(field[1]);
+                expectedPong.append("PONG ").append(field[2]).append(" :").append(field[1]); // PONG serverLocation nonce
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("IRC client sent a PING we don't understand, filtering it (\"" + s + "\")");
@@ -416,7 +421,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             }
             
             if (_log.shouldLog(Log.WARN))
-                _log.warn("sending ping " + rv + ", waiting for " + expectedPong + " orig was [" + s  + "]");
+                _log.warn("sending ping [" + rv + "], waiting for [" + expectedPong + "] orig was [" + s  + "]");
             
             return rv;
         }
