@@ -60,6 +60,7 @@ public class ConfigParser {
      * a single key, value pair on each line, in the format: key=value. Lines
      * starting with '#' or ';' are considered comments, and ignored. Lines that
      * are obviously not in the format key=value are also ignored.
+     * The key is converted to lower case.
      * 
      * @param input
      *            A BufferedReader with lines in key=value format to parse into
@@ -77,7 +78,7 @@ public class ConfigParser {
             inputLine = ConfigParser.stripComments(inputLine);
             String[] splitLine = inputLine.split("=");
             if (splitLine.length == 2) {
-                result.put(splitLine[0].trim(), splitLine[1].trim());
+                result.put(splitLine[0].trim().toLowerCase(), splitLine[1].trim());
             }
             inputLine = input.readLine();
         }

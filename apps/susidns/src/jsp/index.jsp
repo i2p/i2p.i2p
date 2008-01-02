@@ -52,14 +52,13 @@
 <h3>Huh? what addressbook?</h3>
 <p>
 The addressbook application is part of your i2p installation. It regularly updates your hosts.txt file
-from distributed sources. It keeps your hosts.txt up to date, so it automatically contains all new
-eepsites announced on <a href="http://orion.i2p">orion</a>
-or in the <a href="http://forum.i2p/viewforum.php?f=16">forum</a>.
+from distributed sources. It keeps your hosts.txt up to date, so it can automatically add
+eepsites announced on other sites if you subscribe to those sites' addressbooks.
 </p>
 <p>
 (To speak the truth: In its default configuration the addressbook does not poll
-orion, but dev.i2p only. Subscribing to <a href="http://orion.i2p">orion</a> is an easy task,
-just add <a href="http://orion.i2p/hosts.txt">http://orion.i2p/hosts.txt</a> to your <a href="subscriptions.jsp">subscriptions</a> file.)
+additional sites, but dev.i2p only. Subscribing to additional sites is an easy task,
+just add them to your <a href="subscriptions.jsp">subscriptions</a> file.)
 </p>
 <p>If you have questions about naming in i2p, there is an excellent <a href="http://forum.i2p.net/viewtopic.php?t=134">introduction</a>
 from duck in the forum.</p>

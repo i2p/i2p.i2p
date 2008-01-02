@@ -131,6 +131,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
     
+    private final static int MAX_POSTBYTES = 20*1024*1024; // arbitrary but huge -  all in memory, no temp file
+    private final static byte[] ERR_MAXPOST =
+        ("HTTP/1.1 503 Bad POST\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
+         "The maximum POST size is " + MAX_POSTBYTES + " bytes.<BR>")
+        .getBytes();
+    
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
@@ -503,12 +513,25 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
             
+            int postbytes = 0;
             while (br.ready()) { // empty the buffer (POST requests)
                 int i = br.read();
                 if (i != -1) {
                     newRequest.append((char) i);
+                    if (++postbytes > MAX_POSTBYTES) {
+                        if (out != null) {
+                            out.write(ERR_MAXPOST);
+                            out.write("<p /><i>Generated on: ".getBytes());
+                            out.write(new Date().toString().getBytes());
+                            out.write("</i></body></html>\n".getBytes());
+                            out.flush();
+                        }
+                        s.close();
+                        return;
+                    }
                 }
             }
+
             if (method == null || destination == null) {
                 l.log("No HTTP method found in the request.");
                 if (out != null) {
@@ -578,6 +601,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
+        } catch (OutOfMemoryError oom) {  // mainly for huge POSTs
+            IOException ex = new IOException("OOM (in POST?)");
+            _log.info("getPrefix(requestId) + Error trying to connect", ex);
+            l.log(ex.getMessage());
+            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
+            closeSocket(s);
         }
     }
 
@@ -616,10 +645,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
     
-    private static String jumpServers[] = {"http://orion.i2p/jump/",
-                                           "http://trevorreznik.i2p/cgi-bin/jump.php?hostname=",
-                                           "http://i2host.i2p/cgi-bin/i2hostjump?"
-
+    private static String jumpServers[] = {
+                                           "http://i2host.i2p/cgi-bin/i2hostjump?",
+                                           "http://orion.i2p/jump/",
+                                           "http://stats.i2p/cgi-bin/jump.cgi?a=",
+                                           "http://trevorreznik.i2p/cgi-bin/jump.php?hostname="
                                           };
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
                                           boolean usingWWWProxy, String wwwProxy, boolean showAddrHelper) throws IOException {

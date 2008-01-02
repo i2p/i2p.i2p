@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.608 2007-12-29 18:59:26 zzz Exp $
+$Id: history.txt,v 1.609 2007-12-29 22:45:12 zzz Exp $
+
+2008-01-02 zzz
+    * Add stats.i2p to the jump list
+    * Impose 20MB limit on POSTs and catch OOMs in POST
+    * eepsite_index.html: add stats.i2p services
+    * addressbook: log source of new keys; disallow dests > 516 bytes
+    * addressbook: convert hostnames to lower case to prevent duplicates
+    * susidns: generalize references to orion
 
 2007-12-29 zzz
     * Tweak IRC inbound PONG filtering to fix xchat/BitchX lagometers

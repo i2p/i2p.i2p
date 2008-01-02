@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.7 $
+ * $Revision: 1.1 $
  */
 %>
 <%@ page contentType="text/html"%>
@@ -66,9 +66,8 @@
 <p class="help">
 The subscription file contains a list of (i2p) URLs. The addressbook application
 regularly (once per hour) checks this list for new eepsites. Those URLs simply contain the published hosts.txt
-file of other people. Default subscription is the hosts.txt from dev.i2p. The most
-popular collaboration site for eepsite is orion.i2p. So its a good idea to add http://orion.i2p/hosts.txt
-as a 2nd subscription.
+file of other people. The default subscription is the hosts.txt from dev.i2p, which is updated infrequently.
+So it is a good idea to add additional subscriptions to sites that have the latest addresses.
 </p>
 </div>
 <div id="footer">

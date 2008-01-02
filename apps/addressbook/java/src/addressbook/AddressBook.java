@@ -170,7 +170,7 @@ public class AddressBook {
             String otherKey = (String) otherIter.next();
             String otherValue = (String) other.addresses.get(otherKey);
 
-            if (otherKey.endsWith(".i2p") && otherValue.length() >= 516) {
+            if (otherKey.endsWith(".i2p") && otherValue.length() == 516) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {
                     if (!this.addresses.get(otherKey).equals(otherValue)
                             && log != null) {
@@ -185,7 +185,7 @@ public class AddressBook {
                     this.modified = true;
                     if (log != null) {
                         log.append("New address " + otherKey
-                            + " added to address book.");
+                            + " added to address book. From: " + other.location);
                     }
                 }
             }
