@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  */
 %>
 <%@ page contentType="text/html"%>
@@ -42,9 +42,11 @@
 <p>addressbooks
 <a href="addressbook.jsp?book=master">master</a> |
 <a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> *
+<a href="addressbook.jsp?book=published">published</a> |
+<a href="addressbook.jsp?book=private">private</a> *
 <a href="subscriptions.jsp">subscriptions</a> *
-<a href="config.jsp">configuration</a>
+<a href="config.jsp">configuration</a> *
+overview
 </p>
 </div>
 
@@ -64,10 +66,13 @@ just add them to your <a href="subscriptions.jsp">subscriptions</a> file.)
 from duck in the forum.</p>
 <h3>How does the addressbook work?</h3>
 <p>The addressbook application regularly (normally once per hour) polls your subscriptions and merges their content
-into your so called router addressbook (normally your plain hosts.txt). Then it merges your so called master addressbook (normally
-your userhosts.txt) into the router addressbook as well. If configured the router addressbook is now written to the so published addressbook, 
-which is a publicly available copy of your hosts.txt somewhere in your eepsites document root. (Yes, this means that, with activated publication,
-your once private keys from userhosts.txt now are publicly available for everybody.)
+into your so-called router addressbook (normally your plain hosts.txt). Then it merges your so-called master addressbook (normally
+your userhosts.txt) into the router addressbook as well. If configured, the router addressbook is now written to the published addressbook, 
+which is a publicly available copy of your hosts.txt somewhere in your eepsite's document root.
+</p><p>
+The router also uses a private addressbook (privatehosts.txt, not shown in the picture), which is not merged or published.
+Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others.
+The private addressbook can also be used for aliases of hosts in your other addressbooks.
 </p>
 <p><img src="images/how.png" border="0" alt="addressbook working scheme"/></p>
 </div>

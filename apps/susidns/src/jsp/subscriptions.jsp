@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  */
 %>
 <%@ page contentType="text/html"%>
@@ -42,9 +42,11 @@
 <p>addressbooks
 <a href="addressbook.jsp?book=master">master</a> |
 <a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> *
-<a href="subscriptions.jsp">subscriptions</a> *
-<a href="config.jsp">configuration</a>
+<a href="addressbook.jsp?book=published">published</a> |
+<a href="addressbook.jsp?book=private">private</a> *
+subscriptions *
+<a href="config.jsp">configuration</a> *
+<a href="index.jsp">overview</a>
 </p>
 </div>
 <div id="headline">

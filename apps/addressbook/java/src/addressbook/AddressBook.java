@@ -153,6 +153,27 @@ public class AddressBook {
     }
 
     /**
+     * Do basic validation of the hostname and dest
+     * hostname was already converted to lower case by ConfigParser.parse()
+     */
+    private static boolean valid(String host, String dest) {
+	return
+		host.endsWith(".i2p") &&
+		host.length() > 4 &&
+		host.length() <= 67 &&          // 63 + ".i2p"
+                (! host.startsWith(".")) &&
+                (! host.startsWith("-")) &&
+                (! host.endsWith("-.i2p")) &&
+		host.indexOf("..") < 0 &&
+                host.replaceAll("[a-z0-9.-]", "").length() == 0 &&
+
+		dest.length() == 516 &&
+                dest.endsWith("AAAA") &&
+                dest.replaceAll("[a-zA-Z0-9~-]", "").length() == 0
+                ;	
+    }
+
+    /**
      * Merge this AddressBook with AddressBook other, writing messages about new
      * addresses or conflicts to log. Addresses in AddressBook other that are
      * not in this AddressBook are added to this AddressBook. In case of a
@@ -170,7 +191,7 @@ public class AddressBook {
             String otherKey = (String) otherIter.next();
             String otherValue = (String) other.addresses.get(otherKey);
 
-            if (otherKey.endsWith(".i2p") && otherValue.length() == 516) {
+            if (valid(otherKey, otherValue)) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {
                     if (!this.addresses.get(otherKey).equals(otherValue)
                             && log != null) {

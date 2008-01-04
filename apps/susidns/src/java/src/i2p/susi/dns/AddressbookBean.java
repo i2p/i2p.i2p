@@ -19,7 +19,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  */
 
 package i2p.susi.dns;
@@ -76,6 +76,8 @@ public class AddressbookBean
 		deletionMarks = new LinkedList();
 	}
 	private long configLastLoaded = 0;
+	private static final String PRIVATE_BOOK = "private_addressbook";
+	private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
 	private void loadConfig()
 	{
 		long currentTime = System.currentTimeMillis();
@@ -86,6 +88,9 @@ public class AddressbookBean
 		try {
 			properties.clear();
 			properties.load( new FileInputStream( ConfigBean.configFileName ) );
+			// added in 0.5, for compatibility with 0.4 config.txt
+			if( properties.getProperty(PRIVATE_BOOK) == null)
+				properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
 			configLastLoaded = currentTime;
 		}
 		catch (Exception e) {
@@ -112,8 +117,9 @@ public class AddressbookBean
 	public String getBook()
 	{
 		if( book == null || ( book.compareToIgnoreCase( "master" ) != 0 &&
-				book.compareToIgnoreCase( "router" ) != 0 ) &&
-				book.compareToIgnoreCase( "published" ) != 0 )
+				book.compareToIgnoreCase( "router" ) != 0 &&
+				book.compareToIgnoreCase( "private" ) != 0 &&
+				book.compareToIgnoreCase( "published" ) != 0  ))
 			book = "master";
 		
 		return book;
@@ -163,7 +169,11 @@ public class AddressbookBean
 				list.addLast( new AddressBean( name, destination ) );
 			}
 			// Format a message about filtered addressbook size, and the number of displayed entries
-			message = "Filtered list contains " + list.size() + " entries";
+			if( filter != null && filter.length() > 0 )
+				message = "Filtered l";
+			else
+				message = "L";
+			message += "ist contains " + list.size() + " entries";
 			if (list.size() > 300) message += ", displaying the first 300."; else message += ".";
 
 			Object array[] = list.toArray();
@@ -250,6 +260,10 @@ public class AddressbookBean
 	public boolean isPublished()
 	{
 		return getBook().compareToIgnoreCase( "published" ) == 0;
+	}
+	public boolean isPrivate()
+	{
+		return getBook().compareToIgnoreCase( "private" ) == 0;
 	}
 	public void setFilter(String filter) {
 		if( filter != null && ( filter.length() == 0 || filter.compareToIgnoreCase( "none" ) == 0 ) ) {

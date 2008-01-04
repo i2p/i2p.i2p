@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.609 2007-12-29 22:45:12 zzz Exp $
+$Id: history.txt,v 1.610 2008-01-02 17:08:50 zzz Exp $
+
+2008-01-03 zzz
+    * addressbook: Do basic validation of hostnames and destkeys
+    * susidns: Add support for the private addressbook,
+      update the text and links somewhat
 
 2008-01-02 zzz
     * Add stats.i2p to the jump list

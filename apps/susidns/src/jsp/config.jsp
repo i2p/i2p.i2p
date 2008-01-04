@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.14 $
+ * $Revision: 1.1 $
  */
 %>
 <%@ page contentType="text/html" %>
@@ -43,9 +43,11 @@
 addressbooks
 <a href="addressbook.jsp?book=master">master</a> |
 <a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> *
+<a href="addressbook.jsp?book=published">published</a> |
+<a href="addressbook.jsp?book=private">private</a> *
 <a href="subscriptions.jsp">subscriptions</a> *
-<a href="config.jsp">configuration</a>
+configuration *
+<a href="index.jsp">overview</a>
 </p>
 </div>
 <div id="headline">
@@ -65,22 +67,22 @@ addressbooks
 <div id="help">
 <h3>Hints</h3>
 <ol>
-<li>All file or directory paths here are relative to the addressbooks working directory, which normally
+<li>All file or directory paths here are relative to the addressbook's working directory, which normally
 is located at $I2P/addressbook/.</li>
-<li>If you want to manually add lines to an addressbook, add them to the master addressbook. The router
+<li>If you want to manually add lines to an addressbook, add them to the private or master addressbooks. The router
 addressbook and the published addressbook are overwritten by the addressbook application.</li>
-<li><b>Important:</b>When you publish your addressbook, <b>ALL</b> destinations appear there, even those
-from your master addressbook. Unfortunately the master addressbook points to your userhosts.txt, which was
-used for private destinations before. So if you want to keep the destinations in your userhosts.txt secret,
-please change the master addressbook to a different file before turning on addressbook publishing.</li>
+<li><b>Important:</b>When you publish your addressbook, <b>ALL</b> destinations from the master and router addressbooks appear there.
+Use the private addressbook for private destinations, these are not published.
+</li>
 </ol>
 <h3>Options</h3>
 <ul>
 <li><b>subscriptions</b> - file containing the list of subscriptions URLs (no need to change)</li>
 <li><b>update_delay</b> - update interval in hours (no need to change)</li>
 <li><b>published_addressbook</b> - your public hosts.txt file (choose a path within your webserver document root)</li>
-<li><b>router_addressbook</b> - your hosts.txt (no need to change)</li>
-<li><b>master_addressbook</b> - your personal addressbook, it gets never overwritten by the addressbook</li>
+<li><b>router_addressbook</b> - your hosts.txt (don't change)</li>
+<li><b>master_addressbook</b> - your personal addressbook, it never gets overwritten by the addressbook (don't change)</li>
+<li><b>private_addressbook</b> - your private addressbook, it is never published (defaults to ../privatehosts.txt, don't change)</li>
 <li><b>proxy_port</b> - http port for your eepProxy (no need to change)</li>
 <li><b>proxy_host</b> - hostname for your eepProxy (no need to change)</li>
 <li><b>should_publish</b> - true/false whether to write the published addressbook</li>
