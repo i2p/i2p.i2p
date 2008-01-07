@@ -124,8 +124,8 @@ public class EventPumper implements Runnable {
                         
                         int failsafeWrites = 0;
                         int failsafeCloses = 0;
-                        
-                        long expireIdleWriteTime = 60*60*1000l + _context.random().nextLong(60*60*1000l);
+                                                                // pointless if we do this every 2 seconds?
+                        long expireIdleWriteTime = 20*60*1000l; // + _context.random().nextLong(60*60*1000l);
                         for (Iterator iter = all.iterator(); iter.hasNext(); ) {
                             try {
                                 SelectionKey key = (SelectionKey)iter.next();
@@ -143,7 +143,7 @@ public class EventPumper implements Runnable {
                                     failsafeWrites++;
                                 }
                                 
-                                if ( (con.getTimeSinceSend() > expireIdleWriteTime) && (con.getMessagesSent() > 0) ) {
+                                if ( con.getTimeSinceSend() > expireIdleWriteTime) {
                                     // we haven't sent anything in a really long time, so lets just close 'er up
                                     con.close();
                                     failsafeCloses++;

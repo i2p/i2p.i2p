@@ -91,12 +91,12 @@ class ProfileOrganizerRenderer {
             buf.append("<tr>");
             buf.append("<td><code>");
             if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">--").append(peer.toBase64().substring(0,6)).append("</font>");
+                buf.append("<font color=\"red\">-- ").append(peer.toBase64().substring(0,6)).append("</font>");
             } else {
                 if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++").append(peer.toBase64().substring(0,6)).append("</font>");
+                    buf.append("<font color=\"blue\">++ ").append(peer.toBase64().substring(0,6)).append("</font>");
                 } else {
-                    buf.append("__").append(peer.toBase64().substring(0,6));
+                    buf.append("&nbsp;&nbsp;&nbsp;").append(peer.toBase64().substring(0,6));
                 }
             }
             buf.append("</code></td>");

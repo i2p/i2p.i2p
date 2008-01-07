@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.610 2008-01-02 17:08:50 zzz Exp $
+$Id: history.txt,v 1.611 2008-01-03 21:37:27 zzz Exp $
+
+2008-01-07 zzz
+    * profiles.jsp formatting cleanup
+    * NTCP: Reduce max idle time from 60m to 20m
+    * NTCP: Fix idle time on connections with zero messages,
+      correctly drop these connections
 
 2008-01-03 zzz
     * addressbook: Do basic validation of hostnames and destkeys

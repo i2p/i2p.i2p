@@ -111,6 +111,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _created = System.currentTimeMillis();
+        _lastSendTime = _created;
+        _lastReceiveTime = _created;
         _transport = transport;
         _chan = chan;
         _readBufs = new ArrayList(4);
@@ -204,8 +206,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             return queued;
         }
     }
-    public long getTimeSinceSend() { return _lastSendTime <= 0 ? 0 : System.currentTimeMillis()-_lastSendTime; }
-    public long getTimeSinceReceive() { return _lastReceiveTime <= 0 ? 0 : System.currentTimeMillis()-_lastReceiveTime; }
+    public long getTimeSinceSend() { return System.currentTimeMillis()-_lastSendTime; }
+    public long getTimeSinceReceive() { return System.currentTimeMillis()-_lastReceiveTime; }
     public long getTimeSinceCreated() { return System.currentTimeMillis()-_created; }
     public int getConsecutiveBacklog() { return _consecutiveBacklog; }
     
