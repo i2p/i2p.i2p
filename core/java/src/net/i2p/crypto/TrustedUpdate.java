@@ -60,12 +60,25 @@ jP69nPbh4KLGhF+SD0+0bW4=
 =npPe
 -----END PGP SIGNATURE-----
 */
+/*
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+*/
     /* zzz's key */
     private static final String DEFAULT_TRUSTED_KEY2 =
         "lT54eq3SH0TWWwQ1wgH6XPelIno7wH7UfiZOpQg-ZuxdNhc4UjjrohKdK" +
         "Zqfswt1ANPnmOlMewLGBESl7kJB9c5sByz~IOlNyz5BMLRC~R~ZC9QI4W" +
         "XwUBYW8BhYO2mkvtdOrcy690lDkwzdf5xLxlCBpQlTaLYzQVjVWBcvbCA=";
+/*
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
 
+iD8DBQFHdupcQVV2uqduC+0RAocuAKCR4ILLuz3RB8QT7zkadmS2LmFuMwCgweqG
+lFm5Fqx/iW5+k0QaQZ3W9mY=
+=V3i7
+-----END PGP SIGNATURE-----
+*/
     private static final String VALID_VERSION_CHARS = "0123456789.";
     private static final int    VERSION_BYTES       = 16;
     private static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
