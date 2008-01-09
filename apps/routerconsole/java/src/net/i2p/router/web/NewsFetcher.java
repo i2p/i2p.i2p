@@ -24,6 +24,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private Log _log;
     private boolean _updateAvailable;
     private long _lastFetch;
+    private String _lastModified;
     private static NewsFetcher _instance;
     //public static final synchronized NewsFetcher getInstance() { return _instance; }
     public static final synchronized NewsFetcher getInstance(I2PAppContext ctx) { 
@@ -105,11 +106,12 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             proxyPort = Integer.parseInt(port);
             EepGet get = null;
             if (shouldProxy)
-                get = new EepGet(_context, proxyHost, proxyPort, 10, TEMP_NEWS_FILE, newsURL);
+                get = new EepGet(_context, true, proxyHost, proxyPort, 2, TEMP_NEWS_FILE, newsURL, true, null, _lastModified);
             else
-                get = new EepGet(_context, 10, TEMP_NEWS_FILE, newsURL);
+                get = new EepGet(_context, false, null, 0, 0, TEMP_NEWS_FILE, newsURL, true, null, _lastModified);
             get.addStatusListener(this);
-            get.fetch();
+            if (get.fetch())
+                _lastModified = get.getLastModified();
         } catch (Throwable t) {
             _log.error("Error fetching the news", t);
         }
@@ -212,8 +214,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                     _log.error("Failed to copy the news file!");
             }
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Transfer complete, but no file?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
         checkForUpdates();
     }

@@ -6,6 +6,7 @@ Proxy-Connection: close
 
 <html><head>
 <title>Destination key conflict</title>
+<link rel="shortcut icon" href="http://localhost:7657/favicon.ico" />
 <style type='text/css'>
 div.warning {
 	margin: 0em 1em 1em 224px;
@@ -31,7 +32,7 @@ div.logo {
 </head>
 <body>
 <div class=logo>
- <a href="http://localhost:7657/index.jsp">Router Console</a><br />
+ <a href="http://localhost:7657/index.jsp" title="Router Console"><img src="http://localhost:7657/i2plogo.png" alt="Router Console" width="187" height="35" border="0"/></a><br />
  [<a href="http://localhost:7657/config.jsp">configuration</a> | <a href="http://localhost:7657/help.jsp">help</a>]
 </div>
 <div class=warning id=warning>
