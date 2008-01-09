@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.611 2008-01-03 21:37:27 zzz Exp $
+$Id: history.txt,v 1.612 2008-01-07 03:09:44 zzz Exp $
+
+2008-01-08 zzz
+    * addressbook: Limit size of subscribed hosts.txt,
+        don't save old etag or last-modified data
+    * EepGet: Add some logging,
+        enforce size limits even when size not in returned header,
+        don't return old etag or last-modified data,
+        don't call transferFailed listener more than once
 
 2008-01-07 zzz
     * profiles.jsp formatting cleanup

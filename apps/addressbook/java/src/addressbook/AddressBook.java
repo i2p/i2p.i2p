@@ -66,6 +66,7 @@ public class AddressBook {
      *            where key is a human readable name, and value is a base64 i2p
      *            destination.
      */
+/* unused
     public AddressBook(String url, String proxyHost, int proxyPort) {
         this.location = url;
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
@@ -79,23 +80,26 @@ public class AddressBook {
         }
         new File("addressbook.tmp").delete();
     }
-
+*/
     /**
      * Construct an AddressBook from the Subscription subscription. If the
      * address book at subscription has not changed since the last time it was
      * read or cannot be read, return an empty AddressBook.
+     * Set a maximum size of the remote book to make it a little harder for a malicious book-sender.
      * 
      * @param subscription
      *            A Subscription instance pointing at a remote address book.
      */
+    static final long MAX_SUB_SIZE = 3 * 1024 * 1024l; //about 5,000 hosts
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
         this.location = subscription.getLocation();
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                proxyHost, proxyPort, 0, "addressbook.tmp", 
-                subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified());
-        get.fetch();
-        subscription.setEtag(get.getETag());
-        subscription.setLastModified(get.getLastModified());
+                proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, "addressbook.tmp", null,
+                subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified(), null);
+        if (get.fetch()) {
+            subscription.setEtag(get.getETag());
+            subscription.setLastModified(get.getLastModified());
+        }
         try {            
             this.addresses = ConfigParser.parse(new File("addressbook.tmp"));
         } catch (IOException exp) {

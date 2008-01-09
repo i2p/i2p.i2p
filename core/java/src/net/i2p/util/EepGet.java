@@ -392,6 +392,8 @@ public class EepGet {
                 timeout.cancel();
                 for (int i = 0; i < _listeners.size(); i++) 
                     ((StatusListener)_listeners.get(i)).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, ioe);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("ERR: doFetch failed " +  ioe);
             } finally {
                 if (_out != null) {
                     try {
@@ -418,6 +420,8 @@ public class EepGet {
 
         for (int i = 0; i < _listeners.size(); i++) 
             ((StatusListener)_listeners.get(i)).transferFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("All attempts failed for " + _url);
         return false;
     }
 
@@ -478,7 +482,7 @@ public class EepGet {
         boolean strictSize = (_bytesRemaining >= 0);
 
         // If minimum or maximum size defined, ensure they aren't exceeded
-        if ((_minSize > -1) && (_bytesRemaining < _minSize))
+        if ((_minSize > 0) && (_bytesRemaining < _minSize))
             throw new IOException("HTTP response size " + _bytesRemaining + " violates minimum of " + _minSize + " bytes");
         if ((_maxSize > -1) && (_bytesRemaining > _maxSize))
             throw new IOException("HTTP response size " + _bytesRemaining + " violates maximum of " + _maxSize + " bytes");
@@ -500,6 +504,8 @@ public class EepGet {
             // Hopefully this won't break compatibility with existing status listeners
             // (cause them to behave weird, or show weird numbers).
             _alreadyTransferred += read;
+            if ((_maxSize > -1) && (_alreadyTransferred > _maxSize)) // could transfer a little over maxSize
+                throw new IOException("Bytes transferred " + _alreadyTransferred + " violates maximum of " + _maxSize + " bytes");
             remaining -= read;
             if (remaining==0 && _encodingChunked) {
                 int char1 = _proxyIn.read();
@@ -544,10 +550,13 @@ public class EepGet {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Done transferring " + _bytesTransferred + " (ok? " + !_transferFailed + ")");
 
+
         if (_transferFailed) {
-            // 404, etc
+            // 404, etc - transferFailed is called after all attempts fail, by fetch() above
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).transferFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt);
+                ((StatusListener)_listeners.get(i)).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, new Exception("Attempt failed"));
+        } else if ((_minSize > 0) && (_alreadyTransferred < _minSize)) {
+            throw new IOException("Bytes transferred " + _alreadyTransferred + " violates minimum of " + _minSize + " bytes");
         } else if ( (_bytesRemaining == -1) || (remaining == 0) ) {
             for (int i = 0; i < _listeners.size(); i++) 
                 ((StatusListener)_listeners.get(i)).transferComplete(
@@ -615,6 +624,11 @@ public class EepGet {
                 rcOk = false;
                 _transferFailed = true;
         }
+
+        // clear out the arguments, as we use the same variables for return values
+        _etag = null;
+        _lastModified = null;
+
         buf.setLength(0);
         byte lookahead[] = new byte[3];
         while (true) {
