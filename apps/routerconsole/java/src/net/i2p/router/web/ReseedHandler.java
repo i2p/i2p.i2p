@@ -18,8 +18,8 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.EepGet;
 
 /**
- * Handler to deal with reseed requests.  This reseed from the URL
- * http://dev.i2p.net/i2pdb2/ unless the I2P configuration property "i2p.reseedURL" is
+ * Handler to deal with reseed requests.  This will reseed from the URL
+ * http://i2pdb.tin0.de/netDb/ unless the I2P configuration property "i2p.reseedURL" is
  * set.  It always writes to ./netDb/, so don't mess with that.
  *
  */
@@ -31,7 +31,7 @@ public class ReseedHandler {
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 8 * 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL = "http://dev.i2p.net/i2pdb2/";
+    private static final String DEFAULT_SEED_URL = "http://i2pdb.tin0.de/netDb/";
 
     public ReseedHandler() {
         this(ContextHelper.getContext(null));

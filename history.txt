@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.613 2008-01-08 21:15:45 zzz Exp $
+
+2008-01-28 zzz
+    * news.xml: Updates, still preliminary
+    * ReseedHandler: Change default URL
+    * i2ptunnel.config: Change default outproxies
+    * readme.html: Change *.i2p.net URLs
+    * help.jsp: Change *.i2p.net URLs
+    * eepsite_index.html: Change stats.i2p addressbook subscription URL
+    * hosts.txt: Add krabs.i2p, true.i2p, www.i2p2.i2p
+
+* 2008-01-28  0.6.1.30-20 converted from CVS to MTN
 
 2008-01-08 zzz
     * addressbook: Limit size of subscribed hosts.txt,
@@ -11,7 +21,6 @@ $Id: history.txt,v 1.613 2008-01-08 21:15:45 zzz Exp $
     * NewsFetcher: add last-modified support, reduce number of retries
     * Error pages: add icon and logo,
         clarify 'destination not found' and 'proxy not found' pages
-
 
 2008-01-07 zzz
     * profiles.jsp formatting cleanup

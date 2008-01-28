@@ -34,7 +34,7 @@ Their XML parser requires the Sun XML APIs (JAXP) which is included in binary fo
 by their binary code license.  This product includes software developed by the Apache Software Foundation 
 (http://www.apache.org/). </p>
 
-<p>Another application you can see on this webpage is <a href="http://www.i2p.net/i2ptunnel">I2PTunnel</a>
+<p>Another application you can see on this webpage is <a href="http://www.i2p2.i2p/i2ptunnel">I2PTunnel</a>
 (your <a href="i2ptunnel/" target="_blank">web interface</a>) - a GPL'ed application written by mihi that
 lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).  There is also a
 <a href="http://susi.i2p/">susimail</a> web based mail client <a href="susimail/susimail">available</a> on
@@ -42,14 +42,14 @@ the console, which is a GPL'ed application written by susi23.  The addressbook a
 <a href="http://ragnarok.i2p/">Ragnarok</a> helps maintain your hosts.txt files (see ./addressbook/ for
 more information).</p>
 
-<p>The router by default also includes human's public domain <a href="http://www.i2p.net/sam">SAM</a> bridge,
+<p>The router by default also includes human's public domain <a href="http://www.i2p2.i2p/sam">SAM</a> bridge,
 which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.  
 There is also an optimized library for doing large number calculations - jbigi - which in turn uses the 
 LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and the installer is built with <a href="http://www.izforge.com/izpack/">IzPack</a>.  For 
 details on other applications available, as well as their licenses, please see the 
-<a href="http://www.i2p.net/licenses">license policy</a>.  Source for the I2P code and most bundled
-client applications can be found on our <a href="http://www.i2p.net/download">download page</a>, and is
-in <a href="http://www.i2p.net/cvs">cvs</a>.</p>
+<a href="http://www.i2p2.i2p/licenses">license policy</a>.  Source for the I2P code and most bundled
+client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
+.</p>
 
 <h2>Release history</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
@@ -59,9 +59,8 @@ in <a href="http://www.i2p.net/cvs">cvs</a>.</p>
  <jsp:getProperty name="contenthelper" property="textContent" />
  
  <p>
- A more complete list of updates can be found 
- <a href="http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/history.txt?rev=HEAD">online</a> 
- (<a href="http://dev.i2p/cgi-bin/cvsweb.cgi/i2p/history.txt?rev=HEAD">anonymously</a>)
+ A more complete list of changes can be found 
+ in the history.txt file in your i2p directory.
  </p>
 </div>
 
