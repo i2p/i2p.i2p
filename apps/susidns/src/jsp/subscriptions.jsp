@@ -68,7 +68,7 @@ subscriptions *
 <p class="help">
 The subscription file contains a list of (i2p) URLs. The addressbook application
 regularly (once per hour) checks this list for new eepsites. Those URLs simply contain the published hosts.txt
-file of other people. The default subscription is the hosts.txt from dev.i2p, which is updated infrequently.
+file of other people. The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.
 So it is a good idea to add additional subscriptions to sites that have the latest addresses.
 </p>
 </div>

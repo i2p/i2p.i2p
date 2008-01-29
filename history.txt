@@ -1,4 +1,13 @@
 
+2008-01-29 zzz
+    * Addressbook: Change default subscription
+    * ConfigUpdateHandler: Change default news URL
+    * initialNews.xml: Update version to .31
+    * news.xml: More updates
+    * hosts.txt: Add i2p-projekt.i2p
+    * readme.html: More URL updates
+    * SusiDNS: Change references to default subscription
+
 2008-01-28 zzz
     * news.xml: Updates, still preliminary
     * ReseedHandler: Change default URL

@@ -59,7 +59,7 @@ eepsites announced on other sites if you subscribe to those sites' addressbooks.
 </p>
 <p>
 (To speak the truth: In its default configuration the addressbook does not poll
-additional sites, but dev.i2p only. Subscribing to additional sites is an easy task,
+additional sites, but www.i2p2.i2p only. Subscribing to additional sites is an easy task,
 just add them to your <a href="subscriptions.jsp">subscriptions</a> file.)
 </p>
 <p>If you have questions about naming in i2p, there is an excellent <a href="http://forum.i2p.net/viewtopic.php?t=134">introduction</a>

@@ -22,7 +22,7 @@ public class ConfigUpdateHandler extends FormHandler {
 
     public static final String PROP_NEWS_URL = "router.newsURL";
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
-    public static final String DEFAULT_NEWS_URL = "http://dev.i2p/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
+    public static final String DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
     public static final String DEFAULT_REFRESH_FREQUENCY = 12*60*60*1000 + "";
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
