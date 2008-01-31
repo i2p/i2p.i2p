@@ -1,4 +1,9 @@
 
+2008-01-31 zzz
+    * NewsFetcher: Change fetch failed from error to warning
+    * installer: Fix URL and "email"
+    * checklist.txt: New release checklist
+
 2008-01-29 zzz
     * Addressbook: Change default subscription
     * ConfigUpdateHandler: Change default news URL

@@ -221,8 +221,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
-        if (_log.shouldLog(Log.ERROR))
-            _log.error("Failed to fetch the news from " + url);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Failed to fetch the news from " + url);
         File temp = new File(TEMP_NEWS_FILE);
         temp.delete();
     }

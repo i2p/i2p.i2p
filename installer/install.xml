@@ -4,11 +4,11 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.6.1.30</appversion>
+        <appversion>0.6.1.31</appversion>
         <authors>
-            <author name="I2P" email="support@i2p.net"/>
+            <author name="I2P" email="http://forum.i2p.net"/>
         </authors>
-        <url>http://www.i2p.net</url>
+        <url>http://www.i2p2.de</url>
     </info>
 
     <guiprefs width="590" height="356" resizable="yes">

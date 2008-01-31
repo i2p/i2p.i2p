@@ -1,0 +1,12 @@
+Release checklist
+-----------------
+
+Change revision in:
+	initialNews.xml
+	news.xml
+	installer/install.xml
+	router/java/src/net/i2p/router/RouterVersion.java
+
+Create a signed update file with:
+	export I2P=~/i2p
+	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.6.1.xx
