@@ -79,6 +79,26 @@ lFm5Fqx/iW5+k0QaQZ3W9mY=
 =V3i7
 -----END PGP SIGNATURE-----
 */
+/*
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+*/
+    /* Complication's key */
+    private static final String DEFAULT_TRUSTED_KEY3 =
+        "JHFA0yXUgKtmhajXFZH9Nk62OPRHbvvQHTi8EANV-D~3tjLjaz9p9cs6F" +
+        "s8W3FSLfUwsQeFg7dfVSQQZga~1jMjboo94vIcm3j6XbW4mbcorVQ74uP" +
+        "jd8EA1AQhJ6bBTxDAFk~6fVDOdhHT0Wo5CcUn7v8bAYY3x3UWiL8Remx0=";
+/*
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFHphOV+h38a3n8zjMRAll+AJ9KA6WiDJcTN4qfrslSemUMr+FBrwCeM8pF
+D8usM7Dxp5yrDrCYZ5AIijc=
+=SrXI
+-----END PGP SIGNATURE-----
+*/
+
     private static final String VALID_VERSION_CHARS = "0123456789.";
     private static final int    VERSION_BYTES       = 16;
     private static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;

@@ -1,4 +1,7 @@
 
+2008-02-04 Complication
+    * Added my release signing key into TrustedUpdate.java
+
 2008-01-31 zzz
     * NewsFetcher: Change fetch failed from error to warning
     * installer: Fix URL and "email"
