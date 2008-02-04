@@ -1,3 +1,6 @@
+2008-02-05 Complication
+    * Change the dates too (sorry for such forgetfulness!)
+
 2008-02-04 Complication
     * Also use the new key for checking, and add it into news.xml
 
