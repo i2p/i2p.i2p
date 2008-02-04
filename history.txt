@@ -1,3 +1,5 @@
+2008-02-04 Complication
+    * Also use the new key for checking, and add it into news.xml
 
 2008-02-04 Complication
     * Added my release signing key into TrustedUpdate.java
