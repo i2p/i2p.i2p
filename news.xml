@@ -49,7 +49,7 @@ you will still be able to download the new i2pupdate.zip file yourself from loca
 be announced.
 <ol><li>
 On
-<a href="http://localhost:7657/configupdate.jsp">configupdate.jsp</a>:
+<a href="configupdate.jsp">configupdate.jsp</a>:
 </li><ol type="a"><li>
 Change the News URL to: http://complication.i2p/news.xml
 </li><li>
@@ -64,7 +64,7 @@ Click "Save"
 </li></ol>
 <li>
 On
-<a href="http://localhost:7657/configadvanced.jsp">configadvanced.jsp</a>:
+<a href="configadvanced.jsp">configadvanced.jsp</a>:
 <ol type="a"><li>
 Add the following line:
 <br />
