@@ -1,3 +1,10 @@
+2008-02-06 zzz
+    * build.xml: Add some apps to javadoc
+    * checklist.txt: Add some things
+    * news.xml: make links relative
+    * runplain.sh: Add some comments
+    * wrapper.config: Add some comments
+
 2008-02-05 Complication
     * Change the dates too (sorry for such forgetfulness!)
 

@@ -43,9 +43,9 @@ Make the following configuration changes and your router will automatically inst
 the upcoming 0.6.1.31 release when it becomes available.
 The release will include SAM v2, new jump server links, and addressbook, IRC proxy, and i2psnark improvements.
 </p><p>
-We recommend the automated process as will verify the key of the signed update file.
+We recommend the automated process as it will verify the key of the signed update file.
 If you do not make these changes,
-you will still be able to download the new i2pupdate.zip file yourself from locations to
+you will still be able to manually download the new i2pupdate.zip file from locations to
 be announced.
 <ol><li>
 On

@@ -2,9 +2,10 @@ Release checklist
 -----------------
 
 Change revision in:
+	history.txt
 	initialNews.xml
-	news.xml
 	installer/install.xml
+	news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
 
 make dist
@@ -13,6 +14,10 @@ Create a signed update file with:
 	export I2P=~/i2p
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.6.1.xx
 
+Verify signed update file with:
+	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate showversion i2pupdate.sud
+	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate verifysig i2pupdate.sud
+
 More signatures:
 	sha1sum i2pinstall.exe i2p.tar.bz2 i2p-0.6.1.xx.tar.bz2 i2pupdate.zip
 	gpg -b i2pinstall.exe
@@ -20,7 +25,14 @@ More signatures:
 	gpg -b i2p-0.6.1.xx.tar.bz2
 	gpg -b i2pupdate.zip
 
+Distribute files to download locations
+
 Website files to change:
 	announcements.html
 	download.html
 	index.html
+	hosts.txt (copy from mtn)
+
+Copy news.xml to subscription location
+
+Announce on #i2p, forum.i2p, Syndie

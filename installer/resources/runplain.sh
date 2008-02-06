@@ -1,3 +1,10 @@
+#
+# This runs the router by itself, WITHOUT the wrapper.
+# This means the router will not restart if it crashes.
+# Also, you will be using the default memory size, which is
+# probably not enough for i2p.
+# You should really use the i2prouter script instead.
+#
 export CP=. ; for j in lib/*  ; do export CP=$CP:$j ; done;
 JAVA=java
 

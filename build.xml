@@ -138,6 +138,9 @@
                 <pathelement location="apps/i2ptunnel/java/src" />
                 <pathelement location="apps/systray/java/src" />
                 <pathelement location="apps/routerconsole/java/src" />
+                <pathelement location="apps/addressbook/java/src" />
+                <pathelement location="apps/i2psnark/java/src" />
+                <pathelement location="apps/sam/java/src" />
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
