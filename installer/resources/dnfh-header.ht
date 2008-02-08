@@ -38,8 +38,7 @@ div.logo {
 <div class=warning id=warning>
 The eepsite was not found in your router's addressbook.
 Check the link or find a BASE64 address.
-If you have the BASE64 address,  paste it into your userhosts.txt using SusiDNS
-<a href="http://localhost:7657/susidns/addressbook.jsp?book=master">here</a>.
-or use a BASE64 address helper.
-You may be able to find the eepsite's address helper at <a href="http://orion.i2p">orion.i2p</a>.
+If you have the BASE64 address,  paste it into your userhosts.txt using
+<a href="http://localhost:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
+use a BASE64 address helper, or use a jump service link below.
 <BR><BR>Could not find the following destination:<BR><BR>
