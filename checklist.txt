@@ -1,6 +1,9 @@
 Release checklist
 -----------------
 
+Sync with mtn.i2p2.i2p
+Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p
+
 Change revision in:
 	history.txt
 	initialNews.xml
@@ -8,7 +11,11 @@ Change revision in:
 	news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
 
-make dist
+Build and tag:
+	ant dist
+	mtn ci
+	mtn tag i2p-0.6.1.xx
+	Sync with mtn.i2p2.i2p
 
 Create a signed update file with:
 	export I2P=~/i2p
@@ -18,6 +25,11 @@ Verify signed update file with:
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate showversion i2pupdate.sud
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate verifysig i2pupdate.sud
 
+Make the source tarball:
+	Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.6.1.xx
+	tar tjf i2p-0.6.1.xx.tar.bz2 --exclude i2p-0.6.1.xx/_MTN i2p-0.6.1.xx	
+	mv i2p-0.6.1.xx.tar.bz2 i2p.i2p
+
 More signatures:
 	sha1sum i2pinstall.exe i2p.tar.bz2 i2p-0.6.1.xx.tar.bz2 i2pupdate.zip
 	gpg -b i2pinstall.exe
@@ -25,13 +37,15 @@ More signatures:
 	gpg -b i2p-0.6.1.xx.tar.bz2
 	gpg -b i2pupdate.zip
 
-Distribute files to download locations
+Distribute files to download locations and to www.i2p2.i2p
 
 Website files to change:
+	Sync with mtn.i2p2.i2p
 	announcements.html
-	download.html
+	download.html (change SHA1s)
 	index.html
 	hosts.txt (copy from mtn)
+	Sync with mtn.i2p2.i2p
 
 Copy news.xml to subscription location
 
