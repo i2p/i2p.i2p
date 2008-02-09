@@ -555,7 +555,8 @@ public class EventPumper implements Runnable {
                 con.setKey(key);
                 try {
                     NTCPAddress naddr = con.getRemoteAddress();
-		    if (naddr.getPort() <= 0) throw new IOException("Invalid NTCP address: " + naddr);
+		            if (naddr.getPort() <= 0)
+		                throw new IOException("Invalid NTCP address: " + naddr);
                     InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {
