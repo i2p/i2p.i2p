@@ -1,3 +1,8 @@
+* 2008-02-10  0.6.1.31 released
+
+2008-02-10 Complication
+    * Update news and version numbers
+
 2008-02-06 zzz
     * build.xml: Add some apps to javadoc
     * checklist.txt: Add some things
