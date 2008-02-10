@@ -3,6 +3,7 @@ Release checklist
 
 Sync with mtn.i2p2.i2p
 Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p
+Double-check trust list
 
 Change revision in:
 	history.txt
@@ -14,7 +15,7 @@ Change revision in:
 Build and tag:
 	ant dist
 	mtn ci
-	mtn tag i2p-0.6.1.xx
+	mtn tag i2p-0.6.1.xx h:
 	Sync with mtn.i2p2.i2p
 
 Create a signed update file with:
@@ -27,11 +28,12 @@ Verify signed update file with:
 
 Make the source tarball:
 	Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.6.1.xx
-	tar tjf i2p-0.6.1.xx.tar.bz2 --exclude i2p-0.6.1.xx/_MTN i2p-0.6.1.xx	
+        Double-check trust list
+	tar cjf i2psource-0.6.1.xx.tar.bz2 --exclude i2p-0.6.1.xx/_MTN i2p-0.6.1.xx	
 	mv i2p-0.6.1.xx.tar.bz2 i2p.i2p
 
 More signatures:
-	sha1sum i2pinstall.exe i2p.tar.bz2 i2p-0.6.1.xx.tar.bz2 i2pupdate.zip
+	sha1sum i2pinstall.exe i2p.tar.bz2 i2psource-0.6.1.xx.tar.bz2 i2pupdate.zip
 	gpg -b i2pinstall.exe
 	gpg -b i2p.tar.bz2
 	gpg -b i2p-0.6.1.xx.tar.bz2

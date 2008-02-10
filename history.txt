@@ -1,3 +1,8 @@
+2008-02-10 zzz
+    * Add new tunnel build algorithm (preliminary)
+    * Change NTCP backlogged message from error to warning
+    * Checklist updates
+
 * 2008-02-10  0.6.1.31 released
 
 2008-02-10 Complication

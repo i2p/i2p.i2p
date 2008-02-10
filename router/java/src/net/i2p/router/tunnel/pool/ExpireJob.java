@@ -19,9 +19,12 @@ class ExpireJob extends JobImpl {
         // so we rebuild out of sync.  otoh, we will honor tunnel messages on it
         // up through the full lifetime of the tunnel, plus a clock skew, since
         // others may be sending to the published lease expirations
+        // Also skew the inbound away from the outbound
         long expire = cfg.getExpiration();
         _dropAfter = expire + Router.CLOCK_FUDGE_FACTOR;
-        expire -= ctx.random().nextLong(5*60*1000);
+        expire -= ctx.random().nextLong(60*1000);
+        if (_pool.getSettings().isInbound())
+            expire -= ctx.random().nextLong(15*1000);
         cfg.setExpiration(expire);
         getTiming().setStartAfter(expire);
     }
