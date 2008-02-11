@@ -167,8 +167,7 @@ public class InboundEstablishState {
         int off = 0;
         System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
         off += _receivedX.length;
-        if (_sentY == null)
-            _sentY = getSentY();
+        getSentY();
         System.arraycopy(_sentY, 0, signed, off, _sentY.length);
         off += _sentY.length;
         System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
@@ -300,6 +299,7 @@ public class InboundEstablishState {
             off = 0;
             System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
             off += _receivedX.length;
+            getSentY();
             System.arraycopy(_sentY, 0, signed, off, _sentY.length);
             off += _sentY.length;
             System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
