@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -16,6 +17,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -36,7 +39,9 @@ public class TunnelPool {
     private long _started;
     private long _lastRateUpdate;
     private long _lastLifetimeProcessed;
-    private String _rateName;
+    private final String _rateName;
+    private final String _buildStatName;
+    private static final int TUNNEL_LIFETIME = 10*60*1000;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -54,6 +59,9 @@ public class TunnelPool {
         _lastRateUpdate = _started;
         _lastLifetimeProcessed = 0;
         _rateName = "tunnel.Bps." +
+                    (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
+                    (_settings.isInbound() ? ".in" : ".out");
+        _buildStatName = "tunnel.build." +
                     (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
                     (_settings.isInbound() ? ".in" : ".out");
         refreshSettings();
@@ -79,6 +87,9 @@ public class TunnelPool {
         _context.statManager().createRateStat(_rateName,
                                "Tunnel Bandwidth", "Tunnels", 
                                new long[] { 5*60*1000l });
+        _context.statManager().createRateStat(_buildStatName,
+                               "Tunnel Build Frequency", "Tunnels", 
+                               new long[] { TUNNEL_LIFETIME });
     }
     
     public void shutdown() {
@@ -148,25 +159,43 @@ public class TunnelPool {
                 
                 // if there are nonzero hop tunnels and the zero hop tunnels are fallbacks, 
                 // avoid the zero hop tunnels
+                TunnelInfo backloggedTunnel = null;
                 if (avoidZeroHop) {
                     for (int i = 0; i < _tunnels.size(); i++) {
                         TunnelInfo info = (TunnelInfo)_tunnels.get(i);
                         if ( (info.getLength() > 1) && (info.getExpiration() > _context.clock().now()) ) {
-                            _lastSelected = info;
-                            return info;
+                            // avoid outbound tunnels where the 1st hop is backlogged
+                            if (_settings.isInbound() || !_context.commSystem().isBacklogged(info.getPeer(1))) {
+                                _lastSelected = info;
+                                return info;
+                            } else {
+                                backloggedTunnel = info;
+                            }
                         }
                     }
+                    // return a random backlogged tunnel
+                    if (backloggedTunnel != null)
+                        return backloggedTunnel;
                 }
                 // ok, either we are ok using zero hop tunnels, or only fallback tunnels remain.  pick 'em
                 // randomly
                 for (int i = 0; i < _tunnels.size(); i++) {
                     TunnelInfo info = (TunnelInfo)_tunnels.get(i);
                     if (info.getExpiration() > _context.clock().now()) {
-                        //_log.debug("Selecting tunnel: " + info + " - " + _tunnels);
-                        _lastSelected = info;
-                        return info;
+                        // avoid outbound tunnels where the 1st hop is backlogged
+                        if (_settings.isInbound() || info.getLength() <= 1 ||
+                            !_context.commSystem().isBacklogged(info.getPeer(1))) {
+                            //_log.debug("Selecting tunnel: " + info + " - " + _tunnels);
+                            _lastSelected = info;
+                            return info;
+                        } else {
+                            backloggedTunnel = info;
+                        }
                     }
                 }
+                // return a random backlogged tunnel
+                if (backloggedTunnel != null)
+                    return backloggedTunnel;
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": after " + _tunnels.size() + " tries, no unexpired ones were found: " + _tunnels);
             }
@@ -445,6 +474,106 @@ public class TunnelPool {
         
         boolean allowZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) <= 0);
           
+        /**
+         * This algorithm builds based on the previous average length of time it takes
+         * to build a tunnel. This average is kept in the _buildRateName stat.
+         * It is a separate stat for each pool, since in and out building use different methods,
+         * and each pool can have separate length and length variance settings.
+         * We add one minute to the stat for safety.
+         *
+         * We linearly increase the number of builds per expiring tunnel from
+         * 1 to PANIC_FACTOR as the time-to-expire gets shorter.
+         *
+         * The stat will be 0 for first 10m of uptime so we will use the conservative algorithm
+         * further below instead. It will take about 30m of uptime to settle down.
+         * Or, if we are building more than 33% of the time something is seriously wrong,
+         * we also use the conservative algorithm instead
+         *
+         **/
+
+        int avg = 0;
+        RateStat rs = _context.statManager().getRate(_buildStatName);
+        if (rs != null) {
+            Rate r = rs.getRate(TUNNEL_LIFETIME);
+            if (r != null)
+                avg = (int) ( TUNNEL_LIFETIME * r.getAverageValue() / wanted);
+        }
+
+        if (avg > 0 && avg < TUNNEL_LIFETIME / 3) {
+            final int PANIC_FACTOR = 4;  // how many builds to kick off when time gets short
+            avg += 60*1000;   // one minute safety factor
+            if (_settings.isExploratory())
+                avg += 60*1000;   // two minute safety factor
+            long now = _context.clock().now();
+
+            int expireSoon = 0;
+            int expireLater = 0;
+            int expireTime[];
+            int fallback = 0;
+            synchronized (_tunnels) {
+                expireTime = new int[_tunnels.size()];
+                for (int i = 0; i < _tunnels.size(); i++) {
+                    TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                    if (allowZeroHop || (info.getLength() > 1)) {
+                        int timeToExpire = (int) (info.getExpiration() - now);
+                        if (timeToExpire > 0 && timeToExpire < avg) {
+                            expireTime[expireSoon++] = timeToExpire;
+                        } else {
+                            expireLater++;
+                        }
+                    } else if (info.getExpiration() - now > avg) {
+                        fallback++;
+                    }
+                }
+            }
+
+            int inProgress;
+            synchronized (_inProgress) {
+                inProgress = _inProgress.size();
+            }
+            int remainingWanted = (wanted - expireLater) - inProgress;
+            if (allowZeroHop)
+                remainingWanted -= fallback;
+
+            int rv = 0;
+            int latesttime = 0;
+            if (remainingWanted > 0) {
+                if (remainingWanted > expireSoon) {
+                    rv = PANIC_FACTOR * (remainingWanted - expireSoon);  // for tunnels completely missing
+                    remainingWanted = expireSoon;
+                }
+                // add from 1 to PANIC_FACTOR builds, depending on how late it is
+                // only use the expire times of the latest-expiring tunnels,
+                // the other ones are extras
+                for (int i = 0; i < remainingWanted; i++) {
+                    int latestidx = 0;
+                    // given the small size of the array this is efficient enough
+                    for (int j = 0; j < expireSoon; j++) {
+                        if (expireTime[j] > latesttime) {
+                            latesttime = expireTime[j];
+                            latestidx = j;
+                        }
+                    }
+                    expireTime[latestidx] = 0;
+                    if (latesttime > avg / 2)
+                        rv += 1;
+                    else
+                        rv += 2 + ((PANIC_FACTOR - 2) * (((avg / 2) - latesttime) / (avg / 2)));
+                }
+            }
+
+            if (rv > 0 && _log.shouldLog(Log.DEBUG))
+                _log.debug("New Count: rv: " + rv + " allow? " + allowZeroHop
+                       + " avg " + avg + " latesttime " + latesttime
+                       + " soon " + expireSoon + " later " + expireLater
+                       + " std " + wanted + " inProgress " + inProgress + " fallback " + fallback 
+                       + " for " + toString());
+            _context.statManager().addRateData(_buildStatName, rv + inProgress, 0);
+            return rv;
+        }
+
+        // fixed, conservative algorithm - starts building 3 1/2 - 6m before expiration
+        // (210 or 270s) + (0..90s random)
         long expireAfter = _context.clock().now() + _expireSkew; // + _settings.getRebuildPeriod() + _expireSkew;
         int expire30s = 0;
         int expire90s = 0;
@@ -491,8 +620,11 @@ public class TunnelPool {
             }
         }
         
-        return countHowManyToBuild(allowZeroHop, expire30s, expire90s, expire150s, expire210s, expire270s, 
+        int rv = countHowManyToBuild(allowZeroHop, expire30s, expire90s, expire150s, expire210s, expire270s, 
                                    expireLater, wanted, inProgress, fallback);
+        _context.statManager().addRateData(_buildStatName, (rv > 0 || inProgress > 0) ? 1 : 0, 0);
+        return rv;
+
     }
     
     /**
@@ -590,7 +722,7 @@ public class TunnelPool {
         if ( (lifetime < 60*1000) && (rv + inProgress + fallback >= standardAmount) )
                 rv = standardAmount - inProgress - fallback;
         
-        if (_log.shouldLog(Log.DEBUG))
+        if (rv > 0 && _log.shouldLog(Log.DEBUG))
             _log.debug("Count: rv: " + rv + " allow? " + allowZeroHop
                        + " 30s " + expire30s + " 90s " + expire90s + " 150s " + expire150s + " 210s " + expire210s
                        + " 270s " + expire270s + " later " + expireLater
