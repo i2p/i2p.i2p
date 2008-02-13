@@ -70,19 +70,32 @@ public class GraphHelper {
             }
 
             if (hasTx && hasRx && !_showEvents)
+                _out.write("<a href=\"viewstat.jsp?stat=bw.combined"
+                           + "&amp;periodCount=" + (3 * _periodCount )
+                           + "&amp;width=" + (3 * _width)
+                           + "&amp;height=" + (3 * _height)
+                           + "\" />");
                 _out.write("<img width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
                            + "&amp;width=" + _width
                            + "&amp;height=" + (_height - 14)
-                           + "\" title=\"Combined bandwidth graph\" />\n");
+                           + "\" title=\"Combined bandwidth graph\" /></a>\n");
             
             for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
                 SummaryListener lsnr = (SummaryListener)iter.next();
                 Rate r = lsnr.getRate();
                 String title = r.getRateStat().getName() + " for " + DataHelper.formatDuration(_periodCount * r.getPeriod());
-                _out.write("<img width=\""
+                _out.write("<a href=\"viewstat.jsp?stat="
+                           + r.getRateStat().getName() 
+                           + "&amp;showEvents=" + _showEvents
+                           + "&amp;period=" + r.getPeriod() 
+                           + "&amp;periodCount=" + (3 * _periodCount)
+                           + "&amp;width=" + (3 * _width)
+                           + "&amp;height=" + (3 * _height)
+                           + "\" />");
+                _out.write("<img border=\"0\" width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
@@ -91,7 +104,7 @@ public class GraphHelper {
                            + "&amp;periodCount=" + _periodCount 
                            + "&amp;width=" + _width
                            + "&amp;height=" + _height
-                           + "\" title=\"" + title + "\" />\n");
+                           + "\" title=\"" + title + "\" /></a>\n");
             }
             if (_refreshDelaySeconds > 0)
                 _out.write("<meta http-equiv=\"refresh\" content=\"" + _refreshDelaySeconds + "\" />\n");

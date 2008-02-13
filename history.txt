@@ -1,3 +1,8 @@
+2008-02-13 zzz
+    * Make graphs clickable to get larger graphs
+    * Change SimpleTimer CRIT to a WARN, increase threshold
+    * Checklist update
+
 2008-02-10 zzz
     * Add new tunnel build algorithm (preliminary)
     * Change NTCP backlogged message from error to warning
