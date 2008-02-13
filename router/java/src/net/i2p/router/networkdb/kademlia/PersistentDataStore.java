@@ -66,7 +66,9 @@ class PersistentDataStore extends TransientDataStore {
     public void put(Hash key, DataStructure data) {
         if ( (data == null) || (key == null) ) return;
         super.put(key, data);
-        _writer.queue(key, data);
+        // Don't bother writing LeaseSets to disk
+        if (data instanceof RouterInfo)
+            _writer.queue(key, data);
     }
     
     public int countLeaseSets() {
@@ -103,7 +105,7 @@ class PersistentDataStore extends TransientDataStore {
         }
         public String getName() { return "Remove Key"; }
         public void runJob() {
-            _log.info("Removing key " + _key, getAddedBy());
+            _log.info("Removing key " + _key /* , getAddedBy() */);
             try {
                 File dbDir = getDbDir();
                 removeFile(_key, dbDir);
@@ -113,6 +115,9 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
+    /*
+     * Queue up writes, write up to 300 files every 10 minutes
+     */
     private class Writer implements Runnable {
         private Map _keys;
         private List _keyOrder;
@@ -137,12 +142,15 @@ class PersistentDataStore extends TransientDataStore {
         public void run() {
             Hash key = null;
             DataStructure data = null;
+            int count = 0;
             while (true) { // hmm, probably want a shutdown handle... though this is a daemon thread
                 try {
                     synchronized (_keys) {
                         if (_keyOrder.size() <= 0) {
+                            count = 0;
                             _keys.wait();
                         } else {
+                            count++;
                             key = (Hash)_keyOrder.remove(0);
                             data = (DataStructure)_keys.remove(key);
                         }
@@ -153,7 +161,10 @@ class PersistentDataStore extends TransientDataStore {
                     write(key, data);
                 key = null;
                 data = null;
-                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                if (count >= 300)
+                    count = 0;
+                if (count == 0)
+                    try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}
             }
         }
     }
@@ -227,6 +238,7 @@ class PersistentDataStore extends TransientDataStore {
             int routerCount = 0;
             try {
                 File dbDir = getDbDir();
+/****
                 if (getContext().router().getUptime() < 10*60*1000) {
                     File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
                     if (leaseSetFiles != null) {
@@ -237,6 +249,7 @@ class PersistentDataStore extends TransientDataStore {
                         }
                     }
                 }
+****/
                 File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
                 if (routerInfoFiles != null) {
                     routerCount += routerInfoFiles.length;
@@ -259,6 +272,7 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
+/****
     private class ReadLeaseJob extends JobImpl {
         private File _leaseFile;
         private Hash _key;
@@ -313,6 +327,7 @@ class PersistentDataStore extends TransientDataStore {
             }
         }
     }
+****/
     
     private class ReadRouterJob extends JobImpl {
         private File _routerFile;

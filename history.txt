@@ -1,3 +1,11 @@
+2008-02-17 zzz
+    * PersistentDataStore: Write out 300 records every 10 min
+      rather than 1 every 10 sec;
+      Don't store leasesets to disk or read them in
+    * Combine rates for pools with the same length setting
+      in the new tunnel build algorithm
+    * Clarify a log message in the UpdateHandler
+
 2008-02-13 zzz
     * Make graphs clickable to get larger graphs
     * Change SimpleTimer CRIT to a WARN, increase threshold
