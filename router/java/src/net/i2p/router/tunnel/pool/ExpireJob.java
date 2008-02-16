@@ -29,24 +29,7 @@ class ExpireJob extends JobImpl {
         getTiming().setStartAfter(expire);
     }
     public String getName() {
-        if (_pool.getSettings().isExploratory()) {
-            if (_pool.getSettings().isInbound()) {
-                return "Expire exploratory inbound tunnel";
-            } else {
-                return "Expire exploratory outbound tunnel";
-            }
-        } else {
-            StringBuffer rv = new StringBuffer(32);
-            if (_pool.getSettings().isInbound())
-                rv.append("Expire inbound client tunnel for ");
-            else
-                rv.append("Expire outbound client tunnel for ");
-            if (_pool.getSettings().getDestinationNickname() != null)
-                rv.append(_pool.getSettings().getDestinationNickname());
-            else
-                rv.append(_pool.getSettings().getDestination().toBase64().substring(0,4));
-            return rv.toString();
-        }
+        return "Expire tunnel";
     }
     public void runJob() {
         if (!_leaseUpdated) {

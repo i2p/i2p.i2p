@@ -338,14 +338,19 @@ public class TunnelDispatcher implements Service {
             _log.debug("removing " + cfg);
         
         boolean removed = false;
+        int numParticipants = 0;
         synchronized (_participatingConfig) {
             removed = (null != _participatingConfig.remove(recvId));
+            numParticipants = _participatingConfig.size();
         }
         if (!removed) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Participating tunnel, but no longer listed in participatingConfig? " + cfg);
         }
         
+        _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
+        _context.statManager().addRateData("tunnel.participatingMessageCount", cfg.getProcessedMessagesCount(), 10*60*1000);
+
         synchronized (_participants) {
             removed = (null != _participants.remove(recvId));
         }
@@ -357,8 +362,6 @@ public class TunnelDispatcher implements Service {
         synchronized (_outboundEndpoints) {
             removed = (null != _outboundEndpoints.remove(recvId));
         }
-        
-        _context.statManager().addRateData("tunnel.participatingMessageCount", cfg.getProcessedMessagesCount(), 10*60*1000);
     }
     
     /**
@@ -635,24 +638,33 @@ public class TunnelDispatcher implements Service {
             _times = new ArrayList(128);
         }
         
+        private static final int LEAVE_BATCH_TIME = 10*1000;
         public void add(HopConfig cfg) {
-            Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR);
+            Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
+            boolean noTunnels;
             synchronized (LeaveTunnel.this) {
+                noTunnels = _configs.size() <= 0;
                 _configs.add(cfg);
                 _times.add(dropTime);
-            }
             
+                // Make really sure we queue or requeue the job only when we have to, or else bad things happen.
+                // Locking around this part may not be sufficient but there was nothing before.
+                // Symptom is the Leave Participant job not running for 12m, leading to seesaw participating tunnel count
+
+                long oldAfter = getTiming().getStartAfter();
+                long oldStart = getTiming().getActualStart();
+                if ( noTunnels || (oldAfter <= 0) ||
+                     (oldAfter < getContext().clock().now() && oldAfter <= oldStart) || // if oldAfter > oldStart, it's late but it will run, so don't do this (race)
+                     (oldAfter >= dropTime.longValue()) ) {
+                    getTiming().setStartAfter(dropTime.longValue());
+                    getContext().jobQueue().addJob(LeaveTunnel.this);
+                } else {
+                    // already scheduled for the future, and before this expiration
+                }
+            }
             if (_log.shouldLog(Log.INFO)) {
                 long now = getContext().clock().now();
                 _log.info("Scheduling leave in " + DataHelper.formatDuration(dropTime.longValue()-now) +": " + cfg);
-            }
-            
-            long oldAfter = getTiming().getStartAfter();
-            if ( (oldAfter <= 0) || (oldAfter < getContext().clock().now()) || (oldAfter >= dropTime.longValue()) ) {
-                getTiming().setStartAfter(dropTime.longValue());
-                getContext().jobQueue().addJob(LeaveTunnel.this);
-            } else {
-                // already scheduled for the future, and before this expiration
             }
         }
         
@@ -660,7 +672,7 @@ public class TunnelDispatcher implements Service {
         public void runJob() {
             HopConfig cur = null;
             Long nextTime = null;
-            long now = getContext().clock().now();
+            long now = getContext().clock().now() + LEAVE_BATCH_TIME; // leave all expiring in next 10 sec
             while (true) {
                 synchronized (LeaveTunnel.this) {
                     if (_configs.size() <= 0)
@@ -685,8 +697,10 @@ public class TunnelDispatcher implements Service {
             }
             
             if (nextTime != null) {
-                getTiming().setStartAfter(nextTime.longValue());
-                getContext().jobQueue().addJob(LeaveTunnel.this);
+                synchronized (LeaveTunnel.this) {
+                    getTiming().setStartAfter(nextTime.longValue());
+                    getContext().jobQueue().addJob(LeaveTunnel.this);
+                }
             }
         }
     }
