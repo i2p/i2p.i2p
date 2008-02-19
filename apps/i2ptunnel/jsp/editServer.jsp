@@ -185,11 +185,11 @@
                 </label>
                 <select id="tunnelQuantity" name="tunnelQuantity" title="Number of Tunnels in Group" class="selectbox">
                     <% int tunnelQuantity = editBean.getTunnelQuantity(curTunnel, 2);
-                  %><option value="1"<%=(tunnelQuantity == 1 ? " selected=\"selected\"" : "") %>>1 inbound tunnel  (low bandwidth usage, less reliability)</option>
-                    <option value="2"<%=(tunnelQuantity == 2 ? " selected=\"selected\"" : "") %>>2 inbound tunnels (standard bandwidth usage, standard reliability)</option>
-                    <option value="3"<%=(tunnelQuantity == 3 ? " selected=\"selected\"" : "") %>>3 inbound tunnels (higher bandwidth usage, higher reliability)</option>
+                  %><option value="1"<%=(tunnelQuantity == 1 ? " selected=\"selected\"" : "") %>>1 inbound, 1 outbound tunnel  (low bandwidth usage, less reliability)</option>
+                    <option value="2"<%=(tunnelQuantity == 2 ? " selected=\"selected\"" : "") %>>2 inbound, 2 outbound tunnels (standard bandwidth usage, standard reliability)</option>
+                    <option value="3"<%=(tunnelQuantity == 3 ? " selected=\"selected\"" : "") %>>3 inbound, 3 outbound tunnels (higher bandwidth usage, higher reliability)</option>
                 <% if (tunnelQuantity > 3) {
-                %>    <option value="<%=tunnelQuantity%>" selected="selected"><%=tunnelQuantity%> inbound tunnels</option>
+                %>    <option value="<%=tunnelQuantity%>" selected="selected"><%=tunnelQuantity%> tunnels</option>
                 <% }
               %></select>                
             </div>
@@ -200,9 +200,9 @@
                 <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="Number of Reserve Tunnels" class="selectbox">
                     <% int tunnelBackupQuantity = editBean.getTunnelBackupQuantity(curTunnel, 0);
                   %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>>0 backup tunnels      (0 redundancy, no added resource usage)</option>
-                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>>1 backup tunnel       (low redundancy, low resource usage)</option>
-                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>>2 backup tunnels      (medium redundancy, medium resource usage)</option>
-                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>>3 backup tunnels      (high redundancy, high resource usage)</option>
+                    <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>>1 backup tunnel each direction (low redundancy, low resource usage)</option>
+                    <option value="2"<%=(tunnelBackupQuantity == 2 ? " selected=\"selected\"" : "") %>>2 backup tunnels each direction (medium redundancy, medium resource usage)</option>
+                    <option value="3"<%=(tunnelBackupQuantity == 3 ? " selected=\"selected\"" : "") %>>3 backup tunnels each direction (high redundancy, high resource usage)</option>
                 <% if (tunnelBackupQuantity > 3) {
                 %>    <option value="<%=tunnelBackupQuantity%>" selected="selected"><%=tunnelBackupQuantity%> backup tunnels</option>
                 <% }
