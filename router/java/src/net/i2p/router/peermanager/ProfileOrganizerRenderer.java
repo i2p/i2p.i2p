@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 
 /**
@@ -52,7 +53,7 @@ class ProfileOrganizerRenderer {
         buf.append("<table border=\"1\">");
         buf.append("<tr>");
         buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(")</td>");
-        buf.append("<td><b>Groups</b></td>");
+        buf.append("<td><b>Groups (Caps)</b></td>");
         buf.append("<td><b>Speed</b></td>");
         buf.append("<td><b>Capacity</b></td>");
         buf.append("<td><b>Integration</b></td>");
@@ -109,6 +110,9 @@ class ProfileOrganizerRenderer {
                 default: buf.append("Failing"); break;
             }
             if (isIntegrated) buf.append(", Integrated");
+            RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
+            if (info != null)
+                buf.append(" (" + info.getCapabilities() + ")");
             
             buf.append("<td align=\"right\">").append(num(prof.getSpeedValue()));
             //buf.append('/').append(num(prof.getOldSpeedValue()));
@@ -123,7 +127,9 @@ class ProfileOrganizerRenderer {
             buf.append("</tr>");
         }
         buf.append("</table>");
-        buf.append("<i>Definitions:<ul>");
+        buf.append("<p><i>Definitions:<ul>");
+        buf.append("<li><b>groups</b>: as determined by the profile organizer</li>");
+        buf.append("<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>");
         buf.append("<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>");
         buf.append("<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>");
         buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
@@ -131,8 +137,8 @@ class ProfileOrganizerRenderer {
         buf.append("</ul></i>");
         buf.append("Red peers prefixed with '--' means the peer is failing, and blue peers prefixed ");
         buf.append("with '++' means we've sent or received a message from them ");
-        buf.append("in the last five minutes</i><br />");
-        buf.append("<b>Thresholds:</b><br />");
+        buf.append("in the last five minutes.</i><br />");
+        buf.append("<p><b>Thresholds:</b><br />");
         buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
         buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
         buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)<br />");
