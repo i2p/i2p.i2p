@@ -224,6 +224,10 @@ class BuildHandler {
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
                 int record = order.indexOf(new Integer(i));
+                if (record < 0) {
+                    _log.error("Bad status index " + i);
+                    return;
+                }
                 int howBad = statuses[record];
                 if (_log.shouldLog(Log.INFO))
                     _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);

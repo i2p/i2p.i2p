@@ -43,9 +43,11 @@ public abstract class TunnelPeerSelector {
                 else
                     length -= off;
             }
-            if (length < 0)
-                length = 0;
         }
+        if (length < 0)
+            length = 0;
+        if (length > 8) // as documented in tunnel.html
+            length = 8;
         /*
         if ( (ctx.tunnelManager().getOutboundTunnelCount() <= 0) || 
              (ctx.tunnelManager().getFreeTunnelCount() <= 0) ) {
