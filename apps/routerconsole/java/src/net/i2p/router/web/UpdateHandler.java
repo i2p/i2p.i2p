@@ -162,7 +162,8 @@ public class UpdateHandler {
                 _status = "<b>Update verified</b><br />Restarting<br />";
                 restart();
             } else {
-                _log.log(Log.CRIT, "Update was INVALID - have you changed your keys?");
+                _log.log(Log.CRIT, "Update was INVALID - signing key is not trusted!");
+                _status = "<b>Update signing key invalid</b><br />";
                 System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
             }
         }

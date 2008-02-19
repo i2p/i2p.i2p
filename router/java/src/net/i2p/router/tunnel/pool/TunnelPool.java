@@ -40,7 +40,6 @@ public class TunnelPool {
     private long _lastRateUpdate;
     private long _lastLifetimeProcessed;
     private final String _rateName;
-    private final String _buildStatName;
     private static final int TUNNEL_LIFETIME = 10*60*1000;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
@@ -59,9 +58,6 @@ public class TunnelPool {
         _lastRateUpdate = _started;
         _lastLifetimeProcessed = 0;
         _rateName = "tunnel.Bps." +
-                    (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
-                    (_settings.isInbound() ? ".in" : ".out");
-        _buildStatName = "tunnel.build." +
                     (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
                     (_settings.isInbound() ? ".in" : ".out");
         refreshSettings();
@@ -87,9 +83,6 @@ public class TunnelPool {
         _context.statManager().createRateStat(_rateName,
                                "Tunnel Bandwidth", "Tunnels", 
                                new long[] { 5*60*1000l });
-        _context.statManager().createRateStat(_buildStatName,
-                               "Tunnel Build Frequency", "Tunnels", 
-                               new long[] { TUNNEL_LIFETIME });
     }
     
     public void shutdown() {
@@ -461,6 +454,17 @@ public class TunnelPool {
     public long getLifetimeProcessed() { return _lifetimeProcessed; }
     
     /**
+     * Keep a separate stat for each type, direction, and length of tunnel.
+     */
+    private final String buildRateName() {
+        if (_settings.isExploratory())
+            return "tunnel.buildRatio.exploratory." + (_settings.isInbound() ? "in" : "out");
+        else
+            return "tunnel.buildRatio.l" + _settings.getLength() + "v" + _settings.getLengthVariance() +
+                    (_settings.isInbound() ? ".in" : ".out");
+    }
+
+    /**
      * Gather the data to see how many tunnels to build, and then actually compute that value (delegated to
      * the countHowManyToBuild function below)
      *
@@ -491,8 +495,17 @@ public class TunnelPool {
          *
          **/
 
+        // Compute the average time it takes us to build a single tunnel of this type.
         int avg = 0;
-        RateStat rs = _context.statManager().getRate(_buildStatName);
+        RateStat rs = _context.statManager().getRate(buildRateName());
+        if (rs == null) {
+            // Create the RateStat here rather than at the top because
+            // the user could change the length settings while running
+            _context.statManager().createRateStat(buildRateName(),
+                                   "Tunnel Build Frequency", "Tunnels",
+                                   new long[] { TUNNEL_LIFETIME });
+            rs = _context.statManager().getRate(buildRateName());
+        }
         if (rs != null) {
             Rate r = rs.getRate(TUNNEL_LIFETIME);
             if (r != null)
@@ -568,7 +581,7 @@ public class TunnelPool {
                        + " soon " + expireSoon + " later " + expireLater
                        + " std " + wanted + " inProgress " + inProgress + " fallback " + fallback 
                        + " for " + toString());
-            _context.statManager().addRateData(_buildStatName, rv + inProgress, 0);
+            _context.statManager().addRateData(buildRateName(), rv + inProgress, 0);
             return rv;
         }
 
@@ -622,7 +635,7 @@ public class TunnelPool {
         
         int rv = countHowManyToBuild(allowZeroHop, expire30s, expire90s, expire150s, expire210s, expire270s, 
                                    expireLater, wanted, inProgress, fallback);
-        _context.statManager().addRateData(_buildStatName, (rv > 0 || inProgress > 0) ? 1 : 0, 0);
+        _context.statManager().addRateData(buildRateName(), (rv > 0 || inProgress > 0) ? 1 : 0, 0);
         return rv;
 
     }

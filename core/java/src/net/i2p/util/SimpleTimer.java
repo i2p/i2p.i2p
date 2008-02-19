@@ -207,11 +207,11 @@ public class SimpleTimer {
                     _occurredEventCount += eventsToFire.size();
                 } else {
                     _occurredTime = now;
-                    if (_occurredEventCount > 1000) {
+                    if (_occurredEventCount > 2500) {
                         StringBuffer buf = new StringBuffer(128);
                         buf.append("Too many simpleTimerJobs (").append(_occurredEventCount);
                         buf.append(") in a second!");
-                        _log.log(Log.CRIT, buf.toString());
+                        _log.log(Log.WARN, buf.toString());
                     }
                     _occurredEventCount = 0;
                 }

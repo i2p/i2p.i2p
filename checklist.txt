@@ -11,6 +11,7 @@ Change revision in:
 	installer/install.xml
 	news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
+	core/java/src/net/i2p/CoreVersion.java
 
 Build and tag:
 	ant dist
