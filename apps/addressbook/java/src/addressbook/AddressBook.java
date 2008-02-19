@@ -169,7 +169,16 @@ public class AddressBook {
                 (! host.startsWith("-")) &&
                 (! host.endsWith("-.i2p")) &&
 		host.indexOf("..") < 0 &&
+                // IDN - basic check, not complete validation
+                (host.indexOf("--") < 0 || host.startsWith("xn--") || host.indexOf(".xn--") > 0) &&
                 host.replaceAll("[a-z0-9.-]", "").length() == 0 &&
+                // some reserved names that may be used for local configuration someday
+                (! host.equals("proxy.i2p")) &&
+                (! host.equals("router.i2p")) &&
+                (! host.equals("console.i2p")) &&
+                (! host.endsWith(".proxy.i2p")) &&
+                (! host.endsWith(".router.i2p")) &&
+                (! host.endsWith(".console.i2p")) &&
 
 		dest.length() == 516 &&
                 dest.endsWith("AAAA") &&
