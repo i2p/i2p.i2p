@@ -1,3 +1,12 @@
+2008-02-19 zzz
+    * Addressbook: Disallow '--' in host names except in IDN,
+      add some reserved host names
+    * I2PTunnel: Clarify edit form
+    * NetDb: Remove many stats from netDb, effective as of .32
+    * profiles.jsp: Display capabilities
+    * Tunnels: Enforce max tunnel length of 8, catch an index error
+      http://forum.i2p/viewtopic.php?t=2561
+
 2008-02-16 zzz
     * Fix race in TunnelDispatcher which caused
       participating tunnel count to seesaw -
@@ -21,6 +30,9 @@
     * Make graphs clickable to get larger graphs
     * Change SimpleTimer CRIT to a WARN, increase threshold
     * Checklist update
+
+2008-02-11 welterde
+    * Fix an NPE in UDP http://forum.i2p/viewtopic.php?t=2545
 
 2008-02-10 zzz
     * Add new tunnel build algorithm (preliminary)
