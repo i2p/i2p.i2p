@@ -164,7 +164,7 @@ public class ConfigNetHelper {
         if (rate != null)
             return rate;
         else
-            return "16";
+            return "32";
     }
     public String getOutboundRate() {
         String rate = _context.getProperty(PROP_OUTBOUND_KBPS);
@@ -178,7 +178,7 @@ public class ConfigNetHelper {
         if (rate != null)
             return rate;
         else
-            return "32";
+            return "48";
     }
     public String getOutboundBurstRate() {
         String rate = _context.getProperty(PROP_OUTBOUND_BURST_KBPS);
@@ -276,21 +276,21 @@ public class ConfigNetHelper {
     }
 
     public int getShareBandwidth() {
-        String irate = _context.getProperty(PROP_INBOUND_KBPS);
-        String orate = _context.getProperty(PROP_OUTBOUND_KBPS);
-        String pctStr = _context.getProperty(PROP_SHARE_PERCENTAGE);
+        String irate = _context.getProperty(PROP_INBOUND_KBPS, "32");
+        String orate = _context.getProperty(PROP_OUTBOUND_KBPS, "16");
+        String pctStr = _context.getProperty(PROP_SHARE_PERCENTAGE, "" + DEFAULT_SHARE_PERCENTAGE);
         if ( (irate != null) && (orate != null) && (pctStr != null)) {
             try {
                 int irateKBps = Integer.parseInt(irate);
                 int orateKBps = Integer.parseInt(orate);
                 if (irateKBps < 0 || orateKBps < 0)
-                    return 0;
+                    return 12;
                 int pct = Integer.parseInt(pctStr);
                 return (int) (((float) pct) * Math.min(irateKBps, orateKBps) / 100);
             } catch (NumberFormatException nfe) {
                 // ignore
             }
         }
-        return 0;
+        return 12;
     }
 }
