@@ -1,3 +1,9 @@
+2008-02-26 zzz
+    * Reintroduce NTCP backlog pushback, with switch back to
+      previous tunnel when no longer backlogged
+    * Catch an nio exception in an NTCP logging statement if loglevel is WARN
+    * IRC Proxy: terminate all messages with \r\n (thanks TrivialPursuit!)
+
 2008-02-21 zzz
     * Raise inbound default bandwidth to 32KBps
     * Fix config.jsp that showed 0KBps share bandwidth by default

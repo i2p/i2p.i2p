@@ -255,6 +255,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return false;
         }
         
+        // Right here is where we should use a persistent lease and caching like
+        // we do for outbound tunnel selection below???
+
         // randomize the ordering (so leases with equal # of failures per next 
         // sort are randomly ordered)
         Collections.shuffle(leases);
@@ -435,39 +438,79 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
     }
     
+    /**
+     * Clean out old tunnels from a set.
+     * Caller must synchronize on tc.
+     */
+    private void cleanTunnelCache(HashMap tc) {
+        List deleteList = new ArrayList();
+        for (Iterator iter = tc.keySet().iterator(); iter.hasNext(); ) {
+            Destination dest = (Destination) iter.next();
+            TunnelInfo tunnel = (TunnelInfo) tc.get(dest);
+            if (!getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel))
+                deleteList.add(dest);
+        }
+        for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
+            Destination dest = (Destination) iter.next();
+            tc.remove(dest);
+        }
+    }
 
     /**
      * Use the same outbound tunnel as we did for the same destination previously,
      * if possible, to keep the streaming lib happy
+     * Use two caches - although a cache of a list of tunnels per dest might be
+     * more elegant.
+     * Key the caches just on the dest, not on source+dest, as different sources
+     * simultaneously talking to the same dest is probably rare enough
+     * to not bother separating out.
      *
      */
     private static HashMap _tunnelCache = new HashMap();
+    private static HashMap _backloggedTunnelCache = new HashMap();
     private static long _cleanTime = 0;
     private TunnelInfo selectOutboundTunnel(Destination to) {
         TunnelInfo tunnel;
         long now = getContext().clock().now();
         synchronized (_tunnelCache) {
             if (now - _cleanTime > 5*60*1000) {  // clean out periodically
-                List deleteList = new ArrayList();
-                for (Iterator iter = _tunnelCache.keySet().iterator(); iter.hasNext(); ) {
-                    Destination dest = (Destination) iter.next();
-                    tunnel = (TunnelInfo) _tunnelCache.get(dest);
-                    if (!getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel))
-                        deleteList.add(dest);
-                }
-                for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
-                    Destination dest = (Destination) iter.next();
-                    _tunnelCache.remove(dest);
-                }
+                cleanTunnelCache(_tunnelCache);
+                cleanTunnelCache(_backloggedTunnelCache);
                 _cleanTime = now;
             }
+            /**
+             * If old tunnel is valid and no longer backlogged, use it.
+             * This prevents an active anonymity attack, where a peer could tell
+             * if you were the originator by backlogging the tunnel, then removing the
+             * backlog and seeing if traffic came back or not.
+             */
+            tunnel = (TunnelInfo) _backloggedTunnelCache.get(to);
+            if (tunnel != null) {
+                if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel)) {
+                    if (!getContext().commSystem().isBacklogged(tunnel.getPeer(1))) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Switching back to tunnel " + tunnel + " for dest " + to.calculateHash().toBase64()); 
+                        _backloggedTunnelCache.remove(to);
+                        _tunnelCache.put(to, tunnel);
+                        return tunnel;
+                    }  // else still backlogged
+                } else // no longer valid
+                    _backloggedTunnelCache.remove(to);
+            }
+            // Use the same tunnel unless backlogged
             tunnel = (TunnelInfo) _tunnelCache.get(to);
             if (tunnel != null) {
-                if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel))
-                    return(tunnel);
-                else
-                    _tunnelCache.remove(to);
+                if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel)) {
+                    if (tunnel.getLength() <= 1 || !getContext().commSystem().isBacklogged(tunnel.getPeer(1)))
+                        return tunnel;
+                    // backlogged
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Switching from backlogged " + tunnel + " for dest " + to.calculateHash().toBase64()); 
+                    _backloggedTunnelCache.put(to, tunnel);
+                } // else no longer valid
+                _tunnelCache.remove(to);
             }
+            // Pick a new tunnel
             tunnel = selectOutboundTunnel();
             if (tunnel != null)
                 _tunnelCache.put(to, tunnel);

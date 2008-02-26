@@ -325,10 +325,12 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             int writeBufs = 0;
 	    synchronized (_writeBufs) { writeBufs = _writeBufs.size(); }
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Too backlogged: queue time " + queueTime + " and the size is " + size 
+                try {
+                    _log.warn("Too backlogged: queue time " + queueTime + " and the size is " + size 
                           + ", wantsWrite? " + (0 != (_conKey.interestOps()&SelectionKey.OP_WRITE))
                           + ", currentOut set? " + currentOutboundSet
 			  + ", writeBufs: " + writeBufs + " on " + toString());
+                } catch (Exception e) {}  // java.nio.channels.CancelledKeyException
             _context.statManager().addRateData("ntcp.sendBacklogTime", queueTime, size);
             return true;
         //} else if (size > 32) { // another arbitrary limit.

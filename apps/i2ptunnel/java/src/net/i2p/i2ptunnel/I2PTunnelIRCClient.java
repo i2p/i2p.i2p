@@ -164,7 +164,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                                 if (_log.shouldLog(Log.INFO))
                                     _log.info("inbound: "+outmsg);
                             }
-                            outmsg=outmsg+"\n";
+                            outmsg=outmsg+"\r\n";   // rfc1459 sec. 2.3
                             output.write(outmsg.getBytes("ISO-8859-1"));
                         } else {
                             if (_log.shouldLog(Log.WARN))
@@ -238,7 +238,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                                     if (_log.shouldLog(Log.INFO))
                                         _log.info("outbound: "+outmsg);
                                 }
-                                outmsg=outmsg+"\n";
+                                outmsg=outmsg+"\r\n";   // rfc1459 sec. 2.3
                                 output.write(outmsg.getBytes("ISO-8859-1"));
                             } else {
                                 if (_log.shouldLog(Log.WARN))
