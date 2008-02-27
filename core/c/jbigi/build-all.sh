@@ -12,8 +12,9 @@ FreeBSD*)
 	exit;;
 esac
 
-echo "Extracting GMP..."
-tar -xjf gmp-4.1.4.tar.bz2
+VER=4.2.2
+echo "Extracting GMP Version $VER ..."
+tar -xjf gmp-$VER.tar.bz2
 echo "Building..."
 mkdir bin
 mkdir lib
@@ -24,7 +25,7 @@ for x in none pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon
 do
 	mkdir bin/$x
 	cd bin/$x
-	../../gmp-4.1.4/configure --build=$x
+	../../gmp-$VER/configure --build=$x
 	make
 	sh ../../build_jbigi.sh static
 	case `uname -sr` in

@@ -1,3 +1,11 @@
+2008-02-27 zzz
+    * i2ptunnel: Add 3-hop option to edit.jsp to match configtunnels.jsp
+    * i2psnark: Remove orion and gaytorrents from default tracker list
+    * Remove orion from jump list and from eepsite_index.html
+    * Jbigi: Change jbigi version to 4.2.2 in build scripts - tested by amiga
+    * Capitalize OutboundMessageDistributor job name
+    * TunnelPool: Add a warning if all tunnels are backlogged
+
 2008-02-26 zzz
     * Reintroduce NTCP backlog pushback, with switch back to
       previous tunnel when no longer backlogged

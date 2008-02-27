@@ -167,8 +167,11 @@ public class TunnelPool {
                         }
                     }
                     // return a random backlogged tunnel
-                    if (backloggedTunnel != null)
+                    if (backloggedTunnel != null) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(toString() + ": All tunnels are backlogged");
                         return backloggedTunnel;
+                    }
                 }
                 // ok, either we are ok using zero hop tunnels, or only fallback tunnels remain.  pick 'em
                 // randomly

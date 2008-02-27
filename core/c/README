@@ -1,9 +1,27 @@
 Prior to building the jbigi library, you will need to fetch the GMP source
-from http://www.swox.com/gmp/, saving it to jbigi/gmp-4.1.4.tar.bz2 (it will
+from http://www.swox.com/gmp/, saving it to jbigi/gmp-4.2.2.tar.bz2 (it will
 be unpacked and built as necessary).
+
+Version 4.2.2 has not been extensively tested with I2P. If you would like
+to use a well-tested version, get gmp-4.1.4.tar.bz2, and edit jbigi/build.sh
+to change the version number.
 
 To build the native jbigi and jcpuid libraries for the current host CPU,
 simply run sh build.sh and the results will be packaged up into jbigi.jar
+and the libjbigi.so library. To test, copy jbigi/lib/libjbigi.so
+and jcpuid/lib/freenet/support/CPUInformation/libjcpuid-*.so
+to your i2p/ directory. You can also copy jbigi.jar to the i2p/lib/ directory;
+it will be used only if the router fails to load the native library.
 
 To build the native jbigi libraries for all supported CPUs (on the current OS),
 go into jbigi/ and run build-all.sh (the results will be under jbigi/lib/)
+
+After copying the files to the i2p/ directory,
+to run a speed test comparing the native library to the java library,
+run the shell script below.
+
+-----------------
+
+#!/bin/sh
+export I2P=~/i2p
+java -cp $I2P/lib/i2p.jar:$I2P/lib/jbigi.jar net.i2p.util.NativeBigInteger

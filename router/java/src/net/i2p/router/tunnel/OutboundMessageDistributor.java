@@ -80,7 +80,7 @@ public class OutboundMessageDistributor {
             _target = target;
             _tunnel = id;
         }
-        public String getName() { return "distribute outbound message"; }
+        public String getName() { return "Distribute outbound message"; }
         public void runJob() {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_target);
             if (info != null) {

@@ -186,8 +186,9 @@
                   %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>>0 hop tunnel (low anonymity, low latency)</option>
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>>1 hop tunnel (medium anonymity, medium latency)</option>
                     <option value="2"<%=(tunnelDepth == 2 ? " selected=\"selected\"" : "") %>>2 hop tunnel (high anonymity, high latency)</option>
-                <% if (tunnelDepth > 2) { 
-                %>    <option value="<%=tunnelDepth%>" selected="selected"><%=tunnelDepth%> hop tunnel</option>
+                    <option value="3"<%=(tunnelDepth == 3 ? " selected=\"selected\"" : "") %>>3 hop tunnel (very high anonymity, poor performance)</option>
+                <% if (tunnelDepth > 3) { 
+                %>    <option value="<%=tunnelDepth%>" selected="selected"><%=tunnelDepth%> hop tunnel (very poor performance)</option>
                 <% }
               %></select>
             </div>

@@ -647,7 +647,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     
     private static String jumpServers[] = {
                                            "http://i2host.i2p/cgi-bin/i2hostjump?",
-                                           "http://orion.i2p/jump/",
+                                           // "http://orion.i2p/jump/",
                                            "http://stats.i2p/cgi-bin/jump.cgi?a=",
                                            "http://trevorreznik.i2p/cgi-bin/jump.php?hostname="
                                           };
