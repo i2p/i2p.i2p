@@ -11,6 +11,19 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
+2008-02-29: <b>Upcoming 0.6.1.32 Release</b>
+</p><p>
+If you upgraded from 0.6.1.30 to 0.6.1.31, you may wish to take advantage
+of the new round-robin update downloading when .32 is released. This is optional.
+On
+<a href="configupdate.jsp">configupdate.jsp</a>,
+delete the single Update URL and click "Save".
+Verify that you now have <b>three</b> default Update URLs listed.
+If you already have three Update URLs, you do not have to do anything.
+</p>
+
+<p>
+&#149;
 2008-02-10: <b>0.6.1.31 released</b>
 </p><p>
 The transitional 0.6.1.31 release will make the I2P
