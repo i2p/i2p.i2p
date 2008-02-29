@@ -16,9 +16,10 @@
 If you upgraded from 0.6.1.30 to 0.6.1.31, you may wish to take advantage
 of the new round-robin update downloading when .32 is released. This is optional.
 On
-<a href="configupdate.jsp">configupdate.jsp</a>,
-delete the single Update URL and click "Save".
-Verify that you now have <b>three</b> default Update URLs listed.
+<a href="configadvanced.jsp">configadvanced.jsp</a>,
+delete the line "router.updateURL=..." and click "Apply".
+Verify that you now have three default Update URLs listed on
+<a href="configupdate.jsp">configupdate.jsp</a>.
 If you already have three Update URLs, you do not have to do anything.
 </p>
 
