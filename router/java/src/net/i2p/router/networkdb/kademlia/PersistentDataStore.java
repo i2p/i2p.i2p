@@ -71,6 +71,9 @@ class PersistentDataStore extends TransientDataStore {
             _writer.queue(key, data);
     }
     
+/*
+ *  We don't store leasesets here anymore, use the TransientDataStore count
+ *
     public int countLeaseSets() {
         File dbDir = null;
         try {
@@ -86,6 +89,7 @@ class PersistentDataStore extends TransientDataStore {
         else
             return leaseSetFiles.length;
     }
+*/
     
     private void accept(LeaseSet ls) {
         super.put(ls.getDestination().calculateHash(), ls);

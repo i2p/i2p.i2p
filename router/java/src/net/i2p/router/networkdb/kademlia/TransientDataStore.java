@@ -60,8 +60,17 @@ class TransientDataStore implements DataStore {
         }
     }
 
-    public int countLeaseSets() { return 0; }
-
+    public int countLeaseSets() {
+        int count = 0;
+        synchronized (_data) {
+            for (Iterator iter = _data.values().iterator(); iter.hasNext();) {
+                DataStructure data = (DataStructure)iter.next();
+                if (data instanceof LeaseSet)
+                    count++;
+            }
+        }
+        return count;
+    }
     
     /** nothing published more than 5 minutes in the future */
     private final static long MAX_FUTURE_PUBLISH_DATE = 5*60*1000;

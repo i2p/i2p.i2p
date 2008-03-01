@@ -1,3 +1,7 @@
+2008-03-01 zzz
+    * Fix netdb.knownLeaseSets count reported by floodfill routers
+      (was broken by -3)
+
 2008-02-27 zzz
     * i2ptunnel: Add 3-hop option to edit.jsp to match configtunnels.jsp
     * i2psnark: Remove orion and gaytorrents from default tracker list
