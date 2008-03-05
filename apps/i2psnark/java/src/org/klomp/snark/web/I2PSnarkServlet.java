@@ -107,6 +107,9 @@ public class I2PSnarkServlet extends HttpServlet {
         if (I2PSnarkUtil.instance().connected())
             out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
                       "\" title=\"Stop all torrents and the i2p tunnel\">Stop All</a>");
+        else if (snarks.size() > 0)
+            out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
+                      "\" title=\"Start all torrents and the i2p tunnel\">Start All</a>");
         else
             out.write("&nbsp;");
         out.write("</th></tr></thead>\n");
@@ -337,6 +340,14 @@ public class I2PSnarkServlet extends HttpServlet {
             if (I2PSnarkUtil.instance().connected()) {
                 I2PSnarkUtil.instance().disconnect();
                 _manager.addMessage("I2P tunnel closed");
+            }
+        } else if ("StartAll".equals(action)) {
+            _manager.addMessage("Opening the I2P tunnel and starting all torrents");
+            List snarks = getSortedSnarks(req);
+            for (int i = 0; i < snarks.size(); i++) {
+                Snark snark = (Snark)snarks.get(i);
+                if (snark.stopped)
+                    snark.startTorrent();
             }
         }
     }
