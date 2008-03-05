@@ -206,15 +206,15 @@ public class I2PSnarkUtil {
     Destination getDestination(String ip) {
         if (ip == null) return null;
         if (ip.endsWith(".i2p")) {
-            Destination dest = _context.namingService().lookup(ip);
-            if (dest != null) {
-                return dest;
-            } else {
-                try {
-                    return new Destination(ip.substring(0, ip.length()-4)); // sans .i2p
-                } catch (DataFormatException dfe) {
-                    return null;
-                }
+            if (ip.length() < 520) {   // key + ".i2p"
+                Destination dest = _context.namingService().lookup(ip);
+                if (dest != null)
+                    return dest;
+            }
+            try {
+                return new Destination(ip.substring(0, ip.length()-4)); // sans .i2p
+            } catch (DataFormatException dfe) {
+                return null;
             }
         } else {
             try {
