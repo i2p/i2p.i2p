@@ -1,3 +1,13 @@
+2008-03-05 zzz
+    * Naming: Make HostsTxt the sole default NamingService
+      (was Meta = PetName + HostsTxt)
+    * Naming: Add two new experimental NamingServices, EepGet and Exec,
+      not enabled by default -
+      see source comments in core/java/src/net/i2p/client/naming
+      for configuration instructions
+    * i2psnark: Don't do a naming lookup for Base64 destkeys
+    * i2psnark: Add a StartAll button
+
 2008-03-01 zzz
     * Fix netdb.knownLeaseSets count reported by floodfill routers
       (was broken by -3)
