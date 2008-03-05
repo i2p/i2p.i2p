@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.FrequencyStat;
+import net.i2p.stat.StatManager;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -141,4 +142,10 @@ public class ConfigStatsHelper {
     public boolean getCurrentIsGraphed() { return _currentIsGraphed; }
     public boolean getCurrentCanBeGraphed() { return _currentCanBeGraphed; }
     public String getExplicitFilter() { return _filter; }
+    public boolean getIsFull() {
+        String f = _context.getProperty(StatManager.PROP_STAT_FULL);
+        if (f != null && f.equals("true"))
+            return true;
+        return false;
+    }
 }

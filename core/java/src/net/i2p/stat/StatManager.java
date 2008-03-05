@@ -32,6 +32,22 @@ public class StatManager {
     public static final String PROP_STAT_FILTER = "stat.logFilters";
     public static final String PROP_STAT_FILE = "stat.logFile";
     public static final String DEFAULT_STAT_FILE = "stats.log";
+    public static final String PROP_STAT_FULL = "stat.full";
+    public static final String DEFAULT_STAT_FULL = "true";
+    public static final String PROP_STAT_REQUIRED = "stat.required";
+    /**
+     * These are all the stats published in netDb, plus those required for the operation of
+     * the router (many in RouterThrottleImpl), plus those that are on graphs.jsp by default.
+     * Wildcard ('*') allowed at end of stat only.
+     * Ignore all the rest of the stats unless stat.full=true.
+     */
+    public static final String DEFAULT_STAT_REQUIRED =
+        "bw.recvRate,bw.sendBps,bw.sendRate,client.sendAckTime,clock.skew,crypto.elGamal.encrypt," +
+        "jobQueue.jobLag,netDb.successTime,router.fastPeers," +
+        "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
+        "tunnel.buildRatio.*,tunnel.buildFailure,tunnel.buildSuccess,tunnel.corruptMessage," +
+        "tunnel.decryptRequestTime,tunnel.fragmentedDropped,tunnel.participatingMessageCount,"+
+        "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime" ;
     
     /**
      * The stat manager should only be constructed and accessed through the 
@@ -67,6 +83,7 @@ public class StatManager {
      * @param periods array of period lengths (in milliseconds)
      */
     public void createFrequencyStat(String name, String description, String group, long periods[]) {
+        if (ignoreStat(name)) return;
         if (_frequencyStats.containsKey(name)) return;
         _frequencyStats.put(name, new FrequencyStat(name, description, group, periods));
     }
@@ -80,6 +97,7 @@ public class StatManager {
      * @param periods array of period lengths (in milliseconds)
      */
     public void createRateStat(String name, String description, String group, long periods[]) {
+        if (ignoreStat(name)) return;
         synchronized (_rateStats) {
             if (_rateStats.containsKey(name)) return;
             RateStat rs = new RateStat(name, description, group, periods);
@@ -165,4 +183,20 @@ public class StatManager {
 
     public String getStatFilter() { return _context.getProperty(PROP_STAT_FILTER); }
     public String getStatFile() { return _context.getProperty(PROP_STAT_FILE, DEFAULT_STAT_FILE); }
+
+    // Save memory by not creating stats unless they are required for router operation
+    // Return true if the stat should be ignored.
+    public boolean ignoreStat(String statName) {
+        if (_context.getProperty(PROP_STAT_FULL, DEFAULT_STAT_FULL).equalsIgnoreCase("true"))
+            return false;
+        String required = _context.getProperty(PROP_STAT_REQUIRED, DEFAULT_STAT_REQUIRED);
+        String req[] = required.split(",");
+        for (int i=0; i<req.length; i++) {
+             if (req[i].equals(statName))
+                 return false;
+             if (req[i].endsWith("*") && statName.startsWith(req[i].substring(0, req[i].length() - 2)))
+                 return false;
+        }
+        return true;
+    }
 }

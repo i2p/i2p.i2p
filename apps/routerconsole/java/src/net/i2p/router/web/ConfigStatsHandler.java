@@ -20,11 +20,13 @@ public class ConfigStatsHandler extends FormHandler {
     private String _graphs;
     private boolean _explicitFilter;
     private String _explicitFilterValue;
+    private boolean _isFull;
     
     public ConfigStatsHandler() {
         super();
         _stats = new ArrayList();
         _explicitFilter = false;
+        _isFull = false;
     }
     
     protected void processForm() {
@@ -70,6 +72,7 @@ public class ConfigStatsHandler extends FormHandler {
 
     public void setExplicitFilter(String foo) { _explicitFilter = true; }
     public void setExplicitFilterValue(String filter) { _explicitFilterValue = filter; }
+    public void setIsFull(String foo) { _isFull = true; }
     
     /**
      * The user made changes to the config and wants to save them, so
@@ -109,6 +112,7 @@ public class ConfigStatsHandler extends FormHandler {
             
         _context.router().setConfigSetting(StatManager.PROP_STAT_FILTER, stats.toString());
         _context.router().setConfigSetting("stat.summaries", _graphs);
+        _context.router().setConfigSetting(StatManager.PROP_STAT_FULL, "" + _isFull);
         boolean ok = _context.router().saveConfig();
         if (ok) 
             addFormNotice("Stat filter and location updated successfully to: " + stats.toString());

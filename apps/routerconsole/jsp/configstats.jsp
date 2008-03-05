@@ -73,6 +73,10 @@ function toggleAll(category)
     System.setProperty("net.i2p.router.web.ConfigStatsHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="action" value="foo" />
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
+ Enable full stats?
+ <input type="checkbox" name="isFull" value="true" <% 
+ if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
+ (change requires restart to take effect)<br />
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
  Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br />
  <table>

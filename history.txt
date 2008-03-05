@@ -7,6 +7,9 @@
       for configuration instructions
     * i2psnark: Don't do a naming lookup for Base64 destkeys
     * i2psnark: Add a StartAll button
+    * Stats: Add code to disable most stats to save memory.
+      Set on configstats.jsp or set stat.full=false to disable the stats.
+      (true by default for now)
 
 2008-03-01 zzz
     * Fix netdb.knownLeaseSets count reported by floodfill routers
