@@ -532,7 +532,8 @@ public class TunnelDispatcher implements Service {
         
         long dispatchTime = _context.clock().now() - before;
         if (dispatchTime > 1000) {
-            _log.error("wtf, took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("wtf, took " + dispatchTime + " to dispatch " + msg + " out " + outboundTunnel + " in " + gw);
         }
         if (gw instanceof TunnelGatewayZeroHop)
             _context.statManager().addRateData("tunnel.dispatchOutboundZeroHopTime", dispatchTime, dispatchTime);
