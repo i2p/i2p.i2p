@@ -1578,7 +1578,7 @@ public class WebMail extends HttpServlet
 			"<tr><td>Host</td><td><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
 			"<tr><td>POP3-Port</td><td><input type=\"text\" size=\"32\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
 			"<tr><td>SMTP-Port</td><td><input type=\"text\" size=\"32\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"center\" colspan=\"2\">" + button( LOGIN, "Login" ) + " <input type=\"reset\" value=\"Reset\"></td></tr>\n" +
+			"<tr><td align=\"center\" colspan=\"2\"><a href=\"http://hq.postman.i2p/?page_id=16\">Create Account</a> " + button( LOGIN, "Login" ) + " <input type=\"reset\" value=\"Reset\"></td></tr>\n" +
 			"</table>");
 	}
 	/**
