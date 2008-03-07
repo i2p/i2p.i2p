@@ -1,3 +1,8 @@
+* 2008-03-09  0.6.1.32 released
+
+2008-03-07 zzz
+    * Update news and version numbers
+
 2008-03-01 zzz
     * Fix netdb.knownLeaseSets count reported by floodfill routers
       (was broken by -3)
