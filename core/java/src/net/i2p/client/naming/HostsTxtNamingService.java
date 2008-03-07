@@ -54,6 +54,10 @@ public class HostsTxtNamingService extends NamingService {
     }
         
     public Destination lookup(String hostname) {
+        // If it's long, assume it's a key.
+        if (hostname.length() >= 516)
+            return lookupBase64(hostname);
+
         // check the list each time, reloading the file on each
         // lookup
         
@@ -79,9 +83,7 @@ public class HostsTxtNamingService extends NamingService {
             }
             // not found, continue to the next file
         }
-        // If we can't find name in any of the hosts files, 
-        // assume it's a key.
-        return lookupBase64(hostname);
+        return null;
     }
 
     public String reverseLookup(Destination dest) {

@@ -63,6 +63,10 @@ public class EepGetNamingService extends NamingService {
     }
         
     public Destination lookup(String hostname) {
+        // If it's long, assume it's a key.
+        if (hostname.length() >= DEST_SIZE)
+            return lookupBase64(hostname);
+
         hostname = hostname.toLowerCase();
 
         // check the cache
@@ -95,10 +99,7 @@ public class EepGetNamingService extends NamingService {
                 return lookupBase64(key);
             }
         }
-
-        // If we can't find name,
-        // assume it's a key.
-        return lookupBase64(hostname);
+        return null;
     }
 
     private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
