@@ -3,6 +3,8 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -13,11 +15,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.NetworkDatabaseFacade;
@@ -229,13 +233,16 @@ public class ProfileOrganizer {
      *
      */
     public void selectFastPeers(int howMany, Set exclude, Set matches) {
+        selectFastPeers(howMany, exclude, matches, 0);
+    }
+    public void selectFastPeers(int howMany, Set exclude, Set matches, int mask) {
         synchronized (_reorganizeLock) {
-            locked_selectPeers(_fastPeers, howMany, exclude, matches);
+            locked_selectPeers(_fastPeers, howMany, exclude, matches, mask);
         }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
-            selectHighCapacityPeers(howMany, exclude, matches);
+            selectHighCapacityPeers(howMany, exclude, matches, mask);
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
@@ -248,6 +255,9 @@ public class ProfileOrganizer {
      *
      */
     public void selectHighCapacityPeers(int howMany, Set exclude, Set matches) {
+        selectHighCapacityPeers(howMany, exclude, matches, 0);
+    }
+    public void selectHighCapacityPeers(int howMany, Set exclude, Set matches, int mask) {
         synchronized (_reorganizeLock) {
             // we only use selectHighCapacityPeers when we are selecting for PURPOSE_TEST
             // or we are falling back due to _fastPeers being too small, so we can always 
@@ -258,12 +268,12 @@ public class ProfileOrganizer {
             else
                 exclude.addAll(_fastPeers.keySet());
              */
-            locked_selectPeers(_highCapacityPeers, howMany, exclude, matches);
+            locked_selectPeers(_highCapacityPeers, howMany, exclude, matches, mask);
         }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectHighCap("+howMany+"), not enough fast (" + matches.size() + ") going on to notFailing");
-            selectNotFailingPeers(howMany, exclude, matches);
+            selectNotFailingPeers(howMany, exclude, matches, mask);
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
@@ -275,13 +285,16 @@ public class ProfileOrganizer {
      *
      */
     public void selectWellIntegratedPeers(int howMany, Set exclude, Set matches) {
+        selectWellIntegratedPeers(howMany, exclude, matches, 0);
+    }
+    public void selectWellIntegratedPeers(int howMany, Set exclude, Set matches, int mask) {
         synchronized (_reorganizeLock) {
-            locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches);
+            locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches, mask);
         }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
-            selectNotFailingPeers(howMany, exclude, matches);
+            selectNotFailingPeers(howMany, exclude, matches, mask);
         } else {            
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
@@ -295,7 +308,13 @@ public class ProfileOrganizer {
      *
      */
     public void selectNotFailingPeers(int howMany, Set exclude, Set matches) {
-        selectNotFailingPeers(howMany, exclude, matches, false);
+        selectNotFailingPeers(howMany, exclude, matches, false, 0);
+    }
+    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, int mask) {
+        selectNotFailingPeers(howMany, exclude, matches, false, mask);
+    }
+    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
+        selectNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
     /**
      * Return a set of Hashes for peers that are not failing, preferring ones that
@@ -306,9 +325,9 @@ public class ProfileOrganizer {
      * @param matches set to store the matches in
      * @param onlyNotFailing if true, don't include any high capacity peers
      */
-    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
+    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany)
-            selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing);
+            selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, mask);
         return;
     }
     /**
@@ -347,7 +366,10 @@ public class ProfileOrganizer {
      * Return a set of Hashes for peers that are not failing.
      *
      */
-    private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
+    public void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
+        selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
+    }
+    private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany) {
             int orig = matches.size();
             int needed = howMany - orig;
@@ -676,6 +698,7 @@ public class ProfileOrganizer {
                 _log.info("Our average capacity is doing well [" + meanCapacity 
                           + "], and includes " + numExceedingMean);
             _thresholdCapacityValue = meanCapacity;
+// else if mean > median && reordered.size > minHighCapacitiyPeers then threshold = reordered.get(minHighCapacity).getCapacityValue()
         } else if (reordered.size()/2 >= minHighCapacityPeers) {
             // ok mean is skewed low, but we still have enough to use the median
             if (_log.shouldLog(Log.INFO))
@@ -779,6 +802,9 @@ public class ProfileOrganizer {
      *
      */
     private void locked_selectPeers(Map peers, int howMany, Set toExclude, Set matches) {
+        locked_selectPeers(peers, howMany, toExclude, matches, 0);
+    }
+    private void locked_selectPeers(Map peers, int howMany, Set toExclude, Set matches, int mask) {
         List all = new ArrayList(peers.keySet());
         if (toExclude != null)
             all.removeAll(toExclude);
@@ -789,6 +815,11 @@ public class ProfileOrganizer {
         for (int i = 0; (matches.size() < howMany) && (i < all.size()); i++) {
             Hash peer = (Hash)all.get(i);
             boolean ok = isSelectable(peer);
+            if (ok) {
+                ok = mask <= 0 || notRestricted(peer, matches, mask);
+                if ((!ok) && _log.shouldLog(Log.WARN))
+                    _log.warn("IP restriction prevents " + peer + " from joining " + matches);
+            }
             if (ok)
                 matches.add(peer);
             else
@@ -796,6 +827,82 @@ public class ProfileOrganizer {
         }
     }
     
+    /**
+     * Does the peer's IP address NOT match the IP address of any peer already in the set,
+     * on any transport, within a given mask?
+     * mask is 1-4 (number of bytes to match) or 0 to disable
+     * Perhaps rewrite this to just make a set of all the IP addresses rather than loop.
+     */
+    private boolean notRestricted(Hash peer, Set matches, int mask) {
+        if (mask <= 0) return true;
+        if (matches.size() <= 0) return true;
+        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
+        if (pinfo == null) return false;
+        Set paddr = pinfo.getAddresses();
+        if (paddr == null || paddr.size() == 0)
+            return false;
+        List pladdr = new ArrayList(paddr);
+        List lmatches = new ArrayList(matches);
+        // for each match
+        for (int i = 0; i < matches.size(); i++) {
+            RouterInfo minfo = _context.netDb().lookupRouterInfoLocally((Hash) lmatches.get(i));
+            if (minfo == null) continue;
+            Set maddr = minfo.getAddresses();
+            if (maddr == null || maddr.size() == 0)
+                continue;
+            List mladdr = new ArrayList(maddr);
+            String oldphost = null;
+            // for each peer address
+            for (int j = 0; j < paddr.size(); j++) {
+                RouterAddress pa = (RouterAddress) pladdr.get(j);
+                if (pa == null) continue;
+                Properties pprops = pa.getOptions();
+                if (pprops == null) continue;
+                String phost = pprops.getProperty("host");
+                if (phost == null) continue;
+                if (oldphost != null && oldphost.equals(phost)) continue;
+                oldphost = phost;
+                InetAddress pi;
+                try {
+                    pi = InetAddress.getByName(phost);
+                } catch (UnknownHostException uhe) {
+                    continue;
+                }
+                if (pi == null) continue;
+                byte[] pib = pi.getAddress();
+                String oldmhost = null;
+                // for each match address
+                for (int k = 0; k < maddr.size(); k++) {
+                    RouterAddress ma = (RouterAddress) mladdr.get(k);
+                    if (ma == null) continue;
+                    Properties mprops = ma.getOptions();
+                    if (mprops == null) continue;
+                    String mhost = mprops.getProperty("host");
+                    if (mhost == null) continue;
+                    if (oldmhost != null && oldmhost.equals(mhost)) continue;
+                    oldmhost = mhost;
+                    InetAddress mi;
+                    try {
+                        mi = InetAddress.getByName(mhost);
+                    } catch (UnknownHostException uhe) {
+                        continue;
+                    }
+                    if (mi == null) continue;
+                    byte[] mib = mi.getAddress();
+                    // assume ipv4, compare 1 to 4 bytes
+                    // log.info("Comparing " + pi + " with " + mi);
+                    for (int m = 0; m < mask; m++) {
+                        if (pib[m] != mib[m])
+                            break;
+                        if (m == mask-1)
+                            return false; // IP match
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     public boolean isSelectable(Hash peer) {
         NetworkDatabaseFacade netDb = _context.netDb();
         // the CLI shouldn't depend upon the netDb
@@ -807,7 +914,7 @@ public class ProfileOrganizer {
             return false; // never select a shitlisted peer
         }
             
-        RouterInfo info = netDb.lookupRouterInfoLocally(peer);
+        RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (null != info) {
             if (info.getIdentity().isHidden()) {
                if (_log.shouldLog(Log.WARN))

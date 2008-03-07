@@ -1,3 +1,15 @@
+2008-03-07 zzz
+    * Naming: Optimize lookups for a destkey
+    * ProfileOrganizer, TunnelPoolSettings, ClientPeerSelector:
+      - Prevent peers with matching IPs from joining same tunnel.
+        Match 0-4 bytes of IP (0=off, 1=most restrictive, 4=least).
+        Default is 2 (disallow routers in same /16).
+        Set with router.defaultPool.IPRestriction=x
+      - Comment out unused RebuildPeriod pool setting
+      - Add random key to pool in preparation for XOR peer ordering
+    * SusiMail: Add 'Create Account' link
+    * TunnelDispatcher: Change a common wtf error to a warn
+
 2008-03-05 zzz
     * Naming: Make HostsTxt the sole default NamingService
       (was Meta = PetName + HostsTxt)

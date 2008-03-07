@@ -24,10 +24,11 @@ class ClientPeerSelector extends TunnelPeerSelector {
         }
         
         Set exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
-        ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
+        ctx.profileOrganizer().selectFastPeers(length, exclude, matches, settings.getIPRestriction());
         
         matches.remove(ctx.routerHash());
         ArrayList rv = new ArrayList(matches);
+        // Todo - Rather than shuffle, sort using xor distance from settings.getRandomKey()
         Collections.shuffle(rv, ctx.random());
         if (settings.isInbound())
             rv.add(0, ctx.routerHash());
