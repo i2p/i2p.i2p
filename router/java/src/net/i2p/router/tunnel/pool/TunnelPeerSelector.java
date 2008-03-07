@@ -1,12 +1,14 @@
 package net.i2p.router.tunnel.pool;
 
 import java.util.*;
+import java.math.BigInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.PeerSelector;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
@@ -448,5 +450,22 @@ public abstract class TunnelPeerSelector {
         boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
         //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
         return rv;
+    }
+
+    protected void orderPeers(List rv, Hash hash) {
+            Collections.sort(rv, new HashComparator(hash));
+    }
+
+    private class HashComparator implements Comparator {
+        private Hash _hash;
+
+        private HashComparator(Hash h) {
+            _hash = h;
+        }
+        public int compare(Object l, Object r) {
+            BigInteger ll = PeerSelector.getDistance(_hash, (Hash) l);
+            BigInteger rr = PeerSelector.getDistance(_hash, (Hash) r);
+            return ll.compareTo(rr);
+        }
     }
 }

@@ -43,7 +43,8 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         
         matches.remove(ctx.routerHash());
         ArrayList rv = new ArrayList(matches);
-        Collections.shuffle(rv, ctx.random());
+        if (rv.size() > 1)
+            orderPeers(rv, settings.getRandomKey());
         if (settings.isInbound())
             rv.add(0, ctx.routerHash());
         else

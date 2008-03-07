@@ -1,3 +1,8 @@
+2008-03-08 zzz
+    * ClientPeerSelector: Implement strict ordering of peers,
+      based on XOR distance from a random hash
+      separately generated for each tunnel pool
+
 2008-03-07 zzz
     * Naming: Optimize lookups for a destkey
     * ProfileOrganizer, TunnelPoolSettings, ClientPeerSelector:

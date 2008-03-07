@@ -25,7 +25,7 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
-class PeerSelector {
+public class PeerSelector {
     protected Log _log;
     protected RouterContext _context;
     
@@ -180,7 +180,7 @@ class PeerSelector {
             peerHashes.removeAll(failing);
     }
     
-    protected BigInteger getDistance(Hash targetKey, Hash routerInQuestion) {
+    public static BigInteger getDistance(Hash targetKey, Hash routerInQuestion) {
         // plain XOR of the key and router
         byte diff[] = DataHelper.xor(routerInQuestion.getData(), targetKey.getData());
         return new BigInteger(1, diff);
