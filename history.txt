@@ -1,3 +1,10 @@
+2008-03-09 Complication
+    * Give the Jetty build file ability to ask permission
+      before downloading the Jetty archive from the web,
+      and to verify its SHA1 + MD5 hashes. Adjust the main build file
+      in accordance with this change.
+    * Improve the release checklist.
+
 * 2008-03-09  0.6.1.32 released
 
 2008-03-07 zzz

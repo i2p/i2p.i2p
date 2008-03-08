@@ -1,25 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
-        
+
+    <property name="jetty.sha1" value="021164f84da7304bd1ff07c268b45aa3e0b13322" />
+    <property name="jetty.md5" value="a61adc832be6baf2678935506743cfc3" />
+    <property name="jetty.url" value="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.12.zip" />
+    <property name="jetty.filename" value="jetty-5.1.12.zip" />
+
     <target name="all" depends="build" />
-    <target name="fetchJettylib" >
-        <available property="jetty.zip.available" file="jetty-5.1.12.zip" type="file" />
+
+    <target name="ensureJettylib" >
+        <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
         <available property="jetty.zip.extracted" file="jettylib" type="dir" />
-        <ant target="doFetchJettylib" />
-        <ant target="doExtractJettylib" />
+        <ant target="fetchJettylib" />
+        <ant target="verifyJettylib" />
+        <ant target="extractJettylib" />
     </target>
-    <target name="doFetchJettylib" unless="jetty.zip.available" >
-        <echo message="The libraries contained within the fetched file are from Jetty's 5.1.12" />
-        <echo message="distribution (http://jetty.mortbay.org/).  These are not " />
-        <echo message="necessary for using I2P, but are used by some applications on top of I2P," />
-        <echo message="such as the routerconsole." />
-        <get src="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.12.zip" verbose="true" dest="jetty-5.1.12.zip" />
+
+    <target name="fetchJettylib" unless="jetty.zip.available" >
+        <echo message="It seems that you don't have '${jetty.filename}' deployed." />
+        <echo message="The build script can download this file for you automatically," />
+        <echo message="or alternatively you can obtain it manually from:" />
+        <echo message="${jetty.url}" />
+        <echo message="" />
+        <echo message="The libraries contained in the fetched file provide the Jetty web server" />
+        <echo message="(http://jetty.mortbay.org/). They are not absolutely necessary" />
+        <echo message="but strongly recommended, since they are used by some applications" />
+        <echo message="on top of I2P, like the router console." />
+        <echo message="" />
+        <echo message="Even if you deploy the Jetty archive manually, the build script will" />
+        <echo message="still attempt to verify its checksums, which must be:" />
+        <echo message="SHA1 ${jetty.sha1}" />
+        <echo message="MD5 ${jetty.md5}" />
+        <echo message="" />
+        <input message="Download Jetty archive automatically?" validargs="y,n" addproperty="jetty.download" />
+        <fail message="Aborting as requested. Please deploy the Jetty archive manually." >
+            <condition>
+                <equals arg1="${jetty.download}" arg2="n"/>
+            </condition>
+        </fail>
+        <get src="${jetty.url}" verbose="true" dest="${jetty.filename}" />
     </target>
-    <target name="doExtractJettylib" unless="jetty.zip.extracted" >
-        <ant target="doExtract" />
+
+    <target name="verifyJettylib" >
+        <condition property="jetty.zip.verified" >
+            <and>
+                <checksum file="${jetty.filename}" algorithm="SHA" property="${jetty.sha1}" />
+                <checksum file="${jetty.filename}" algorithm="MD5" property="${jetty.md5}" />
+            </and>
+        </condition>
+        <fail message="Jetty archive does not match its checksums!" >
+            <condition>
+                <not>
+                    <istrue value="${jetty.zip.verified}" />
+                </not>
+            </condition>
+        </fail>
     </target>
-    <target name="doExtract">
-        <unzip src="jetty-5.1.12.zip" dest="." />
+
+    <target name="extractJettylib" unless="jetty.zip.extracted" >
+        <unzip src="${jetty.filename}" dest="." />
         <mkdir dir="jettylib" />
         <copy todir="jettylib">
             <fileset dir="jetty-5.1.12/lib">
@@ -30,7 +69,7 @@
             <fileset dir="jetty-5.1.12/ext">
                 <include name="ant.jar" />
                 <include name="commons-el.jar" />
-	        <include name="commons-logging.jar" />
+                <include name="commons-logging.jar" />
                 <include name="jasper-compiler.jar" />
                 <include name="jasper-runtime.jar" />
                 <include name="javax.servlet.jar" />
@@ -40,7 +79,8 @@
         </copy>
         <delete dir="jetty-5.1.12" />
     </target>
-    <target name="build" depends="fetchJettylib" />
+
+    <target name="build" depends="ensureJettylib" />
     <target name="builddep" />
     <target name="compile" />
     <target name="jar" />

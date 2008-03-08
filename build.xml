@@ -42,7 +42,7 @@
         <copy file="router/java/build/router.jar" todir="build/" />
     </target>
     <target name="buildWEB">
-        <ant dir="apps/jetty" target="fetchJettylib" />
+        <ant dir="apps/jetty" target="ensureJettylib" />
         <ant dir="apps/routerconsole/java" target="build" />
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
