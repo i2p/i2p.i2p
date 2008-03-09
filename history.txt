@@ -1,32 +1,14 @@
-2008-03-08 zzz
-    * ClientPeerSelector: Implement strict ordering of peers,
-      based on XOR distance from a random hash
-      separately generated for each tunnel pool
+2008-03-09 Complication
+    * Give the Jetty build file ability to ask permission
+      before downloading the Jetty archive from the web,
+      and to verify its SHA1 + MD5 hashes. Adjust the main build file
+      in accordance with this change.
+    * Improve the release checklist.
+
+* 2008-03-09  0.6.1.32 released
 
 2008-03-07 zzz
-    * Naming: Optimize lookups for a destkey
-    * ProfileOrganizer, TunnelPoolSettings, ClientPeerSelector:
-      - Prevent peers with matching IPs from joining same tunnel.
-        Match 0-4 bytes of IP (0=off, 1=most restrictive, 4=least).
-        Default is 2 (disallow routers in same /16).
-        Set with router.defaultPool.IPRestriction=x
-      - Comment out unused RebuildPeriod pool setting
-      - Add random key to pool in preparation for XOR peer ordering
-    * SusiMail: Add 'Create Account' link
-    * TunnelDispatcher: Change a common wtf error to a warn
-
-2008-03-05 zzz
-    * Naming: Make HostsTxt the sole default NamingService
-      (was Meta = PetName + HostsTxt)
-    * Naming: Add two new experimental NamingServices, EepGet and Exec,
-      not enabled by default -
-      see source comments in core/java/src/net/i2p/client/naming
-      for configuration instructions
-    * i2psnark: Don't do a naming lookup for Base64 destkeys
-    * i2psnark: Add a StartAll button
-    * Stats: Add code to disable most stats to save memory.
-      Set on configstats.jsp or set stat.full=false to disable the stats.
-      (true by default for now)
+    * Update news and version numbers
 
 2008-03-01 zzz
     * Fix netdb.knownLeaseSets count reported by floodfill routers
