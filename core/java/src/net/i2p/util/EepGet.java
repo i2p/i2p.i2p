@@ -215,6 +215,20 @@ public class EepGet {
     }
     
     public static interface StatusListener {
+        /**
+         *  alreadyTransferred - total of all attempts, not including currentWrite
+         *                       If nonzero on the first call, a partial file of that length was found
+         *                       To track _actual_ transfer if the output file could already exist,
+         *                       the listener should keep its own counter,
+         *                       or subtract the initial alreadyTransferred value.
+         *  currentWrite - since last call to the listener
+         *  bytesTransferred - includes headers, retries, redirects, ...
+         *  bytesRemaining - on this attempt only, currentWrite already subtracted -
+         *                   or -1 if chunked encoding or server does not return a length
+         *
+         *  Total length should be == alreadyTransferred + currentWrite + bytesRemaining for all calls
+         *
+         */
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url);
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified);
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause);
@@ -227,7 +241,9 @@ public class EepGet {
         private int _lineSize;
         private long _startedOn;
         private long _written;
+        private long _previousWritten;
         private long _lastComplete;
+        private boolean _firstTime;
         private DecimalFormat _pct = new DecimalFormat("00.0%");
         private DecimalFormat _kbps = new DecimalFormat("###,000.00");
         public CLIStatusListener() { 
@@ -237,10 +253,19 @@ public class EepGet {
             _markSize = markSize;
             _lineSize = lineSize;
             _written = 0;
+            _previousWritten = 0;
             _lastComplete = _context.clock().now();
             _startedOn = _lastComplete;
+            _firstTime = true;
         }
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
+            if (_firstTime) {
+                if (alreadyTransferred > 0) {
+                    _previousWritten = alreadyTransferred;
+                    System.out.println("File found with length " + alreadyTransferred + ", resuming");
+                }
+                _firstTime = false;
+            }
             for (int i = 0; i < currentWrite; i++) {
                 _written++;
                 if ( (_markSize > 0) && (_written % _markSize == 0) ) {
@@ -253,13 +278,14 @@ public class EepGet {
                             StringBuffer buf = new StringBuffer(50);
                             buf.append(" ");
                             if ( bytesRemaining > 0 ) {
-                                double pct = ((double)alreadyTransferred + (double)_written) / ((double)alreadyTransferred + (double)bytesRemaining);
+                                double pct = ((double)_written + _previousWritten) /
+                                             ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);
                                 synchronized (_pct) {
                                     buf.append(_pct.format(pct));
                                 }
                                 buf.append(": ");
                             }
-                            buf.append(_written+alreadyTransferred);
+                            buf.append(_written);
                             buf.append(" @ ");
                             double lineKBytes = ((double)_markSize * (double)_lineSize)/1024.0d;
                             double kbps = lineKBytes/((double)timeToSend/1000.0d);
@@ -270,7 +296,7 @@ public class EepGet {
                             
                             buf.append(" / ");
                             long lifetime = _context.clock().now() - _startedOn;
-                            double lifetimeKBps = (1000.0d*(double)(_written+alreadyTransferred)/((double)lifetime*1024.0d));
+                            double lifetimeKBps = (1000.0d*(double)(_written)/((double)lifetime*1024.0d));
                             synchronized (_kbps) {
                                 buf.append(_kbps.format(lifetimeKBps));
                             }
@@ -283,32 +309,40 @@ public class EepGet {
             }
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+            long transferred;
+            if (_firstTime)
+                transferred = 0;
+            else
+                transferred = alreadyTransferred - _previousWritten;
             System.out.println();
             System.out.println("== " + new Date());
             if (notModified) {
                 System.out.println("== Source not modified since last download");
             } else {
                 if ( bytesRemaining > 0 ) {
-                    System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
-                            + " and " + (bytesRemaining - bytesTransferred) + " remaining");
-                    System.out.println("== Output saved to " + outputFile);
+                    System.out.println("== Transfer of " + url + " completed with " + transferred
+                            + " transferred and " + (bytesRemaining - bytesTransferred) + " remaining");
                 } else {
-                    System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
+                    System.out.println("== Transfer of " + url + " completed with " + transferred
                             + " bytes transferred");
-                    System.out.println("== Output saved to " + outputFile);
                 }
+                if (transferred > 0)
+                    System.out.println("== Output saved to " + outputFile + " (" + alreadyTransferred + " bytes)");
             }
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
-            System.out.println("== ETag: " + _etag);            
-            StringBuffer buf = new StringBuffer(50);
-            buf.append("== Transfer rate: ");
-            double kbps = (1000.0d*(double)(_written)/((double)timeToSend*1024.0d));
-            synchronized (_kbps) {
-                buf.append(_kbps.format(kbps));
+            if (_etag != null)
+                System.out.println("== ETag: " + _etag);            
+            if (transferred > 0) {
+                StringBuffer buf = new StringBuffer(50);
+                buf.append("== Transfer rate: ");
+                double kbps = (1000.0d*(double)(transferred)/((double)timeToSend*1024.0d));
+                synchronized (_kbps) {
+                    buf.append(_kbps.format(kbps));
+                }
+                buf.append("KBps");
+                System.out.println(buf.toString());
             }
-            buf.append("KBps");
-            System.out.println(buf.toString());
         }
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             System.out.println();
@@ -499,13 +533,8 @@ public class EepGet {
             timeout.resetTimer();
             _out.write(buf, 0, read);
             _bytesTransferred += read;
-            // This seems necessary to properly resume a partial download into a stream,
-            // as nothing else increments _alreadyTransferred, and there's no file length to check.
-            // Hopefully this won't break compatibility with existing status listeners
-            // (cause them to behave weird, or show weird numbers).
-            _alreadyTransferred += read;
-            if ((_maxSize > -1) && (_alreadyTransferred > _maxSize)) // could transfer a little over maxSize
-                throw new IOException("Bytes transferred " + _alreadyTransferred + " violates maximum of " + _maxSize + " bytes");
+            if ((_maxSize > -1) && (_alreadyTransferred + read > _maxSize)) // could transfer a little over maxSize
+                throw new IOException("Bytes transferred " + (_alreadyTransferred + read) + " violates maximum of " + _maxSize + " bytes");
             remaining -= read;
             if (remaining==0 && _encodingChunked) {
                 int char1 = _proxyIn.read();
@@ -528,7 +557,9 @@ public class EepGet {
                 }
             }
             timeout.resetTimer();
-            if (read > 0) 
+            if (_bytesRemaining >= read) // else chunked?
+                _bytesRemaining -= read;
+            if (read > 0) {
                 for (int i = 0; i < _listeners.size(); i++) 
                     ((StatusListener)_listeners.get(i)).bytesTransferred(
                             _alreadyTransferred, 
@@ -536,6 +567,11 @@ public class EepGet {
                             _bytesTransferred, 
                             _encodingChunked?-1:_bytesRemaining, 
                             _url);
+                // This seems necessary to properly resume a partial download into a stream,
+                // as nothing else increments _alreadyTransferred, and there's no file length to check.
+                // Do this after calling the listeners to keep the total correct
+                _alreadyTransferred += read;
+            }
         }
             
         if (_out != null)

@@ -33,6 +33,7 @@ public class UpdateHandler {
     private DecimalFormat _pct = new DecimalFormat("00.0%");
     
     private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
+    private static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
 
     public UpdateHandler() {
         this(ContextHelper.getContext(null));
@@ -67,21 +68,27 @@ public class UpdateHandler {
     }
 
     public void update() {
+        // don't block waiting for the other one to finish
+        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS, "false"))) {
+            _log.error("Update already running");
+            return;
+        }
         synchronized (UpdateHandler.class) {
             if (_updateRunner == null)
                 _updateRunner = new UpdateRunner();
             if (_updateRunner.isRunning()) {
                 return;
             } else {
-                System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "true");
+                System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
                 I2PThread update = new I2PThread(_updateRunner, "Update");
                 update.start();
             }
         }
-
     }
     
     public String getStatus() {
+        if (_updateRunner == null)
+            return "";
         return _updateRunner.getStatus();
     }
     
@@ -89,22 +96,21 @@ public class UpdateHandler {
         private boolean _isRunning;
         private String _status;
         private long _startedOn;
-        private long _written;
         public UpdateRunner() { 
             _isRunning = false; 
-            _status = "<b>Updating</b><br />";
+            _status = "<b>Updating</b>";
         }
         public boolean isRunning() { return _isRunning; }
         public String getStatus() { return _status; }
         public void run() {
             _isRunning = true;
             update();
-            System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
+            System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             _isRunning = false;
         }
         private void update() {
             _startedOn = -1;
-            _status = "<b>Updating</b><br />";
+            _status = "<b>Updating</b>";
             String updateURL = selectUpdateURL();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Selected update URL: " + updateURL);
@@ -115,64 +121,65 @@ public class UpdateHandler {
             try {
                 proxyPort = Integer.parseInt(port);
             } catch (NumberFormatException nfe) {
-                System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
+                System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
                 return;
             }
             try {
                 EepGet get = null;
                 if (shouldProxy)
-                    get = new EepGet(_context, proxyHost, proxyPort, 10, SIGNED_UPDATE_FILE, updateURL, false);
+                    get = new EepGet(_context, proxyHost, proxyPort, 20, SIGNED_UPDATE_FILE, updateURL, false);
                 else
-                    get = new EepGet(_context, 10, SIGNED_UPDATE_FILE, updateURL, false);
+                    get = new EepGet(_context, 1, SIGNED_UPDATE_FILE, updateURL, false);
                 get.addStatusListener(UpdateRunner.this);
                 _startedOn = _context.clock().now();
                 get.fetch();
             } catch (Throwable t) {
                 _context.logManager().getLog(UpdateHandler.class).error("Error updating", t);
-                System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
+                System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             }
         }
         
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Attempt failed on " + url, cause);
-            _written = 0;
             // ignored
         }
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
-            _written += currentWrite;
             StringBuffer buf = new StringBuffer(64);
             buf.append("<b>Updating</b> ");
-            double pct = ((double)alreadyTransferred + (double)_written) / ((double)alreadyTransferred + (double)bytesRemaining);
+            double pct = ((double)alreadyTransferred + (double)currentWrite) /
+                         ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);
             synchronized (_pct) {
                 buf.append(_pct.format(pct));
             }
-            buf.append(":<br />\n").append(_written+alreadyTransferred);
-            buf.append(" transferred<br />");
+            buf.append(":<br />\n" + (currentWrite + alreadyTransferred));
+            buf.append(" transferred");
             _status = buf.toString();
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
-            _status = "<b>Update downloaded</b><br />";
+            _status = "<b>Update downloaded</b>";
             TrustedUpdate up = new TrustedUpdate(_context);
             boolean ok = up.migrateVerified(RouterVersion.VERSION, SIGNED_UPDATE_FILE, "i2pupdate.zip");
             File f = new File(SIGNED_UPDATE_FILE);
             f.delete();
             if (ok) {
                 _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
-                _status = "<b>Update verified</b><br />Restarting<br />";
+                _status = "<b>Update verified</b><br />Restarting";
                 restart();
             } else {
-                _log.log(Log.CRIT, "Update was INVALID - signing key is not trusted!");
-                _status = "<b>Update signing key invalid</b><br />";
-                System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
+                // One other possibility, the version in the file is not sufficient
+                // Perhaps need an int return code - but version problem unlikely?
+                _log.log(Log.CRIT, "Update was INVALID - signing key is not trusted or file is corrupt from " + url);
+                _status = "<b>Update signing key invalid or file is corrupt from " + url + "</b>";
+                System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             }
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
             _log.log(Log.CRIT, "Update from " + url + " did not download completely (" + bytesTransferred + " with " 
                                + bytesRemaining + " after " + currentAttempt + " tries)");
 
-            _status = "<b>Transfer failed</b><br />";
-            System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
+            _status = "<b>Transfer failed</b>";
+            System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
         }
         public void headerReceived(String url, int attemptNum, String key, String val) {}
         public void attempting(String url) {}

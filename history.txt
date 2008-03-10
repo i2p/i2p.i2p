@@ -1,3 +1,16 @@
+2008-03-10 zzz
+    * EepGet: Fix byte count for bytesTransferred status listeners
+      (fixes command line status)
+    * UpdateHandler:
+       - Fix byte count display
+       - Display final status on router console
+       - Don't allow multiple update jobs to queue up
+       - Increase max retries
+       - Code cleanup
+       - Don't show 'check for update' button when update in progress
+       - Enhance error messages
+    * NetDb: Comment out published netDb stats disabled for .32
+
 2008-03-08 zzz
     * ClientPeerSelector: Implement strict ordering of peers,
       based on XOR distance from a random hash

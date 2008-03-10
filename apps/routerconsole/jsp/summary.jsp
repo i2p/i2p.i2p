@@ -16,8 +16,9 @@
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><!--<br />
  <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a>--><%
     if (helper.updateAvailable()) {
+        // display all the time so we display the final failure message
+        out.print("<br />" + update.getStatus());
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
-            out.print("<br />" + update.getStatus());
         } else {
             long nonce = new java.util.Random().nextLong();
             String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
