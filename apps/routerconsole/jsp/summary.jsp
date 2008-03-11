@@ -40,7 +40,7 @@
  <b>Active:</b> <jsp:getProperty name="helper" property="activePeers" />/<jsp:getProperty name="helper" property="activeProfiles" /><br />
  <b>Fast:</b> <jsp:getProperty name="helper" property="fastPeers" /><br />
  <b>High capacity:</b> <jsp:getProperty name="helper" property="highCapacityPeers" /><br />
- <!-- <b>Well integrated:</b> <jsp:getProperty name="helper" property="wellIntegratedPeers" /><br /> -->
+ <b>Well integrated:</b> <jsp:getProperty name="helper" property="wellIntegratedPeers" /><br />
  <b>Failing:</b> <jsp:getProperty name="helper" property="failingPeers" /><br />
  <!-- <b>Shitlisted:</b> <jsp:getProperty name="helper" property="shitlistedPeers" /><br /> -->
  <b>Known:</b> <jsp:getProperty name="helper" property="allPeers" /><br /><%

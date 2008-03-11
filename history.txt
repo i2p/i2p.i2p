@@ -1,3 +1,14 @@
+2008-03-11 zzz
+    * ProfileOrganizer:
+       - Don't require a peer to be high-capacity to be
+         well-integrated (not used for anything right now,
+         but want to get it right for possible floodfill verification)
+       - Don't fall back to median for high-capacity threshold
+         if the mean is higher than the median, this prevents
+         frequent large high-capacity counts
+       - Fix high-capacity selector that picked one too many
+    * Console: put well-integrated count back in the summary
+
 2008-03-10 zzz
     * EepGet: Fix byte count for bytesTransferred status listeners
       (fixes command line status)

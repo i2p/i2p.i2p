@@ -653,7 +653,10 @@ public class ProfileOrganizer {
         locked_calculateCapacityThreshold(totalCapacity, reordered);
         locked_calculateSpeedThreshold(reordered);
         
-        _thresholdIntegrationValue = 1.0d * avg(totalIntegration, reordered.size());
+        if (totalIntegration > 0)
+            _thresholdIntegrationValue = 1.0d * avg(totalIntegration, reordered.size());
+        else    // Make nobody rather than everybody well-integrated
+            _thresholdIntegrationValue = 1.0d;
     }
     
     /**
@@ -685,7 +688,7 @@ public class ProfileOrganizer {
                 numExceedingMean++;
             if (cur == reordered.size()/2)
                 thresholdAtMedian = val;
-            if (cur == minHighCapacityPeers)
+            if (cur == minHighCapacityPeers - 1)
                 thresholdAtMinHighCap = val;
             if (cur == reordered.size() -1)
                 thresholdAtLowest = val;
@@ -698,12 +701,20 @@ public class ProfileOrganizer {
                 _log.info("Our average capacity is doing well [" + meanCapacity 
                           + "], and includes " + numExceedingMean);
             _thresholdCapacityValue = meanCapacity;
-// else if mean > median && reordered.size > minHighCapacitiyPeers then threshold = reordered.get(minHighCapacity).getCapacityValue()
+        } else if (meanCapacity > thresholdAtMedian &&
+                   reordered.size()/2 > minHighCapacityPeers) {
+            // avg > median, get the min High Cap peers
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Our average capacity [" + meanCapacity + "] is greater than the median,"
+                          + " so threshold is that reqd to get the min high cap peers " + thresholdAtMinHighCap);
+            _thresholdCapacityValue = thresholdAtMinHighCap;
         } else if (reordered.size()/2 >= minHighCapacityPeers) {
             // ok mean is skewed low, but we still have enough to use the median
+            // We really don't want to be here, since the default is 5.0 and the median
+            // is inevitably 5.01 or so.
             if (_log.shouldLog(Log.INFO))
-                _log.info("Our average capacity is skewed under the median [" + meanCapacity 
-                          + "], so use the median threshold " + thresholdAtMedian);
+                _log.info("Our average capacity [" + meanCapacity + "] is skewed under the median,"
+                          + " so use the median threshold " + thresholdAtMedian);
             _thresholdCapacityValue = thresholdAtMedian;
         } else {
             // our average is doing well, but not enough peers
@@ -979,13 +990,18 @@ public class ProfileOrganizer {
                     }
                 }
                 
-                if (_thresholdIntegrationValue <= profile.getIntegrationValue()) {
-                    _wellIntegratedPeers.put(profile.getPeer(), profile);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Integrated: \t" + profile.getPeer().toBase64());
-                }
             } else {
                 // not high capacity, but not failing (yet)
+            }
+            // We aren't using the well-integrated list yet...
+            // But by observation, the floodfill peers are often not in the
+            // high-capacity group, so let's not require a peer to be high-capactiy
+            // to call him well-integrated.
+            // This could be used later to see if a floodfill peer is for real.
+            if (_thresholdIntegrationValue <= profile.getIntegrationValue()) {
+                _wellIntegratedPeers.put(profile.getPeer(), profile);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Integrated: \t" + profile.getPeer().toBase64());
             }
         }
     }
