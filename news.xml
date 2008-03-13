@@ -11,6 +11,23 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
+2008-03-14: <b><a href="http://forum.i2p/">forum.i2p</a> is Temporarily Down</b>
+</p><p>
+Use
+<a href="http://codevoid.i2p/forum">codevoid.i2p/forum</a>
+as an alternate.
+</p>
+
+<p>
+&#149;
+2008-03-14: <b>krabs.i2p</a> Outproxy is Temporarily Down</b>
+</p><p>
+Use new outproxy false.i2p
+as an alternate - must be in your hosts.txt.
+</p>
+
+<p>
+&#149;
 2008-03-09: <b>0.6.1.32 Released</b>
 </p><p>
 The 0.6.1.32 release contains a new, more efficient
@@ -24,7 +41,7 @@ You may wish to adjust your limits on
 
 <p>
 &#149;
-2008-02-29: <b>Upcoming 0.6.1.32 Release</b>
+2008-02-29: <b>Upgrading from 0.6.1.31</b>
 </p><p>
 If you upgraded from 0.6.1.30 to 0.6.1.31, you may wish to take advantage
 of the new round-robin update downloading when .32 is released. This is optional.
@@ -40,57 +57,8 @@ If you already have three Update URLs, you do not have to do anything.
 &#149;
 2008-02-05: <b>Upgrading from 0.6.1.30 and Earlier Releases</b>
 </p><p>
-Since i2p's lead developer
-<a href="http://dreamtheaterfan.i2p/jrandom-awol.html">has gone AWOL</a>,
-we do not have his update signing key or write access to
-<a href="http://www.i2p/">www.i2p</a> or
-<a href="http://dev.i2p/">dev.i2p</a>.
-Complication and zzz have generated new signing keys, and they and Amiga are providing
-update file hosting. These changes must be configured in your router to take effect.
-</p><p>
-Make the following configuration changes and your router will automatically install
-the latest release.
-</p><p>
-We recommend the automated process as it will verify the key of the signed update file.
-If you do not make these changes,
-you may manually download the i2pupdate.zip file from
-<a href="http://www.i2p2.i2p/download.html">www.i2p2.i2p/download</a>.
-<ol><li>
-On
-<a href="configupdate.jsp">configupdate.jsp</a>:
-</li><ol type="a"><li>
-Change the News URL to: http://complication.i2p/news.xml
-</li><li>
-Select ONE of the following new Update URLs at random and enter it into the Update URL box: 
-<br />http://amiga.i2p/i2p/i2pupdate.sud
-<br />http://complication.i2p/i2p/i2pupdate.sud
-<br />http://stats.i2p/i2p/i2pupdate.sud
-</li><li>
-Check the box "Update through the eepProxy?"
-</li><li>
-Click "Save"
-</li></ol>
-<li>
-On
-<a href="configadvanced.jsp">configadvanced.jsp</a>:
-<ol type="a"><li>
-Add the following line:
-<br />
-<textarea rows="1" cols="80" readonly="readonly">router.trustedUpdateKeys=W4kJbnv9KSVwbnapV7SaNW2kMIZKs~hwL0ro9pZXFo1xTwqz45nykCp1HM7sAKYDZay5z1HvYYOl9CNVz00xF03KPU9RUCVxhDZ1YXhZIskPKjUPUsCIpE~Z1C~N9KSEV6~2stDlBNH10VZ4T0X1TrcXwb3IBXliWo2y2GAx~Ow=,lT54eq3SH0TWWwQ1wgH6XPelIno7wH7UfiZOpQg-ZuxdNhc4UjjrohKdKZqfswt1ANPnmOlMewLGBESl7kJB9c5sByz~IOlNyz5BMLRC~R~ZC9QI4WXwUBYW8BhYO2mkvtdOrcy690lDkwzdf5xLxlCBpQlTaLYzQVjVWBcvbCA=,JHFA0yXUgKtmhajXFZH9Nk62OPRHbvvQHTi8EANV-D~3tjLjaz9p9cs6Fs8W3FSLfUwsQeFg7dfVSQQZga~1jMjboo94vIcm3j6XbW4mbcorVQ74uPjd8EA1AQhJ6bBTxDAFk~6fVDOdhHT0Wo5CcUn7v8bAYY3x3UWiL8Remx0=</textarea>
-</li><li>
-Click "Apply"
-</li></ol>
-<li>
-You are now ready to automatically receive the release update file,
-either by setting your update policy to "download and install" or by clicking on the
-"update available" link when it appears.
-</li></li></ol>
-</p><p>
-If you would like to verify the trusted update keys, they are also
-<a href="http://stats.i2p/i2p/signingkeys.html">posted and signed here</a>.
-Thank you for your support during this transition. For help please contact us on #i2p.
-</p><p>
-Amiga, Complication, welterde, zzz
+Full instructions are posted at
+<a href="http://www.i2p2.i2p/upgrade-0.6.1.30.html">www.i2p2.i2p/upgrade-0.6.1.30.html</a>.
 </p>
 
 <p>

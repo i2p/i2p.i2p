@@ -484,15 +484,16 @@ public class TunnelPool {
         /**
          * This algorithm builds based on the previous average length of time it takes
          * to build a tunnel. This average is kept in the _buildRateName stat.
-         * It is a separate stat for each pool, since in and out building use different methods,
+         * It is a separate stat for each type of pool, since in and out building use different methods,
+         * as do exploratory and client pools,
          * and each pool can have separate length and length variance settings.
-         * We add one minute to the stat for safety.
+         * We add one minute to the stat for safety (two for exploratory tunnels).
          *
          * We linearly increase the number of builds per expiring tunnel from
          * 1 to PANIC_FACTOR as the time-to-expire gets shorter.
          *
-         * The stat will be 0 for first 10m of uptime so we will use the conservative algorithm
-         * further below instead. It will take about 30m of uptime to settle down.
+         * The stat will be 0 for first 10m of uptime so we will use the older, conservative algorithm
+         * below instead. This algorithm will take about 30m of uptime to settle down.
          * Or, if we are building more than 33% of the time something is seriously wrong,
          * we also use the conservative algorithm instead
          *
@@ -515,7 +516,7 @@ public class TunnelPool {
                 avg = (int) ( TUNNEL_LIFETIME * r.getAverageValue() / wanted);
         }
 
-        if (avg > 0 && avg < TUNNEL_LIFETIME / 3) {
+        if (avg > 0 && avg < TUNNEL_LIFETIME / 3) {  // if we're taking less than 200s per tunnel to build
             final int PANIC_FACTOR = 4;  // how many builds to kick off when time gets short
             avg += 60*1000;   // one minute safety factor
             if (_settings.isExploratory())
@@ -644,6 +645,7 @@ public class TunnelPool {
     }
     
     /**
+     * Helper function for the old conservative algorithm.
      * This is the big scary function determining how many new tunnels we want to try to build at this
      * point in time, as used by the BuildExecutor
      *

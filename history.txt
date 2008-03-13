@@ -1,4 +1,14 @@
 2008-03-14 zzz
+    * ProfileOrganizer:
+       - Use more recent stats to calculate integrationory.txt
+       - Show that fast peers are also high-capacity on profiles.jsp
+    * readme.html: Update Syndie link
+    * TunnelPool: Update comments
+    * netDb: Report 1-2h uptime as 90m to further frustrate tracking,
+      get rid of the 60s tunnel stats
+      (effective as of .33 to provide cover)
+
+2008-03-13 zzz
     * Floodfill Search:
        - Fix a bug that caused a single FloodfillOnlySearchJob
          instance to be run multiple times, with unpredictable

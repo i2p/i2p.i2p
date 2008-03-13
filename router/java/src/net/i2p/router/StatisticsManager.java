@@ -128,6 +128,7 @@ public class StatisticsManager implements Service {
             if (false)
                 stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
+            boolean commentMeOutInDot33 = RouterVersion.VERSION.equals("0.6.1.32");
             includeThroughput(stats);
             //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             //includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
@@ -162,7 +163,11 @@ public class StatisticsManager implements Service {
             
             //includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
             //includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
+           if (commentMeOutInDot33) {   // get rid of 60s stats
             includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*1000, 60*60*1000 });
+           } else {
+            includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
+           }
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("tunnel.testSuccessTime", stats, new long[] { 10*60*1000l });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
@@ -174,12 +179,15 @@ public class StatisticsManager implements Service {
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
 
             // Round smaller uptimes to 1 hour, to frustrate uptime tracking
+            // Round 2nd hour to 90m since peers use 2h minimum to route
             long publishedUptime = _context.router().getUptime();
             if (publishedUptime < 60*60*1000) publishedUptime = 60*60*1000;
+            else if (publishedUptime < 2*60*60*1000 && !commentMeOutInDot33) publishedUptime = 90*60*1000;
 
             stats.setProperty("stat_uptime", DataHelper.formatDuration(publishedUptime));
             //stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             
+           if (commentMeOutInDot33) {   // get rid of 60s stats
             includeRate("tunnel.buildRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
             //includeRate("tunnel.decryptRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
             includeRate("tunnel.buildClientExpire", stats, new long[] { 60*1000, 10*60*1000 });
@@ -194,6 +202,18 @@ public class StatisticsManager implements Service {
             
             includeRate("tunnel.rejectOverloaded", stats, new long[] { 60*1000, 10*60*1000 });
             includeRate("tunnel.acceptLoad", stats, new long[] { 60*1000, 10*60*1000 });
+           } else {
+            includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.buildClientExpire", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.buildClientReject", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.buildClientSuccess", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.buildExploratoryExpire", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.buildExploratoryReject", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.buildExploratorySuccess", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });
+           }
             
             if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
                 stats.setProperty("netdb.knownRouters", ""+_context.netDb().getKnownRouters());

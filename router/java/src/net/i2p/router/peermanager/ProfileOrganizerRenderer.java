@@ -104,7 +104,7 @@ class ProfileOrganizerRenderer {
             buf.append("<td>");
             
             switch (tier) {
-                case 1: buf.append("Fast"); break;
+                case 1: buf.append("Fast, High Capacity"); break;
                 case 2: buf.append("High Capacity"); break;
                 case 3: buf.append("Not Failing"); break;
                 default: buf.append("Failing"); break;

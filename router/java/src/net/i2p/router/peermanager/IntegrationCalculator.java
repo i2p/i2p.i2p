@@ -18,7 +18,11 @@ public class IntegrationCalculator extends Calculator {
     }
     
     public double calc(PeerProfile profile) {
+        // give more weight to recent counts
         long val = profile.getDbIntroduction().getRate(24*60*60*1000l).getCurrentEventCount();
+        val += 2 * 4 * profile.getDbIntroduction().getRate(6*60*60*1000l).getCurrentEventCount();
+        val += 4 * 24 * profile.getDbIntroduction().getRate(60*60*1000l).getCurrentEventCount();
+        val /= 7;
         val += profile.getIntegrationBonus();
         return val;
     }
