@@ -1,3 +1,11 @@
+2008-03-14 zzz
+    * Floodfill Search:
+       - Fix a bug that caused a single FloodfillOnlySearchJob
+         instance to be run multiple times, with unpredictable
+         results
+       - Select ff peers randomly to improve reliability
+       - Add some bulletproofing
+
 2008-03-11 zzz
     * ProfileOrganizer:
        - Don't require a peer to be high-capacity to be

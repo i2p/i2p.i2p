@@ -72,6 +72,13 @@ class FloodOnlySearchJob extends FloodSearchJob {
         OutNetMessage out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
         synchronized (_out) { _out.add(out); }
 
+        // We need to randomize our ff selection, else we stay with the same ones since
+        // getFloodfillPeers() is sorted by closest distance. Always using the same
+        // ones didn't help reliability.
+        if (floodfillPeers.size() > CONCURRENT_SEARCHES)
+            Collections.shuffle(floodfillPeers, getContext().random());
+
+        int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
         for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
             Hash peer = (Hash)floodfillPeers.get(i);
             if (peer.equals(getContext().routerHash()))
@@ -92,10 +99,11 @@ class FloodOnlySearchJob extends FloodSearchJob {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " to " + peer.toBase64());
             getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), peer);
+            count++;
             _lookupsRemaining++;
         }
         
-        if (_lookupsRemaining <= 0) {
+        if (count <= 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " had no peers to send to");
             // no floodfill peers, fail
@@ -105,7 +113,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
     public String getName() { return "NetDb flood search (phase 1)"; }
     
     Hash getKey() { return _key; }
-    void decrementRemaining() { _lookupsRemaining--; }
+    void decrementRemaining() { if (_lookupsRemaining > 0) _lookupsRemaining--; }
     int getLookupsRemaining() { return _lookupsRemaining; }
     
     void failed() {
