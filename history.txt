@@ -1,6 +1,10 @@
 2008-03-14 zzz
+    * Floodfill Search:
+       - Prefer heard-from, unfailing, unshitlisted floodfill peers
+
+2008-03-14 zzz
     * ProfileOrganizer:
-       - Use more recent stats to calculate integrationory.txt
+       - Use more recent stats to calculate integration
        - Show that fast peers are also high-capacity on profiles.jsp
     * readme.html: Update Syndie link
     * TunnelPool: Update comments

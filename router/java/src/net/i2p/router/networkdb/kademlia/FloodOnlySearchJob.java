@@ -5,6 +5,7 @@ import net.i2p.router.*;
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.*;
 import net.i2p.util.Log;
+import net.i2p.router.peermanager.PeerProfile;
 
 /**
  * Try sending a search to some floodfill peers, failing completely if we don't get
@@ -75,8 +76,30 @@ class FloodOnlySearchJob extends FloodSearchJob {
         // We need to randomize our ff selection, else we stay with the same ones since
         // getFloodfillPeers() is sorted by closest distance. Always using the same
         // ones didn't help reliability.
-        if (floodfillPeers.size() > CONCURRENT_SEARCHES)
+        // Also, query the unheard-from, unprofiled, failing and shitlisted ones last.
+        // We should hear from floodfills pretty frequently so set a 30m time limit.
+        // If unprofiled we haven't talked to them in a long time.
+        // We aren't contacting the peer directly, so shitlist doesn't strictly matter,
+        // but it's a bad sign, and we often shitlist a peer before we fail it...
+        if (floodfillPeers.size() > CONCURRENT_SEARCHES) {
             Collections.shuffle(floodfillPeers, getContext().random());
+            List ffp = new ArrayList(floodfillPeers.size());
+            int failcount = 0;
+            long before = getContext().clock().now() - 30*60*1000;
+            for (int i = 0; i < floodfillPeers.size(); i++) {
+                 Hash peer = (Hash)floodfillPeers.get(i);
+                 PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
+                 if (profile == null || profile.getLastHeardFrom() < before ||
+                     profile.getIsFailing() || getContext().shitlist().isShitlisted(peer)) {
+                     failcount++;
+                     ffp.add(peer);
+                 } else
+                     ffp.add(0, peer);
+            }
+            if (_log.shouldLog(Log.INFO) && failcount > 0)
+                _log.info(getJobId() + ": " + failcount + " of " + floodfillPeers.size() + " floodfills are not heard from, unprofiled, failing or shitlisted");
+            floodfillPeers = ffp;
+        }
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
         for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
