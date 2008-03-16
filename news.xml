@@ -11,11 +11,10 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2008-03-14: <b><a href="http://forum.i2p/">forum.i2p</a> is Temporarily Down</b>
+2008-03-16: <b><a href="http://forum.i2p/">forum.i2p</a> Has Returned</b>
 </p><p>
-Use
-<a href="http://codevoid.i2p/forum">codevoid.i2p/forum</a>
-as an alternate.
+<a href="http://forum.i2p.net/">forum.i2p.net</a> has permanently moved to
+<a href="http://forum.i2p2.de/">forum.i2p2.de</a>.
 </p>
 
 <p>
@@ -23,12 +22,14 @@ as an alternate.
 2008-03-14: <b>krabs.i2p</a> Outproxy is Temporarily Down</b>
 </p><p>
 Use new outproxy false.i2p
-as an alternate - must be in your hosts.txt.
+as an alternate - must be in your hosts.txt -
+<a href="http://stats.i2p/cgi-bin/hostquery.cgi?a=false.i2p">here is the destkey</a>
+if you don't have it.
 </p>
 
 <p>
 &#149;
-2008-03-09: <b>0.6.1.32 Released</b>
+2008-03-09: <b>0.6.1.32 <a href="http://www.i2p2.i2p/release-0.6.1.32.html">Released</a></b>
 </p><p>
 The 0.6.1.32 release contains a new, more efficient
 tunnel build algorithm, and fixes participating tunnel counts.
