@@ -312,7 +312,7 @@ public class Snark
         else
           {
             activity = "Getting torrent";
-            File torrentFile = I2PSnarkUtil.instance().get(torrent);
+            File torrentFile = I2PSnarkUtil.instance().get(torrent, 3);
             if (torrentFile == null) {
                 fatal("Unable to fetch " + torrent);
                 if (false) return; // never reached - fatal(..) throws

@@ -1,3 +1,17 @@
+2008-03-19 zzz
+    * ExploratoryPeerSelector:
+      - Exclude floodfill peers
+      - Tweak the HighCap vs. NonFailing decision
+    * i2psnark: Increase retries for .torrent fetch
+    * IRC Proxy: Prevent mIRC from sending an alternate DCC request
+      containing an IP
+    * readme.html: Reorder some items
+    * Stats: Add some more required stats
+    * Streaming lib: Fix slow start to be exponential growth,
+      fix congestion avoidance to be linear growth.
+      Should speed up local connections a lot, and remote
+      connections a little.
+
 2008-03-14 zzz
     * Floodfill Search:
        - Prefer heard-from, unfailing, unshitlisted floodfill peers
@@ -45,7 +59,7 @@
     * NetDb: Comment out published netDb stats disabled for .32
 
 2008-03-08 zzz
-    * ClientPeerSelector: Implement strict ordering of peers,
+    * TunnelPeerSelectors: Implement strict ordering of peers,
       based on XOR distance from a random hash
       separately generated for each tunnel pool
 

@@ -45,6 +45,9 @@ public class StatManager {
         "bw.recvRate,bw.sendBps,bw.sendRate,client.sendAckTime,clock.skew,crypto.elGamal.encrypt," +
         "jobQueue.jobLag,netDb.successTime,router.fastPeers," +
         "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
+        "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout" +
+        "tunnel.buildClientExpire,tunnel.buildClientReject,tunnel.buildClientSuccess," +
+        "tunnel.buildExploratoryExpire,tunnel.buildExploratoryReject,tunnel.buildExploratorySuccess," +
         "tunnel.buildRatio.*,tunnel.buildFailure,tunnel.buildSuccess,tunnel.corruptMessage," +
         "tunnel.decryptRequestTime,tunnel.fragmentedDropped,tunnel.participatingMessageCount,"+
         "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime" ;

@@ -5,8 +5,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 
 /**
- * Pick peers randomly out of the fast pool, and put them into tunnels in a 
- * random order
+ * Pick peers randomly out of the fast pool, and put them into tunnels
+ * ordered by XOR distance from a random key.
  *
  */
 class ClientPeerSelector extends TunnelPeerSelector {

@@ -302,24 +302,35 @@ public class ConnectionPacketHandler {
             _context.statManager().addRateData("stream.trend", trend, newWindowSize);
             
             if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
-                if (trend < 0) {
+                if (newWindowSize < con.getLastCongestionSeenAt() / 2) {
+                    // Don't make this <= LastCongestion/2 or we'll jump right back to where we were
+                    // slow start - exponential growth
+                    // grow acked/N times (where N = the slow start factor)
+                    // always grow at least 1
+                    int factor = con.getOptions().getSlowStartGrowthRateFactor();
+                    if (factor <= 1)
+                        newWindowSize += acked;
+                    else if (acked < factor)
+                        newWindowSize++;
+                    else
+                        newWindowSize += acked / factor;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("slow start acks = " + acked + " for " + con);
+                } else if (trend < 0) {
                     // rtt is shrinking, so lets increment the cwin
                     newWindowSize++;
-                } else if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("trend < 0 for " + con);
+                } else {
                     // congestion avoidance
-
-                    // we can't use newWindowSize += 1/newWindowSize, since we're
+                    // linear growth - increase window 1/N per RTT
+                    // we can't use newWindowSize += acked/(oldWindow*N) (where N = the cong. avoid. factor), since we're
                     // integers, so lets use a random distribution instead
                     int shouldIncrement = _context.random().nextInt(con.getOptions().getCongestionAvoidanceGrowthRateFactor()*newWindowSize);
-                    if (shouldIncrement <= 0)
+                    if (shouldIncrement < acked)
                         newWindowSize += 1;
-                } else {
-                    // slow start, but modified to take into account the fact
-                    // that windows in the streaming lib are messages, not bytes,
-                    // so we only grow 1 every N times (where N = the slow start factor)
-                    int shouldIncrement = _context.random().nextInt(con.getOptions().getSlowStartGrowthRateFactor());
-                    if (shouldIncrement <= 0)
-                        newWindowSize += 1;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("cong. avoid acks = " + acked + " for " + con);
                 }
             }
             

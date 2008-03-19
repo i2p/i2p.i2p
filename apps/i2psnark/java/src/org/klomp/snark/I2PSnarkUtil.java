@@ -160,8 +160,10 @@ public class I2PSnarkUtil {
     /**
      * fetch the given URL, returning the file it is stored in, or null on error
      */
-    public File get(String url) { return get(url, true); }
-    public File get(String url, boolean rewrite) {
+    public File get(String url) { return get(url, true, 1); }
+    public File get(String url, boolean rewrite) { return get(url, rewrite, 1); }
+    public File get(String url, int retries) { return get(url, true, retries); }
+    public File get(String url, boolean rewrite, int retries) {
         _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
@@ -175,7 +177,7 @@ public class I2PSnarkUtil {
         if (rewrite)
             fetchURL = rewriteAnnounce(url);
         //_log.debug("Rewritten url [" + fetchURL + "]");
-        EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, 1, out.getAbsolutePath(), fetchURL);
+        EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, retries, out.getAbsolutePath(), fetchURL);
         if (get.fetch()) {
             _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;

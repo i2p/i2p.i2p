@@ -435,6 +435,16 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 return s;
         }
         
+        // mIRC sends "NOTICE user :DCC Send file (IP)"
+        // in addition to the CTCP version
+        if("NOTICE".equalsIgnoreCase(command))
+        {
+            String msg = field[2];
+            if(msg.startsWith(":DCC "))
+                return null;
+            // fall through
+        }
+        
         // Allow PRIVMSG, but block CTCP (except ACTION).
         if("PRIVMSG".equalsIgnoreCase(command) || "NOTICE".equalsIgnoreCase(command))
         {

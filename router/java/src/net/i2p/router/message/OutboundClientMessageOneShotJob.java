@@ -277,6 +277,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             _lease = (Lease)orderedLeases.get(orderedLeases.firstKey());
         } else {
+            // strangely, _lease isn't used anywhere except for log messages - ?!?!??!?!?!
+            // Apparently the outbound endpoint gets to pick the inbound gateway
+            // and this whole function is pointless.
             _lease = (Lease)leases.get(0);
         }
         return true;
