@@ -41,14 +41,16 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
+        _lastFetch = 0;
         updateLastFetched();
     }
     
     private void updateLastFetched() {
         File news = new File(NEWS_FILE);
-        if (news.exists())
-            _lastFetch = news.lastModified();
-        else
+        if (news.exists()) {
+            if (_lastFetch == 0)
+                _lastFetch = news.lastModified();
+        } else
             _lastFetch = 0;
     }
     
@@ -115,8 +117,6 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         } catch (Throwable t) {
             _log.error("Error fetching the news", t);
         }
-
-        _lastFetch = _context.clock().now();
     }
     
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
@@ -209,6 +209,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             boolean copied = FileUtil.copy(TEMP_NEWS_FILE, NEWS_FILE, true);
             if (copied) {
                 temp.delete();
+                checkForUpdates();
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Failed to copy the news file!");
@@ -217,7 +218,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
-        checkForUpdates();
+        _lastFetch = _context.clock().now();
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {

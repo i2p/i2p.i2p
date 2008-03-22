@@ -1,4 +1,7 @@
 2008-03-22 zzz
+    * NewsFetcher: Fix bug causing fetch every 10m
+
+2008-03-22 zzz
     * Tunnel Testing:
       - Fix counting so it really takes 4 consecutive failures
         rather than 4 total to remove a tunnel
