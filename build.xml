@@ -3,7 +3,8 @@
    
     <target name="all" >
         <echo message="Useful targets: " />
-        <echo message="  dist:      distclean then package everything up (installer, clean tarball, update tarball)" />
+        <echo message="  pkg:       distclean then package everything up (installer, clean tarball, update tarball)" />
+        <echo message="  dist:      pkg and javadoc" />
         <echo message="  installer: build the GUI installer" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />

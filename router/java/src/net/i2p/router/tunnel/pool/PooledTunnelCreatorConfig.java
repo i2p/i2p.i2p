@@ -29,6 +29,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         _live = false;
     }
     
+    // calls TestJob
     public void testSuccessful(int ms) {
         if (_testJob != null)
             _testJob.testSuccessful(ms);
@@ -36,8 +37,14 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         _live = true;
     }
     
+    // called from TestJob
+    public void testJobSuccessful(int ms) {
+        super.testSuccessful(ms);
+        _live = true;
+    }
+    
     /**
-     * The tunnel failed, so stop using it
+     * The tunnel failed a test, so (maybe) stop using it
      */
     public boolean tunnelFailed() {
         boolean rv = super.tunnelFailed();

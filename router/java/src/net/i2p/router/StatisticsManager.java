@@ -136,6 +136,7 @@ public class StatisticsManager implements Service {
             //includeRate("tunnel.fragmentedDropped", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             //includeRate("tunnel.fullFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             //includeRate("tunnel.smallFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
+           if (commentMeOutInDot33)
             includeRate("tunnel.testFailedTime", stats, new long[] { 10*60*1000 });
             
             includeRate("tunnel.buildFailure", stats, new long[] { 60*60*1000 });

@@ -137,10 +137,11 @@ public class TunnelCreatorConfig implements TunnelInfo {
     }
     
     
+    // Make configurable? - but can't easily get to pool options from here
     private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
     
     /**
-     * The tunnel failed, so stop using it
+     * The tunnel failed a test, so (maybe) stop using it
      */
     public boolean tunnelFailed() {
         _failures++;
@@ -155,11 +156,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
     public int getTunnelFailures() { return _failures; }
     
     public void testSuccessful(int ms) {
-        int failures = _failures - 1;
-        if (failures < 0)
+        if (!_failed)
             _failures = 0;
-        else
-            _failures = failures;
     }
     
     public String toString() {

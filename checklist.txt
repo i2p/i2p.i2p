@@ -15,7 +15,7 @@ Change revision in:
 	core/java/src/net/i2p/CoreVersion.java
 
 Build and tag:
-	ant dist
+	ant pkg
 	mtn ci
 	mtn tag h: i2p-0.6.1.xx
 	Sync with mtn.i2p2.i2p

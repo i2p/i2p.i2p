@@ -27,6 +27,7 @@ class TestJob extends JobImpl {
     private boolean _found;
     private TunnelInfo _outTunnel;
     private TunnelInfo _replyTunnel;
+    private PooledTunnelCreatorConfig _otherTunnel;
     
     /** base to randomize the test delay on */
     private static final int TEST_DELAY = 30*1000;
@@ -78,9 +79,11 @@ class TestJob extends JobImpl {
         if (_cfg.isInbound()) {
             _replyTunnel = _cfg;
             _outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+            _otherTunnel = (PooledTunnelCreatorConfig) _outTunnel;
         } else {
             _replyTunnel = getContext().tunnelManager().selectInboundTunnel();
             _outTunnel = _cfg;
+            _otherTunnel = (PooledTunnelCreatorConfig) _replyTunnel;
         }
         
         if ( (_replyTunnel == null) || (_outTunnel == null) ) {
@@ -156,6 +159,13 @@ class TestJob extends JobImpl {
         noteSuccess(ms, _outTunnel);
         noteSuccess(ms, _replyTunnel);
         
+        _cfg.testJobSuccessful(ms);
+        // credit the expl. tunnel too
+        if (_otherTunnel.getLength() > 1)
+            _otherTunnel.testJobSuccessful(ms);
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Tunnel test successful in " + ms + "ms: " + _cfg);
         scheduleRetest();
     }
     
@@ -178,6 +188,9 @@ class TestJob extends JobImpl {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Tunnel test failed in " + timeToFail + "ms: " + _cfg);
         boolean keepGoing = _cfg.tunnelFailed();
+        // blame the expl. tunnel too
+        if (_otherTunnel.getLength() > 1)
+            _otherTunnel.tunnelFailed();
         if (keepGoing) {
             scheduleRetest(true);
         } else {
@@ -190,8 +203,18 @@ class TestJob extends JobImpl {
     
     /** randomized time we should wait before testing */
     private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY); }
+
     /** how long we allow tests to run for before failing them */
-    private int getTestPeriod() { return 15*1000; }
+    private int getTestPeriod() {
+        if (_outTunnel == null || _replyTunnel == null)
+            return 15*1000;
+        // Give it 2.5s per hop + 5s (2 hop tunnel = length 3, so this will be 15s for two 2-hop tunnels)
+        // Minimum is 7.5s (since a 0-hop could be the expl. tunnel, but only >= 1-hop client tunnels are tested)
+        // Network average for success is about 1.5s.
+        // Another possibility - make configurable via pool options
+        return 2500 * (_outTunnel.getLength() + _replyTunnel.getLength());
+    }
+
     private void scheduleRetest() { scheduleRetest(false); }
     private void scheduleRetest(boolean asap) {
         if (asap) {

@@ -73,13 +73,13 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             failPct = 100 - MIN_NONFAILING_PCT;
         } else {
             failPct = getExploratoryFailPercentage(ctx);
+            Log l = ctx.logManager().getLog(getClass());
+            if (l.shouldLog(Log.DEBUG))
+                l.debug("Fail pct: " + failPct);
             // always try a little, this helps keep the failPct stat accurate too
             if (failPct > 100 - MIN_NONFAILING_PCT)
                 failPct = 100 - MIN_NONFAILING_PCT;
         }
-        Log l = ctx.logManager().getLog(getClass());
-        if (l.shouldLog(Log.DEBUG))
-            l.error("Fail pct: " + failPct);
         return (failPct >= ctx.random().nextInt(100));
     }
     

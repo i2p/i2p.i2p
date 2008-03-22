@@ -1,7 +1,22 @@
+2008-03-22 zzz
+    * Tunnel Testing:
+      - Fix counting so it really takes 4 consecutive failures
+        rather than 4 total to remove a tunnel
+      - Credit or blame goes to the exploratory tunnel as well
+        as the tunnel being tested
+      - Adjust tunnel test timeout based on tunnel length
+    * ExploratoryPeerSelector: Tweak logging
+    * ProfileOrganizer: Adjust integration calculation again
+    * build.xml: Add to help
+    * checklist.txt: Tweak
+    * readme.html: Fix forum links
+    * netDb: Remove tunnel.testFailedTime
+
 2008-03-19 zzz
     * ExploratoryPeerSelector:
       - Exclude floodfill peers
-      - Tweak the HighCap vs. NonFailing decision
+      - Tweak the HighCap vs. NonFailing decision; try NonFailing
+        at least a minimum % of the time
     * i2psnark: Increase retries for .torrent fetch
     * IRC Proxy: Prevent mIRC from sending an alternate DCC request
       containing an IP
