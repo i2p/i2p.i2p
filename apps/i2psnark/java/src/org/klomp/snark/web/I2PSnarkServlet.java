@@ -115,8 +115,9 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("</th></tr></thead>\n");
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
-            boolean showPeers = "1".equals(peerParam) || Base64.encode(snark.meta.getInfoHash()).equals(peerParam);
-            displaySnark(out, snark, uri, i, stats, showPeers);
+            boolean showDebug = "2".equals(peerParam);
+            boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.meta.getInfoHash()).equals(peerParam);
+            displaySnark(out, snark, uri, i, stats, showPeers, showDebug);
         }
         if (snarks.size() <= 0) {
             out.write(TABLE_EMPTY);
@@ -292,7 +293,9 @@ public class I2PSnarkServlet extends HttpServlet {
             String i2cpPort = req.getParameter("i2cpPort");
             String i2cpOpts = req.getParameter("i2cpOpts");
             String upLimit = req.getParameter("upLimit");
-            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit);
+            boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
+            String openTrackers = req.getParameter("openTrackers");
+            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, useOpenTrackers, openTrackers);
         } else if ("Create torrent".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null) {
@@ -367,7 +370,7 @@ public class I2PSnarkServlet extends HttpServlet {
 
     private static final int MAX_DISPLAYED_FILENAME_LENGTH = 60;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 40;
-    private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers) throws IOException {
+    private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
         File f = new File(filename);
         filename = f.getName(); // the torrent may be the canonical name, so lets just grab the local name
@@ -551,6 +554,8 @@ public class I2PSnarkServlet extends HttpServlet {
                 else
                     client = "Unknown";
                 out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
+                if (showDebug)
+                    out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
@@ -599,6 +604,8 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td></tr>\n\t");
+                if (showDebug)
+                    out.write("<tr><td colspan=\"8\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">" + peer.getSocket() + "</td></tr>");
             }
         }
     }
@@ -660,6 +667,8 @@ public class I2PSnarkServlet extends HttpServlet {
         String uri = req.getRequestURI();
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean autoStart = _manager.shouldAutoStart();
+        boolean useOpenTrackers = _manager.shouldUseOpenTrackers();
+        String openTrackers = _manager.getOpenTrackerString();
         //int seedPct = 0;
        
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
@@ -693,6 +702,12 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
                   + I2PSnarkUtil.instance().getMaxUploaders() + "\" size=\"3\" /> peers<br />\n");
         
+        out.write("Use open trackers also: <input type=\"checkbox\" name=\"useOpenTrackers\" value=\"true\" " 
+                  + (useOpenTrackers ? "checked " : "") 
+                  + "title=\"If true, uses open trackers in addition\" /> ");
+        out.write("Announce URLs: <input type=\"text\" name=\"openTrackers\" value=\""
+                  + openTrackers + "\" size=\"50\" /><br />\n");
+
         //out.write("<hr />\n");
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
                   + I2PSnarkUtil.instance().getEepProxyHost() + "\" size=\"15\" /> ");

@@ -160,8 +160,8 @@ public class I2PSnarkUtil {
     /**
      * fetch the given URL, returning the file it is stored in, or null on error
      */
-    public File get(String url) { return get(url, true, 1); }
-    public File get(String url, boolean rewrite) { return get(url, rewrite, 1); }
+    public File get(String url) { return get(url, true, 0); }
+    public File get(String url, boolean rewrite) { return get(url, rewrite, 0); }
     public File get(String url, int retries) { return get(url, true, retries); }
     public File get(String url, boolean rewrite, int retries) {
         _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
@@ -227,12 +227,22 @@ public class I2PSnarkUtil {
         }
     }
 
+    public String lookup(String name) {
+        Destination dest = getDestination(name);
+	if (dest == null)
+            return null;
+        return dest.toBase64();
+    }
+
     /**
-     * Given http://blah.i2p/foo/announce turn it into http://i2p/blah/foo/announce
+     * Given http://KEY.i2p/foo/announce turn it into http://i2p/KEY/foo/announce
+     * Given http://tracker.blah.i2p/foo/announce leave it alone
      */
     String rewriteAnnounce(String origAnnounce) {
         int destStart = "http://".length();
         int destEnd = origAnnounce.indexOf(".i2p");
+        if (destEnd < destStart + 516)
+            return origAnnounce;
         int pathStart = origAnnounce.indexOf('/', destEnd);
         String rv = "http://i2p/" + origAnnounce.substring(destStart, destEnd) + origAnnounce.substring(pathStart);
         //_log.debug("Rewriting [" + origAnnounce + "] as [" + rv + "]");

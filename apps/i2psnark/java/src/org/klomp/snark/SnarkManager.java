@@ -34,8 +34,12 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
 
-    public static final String PROP_AUTO_START = "i2snark.autoStart";
+    public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
     public static final String DEFAULT_AUTO_START = "false";
+    public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
+    public static final String DEFAULT_USE_OPENTRACKERS = "true";
+    public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
+    public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     
     private SnarkManager() {
         _snarks = new HashMap();
@@ -71,6 +75,9 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public boolean shouldAutoStart() {
         return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START+"")).booleanValue();
+    }
+    public boolean shouldUseOpenTrackers() {
+        return Boolean.valueOf(_config.getProperty(PROP_USE_OPENTRACKERS, DEFAULT_USE_OPENTRACKERS)).booleanValue();
     }
     private int getStartupDelayMinutes() { return 1; }
     public File getDataDir() { 
@@ -152,7 +159,7 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public void updateConfig(String dataDir, boolean autoStart, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit) {
+                             String upLimit, boolean useOpenTrackers, String openTrackers) {
         boolean changed = false;
         if (eepHost != null) {
             int port = I2PSnarkUtil.instance().getEepProxyPort();
@@ -170,7 +177,7 @@ public class SnarkManager implements Snark.CompleteListener {
         if (upLimit != null) {
             int limit = I2PSnarkUtil.instance().getMaxUploaders();
             try { limit = Integer.parseInt(upLimit); } catch (NumberFormatException nfe) {}
-            if ( limit != I2PSnarkUtil.instance().getEepProxyPort()) {
+            if ( limit != I2PSnarkUtil.instance().getMaxUploaders()) {
                 if ( limit >= Snark.MIN_TOTAL_UPLOADERS ) {
                     I2PSnarkUtil.instance().setMaxUploaders(limit);
                     changed = true;
@@ -264,6 +271,18 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_AUTO_START, autoStart + "");
             addMessage("Adjusted autostart to " + autoStart);
             changed = true;
+        }
+        if (shouldUseOpenTrackers() != useOpenTrackers) {
+            _config.setProperty(PROP_USE_OPENTRACKERS, useOpenTrackers + "");
+            addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect");
+            changed = true;
+        }
+        if (openTrackers != null) {
+            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(getOpenTrackerString())) {
+                _config.setProperty(PROP_OPENTRACKERS, openTrackers.trim());
+                addMessage("Open Tracker list changed - torrent restart required to take effect");
+                changed = true;
+            }
         }
         if (changed) {
             saveConfig();
@@ -600,6 +619,7 @@ public class SnarkManager implements Snark.CompleteListener {
 //       , "Orion", "http://gKik1lMlRmuroXVGTZ~7v4Vez3L3ZSpddrGZBrxVriosCQf7iHu6CIk8t15BKsj~P0JJpxrofeuxtm7SCUAJEr0AIYSYw8XOmp35UfcRPQWyb1LsxUkMT4WqxAT3s1ClIICWlBu5An~q-Mm0VFlrYLIPBWlUFnfPR7jZ9uP5ZMSzTKSMYUWao3ejiykr~mtEmyls6g-ZbgKZawa9II4zjOy-hdxHgP-eXMDseFsrym4Gpxvy~3Fv9TuiSqhpgm~UeTo5YBfxn6~TahKtE~~sdCiSydqmKBhxAQ7uT9lda7xt96SS09OYMsIWxLeQUWhns-C~FjJPp1D~IuTrUpAFcVEGVL-BRMmdWbfOJEcWPZ~CBCQSO~VkuN1ebvIOr9JBerFMZSxZtFl8JwcrjCIBxeKPBmfh~xYh16BJm1BBBmN1fp2DKmZ2jBNkAmnUbjQOqWvUcehrykWk5lZbE7bjJMDFH48v3SXwRuDBiHZmSbsTY6zhGY~GkMQHNGxPMMSIAAAA.i2p/bt/announce.php=http://orion.i2p/bt/"
 //       , "anonymity", "http://8EoJZIKrWgGuDrxA3nRJs1jsPfiGwmFWL91hBrf0HA7oKhEvAna4Ocx47VLUR9retVEYBAyWFK-eZTPcvhnz9XffBEiJQQ~kFSCqb1fV6IfPiV3HySqi9U5Caf6~hC46fRd~vYnxmaBLICT3N160cxBETqH3v2rdxdJpvYt8q4nMk9LUeVXq7zqCTFLLG5ig1uKgNzBGe58iNcsvTEYlnbYcE930ABmrzj8G1qQSgSwJ6wx3tUQNl1z~4wSOUMan~raZQD60lRK70GISjoX0-D0Po9WmPveN3ES3g72TIET3zc3WPdK2~lgmKGIs8GgNLES1cXTolvbPhdZK1gxddRMbJl6Y6IPFyQ9o4-6Rt3Lp-RMRWZ2TG7j2OMcNSiOmATUhKEFBDfv-~SODDyopGBmfeLw16F4NnYednvn4qP10dyMHcUASU6Zag4mfc2-WivrOqeWhD16fVAh8MoDpIIT~0r9XmwdaVFyLcjbXObabJczxCAW3fodQUnvuSkwzAAAA.i2p/anonymityTracker/announce.php=http://anonymityweb.i2p/anonymityTracker/"
 //       , "The freak's tracker", "http://mHKva9x24E5Ygfey2llR1KyQHv5f8hhMpDMwJDg1U-hABpJ2NrQJd6azirdfaR0OKt4jDlmP2o4Qx0H598~AteyD~RJU~xcWYdcOE0dmJ2e9Y8-HY51ie0B1yD9FtIV72ZI-V3TzFDcs6nkdX9b81DwrAwwFzx0EfNvK1GLVWl59Ow85muoRTBA1q8SsZImxdyZ-TApTVlMYIQbdI4iQRwU9OmmtefrCe~ZOf4UBS9-KvNIqUL0XeBSqm0OU1jq-D10Ykg6KfqvuPnBYT1BYHFDQJXW5DdPKwcaQE4MtAdSGmj1epDoaEBUa9btQlFsM2l9Cyn1hzxqNWXELmx8dRlomQLlV4b586dRzW~fLlOPIGC13ntPXogvYvHVyEyptXkv890jC7DZNHyxZd5cyrKC36r9huKvhQAmNABT2Y~pOGwVrb~RpPwT0tBuPZ3lHYhBFYmD8y~AOhhNHKMLzea1rfwTvovBMByDdFps54gMN1mX4MbCGT4w70vIopS9yAAAA.i2p/bytemonsoon/announce.php"
+       , "welterde", "http://BGKmlDOoH3RzFbPRfRpZV2FjpVj8~3moFftw5-dZfDf2070TOe8Tf2~DAVeaM6ZRLdmFEt~9wyFL8YMLMoLoiwGEH6IGW6rc45tstN68KsBDWZqkTohV1q9XFgK9JnCwE~Oi89xLBHsLMTHOabowWM6dkC8nI6QqJC2JODqLPIRfOVrDdkjLwtCrsckzLybNdFmgfoqF05UITDyczPsFVaHtpF1sRggOVmdvCM66otyonlzNcJbn59PA-R808vUrCPMGU~O9Wys0i-NoqtIbtWfOKnjCRFMNw5ex4n9m5Sxm9e20UkpKG6qzEuvKZWi8vTLe1NW~CBrj~vG7I3Ok4wybUFflBFOaBabxYJLlx4xTE1zJIVxlsekmAjckB4v-cQwulFeikR4LxPQ6mCQknW2HZ4JQIq6hL9AMabxjOlYnzh7kjOfRGkck8YgeozcyTvcDUcUsOuSTk06L4kdrv8h2Cozjbloi5zl6KTbj5ZTciKCxi73Pn9grICn-HQqEAAAA.i2p/a=http://tracker.welterde.i2p/stats?mode=top5"
     };
     
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */
@@ -632,6 +652,26 @@ public class SnarkManager implements Snark.CompleteListener {
         
         trackerMap = rv;
         return trackerMap;
+    }
+    
+    public String getOpenTrackerString() { 
+        return _config.getProperty(PROP_OPENTRACKERS, DEFAULT_OPENTRACKERS);
+    }
+
+    /** comma delimited list open trackers to use as backups */
+    /** sorted map of name to announceURL=baseURL */
+    public List getOpenTrackers() { 
+        if (!shouldUseOpenTrackers())
+            return null;
+        List rv = new ArrayList(1);
+        String trackers = getOpenTrackerString();
+        StringTokenizer tok = new StringTokenizer(trackers, ", ");
+        while (tok.hasMoreTokens())
+            rv.add(tok.nextToken());
+        
+        if (rv.size() <= 0)
+            return null;
+        return rv;
     }
     
     private static class TorrentFilenameFilter implements FilenameFilter {

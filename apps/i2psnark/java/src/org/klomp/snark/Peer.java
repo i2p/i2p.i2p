@@ -115,6 +115,14 @@ public class Peer implements Comparable
   }
 
   /**
+   * Returns socket (for debug printing)
+   */
+  public String getSocket()
+  {
+    return sock.toString();
+  }
+
+  /**
    * The hash code of a Peer is the hash code of the peerID.
    */
   public int hashCode()
