@@ -1,3 +1,7 @@
+2008-03-26 zzz
+    * ReseedHandler: Support multiple urls,
+      add netdb.i2p2.de as a 2nd default
+
 2008-03-25 zzz
     * i2psnark:
       - Add support for secondary open trackers

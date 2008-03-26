@@ -7,9 +7,13 @@ import java.io.OutputStream;
 
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
@@ -31,7 +35,7 @@ public class ReseedHandler {
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 8 * 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL = "http://i2pdb.tin0.de/netDb/";
+    private static final String DEFAULT_SEED_URL = "http://i2pdb.tin0.de/netDb/,http://netdb.i2p2.de/";
 
     public ReseedHandler() {
         this(ContextHelper.getContext(null));
@@ -121,10 +125,28 @@ public class ReseedHandler {
         "and if nothing helps, read FAQ about reseeding manually.";
         
         private void reseed(boolean echoStatus) {
+            List URLList = new ArrayList();
+            String URLs = _context.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
+            StringTokenizer tok = new StringTokenizer(URLs, " ,");
+            while (tok.hasMoreTokens())
+                URLList.add(tok.nextToken().trim());
+            Collections.shuffle(URLList);
+            for (int i = 0; i < URLList.size() && _isRunning; i++)
+                reseedOne((String) URLList.get(i), echoStatus);
+        }
 
-            String seedURL = _context.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
-            if ( (seedURL == null) || (seedURL.trim().length() <= 0) ) 
-                seedURL = DEFAULT_SEED_URL;
+        /**
+         *  Fetch a directory listing and then all the routerInfo files in the listing.
+         *  The listing must contain (exactly) strings that match:
+         *           href="routerInfo-{hash}.dat">
+         * and then it fetches the files
+         *           {seedURL}routerInfo-{hash}.dat
+         * after appending a '/' to seedURL if it doesn't have one.
+         * Essentially this means that the seedURL must be a directory, it
+         * can't end with 'index.html', for example.
+         **/
+        private void reseedOne(String seedURL, boolean echoStatus) {
+
             try {
                 System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
                 System.setProperty("net.i2p.router.web.ReseedHandler.statusMessage","Reseeding: fetching seed URL.");
@@ -194,6 +216,9 @@ public class ReseedHandler {
                         "Last reseed failed (" + failPercent + "% of " + urls.size() + "). " +
                         RESEED_TIPS);
                 }
+                // Don't go on to the next URL if we have enough
+                if (fetched > 25)
+                    _isRunning = false;
             } catch (Throwable t) {
                 System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
                     "Last reseed failed fully (exception caught). " +
