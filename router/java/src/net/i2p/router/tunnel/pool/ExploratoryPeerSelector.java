@@ -33,8 +33,10 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         Set exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
         exclude.add(ctx.routerHash());
         // Don't use ff peers for exploratory tunnels to lessen exposure to netDb searches and stores
-        FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
-        exclude.addAll(fac.getFloodfillPeers());
+        // Hmm if they don't get explored they don't get a speed/capacity rating
+        // so they don't get used for client tunnels either.
+        // FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
+        // exclude.addAll(fac.getFloodfillPeers());
         HashSet matches = new HashSet(length);
         boolean exploreHighCap = shouldPickHighCap(ctx);
         if (exploreHighCap) 

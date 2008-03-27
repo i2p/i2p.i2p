@@ -199,7 +199,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
     }
     
-    /** send a message to a random lease */
+    /** send a message to a lease */
     private class SendJob extends JobImpl {
         public SendJob(RouterContext enclosingContext) { 
             super(enclosingContext);
@@ -222,11 +222,20 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
     
     /**
+     * Use the same inbound tunnel (i.e. lease) as we did for the same destination previously,
+     * if possible, to keep the streaming lib happy
+     * Key the cache just on the dest, not on source+dest, as different sources
+     * simultaneously talking to the same dest is probably rare enough
+     * to not bother separating out.
+     *
+     * If not found,
      * fetch the next lease that we should try sending through, randomly chosen
-     * from within the sorted leaseSet (sorted by # of failures through each 
+     * from within the sorted leaseSet (NOT sorted by # of failures through each 
      * lease).
      *
      */
+    private static HashMap _leaseCache = new HashMap();
+    private static long _lcleanTime = 0;
     private boolean getNextLease() {
         _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
         if (_leaseSet == null) {
@@ -236,6 +245,26 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         } 
         long now = getContext().clock().now();
         
+        // Use the same lease if it's still good
+        synchronized (_leaseCache) {
+            if (now - _cleanTime > 5*60*1000) {  // clean out periodically
+                cleanLeaseCache(_leaseCache);
+                _cleanTime = now;
+            }
+            _lease = (Lease) _leaseCache.get(_to);
+            if (_lease != null) {
+                if (!_lease.isExpired()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Found in cache - lease for dest " + _to.calculateHash().toBase64()); 
+                    return true;
+                } else {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Expired from cache - lease for dest " + _to.calculateHash().toBase64()); 
+                    _leaseCache.remove(_to);
+                }
+            }
+        }
+
         // get the possible leases
         List leases = new ArrayList(_leaseSet.getLeaseCount());
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
@@ -255,9 +284,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return false;
         }
         
-        // Right here is where we should use a persistent lease and caching like
-        // we do for outbound tunnel selection below???
-
         // randomize the ordering (so leases with equal # of failures per next 
         // sort are randomly ordered)
         Collections.shuffle(leases);
@@ -277,11 +303,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             _lease = (Lease)orderedLeases.get(orderedLeases.firstKey());
         } else {
-            // strangely, _lease isn't used anywhere except for log messages - ?!?!??!?!?!
-            // Apparently the outbound endpoint gets to pick the inbound gateway
-            // and this whole function is pointless.
             _lease = (Lease)leases.get(0);
         }
+        synchronized (_leaseCache) {
+            _leaseCache.put(_to, _lease);
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Added to cache - lease for dest " + _to.calculateHash().toBase64()); 
         return true;
     }
 
@@ -441,6 +469,24 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
     }
     
+    /**
+     * Clean out old leases from a set.
+     * Caller must synchronize on tc.
+     */
+    private void cleanLeaseCache(HashMap tc) {
+        List deleteList = new ArrayList();
+        for (Iterator iter = tc.keySet().iterator(); iter.hasNext(); ) {
+            Destination dest = (Destination) iter.next();
+            Lease l = (Lease) tc.get(dest);
+            if (l.isExpired())
+                deleteList.add(dest);
+        }
+        for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
+            Destination dest = (Destination) iter.next();
+            tc.remove(dest);
+        }
+    }
+
     /**
      * Clean out old tunnels from a set.
      * Caller must synchronize on tc.

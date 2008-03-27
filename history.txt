@@ -1,3 +1,9 @@
+2008-03-27 zzz
+    * Send messages for the same destination to the same inbound
+      lease to reduce out-of-order delivery.
+    * ExploratoryPeerSelector: Back out the floodfill peer exclusion
+      for now, as it prevents speed rating of those peers
+
 2008-03-26 zzz
     * ReseedHandler: Support multiple urls,
       add netdb.i2p2.de as a 2nd default
