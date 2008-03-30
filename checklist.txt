@@ -14,6 +14,10 @@ Change revision in:
 	router/java/src/net/i2p/router/RouterVersion.java
 	core/java/src/net/i2p/CoreVersion.java
 
+Review the complete diff from the last release:
+        mtn diff -r t:i2p-0.6.1.(xx-1) > out.diff
+        vi out.diff
+
 Build and tag:
 	ant pkg
 	mtn ci

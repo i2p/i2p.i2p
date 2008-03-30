@@ -1,3 +1,14 @@
+2008-03-30 zzz
+    * ExploratoryPeerSelector: Try NonFailing even more
+    * HostsTxtNamingService: Add reverse lookup support
+    * Outbound message: Minor cleanup
+    * i2psnark TrackerCLient: Minor cleanup
+    * checklist.txt: Minor edit
+    * hosts.txt: Add perv.i2p, false.i2p, mtn.i2p2.i2p
+    * i2ptunnel.config: Change CVS client to mtn
+    * netdb.jsp: Show leaseSet destinations using reverse lookup
+    * profiles.jsp: First cut at showing floodfill data
+
 2008-03-27 zzz
     * Send messages for the same destination to the same inbound
       lease to reduce out-of-order delivery.
@@ -16,6 +27,7 @@
       - Don't have eepget retry announces
       - Slow down tracker contacts if they've failed for a while
       - Add some debug support showing connections (?p=2)
+    * hosts.txt: Add nickyb.i2p, tracker.welterde.i2p
 
 2008-03-22 zzz
     * NewsFetcher: Fix bug causing fetch every 10m

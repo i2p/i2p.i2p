@@ -9,8 +9,10 @@ package net.i2p.client.naming;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -87,6 +89,28 @@ public class HostsTxtNamingService extends NamingService {
     }
 
     public String reverseLookup(Destination dest) {
+        String destkey = dest.toBase64();
+        List filenames = getFilenames();
+        for (int i = 0; i < filenames.size(); i++) { 
+            String hostsfile = (String)filenames.get(i);
+            Properties hosts = new Properties();
+            try {
+                File f = new File(hostsfile);
+                if ( (f.exists()) && (f.canRead()) ) {
+                    DataHelper.loadProps(hosts, f, true);
+                    Set keyset = hosts.keySet();
+                    Iterator iter = keyset.iterator();
+                    while (iter.hasNext()) {
+                        String host = (String)iter.next();
+                        String key = hosts.getProperty(host);
+                        if (destkey.equals(key))
+                            return host;
+                    }
+                }
+            } catch (Exception ioe) {
+                _log.error("Error loading hosts file " + hostsfile, ioe);
+            }
+        }
         return null;
     }
 }

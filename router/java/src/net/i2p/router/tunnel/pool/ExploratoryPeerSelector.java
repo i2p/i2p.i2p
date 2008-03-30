@@ -77,7 +77,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             failPct = getExploratoryFailPercentage(ctx);
             Log l = ctx.logManager().getLog(getClass());
             if (l.shouldLog(Log.DEBUG))
-                l.debug("Fail pct: " + failPct);
+                l.debug("Normalized Fail pct: " + failPct);
             // always try a little, this helps keep the failPct stat accurate too
             if (failPct > 100 - MIN_NONFAILING_PCT)
                 failPct = 100 - MIN_NONFAILING_PCT;
@@ -86,14 +86,32 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
     }
     
     // We should really use the difference between the exploratory fail rate
-    // and the client fail rate.
-    // (return 100 * ((Efail - Cfail) / (1 - Cfail)))
+    // and the high capacity fail rate - but we don't have a stat for high cap,
+    // so use the fast (== client) fail rate, it should be close
+    // if the expl. and client tunnel lengths aren't too different.
+    // So calculate the difference between the exploratory fail rate
+    // and the client fail rate, normalized to 100:
+    //    100 * ((Efail - Cfail) / (100 - Cfail))
     // Even this isn't the "true" rate for the NonFailingPeers pool, since we
     // are often building exploratory tunnels using the HighCapacity pool.
     private int getExploratoryFailPercentage(RouterContext ctx) {
-        int timeout = getEvents(ctx, "tunnel.buildExploratoryExpire", 10*60*1000);
-        int reject = getEvents(ctx, "tunnel.buildExploratoryReject", 10*60*1000);
-        int accept = getEvents(ctx, "tunnel.buildExploratorySuccess", 10*60*1000);
+        int c = getFailPercentage(ctx, "Client");
+        int e = getFailPercentage(ctx, "Exploratory");
+        Log l = ctx.logManager().getLog(getClass());
+        if (l.shouldLog(Log.DEBUG))
+            l.debug("Client, Expl. Fail pct: " + c + ", " + e);
+        if (e <= c || e <= 25) // doing very well (unlikely)
+            return 0;
+        if (c >= 90) // doing very badly
+            return 100 - MIN_NONFAILING_PCT;
+        return (100 * (e-c)) / (100-c);
+    }
+
+    private int getFailPercentage(RouterContext ctx, String t) {
+        String pfx = "tunnel.build" + t;
+        int timeout = getEvents(ctx, pfx + "Expire", 10*60*1000);
+        int reject = getEvents(ctx, pfx + "Reject", 10*60*1000);
+        int accept = getEvents(ctx, pfx + "Success", 10*60*1000);
         if (accept + reject + timeout <= 0)
             return 0;
         double pct = (double)(reject + timeout) / (accept + reject + timeout);

@@ -228,6 +228,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * simultaneously talking to the same dest is probably rare enough
      * to not bother separating out.
      *
+     * We're going to use the lease until it expires, not even looking for a newer lease.
+     * So if the inbound tunnel fails and the dest publishes a new lease, we won't know about it.
+     *
      * If not found,
      * fetch the next lease that we should try sending through, randomly chosen
      * from within the sorted leaseSet (NOT sorted by # of failures through each 
@@ -244,8 +247,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return false;
         } 
         long now = getContext().clock().now();
-        
+
         // Use the same lease if it's still good
+        // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
         synchronized (_leaseCache) {
             if (now - _cleanTime > 5*60*1000) {  // clean out periodically
                 cleanLeaseCache(_leaseCache);
@@ -254,12 +258,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _lease = (Lease) _leaseCache.get(_to);
             if (_lease != null) {
                 if (!_lease.isExpired()) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Found in cache - lease for dest " + _to.calculateHash().toBase64()); 
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Found in cache - lease for " + _toString); 
                     return true;
                 } else {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Expired from cache - lease for dest " + _to.calculateHash().toBase64()); 
+                        _log.warn("Expired from cache - lease for " + _toString); 
                     _leaseCache.remove(_to);
                 }
             }
@@ -288,6 +292,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // sort are randomly ordered)
         Collections.shuffle(leases);
         
+/****
         if (false) {
             // ordered by lease number of failures
             TreeMap orderedLeases = new TreeMap();
@@ -303,13 +308,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             _lease = (Lease)orderedLeases.get(orderedLeases.firstKey());
         } else {
+****/
             _lease = (Lease)leases.get(0);
-        }
+//      }
         synchronized (_leaseCache) {
             _leaseCache.put(_to, _lease);
         }
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Added to cache - lease for dest " + _to.calculateHash().toBase64()); 
+            _log.warn("Added to cache - lease for " + _toString); 
         return true;
     }
 
@@ -538,7 +544,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (getContext().tunnelManager().isValidTunnel(_from.calculateHash(), tunnel)) {
                     if (!getContext().commSystem().isBacklogged(tunnel.getPeer(1))) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Switching back to tunnel " + tunnel + " for dest " + to.calculateHash().toBase64()); 
+                            _log.warn("Switching back to tunnel " + tunnel + " for " + _toString); 
                         _backloggedTunnelCache.remove(to);
                         _tunnelCache.put(to, tunnel);
                         return tunnel;
@@ -554,7 +560,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                         return tunnel;
                     // backlogged
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Switching from backlogged " + tunnel + " for dest " + to.calculateHash().toBase64()); 
+                        _log.warn("Switching from backlogged " + tunnel + " for " + _toString); 
                     _backloggedTunnelCache.put(to, tunnel);
                 } // else no longer valid
                 _tunnelCache.remove(to);

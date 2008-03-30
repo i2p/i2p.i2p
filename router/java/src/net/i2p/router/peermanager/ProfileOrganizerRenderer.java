@@ -3,6 +3,8 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.Writer;
 
+import java.lang.Math;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
@@ -12,9 +14,13 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.peermanager.DBHistory;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 
 /**
  * Helper class to refactor the HTML rendering from out of the ProfileOrganizer
@@ -33,13 +39,22 @@ class ProfileOrganizerRenderer {
     public void renderStatusHTML(Writer out) throws IOException {
         Set peers = _organizer.selectAllPeers();
         
-        long hideBefore = _context.clock().now() - 3*60*60*1000;
+        long now = _context.clock().now();
+        long hideBefore = now - 3*60*60*1000;
         
         TreeSet order = new TreeSet(_comparator);
+        TreeSet integratedPeers = new TreeSet(_comparator);
         for (Iterator iter = peers.iterator(); iter.hasNext();) {
             Hash peer = (Hash)iter.next();
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
+            if (_organizer.isWellIntegrated(peer)) {
+                integratedPeers.add(prof);
+            } else {
+                RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
+                if (info != null && info.getCapabilities().indexOf("f") >= 0)
+                    integratedPeers.add(prof);
+            }
             if (prof.getLastSendSuccessful() <= hideBefore) continue;
             order.add(prof);
         }
@@ -127,6 +142,75 @@ class ProfileOrganizerRenderer {
             buf.append("</tr>");
         }
         buf.append("</table>");
+
+        buf.append("<h2>Floodfill and Integrated Peers</h2>\n");
+        buf.append("<table border=\"1\">");
+        buf.append("<tr>");
+        buf.append("<td><b>Peer</b></td>");
+        buf.append("<td><b>Caps</b></td>");
+        buf.append("<td><b>Integ. Value</b></td>");
+        buf.append("<td><b>Last Heard About</b></td>");
+        buf.append("<td><b>Last Heard From</b></td>");
+        buf.append("<td><b>Last Successful Send</b></td>");
+        buf.append("<td><b>Last Failed Send</b></td>");
+        buf.append("<td><b>10m Resp. Time</b></td>");
+        buf.append("<td><b>1h Resp. Time</b></td>");
+        buf.append("<td><b>1d Resp. Time</b></td>");
+        buf.append("<td><b>Successful Lookups</b></td>");
+        buf.append("<td><b>Failed Lookups</b></td>");
+        buf.append("<td><b>New Stores</b></td>");
+        buf.append("<td><b>Old Stores</b></td>");
+        buf.append("<td><b>1m Fail Rate</b></td>");
+        buf.append("<td><b>1h Fail Rate</b></td>");
+        buf.append("<td><b>1d Fail Rate</b></td>");
+        buf.append("</tr>");
+        for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
+            PeerProfile prof = (PeerProfile)iter.next();
+            Hash peer = prof.getPeer();
+
+            buf.append("<tr>");
+            buf.append("<td><code>");
+            if (prof.getIsFailing()) {
+                buf.append("<font color=\"red\">-- ").append(peer.toBase64().substring(0,6)).append("</font>");
+            } else {
+                if (prof.getIsActive()) {
+                    buf.append("<font color=\"blue\">++ ").append(peer.toBase64().substring(0,6)).append("</font>");
+                } else {
+                    buf.append("&nbsp;&nbsp;&nbsp;").append(peer.toBase64().substring(0,6));
+                }
+            }
+            RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
+            if (info != null)
+                buf.append("<td align=\"center\">" + info.getCapabilities() + "</td>");
+            else
+                buf.append("<td>&nbsp;</td>");
+            buf.append("</code></td>");
+            buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
+            long time;
+            time = now - prof.getLastHeardAbout();
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            time = now - prof.getLastHeardFrom();
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            time = now - prof.getLastSendSuccessful();
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            time = now - prof.getLastSendFailed();
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            buf.append("<td align=\"right\">").append(avg(prof, 10*60*1000l)).append("</td>");
+            buf.append("<td align=\"right\">").append(avg(prof, 60*60*1000l)).append("</td>");
+            buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l)).append("</td>");
+            DBHistory dbh = prof.getDBHistory();
+            if (dbh != null) {
+                buf.append("<td align=\"right\">").append(dbh.getSuccessfulLookups()).append("</td>");
+                buf.append("<td align=\"right\">").append(dbh.getFailedLookups()).append("</td>");
+                buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreNew()).append("</td>");
+                buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreOld()).append("</td>");
+                buf.append("<td align=\"right\">").append(davg(dbh, 60*1000l)).append("</td>");
+                buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
+                buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
+            }
+        }
+        buf.append("</table>");
+
         buf.append("<p><i>Definitions:<ul>");
         buf.append("<li><b>groups</b>: as determined by the profile organizer</li>");
         buf.append("<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>");
@@ -198,4 +282,29 @@ class ProfileOrganizerRenderer {
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
+
+    String avg (PeerProfile prof, long rate) {
+            RateStat rs = prof.getDbResponseTime();
+            if (rs == null)
+                return num(0d);
+            Rate r = rs.getRate(rate);
+            if (r == null)
+                return num(0d);
+            long c = r.getCurrentEventCount() + r.getLastEventCount();
+            if (c == 0)
+                return num(0d);
+            double d = r.getCurrentTotalValue() + r.getLastTotalValue();
+            return Math.round(d/c) + "ms";
+    }
+
+    String davg (DBHistory dbh, long rate) {
+            RateStat rs = dbh.getFailedLookupRate();
+            if (rs == null)
+                return num(0d);
+            Rate r = rs.getRate(rate);
+            if (r == null)
+                return num(0d);
+            long c = r.getCurrentEventCount() + r.getLastEventCount();
+            return "" + c;
+    }
 }

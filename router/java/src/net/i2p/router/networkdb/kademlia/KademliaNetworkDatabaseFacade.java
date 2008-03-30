@@ -21,9 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructure;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
@@ -39,6 +41,7 @@ import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.Log;
 
 /**
@@ -934,8 +937,28 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         long now = _context.clock().now();
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
             LeaseSet ls = (LeaseSet)iter.next();
-            Hash key = ls.getDestination().calculateHash();
-            buf.append("<b>LeaseSet: ").append(key.toBase64()).append("</b><br />\n");
+            Destination dest = ls.getDestination();
+            Hash key = dest.calculateHash();
+            buf.append("<b>LeaseSet: ").append(key.toBase64());
+            if (_context.clientManager().isLocal(dest)) {
+                buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">Local</a> ");
+                if (! _context.clientManager().shouldPublishLeaseSet(key))
+                    buf.append("Unpublished ");
+                buf.append("Destination ");
+                TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
+                if (in != null && in.getDestinationNickname() != null)
+                    buf.append(in.getDestinationNickname());
+                else
+                    buf.append(dest.toBase64().substring(0, 6));
+            } else {
+                buf.append(" (Destination ");
+                String host = _context.namingService().reverseLookup(dest);
+                if (host != null)
+                    buf.append(host);
+                else
+                    buf.append(dest.toBase64().substring(0, 6));
+            }
+            buf.append(")</b><br />\n");
             long exp = ls.getEarliestLeaseDate()-now;
             if (exp > 0)
                 buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br />\n");

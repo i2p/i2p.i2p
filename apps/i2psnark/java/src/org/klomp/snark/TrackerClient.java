@@ -275,8 +275,11 @@ public class TrackerClient extends I2PThread
                           tr.stop = true;
                       }
                     }
-                    if (++tr.consecutiveFails == MAX_CONSEC_FAILS && tr.interval < LONG_SLEEP)
-                        tr.interval = LONG_SLEEP;  // slow down
+                    if (++tr.consecutiveFails == MAX_CONSEC_FAILS) {
+                        tr.seenPeers = 0;
+                        if (tr.interval < LONG_SLEEP)
+                            tr.interval = LONG_SLEEP;  // slow down
+                    }
                   }
               }
               if ((!tr.stop) && maxSeenPeers < tr.seenPeers)
