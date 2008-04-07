@@ -599,6 +599,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     return;
                 // if (_outbound.indexOf(msg) > 0)
                 //     _log.debug("Priority message sent, pri = " + msg.getPriority() + " pos = " + _outbound.indexOf(msg) + "/" +_outbound.size());
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Type " + msg.getMessage().getType() + " pri " + msg.getPriority() + " slot " + _outbound.indexOf(msg));
                 _outbound.remove(msg);
             }
             _currentOutbound = msg;

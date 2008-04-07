@@ -1,8 +1,20 @@
+2008-04-07 zzz
+    * i2psnark:
+      - Implement upstream bandwidth limiting
+      - Fix a rare NPE at startup/shutdown
+      - Really increase retries for .torrent fetch
+    * profiles.jsp: Minor cleanup
+    * DataHelper: Only format < 5s as ms
+    * Eepget: Fix percentage output on command line eepget retries
+    * Lower partipating message priority from 400 to 200
+    * NTCP: Add a debug message
+    * Outbound message: Minor cleanup
+
 2008-03-30 zzz
     * ExploratoryPeerSelector: Try NonFailing even more
     * HostsTxtNamingService: Add reverse lookup support
     * Outbound message: Minor cleanup
-    * i2psnark TrackerCLient: Minor cleanup
+    * i2psnark TrackerClient: Minor cleanup
     * checklist.txt: Minor edit
     * hosts.txt: Add perv.i2p, false.i2p, mtn.i2p2.i2p
     * i2ptunnel.config: Change CVS client to mtn

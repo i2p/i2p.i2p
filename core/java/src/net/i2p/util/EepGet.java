@@ -351,6 +351,7 @@ public class EepGet {
             System.out.println("** Transfered " + bytesTransferred
                                + " with " + (bytesRemaining < 0 ? "unknown" : ""+bytesRemaining) + " remaining");
             System.out.println("** " + cause.getMessage());
+            _previousWritten += _written;
             _written = 0;
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {

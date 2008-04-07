@@ -257,15 +257,15 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
             _lease = (Lease) _leaseCache.get(_to);
             if (_lease != null) {
-                if (!_lease.isExpired()) {
+                // if outbound tunnel length == 0 && lease.firsthop.isBacklogged() don't use it ??
+                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Found in cache - lease for " + _toString); 
                     return true;
-                } else {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Expired from cache - lease for " + _toString); 
-                    _leaseCache.remove(_to);
                 }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Expired from cache - lease for " + _toString); 
+                _leaseCache.remove(_to);
             }
         }
 
@@ -484,7 +484,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         for (Iterator iter = tc.keySet().iterator(); iter.hasNext(); ) {
             Destination dest = (Destination) iter.next();
             Lease l = (Lease) tc.get(dest);
-            if (l.isExpired())
+            if (l.isExpired(Router.CLOCK_FUDGE_FACTOR))
                 deleteList.add(dest);
         }
         for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
@@ -599,8 +599,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         long sendTime = getContext().clock().now() - _start;
         if (_log.shouldLog(Log.WARN))
-            _log.warn(getJobId() + ": Failed to send the message " + _clientMessageId + " after " 
-                       + sendTime + "ms");
+            _log.warn(getJobId() + ": Failed to send the message " + _clientMessageId + " to " + _toString +
+                       " after " + sendTime + "ms");
         
         long messageDelay = getContext().throttle().getMessageDelay();
         long tunnelLag = getContext().throttle().getTunnelLag();

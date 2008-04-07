@@ -286,13 +286,13 @@ class ProfileOrganizerRenderer {
     String avg (PeerProfile prof, long rate) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
-                return num(0d);
+                return "0ms";
             Rate r = rs.getRate(rate);
             if (r == null)
-                return num(0d);
+                return "0ms";
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             if (c == 0)
-                return num(0d);
+                return "0ms";
             double d = r.getCurrentTotalValue() + r.getLastTotalValue();
             return Math.round(d/c) + "ms";
     }
