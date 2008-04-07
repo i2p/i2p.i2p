@@ -52,8 +52,8 @@ public class PeerCoordinator implements PeerListener
   private long uploaded;
   private long downloaded;
   final static int RATE_DEPTH = 6; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {0,0,0,0,0,0};
-  private long downloaded_old[] = {0,0,0,0,0,0};
+  private long uploaded_old[] = {-1,-1,-1,-1,-1,-1};
+  private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
 
   // synchronize on this when changing peers or downloaders
   final List peers = new ArrayList();
@@ -195,11 +195,17 @@ public class PeerCoordinator implements PeerListener
   private long getRate(long array[])
   {
     long rate = 0;
+    int i = 0;
     synchronized(array) {
-      for (int i = 0; i < RATE_DEPTH; i++)
+      for ( ; i < RATE_DEPTH; i++) {
+        if (array[i] < 0)
+            break;
         rate += array[i];
+      }
     }
-    return rate / (RATE_DEPTH * CHECK_PERIOD / 1000);
+    if (i == 0)
+        return 0;
+    return rate / (i * CHECK_PERIOD / 1000);
   }
 
   public MetaInfo getMetaInfo()
@@ -818,6 +824,11 @@ public class PeerCoordinator implements PeerListener
         return uploaders + 1;
     else
         return MAX_UPLOADERS;
+  }
+
+  public boolean overUpBWLimit()
+  {
+    return Snark.overUpBWLimit();
   }
 }
 

@@ -776,4 +776,18 @@ public class Snark
     // Snark.debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
     return totalUploaders > limit;
   }
+
+  public static boolean overUpBWLimit() {
+    PeerCoordinatorSet coordinators = PeerCoordinatorSet.instance();
+    if (coordinators == null)
+      return false;
+    long total = 0;
+    for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
+      PeerCoordinator c = (PeerCoordinator)iter.next();
+      if (!c.halted())
+        total += c.getUploadRate();
+    }
+    long limit = 1024l * I2PSnarkUtil.instance().getMaxUpBW();
+    return total > limit;
+  }
 }

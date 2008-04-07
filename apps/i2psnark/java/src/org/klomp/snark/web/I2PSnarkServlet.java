@@ -293,9 +293,10 @@ public class I2PSnarkServlet extends HttpServlet {
             String i2cpPort = req.getParameter("i2cpPort");
             String i2cpOpts = req.getParameter("i2cpOpts");
             String upLimit = req.getParameter("upLimit");
+            String upBW = req.getParameter("upBW");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
             String openTrackers = req.getParameter("openTrackers");
-            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, useOpenTrackers, openTrackers);
+            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
         } else if ("Create torrent".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null) {
@@ -700,7 +701,9 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("</select><br />\n");
 */
         out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
-                  + I2PSnarkUtil.instance().getMaxUploaders() + "\" size=\"3\" /> peers<br />\n");
+                  + I2PSnarkUtil.instance().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" /> peers<br />\n");
+        out.write("Up bandwidth limit: <input type=\"text\" name=\"upBW\" value=\""
+                  + I2PSnarkUtil.instance().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Router Up BW / 3 recommended)</i><br />\n");
         
         out.write("Use open trackers also: <input type=\"checkbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
@@ -712,11 +715,11 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
                   + I2PSnarkUtil.instance().getEepProxyHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
-                  + I2PSnarkUtil.instance().getEepProxyPort() + "\" size=\"5\" /><br />\n");
+                  + I2PSnarkUtil.instance().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br />\n");
         out.write("I2CP host: <input type=\"text\" name=\"i2cpHost\" value=\"" 
                   + I2PSnarkUtil.instance().getI2CPHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"i2cpPort\" value=\"" +
-                  + I2PSnarkUtil.instance().getI2CPPort() + "\" size=\"5\" /> <br />\n");
+                  + I2PSnarkUtil.instance().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" /> <br />\n");
         StringBuffer opts = new StringBuffer(64);
         Map options = new TreeMap(I2PSnarkUtil.instance().getI2CPOptions());
         for (Iterator iter = options.keySet().iterator(); iter.hasNext(); ) {
@@ -850,7 +853,8 @@ class FetchAndAdd implements Runnable {
     }
     public void run() {
         _url = _url.trim();
-        File file = I2PSnarkUtil.instance().get(_url, false);
+        // 3 retries
+        File file = I2PSnarkUtil.instance().get(_url, false, 3);
         try {
             if ( (file != null) && (file.exists()) && (file.length() > 0) ) {
                 _manager.addMessage("Torrent fetched from " + _url);

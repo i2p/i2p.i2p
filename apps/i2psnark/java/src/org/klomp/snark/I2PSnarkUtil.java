@@ -34,6 +34,7 @@ public class I2PSnarkUtil {
     private boolean _configured;
     private Set _shitlist;
     private int _maxUploaders;
+    private int _maxUpBW;
     
     private I2PSnarkUtil() {
         _context = I2PAppContext.getGlobalContext();
@@ -79,6 +80,11 @@ public class I2PSnarkUtil {
         _configured = true;
     }
     
+    public void setMaxUpBW(int limit) {
+        _maxUpBW = limit;
+        _configured = true;
+    }
+    
     public String getI2CPHost() { return _i2cpHost; }
     public int getI2CPPort() { return _i2cpPort; }
     public Map getI2CPOptions() { return _opts; }
@@ -86,6 +92,7 @@ public class I2PSnarkUtil {
     public int getEepProxyPort() { return _proxyPort; }
     public boolean getEepProxySet() { return _shouldProxy; }
     public int getMaxUploaders() { return _maxUploaders; }
+    public int getMaxUpBW() { return _maxUpBW; }
     
     /**
      * Connect to the router, if we aren't already
@@ -197,6 +204,8 @@ public class I2PSnarkUtil {
     }
     
     String getOurIPString() {
+        if (_manager == null)
+            return "unknown";
         I2PSession sess = _manager.getSession();
         if (sess != null) {
             Destination dest = sess.getMyDestination();

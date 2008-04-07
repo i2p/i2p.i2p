@@ -14,7 +14,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.3" target="1.3" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../../router/java/build/router.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
     </target>
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/*Servlet.class">

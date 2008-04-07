@@ -68,6 +68,7 @@ class PeerCheckerTask extends TimerTask
         // we will add them back to the end of the list.
         List removed = new ArrayList();
         int uploadLimit = coordinator.allowedUploaders();
+        boolean overBWLimit = coordinator.overUpBWLimit();
         while (it.hasNext())
           {
             Peer peer = (Peer)it.next();
@@ -109,7 +110,8 @@ class PeerCheckerTask extends TimerTask
             // (Note use of coordinator.uploaders)
             if (((coordinator.uploaders == uploadLimit
                 && coordinator.interestedAndChoking > 0)
-                || coordinator.uploaders > uploadLimit)
+                || coordinator.uploaders > uploadLimit
+                || overBWLimit)
                 && !peer.isChoking())
               {
                 // Check if it still wants pieces from us.
@@ -124,6 +126,15 @@ class PeerCheckerTask extends TimerTask
                     // Put it at the back of the list
                     it.remove();
                     removed.add(peer);
+                  }
+                else if (overBWLimit)
+                  {
+                    Snark.debug("BW limit, choke peer: " + peer,
+                                Snark.INFO);
+                    peer.setChoking(true);
+                    uploaders--;
+                    coordinator.uploaders--;
+                    removedCount++;
                   }
                 else if (peer.isInteresting() && peer.isChoked())
                   {
@@ -209,7 +220,8 @@ class PeerCheckerTask extends TimerTask
           }
         
         // Optimistically unchoke a peer
-        coordinator.unchokePeer();
+        if (!overBWLimit)
+            coordinator.unchokePeer();
 
         // Put peers back at the end of the list that we removed earlier.
         coordinator.peers.addAll(removed);

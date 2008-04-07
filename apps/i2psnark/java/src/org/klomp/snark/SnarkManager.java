@@ -5,6 +5,7 @@ import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -30,6 +31,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_EEP_HOST = "i2psnark.eepHost";
     public static final String PROP_EEP_PORT = "i2psnark.eepPort";
     public static final String PROP_UPLOADERS_TOTAL = "i2psnark.uploaders.total";
+    public static final String PROP_UPBW_MAX = "i2psnark.upbw.max";
     public static final String PROP_DIR = "i2psnark.dir";
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
@@ -41,6 +43,9 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     
+    public static final int MIN_UP_BW = 2;
+    public static final int DEFAULT_MAX_UP_BW = 10;
+
     private SnarkManager() {
         _snarks = new HashMap();
         _addSnarkLock = new Object();
@@ -112,6 +117,12 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_EEP_PORT, "4444");
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
+        if (!_config.containsKey(PROP_UPBW_MAX)) {
+            if (_context instanceof RouterContext)
+                _config.setProperty(PROP_UPBW_MAX, "" + (((RouterContext)_context).bandwidthLimiter().getOutboundKBytesPerSecond() / 3));
+            else
+                _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
+        }
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
@@ -143,6 +154,7 @@ public class SnarkManager implements Snark.CompleteListener {
         if (eepHost != null)
             I2PSnarkUtil.instance().setProxy(eepHost, eepPort);
         I2PSnarkUtil.instance().setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
+        I2PSnarkUtil.instance().setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
         getDataDir().mkdirs();
     }
     
@@ -159,7 +171,7 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public void updateConfig(String dataDir, boolean autoStart, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, boolean useOpenTrackers, String openTrackers) {
+                             String upLimit, String upBW, boolean useOpenTrackers, String openTrackers) {
         boolean changed = false;
         if (eepHost != null) {
             int port = I2PSnarkUtil.instance().getEepProxyPort();
@@ -185,6 +197,20 @@ public class SnarkManager implements Snark.CompleteListener {
                     addMessage("Total uploaders limit changed to " + limit);
                 } else {
                     addMessage("Minimum total uploaders limit is " + Snark.MIN_TOTAL_UPLOADERS);
+                }
+            }
+        }
+        if (upBW != null) {
+            int limit = I2PSnarkUtil.instance().getMaxUpBW();
+            try { limit = Integer.parseInt(upBW); } catch (NumberFormatException nfe) {}
+            if ( limit != I2PSnarkUtil.instance().getMaxUpBW()) {
+                if ( limit >= MIN_UP_BW ) {
+                    I2PSnarkUtil.instance().setMaxUpBW(limit);
+                    changed = true;
+                    _config.setProperty(PROP_UPBW_MAX, "" + limit);
+                    addMessage("Up BW limit changed to " + limit + "KBps");
+                } else {
+                    addMessage("Minimum Up BW limit is " + MIN_UP_BW + "KBps");
                 }
             }
         }
