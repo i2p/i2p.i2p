@@ -41,7 +41,7 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
         out.setMessage(msg);
         out.setTarget(_target);
         out.setExpiration(msg.getMessageExpiration());
-        out.setPriority(400);
+        out.setPriority(200);
         _context.outNetMessagePool().add(out);
         return msg.getUniqueId();
     }

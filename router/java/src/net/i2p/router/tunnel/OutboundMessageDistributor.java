@@ -16,12 +16,14 @@ import net.i2p.util.Log;
  */
 public class OutboundMessageDistributor {
     private RouterContext _context;
+    private int _priority;
     private Log _log;
     
     private static final int MAX_DISTRIBUTE_TIME = 10*1000;
     
-    public OutboundMessageDistributor(RouterContext ctx) {
+    public OutboundMessageDistributor(RouterContext ctx, int priority) {
         _context = ctx;
+        _priority = priority;
         _log = ctx.logManager().getLog(OutboundMessageDistributor.class);
     }
     
@@ -62,7 +64,7 @@ public class OutboundMessageDistributor {
             out.setExpiration(_context.clock().now() + MAX_DISTRIBUTE_TIME);
             out.setTarget(target);
             out.setMessage(m);
-            out.setPriority(400);
+            out.setPriority(_priority);
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("queueing outbound message to " + target.getIdentity().calculateHash().toBase64().substring(0,4));

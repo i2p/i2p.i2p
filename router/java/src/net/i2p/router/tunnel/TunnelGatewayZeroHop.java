@@ -29,7 +29,7 @@ public class TunnelGatewayZeroHop extends TunnelGateway {
         if (config.isInbound())
             _inDistributor = new InboundMessageDistributor(_context, config.getDestination());
         else
-            _outDistributor = new OutboundMessageDistributor(context);
+            _outDistributor = new OutboundMessageDistributor(context, 400);
     }
     
     /**

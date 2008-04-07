@@ -26,7 +26,7 @@ public class OutboundTunnelEndpoint {
         _config = config;
         _processor = processor;
         _handler = new RouterFragmentHandler(ctx, new DefragmentedHandler());
-        _outDistributor = new OutboundMessageDistributor(ctx);
+        _outDistributor = new OutboundMessageDistributor(ctx, 200);
     }
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
         _config.incrementProcessedMessages();

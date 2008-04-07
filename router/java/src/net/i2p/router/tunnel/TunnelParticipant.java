@@ -157,7 +157,7 @@ public class TunnelParticipant {
         m.setMessage(msg);
         m.setExpiration(msg.getMessageExpiration());
         m.setTarget(ri);
-        m.setPriority(400);
+        m.setPriority(200);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Forward on from " + _config + ": " + msg);
         _context.outNetMessagePool().add(m);
