@@ -228,8 +228,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * simultaneously talking to the same dest is probably rare enough
      * to not bother separating out.
      *
-     * We're going to use the lease until it expires, not even looking for a newer lease.
-     * So if the inbound tunnel fails and the dest publishes a new lease, we won't know about it.
+     * We're going to use the lease until it expires, as long as it remains in the current leaseSet.
      *
      * If not found,
      * fetch the next lease that we should try sending through, randomly chosen
@@ -259,9 +258,16 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_lease != null) {
                 // if outbound tunnel length == 0 && lease.firsthop.isBacklogged() don't use it ??
                 if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Found in cache - lease for " + _toString); 
-                    return true;
+                    // see if the current leaseSet contains the old lease, so that if the dest removes
+                    // it (due to failure for example) we won't continue to use it.
+                    for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
+                        Lease lease = _leaseSet.getLease(i);
+                        if (_lease.equals(lease)) {
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Found in cache - lease for " + _toString); 
+                            return true;
+                        }
+                    }
                 }
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Expired from cache - lease for " + _toString); 

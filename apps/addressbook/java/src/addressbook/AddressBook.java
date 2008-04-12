@@ -167,7 +167,8 @@ public class AddressBook {
 		host.length() <= 67 &&          // 63 + ".i2p"
                 (! host.startsWith(".")) &&
                 (! host.startsWith("-")) &&
-                (! host.endsWith("-.i2p")) &&
+                host.indexOf(".-") < 0 &&
+                host.indexOf("-.") < 0 &&
 		host.indexOf("..") < 0 &&
                 // IDN - basic check, not complete validation
                 (host.indexOf("--") < 0 || host.startsWith("xn--") || host.indexOf(".xn--") > 0) &&

@@ -141,6 +141,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _created = System.currentTimeMillis();
+        _lastSendTime = _created;
+        _lastReceiveTime = _created;
         _transport = transport;
         _remAddr = remAddr;
         _readBufs = new ArrayList(4);

@@ -46,8 +46,8 @@ class PersistentDataStore extends TransientDataStore {
         _dbDir = dbDir;
         _facade = facade;
         _context.jobQueue().addJob(new ReadJob());
-        ctx.statManager().createRateStat("netDb.writeClobber", "How often we clobber a pending netDb write", "Network Database", new long[] { 60*1000, 10*60*1000 });
-        ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "Network Database", new long[] { 60*1000, 10*60*1000 });
+        ctx.statManager().createRateStat("netDb.writeClobber", "How often we clobber a pending netDb write", "NetworkDatabase", new long[] { 60*1000, 10*60*1000 });
+        ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "NetworkDatabase", new long[] { 60*1000, 10*60*1000 });
         _writer = new Writer();
         I2PThread writer = new I2PThread(_writer, "DBWriter");
         writer.setDaemon(true);

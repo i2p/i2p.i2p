@@ -97,7 +97,7 @@ public class I2PSnarkUtil {
     /**
      * Connect to the router, if we aren't already
      */
-    public boolean connect() {
+    synchronized public boolean connect() {
         if (_manager == null) {
             Properties opts = new Properties();
             if (_opts != null) {

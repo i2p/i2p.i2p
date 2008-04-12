@@ -1,3 +1,12 @@
+2008-04-12 zzz
+    * Addressbook: Disallow '.-' and '-.' in host names
+    * NTCP: Don't drop a connection unless both directions are idle;
+            Fix idle time for outbound connections
+    * Outbound message: Make sure cached lease is in current leaseSet
+    * Stats: Put all NetworkDatabase stats in same group
+    * TunnelPool: Stop building tunnels and leaseSets after client shutdown
+    * i2psnark: Add locking to prevent two I2CP connections
+
 2008-04-07 zzz
     * i2psnark:
       - Implement upstream bandwidth limiting

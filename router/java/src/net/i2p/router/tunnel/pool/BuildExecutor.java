@@ -246,6 +246,8 @@ class BuildExecutor implements Runnable {
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
                     TunnelPool pool = (TunnelPool)pools.get(i);
+                    if (!pool.isAlive())
+                        continue;
                     int howMany = pool.countHowManyToBuild();
                     for (int j = 0; j < howMany; j++)
                         wanted.add(pool);

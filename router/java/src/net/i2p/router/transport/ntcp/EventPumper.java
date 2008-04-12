@@ -143,8 +143,9 @@ public class EventPumper implements Runnable {
                                     failsafeWrites++;
                                 }
                                 
-                                if ( con.getTimeSinceSend() > expireIdleWriteTime) {
-                                    // we haven't sent anything in a really long time, so lets just close 'er up
+                                if ( con.getTimeSinceSend() > expireIdleWriteTime &&
+                                     con.getTimeSinceReceive() > expireIdleWriteTime) {
+                                    // we haven't sent or received anything in a really long time, so lets just close 'er up
                                     con.close();
                                     failsafeCloses++;
                                 }
