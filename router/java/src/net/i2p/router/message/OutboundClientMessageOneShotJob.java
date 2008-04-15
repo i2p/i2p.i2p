@@ -190,6 +190,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                     _log.warn(getJobId() + ": Bundle leaseSet probability overridden incorrectly [" 
                               + str + "]", nfe);
             }
+            if (probability >= 100)
+                return true;
+            _log.error(getJobId() + ": Bundle leaseSet probability is " + probability);
             if (probability >= getContext().random().nextInt(100))
                 return true;
             else
@@ -247,6 +250,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         } 
         long now = getContext().clock().now();
 
+/*** removed until we fix SSU reachability
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
         synchronized (_leaseCache) {
@@ -274,7 +278,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 _leaseCache.remove(_to);
             }
         }
-
+***/
         // get the possible leases
         List leases = new ArrayList(_leaseSet.getLeaseCount());
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
@@ -317,9 +321,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 ****/
             _lease = (Lease)leases.get(0);
 //      }
+/*** removed until we fix SSU reachability
         synchronized (_leaseCache) {
             _leaseCache.put(_to, _lease);
         }
+***/
         if (_log.shouldLog(Log.WARN))
             _log.warn("Added to cache - lease for " + _toString); 
         return true;
@@ -606,6 +612,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         long sendTime = getContext().clock().now() - _start;
         if (_log.shouldLog(Log.WARN))
             _log.warn(getJobId() + ": Failed to send the message " + _clientMessageId + " to " + _toString +
+                       " out " + _outTunnel + " in " + _lease + " ack " + _inTunnel +
                        " after " + sendTime + "ms");
         
         long messageDelay = getContext().throttle().getMessageDelay();

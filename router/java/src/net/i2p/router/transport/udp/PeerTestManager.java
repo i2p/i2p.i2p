@@ -56,6 +56,11 @@ class PeerTestManager {
     private static final long MAX_NONCE = (1l << 32) - 1l;
     //public void runTest(InetAddress bobIP, int bobPort, SessionKey bobIntroKey) {
     public void runTest(InetAddress bobIP, int bobPort, SessionKey bobCipherKey, SessionKey bobMACKey) {
+        if (_currentTest != null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("We are already running a test with bob = " + _currentTest.getBobIP() + ", aborting test with bob = " + bobIP);
+            return;
+        }
         PeerTestState test = new PeerTestState();
         test.setNonce(_context.random().nextLong(MAX_NONCE));
         test.setBobIP(bobIP);
@@ -137,11 +142,15 @@ class PeerTestManager {
     }
     
     /**
-     * If we have sent a packet to charlie within the last 3 minutes, ignore any test 
+     * If we have sent a packet to charlie within the last 10 minutes, ignore any test 
      * results we get from them, as our NAT will have poked a hole anyway
+     * NAT idle timeouts vary widely, from 30s to 10m or more.
+     * Set this too high and a high-traffic router may rarely get a good test result.
+     * Set it too low and a router will think it is reachable when it isn't.
+     * Maybe a router should need two consecutive OK results before believing it?
      *
      */
-    private static final long CHARLIE_RECENT_PERIOD = 3*60*1000;
+    private static final long CHARLIE_RECENT_PERIOD = 10*60*1000;
 
     /**
      * Receive a PeerTest message which contains the correct nonce for our current 
@@ -175,14 +184,15 @@ class PeerTestManager {
             PeerState charlieSession = _transport.getPeerState(from);
             long recentBegin = _context.clock().now() - CHARLIE_RECENT_PERIOD;
             if ( (charlieSession != null) && 
-                 (charlieSession.getLastACKSend() > recentBegin) &&
-                 (charlieSession.getLastSendTime() > recentBegin) ) {
+                 ( (charlieSession.getLastACKSend() > recentBegin) ||
+                   (charlieSession.getLastSendTime() > recentBegin) ) ) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bob chose a charlie we already have a session to, cancelling the test and rerunning (bob: " 
                               + _currentTest + ", charlie: " + from + ")");
                 _currentTestComplete = true;
                 _context.statManager().addRateData("udp.statusKnownCharlie", 1, 0);
                 honorStatus(CommSystemFacade.STATUS_UNKNOWN);
+                _currentTest = null;
                 return;
             }
     
@@ -198,7 +208,7 @@ class PeerTestManager {
                         _log.debug("Receive test reply from charlie @ " + test.getCharlieIP() + " via our " 
                                    + test.getAlicePort() + "/" + test.getAlicePortFromCharlie());
                     if (test.getReceiveBobTime() > 0)
-                        testComplete(false);
+                        testComplete(true);
                 } catch (UnknownHostException uhe) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Charlie @ " + from + " said we were an invalid IP address: " + uhe.getMessage(), uhe);
@@ -211,6 +221,10 @@ class PeerTestManager {
                     return;
                 }
                 
+                if (_log.shouldLog(Log.INFO) && charlieSession != null)
+                    _log.info("Bob chose a charlie we last acked " + DataHelper.formatDuration(_context.clock().now() - charlieSession.getLastACKSend()) + " last sent " + DataHelper.formatDuration(_context.clock().now() - charlieSession.getLastSendTime()) + " (bob: " 
+                              + _currentTest + ", charlie: " + from + ")");
+
                 // ok, first charlie.  send 'em a packet
                 test.setReceiveCharlieTime(_context.clock().now());
                 SessionKey charlieIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
@@ -239,10 +253,14 @@ class PeerTestManager {
         _currentTestComplete = true;
         short status = -1;
         PeerTestState test = _currentTest;
-        if (expired()) { 
-            _currentTest = null;
-            return;
-        }
+
+        // Don't do this or we won't call honorStatus()
+        // to set the status to UNKNOWN or REJECT_UNSOLICITED
+        // if (expired()) { 
+        //     _currentTest = null;
+        //    return;
+        // }
+
         if (test.getAlicePortFromCharlie() > 0) {
             // we received a second message from charlie
             if ( (test.getAlicePort() == test.getAlicePortFromCharlie()) &&

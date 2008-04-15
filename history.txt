@@ -1,3 +1,13 @@
+2008-04-15 zzz
+    * SSU Reachability/PeerTestManager:
+      - Back out strict peer ordering until we fix SSU
+      - Back out persistent lease selection until we fix SSU
+      - Fix detection of UDP REJECT_UNSOLICITED by recording status on expiration
+      - Increase known Charlie time to 10m; 3m wasn't enough
+      - Don't continue retransmitting peer test if we know Charlie
+      - Don't run multiple peer tests at once
+      - Tighten test frequency range to 6.5-19.5m, was 0-26m
+
 2008-04-12 zzz
     * Addressbook: Disallow '.-' and '-.' in host names
     * NTCP: Don't drop a connection unless both directions are idle;

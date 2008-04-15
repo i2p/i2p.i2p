@@ -29,7 +29,10 @@ class ClientPeerSelector extends TunnelPeerSelector {
         matches.remove(ctx.routerHash());
         ArrayList rv = new ArrayList(matches);
         if (rv.size() > 1)
+/*** removed until we fix SSU reachability
             orderPeers(rv, settings.getRandomKey());
+***/
+            Collections.shuffle(rv, ctx.random());
         if (settings.isInbound())
             rv.add(0, ctx.routerHash());
         else
