@@ -190,7 +190,9 @@ public class PeerState {
     private volatile int _concurrentMessagesActive = 0;
     /** how many concurrency rejections have we had in a row */
     private volatile int _consecutiveRejections = 0;
-    
+    /** is it inbound? **/
+    private boolean _isInbound;
+
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
@@ -268,6 +270,7 @@ public class PeerState {
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
         _dead = false;
+        _isInbound = false;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -553,6 +556,8 @@ public class PeerState {
     public int getConcurrentSends() { return _concurrentMessagesActive; }
     public int getConcurrentSendWindow() { return _concurrentMessagesAllowed; }
     public int getConsecutiveSendRejections() { return _consecutiveRejections; }
+    public boolean isInbound() { return _isInbound; }
+    public void setInbound() { _isInbound = true; }
     
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }

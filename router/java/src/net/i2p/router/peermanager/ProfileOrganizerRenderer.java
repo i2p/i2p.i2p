@@ -134,7 +134,10 @@ class ProfileOrganizerRenderer {
             buf.append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getCapacityValue())).append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
-            buf.append("<td align=\"right\">").append(prof.getIsFailing()).append("</td>");
+            buf.append("<td>");
+            if (_context.shitlist().isShitlisted(peer)) buf.append("Shitlist");
+            if (prof.getIsFailing()) buf.append(" Failing");
+            buf.append("&nbsp</td>");
             //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
             buf.append("<td nowrap><a href=\"netdb.jsp#").append(peer.toBase64().substring(0,6)).append("\">netDb</a>");

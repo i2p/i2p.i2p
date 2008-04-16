@@ -625,6 +625,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                 }
                 markUnreachable(peerHash);
+                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network");
                 //_context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
@@ -1673,14 +1674,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(port);
 */
             buf.append("</a>&nbsp;");
+            if (peer.isInbound())
+                buf.append("&gt; ");
+            else
+                buf.append("&lt; ");
             if (peer.getWeRelayToThemAs() > 0)
-                buf.append("&gt;");
+                buf.append("^");
             else
                 buf.append("&nbsp;");
             if (peer.getTheyRelayToUsAs() > 0)
-                buf.append("&lt;");
-            else
-                buf.append("&nbsp;");
+                buf.append("v");
             
             boolean appended = false;
             if (_activeThrottle.isChoked(peer.getRemotePeer())) {
@@ -1872,7 +1875,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private static final String KEY = "<tr><td colspan=\"15\" valign=\"top\" align=\"left\">" +
-        "<b id=\"def.peer\">peer</b>: the remote peer (&lt; means they offer to introduce us, &gt; means we offer to introduce them)<br />\n" +
+        "<b id=\"def.peer\">peer</b>: the remote peer (&lt; inbound, &gt; outbound, v means they offer to introduce us, ^ means we offer to introduce them)<br />\n" +
         "<b id=\"def.idle\">idle</b>: the idle time is how long since a packet has been received or sent<br />\n" +
         "<b id=\"def.rate\">in/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second)<br />\n" +
         "<b id=\"def.up\">up</b>: the uptime is how long ago this session was established<br />\n" +

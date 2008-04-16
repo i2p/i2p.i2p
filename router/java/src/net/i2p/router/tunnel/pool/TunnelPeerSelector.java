@@ -152,16 +152,26 @@ public abstract class TunnelPeerSelector {
         // isn't safe, since they may publish one set of routerInfo to us and another to
         // other peers.  the defaults for filterUnreachable has always been to return false,
         // but might as well make it explicit with a "false &&"
-        
-        if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
+        //
+        // Unreachable peers at the inbound gateway is a major cause of problems.
+        // Due to a bug in SSU peer testing in 0.6.1.32 and earlier, peers don't know
+        // if they are unreachable, so this won't help much. As of 0.6.1.33 we should have
+        // lots of unreachables, so enable this for now.
+        // We could just try and exclude them as the inbound gateway but that's harder
+        // (and even worse for anonymity?).
+        //
+        // Defaults changed to true for inbound only in filterUnreachable below.
+
+        Set peers = new HashSet(1);
+        // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
+        if (filterUnreachable(ctx, isInbound, isExploratory)) {
             List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
-            if (caps == null) return new HashSet(0);
-            HashSet rv = new HashSet(caps);
-            return rv;
-        } else if (filterSlow(ctx, isInbound, isExploratory)) {
+            if (caps != null)
+                peers.addAll(caps);
+        }
+        if (filterSlow(ctx, isInbound, isExploratory)) {
             Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
             char excl[] = getExcludeCaps(ctx);
-            Set peers = new HashSet(1);
             if (excl != null) {
                 FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)ctx.netDb();
                 List known = fac.getKnownRouterData();
@@ -268,10 +278,8 @@ public abstract class TunnelPeerSelector {
                 }
                  */
             }
-            return peers;
-        } else {
-            return new HashSet(1);
         }
+        return peers;
     }
     
     public static boolean shouldExclude(RouterContext ctx, RouterInfo peer) {
@@ -375,10 +383,11 @@ public abstract class TunnelPeerSelector {
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.inboundExploratoryExcludeUnreachable";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.inboundClientExcludeUnreachable";
     
-    private static final boolean DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
-    private static final boolean DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
-    private static final boolean DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
-    private static final boolean DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
+    private static final String DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "false";
+    private static final String DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = "false";
+    // see comments at getExclude() above
+    private static final String DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "true";
+    private static final String DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "true";
     
     protected boolean filterUnreachable(RouterContext ctx, boolean isInbound, boolean isExploratory) {
         boolean def = false;
@@ -386,14 +395,14 @@ public abstract class TunnelPeerSelector {
         
         if (isExploratory)
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
+                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
             else
-                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
+                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
         else
             if (isInbound)
-                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
             else 
-                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE, DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
         
         boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
         //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);

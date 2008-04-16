@@ -37,7 +37,7 @@ public class Shitlist {
         Set transports;
     }
     
-    public final static long SHITLIST_DURATION_MS = 4*60*1000; // 4 minute shitlist
+    public final static long SHITLIST_DURATION_MS = 40*60*1000; // 40 minute shitlist
     
     public Shitlist(RouterContext context) {
         _context = context;
@@ -72,6 +72,8 @@ public class Shitlist {
                 if (prof != null)
                     prof.unshitlist();
                 _context.messageHistory().unshitlist(peer);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Unshitlisting router (expired) " + peer.toBase64());
             }
             
             requeue(30*1000);
@@ -152,12 +154,13 @@ public class Shitlist {
     public void unshitlistRouter(Hash peer, String transport) { unshitlistRouter(peer, true, transport); }
     private void unshitlistRouter(Hash peer, boolean realUnshitlist, String transport) {
         if (peer == null) return;
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Unshitlisting router " + peer.toBase64()
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Calling unshitlistRouter " + peer.toBase64()
                       + (transport != null ? "/" + transport : ""));
         boolean fully = false;
+        Entry e;
         synchronized (_entries) {
-            Entry e = (Entry)_entries.remove(peer);
+            e = (Entry)_entries.remove(peer);
             if ( (e == null) || (e.transports == null) || (transport == null) || (e.transports.size() <= 1) ) {
                 // fully unshitlisted
                 fully = true;
@@ -176,6 +179,9 @@ public class Shitlist {
                     prof.unshitlist();
             }
             _context.messageHistory().unshitlist(peer);
+            if (_log.shouldLog(Log.INFO) && e != null)
+                _log.info("Unshitlisting router " + peer.toBase64()
+                          + (transport != null ? "/" + transport : ""));
         }
     }
     
@@ -209,6 +215,8 @@ public class Shitlist {
             if (prof != null)
                 prof.unshitlist();
             _context.messageHistory().unshitlist(peer);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Unshitlisting router (expired) " + peer.toBase64());
         }
         
         return rv;

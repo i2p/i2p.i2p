@@ -431,6 +431,7 @@ public class EstablishmentManager {
         peer.setRemotePeer(remote.calculateHash());
         peer.setWeRelayToThemAs(state.getSentRelayTag());
         peer.setTheyRelayToUsAs(0);
+        peer.setInbound();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle completely established (inbound): " + state.getRemoteHostId().toString() 
@@ -451,9 +452,16 @@ public class EstablishmentManager {
      * dont send our info immediately, just send a small data packet, and 5-10s later, 
      * if the peer isnt shitlisted, *then* send them our info.  this will help kick off
      * the oldnet
+     * The "oldnet" was < 0.6.1.10, it is long gone.
+     * The delay really slows down the network.
+     * The peer is unshitlisted and marked reachable by addRemotePeerState() which calls markReachable()
+     * so the check below is fairly pointless.
+     * If for some strange reason an oldnet router (NETWORK_ID == 1) does show up,
+     *  it's handled in UDPTransport.messageReceived()
+     * (where it will get dropped, marked unreachable and shitlisted at that time).
      */
     private void sendInboundComplete(PeerState peer) {
-        SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
+        // SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 10*1000);
         if (_log.shouldLog(Log.INFO))
             _log.info("Completing to the peer after confirm: " + peer);
         DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
@@ -461,6 +469,7 @@ public class EstablishmentManager {
         dsm.setMessageExpiration(_context.clock().now()+10*1000);
         dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         _transport.send(dsm, peer);
+        SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 0);
     }
     private class PublishToNewInbound implements SimpleTimer.TimedEvent {
         private PeerState _peer;

@@ -259,6 +259,9 @@ public class TransportManager implements TransportEventListener {
             Transport t = (Transport)_transports.get(i);
             if (t.isUnreachable(peer)) {
                 unreachableTransports++;
+                // this keeps GetBids() from shitlisting for "no common transports"
+                // right after we shitlisted for "unreachable on any transport" below...
+                msg.transportFailed(t.getStyle());
                 continue;
             }
             if (failedTransports.contains(t.getStyle())) {

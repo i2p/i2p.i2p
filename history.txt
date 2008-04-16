@@ -1,3 +1,15 @@
+2008-04-16 zzz
+    * SSU/Reachability:
+      - Extend shitlist time from 4-8m to 40-60m
+      - Add some shitlist logging
+      - Don't shitlist twice when unreachable on all transports
+      - Exclude netDb-listed unreachable peers from inbound tunnels;
+        this won't help much since there are very few of these now
+      - Remove 10s delay on inbound UDP connections used for the
+        0.6.1.10 transition
+      - Track and display UDP connection direction on peers.jsp
+      - Show shitlist status in-line on profiles.jsp
+
 2008-04-15 zzz
     * SSU Reachability/PeerTestManager:
       - Back out strict peer ordering until we fix SSU
