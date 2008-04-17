@@ -125,6 +125,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.isBacklogged(dest); 
     }
     
+    public boolean wasUnreachable(Hash dest) { 
+        return _manager.wasUnreachable(dest); 
+    }
+    
     public List getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
     }

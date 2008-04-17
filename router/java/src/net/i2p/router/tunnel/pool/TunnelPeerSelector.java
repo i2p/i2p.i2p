@@ -155,8 +155,12 @@ public abstract class TunnelPeerSelector {
         //
         // Unreachable peers at the inbound gateway is a major cause of problems.
         // Due to a bug in SSU peer testing in 0.6.1.32 and earlier, peers don't know
-        // if they are unreachable, so this won't help much. As of 0.6.1.33 we should have
-        // lots of unreachables, so enable this for now.
+        // if they are unreachable, so the netdb indication won't help much.
+        // As of 0.6.1.33 we should have lots of unreachables, so enable this for now.
+        // Also (and more effectively) exclude peers we detect are unreachable,
+        // this should be much more effective, especially on a router that has been
+        // up a few hours.
+        //
         // We could just try and exclude them as the inbound gateway but that's harder
         // (and even worse for anonymity?).
         //
@@ -166,6 +170,9 @@ public abstract class TunnelPeerSelector {
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
         if (filterUnreachable(ctx, isInbound, isExploratory)) {
             List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
+            if (caps != null)
+                peers.addAll(caps);
+            caps = ctx.profileOrganizer().selectPeersLocallyUnreachable();
             if (caps != null)
                 peers.addAll(caps);
         }

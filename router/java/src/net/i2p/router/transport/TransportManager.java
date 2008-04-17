@@ -202,6 +202,20 @@ public class TransportManager implements TransportEventListener {
         return false;
     }    
     
+    /**
+     * Was the peer UNreachable (outbound only) on any transport,
+     * based on the last time we tried it for each transport?
+     * This is NOT reset if the peer contacts us.
+     */
+    public boolean wasUnreachable(Hash dest) {
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            if (!t.wasUnreachable(dest))
+                return false;
+        }
+        return true;
+    }    
+    
     Map getAddresses() {
         Map rv = new HashMap(_transports.size());
         for (int i = 0; i < _transports.size(); i++) {

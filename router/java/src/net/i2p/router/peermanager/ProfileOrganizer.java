@@ -424,6 +424,24 @@ public class ProfileOrganizer {
         return;
     }
     
+    public List selectPeersLocallyUnreachable() { 
+        List n;
+        int count;
+        synchronized (_reorganizeLock) {
+            count = _notFailingPeers.size();
+            n = new ArrayList(_notFailingPeers.keySet());
+        }
+        List l = new ArrayList(count / 4);
+        for (Iterator iter = n.iterator(); iter.hasNext(); ) {
+            Hash peer = (Hash)iter.next();
+            if (_context.commSystem().wasUnreachable(peer))
+                l.add(peer);
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Unreachable: " + l);
+        return l;
+    }
+
     /**
      * Find the hashes for all peers we are actively profiling
      *

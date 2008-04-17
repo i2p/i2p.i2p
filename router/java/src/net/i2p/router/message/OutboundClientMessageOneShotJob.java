@@ -319,15 +319,29 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _lease = (Lease)orderedLeases.get(orderedLeases.firstKey());
         } else {
 ****/
+
+        // Avoid a lease on a gateway we think is unreachable, if possible
+        for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
+            Lease l = _leaseSet.getLease(i);
+            if (!getContext().commSystem().wasUnreachable(l.getGateway())) {
+                _lease = l;
+                break;
+            }
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getJobId() + ": Skipping unreachable (by us) gateway " + l.getGateway()); 
+        }
+        if (_lease == null) {
             _lease = (Lease)leases.get(0);
-//      }
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getJobId() + ": All leases are unreachable (by us) for " + _toString); 
+        }
 /*** removed until we fix SSU reachability
         synchronized (_leaseCache) {
             _leaseCache.put(_to, _lease);
         }
-***/
         if (_log.shouldLog(Log.WARN))
             _log.warn("Added to cache - lease for " + _toString); 
+***/
         return true;
     }
 

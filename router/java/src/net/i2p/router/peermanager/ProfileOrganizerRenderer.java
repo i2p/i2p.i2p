@@ -137,6 +137,7 @@ class ProfileOrganizerRenderer {
             buf.append("<td>");
             if (_context.shitlist().isShitlisted(peer)) buf.append("Shitlist");
             if (prof.getIsFailing()) buf.append(" Failing");
+            if (_context.commSystem().wasUnreachable(peer)) buf.append(" Unreachable");
             buf.append("&nbsp</td>");
             //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");

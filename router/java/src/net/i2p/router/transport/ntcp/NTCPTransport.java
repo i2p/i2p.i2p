@@ -132,7 +132,7 @@ public class NTCPTransport extends TransportImpl {
     
     void inboundEstablished(NTCPConnection con) {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1, 0);
-        markReachable(con.getRemotePeer().calculateHash());
+        markReachable(con.getRemotePeer().calculateHash(), true);
         //_context.shitlist().unshitlistRouter(con.getRemotePeer().calculateHash());
         NTCPConnection old = null;
         synchronized (_conLock) {

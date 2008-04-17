@@ -15,6 +15,7 @@ import java.util.*;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
@@ -36,6 +37,7 @@ public abstract class TransportImpl implements Transport {
     protected RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private Map _unreachableEntries;
+    private Set _wasUnreachableEntries;
 
     /**
      * Initialize the new transport
@@ -54,6 +56,7 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
         _unreachableEntries = new HashMap(16);
+        _wasUnreachableEntries = new HashSet(16);
         _currentAddress = null;
     }
     
@@ -399,19 +402,23 @@ public abstract class TransportImpl implements Transport {
         }
     }
     /** called when we can't reach a peer */
+    /** This isn't very useful since it is cleared when they contact us */
     public void markUnreachable(Hash peer) {
         long now = _context.clock().now();
         synchronized (_unreachableEntries) {
             _unreachableEntries.put(peer, new Long(now));
         }
+        markWasUnreachable(peer, true);
     }
     /** called when we establish a peer connection (outbound or inbound) */
-    public void markReachable(Hash peer) {
+    public void markReachable(Hash peer, boolean isInbound) {
         // if *some* transport can reach them, then we shouldn't shitlist 'em
         _context.shitlist().unshitlistRouter(peer);
         synchronized (_unreachableEntries) {
             _unreachableEntries.remove(peer);
         }
+        if (!isInbound)
+            markWasUnreachable(peer, false);
     }
     private class CleanupUnreachable extends JobImpl {
         public CleanupUnreachable(RouterContext ctx) {
@@ -430,6 +437,34 @@ public abstract class TransportImpl implements Transport {
             }
             requeue(60*1000);
         }
+    }
+
+    /**
+     * Was the peer UNreachable (outbound only) the last time we tried it?
+     * This is NOT reset if the peer contacts us and it is never expired.
+     */
+    public boolean wasUnreachable(Hash peer) {
+        synchronized (_wasUnreachableEntries) {
+            if (_wasUnreachableEntries.contains(peer))
+                return true;
+        }
+        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+        if (ri == null)
+            return false;
+        return null == ri.getTargetAddress(this.getStyle());
+    }
+    /**
+     * Maintain the WasUnreachable list
+     */
+    public void markWasUnreachable(Hash peer, boolean yes) {
+        synchronized (_wasUnreachableEntries) {
+            if (yes)
+                _wasUnreachableEntries.add(peer);
+            else
+                _wasUnreachableEntries.remove(peer);
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
     }
 
     public static boolean isPubliclyRoutable(byte addr[]) {

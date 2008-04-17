@@ -48,6 +48,7 @@ public interface Transport {
     public short getReachabilityStatus();
     public void recheckReachability();
     public boolean isBacklogged(Hash dest);
+    public boolean wasUnreachable(Hash dest);
     
     public boolean isUnreachable(Hash peer);
 }

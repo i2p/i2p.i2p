@@ -76,7 +76,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         // We need to randomize our ff selection, else we stay with the same ones since
         // getFloodfillPeers() is sorted by closest distance. Always using the same
         // ones didn't help reliability.
-        // Also, query the unheard-from, unprofiled, failing and shitlisted ones last.
+        // Also, query the unheard-from, unprofiled, failing, unreachable and shitlisted ones last.
         // We should hear from floodfills pretty frequently so set a 30m time limit.
         // If unprofiled we haven't talked to them in a long time.
         // We aren't contacting the peer directly, so shitlist doesn't strictly matter,
@@ -90,14 +90,15 @@ class FloodOnlySearchJob extends FloodSearchJob {
                  Hash peer = (Hash)floodfillPeers.get(i);
                  PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
                  if (profile == null || profile.getLastHeardFrom() < before ||
-                     profile.getIsFailing() || getContext().shitlist().isShitlisted(peer)) {
+                     profile.getIsFailing() || getContext().shitlist().isShitlisted(peer) ||
+                     getContext().commSystem().wasUnreachable(peer)) {
                      failcount++;
                      ffp.add(peer);
                  } else
                      ffp.add(0, peer);
             }
             if (_log.shouldLog(Log.INFO) && failcount > 0)
-                _log.info(getJobId() + ": " + failcount + " of " + floodfillPeers.size() + " floodfills are not heard from, unprofiled, failing or shitlisted");
+                _log.info(getJobId() + ": " + failcount + " of " + floodfillPeers.size() + " floodfills are not heard from, unprofiled, failing, unreachable or shitlisted");
             floodfillPeers = ffp;
         }
 
