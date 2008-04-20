@@ -103,6 +103,7 @@ public class StatisticsManager implements Service {
         // stats.setProperty("router.id", RouterVersion.ID);
         // stats.setProperty("core.id", CoreVersion.ID);
 
+/***
         int newlines = 0;
         FileInputStream in = null;
         try {
@@ -122,7 +123,7 @@ public class StatisticsManager implements Service {
         }
         if (newlines > 0)
             stats.setProperty("stat_identities", newlines+"");
-
+***/
         
         if (_includePeerRankings) {
             if (false)
@@ -150,6 +151,7 @@ public class StatisticsManager implements Service {
             //includeRate("router.throttleTunnelProbTooFast", stats, new long[] { 60*60*1000 });
             //includeRate("router.throttleTunnelProcessingTime1m", stats, new long[] { 60*60*1000 });
 
+           if (commentMeOutInDot33)
             includeRate("router.fastPeers", stats, new long[] { 60*60*1000 });
             
             //includeRate("udp.statusOK", stats, new long[] { 20*60*1000 });

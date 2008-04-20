@@ -1,3 +1,14 @@
+2008-04-20 zzz
+    * Outbound message/Reachability:
+      - Fix a bug from -19 causing the persistent lease selection
+        removed in -17 to be back again
+      - Use netDb-listed-unreachable instead of detected-unreachable
+        for exclusion of unreachable peers from selected leases,
+        as there are potential anonymity problems with using
+        detected-unreachable
+      - Tweak logging some more
+    * NetDb stats: Remove a couple more including the inefficient stat_identities
+
 2008-04-17 zzz
     * Reachability:
       - Track unreachable peers persistently

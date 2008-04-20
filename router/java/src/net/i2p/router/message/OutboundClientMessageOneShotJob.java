@@ -16,6 +16,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PublicKey;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.MessageId;
@@ -320,20 +321,29 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         } else {
 ****/
 
+
         // Avoid a lease on a gateway we think is unreachable, if possible
-        for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
-            Lease l = _leaseSet.getLease(i);
+        for (int i = 0; i < leases.size(); i++) {
+            Lease l = (Lease) leases.get(i);
+/***
+ ***  Anonymity concerns with this, as the dest could act unreachable just to us, then
+ ***  look at our lease selection.
+ ***  Let's just look at whether the gw thinks it is unreachable instead -
+ ***  unfortunately the "U" is rarely seen.
             if (!getContext().commSystem().wasUnreachable(l.getGateway())) {
+***/
+            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(l.getGateway());
+            if (ri == null || ri.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) < 0) {
                 _lease = l;
                 break;
             }
             if (_log.shouldLog(Log.WARN))
-                _log.warn(getJobId() + ": Skipping unreachable (by us) gateway " + l.getGateway()); 
+                _log.warn(getJobId() + ": Skipping unreachable gateway " + l.getGateway() + " for " + _toString); 
         }
         if (_lease == null) {
             _lease = (Lease)leases.get(0);
             if (_log.shouldLog(Log.WARN))
-                _log.warn(getJobId() + ": All leases are unreachable (by us) for " + _toString); 
+                _log.warn(getJobId() + ": All leases are unreachable for " + _toString); 
         }
 /*** removed until we fix SSU reachability
         synchronized (_leaseCache) {
