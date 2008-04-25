@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2008-03-09 15:00:00 $">
- <i2p.release version="0.6.1.32" date="2008/03/09" minVersion="0.6"
+<i2p.news date="$Date: 2008-04-26 15:00:00 $">
+ <i2p.release version="0.6.1.33" date="2008/04/26" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,50 +11,19 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
+2008-04-26: <b>0.6.1.33 <a href="http://www.i2p2.i2p/release-0.6.1.33.html">Released</a></b>
+</p><p>
+The 0.6.1.33 release contains several important bug fixes and performance improvements
+in SSU reachability detection, floodfill peer selection, tunnel peer selection, tunnel testing,
+NTCP idle detection, the streaming lib, and news fetching.
+It also adds secondary tracker support to i2psnark.
+Please upgrade as soon as you can, as these fixes
+should improve the reliability of the whole network.
+</p>
+
+<p>
+&#149;
 2008-04-20: <b><a href="http://trac.i2p2.i2p/">We are now using Trac as bugtracker</a></b>
-</p><p>
-&#149;
-2008-03-16: <b><a href="http://forum.i2p/">forum.i2p</a> Has Returned</b>
-</p><p>
-<a href="http://forum.i2p.net/">forum.i2p.net</a> has permanently moved to
-<a href="http://forum.i2p2.de/">forum.i2p2.de</a>.
-</p>
-
-<p>
-&#149;
-2008-03-14: <b>krabs.i2p</a> Outproxy is Temporarily Down</b>
-</p><p>
-Use new outproxy false.i2p
-as an alternate - must be in your hosts.txt -
-<a href="http://stats.i2p/cgi-bin/hostquery.cgi?a=false.i2p">here is the destkey</a>
-if you don't have it.
-</p>
-
-<p>
-&#149;
-2008-03-09: <b>0.6.1.32 <a href="http://www.i2p2.i2p/release-0.6.1.32.html">Released</a></b>
-</p><p>
-The 0.6.1.32 release contains a new, more efficient
-tunnel build algorithm, and fixes participating tunnel counts.
-These changes should help network capacity, so please
-upgrade when you get a chance.
-This release also increases the default inbound bandwidth limit to 32KBps.
-You may wish to adjust your limits on
-<a href="config.jsp">config.jsp</a>.
-</p>
-
-<p>
-&#149;
-2008-02-29: <b>Upgrading from 0.6.1.31</b>
-</p><p>
-If you upgraded from 0.6.1.30 to 0.6.1.31, you may wish to take advantage
-of the new round-robin update downloading when .32 is released. This is optional.
-On
-<a href="configadvanced.jsp">configadvanced.jsp</a>,
-delete the line "router.updateURL=..." and click "Apply".
-Verify that you now have three default Update URLs listed on
-<a href="configupdate.jsp">configupdate.jsp</a>.
-If you already have three Update URLs, you do not have to do anything.
 </p>
 
 <p>
@@ -63,26 +32,6 @@ If you already have three Update URLs, you do not have to do anything.
 </p><p>
 Full instructions are posted at
 <a href="http://www.i2p2.i2p/upgrade-0.6.1.30.html">www.i2p2.i2p/upgrade-0.6.1.30.html</a>.
-</p>
-
-<p>
-&#149;
-2008-02-05: <b>*.i2p[.net] Replacements</b>
-<p>
-As you probably know, <a href="http://www.i2p.net/">www.i2p.net</a>
-and its related sites and services went down January 13 after
-a power outage at the hosting facility, and did not return fully to service.
-While some pages are still available at
-<a href="http://66.111.51.110/">66.111.51.110</a>
-we have a new official site at
-<a href="http://www.i2p2.de/">www.i2p2.de</a>
-and
-<a href="http://www.i2p2.i2p/">www.i2p2.i2p</a>.
-Extensive information about replacements for the various services
-is available at
-<a href="http://forum.i2p/viewtopic.php?t=2500">the forums</a>,
-<a href="http://complication.i2p/">complication.i2p</a>, and
-<a href="http://zzz.i2p/">zzz.i2p</a>.
 </p>
 
 <!--
