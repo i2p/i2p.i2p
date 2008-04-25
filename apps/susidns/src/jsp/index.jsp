@@ -62,8 +62,8 @@ eepsites announced on other sites if you subscribe to those sites' addressbooks.
 additional sites, but www.i2p2.i2p only. Subscribing to additional sites is an easy task,
 just add them to your <a href="subscriptions.jsp">subscriptions</a> file.)
 </p>
-<p>If you have questions about naming in i2p, there is an excellent <a href="http://forum.i2p.net/viewtopic.php?t=134">introduction</a>
-from duck in the forum.</p>
+<p>If you have questions about naming in i2p, there is an excellent <a href="http://forum.i2p/viewtopic.php?t=134">introduction</a>
+from duck in the forum and <a href="http://www.i2p2.i2p/naming.html">additional information on www.i2p2.i2p</a>.</p>
 <h3>How does the addressbook work?</h3>
 <p>The addressbook application regularly (normally once per hour) polls your subscriptions and merges their content
 into your so-called router addressbook (normally your plain hosts.txt). Then it merges your so-called master addressbook (normally
