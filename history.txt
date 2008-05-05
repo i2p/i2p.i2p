@@ -1,3 +1,23 @@
+2008-05-05 zzz
+    * NetDb Stats: Cleanup of commented out stats
+    * Outbound message:
+      - Fix a couple of tunnel cache cleaning bugs
+      - Cache based on source+dest pairs rather than just dest
+      - Send the reply leaseSet only when necessary,
+        rather than all the time (big savings in overhead)
+      - Enable persistent lease selection again
+      - Logging tweaks
+    * Reachability:
+      - Restrict <= .32 SSU-only peers from inbound tunnels,
+        since they don't know if they are unreachable
+      - Have SSU bid aggressively when it has less than 3 peers, so
+        we can determine our IP address and do peer testing.
+        Otherwise a router may never determine its IP address or reachability status.
+    * Summary bar:
+      - Add reachability status
+      - Add participating tunnel acceptance status
+    * Throttle: Reject tunnels for first 10m uptime
+
 * 2008-04-26  0.6.1.33 released
 
 2008-04-20 zzz
