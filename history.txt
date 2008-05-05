@@ -17,6 +17,7 @@
       - Add reachability status
       - Add participating tunnel acceptance status
     * Throttle: Reject tunnels for first 10m uptime
+    * I2PTunnel: Change default outproxy to false.i2p
 
 * 2008-04-26  0.6.1.33 released
 
