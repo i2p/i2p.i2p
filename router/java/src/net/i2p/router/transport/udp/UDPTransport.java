@@ -863,7 +863,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
-            if (alwaysPreferUDP())
+
+            // Try to maintain at least 3 peers so we can determine our IP address and
+            // we have a selection to run peer tests with.
+            int count;
+            synchronized (_peersByIdent) {
+                count = _peersByIdent.size();
+            }
+            if (alwaysPreferUDP() || count < 3)
                 return _slowPreferredBid;
             else if (preferUDP())
                 return _slowBid;
