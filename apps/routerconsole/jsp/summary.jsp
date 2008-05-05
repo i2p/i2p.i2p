@@ -13,8 +13,8 @@
  <b>Ident:</b> <jsp:getProperty name="helper" property="ident" /><br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
- <b>Now:</b> <jsp:getProperty name="helper" property="time" /><!--<br />
- <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a>--><%
+ <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
+ <b>Reachability:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><%
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
         out.print("<br />" + update.getStatus());
@@ -95,6 +95,7 @@
  <b>Message delay:</b> <jsp:getProperty name="helper" property="messageDelay" /><br />
  <b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
  <b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
+ <b><jsp:getProperty name="helper" property="tunnelStatus" /></b><br />
  <hr />
  
 </div>

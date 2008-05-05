@@ -43,4 +43,8 @@ public interface RouterThrottle {
      *
      */
     public double getInboundRateDelta();
+    /**
+     * Message on the state of participating tunnel acceptance
+     */
+    public String getTunnelStatus();
 }

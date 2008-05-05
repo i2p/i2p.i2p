@@ -124,10 +124,10 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_DIFFERENT:
                 return "ERR-SymmetricNAT";
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                return "OK (NAT)";
+                return "Firewalled";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
-                return "Unknown";
+                return "Testing";
         }
     }
     
@@ -492,6 +492,12 @@ public class SummaryHelper {
             return "0ms";
         
         return _context.throttle().getTunnelLag() + "ms";
+    }
+    
+    public String getTunnelStatus() { 
+        if (_context == null) 
+            return "";
+        return _context.throttle().getTunnelStatus();
     }
     
     public String getInboundBacklog() {
