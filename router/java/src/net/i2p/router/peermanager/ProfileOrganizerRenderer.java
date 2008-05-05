@@ -126,8 +126,13 @@ class ProfileOrganizerRenderer {
             }
             if (isIntegrated) buf.append(", Integrated");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
-            if (info != null)
-                buf.append(" (" + info.getCapabilities() + ")");
+            if (info != null) {
+                buf.append(" (").append(info.getCapabilities());
+                String v = info.getOption("router.version");
+                if (v != null)
+                    buf.append(' ').append(v);
+                buf.append(')');
+            }
             
             buf.append("<td align=\"right\">").append(num(prof.getSpeedValue()));
             //buf.append('/').append(num(prof.getOldSpeedValue()));
