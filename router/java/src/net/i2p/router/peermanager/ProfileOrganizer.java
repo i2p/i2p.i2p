@@ -424,6 +424,11 @@ public class ProfileOrganizer {
         return;
     }
     
+    /**
+     * Get the peers the transport layer thinks are unreachable, and
+     * add in the peers with the SSU peer testing bug.
+     *
+     */
     public List selectPeersLocallyUnreachable() { 
         List n;
         int count;
@@ -436,6 +441,17 @@ public class ProfileOrganizer {
             Hash peer = (Hash)iter.next();
             if (_context.commSystem().wasUnreachable(peer))
                 l.add(peer);
+            else {
+                // blacklist <= 0.6.1.32 SSU-only peers, they don't know if they are unreachable,
+                // and we may not know either if they contacted us first, so assume they are
+                RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
+                if (info != null) {
+                    String v = info.getOption("router.version");
+                    if (v != null && (!v.equals("0.6.1.33")) &&
+                        v.startsWith("0.6.1.") && info.getTargetAddress("NTCP") == null)
+                        l.add(peer);
+                }
+            }
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Unreachable: " + l);
