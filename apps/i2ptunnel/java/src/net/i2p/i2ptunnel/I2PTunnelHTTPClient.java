@@ -649,7 +649,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                            "http://i2host.i2p/cgi-bin/i2hostjump?",
                                            // "http://orion.i2p/jump/",
                                            "http://stats.i2p/cgi-bin/jump.cgi?a=",
-                                           "http://trevorreznik.i2p/cgi-bin/jump.php?hostname="
+                                           "http://trevorreznik.i2p/cgi-bin/jump.php?hostname=",
+                                           "http://i2jump.i2p/"
                                           };
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
                                           boolean usingWWWProxy, String wwwProxy, boolean showAddrHelper) throws IOException {
