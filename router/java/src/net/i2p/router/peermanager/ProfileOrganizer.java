@@ -426,7 +426,8 @@ public class ProfileOrganizer {
     
     /**
      * Get the peers the transport layer thinks are unreachable, and
-     * add in the peers with the SSU peer testing bug.
+     * add in the peers with the SSU peer testing bug,
+     * and peers requiring introducers.
      *
      */
     public List selectPeersLocallyUnreachable() { 
@@ -442,14 +443,28 @@ public class ProfileOrganizer {
             if (_context.commSystem().wasUnreachable(peer))
                 l.add(peer);
             else {
-                // blacklist <= 0.6.1.32 SSU-only peers, they don't know if they are unreachable,
-                // and we may not know either if they contacted us first, so assume they are
+                // Blacklist <= 0.6.1.32 SSU-only peers, they don't know if they are unreachable,
+                // and we may not know either if they contacted us first, so assume they are.
+                // Also blacklist all peers requiring SSU introducers, because either
+                //  a) it's slow; or
+                //  b) it doesn't work very often; or
+                //  c) in the event they are advertising NTCP, it probably won't work because
+                //     they probably don't have a TCP hole punched in their firewall either.
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null) {
                     String v = info.getOption("router.version");
+                    // this only works if there is no 0.6.1.34!
                     if (v != null && (!v.equals("0.6.1.33")) &&
                         v.startsWith("0.6.1.") && info.getTargetAddress("NTCP") == null)
                         l.add(peer);
+                    else {
+                        RouterAddress ra = info.getTargetAddress("SSU");
+                        if (ra == null) continue;
+                        // This is the quick way of doing UDPAddress.getIntroducerCount() > 0
+                        Properties props = ra.getOptions();
+                        if (props != null && props.getProperty("ihost0") != null)
+                            l.add(peer);
+                    }
                 }
             }
         }

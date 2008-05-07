@@ -29,8 +29,7 @@ public class StatsGenerator {
     
     public void generateStatsPage(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(16*1024);
-        buf.append("<h1>Router statistics</h1>");
-        buf.append("<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><hr />");
+        buf.append("<h1>Router statistics</h1><hr />");
         buf.append("<form action=\"/oldstats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
@@ -120,7 +119,7 @@ public class StatsGenerator {
             buf.append(num(curFreq.getStrictAverageEventsPerPeriod()));
             buf.append(" events (averaged ");
             buf.append(" using the lifetime of ");
-            buf.append(num(curFreq.getEventCount()));
+            buf.append(curFreq.getEventCount());
             buf.append(" events)");
             buf.append("<br />");
         }
@@ -169,7 +168,7 @@ public class StatsGenerator {
                 buf.append(")");
             }
             buf.append(" <i>events per period:</i> ");
-            buf.append(num(curRate.getLastEventCount()));
+            buf.append(curRate.getLastEventCount());
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
@@ -177,7 +176,7 @@ public class StatsGenerator {
                 buf.append(" (lifetime average: ");
                 buf.append(num(avgFrequency));
                 buf.append(", peak average: ");
-                buf.append(num(curRate.getExtremeEventCount()));
+                buf.append(curRate.getExtremeEventCount());
                 buf.append(")");
             }
             if (curRate.getSummaryListener() != null) {
@@ -197,7 +196,7 @@ public class StatsGenerator {
                 buf.append("<li><b>lifetime average value:</b> ");
                 buf.append(num(curRate.getLifetimeAverageValue()));
                 buf.append(" over ");
-                buf.append(num(curRate.getLifetimeEventCount()));
+                buf.append(curRate.getLifetimeEventCount());
                 buf.append(" events<br /></li>");
             }
         }

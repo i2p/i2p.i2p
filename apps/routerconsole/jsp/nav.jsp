@@ -34,8 +34,8 @@
  <a href="logs.jsp">Logs</a> |
  <a href="jobs.jsp">Jobs</a> |
  <a href="graphs.jsp">Graphs</a> |
- <a href="oldstats.jsp">Stats</a> |
- <a href="oldconsole.jsp">Internals</a>
+ <a href="oldstats.jsp">Stats</a> <!-- |
+ <a href="oldconsole.jsp">Internals</a> -->
 <% } %>
  <jsp:useBean class="net.i2p.router.web.NavHelper" id="navhelper" scope="request" />
  <jsp:setProperty name="navhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

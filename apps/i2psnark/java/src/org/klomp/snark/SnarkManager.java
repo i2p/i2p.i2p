@@ -84,7 +84,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public boolean shouldUseOpenTrackers() {
         return Boolean.valueOf(_config.getProperty(PROP_USE_OPENTRACKERS, DEFAULT_USE_OPENTRACKERS)).booleanValue();
     }
-    private int getStartupDelayMinutes() { return 1; }
+    private int getStartupDelayMinutes() { return 3; }
     public File getDataDir() { 
         String dir = _config.getProperty(PROP_DIR);
         if ( (dir == null) || (dir.trim().length() <= 0) )
@@ -508,7 +508,7 @@ public class SnarkManager implements Snark.CompleteListener {
         } else if (info.getPieces() <= 0) {
             return "No pieces in " + info.getName() + "?  deleting it";
         } else if (info.getPieceLength(0) > 1*1024*1024) {
-            return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB, deleting it";
+            return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB), deleting it";
         } else if (info.getTotalLength() > 10*1024*1024*1024l) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();

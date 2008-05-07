@@ -124,7 +124,10 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_DIFFERENT:
                 return "ERR-SymmetricNAT";
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                return "Firewalled";
+                if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
+                    return "WARN-Firewalled with Inbound TCP Enabled";
+                else
+                    return "Firewalled";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 return "Testing";
