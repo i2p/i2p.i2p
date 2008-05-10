@@ -405,15 +405,15 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @param signedFile     A signed update file.
      * @param outputFile     The file to write the verified data to.
      * 
-     * @return <code>true</code> if the signature and version were valid and the
-     *         data was moved, <code>false</code> otherwise.
+     * @return <code>null</code> if the signature and version were valid and the
+     *         data was moved, and an error <code>String</code> otherwise.
      */
-    public boolean migrateVerified(String currentVersion, String signedFile, String outputFile) {
+    public String migrateVerified(String currentVersion, String signedFile, String outputFile) {
         if (!isUpdatedVersion(currentVersion, signedFile))
-            return false;
+            return "Downloaded version is not greater than current version";
 
         if (!verify(signedFile))
-            return false;
+            return "Unknown signing key or corrupt file";
 
         FileInputStream fileInputStream = null;
         FileOutputStream fileOutputStream = null;
@@ -432,7 +432,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
                 fileOutputStream.write(buffer, 0, bytesRead);
         } catch (IOException ioe) {
-            return false;
+            return "I/O Exception during file extraction";
         } finally {
             if (fileInputStream != null)
                 try {
@@ -447,7 +447,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
                 }
         }
 
-        return true;
+        return null;
     }
 
     /**

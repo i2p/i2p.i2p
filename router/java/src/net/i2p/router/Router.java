@@ -998,7 +998,7 @@ public class Router {
         }
     }
     
-    private static final String UPDATE_FILE = "i2pupdate.zip";
+    public static final String UPDATE_FILE = "i2pupdate.zip";
     
     private static void installUpdates() {
         File updateFile = new File(UPDATE_FILE);

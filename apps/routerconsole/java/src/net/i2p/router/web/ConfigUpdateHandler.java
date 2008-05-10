@@ -49,9 +49,12 @@ public class ConfigUpdateHandler extends FormHandler {
         if ("Check for update now".equals(_action)) {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
             fetcher.fetchNews();
-            if (fetcher.updateAvailable())
-                addFormNotice("Update available, click link on left");
-            else
+            if (fetcher.updateAvailable()) {
+                if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
+                    addFormNotice("Update available, attempting to download now");
+                else
+                    addFormNotice("Update available, click link on left to download");
+            } else
                 addFormNotice("No update available");
         }
 

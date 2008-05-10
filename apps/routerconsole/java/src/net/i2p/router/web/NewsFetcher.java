@@ -9,6 +9,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.util.EepGet;
@@ -68,7 +69,10 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     
     private boolean shouldInstall() {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
-        return ("install".equals(policy));
+        if ("notify".equals(policy))
+            return false;
+        File zip = new File(Router.UPDATE_FILE);
+        return !zip.exists();
     }
     
     private boolean shouldFetchNews() {

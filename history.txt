@@ -1,3 +1,16 @@
+2008-05-10 zzz
+    * NetDb: Don't write the my.info file to disk, it isn't used for anything
+    * Stats:
+      - Simplify oldstats.jsp if no events in a stat
+      - Fix the hosed inNetPool.droppedDeliveryStatusDelay stat
+        (caused by an SSU hack)
+    * Update Handler:
+      - Add option to download and verify only
+      - Add distinct error message if version check fails
+
+2008-05-09 welterde
+    * Add an update URL to the list
+
 2008-05-07 zzz
     * Reachability:
       - Restrict peers requiring introducers from inbound tunnels,

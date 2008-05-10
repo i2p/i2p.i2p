@@ -159,18 +159,23 @@ public class UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             _status = "<b>Update downloaded</b>";
             TrustedUpdate up = new TrustedUpdate(_context);
-            boolean ok = up.migrateVerified(RouterVersion.VERSION, SIGNED_UPDATE_FILE, "i2pupdate.zip");
+            String err = up.migrateVerified(RouterVersion.VERSION, SIGNED_UPDATE_FILE, Router.UPDATE_FILE);
             File f = new File(SIGNED_UPDATE_FILE);
             f.delete();
-            if (ok) {
-                _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
-                _status = "<b>Update verified</b><br />Restarting";
-                restart();
+            if (err == null) {
+                String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
+                if ("install".equals(policy)) {
+                    _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
+                    _status = "<b>Update verified</b><br />Restarting";
+                    restart();
+                } else {
+                    _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
+                    _status = "<b>Update downloaded</b><br />Click Restart to Install";
+                }
             } else {
-                // One other possibility, the version in the file is not sufficient
-                // Perhaps need an int return code - but version problem unlikely?
-                _log.log(Log.CRIT, "Update was INVALID - signing key is not trusted or file is corrupt from " + url);
-                _status = "<b>Update signing key invalid or file is corrupt from " + url + "</b>";
+                err = err + " from " + url;
+                _log.log(Log.CRIT, err);
+                _status = "<b>" + err + "</b>";
                 System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             }
         }
