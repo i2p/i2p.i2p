@@ -527,7 +527,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (!_initialized) return;
-        writeMyInfo(localRouterInfo);
+        // This isn't really used for anything
+        // writeMyInfo(localRouterInfo);
         if (localRouterInfo.isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
@@ -543,6 +544,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * for getting the freshest data.
      *
      */
+/***
     private final void writeMyInfo(RouterInfo info) {
         FileOutputStream fos = null;
         try {
@@ -562,6 +564,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
+***/
     
     /**
      * Don't let leaseSets go 20 minutes into the future 
