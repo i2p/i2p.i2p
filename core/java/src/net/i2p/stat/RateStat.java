@@ -72,7 +72,7 @@ public class RateStat {
         if ( (_rates == null) || (_rates.length <= 0) ) return 0;
         return _rates[0].getLifetimeAverageValue();
     }
-    public double getLifetimeEventCount() {
+    public long getLifetimeEventCount() {
         if ( (_rates == null) || (_rates.length <= 0) ) return 0;
         return _rates[0].getLifetimeEventCount();
     }

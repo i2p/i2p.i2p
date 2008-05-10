@@ -98,9 +98,12 @@ public class StatsGenerator {
         buf.append("<i>");
         buf.append(freq.getDescription());
         buf.append("</i><br />");
+        long uptime = _context.router().getUptime();
         long periods[] = freq.getPeriods();
         Arrays.sort(periods);
         for (int i = 0; i < periods.length; i++) {
+            if (periods[i] > uptime)
+                break;
             renderPeriod(buf, periods[i], "frequency");
             Frequency curFreq = freq.getFrequency(periods[i]);
             buf.append(" <i>avg per period:</i> (");
@@ -128,47 +131,64 @@ public class StatsGenerator {
     
     private void renderRate(String name, StringBuffer buf) {
         RateStat rate = _context.statManager().getRate(name);
-        buf.append("<i>");
-        buf.append(rate.getDescription());
-        buf.append("</i><br />");
+        String d = rate.getDescription();
+        if (! "".equals(d)) {
+            buf.append("<i>");
+            buf.append(d);
+            buf.append("</i><br />");
+        }
+        if (rate.getLifetimeEventCount() <= 0) {
+            buf.append("No lifetime events<br />&nbsp;<br />");
+            return;
+        }
+        long now = _context.clock().now();
         long periods[] = rate.getPeriods();
         Arrays.sort(periods);
         buf.append("<ul>");
         for (int i = 0; i < periods.length; i++) {
+            Rate curRate = rate.getRate(periods[i]);
+            if (curRate.getLastCoalesceDate() <= curRate.getCreationDate())
+                break;
             buf.append("<li>");
             renderPeriod(buf, periods[i], "rate");
-            Rate curRate = rate.getRate(periods[i]);
-            buf.append( "<i>avg value:</i> (");
-            buf.append(num(curRate.getAverageValue()));
-            buf.append(" peak ");
-            buf.append(num(curRate.getExtremeAverageValue()));
-            buf.append(", [");
-            buf.append(pct(curRate.getPercentageOfExtremeValue()));
-            buf.append(" of max");
-            buf.append(", and ");
-            buf.append(pct(curRate.getPercentageOfLifetimeValue()));
-            buf.append(" of lifetime average]");
-            
-            buf.append(")");
-            buf.append(" <i>highest total period value:</i> (");
-            buf.append(num(curRate.getExtremeTotalValue()));
-            buf.append(")");
-            if (curRate.getLifetimeTotalEventTime() > 0) {
-                buf.append(" <i>saturation:</i> (");
-                buf.append(pct(curRate.getLastEventSaturation()));
+            if (curRate.getLastEventCount() > 0) {
+                buf.append( "<i>avg value:</i> (");
+                buf.append(num(curRate.getAverageValue()));
+                buf.append(" peak ");
+                buf.append(num(curRate.getExtremeAverageValue()));
+                buf.append(", [");
+                buf.append(pct(curRate.getPercentageOfExtremeValue()));
+                buf.append(" of max");
+                buf.append(", and ");
+                buf.append(pct(curRate.getPercentageOfLifetimeValue()));
+                buf.append(" of lifetime average]");
+                
                 buf.append(")");
-                buf.append(" <i>saturated limit:</i> (");
-                buf.append(num(curRate.getLastSaturationLimit()));
+                buf.append(" <i>highest total period value:</i> (");
+                buf.append(num(curRate.getExtremeTotalValue()));
                 buf.append(")");
-                buf.append(" <i>peak saturation:</i> (");
-                buf.append(pct(curRate.getExtremeEventSaturation()));
-                buf.append(")");
-                buf.append(" <i>peak saturated limit:</i> (");
-                buf.append(num(curRate.getExtremeSaturationLimit()));
-                buf.append(")");
+                if (curRate.getLifetimeTotalEventTime() > 0) {
+                    buf.append(" <i>saturation:</i> (");
+                    buf.append(pct(curRate.getLastEventSaturation()));
+                    buf.append(")");
+                    buf.append(" <i>saturated limit:</i> (");
+                    buf.append(num(curRate.getLastSaturationLimit()));
+                    buf.append(")");
+                    buf.append(" <i>peak saturation:</i> (");
+                    buf.append(pct(curRate.getExtremeEventSaturation()));
+                    buf.append(")");
+                    buf.append(" <i>peak saturated limit:</i> (");
+                    buf.append(num(curRate.getExtremeSaturationLimit()));
+                    buf.append(")");
+                }
+                buf.append(" <i>events:</i> ");
+                buf.append(curRate.getLastEventCount());
+                buf.append(" <i>in this period which ended:</i> ");
+                buf.append(DataHelper.formatDuration(now - curRate.getLastCoalesceDate()));
+                buf.append(" ago ");
+            } else {
+                buf.append(" <i>No events</i> ");
             }
-            buf.append(" <i>events per period:</i> ");
-            buf.append(curRate.getLastEventCount());
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
@@ -191,15 +211,13 @@ public class StatsGenerator {
                 buf.append(" in a format <a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool\">RRDTool</a> understands)");
             }
             buf.append("</li>");
-            if (i + 1 == periods.length) {
-                // last one, so lets display the strict average
-                buf.append("<li><b>lifetime average value:</b> ");
-                buf.append(num(curRate.getLifetimeAverageValue()));
-                buf.append(" over ");
-                buf.append(curRate.getLifetimeEventCount());
-                buf.append(" events<br /></li>");
-            }
         }
+        // Display the strict average
+        buf.append("<li><b>lifetime average value:</b> ");
+        buf.append(num(rate.getLifetimeAverageValue()));
+        buf.append(" over ");
+        buf.append(rate.getLifetimeEventCount());
+        buf.append(" events<br /></li>");
         buf.append("</ul>");
         buf.append("<br />");
     }
