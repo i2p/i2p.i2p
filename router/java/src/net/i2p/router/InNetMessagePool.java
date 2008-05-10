@@ -186,11 +186,15 @@ public class InNetMessagePool implements Service {
                     // was not handled via HandlerJobBuilder
                     _context.messageHistory().droppedOtherMessage(messageBody, (fromRouter != null ? fromRouter.calculateHash() : fromRouterHash));
                     if (type == DeliveryStatusMessage.MESSAGE_TYPE) {
-                        long timeSinceSent = _context.clock().now() - 
-                                            ((DeliveryStatusMessage)messageBody).getArrival();
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Dropping unhandled delivery status message created " + timeSinceSent + "ms ago: " + messageBody);
-                        _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent, timeSinceSent);
+                        // Avoid logging side effect from a horrible UDP EstablishmentManager hack
+                        // We could set up a separate stat for it but don't bother for now
+                        long arr = ((DeliveryStatusMessage)messageBody).getArrival();
+                        if (arr > 10) {
+                            long timeSinceSent = _context.clock().now() - arr;
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Dropping unhandled delivery status message created " + timeSinceSent + "ms ago: " + messageBody);
+                            _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent, timeSinceSent);
+                        }
                     } else if (type == TunnelCreateStatusMessage.MESSAGE_TYPE) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Dropping slow tunnel create request response: " + messageBody);

@@ -466,6 +466,8 @@ public class EstablishmentManager {
             _log.info("Completing to the peer after confirm: " + peer);
         DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
         dsm.setArrival(Router.NETWORK_ID); // overloaded, sure, but future versions can check this
+                                           // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat
+                                           // so it needs to be caught in InNetMessagePool.
         dsm.setMessageExpiration(_context.clock().now()+10*1000);
         dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         _transport.send(dsm, peer);
