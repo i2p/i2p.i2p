@@ -50,7 +50,8 @@ public class StatManager {
         "tunnel.buildExploratoryExpire,tunnel.buildExploratoryReject,tunnel.buildExploratorySuccess," +
         "tunnel.buildRatio.*,tunnel.buildFailure,tunnel.buildSuccess,tunnel.corruptMessage," +
         "tunnel.decryptRequestTime,tunnel.fragmentedDropped,tunnel.participatingMessageCount,"+
-        "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime" ;
+        "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime," +
+        "udp.sendPacketSize,udp.packetsRetransmitted" ;
     
     /**
      * The stat manager should only be constructed and accessed through the 
