@@ -785,9 +785,10 @@ public class Snark
     for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
       PeerCoordinator c = (PeerCoordinator)iter.next();
       if (!c.halted())
-        total += c.getUploadRate();
+        total += c.getCurrentUploadRate();
     }
     long limit = 1024l * I2PSnarkUtil.instance().getMaxUpBW();
+    Snark.debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
     return total > limit;
   }
 }

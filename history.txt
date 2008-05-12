@@ -1,3 +1,24 @@
+2008-05-12 zzz
+    * Outbound message:
+      - Tweak the cache key for efficiency
+    * Stats:
+      - Require two udp stats when stats.full=false, caused NPE on peers.jsp
+    * Summary bar:
+      - Add messages when dropping tunnel requests due to load
+    * Update Handler:
+      - Add postman to the list
+    * i2psnark:
+      - Randomize the PeerCheckerTask start times to make global limiting
+        work better
+      - Calculate bw limits using 40s rather than 4m averages to make
+        bw limiting work better
+      - Change default bw limit from uplimit/3 to uplimit/2 due to
+        overhead reduction from the leaseset bundling change
+    * libjbigi:
+      - Add documentation on dynamic build option
+      - Add two speed tests to the build script
+      - Clean up the build script, make it easier to build dynamic
+
 2008-05-10 zzz
     * NetDb: Don't write the my.info file to disk, it isn't used for anything
     * Stats:

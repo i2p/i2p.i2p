@@ -87,7 +87,10 @@ public class PeerCoordinator implements PeerListener
     setWantedPieces();
 
     // Install a timer to check the uploaders.
-    timer.schedule(new PeerCheckerTask(this), CHECK_PERIOD, CHECK_PERIOD);
+    // Randomize the first start time so multiple tasks are spread out,
+    // this will help the behavior with global limits
+    Random r = new Random();
+    timer.schedule(new PeerCheckerTask(this), (CHECK_PERIOD / 2) + r.nextInt((int) CHECK_PERIOD), CHECK_PERIOD);
   }
   
   // only called externally from Storage after the double-check fails
@@ -190,6 +193,15 @@ public class PeerCoordinator implements PeerListener
   public long getUploadRate()
   {
     return getRate(uploaded_old);
+  }
+
+  public long getCurrentUploadRate()
+  {
+    // no need to synchronize, only one value
+    long r = uploaded_old[0];
+    if (r <= 0)
+        return 0;
+    return (r * 1000) / CHECK_PERIOD;
   }
 
   private long getRate(long array[])
