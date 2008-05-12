@@ -94,6 +94,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_CRIT;
 
         long lag = _context.jobQueue().getMaxLag();
+// reject here if lag too high???
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
         Rate r = null;
         if (rs != null)
@@ -104,7 +105,7 @@ class RouterThrottleImpl implements RouterThrottle {
                 _log.debug("Refusing tunnel request with the job lag of " + lag 
                            + "since the 1 minute message processing time is too slow (" + processTime + ")");
             _context.statManager().addRateData("router.throttleTunnelProcessingTime1m", (long)processTime, (long)processTime);
-            setTunnelStatus("Rejecting tunnels: High processing time");
+            setTunnelStatus("Rejecting tunnels: High message delay");
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
         
@@ -431,7 +432,7 @@ class RouterThrottleImpl implements RouterThrottle {
             setTunnelStatus("Rejecting tunnels");
     }
 
-    private void setTunnelStatus(String msg) {
+    public void setTunnelStatus(String msg) {
         _tunnelStatus = msg;
     }
 
