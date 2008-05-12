@@ -580,11 +580,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
     /**
      * String used to cache things with based on source + dest
+     * Put the dest first to make string matching faster
      */
     private String _hashPair;
     private String hashPair() {
         if (_hashPair == null)
-            _hashPair = _from.calculateHash().toBase64() + _to.calculateHash().toBase64();
+            _hashPair = _to.calculateHash().toBase64() + _from.calculateHash().toBase64();
         return _hashPair;
     }
 
@@ -594,7 +595,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * 44 = 32 * 4 / 3
      */
     private Hash sourceFromHashPair(String s) {
-        return new Hash(Base64.decode(s.substring(0, 44)));
+        return new Hash(Base64.decode(s.substring(44, 88)));
     }
 
     /**
