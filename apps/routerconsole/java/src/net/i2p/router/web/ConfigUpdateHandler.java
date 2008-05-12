@@ -40,7 +40,8 @@ public class ConfigUpdateHandler extends FormHandler {
     "http://amiga.i2p/i2p/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
     "http://complication.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://www.i2p2.i2p/_static/i2pupdate.sud";
+    "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
+    "http://update.postman.i2p/i2pupdate.sud" ;
     
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     
