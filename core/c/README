@@ -1,4 +1,10 @@
-Prior to building the jbigi library, you will need to fetch the GMP source
+If you have a libgmp.so installed on your system already
+(check in /usr/lib), you can build a dynamically linked libjbigi.so as follows:
+	cd jbigi
+	build.sh dynamic
+The built library is jbigi/lib/libjbigi.so .
+	
+Otherwise, prior to building the jbigi library, you will need to fetch the GMP source
 from http://www.swox.com/gmp/, saving it to jbigi/gmp-4.2.2.tar.bz2 (it will
 be unpacked and built as necessary).
 
@@ -16,9 +22,12 @@ it will be used only if the router fails to load the native library.
 To build the native jbigi libraries for all supported CPUs (on the current OS),
 go into jbigi/ and run build-all.sh (the results will be under jbigi/lib/)
 
-After copying the files to the i2p/ directory,
+The build.sh script runs two speed tests, one with your existing
+I2P installation and one with the new libjbigi.
+
+Alternatively, after copying the files to the i2p/ directory,
 to run a speed test comparing the native library to the java library,
-run the shell script below.
+run the shell script below. Adjust the I2P= line as necessary.
 
 -----------------
 
