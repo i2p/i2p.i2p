@@ -38,8 +38,8 @@ public class PeerCoordinator implements PeerListener
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
-  final static int MAX_CONNECTIONS = 24;
-  final static int MAX_UPLOADERS = 4;
+  final static int MAX_CONNECTIONS = 16;
+  final static int MAX_UPLOADERS = 6;
 
   // Approximation of the number of current uploaders.
   // Resynced by PeerChecker once in a while.
@@ -286,6 +286,14 @@ public class PeerCoordinator implements PeerListener
             // toDisconnect = peer to get out of synchronized(peers)
             peer.disconnect(false); // Don't deregister this connection/peer.
           }
+        // This is already checked in addPeer() but we could have gone over the limit since then
+        else if (peers.size() >= MAX_CONNECTIONS)
+          {
+            if (_log.shouldLog(Log.WARN))
+              _log.warn("Already at MAX_CONNECTIONS in connected() with peer: " + peer);
+            // toDisconnect = peer to get out of synchronized(peers)
+            peer.disconnect(false);
+          }
         else
           {
             if (_log.shouldLog(Log.INFO))
@@ -307,6 +315,7 @@ public class PeerCoordinator implements PeerListener
     }
   }
 
+  // caller must synchronize on peers
   private static Peer peerIDInList(PeerID pid, List peers)
   {
     Iterator it = peers.iterator();
@@ -328,9 +337,13 @@ public class PeerCoordinator implements PeerListener
       }
 
     boolean need_more;
+    int peersize = 0;
     synchronized(peers)
       {
-        need_more = !peer.isConnected() && peers.size() < MAX_CONNECTIONS;
+        peersize = peers.size();
+        // This isn't a strict limit, as we may have several pending connections;
+        // thus there is an additional check in connected()
+        need_more = (!peer.isConnected()) && peersize < MAX_CONNECTIONS;
         // Check if we already have this peer before we build the connection
         Peer old = peerIDInList(peer.getPeerID(), peers);
         need_more = need_more && ((old == null) || (old.getInactiveTime() > 8*60*1000));
@@ -354,15 +367,14 @@ public class PeerCoordinator implements PeerListener
         new I2PThread(r, threadName).start();
         return true;
       }
-    else
-      if (_log.shouldLog(Log.DEBUG)) {
-        if (peer.isConnected())
-          _log.info("Add peer already connected: " + peer);
-        else
-          _log.info("MAX_CONNECTIONS = " + MAX_CONNECTIONS
-                    + " not accepting extra peer: " + peer);
-      }
-      return false;
+    if (_log.shouldLog(Log.DEBUG)) {
+      if (peer.isConnected())
+        _log.info("Add peer already connected: " + peer);
+      else
+        _log.info("Connections: " + peersize + "/" + MAX_CONNECTIONS
+                  + " not accepting extra peer: " + peer);
+    }
+    return false;
   }
 
 
@@ -841,6 +853,11 @@ public class PeerCoordinator implements PeerListener
   public boolean overUpBWLimit()
   {
     return Snark.overUpBWLimit();
+  }
+
+  public boolean overUpBWLimit(long total)
+  {
+    return Snark.overUpBWLimit(total * 1000 / CHECK_PERIOD);
   }
 }
 

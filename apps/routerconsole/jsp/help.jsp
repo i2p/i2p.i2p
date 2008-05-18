@@ -11,7 +11,10 @@
 <%@include file="summary.jsp" %>
 
 <div class="main" id="main">
-hmm.  we should probably have some help text here.<br />
+<h2>Help</h2>
+Sorry, there's no help text here yet, so check out the
+<a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>.
+<br />
 
 <h2>Legal stuff</h2>
 The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with 

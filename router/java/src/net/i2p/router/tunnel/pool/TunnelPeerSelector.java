@@ -372,8 +372,9 @@ public abstract class TunnelPeerSelector {
                     return true;
                 }
             } else {
-                if ( (infoAge + uptimeMs < 2*60*60*1000) && (ctx.router().getUptime() > DONT_EXCLUDE_PERIOD) ) {
-                    // up for less than 2 hours, so exclude it
+                if ( (infoAge + uptimeMs < 90*60*1000) && (ctx.router().getUptime() > DONT_EXCLUDE_PERIOD) ) {
+                    // up for less than 90 min (which is really 1h since an uptime of 1h-2h is published as 90m),
+                    // so exclude it
                     return true;
                 } else {
                     return false;

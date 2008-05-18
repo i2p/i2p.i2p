@@ -791,4 +791,9 @@ public class Snark
     Snark.debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
     return total > limit;
   }
+
+  public static boolean overUpBWLimit(long total) {
+    long limit = 1024l * I2PSnarkUtil.instance().getMaxUpBW();
+    return total > limit;
+  }
 }

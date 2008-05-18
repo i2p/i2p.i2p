@@ -1682,9 +1682,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 */
             buf.append("</a>&nbsp;");
             if (peer.isInbound())
-                buf.append("&gt; ");
-            else
                 buf.append("&lt; ");
+            else
+                buf.append("&gt; ");
             if (peer.getWeRelayToThemAs() > 0)
                 buf.append("^");
             else

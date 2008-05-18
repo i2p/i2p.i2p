@@ -392,6 +392,23 @@ class PeerConnectionOut implements Runnable
     req.sendTime = System.currentTimeMillis();
   }
 
+  // Used by PeerState to limit pipelined requests
+  int queuedBytes()
+  {
+    int total = 0;
+    synchronized(sendQueue)
+      {
+        Iterator it = sendQueue.iterator();
+        while (it.hasNext())
+          {
+            Message m = (Message)it.next();
+            if (m.type == Message.PIECE)
+                total += m.length;
+          }
+      }
+    return total;
+  }
+
   void sendPiece(int piece, int begin, int length, byte[] bytes)
   {
     Message m = new Message();

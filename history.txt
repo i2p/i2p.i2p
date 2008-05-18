@@ -1,3 +1,22 @@
+2008-05-18 zzz
+    * Throttle: Reject tunnels for first 20m uptime (was 10m)
+    * TunnelPeerSelectors:
+       - Re-enable strict ordering of peers,
+         based on XOR distance from a random hash
+       - Restrict peers with uptime < 90m from tunnels (was 2h),
+         which is really 60m due to rounding in netDb publishing.
+    * i2psnark:
+       - Limit max pipelined requests from a single peer to 128KB
+         (was unlimited; i2p-bt default is 5 * 64KB)
+       - Increase max uploaders per torrent to 6 (was 4)
+       - Reduce max connections per torrent to 16 (was 24) to increase
+         unchoke time and reduce memory consumption
+       - Strictly enforce max connections per torrent
+       - Choke more gradually when over BW limit
+    * help.jsp: Add a link to the FAQ
+    * peers.jsp: Fix UDP direction indicators
+    * hosts.txt: Add update.postman.i2p
+
 2008-05-12 zzz
     * Outbound message:
       - Tweak the cache key for efficiency

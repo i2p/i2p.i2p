@@ -90,7 +90,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_CRIT;
         }
         
-        if (_context.router().getUptime() < 10*60*1000)
+        if (_context.router().getUptime() < 20*60*1000)
             return TunnelHistory.TUNNEL_REJECT_CRIT;
 
         long lag = _context.jobQueue().getMaxLag();

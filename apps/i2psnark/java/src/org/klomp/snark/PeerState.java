@@ -62,7 +62,8 @@ class PeerState
   // If we have te resend outstanding requests (true after we got choked).
   private boolean resend = false;
 
-  private final static int MAX_PIPELINE = 2;
+  private final static int MAX_PIPELINE = 2;               // this is for outbound requests
+  private final static int MAX_PIPELINE_BYTES = 128*1024;  // this is for inbound requests
   private final static int PARTSIZE = 32*1024; // Snark was 16K, i2p-bt uses 64KB
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
 
@@ -182,6 +183,15 @@ class PeerState
                       + ", " + begin
                       + ", " + length
                       + "' message from " + peer);
+        return;
+      }
+
+    // Limit total pipelined requests to MAX_PIPELINE bytes
+    // to conserve memory and prevent DOS
+    if (out.queuedBytes() + length > MAX_PIPELINE_BYTES)
+      {
+        if (_log.shouldLog(Log.WARN))
+          _log.warn("Discarding request over pipeline limit from " + peer);
         return;
       }
 

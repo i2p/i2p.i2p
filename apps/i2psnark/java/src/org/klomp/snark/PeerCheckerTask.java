@@ -37,6 +37,8 @@ class PeerCheckerTask extends TimerTask
     this.coordinator = coordinator;
   }
 
+  private Random random = new Random();
+
   public void run()
   {
     synchronized(coordinator.peers)
@@ -105,13 +107,19 @@ class PeerCheckerTask extends TimerTask
                         + " C: " + peer.isChoked(),
                         Snark.DEBUG);
 
+            // Choke half of them rather than all so it isn't so drastic...
+            // unless this torrent is over the limit all by itself.
+            boolean overBWLimitChoke = upload > 0 &&
+                                       ((overBWLimit && random.nextBoolean()) ||
+                                        (coordinator.overUpBWLimit(uploaded)));
+
             // If we are at our max uploaders and we have lots of other
             // interested peers try to make some room.
             // (Note use of coordinator.uploaders)
             if (((coordinator.uploaders == uploadLimit
                 && coordinator.interestedAndChoking > 0)
                 || coordinator.uploaders > uploadLimit
-                || overBWLimit)
+                || overBWLimitChoke)
                 && !peer.isChoking())
               {
                 // Check if it still wants pieces from us.
@@ -127,14 +135,18 @@ class PeerCheckerTask extends TimerTask
                     it.remove();
                     removed.add(peer);
                   }
-                else if (overBWLimit)
+                else if (overBWLimitChoke)
                   {
-                    Snark.debug("BW limit, choke peer: " + peer,
+                    Snark.debug("BW limit (" + upload + "/" + uploaded + "), choke peer: " + peer,
                                 Snark.INFO);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
                     removedCount++;
+
+                    // Put it at the back of the list for fairness, even though we won't be unchoking this time
+                    it.remove();
+                    removed.add(peer);
                   }
                 else if (peer.isInteresting() && peer.isChoked())
                   {
@@ -220,7 +232,7 @@ class PeerCheckerTask extends TimerTask
           }
         
         // Optimistically unchoke a peer
-        if (!overBWLimit)
+        if ((!overBWLimit) && !coordinator.overUpBWLimit(uploaded))
             coordinator.unchokePeer();
 
         // Put peers back at the end of the list that we removed earlier.
