@@ -150,13 +150,14 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the peer participated in a tunnel that failed.  Its failure may not have
      * been the peer's fault however.
+     * Blame the peer with a probability of pct/100.
      *
      */
-    public void tunnelFailed(Hash peer) {
+    public void tunnelFailed(Hash peer, int pct) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
-        data.getTunnelHistory().incrementFailed();
+        data.getTunnelHistory().incrementFailed(pct);
     }
     
     /**

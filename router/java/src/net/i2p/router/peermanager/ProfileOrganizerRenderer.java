@@ -143,6 +143,14 @@ class ProfileOrganizerRenderer {
             if (_context.shitlist().isShitlisted(peer)) buf.append("Shitlist");
             if (prof.getIsFailing()) buf.append(" Failing");
             if (_context.commSystem().wasUnreachable(peer)) buf.append(" Unreachable");
+            Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
+            long fails = failed.getCurrentEventCount() + failed.getLastEventCount();
+            if (fails > 0) {
+                Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
+                long total = fails + accepted.getCurrentEventCount() + accepted.getLastEventCount();
+                if (total / fails <= 10)   // hide if < 10%
+                    buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
+            }
             buf.append("&nbsp</td>");
             //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");

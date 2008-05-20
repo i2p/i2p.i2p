@@ -1,3 +1,16 @@
+2008-05-20 zzz
+    * Reachability:
+      - Call the previously unused profile.tunnelTestFailed()
+        (redefined to include a probability argument)
+        and severely downgrade a peer's capacity upon failures,
+        depending on tunnel length and direction.
+        This will help push unreachable and malicious peers
+        out of the High Capacity tier.
+      - Put recent fail rate on profiles.jsp
+    * ProfileOrganizer: Logging cleanup
+    * eepsite_index.html: Update add-host and jump links
+    * HTTP Proxy: Remove trevorreznik jump server from list
+
 2008-05-20 welterde
     * implemented PrivateKeyFile
 

@@ -563,6 +563,7 @@ public class ProfileOrganizer {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
                            + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
+            /*****
             if (_log.shouldLog(Log.DEBUG)) {
                 StringBuffer buf = new StringBuffer(512);
                 for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
@@ -572,6 +573,7 @@ public class ProfileOrganizer {
                 _log.debug("Strictly organized (highest capacity first): " + buf.toString());
                 _log.debug("fast: " + _fastPeers.values());
             }
+            *****/
         }
         
         long total = System.currentTimeMillis()-start;
@@ -601,16 +603,18 @@ public class ProfileOrganizer {
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
                     if (!isSelectable(cur.getPeer())) {
                         // skip peers we dont have in the netDb
-                        if (_log.shouldLog(Log.INFO))   
-                            _log.info("skip unknown peer from fast promotion: " + cur.getPeer().toBase64());
+                        // if (_log.shouldLog(Log.INFO))   
+                        //     _log.info("skip unknown peer from fast promotion: " + cur.getPeer().toBase64());
                         continue;
                     }
                     if (!cur.getIsActive()) {
                         // skip inactive
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("skip inactive peer from fast promotion: " + cur.getPeer().toBase64());
+                        // if (_log.shouldLog(Log.INFO))
+                        //     _log.info("skip inactive peer from fast promotion: " + cur.getPeer().toBase64());
                         continue;
                     }
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Fast promoting: " + cur.getPeer().toBase64());
                     _fastPeers.put(cur.getPeer(), cur);
                     // no need to remove it from any of the other groups, since if it is 
                     // fast, it has a high capacity, and it is not failing
@@ -969,8 +973,8 @@ public class ProfileOrganizer {
         if (netDb == null) return true;
         if (_context.router() == null) return true;
         if ( (_context.shitlist() != null) && (_context.shitlist().isShitlisted(peer)) ) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Peer " + peer.toBase64() + " is shitlisted, dont select it");
+            // if (_log.shouldLog(Log.DEBUG))
+            //     _log.debug("Peer " + peer.toBase64() + " is shitlisted, dont select it");
             return false; // never select a shitlisted peer
         }
             
@@ -983,18 +987,18 @@ public class ProfileOrganizer {
             } else {
                 boolean exclude = TunnelPeerSelector.shouldExclude(_context, info);
                 if (exclude) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Peer " + peer.toBase64() + " has capabilities or other stats suggesting we avoid it");
+                    // if (_log.shouldLog(Log.WARN))
+                    //     _log.warn("Peer " + peer.toBase64() + " has capabilities or other stats suggesting we avoid it");
                     return false;
                 } else {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
+                    // if (_log.shouldLog(Log.INFO))
+                    //     _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
                     return true;
                 }
             }
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Peer " + peer.toBase64() + " is NOT locally known, disallowing its use");
+            // if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Peer " + peer.toBase64() + " is NOT locally known, disallowing its use");
             return false;
         }
     }

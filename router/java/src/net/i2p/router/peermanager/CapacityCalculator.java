@@ -103,8 +103,12 @@ public class CapacityCalculator extends Calculator {
         double stretch = ((double)ESTIMATE_PERIOD) / period;
         double val = eventCount * stretch;
         long failed = 0;
+        // Let's say a failure is 4 times worse than a rejection.
+        // It's actually much worse than that, but with 2-hop tunnels and a 8-peer
+        // fast pool, for example, you have a 1/7 chance of being falsely blamed.
+        // We also don't want to drive everybody's capacity to zero, that isn't helpful.
         if (curFailed != null)
-            failed = curFailed.getCurrentEventCount() + curFailed.getLastEventCount();
+            failed = (long) (0.5 + (4.0 * (curFailed.getCurrentTotalValue() + curFailed.getLastTotalValue()) / 100.0));
         if (failed > 0) {
             //if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
             //    return 0.0d; // their tunnels have failed in the last 0-10 minutes

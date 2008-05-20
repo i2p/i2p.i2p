@@ -85,7 +85,7 @@ public interface ProfileManager {
      * been the peer's fault however.
      *
      */
-    void tunnelFailed(Hash peer);
+    void tunnelFailed(Hash peer, int pct);
     
     /**
      * Note that the peer was able to return the valid data for a db lookup

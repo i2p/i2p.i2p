@@ -108,9 +108,12 @@ public class TunnelHistory {
             // dont increment the reject rate in this case
         }
     }
-    public void incrementFailed() {
+
+    // Define this rate as the probability it really failed
+    // @param pct = probability * 100
+    public void incrementFailed(int pct) {
         _lifetimeFailed++;
-        _failRate.addData(1, 1);
+        _failRate.addData(pct, 1);
         _lastFailed = _context.clock().now();
     }
     

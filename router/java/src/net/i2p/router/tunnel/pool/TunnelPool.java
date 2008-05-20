@@ -332,6 +332,7 @@ public class TunnelPool {
         }
         
         _manager.tunnelFailed();
+        tellProfileFailed(cfg);
         
         _lifetimeProcessed += cfg.getProcessedMessagesCount();
         updateRate();
@@ -340,6 +341,33 @@ public class TunnelPool {
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
             }
+        }
+    }
+
+    // Blame all the other peers in the tunnel, with a probability
+    // inversely related to the tunnel length
+    private void tellProfileFailed(PooledTunnelCreatorConfig cfg) {
+        int len = cfg.getLength();
+        if (len < 2)
+            return;
+        int start = 0;
+        int end = len;
+        if (cfg.isInbound())
+            end--;
+        else
+            start++;
+        for (int i = start; i < end; i++) {
+            int pct = 100/(len-1);
+            // if inbound, it's probably the gateway's fault
+            if (cfg.isInbound() && len > 2) {
+                if (i == start)
+                    pct *= 2;
+                else
+                    pct /= 2;
+            }
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(toString() + ": Blaming " + cfg.getPeer(i) + ' ' + pct + '%');
+            _context.profileManager().tunnelFailed(cfg.getPeer(i), pct);
         }
     }
 
