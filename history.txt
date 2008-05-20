@@ -1,3 +1,6 @@
+2008-05-20 welterde
+    * implemented PrivateKeyFile
+
 2008-05-18 zzz
     * Throttle: Reject tunnels for first 20m uptime (was 10m)
     * TunnelPeerSelectors:
