@@ -3,7 +3,7 @@
 
     <property name="jetty.sha1" value="021164f84da7304bd1ff07c268b45aa3e0b13322" />
     <property name="jetty.md5" value="a61adc832be6baf2678935506743cfc3" />
-    <property name="jetty.url" value="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.12.zip" />
+    <property name="jetty.url" value="http://dist.codehaus.org/jetty/jetty-5.1.x/jetty-5.1.12.zip" />
     <property name="jetty.filename" value="jetty-5.1.12.zip" />
 
     <target name="all" depends="build" />
