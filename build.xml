@@ -10,6 +10,7 @@
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, news.xml, or history.txt" />
+        <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
@@ -305,6 +306,9 @@
     <target name="updaterSmall" depends="prepupdateSmall">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
+    <target name="updaterRouter" depends="prepupdateRouter">
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
     <target name="updateTest" depends="prepupdate">
         <ant dir="core/java/" target="jarTest" />    
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
@@ -331,6 +335,11 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+    </target>
+    <target name="prepupdateRouter" depends="buildrouter">
+        <delete dir="pkg-temp" />
+        <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
+        <copy file="build/router.jar" todir="pkg-temp/lib/" />
     </target>
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy file="build/ant.jar" todir="pkg-temp/lib/" />
