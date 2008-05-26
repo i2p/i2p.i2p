@@ -1,3 +1,17 @@
+2008-05-26 zzz
+    * Throttle: Set a default router.maxParticipatingTunnels = 3000 (was none)
+    * Stats: Add a fake uptime if not publishing stats, to get participating tunnels
+    * build.xml:
+      - Add an updateSmall target which includes only the essentials
+      - Clean up the build file some 
+      - Remove empty eepsite/ and subdirs from i2pupdate.zip
+    * configtunnels.jsp: Add warning
+    * i2psnark: Catch a bencode exception (bad peer from tracker) earlier
+    * i2psnark-standalone: Fix exception http://forum.i2p/viewtopic.php?p=12217
+
+2008-05-22 welterde
+    * Change jetty download location in build script
+
 2008-05-20 zzz
     * Reachability:
       - Call the previously unused profile.tunnelTestFailed()

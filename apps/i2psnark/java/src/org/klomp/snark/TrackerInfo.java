@@ -95,7 +95,14 @@ public class TrackerInfo
     Iterator it = l.iterator();
     while (it.hasNext())
       {
-        PeerID peerID = new PeerID(((BEValue)it.next()).getMap());
+        PeerID peerID;
+        try {
+            peerID = new PeerID(((BEValue)it.next()).getMap());
+        } catch (InvalidBEncodingException ibe) {
+            // don't let one bad entry spoil the whole list
+            Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
+            continue;
+        }
         peers.add(new Peer(peerID, my_id, metainfo));
       }
 

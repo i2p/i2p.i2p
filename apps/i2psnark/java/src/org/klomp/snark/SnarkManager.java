@@ -118,10 +118,14 @@ public class SnarkManager implements Snark.CompleteListener {
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
         if (!_config.containsKey(PROP_UPBW_MAX)) {
-            if (_context instanceof RouterContext)
-                _config.setProperty(PROP_UPBW_MAX, "" + (((RouterContext)_context).bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
-            else
+            try {
+                if (_context instanceof RouterContext)
+                    _config.setProperty(PROP_UPBW_MAX, "" + (((RouterContext)_context).bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
+                else
+                    _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
+            } catch (NoClassDefFoundError ncdfe) {
                 _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
+            }
         }
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");

@@ -205,6 +205,8 @@ public class StatisticsManager implements Service {
             
             _log.debug("Publishing peer rankings");
         } else {
+            // So that we will still get build requests
+            stats.setProperty("stat_uptime", "90m");
             _log.debug("Not publishing peer rankings");
         }
 

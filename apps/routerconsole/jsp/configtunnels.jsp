@@ -25,6 +25,15 @@
  <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
  <i><jsp:getProperty name="formhandler" property="notices" /></i>
  
+ <p><i>
+ NOTE: The default settings work for most people.
+ There is a fundamental tradeoff between anonymity and performance.
+ Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 hops, 3 hops + 0-2 hops),
+ or a high quantity + backup quantity, may severely reduce performance or reliability.
+ High CPU and/or high outbound bandwidth usage may result.
+ Change these settings with care, and adjust them if you have problems.
+ </i></p>
+
  <form action="configtunnels.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.noncePrev", prev);
