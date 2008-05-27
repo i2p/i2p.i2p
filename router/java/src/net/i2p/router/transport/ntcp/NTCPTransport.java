@@ -69,6 +69,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.closeOnBacklog", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.connectFailedIOE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.connectFailedInvalidPort", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.bidRejectedLocalAddress", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.bidRejectedNoNTCPAddress", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.connectFailedTimeout", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.connectFailedTimeoutIOE", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
@@ -272,6 +273,15 @@ public class NTCPTransport extends TransportImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they don't have a valid ntcp address");
             return null;
+        }
+        if (!naddr.isPubliclyRoutable()) {
+            if (! _context.getProperty("i2np.ntcp.allowLocal", "false").equals("true")) {
+                _context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1, 0);
+                markUnreachable(peer);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they have a private ntcp address");
+                return null;
+            }
         }
         
         //if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 

@@ -1,8 +1,14 @@
+2008-05-29 zzz
+    * Transport:
+      - NTCP and UDP: Don't bid to connect to private IP addresses, mark unreachable
+      - UDP: Don't bid when IP address missing, mark unreachable
+
 2008-05-26 zzz
     * Throttle: Set a default router.maxParticipatingTunnels = 3000 (was none)
     * Stats: Add a fake uptime if not publishing stats, to get participating tunnels
     * build.xml:
-      - Add an updateSmall target which includes only the essentials
+      - Add an updaterSmall target which includes only the essentials
+      - Add an updaterRouter target which includes only i2p.jar and router.jar
       - Clean up the build file some 
       - Remove empty eepsite/ and subdirs from i2pupdate.zip
     * configtunnels.jsp: Add warning

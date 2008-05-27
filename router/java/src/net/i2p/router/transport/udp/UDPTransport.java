@@ -858,8 +858,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 return _fastBid;
         } else {
-            if (null == toAddress.getTargetAddress(STYLE))
+            // Validate his SSU address
+            RouterAddress addr = toAddress.getTargetAddress(STYLE);
+            if (addr == null) {
+                markUnreachable(to);
                 return null;
+            }
+            UDPAddress ua = new UDPAddress(addr);
+            if (ua == null) {
+                markUnreachable(to);
+                return null;
+            }
+            if (ua.getIntroducerCount() <= 0) {
+                InetAddress ia = ua.getHostAddress();
+                if (ua.getPort() <= 0 || ia == null || !isPubliclyRoutable(ia.getAddress())) {
+                    markUnreachable(to);
+                    return null;
+                }
+            }
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
