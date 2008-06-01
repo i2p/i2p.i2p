@@ -167,7 +167,9 @@ public class PeerID implements Comparable
   }
 
   /**
-   * Returns the String "id@address" where id is the base64 encoded id.
+   * Returns the String "id@address" where id is the base64 encoded id
+   * and address is the base64 dest (was the base64 hash of the dest) which
+   * should match what the bytemonsoon tracker reports on its web pages.
    */
   public String toString()
   {
@@ -178,7 +180,7 @@ public class PeerID implements Comparable
             break;
         }
     }
-    return Base64.encode(id, nonZero, id.length-nonZero).substring(0,4) + "@" + address.calculateHash().toBase64().substring(0,6);
+    return Base64.encode(id, nonZero, id.length-nonZero).substring(0,4) + "@" + address.toBase64().substring(0,6);
   }
 
   /**
