@@ -1025,15 +1025,15 @@ public class ProfileOrganizer {
             
             _notFailingPeers.put(profile.getPeer(), profile);
             _notFailingPeersList.add(profile.getPeer());
-            if (_thresholdCapacityValue <= profile.getCapacityValue()) { 
+            // if not selectable for a tunnel (shitlisted for example),
+            // don't allow them in the high-cap pool, what would the point of that be?
+            if (_thresholdCapacityValue <= profile.getCapacityValue() &&
+                isSelectable(profile.getPeer())) {
                 _highCapacityPeers.put(profile.getPeer(), profile);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("High capacity: \t" + profile.getPeer().toBase64());
                 if (_thresholdSpeedValue <= profile.getSpeedValue()) {
-                    if (!isSelectable(profile.getPeer())) {
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Skipping fast mark [!ok] for " + profile.getPeer().toBase64());
-                    } else if (!profile.getIsActive()) {
+                    if (!profile.getIsActive()) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Skipping fast mark [!active] for " + profile.getPeer().toBase64());
                     } else {
