@@ -225,8 +225,8 @@ class PeerManager {
                 if (caps.indexOf(capability) >= 0)
                     rv.add(ri.getIdentity().calculateHash());
             }
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Peers with capacity " + capability + ": " + rv.size());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peers with capacity " + capability + ": " + rv.size());
             return rv;
         }
     }

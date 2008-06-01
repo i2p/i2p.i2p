@@ -124,8 +124,8 @@ class FIFOBandwidthRefiller implements Runnable {
             }
             return true;
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Refresh delay too fast (" + numMs + ")");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Refresh delay too fast (" + numMs + ")");
             return false;
         }
     }

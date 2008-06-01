@@ -110,8 +110,8 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                 _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);
                 from.messageFullyReceived(messageId, -1);
                 _ackSender.ackPeer(from);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Message received is a dup: " + mid + " dups: " 
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Message received is a dup: " + mid + " dups: " 
                               + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
                               + _recentlyCompletedMessages.getInsertedCount());
                 _context.messageHistory().droppedInboundMessage(mid, from.getRemotePeer(), "dup");

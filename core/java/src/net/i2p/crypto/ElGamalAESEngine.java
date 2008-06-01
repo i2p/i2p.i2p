@@ -93,8 +93,8 @@ public class ElGamalAESEngine {
             decrypted = decryptExistingSession(data, key, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptExistingSession");
-                if ( (foundTags.size() > 0) && (_log.shouldLog(Log.WARN)) )
-                    _log.warn(id + ": ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
+                if ( (foundTags.size() > 0) && (_log.shouldLog(Log.DEBUG)) )
+                    _log.debug(id + ": ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
                 wasExisting = true;
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
@@ -107,8 +107,8 @@ public class ElGamalAESEngine {
             decrypted = decryptNewSession(data, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptNewSession");
-                if ( (foundTags.size() > 0) && (_log.shouldLog(Log.WARN)) )
-                    _log.warn("ElG decrypt success: found tags: " + foundTags);
+                if ( (foundTags.size() > 0) && (_log.shouldLog(Log.DEBUG)) )
+                    _log.debug("ElG decrypt success: found tags: " + foundTags);
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
                 if (_log.shouldLog(Log.WARN))

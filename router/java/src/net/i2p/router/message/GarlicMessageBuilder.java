@@ -123,13 +123,13 @@ public class GarlicMessageBuilder {
         
         long timeFromNow = config.getExpiration() - ctx.clock().now();
         if (timeFromNow < 1*1000) {
-            if (log.shouldLog(Log.WARN))
-                log.warn("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
             return null;
         }
         
-        if (log.shouldLog(Log.WARN))
-            log.warn("CloveSet size for message " + msg.getUniqueId() + " is " + cloveSet.length
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("CloveSet size for message " + msg.getUniqueId() + " is " + cloveSet.length
                      + " and encrypted message data is " + encData.length);
         
         return msg;

@@ -302,13 +302,13 @@ public class PeerProfile {
                 }
             }
             
-            if (_log.shouldLog(Log.WARN) ) {
+            if (_log.shouldLog(Log.DEBUG) ) {
                 StringBuffer buf = new StringBuffer(128);
                 buf.append("Updating 1m throughput after ").append(size).append(" to ");
                 for (int i = 0; i < THROUGHPUT_COUNT; i++)
                     buf.append(_peakTunnel1mThroughput[i]).append(',');
                 buf.append(" for ").append(_peer.toBase64());
-                _log.warn(buf.toString());
+                _log.debug(buf.toString());
             }
         }
     }
