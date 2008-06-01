@@ -41,10 +41,17 @@ class LoadClientAppsJob extends JobImpl {
         int i = 0;
         while (true) {
             String className = clientApps.getProperty("clientApp."+i+".main");
+            if (className == null) 
+                break;
             String clientName = clientApps.getProperty("clientApp."+i+".name");
             String args = clientApps.getProperty("clientApp."+i+".args");
             String delayStr = clientApps.getProperty("clientApp." + i + ".delay");
             String onBoot = clientApps.getProperty("clientApp." + i + ".onBoot");
+            String disabled = clientApps.getProperty("clientApp." + i + ".startOnLoad");
+            i++;
+            if (disabled != null && "false".equals(disabled))
+                continue;
+
             boolean onStartup = false;
             if (onBoot != null)
                 onStartup = "true".equals(onBoot) || "yes".equals(onBoot);
@@ -52,9 +59,6 @@ class LoadClientAppsJob extends JobImpl {
             long delay = (onStartup ? 0 : STARTUP_DELAY);
             if (delayStr != null)
                 try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
-
-            if (className == null) 
-                break;
 
             String argVal[] = parseArgs(args);
             if (onStartup) {
@@ -64,7 +68,6 @@ class LoadClientAppsJob extends JobImpl {
                 // wait before firing it up
                 getContext().jobQueue().addJob(new DelayedRunClient(getContext(), className, clientName, argVal, delay));
             }
-            i++;
         }
     }
 
