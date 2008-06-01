@@ -27,15 +27,15 @@ lib/libsam.so: obj/libsam.la
 
 obj/libsam-static.la: $(OBJS)
 	$(STATUS) library '(static)'
-	libtool --mode=link gcc -static $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
+	libtool --mode=link $(CC) -static $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
 
 obj/libsam.la: $(OBJS)
 	$(STATUS) library '(shared)'
-	libtool --mode=link gcc -rpath  $(DESTDIR) $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
+	libtool --mode=link $(CC) -rpath  $(DESTDIR) $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
 
 obj/%.lo: src/%.c
 	$(STATUS) compile $*
-	libtool --mode=compile gcc $(CFLAGS) -Iinc/ -c -o $@ $< >>$(LIBTOOL_LOG)
+	libtool --mode=compile $(CC) $(CFLAGS) -Iinc/ -c -o $@ $< >>$(LIBTOOL_LOG)
 
 $(OBJS):|obj
 obj:
@@ -44,7 +44,7 @@ obj:
 
 .deps/%.d: src/%.c
 	$(STATUS) deps $*
-	gcc -Iinc/ -MM -MT obj/$*.o $< -o $@
+	$(CC) -Iinc/ -MM -MT obj/$*.o $< -o $@
 
 -include $(DEPS)
 

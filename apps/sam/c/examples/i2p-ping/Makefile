@@ -25,14 +25,14 @@ cleanlog:
 
 i2p-ping: $(OBJS)
 	$(STATUS) link
-	libtool --mode=link gcc $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
+	libtool --mode=link $(CC) $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
 
 %.lo: %.c
 	$(STATUS) compile $*
-	libtool --mode=compile gcc $(CFLAGS) -Iinc/ -c -o $@ $< >>$(LIBTOOL_LOG)
+	libtool --mode=compile $(CC) $(CFLAGS) -Iinc/ -c -o $@ $< >>$(LIBTOOL_LOG)
 .deps/%.d: src/%.c
 	$(STATUS) deps $*
-	gcc -Iinc/ -MM -MT obj/$*.o $^ -o $@
+	$(CC) -Iinc/ -MM -MT obj/$*.o $^ -o $@
 
 clean:
 	$(STATUS) clean
@@ -44,7 +44,7 @@ obj:
 	$(STATUS) MKDIR $@
 	mkdir -p $@
 
--include $(DEPS)
+# -include $(DEPS)
 $(DEPS):|.deps
 .deps:
 	$(STATUS) MKDIR $@
