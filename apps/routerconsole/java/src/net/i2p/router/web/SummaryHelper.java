@@ -126,6 +126,8 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
                     return "WARN-Firewalled with Inbound TCP Enabled";
+                else if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
+                    return "WARN-Firewalled and Fast";
                 else
                     return "Firewalled";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
