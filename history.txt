@@ -1,4 +1,22 @@
+2008-06-01 zzz
+    * Client Apps: Add new parameter for clients.config,
+        clientApp.x.startOnLoad=false, to disable loading
+        (for SAM for example). Defaults to true of course.
+    * Logging: Move common WARN output to DEBUG so we can ask users to
+        set the default log level to WARN without massive spewage
+    * ProfileOrganizer: Restrict !isSelectable() (i.e. shitlisted) peers from the High Capacity tier,
+      not just the Fast tier, since we don't use them for tunnels anyway
+    * SAM: Add some compiler flexibility to two obscure makefiles
+    * i2psnark: Change displayed peer idents to match that shown by bytemonsoon
+      (sponge's suggestion)
+    * summary bar:
+      - Hide ident, provide a tooltip and a link
+      - Add a warning if you are firewalled and class O
+
 2008-05-29 zzz
+    * Fix up initialNews.xml
+
+2008-05-27 zzz
     * Transport:
       - NTCP and UDP: Don't bid to connect to private IP addresses, mark unreachable
       - UDP: Don't bid when IP address missing, mark unreachable
