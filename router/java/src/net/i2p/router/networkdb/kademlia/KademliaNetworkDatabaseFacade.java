@@ -1038,7 +1038,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         String hash = info.getIdentity().getHash().toBase64();
         if (isUs) {
             buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
-            buf.append("<b>Our info: </b><br />\n");
+            buf.append("<a name=\"our-info\" /a><b>Our info (").append(hash).append(") : </b><br />\n");
         } else {
             buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
             buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");

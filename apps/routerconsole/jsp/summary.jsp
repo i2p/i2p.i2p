@@ -10,7 +10,7 @@
 
 <div class="routersummary">
  <u><b>General</b></u><br />
- <b>Ident:</b> <jsp:getProperty name="helper" property="ident" /><br />
+ <b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp#our-info">view</a>)<br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
