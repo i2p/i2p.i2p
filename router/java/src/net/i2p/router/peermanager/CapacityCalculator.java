@@ -74,10 +74,10 @@ public class CapacityCalculator extends Calculator {
         else if (profile.getTunnelHistory().getLastRejectedProbabalistic() > now - 5*60*1000)
             capacity -= _context.random().nextInt(5);
         
+        capacity += profile.getCapacityBonus();
         if (capacity < 0)
             capacity = 0;
         
-        capacity += profile.getReliabilityBonus();
         return capacity;
     }
     

@@ -174,7 +174,7 @@ public class PeerProfile {
      * written to disk to affect how the algorithm ranks capacity.  Negative values are
      * penalties
      */
-    public double getCapacityBonus() { return _capacityBonus; }
+    public long getCapacityBonus() { return _capacityBonus; }
     public void setCapacityBonus(long bonus) { _capacityBonus = bonus; }
     
     /**

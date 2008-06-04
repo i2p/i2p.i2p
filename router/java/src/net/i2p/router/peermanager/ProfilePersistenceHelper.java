@@ -103,8 +103,8 @@ class ProfilePersistenceHelper {
         buf.append("# Groups: ").append(groups).append(NL);
         buf.append("########################################################################").append(NL);
         buf.append("##").append(NL);
-        buf.append("# Reliability bonus: used to affect the reliability score after all other calculations are done").append(NL);
-        buf.append("reliabilityBonus=").append(profile.getReliabilityBonus()).append(NL);
+        buf.append("# Capacity bonus: used to affect the capacity score after all other calculations are done").append(NL);
+        buf.append("capacityBonus=").append(profile.getCapacityBonus()).append(NL);
         buf.append("# Integration bonus: used to affect the integration score after all other calculations are done").append(NL);
         buf.append("integrationBonus=").append(profile.getIntegrationBonus()).append(NL);
         buf.append("# Speed bonus: used to affect the speed score after all other calculations are done").append(NL);
@@ -200,7 +200,7 @@ class ProfilePersistenceHelper {
                 return null;
             }
             
-            profile.setReliabilityBonus(getLong(props, "reliabilityBonus"));
+            profile.setCapacityBonus(getLong(props, "capacityBonus"));
             profile.setIntegrationBonus(getLong(props, "integrationBonus"));
             profile.setSpeedBonus(getLong(props, "speedBonus"));
             
