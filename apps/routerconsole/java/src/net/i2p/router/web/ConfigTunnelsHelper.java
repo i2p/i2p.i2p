@@ -61,10 +61,21 @@ public class ConfigTunnelsHelper {
         return buf.toString();
     }
 
+    static final int WARN_LENGTH = 4;
     private void renderForm(StringBuffer buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
 
         buf.append("<tr><td colspan=\"3\"><b><a name=\"").append(prefix).append("\">");
         buf.append(name).append("</a></b></td></tr>\n");
+        if (in.getLength() <= 0 ||
+            in.getLength() + in.getLengthVariance() <= 0 ||
+            out.getLength() <= 0 ||
+            out.getLength() + out.getLengthVariance() <= 0)
+            buf.append("<tr><td colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 0-hop tunnels</font></td></tr>");
+        if (in.getLength() + Math.abs(in.getLengthVariance()) >= WARN_LENGTH ||
+            out.getLength() + Math.abs(out.getLengthVariance()) >= WARN_LENGTH)
+            buf.append("<tr><td colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include very long tunnels</font></td></tr>");
+
+
         buf.append("<tr><td></td><td><b>Inbound</b></td><td><b>Outbound</b></td></tr>\n");
         
         // tunnel depth
