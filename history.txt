@@ -1,3 +1,22 @@
+2008-06-05 zzz
+    * LeaseSet - code cleanup:
+      - Add exception to enforce max # of leases = 6, should be plenty
+      - Rewrite TunnelPool.locked_buildNewLeaseSet() so it doesn't add lots of
+        leases and then immediately remove them again, triggering
+        the new leaseSet size exception
+      - Remove the now unused LeaseSet.removeLease(lease) and
+        LeaseSet.removeLease(index)
+      - Store first and last expiration for efficiency
+    * Peer Profiles - Preparation for using bonuses:
+      - Use CapacityBonus rather than ReachablilityBonus in the Capacity calculation
+      - Persist CapacityBonus rather than ReachabilityBonus
+      - Include SpeedBonus in the Speed calculation
+      - Prevent negative values in Speed and Capacity when using bonuses
+      - Clean up SpeedCalculator.java
+    * HTTP Proxy error pages: Don't say eepsites are 'temporarily' down since we don't know
+    * Add some config files for a future small distribution
+    * configtunnels.jsp: Add warnings for <= 0 and >= 4 hop configurations
+
 2008-06-01 zzz
     * Client Apps: Add new parameter for clients.config,
         clientApp.x.startOnLoad=false, to disable loading

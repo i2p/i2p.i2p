@@ -430,7 +430,7 @@ public class TunnelPool {
     }
     
     /**
-     * Build a leaseSet with all of the tunnels that aren't about to expire
+     * Build a leaseSet with the required tunnels that aren't about to expire
      *
      */
     private LeaseSet locked_buildNewLeaseSet() {
@@ -438,7 +438,7 @@ public class TunnelPool {
             return null;
         long expireAfter = _context.clock().now(); // + _settings.getRebuildPeriod();
         
-        LeaseSet ls = new LeaseSet();
+        List leases = new ArrayList(_tunnels.size());
         for (int i = 0; i < _tunnels.size(); i++) {
             TunnelInfo tunnel = (TunnelInfo)_tunnels.get(i);
             if (tunnel.getExpiration() <= expireAfter)
@@ -454,34 +454,37 @@ public class TunnelPool {
             lease.setEndDate(new Date(tunnel.getExpiration()));
             lease.setTunnelId(inId);
             lease.setGateway(gw);
-            ls.addLease(lease);
+            leases.add(lease);
         }
         
         int wanted = _settings.getQuantity();
         
-        if (ls.getLeaseCount() < wanted) {
+        if (leases.size() < wanted) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn(toString() + ": Not enough leases (" + ls.getLeaseCount() + ", wanted " + wanted + ")");
+                _log.warn(toString() + ": Not enough leases (" + leases.size() + ", wanted " + wanted + ")");
             return null;
         } else {
             // linear search to trim down the leaseSet, removing the ones that 
             // will expire the earliest.  cheaper than a tree for this size
-            while (ls.getLeaseCount() > wanted) {
+            while (leases.size() > wanted) {
                 int earliestIndex = -1;
                 long earliestExpiration = -1;
-                for (int i = 0; i < ls.getLeaseCount(); i++) {
-                    Lease cur = ls.getLease(i);
+                for (int i = 0; i < leases.size(); i++) {
+                    Lease cur = (Lease) leases.get(i);
                     if ( (earliestExpiration < 0) || (cur.getEndDate().getTime() < earliestExpiration) ) {
                         earliestIndex = i;
                         earliestExpiration = cur.getEndDate().getTime();
                     }
                 }
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(toString() + ": Dropping older lease from the leaseSet: " + earliestIndex + " out of " + ls.getLeaseCount());
-                ls.removeLease(earliestIndex);
+                leases.remove(earliestIndex);
             }
-            return ls;
         }
+        LeaseSet ls = new LeaseSet();
+        for (int i = 0; i < leases.size(); i++)
+             ls.addLease((Lease) leases.get(i));
+        if (_log.shouldLog(Log.INFO))
+            _log.info(toString() + ": built new leaseSet: " + ls);
+        return ls;
     }
     
     public long getLifetimeProcessed() { return _lifetimeProcessed; }

@@ -31,14 +31,18 @@ public class LeaseSet extends DataStructureImpl {
     private Destination _destination;
     private PublicKey _encryptionKey;
     private SigningPublicKey _signingKey;
+    // Keep leases in the order received, or else signature verification will fail!
     private List _leases;
     private Signature _signature;
     private volatile Hash _currentRoutingKey;
     private volatile byte[] _routingKeyGenMod;
     private boolean _receivedAsPublished;
+    // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
+    private long _firstExpiration;
+    private long _lastExpiration;
 
-    /** um, no lease can last more than a year.  */
-    private final static long MAX_FUTURE_EXPIRATION = 365 * 24 * 60 * 60 * 1000L;
+    /** This seems like plenty  */
+    private final static int MAX_LEASES = 6;
 
     public LeaseSet() {
         setDestination(null);
@@ -49,6 +53,8 @@ public class LeaseSet extends DataStructureImpl {
         _leases = new ArrayList();
         _routingKeyGenMod = null;
         _receivedAsPublished = false;
+        _firstExpiration = Long.MAX_VALUE;
+        _lastExpiration = 0;
     }
 
     public Destination getDestination() {
@@ -87,14 +93,14 @@ public class LeaseSet extends DataStructureImpl {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");
         if (lease.getGateway() == null) throw new IllegalArgumentException("erm, lease has no gateway");
         if (lease.getTunnelId() == null) throw new IllegalArgumentException("erm, lease has no tunnel");
+        if (_leases.size() > MAX_LEASES)
+            throw new IllegalArgumentException("Too many leases - max is " + MAX_LEASES);
         _leases.add(lease);
-    }
-
-    public void removeLease(Lease lease) {
-        _leases.remove(lease);
-    }
-    public void removeLease(int index) {
-        _leases.remove(index);
+        long expire = lease.getEndDate().getTime();
+        if (expire < _firstExpiration)
+            _firstExpiration = expire;
+        if (expire > _lastExpiration)
+            _lastExpiration = expire;
     }
 
     public int getLeaseCount() {
@@ -150,14 +156,9 @@ public class LeaseSet extends DataStructureImpl {
      * @return earliest end date of any lease in the set, or -1 if there are no leases
      */
     public long getEarliestLeaseDate() {
-        long when = -1;
-        for (int i = 0; i < getLeaseCount(); i++) {
-            Lease lse = getLease(i);
-            if ((lse != null) && (lse.getEndDate() != null)) {
-                if ((when <= 0) || (lse.getEndDate().getTime() < when)) when = lse.getEndDate().getTime();
-            }
-        }
-        return when;
+        if (_leases.size() <= 0)
+            return -1;
+        return _firstExpiration;
     }
 
     /**
@@ -211,7 +212,7 @@ public class LeaseSet extends DataStructureImpl {
     }
 
     /**
-     * Determine whether there are currently valid leases, at least within a given
+     * Determine whether ANY lease is currently valid, at least within a given
      * fudge factor 
      *
      * @param fudge milliseconds fudge factor to allow between the current time
@@ -219,28 +220,7 @@ public class LeaseSet extends DataStructureImpl {
      */
     public boolean isCurrent(long fudge) {
         long now = Clock.getInstance().now();
-        long insane = now + MAX_FUTURE_EXPIRATION;
-        int cnt = getLeaseCount();
-        for (int i = 0; i < cnt; i++) {
-            Lease l = getLease(i);
-            if (l.getEndDate().getTime() > insane) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("LeaseSet" + calculateHash() + " expires an insane amount in the future - skip it: " + l);
-                return false;
-            }
-            // if it hasn't finished, we're current
-            if (l.getEndDate().getTime() > now) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("LeaseSet " + calculateHash() + " isn't exired: " + l);
-                return true;
-            } else if (l.getEndDate().getTime() > now - fudge) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("LeaseSet " + calculateHash()
-                               + " isn't quite expired, but its within the fudge factor so we'll let it slide: " + l);
-                return true;
-            }
-        }
-        return false;
+        return _lastExpiration > now - fudge;
     }
 
     private byte[] getBytes() {
@@ -282,12 +262,14 @@ public class LeaseSet extends DataStructureImpl {
         _signingKey = new SigningPublicKey();
         _signingKey.readBytes(in);
         int numLeases = (int) DataHelper.readLong(in, 1);
+        if (numLeases > MAX_LEASES)
+            throw new DataFormatException("Too many leases - max is " + MAX_LEASES);
         //_version = DataHelper.readLong(in, 4);
         _leases.clear();
         for (int i = 0; i < numLeases; i++) {
             Lease lease = new Lease();
             lease.readBytes(in);
-            _leases.add(lease);
+            addLease(lease);
         }
         _signature = new Signature();
         _signature.readBytes(in);
