@@ -40,6 +40,6 @@ The eepsite destination specified was not valid, or was
 otherwise unreachable.  Perhaps you pasted in the 
 wrong BASE64 string or the link you are following is 
 bad. The I2P host could also 
-be temporarily offline.  You may want to 
+be offline.  You may want to 
 <a href="javascript: window.location.reload()">retry</a>. 
 <BR><BR>Could not find the following destination:<BR><BR>

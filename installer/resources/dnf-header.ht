@@ -37,7 +37,7 @@ div.logo {
 </div>
 <div class=warning id=warning>
 The eepsite was not reachable.
-The eepsite is temporarily offline, there is network congestion,
+The eepsite is offline, there is network congestion,
 or your router is not yet well-integrated with peers.
 You may want to 
 <a href="javascript: window.location.reload()">retry</a>. 
