@@ -1,3 +1,14 @@
+2008-06-06 zzz
+    * LeaseSet:
+      - Sort the leases by expiration date in TunnelPool.locked_buildNewLeaseSet()
+        to make later LeaseSet comparisons reliable. This cleans up the code too.
+      - Fix broken old vs. new LeaseSet comparison
+        in ClientConnectionRunner.requestLeaseSet(),
+        so that we only sign and publish a new LeaseSet when it's really new.
+        Should reduce outbound overhead both in LeaseSet publishing and LeaseSet bundling,
+        and floodfill router load, since locked_buildNewLeaseSet() generates
+        the same LeaseSet as before quite frequently, often just seconds apart.
+
 2008-06-05 zzz
     * LeaseSet - code cleanup:
       - Add exception to enforce max # of leases = 6, should be plenty

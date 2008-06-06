@@ -3,9 +3,12 @@ package net.i2p.router.tunnel.pool;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
@@ -430,15 +433,36 @@ public class TunnelPool {
     }
     
     /**
+     * Always build a LeaseSet with Leases in sorted order,
+     * so that LeaseSet.equals() and lease-by-lease equals() always work.
+     * The sort method is arbitrary, as far as the equals() tests are concerned,
+     * but we use latest expiration first, since we need to sort them by that anyway.
+     *
+     */
+    class LeaseComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return ((Lease)r).getEndDate().compareTo(((Lease)l).getEndDate());
+        }
+    }
+
+    /**
      * Build a leaseSet with the required tunnels that aren't about to expire
      *
      */
     private LeaseSet locked_buildNewLeaseSet() {
         if (!_alive)
             return null;
+
+        int wanted = _settings.getQuantity();
+        if (_tunnels.size() < wanted) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(toString() + ": Not enough tunnels (" + _tunnels.size() + ", wanted " + wanted + ")");
+            return null;
+        }
+
         long expireAfter = _context.clock().now(); // + _settings.getRebuildPeriod();
         
-        List leases = new ArrayList(_tunnels.size());
+        TreeSet leases = new TreeSet(new LeaseComparator());
         for (int i = 0; i < _tunnels.size(); i++) {
             TunnelInfo tunnel = (TunnelInfo)_tunnels.get(i);
             if (tunnel.getExpiration() <= expireAfter)
@@ -457,36 +481,21 @@ public class TunnelPool {
             leases.add(lease);
         }
         
-        int wanted = _settings.getQuantity();
-        
         if (leases.size() < wanted) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": Not enough leases (" + leases.size() + ", wanted " + wanted + ")");
             return null;
-        } else {
-            // linear search to trim down the leaseSet, removing the ones that 
-            // will expire the earliest.  cheaper than a tree for this size
-            while (leases.size() > wanted) {
-                int earliestIndex = -1;
-                long earliestExpiration = -1;
-                for (int i = 0; i < leases.size(); i++) {
-                    Lease cur = (Lease) leases.get(i);
-                    if ( (earliestExpiration < 0) || (cur.getEndDate().getTime() < earliestExpiration) ) {
-                        earliestIndex = i;
-                        earliestExpiration = cur.getEndDate().getTime();
-                    }
-                }
-                leases.remove(earliestIndex);
-            }
         }
+
         LeaseSet ls = new LeaseSet();
-        for (int i = 0; i < leases.size(); i++)
-             ls.addLease((Lease) leases.get(i));
+        Iterator iter = leases.iterator();
+        for (int i = 0; i < wanted; i++)
+             ls.addLease((Lease) iter.next());
         if (_log.shouldLog(Log.INFO))
             _log.info(toString() + ": built new leaseSet: " + ls);
         return ls;
     }
-    
+
     public long getLifetimeProcessed() { return _lifetimeProcessed; }
     
     /**

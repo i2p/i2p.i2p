@@ -375,13 +375,32 @@ public class ClientConnectionRunner {
                 _context.jobQueue().addJob(onFailedJob);
             return;
         }
-        if ( (_currentLeaseSet != null) && (_currentLeaseSet.equals(set)) ) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Requested leaseSet hasn't changed");
-            if (onCreateJob != null)
-                _context.jobQueue().addJob(onCreateJob);
-            return; // no change
+        // We can't use LeaseSet.equals() here because the dest, keys, and sig on
+        // the new LeaseSet are null. So we compare leases one by one.
+        // In addition, the client rewrites the expiration time of all the leases to
+        // the earliest one, so we can't use Lease.equals() or Lease.getEndDate().
+        // So compare by tunnel ID, and then by gateway.
+        // (on the remote possibility that two gateways are using the same ID).
+        // TunnelPool.locked_buildNewLeaseSet() ensures that leases are sorted,
+        //  so the comparison will always work.
+        int leases = set.getLeaseCount();
+        if (_currentLeaseSet != null && _currentLeaseSet.getLeaseCount() == leases) {
+            for (int i = 0; i < leases; i++) {
+                if (! _currentLeaseSet.getLease(i).getTunnelId().equals(set.getLease(i).getTunnelId()))
+                    break;
+                if (! _currentLeaseSet.getLease(i).getGateway().equals(set.getLease(i).getGateway()))
+                    break;
+                if (i == leases - 1) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Requested leaseSet hasn't changed");
+                    if (onCreateJob != null)
+                        _context.jobQueue().addJob(onCreateJob);
+                    return; // no change
+                }
+            }
         }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Current leaseSet " + _currentLeaseSet + "\nNew leaseSet " + set);
         LeaseRequestState state = null;
         synchronized (this) {
             state = _leaseRequest;
