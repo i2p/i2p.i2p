@@ -1,3 +1,8 @@
+* 2008-06-07  0.6.2 released
+
+2008-06-07 Complication
+    * Write announcement and prepare for release
+
 2008-05-29 zzz
     * Transport:
       - NTCP and UDP: Don't bid to connect to private IP addresses, mark unreachable

@@ -11,14 +11,17 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2008-04-26: <b>0.6.1.33 <a href="http://www.i2p2.i2p/release-0.6.1.33.html">Released</a></b>
+2008-06-07: <b>0.6.2 <a href="http://www.i2p2.i2p/release-0.6.2.html">Released</a></b>
 </p><p>
-The 0.6.1.33 release contains several important bug fixes and performance improvements
-in SSU reachability detection, floodfill peer selection, tunnel peer selection, tunnel testing,
-NTCP idle detection, the streaming lib, and news fetching.
-It also adds secondary tracker support to i2psnark.
-Please upgrade as soon as you can, as these fixes
-should improve the reliability of the whole network.
+The 0.6.2 release delivers notable performance and anonymity improvements.
+LeaseSet data is no longer added to every end-to-end message, reducing protocol overhead.
+Unreachable peers are avoided as inbound tunnel gateways,
+which helps reliability and makes it possible to use persistent Lease selection,
+which in turn helps performance by reducing out-of-order message delivery.
+The sequence of peers in a tunnel is now kept in a strict order
+according to XOR distance from a random value, to make it harder
+for an adversary to gather meaningful statistics for a predecessor attack.
+Improvements to applications like I2PSnark and the Router Console are also introduced.
 </p>
 
 <p>
