@@ -1,3 +1,6 @@
+2008-06-07 Complication
+    * Fix version in news.xml so it could be published
+
 * 2008-06-07  0.6.2 released
 
 2008-06-07 Complication
