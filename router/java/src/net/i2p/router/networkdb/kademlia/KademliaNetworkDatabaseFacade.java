@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -579,13 +581,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     String validate(Hash key, LeaseSet leaseSet) {
         if (!key.equals(leaseSet.getDestination().calculateHash())) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid store attempt! key does not match leaseSet.destination!  key = "
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Invalid store attempt! key does not match leaseSet.destination!  key = "
                           + key + ", leaseSet = " + leaseSet);
             return "Key does not match leaseSet.destination - " + key.toBase64();
         } else if (!leaseSet.verifySignature()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid leaseSet signature!  leaseSet = " + leaseSet);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Invalid leaseSet signature!  leaseSet = " + leaseSet);
             return "Invalid leaseSet signature on " + leaseSet.getDestination().calculateHash().toBase64();
         } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now() - 2*Router.CLOCK_FUDGE_FACTOR) {
             long age = _context.clock().now() - leaseSet.getEarliestLeaseDate();
@@ -597,8 +599,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                    + " expired " + DataHelper.formatDuration(age) + " ago";
         } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) {
             long age = leaseSet.getEarliestLeaseDate() - _context.clock().now();
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("LeaseSet to expire too far in the future: " 
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("LeaseSet to expire too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
             return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
@@ -924,6 +926,24 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _context.jobQueue().addJob(new StoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
     }
     
+    class LeaseSetComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             Destination dl = ((LeaseSet)l).getDestination();
+             Destination dr = ((LeaseSet)r).getDestination();
+             boolean locall = _context.clientManager().isLocal(dl);
+             boolean localr = _context.clientManager().isLocal(dr);
+             if (locall && !localr) return -1;
+             if (localr && !locall) return 1;
+             return dl.calculateHash().toBase64().compareTo(dr.calculateHash().toBase64());
+        }
+    }
+
+    class RouterInfoComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return ((RouterInfo)l).getIdentity().getHash().toBase64().compareTo(((RouterInfo)r).getIdentity().getHash().toBase64());
+        }
+    }
+
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(10*1024);
         buf.append("<h2>Kademlia Network DB Contents</h2>\n");
@@ -933,7 +953,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             out.flush();
             return;
         }
-        Set leases = getLeases();
+        Set leases = new TreeSet(new LeaseSetComparator());
+        leases.addAll(getLeases());
         buf.append("<h3>Leases</h3>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -978,7 +999,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         Hash us = _context.routerHash();
-        Set routers = getRouters();
         out.write("<h3>Routers</h3>\n");
         
         RouterInfo ourInfo = _context.router().getRouterInfo();
@@ -989,6 +1009,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         /* coreVersion to Map of routerVersion to Integer */
         Map versions = new TreeMap();
         
+        Set routers = new TreeSet(new RouterInfoComparator());
+        routers.addAll(getRouters());
         for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
             RouterInfo ri = (RouterInfo)iter.next();
             Hash key = ri.getIdentity().getHash();
@@ -1038,7 +1060,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         String hash = info.getIdentity().getHash().toBase64();
         if (isUs) {
             buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
-            buf.append("<a name=\"our-info\" /a><b>Our info (").append(hash).append(") : </b><br />\n");
+            buf.append("<a name=\"our-info\" /a><b>Our info: ").append(hash).append("</b><br />\n");
         } else {
             buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
             buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");

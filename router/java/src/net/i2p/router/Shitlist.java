@@ -11,8 +11,8 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
-import net.i2p.data.DataHelper;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
@@ -38,6 +38,8 @@ public class Shitlist {
     }
     
     public final static long SHITLIST_DURATION_MS = 40*60*1000; // 40 minute shitlist
+    public final static long SHITLIST_DURATION_MAX = 60*60*1000;
+    public final static long SHITLIST_DURATION_FOREVER = 181l*24*60*60*1000; // will get rounded down to 180d on console
     
     public Shitlist(RouterContext context) {
         _context = context;
@@ -91,6 +93,12 @@ public class Shitlist {
     }
     public boolean shitlistRouter(Hash peer, String reason) { return shitlistRouter(peer, reason, null); }
     public boolean shitlistRouter(Hash peer, String reason, String transport) {
+        return shitlistRouter(peer, reason, null, false);
+    }
+    public boolean shitlistRouterForever(Hash peer, String reason) {
+        return shitlistRouter(peer, reason, null, true);
+    }
+    public boolean shitlistRouter(Hash peer, String reason, String transport, boolean forever) {
         if (peer == null) {
             _log.error("wtf, why did we try to shitlist null?", new Exception("shitfaced"));
             return false;
@@ -103,18 +111,21 @@ public class Shitlist {
         if (_log.shouldLog(Log.INFO))
             _log.info("Shitlisting router " + peer.toBase64(), new Exception("Shitlist cause: " + reason));
         
-        long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
-        PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-        if (prof != null) {
-            period = SHITLIST_DURATION_MS << prof.incrementShitlists();
-            period += _context.random().nextLong(period);
-        }
-        
-        if (period > 60*60*1000)
-            period = 60*60*1000;
-        
         Entry e = new Entry();
-        e.expireOn = _context.clock().now() + period;
+        if (forever) {
+            e.expireOn = _context.clock().now() + SHITLIST_DURATION_FOREVER;
+        } else {
+            long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
+            PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+            if (prof != null) {
+                period = SHITLIST_DURATION_MS << prof.incrementShitlists();
+                period += _context.random().nextLong(period);
+            }
+       
+            if (period > SHITLIST_DURATION_MAX)
+                period = SHITLIST_DURATION_MAX;
+            e.expireOn = _context.clock().now() + period;
+        }
         e.cause = reason;
         e.transports = null;
         if (transport != null) {
@@ -123,17 +134,22 @@ public class Shitlist {
         }
         
         synchronized (_entries) {
-            Entry old = (Entry)_entries.put(peer, e);
+            Entry old = (Entry)_entries.get(peer);
             if (old != null) {
                 wasAlready = true;
-                _entries.put(peer, old);
-                if (e.transports == null) {
-                    old.transports = null;
-                } else if (old.transports != null) {
-                    old.transports.addAll(e.transports);
+                // take the oldest expiration and cause, combine transports
+                if (old.expireOn > e.expireOn) {
+                    e.expireOn = old.expireOn;
+                    e.cause = old.cause;
                 }
-                e = old;
+                if (e.transports != null) {
+                    if (old.transports != null)
+                        e.transports.addAll(old.transports);
+                    else   
+                        e.transports = null;
+                }
             }
+            _entries.put(peer, e);
         }
         
         if (transport == null) {
@@ -222,13 +238,27 @@ public class Shitlist {
         return rv;
     }
     
+    public boolean isShitlistedForever(Hash peer) {
+        Entry entry;
+        synchronized (_entries) {
+            entry = (Entry)_entries.get(peer);
+        }
+        return entry != null && entry.expireOn > _context.clock().now() + SHITLIST_DURATION_MAX;
+    }
+
+    class HashComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
+        }
+    }
+
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<h2>Shitlist</h2>");
-        Map entries = null;
+        Map entries = new TreeMap(new HashComparator());
         
         synchronized (_entries) {
-            entries = new HashMap(_entries);
+            entries.putAll(_entries);
         }
         buf.append("<ul>");
         
@@ -241,7 +271,7 @@ public class Shitlist {
                 continue;
             }
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
-            buf.append(" <a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">(?)</a>");
+            buf.append(" (<a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
             buf.append(" expiring in ");
             buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
             Set transports = entry.transports;
@@ -251,12 +281,16 @@ public class Shitlist {
                 buf.append("<br />\n");
                 buf.append(entry.cause);
             }
+            // future
+            // buf.append(" (<a href=\"configblock.jsp?peer=").append(key.toBase64()).append("#unsh\">unshitlist now</a>)");
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
-        buf.append("<i>Partial shitlisted peers (only blocked on some transports): ");
-        buf.append(partial);
-        buf.append("</i>\n");
+        if (partial > 0) {
+            buf.append("<i>Partial shitlisted peers (only blocked on some transports): ");
+            buf.append(partial);
+            buf.append("</i>\n");
+        }
         out.write(buf.toString());
         out.flush();
     }

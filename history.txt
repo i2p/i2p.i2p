@@ -1,3 +1,13 @@
+2008-06-07 zzz
+    * NetDb: Tweak some logging on lease problems
+    * Shitlist:
+      - Add shitlistForever() and isShitlistedForever(), unused for now
+      - Sort the HTML output by router hash
+    * config.jsp: Add another warning
+    * netdb.jsp:
+      - Sort the lease HTML output by dest hash, local first
+      - Sort the router HTML output by router hash
+
 2008-06-06 zzz
     * LeaseSet:
       - Sort the leases by expiration date in TunnelPool.locked_buildNewLeaseSet()
