@@ -22,6 +22,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  
+ <br /><i><jsp:getProperty name="updatehelper" property="newsStatus" /></i><br />&nbsp;<br />
  <form action="configupdate.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUpdateHandler.noncePrev", prev);

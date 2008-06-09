@@ -119,4 +119,12 @@ public class ConfigUpdateHelper {
     public String getTrustedKeys() {
         return new TrustedUpdate(_context).getTrustedKeysString();
     }
+
+    public String getNewsStatus() { 
+        return NewsFetcher.getInstance(_context).status();
+    }
+
+    public String getUpdateVersion() { 
+        return NewsFetcher.getInstance(_context).updateVersion();
+    }
 }

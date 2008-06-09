@@ -21,6 +21,10 @@ if (System.getProperty("router.consoleNonce") == null) {
  <jsp:setProperty name="newshelper" property="page" value="docs/news.xml" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
+
+ <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
+ <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <br /><i><font size="-1"><jsp:getProperty name="updatehelper" property="newsStatus" /></font></i><br />
 </div>
 
 <div class="main" id="main">

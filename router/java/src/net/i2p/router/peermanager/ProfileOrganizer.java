@@ -459,7 +459,11 @@ public class ProfileOrganizer {
                         l.add(peer);
                     else {
                         RouterAddress ra = info.getTargetAddress("SSU");
-                        if (ra == null) continue;
+                        // Definitely don't want peers with no SSU address at all
+                        if (ra == null) {
+                            l.add(peer);
+                            continue;
+                        }
                         // This is the quick way of doing UDPAddress.getIntroducerCount() > 0
                         Properties props = ra.getOptions();
                         if (props != null && props.getProperty("ihost0") != null)

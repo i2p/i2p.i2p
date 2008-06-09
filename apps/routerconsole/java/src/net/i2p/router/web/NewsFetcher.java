@@ -25,6 +25,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private Log _log;
     private boolean _updateAvailable;
     private long _lastFetch;
+    private long _lastUpdated;
+    private String _updateVersion;
     private String _lastModified;
     private static NewsFetcher _instance;
     //public static final synchronized NewsFetcher getInstance() { return _instance; }
@@ -44,6 +46,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _instance = this;
         _lastFetch = 0;
         updateLastFetched();
+        _lastUpdated = _lastFetch;
+        _updateVersion = "";
     }
     
     private void updateLastFetched() {
@@ -56,6 +60,14 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     }
     
     public boolean updateAvailable() { return _updateAvailable; }
+    public String updateVersion() { return _updateVersion; }
+
+    public String status() {
+         long now = _context.clock().now();
+         return
+             (_lastUpdated > 0 ? "News last updated " + DataHelper.formatDuration(now - _lastUpdated) + " ago" : "") +
+             (_lastFetch > _lastUpdated ? ", last checked " + DataHelper.formatDuration(now - _lastFetch) + " ago" : "");
+    }
     
     public void run() {
         try { Thread.sleep(_context.random().nextLong(5*60*1000)); } catch (InterruptedException ie) {}
@@ -146,6 +158,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                         if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is out of date, update!");
+                            _updateVersion = ver;
                             break;
                         } else {
                             if (_log.shouldLog(Log.DEBUG))

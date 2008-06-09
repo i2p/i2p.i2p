@@ -1,9 +1,16 @@
+2008-06-09 zzz
+    * Reachability: Restrict peers with no SSU address at all from inbound tunnels
+    * News:
+      - Add display of last updated and last checked time
+        on index.jsp and configupdate.jsp
+      - Add a function to get update version (unused for now)
+    * config.jsp: Add another warning
+
 2008-06-07 zzz
     * NetDb: Tweak some logging on lease problems
     * Shitlist:
       - Add shitlistForever() and isShitlistedForever(), unused for now
       - Sort the HTML output by router hash
-    * config.jsp: Add another warning
     * netdb.jsp:
       - Sort the lease HTML output by dest hash, local first
       - Sort the router HTML output by router hash

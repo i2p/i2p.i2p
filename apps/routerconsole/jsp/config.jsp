@@ -93,6 +93,10 @@
     OR use the same port configured for SSU
     (currently <jsp:getProperty name="nethelper" property="udpPort" />)?
     <input type="checkbox" name="ntcpAutoPort" value="true" <jsp:getProperty name="nethelper" property="tcpAutoPortChecked" /> /><br />
+ <p>A hostname entered here will be published in the network database.
+    It is <b>not private</b>.
+    Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.
+ </p>
  <p>You do <i>not</i> need to allow inbound TCP connections - outbound connections work with no
     configuration.  However, if you want to receive inbound TCP connections, you <b>must</b> poke a hole
     in your NAT or firewall for unsolicited TCP connections.  If you specify the wrong IP address or
