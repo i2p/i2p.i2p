@@ -1,4 +1,7 @@
 2008-06-09 zzz
+    * Propagate i2.i2p.i2p-0.6.2.1-pre branch to i2p.i2p
+
+2008-06-09 zzz
     * Reachability: Restrict peers with no SSU address at all from inbound tunnels
     * News:
       - Add display of last updated and last checked time
@@ -59,6 +62,14 @@
     * summary bar:
       - Hide ident, provide a tooltip and a link
       - Add a warning if you are firewalled and class O
+
+2008-06-07 Complication
+    * Fix version in news.xml so it could be published
+
+* 2008-06-07  0.6.2 released
+
+2008-06-07 Complication
+    * Write announcement and prepare for release
 
 2008-05-29 zzz
     * Fix up initialNews.xml
