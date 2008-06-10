@@ -69,7 +69,7 @@ public class GraphHelper {
                 else if (title.equals("bw.recvRate")) hasRx = true;
             }
 
-            if (hasTx && hasRx && !_showEvents)
+            if (hasTx && hasRx && !_showEvents) {
                 _out.write("<a href=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + (3 * _periodCount )
                            + "&amp;width=" + (3 * _width)
@@ -82,6 +82,7 @@ public class GraphHelper {
                            + "&amp;width=" + _width
                            + "&amp;height=" + (_height - 14)
                            + "\" title=\"Combined bandwidth graph\" /></a>\n");
+            }
             
             for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
                 SummaryListener lsnr = (SummaryListener)iter.next();
