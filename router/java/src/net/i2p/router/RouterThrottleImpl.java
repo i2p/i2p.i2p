@@ -91,8 +91,9 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_CRIT;
         }
         
+        // Don't use CRIT because we don't want peers to think we're failing
         if (_context.router().getUptime() < 20*60*1000)
-            return TunnelHistory.TUNNEL_REJECT_CRIT;
+            return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
 
         long lag = _context.jobQueue().getMaxLag();
 // reject here if lag too high???

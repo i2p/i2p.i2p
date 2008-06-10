@@ -7,6 +7,8 @@
       - Don't publish bw stats in first hour of uptime
       - Publish floodfill stats even if other stats are disabled
       - Changes not effective until 0.6.2.1 to provide cover.
+    * Throttle: Use BANDWIDTH rather than CRIT as the rejection reason at
+      startup, so peers don't list us as failing.
     * graphs.jsp: Fix a bug where it tries to display the combined
       bandwidth graph when it isn't available
 
