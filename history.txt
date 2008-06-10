@@ -1,3 +1,15 @@
+2008-06-10 zzz
+    * Floodfill: Add new FloodfillMonitorJob, which tracks active
+      floodfills, and automatically enables/disables floodfill on
+      Class O routers to maintain 5-7 total active floodfills
+    * NetDb Stats:
+      - Remove several more stats
+      - Don't publish bw stats in first hour of uptime
+      - Publish floodfill stats even if other stats are disabled
+      - Changes not effective until 0.6.2.1 to provide cover.
+    * graphs.jsp: Fix a bug where it tries to display the combined
+      bandwidth graph when it isn't available
+
 2008-06-09 zzz
     * Propagate i2.i2p.i2p-0.6.2.1-pre branch to i2p.i2p
 

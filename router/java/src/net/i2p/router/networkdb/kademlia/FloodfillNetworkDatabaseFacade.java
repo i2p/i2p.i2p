@@ -12,13 +12,13 @@ import net.i2p.util.Log;
  */
 public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacade {
     public static final char CAPACITY_FLOODFILL = 'f';
-    private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
-    private static final String DEFAULT_FLOODFILL_PARTICIPANT = "false";
     private Map _activeFloodQueries;
+    private boolean _floodfillEnabled;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
+         _floodfillEnabled = false;
 
         _context.statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -31,6 +31,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+    }
+
+    public void startup() {
+        super.startup();
+        _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
     }
 
     protected void createHandlers() {
@@ -106,10 +111,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     
-    public boolean floodfillEnabled() { return floodfillEnabled(_context); }
+    public void setFloodfillEnabled(boolean yes) { _floodfillEnabled = yes; }
+    public boolean floodfillEnabled() { return _floodfillEnabled; }
     public static boolean floodfillEnabled(RouterContext ctx) {
-        String enabled = ctx.getProperty(PROP_FLOODFILL_PARTICIPANT, DEFAULT_FLOODFILL_PARTICIPANT);
-        return "true".equals(enabled);
+        return ((FloodfillNetworkDatabaseFacade)ctx.netDb()).floodfillEnabled();
     }
     
     public static boolean isFloodfill(RouterInfo peer) {
