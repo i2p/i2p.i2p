@@ -6,9 +6,11 @@ They disable the following:
   - SAM
   - SusiDNS
   - SusiMail
+  - Don't include the history file
 
 And reduce the following:
-  - JVM heap size
-  - Logging file size
-  - Exploratory tunnel length
+  - JVM heap size (64MB)
+  - Logging file size (128KB, 2 files)
+  - Exploratory tunnel length (2+0)
   - Full stats disabled
+  - No graphs enabled by default
