@@ -1,12 +1,15 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.apps.systray.SysTray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 
@@ -22,6 +25,11 @@ public class RouterConsoleRunner {
     private String _listenPort = "7657";
     private String _listenHost = "127.0.0.1";
     private String _webAppsDir = "./webapps/";
+    private static final String PROP_WEBAPP_CONFIG_FILENAME = "router.webappsConfigFile";
+    private static final String DEFAULT_WEBAPP_CONFIG_FILENAME = "webapps.config";
+    public static final String ROUTERCONSOLE = "routerconsole";
+    public static final String PREFIX = "webapps.";
+    public static final String ENABLED = ".startOnLoad";
     
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
@@ -51,18 +59,44 @@ public class RouterConsoleRunner {
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
         _server = new Server();
-        WebApplicationContext contexts[] = null;
+        boolean rewrite = false;
+        Properties props = webAppProperties();
+        if (props.size() <= 0) {
+            props.setProperty(PREFIX + ROUTERCONSOLE + ENABLED, "true");
+            rewrite = true;
+        }
         try {
             _server.addListener(_listenHost + ':' + _listenPort);
-            _server.setRootWebApp("routerconsole");
-            contexts = _server.addWebApplications(_webAppsDir);
-            if (contexts != null) {
-                for (int i = 0; i < contexts.length; i++) 
-                    initialize(contexts[i]);
+            _server.setRootWebApp(ROUTERCONSOLE);
+            WebApplicationContext wac = _server.addWebApplication("/", _webAppsDir + ROUTERCONSOLE + ".war");
+            initialize(wac);
+            File dir = new File(_webAppsDir);
+            String fileNames[] = dir.list(WarFilenameFilter.instance());
+            if (fileNames != null) {
+                for (int i = 0; i < fileNames.length; i++) {
+                    try {
+                        String appName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
+                        String enabled = props.getProperty(PREFIX + appName + ENABLED);
+                        if (! "false".equals(enabled)) {
+                            String path = new File(dir, fileNames[i]).getCanonicalPath();
+                            wac = _server.addWebApplication("/"+ appName, path);
+                            initialize(wac);
+                            if (enabled == null) {
+                                // do this so configclients.jsp knows about all apps from reading the config
+                                props.setProperty(PREFIX + appName + ENABLED, "true");
+                                rewrite = true;
+                            }
+                        }
+                    } catch (IOException ioe) {
+                        System.err.println("Error resolving '" + fileNames[i] + "' in '" + dir);
+                    }
+                }
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+        if (rewrite)
+            storeWebAppProperties(props);
         try {
             _server.start();
         } catch (Exception me) {
@@ -147,4 +181,38 @@ public class RouterConsoleRunner {
         }
     }
     
+    public static Properties webAppProperties() {
+        Properties rv = new Properties();
+        // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
+        String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
+        File cfgFile = new File(webappConfigFile);
+        
+        try {
+            DataHelper.loadProps(rv, cfgFile);
+        } catch (IOException ioe) {
+            // _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
+        }
+        
+        return rv;
+    }
+
+    public static void storeWebAppProperties(Properties props) {
+        // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
+        String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
+        File cfgFile = new File(webappConfigFile);
+        
+        try {
+            DataHelper.storeProps(props, cfgFile);
+        } catch (IOException ioe) {
+            // _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
+        }
+    }
+
+    private static class WarFilenameFilter implements FilenameFilter {
+        private static final WarFilenameFilter _filter = new WarFilenameFilter();
+        public static WarFilenameFilter instance() { return _filter; }
+        public boolean accept(File dir, String name) {
+            return (name != null) && (name.endsWith(".war") && !name.equals(ROUTERCONSOLE + ".war"));
+        }
+    }
 }
