@@ -1,13 +1,9 @@
 package net.i2p.router.startup;
 
 import java.lang.reflect.Method;
-import java.io.IOException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-import net.i2p.data.DataHelper;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -21,11 +17,6 @@ import net.i2p.util.Log;
  */
 class LoadClientAppsJob extends JobImpl {
     private Log _log;
-    /** wait 2 minutes before starting up client apps */
-    private final static long STARTUP_DELAY = 2*60*1000;
-    
-    private static final String PROP_CLIENT_CONFIG_FILENAME = "router.clientConfigFile";
-    private static final String DEFAULT_CLIENT_CONFIG_FILENAME = "clients.config";
     private static boolean _loaded = false;
     
     public LoadClientAppsJob(RouterContext ctx) {
@@ -37,58 +28,21 @@ class LoadClientAppsJob extends JobImpl {
             if (_loaded) return;
             _loaded = true;
         }
-        Properties clientApps = getClientApps();
-        int i = 0;
-        while (true) {
-            String className = clientApps.getProperty("clientApp."+i+".main");
-            if (className == null) 
-                break;
-            String clientName = clientApps.getProperty("clientApp."+i+".name");
-            String args = clientApps.getProperty("clientApp."+i+".args");
-            String delayStr = clientApps.getProperty("clientApp." + i + ".delay");
-            String onBoot = clientApps.getProperty("clientApp." + i + ".onBoot");
-            String disabled = clientApps.getProperty("clientApp." + i + ".startOnLoad");
-            i++;
-            if (disabled != null && "false".equals(disabled))
+        List apps = ClientAppConfig.getClientApps(getContext());
+        for(int i = 0; i < apps.size(); i++) {
+            ClientAppConfig app = (ClientAppConfig) apps.get(i);
+            if (app.disabled)
                 continue;
-
-            boolean onStartup = false;
-            if (onBoot != null)
-                onStartup = "true".equals(onBoot) || "yes".equals(onBoot);
-
-            long delay = (onStartup ? 0 : STARTUP_DELAY);
-            if (delayStr != null)
-                try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
-
-            String argVal[] = parseArgs(args);
-            if (onStartup) {
+            String argVal[] = parseArgs(app.args);
+            if (app.delay == 0) {
                 // run this guy now
-                runClient(className, clientName, argVal);
+                runClient(app.className, app.clientName, argVal);
             } else {
                 // wait before firing it up
-                getContext().jobQueue().addJob(new DelayedRunClient(getContext(), className, clientName, argVal, delay));
+                getContext().jobQueue().addJob(new DelayedRunClient(getContext(), app.className, app.clientName, argVal, app.delay));
             }
         }
     }
-
-    private Properties getClientApps() {
-        Properties rv = new Properties();
-        String clientConfigFile = getContext().getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
-        File cfgFile = new File(clientConfigFile);
-        
-        // fall back to use router.config's clientApp.* lines
-        if (!cfgFile.exists()) 
-            return getContext().router().getConfigMap();
-        
-        try {
-            DataHelper.loadProps(rv, cfgFile);
-        } catch (IOException ioe) {
-            _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
-        }
-        
-        return rv;
-    }
-    
     private class DelayedRunClient extends JobImpl {
         private String _className;
         private String _clientName;
