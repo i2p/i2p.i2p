@@ -1,3 +1,18 @@
+2008-06-16 zzz
+    * UDP: Prevent 100% CPU when UDP bind fails;
+      change bind fail message from ERROR to CRIT
+    * Refactor LoadClientAppsJob.java, move some functions to new
+      ClientAppConfig.java, to make them easily available to
+      new configclients.jsp
+    * RouterConsoleRunner: Use a new config file, webapps.config,
+      to control which .wars in webapps/ get run. Apps are enabled
+      by default; disable by (e.g.) webapps.syndie.startOnLoad=false
+      Config file is written if it does not exist.
+      Implement methods for use by new configclients.jsp.
+    * configclients.jsp: New. For both clients and webapps.
+      Saves are not yet implemented.
+
+
 2008-06-10 zzz
     * Floodfill: Add new FloodfillMonitorJob, which tracks active
       floodfills, and automatically enables/disables floodfill on
