@@ -44,8 +44,7 @@ public class UDPEndpoint {
             _sender.startup();
             _receiver.startup();
         } catch (SocketException se) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to bind on " + _listenPort, se);
+            _log.log(Log.CRIT, "Unable to bind on port " + _listenPort, se);
         }
     }
     

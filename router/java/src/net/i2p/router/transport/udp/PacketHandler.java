@@ -126,7 +126,7 @@ public class PacketHandler {
                 _state = 2;
                 UDPPacket packet = _endpoint.receive();
                 _state = 3;
-                if (packet == null) continue; // keepReading is probably false...
+                if (packet == null) break; // keepReading is probably false, or bind failed...
 
                 packet.received();
                 if (_log.shouldLog(Log.INFO))
