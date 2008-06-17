@@ -858,6 +858,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 return _fastBid;
         } else {
+            // If we don't have a port, all is lost
+            if ( _reachabilityStatus == CommSystemFacade.STATUS_HOSED) {
+                markUnreachable(to);
+                return null;
+            }
+
             // Validate his SSU address
             RouterAddress addr = toAddress.getTargetAddress(STYLE);
             if (addr == null) {
@@ -1870,6 +1876,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(" </tr>\n");
         buf.append("<tr><td colspan=\"15\" valign=\"top\" align=\"left\">");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
+        // NPE here early
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();
         // lifetime value, not just the retransmitted packets of current connections
         resentTotal = (long)_context.statManager().getRate("udp.packetsRetransmitted").getLifetimeEventCount();
@@ -2005,6 +2012,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 _context.statManager().addRateData("udp.statusReject", 1, 0);
+                // fall through...
+            case CommSystemFacade.STATUS_HOSED:
                 _reachabilityStatus = status; 
                 _reachabilityStatusLastUpdated = now;
                 break;
@@ -2021,6 +2030,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
         }
         if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
             if (needsRebuild())
                 rebuildExternalAddress();
         }

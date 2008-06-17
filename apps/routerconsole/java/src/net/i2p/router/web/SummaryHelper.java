@@ -130,6 +130,8 @@ public class SummaryHelper {
                     return "WARN-Firewalled and Fast";
                 else
                     return "Firewalled";
+            case CommSystemFacade.STATUS_HOSED:
+                return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 return "Testing";
