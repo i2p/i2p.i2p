@@ -26,7 +26,6 @@ public class ConfigClientsHelper {
 
     public ConfigClientsHelper() {}
     
-    
     public String getForm1() {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<table border=\"1\">\n");
@@ -35,7 +34,7 @@ public class ConfigClientsHelper {
         List clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = (ClientAppConfig) clients.get(cur);
-            renderForm(buf, cur, ca.clientName, false, !ca.disabled, "webConsole".equals(ca.clientName), ca.className + " " + ca.args);
+            renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled, "webConsole".equals(ca.clientName), ca.className + " " + ca.args);
         }
         
         buf.append("</table>\n");
@@ -48,21 +47,19 @@ public class ConfigClientsHelper {
         buf.append("<tr><td>WebApp</td><td>Enabled?</td><td>Description</td></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = new TreeSet(props.keySet());
-        int cur = 0;
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (name.startsWith(RouterConsoleRunner.PREFIX) && name.endsWith(RouterConsoleRunner.ENABLED)) {
-                String app = name.substring(8, name.lastIndexOf(RouterConsoleRunner.ENABLED));
+                String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
-                renderForm(buf, cur, app, !"addressbook".equals(app), "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war");
-                cur++;
+                renderForm(buf, app, app, !"addressbook".equals(app), "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war");
             }
         }
         buf.append("</table>\n");
         return buf.toString();
     }
 
-    private void renderForm(StringBuffer buf, int index, String name, boolean urlify, boolean enabled, boolean ro, String desc) {
+    private void renderForm(StringBuffer buf, String index, String name, boolean urlify, boolean enabled, boolean ro, String desc) {
         buf.append("<tr><td>");
         if (urlify && enabled) {
             String link = "/";
@@ -72,7 +69,7 @@ public class ConfigClientsHelper {
         } else {
             buf.append(name);
         }
-        buf.append("</td><td align=\"center\"><input type=\"checkbox\" name=\"enable\" value=\"").append(index).append(".enabled\" ");
+        buf.append("</td><td align=\"center\"><input type=\"checkbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {
             buf.append("checked=\"true\" ");
             if (ro)
