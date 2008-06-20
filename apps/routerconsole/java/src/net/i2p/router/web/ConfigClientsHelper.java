@@ -29,7 +29,7 @@ public class ConfigClientsHelper {
     public String getForm1() {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>Client</td><td>Enabled?</td><td>Class and arguments</td></tr>\n");
+        buf.append("<tr><td>Client</td><td>Run at Startup?</td><td>Start Now</td><td>Class and arguments</td></tr>\n");
         
         List clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
@@ -44,7 +44,7 @@ public class ConfigClientsHelper {
     public String getForm2() {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>WebApp</td><td>Enabled?</td><td>Description</td></tr>\n");
+        buf.append("<tr><td>WebApp</td><td>Run at Startup?</td><td>Start Now</td><td>Description</td></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = new TreeSet(props.keySet());
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
@@ -75,6 +75,10 @@ public class ConfigClientsHelper {
             if (ro)
                 buf.append("disabled=\"true\" ");
         }
-        buf.append("/><td>").append(desc).append("</td></tr>\n");
+        buf.append("/></td><td>&nbsp");
+        if (!enabled) {
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" />Start</button>");
+        }
+        buf.append("&nbsp</td><td>").append(desc).append("</td></tr>\n");
     }
 }

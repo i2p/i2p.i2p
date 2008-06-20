@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +10,11 @@ import java.util.Set;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.router.startup.ClientAppConfig;
+import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.util.Log;
+
+import org.mortbay.http.HttpListener;
+import org.mortbay.jetty.Server;
 
 /**
  *  Saves changes to clients.config or webapps.config
@@ -18,13 +23,25 @@ public class ConfigClientsHandler extends FormHandler {
     private Log _log;
     private Map _settings;
     
-    public ConfigClientsHandler() {}
-    
+    public ConfigClientsHandler() {
+        _log = ContextHelper.getContext(null).logManager().getLog(ConfigClientsHandler.class);
+    }
+
     protected void processForm() {
         if (_action.startsWith("Save Client")) {
             saveClientChanges();
         } else if (_action.startsWith("Save WebApp")) {
             saveWebAppChanges();
+        } else if (_action.startsWith("Start ")) {
+            String app = _action.substring(6);
+            int appnum = -1;
+            try {
+                appnum = Integer.parseInt(app);
+            } catch (NumberFormatException nfe) {}
+            if (appnum >= 0)
+                startClient(appnum);
+            else
+                startWebApp(app);
         } else {
             addFormError("Unsupported " + _action);
         }
@@ -44,6 +61,17 @@ public class ConfigClientsHandler extends FormHandler {
         addFormNotice("Client configuration saved successfully - restart required to take effect");
     }
 
+    private void startClient(int i) {
+        List clients = ClientAppConfig.getClientApps(_context);
+        if (i >= clients.size()) {
+            addFormError("Bad client index");
+            return;
+        }
+        ClientAppConfig ca = (ClientAppConfig) clients.get(i);
+        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
+        addFormNotice("Client " + ca.clientName + " started");
+    }
+
     private void saveWebAppChanges() {
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = props.keySet();
@@ -59,5 +87,29 @@ public class ConfigClientsHandler extends FormHandler {
         }
         RouterConsoleRunner.storeWebAppProperties(props);
         addFormNotice("WebApp configuration saved successfully - restart required to take effect");
+    }
+
+    // Big hack for the moment, not using properties for directory and port
+    // Go through all the Jetty servers, find the one serving port 7657,
+    // requested and add the .war to that one
+    private void startWebApp(String app) {
+        Collection c = Server.getHttpServers();
+        for (int i = 0; i < c.size(); i++) {
+            Server s = (Server) c.toArray()[i];
+            HttpListener[] hl = s.getListeners();
+            for (int j = 0; j < hl.length; j++) {
+                if (hl[j].getPort() == 7657) {
+                    try {
+                        s.addWebApplication("/"+ app, "./webapps/" + app + ".war").start();
+                        // no passwords... initialize(wac);
+                        addFormNotice("WebApp " + app + " started");
+                    } catch (Exception ioe) {
+                        addFormError("Failed to start " + app + " " + ioe);
+                    }
+                    return;
+                }
+            }
+        }
+        addFormError("Failed to find server");
     }
 }
