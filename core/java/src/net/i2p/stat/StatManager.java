@@ -37,13 +37,15 @@ public class StatManager {
     public static final String PROP_STAT_REQUIRED = "stat.required";
     /**
      * These are all the stats published in netDb, plus those required for the operation of
-     * the router (many in RouterThrottleImpl), plus those that are on graphs.jsp by default.
+     * the router (many in RouterThrottleImpl), plus those that are on graphs.jsp by default,
+     * plus those used on the summary bar (SummaryHelper.java).
      * Wildcard ('*') allowed at end of stat only.
      * Ignore all the rest of the stats unless stat.full=true.
      */
     public static final String DEFAULT_STAT_REQUIRED =
         "bw.recvRate,bw.sendBps,bw.sendRate,client.sendAckTime,clock.skew,crypto.elGamal.encrypt," +
         "jobQueue.jobLag,netDb.successTime,router.fastPeers," +
+        "prng.bufferFillTime,prng.bufferWaitTime," +
         "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
         "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout" +
         "tunnel.buildClientExpire,tunnel.buildClientReject,tunnel.buildClientSuccess," +
