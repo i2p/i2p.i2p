@@ -42,6 +42,8 @@ public final class I2PDatagramDissector {
     private byte[] rxPayload = new byte[DGRAM_BUFSIZE];
 
     private int rxPayloadLen = 0;
+    
+    private boolean valid = false;
 
     /**
      * Crate a new I2P repliable datagram dissector.
@@ -89,11 +91,8 @@ public final class I2PDatagramDissector {
      * @throws I2PInvalidDatagramException if the signature verification fails
      */
     public byte[] getPayload() throws I2PInvalidDatagramException {
-        if (!dsaEng.verifySignature(rxSign, rxHashBytes,
-                                    rxDest.getSigningPublicKey())) {
-            throw new I2PInvalidDatagramException("Incorrect I2P repliable datagram signature");
-        }
-
+        this.verifySignature();
+        
         byte[] retPayload = new byte[rxPayloadLen];
         System.arraycopy(rxPayload, 0, retPayload, 0, rxPayloadLen);
 
@@ -109,11 +108,8 @@ public final class I2PDatagramDissector {
      * @throws I2PInvalidDatagramException if the signature verification fails
      */
     public Destination getSender() throws I2PInvalidDatagramException {
-        if (!dsaEng.verifySignature(rxSign, rxHashBytes,
-                                    rxDest.getSigningPublicKey())) {
-            throw new I2PInvalidDatagramException("Incorrect I2P repliable datagram signature");
-        }
-
+        this.verifySignature();
+        
         Destination retDest = new Destination();
         try {
             retDest.fromByteArray(rxDest.toByteArray());
@@ -155,5 +151,22 @@ public final class I2PDatagramDissector {
         }
         
         return retDest;
+    }
+    
+    /**
+     * Verify the signature of this datagram (previously loaded with the
+     * loadI2PDatagram() method)
+     */
+    public void verifySignature() throws I2PInvalidDatagramException {
+        // first check if it already got validated
+        if(this.valid)
+            return;
+        
+        // now validate
+        if (!dsaEng.verifySignature(rxSign, rxHashBytes, rxDest.getSigningPublicKey()))
+            throw new I2PInvalidDatagramException("Incorrect I2P repliable datagram signature");
+        
+        // set validated
+        this.valid = true;
     }
 }
