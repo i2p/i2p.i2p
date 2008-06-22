@@ -18,7 +18,6 @@
   
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="formhandler" property="shouldsave" value="<%=request.getParameter("shouldsave")%>" />
  <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
@@ -30,7 +29,6 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigClientsHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce")%>" />
- <input type="hidden" name="action" value="blah" />
  <h3>Client Configuration</h3>
  <p>
  The Java clients listed below are started by the router and run in the same JVM.
@@ -39,7 +37,7 @@
  </p><p>
  <input type="submit" name="action" value="Save Client Configuration" />
  </p><p>
- <i>All changes require restart to take effect. For other changes edit the clients.config file.</i>
+ <i>All changes require restart to take effect. To change other client options, edit the clients.config file.</i>
  </p>
  <hr />
  <h3>WebApp Configuration</h3>
@@ -50,11 +48,15 @@
  front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel),
  or have no web interface at all (e.g. addressbook).
  </p><p>
+ A web app may also be disabled by removing the .war file from the webapps directory;
+ however the .war file and web app will reappear when you update your router to a newer version,
+ so disabling the web app here is the preferred method.
+ </p><p>
  <jsp:getProperty name="clientshelper" property="form2" />
  </p><p>
  <input type="submit" name="action" value="Save WebApp Configuration" />
  </p><p>
- <i>All changes require restart to take effect. For other changes edit the webapps.config file.</i>
+ <i>All changes require restart to take effect. To change other webapp options, edit the webapps.config file.</i>
  </p>
  </form>
 </div>

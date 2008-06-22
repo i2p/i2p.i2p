@@ -2,6 +2,7 @@ package net.i2p.router.startup;
 
 import java.io.IOException;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -22,6 +23,7 @@ public class ClientAppConfig {
     
     private static final String PROP_CLIENT_CONFIG_FILENAME = "router.clientConfigFile";
     private static final String DEFAULT_CLIENT_CONFIG_FILENAME = "clients.config";
+    private static final String PREFIX = "clientApp.";
 
     // let's keep this really simple
     public String className;
@@ -63,14 +65,14 @@ public class ClientAppConfig {
         List rv = new ArrayList(5);
         int i = 0;
         while (true) {
-            String className = clientApps.getProperty("clientApp."+i+".main");
+            String className = clientApps.getProperty(PREFIX + i + ".main");
             if (className == null) 
                 break;
-            String clientName = clientApps.getProperty("clientApp."+i+".name");
-            String args = clientApps.getProperty("clientApp."+i+".args");
-            String delayStr = clientApps.getProperty("clientApp." + i + ".delay");
-            String onBoot = clientApps.getProperty("clientApp." + i + ".onBoot");
-            String disabled = clientApps.getProperty("clientApp." + i + ".startOnLoad");
+            String clientName = clientApps.getProperty(PREFIX + i + ".name");
+            String args = clientApps.getProperty(PREFIX + i + ".args");
+            String delayStr = clientApps.getProperty(PREFIX + i + ".delay");
+            String onBoot = clientApps.getProperty(PREFIX + i + ".onBoot");
+            String disabled = clientApps.getProperty(PREFIX + i + ".startOnLoad");
             i++;
             boolean dis = disabled != null && "false".equals(disabled);
 
@@ -87,5 +89,25 @@ public class ClientAppConfig {
         return rv;
     }
 
+    public static void writeClientAppConfig(RouterContext ctx, List apps) {
+        String clientConfigFile = ctx.getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(clientConfigFile);
+            StringBuffer buf = new StringBuffer(2048);
+            for(int i = 0; i < apps.size(); i++) {
+                ClientAppConfig app = (ClientAppConfig) apps.get(i);
+                buf.append(PREFIX).append(i).append(".main=").append(app.className).append("\n");
+                buf.append(PREFIX).append(i).append(".name=").append(app.clientName).append("\n");
+                buf.append(PREFIX).append(i).append(".args=").append(app.args).append("\n");
+                buf.append(PREFIX).append(i).append(".delay=").append(app.delay / 1000).append("\n");
+                buf.append(PREFIX).append(i).append(".startOnLoad=").append(!app.disabled).append("\n");
+            }
+            fos.write(buf.toString().getBytes());
+        } catch (IOException ioe) {
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+    }
 }
 

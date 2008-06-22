@@ -2,6 +2,8 @@ package gnu.crypto.prng;
 
 import java.util.*;
 
+import net.i2p.I2PAppContext;
+
 /**
  * fortuna instance that tries to avoid blocking if at all possible by using separate
  * filled buffer segments rather than one buffer (and blocking when that buffer's data
@@ -13,16 +15,20 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     private final byte asyncBuffers[][] = new byte[BUFFERS][BUFSIZE];
     private final int status[] = new int[BUFFERS];
     private int nextBuf = 0;
+    private I2PAppContext _context;
 
     private static final int STATUS_NEED_FILL = 0;
     private static final int STATUS_FILLING = 1;
     private static final int STATUS_FILLED = 2;
     private static final int STATUS_LIVE = 3;
     
-    public AsyncFortunaStandalone() {
+    public AsyncFortunaStandalone(I2PAppContext context) {
         super();
         for (int i = 0; i < BUFFERS; i++)
             status[i] = STATUS_NEED_FILL;
+        _context = context;
+        context.statManager().createRateStat("prng.bufferWaitTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        context.statManager().createRateStat("prng.bufferFillTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
     }
     
     public void startup() {
@@ -61,6 +67,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                 } catch (InterruptedException ie) {}
                 waited = System.currentTimeMillis()-before;
             }
+            _context.statManager().addRateData("prng.bufferWaitTime", waited, 0);
             if (waited > 10*1000)
                 System.out.println(Thread.currentThread().getName() + ": Took " + waited
                                    + "ms for a full PRNG buffer to be found");
@@ -108,6 +115,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                     //System.out.println(Thread.currentThread().getName() + ": Prng buffer " + toFill + " filled after " + (after-before));
                     asyncBuffers.notifyAll();
                 }
+                _context.statManager().addRateData("prng.bufferFillTime", after - before, 0);
                 Thread.yield();
                 long waitTime = (after-before)*5;
                 if (waitTime <= 0) // somehow postman saw waitTime show up as negative
@@ -147,7 +155,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     
     public static void main(String args[]) {
         try {
-            AsyncFortunaStandalone rand = new AsyncFortunaStandalone();
+            AsyncFortunaStandalone rand = new AsyncFortunaStandalone(null);  // Will cause NPEs above; fix this if you want to test! Sorry...
             
             byte seed[] = new byte[1024];
             rand.seed(seed);

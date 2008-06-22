@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * it'll get queued up for starting 2 minutes later.
  *
  */
-class LoadClientAppsJob extends JobImpl {
+public class LoadClientAppsJob extends JobImpl {
     private Log _log;
     private static boolean _loaded = false;
     
@@ -36,7 +36,7 @@ class LoadClientAppsJob extends JobImpl {
             String argVal[] = parseArgs(app.args);
             if (app.delay == 0) {
                 // run this guy now
-                runClient(app.className, app.clientName, argVal);
+                runClient(app.className, app.clientName, argVal, _log);
             } else {
                 // wait before firing it up
                 getContext().jobQueue().addJob(new DelayedRunClient(getContext(), app.className, app.clientName, argVal, app.delay));
@@ -56,11 +56,11 @@ class LoadClientAppsJob extends JobImpl {
         }
         public String getName() { return "Delayed client job"; }
         public void runJob() {
-            runClient(_className, _clientName, _args);
+            runClient(_className, _clientName, _args, _log);
         }
     }
     
-    static String[] parseArgs(String args) {
+    public static String[] parseArgs(String args) {
         List argList = new ArrayList(4);
         if (args != null) {
             char data[] = args.toCharArray();
@@ -109,9 +109,9 @@ class LoadClientAppsJob extends JobImpl {
         return rv;
     }
 
-    private void runClient(String className, String clientName, String args[]) {
-        _log.info("Loading up the client application " + clientName + ": " + className + " " + args);
-        I2PThread t = new I2PThread(new RunApp(className, clientName, args));
+    public static void runClient(String className, String clientName, String args[], Log log) {
+        log.info("Loading up the client application " + clientName + ": " + className + " " + args);
+        I2PThread t = new I2PThread(new RunApp(className, clientName, args, log));
         if (clientName == null) 
             clientName = className + " client";
         t.setName(clientName);
@@ -119,17 +119,19 @@ class LoadClientAppsJob extends JobImpl {
         t.start();
     }
 
-    private final class RunApp implements Runnable {
+    private final static class RunApp implements Runnable {
         private String _className;
         private String _appName;
         private String _args[];
-        public RunApp(String className, String appName, String args[]) { 
+        private Log _log;
+        public RunApp(String className, String appName, String args[], Log log) { 
             _className = className; 
             _appName = appName;
             if (args == null)
                 _args = new String[0];
             else
                 _args = args;
+            _log = log;
         }
         public void run() {
             try {

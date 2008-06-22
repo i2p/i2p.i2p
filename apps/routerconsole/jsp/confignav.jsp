@@ -4,10 +4,10 @@
  %>Service | <% } else { %><a href="configservice.jsp">Service</a> | <% }
  if (request.getRequestURI().indexOf("configupdate.jsp") != -1) {
  %>Update | <% } else { %><a href="configupdate.jsp">Update</a> | <% }
- if (request.getRequestURI().indexOf("configclients.jsp") != -1) {
- %>Clients | <% } else { %><a href="configclients.jsp">Clients</a> | <% }
  if (request.getRequestURI().indexOf("configtunnels.jsp") != -1) {
  %>Tunnels | <% } else { %><a href="configtunnels.jsp">Tunnels</a> | <% }
+ if (request.getRequestURI().indexOf("configclients.jsp") != -1) {
+ %>Clients | <% } else { %><a href="configclients.jsp">Clients</a> | <% }
  if (request.getRequestURI().indexOf("configlogging.jsp") != -1) {
  %>Logging | <% } else { %><a href="configlogging.jsp">Logging</a> | <% }
  if (request.getRequestURI().indexOf("configstats.jsp") != -1) {

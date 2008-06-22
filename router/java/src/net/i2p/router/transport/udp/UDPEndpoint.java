@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -44,6 +45,7 @@ public class UDPEndpoint {
             _sender.startup();
             _receiver.startup();
         } catch (SocketException se) {
+            _transport.setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
             _log.log(Log.CRIT, "Unable to bind on port " + _listenPort, se);
         }
     }

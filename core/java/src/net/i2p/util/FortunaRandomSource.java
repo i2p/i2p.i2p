@@ -32,7 +32,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
 
     public FortunaRandomSource(I2PAppContext context) {
         super(context);
-        _fortuna = new AsyncFortunaStandalone();
+        _fortuna = new AsyncFortunaStandalone(context);
         byte seed[] = new byte[1024];
         if (initSeed(seed)) {
             _fortuna.seed(seed);

@@ -10,6 +10,7 @@ import java.util.Set;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterAddress;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.router.CommSystemFacade;
@@ -17,6 +18,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.transport.ntcp.NTCPAddress;
 
 /**
  * Simple helper to query the appropriate router for data necessary to render
@@ -120,7 +122,10 @@ public class SummaryHelper {
         int status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
-                return "OK";
+                RouterAddress ra = _context.router().getRouterInfo().getTargetAddress("NTCP");
+                if (ra == null || (new NTCPAddress(ra)).isPubliclyRoutable())
+                    return "OK";
+                return "ERR-Private TCP Address";
             case CommSystemFacade.STATUS_DIFFERENT:
                 return "ERR-SymmetricNAT";
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
@@ -130,6 +135,8 @@ public class SummaryHelper {
                     return "WARN-Firewalled and Fast";
                 else
                     return "Firewalled";
+            case CommSystemFacade.STATUS_HOSED:
+                return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 return "Testing";
@@ -512,6 +519,28 @@ public class SummaryHelper {
         return String.valueOf(_context.tunnelManager().getInboundBuildQueueSize());
     }
     
+    public String getPRNGStatus() {
+        Rate r = _context.statManager().getRate("prng.bufferWaitTime").getRate(60*1000);
+        int use = (int) r.getLastEventCount();
+        int i = (int) (r.getAverageValue() + 0.5);
+        if (i <= 0) {
+            r = _context.statManager().getRate("prng.bufferWaitTime").getRate(10*60*1000);
+            i = (int) (r.getAverageValue() + 0.5);
+        }
+        String rv = i + "/";
+        r = _context.statManager().getRate("prng.bufferFillTime").getRate(60*1000);
+        i = (int) (r.getAverageValue() + 0.5);
+        if (i <= 0) {
+            r = _context.statManager().getRate("prng.bufferFillTime").getRate(10*60*1000);
+            i = (int) (r.getAverageValue() + 0.5);
+        }
+        rv = rv + i + "ms";
+        // margin == fill time / use time
+        if (use > 0 && i > 0)
+            rv = rv + ' ' + (60*1000 / (use * i)) + 'x';
+        return rv;
+    }
+
     public boolean updateAvailable() { 
         return NewsFetcher.getInstance(_context).updateAvailable();
     }

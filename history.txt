@@ -1,3 +1,17 @@
+2008-06-23 zzz
+    * configclients.jsp: Add start button for clients and webapps.
+    * PRNG: Add two stats
+    * Summary bar:
+      - Display Warning for TCP private IP address
+      - Display PRNG stats
+    * OutNetMessage: Change cache logging from WARN to INFO
+
+2008-06-17 zzz
+    * Comm System: Add new STATUS_HOSED for use when UDP bind fails
+    * Summary bar: Display helpful errror message when UDP bind fails
+    * UDP: Don't bid when UDP bind fails
+    * configclients.jsp: Implement saves for clients and webapps.
+
 2008-06-16 zzz
     * UDP: Prevent 100% CPU when UDP bind fails;
       change bind fail message from ERROR to CRIT
@@ -11,7 +25,6 @@
       Implement methods for use by new configclients.jsp.
     * configclients.jsp: New. For both clients and webapps.
       Saves are not yet implemented.
-
 
 2008-06-10 zzz
     * Floodfill: Add new FloodfillMonitorJob, which tracks active

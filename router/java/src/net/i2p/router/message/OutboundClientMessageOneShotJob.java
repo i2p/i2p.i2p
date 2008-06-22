@@ -247,8 +247,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                             return null;
                         //}
                     } else {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Expired from cache - reply leaseset for " + _toString); 
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Expired from cache - reply leaseset for " + _toString); 
                         // will get overwritten below
                         // _leaseSetCache.remove(hashPair());
                     }
@@ -256,8 +256,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
             _leaseSetCache.put(hashPair(), newLS);
         }
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Added to cache - reply leaseset for " + _toString); 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Added to cache - reply leaseset for " + _toString); 
         return newLS;
     }
     
@@ -329,8 +329,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                         }
                     }
                 }
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Expired from cache - lease for " + _toString); 
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Expired from cache - lease for " + _toString); 
                 _leaseCache.remove(_to);
             }
         }
@@ -340,8 +340,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
             Lease lease = _leaseSet.getLease(i);
             if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": getNextLease() - expired lease! - " + lease + " for " + _toString);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": getNextLease() - expired lease! - " + lease + " for " + _toString);
                 continue;
             } else {
                 leases.add(lease);
@@ -403,8 +403,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         synchronized (_leaseCache) {
             _leaseCache.put(hashPair(), _lease);
         }
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Added to cache - lease for " + _toString); 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Added to cache - lease for " + _toString); 
         return true;
     }
 
