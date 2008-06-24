@@ -78,8 +78,7 @@ public class Connection {
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
     
-    /** lets be sane- no more than 64 packets in the air in each dir */
-    public static final int MAX_WINDOW_SIZE = 64;
+    public static final int MAX_WINDOW_SIZE = 128;
     
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
