@@ -431,8 +431,6 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             _transport.getWriter().wantsWrite(this, "outbound established");
     }
     
-    public boolean getIsInbound() { return _isInbound; }
-    
     // Time vs space tradeoff:
     // on slow GCing jvms, the mallocs in the following preparation can cause the 
     // write to get congested, taking up a substantial portion of the Writer's

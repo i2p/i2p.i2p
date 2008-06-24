@@ -577,7 +577,7 @@ public class NTCPTransport extends TransportImpl {
             String name = con.getRemotePeer().calculateHash().toBase64().substring(0,6);
             buf.append("<tr><td><code><a href=\"netdb.jsp#").append(name).append("\">").append(name);
             buf.append("</code></td><td align=\"center\"><code>");
-            if (con.getIsInbound())
+            if (con.isInbound())
                 buf.append("in");
             else
                 buf.append("out");
