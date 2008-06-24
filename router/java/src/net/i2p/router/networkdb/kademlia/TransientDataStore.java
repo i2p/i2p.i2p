@@ -163,6 +163,10 @@ class TransientDataStore implements DataStore {
         return buf.toString();
     }
     
+    public DataStructure removeLease(Hash key) {
+        return remove(key);
+    }
+
     public DataStructure remove(Hash key) {
         synchronized (_data) {
             if (_log.shouldLog(Log.DEBUG))

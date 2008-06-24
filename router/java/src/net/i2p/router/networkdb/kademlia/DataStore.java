@@ -18,6 +18,7 @@ public interface DataStore {
     public DataStructure get(Hash key);
     public void put(Hash key, DataStructure data);
     public DataStructure remove(Hash key);
+    public DataStructure removeLease(Hash key);
     public Set getKeys();
     public void restart();
     public int countLeaseSets();

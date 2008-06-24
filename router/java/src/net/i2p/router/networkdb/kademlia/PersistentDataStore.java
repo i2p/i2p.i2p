@@ -63,6 +63,10 @@ class PersistentDataStore extends TransientDataStore {
         return super.remove(key);
     }
     
+    public DataStructure removeLease(Hash key) {
+        return super.removeLease(key);
+    }
+    
     public void put(Hash key, DataStructure data) {
         if ( (data == null) || (key == null) ) return;
         super.put(key, data);

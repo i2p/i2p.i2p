@@ -783,7 +783,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // if we dont know the key, lets make sure it isn't a now-dead peer
         }
         
-        _ds.remove(dbEntry);
+        if (isRouterInfo)
+            _ds.remove(dbEntry);
+        else
+            _ds.removeLease(dbEntry);
         synchronized (_lastSent) {
             _lastSent.remove(dbEntry);
         }
