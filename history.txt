@@ -1,4 +1,15 @@
-2008-06-23 zzz
+2008-06-24 zzz
+    * FloodfillMonitorJob: Change range from 5-7 to 4-6
+    * NTCP: Remove getIsInbound(), duplicate of isInbound()
+    * PersistentDataStore: Don't try to remove nonexistent leaseSet files
+    * Router console: add placeholder pages for i2psnark, i2ptunnel,
+      susidns, and susimail for use when the .wars are not running
+    * Streaming lib: Increase max window size to 128
+
+2008-06-22 welterde
+    * Optimize I2PDatagramDissector
+
+2008-06-20 zzz
     * configclients.jsp: Add start button for clients and webapps.
     * PRNG: Add two stats
     * Summary bar:
