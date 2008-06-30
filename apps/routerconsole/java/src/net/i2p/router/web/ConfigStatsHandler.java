@@ -25,6 +25,7 @@ public class ConfigStatsHandler extends FormHandler {
     public ConfigStatsHandler() {
         super();
         _stats = new ArrayList();
+        _graphs = "";
         _explicitFilter = false;
         _isFull = false;
     }
