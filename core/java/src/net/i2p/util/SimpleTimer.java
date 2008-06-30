@@ -107,8 +107,8 @@ public class SimpleTimer {
             _events.notifyAll();
         }
         if (time.longValue() > eventTime + 100) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Lots of timer congestion, had to push " + event + " back "
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Lots of timer congestion, had to push " + event + " back "
                            + (time.longValue()-eventTime) + "ms (# events: " + totalEvents + ")");
         }
         long timeToAdd = System.currentTimeMillis() - now;
