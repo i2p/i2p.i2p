@@ -451,8 +451,18 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     private void removeFile(Hash key, File dir) throws IOException {
-        String lsName = getLeaseSetName(key);
         String riName = getRouterInfoName(key);
+        File f = new File(dir, riName);
+        if (f.exists()) {
+            boolean removed = f.delete();
+            if (!removed)
+                _log.warn("Unable to remove router info at " + f.getAbsolutePath());
+            else
+                _log.info("Removed router info at " + f.getAbsolutePath());
+            return;
+        }
+/***
+        String lsName = getLeaseSetName(key);
         File f = new File(dir, lsName);
         if (f.exists()) {
             boolean removed = f.delete();
@@ -462,17 +472,10 @@ class PersistentDataStore extends TransientDataStore {
                 _log.info("Removed lease set at " + f.getAbsolutePath());
             return;
         }
-        f = new File(dir, riName);
-        if (f.exists()) {
-            boolean removed = f.delete();
-            if (!removed)
-                _log.warn("Unable to remove router info at " + f.getAbsolutePath());
-            else
-                _log.info("Removed router info at " + f.getAbsolutePath());
-            return;
-        }
+***/
     }
     
+/***
     private final static class LeaseSetFilter implements FilenameFilter {
         private static final FilenameFilter _instance = new LeaseSetFilter();
         public static final FilenameFilter getInstance() { return _instance; }
@@ -482,6 +485,7 @@ class PersistentDataStore extends TransientDataStore {
             return (name.startsWith(LEASESET_PREFIX.toUpperCase()) && name.endsWith(LEASESET_SUFFIX.toUpperCase()));
         }
     }
+***/
     private final static class RouterInfoFilter implements FilenameFilter {
         private static final FilenameFilter _instance = new RouterInfoFilter();
         public static final FilenameFilter getInstance() { return _instance; }
