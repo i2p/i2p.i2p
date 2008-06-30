@@ -1,3 +1,14 @@
+2008-06-30 zzz
+    * configstats.jsp: Fix NPE when no stats checked (thanks nothome27!)
+    * i2psnark:
+      - Fix NPE caused by race (thanks echelon!)
+      - Add mastertracker, remove de-ebook
+    * NTCP:
+      - Try to fix 100% CPU, caused perhaps by JVM NIO bug...
+      - Fix failsafe stats
+    * PersistentDataStore: More leaseSet code cleanup
+    * SimpleTimer: Change congestion message from error to warn
+
 2008-06-24 zzz
     * FloodfillMonitorJob: Change range from 5-7 to 4-6
     * NTCP: Remove getIsInbound(), duplicate of isInbound()

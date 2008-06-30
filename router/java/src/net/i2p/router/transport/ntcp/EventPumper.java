@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
@@ -124,6 +125,7 @@ public class EventPumper implements Runnable {
                         
                         int failsafeWrites = 0;
                         int failsafeCloses = 0;
+                        int failsafeInvalid = 0;
                                                                 // pointless if we do this every 2 seconds?
                         long expireIdleWriteTime = 20*60*1000l; // + _context.random().nextLong(60*60*1000l);
                         for (Iterator iter = all.iterator(); iter.hasNext(); ) {
@@ -134,6 +136,33 @@ public class EventPumper implements Runnable {
                                     continue; // to the next con
                                 NTCPConnection con = (NTCPConnection)att;
                                 
+                                /**
+                                 * 100% CPU bug
+                                 * http://forums.java.net/jive/thread.jspa?messageID=255525
+                                 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6595055
+                                 * 
+                                 * The problem is around a channel that was originally registered with Selector for i/o gets
+                                 * closed on the server side (due to early client side exit).  But the server side can know
+                                 * about such channel only when it does i/o (read/write) and thereby getting into an IO exception.
+                                 * In this case, (bug 6595055)there are times (erroneous) when server side (selector) did not
+                                 * know the channel is already closed (peer-reset), but continue to do the selection cycle on
+                                 * a key set whose associated channel is alreay closed or invalid. Hence, selector's slect(..)
+                                 * keep spinging with zero return without blocking for the timeout period.
+                                 * 
+                                 * One fix is to have a provision in the application, to check if any of the Selector's keyset
+                                 * is having a closed channel/or invalid registration due to channel closure.
+                                 */
+                                if ((!key.isValid()) &&
+                                    (!((SocketChannel)key.channel()).isConnectionPending()) &&
+                                    con.getTimeSinceCreated() > 2 * NTCPTransport.ESTABLISH_TIMEOUT) {
+                                    if (_log.shouldLog(Log.WARN))
+                                        _log.warn("Invalid key " + con);
+                                    // this will cancel the key, and it will then be removed from the keyset
+                                    con.close();
+                                    failsafeInvalid++;
+                                    continue;
+                                }
+
                                 if ( (con.getWriteBufCount() > 0) &&
                                      ((key.interestOps() & SelectionKey.OP_WRITE) == 0) ) {
                                     // the data queued to be sent has already passed through
@@ -152,11 +181,13 @@ public class EventPumper implements Runnable {
                             } catch (CancelledKeyException cke) {
                                 // cancelled while updating the interest ops.  ah well
                             }
-                            if (failsafeWrites > 0)
-                                _context.statManager().addRateData("ntcp.failsafeWrites", failsafeWrites, 0);
-                            if (failsafeCloses > 0)
-                                _context.statManager().addRateData("ntcp.failsafeCloses", failsafeCloses, 0);
                         }
+                        if (failsafeWrites > 0)
+                            _context.statManager().addRateData("ntcp.failsafeWrites", failsafeWrites, 0);
+                        if (failsafeCloses > 0)
+                            _context.statManager().addRateData("ntcp.failsafeCloses", failsafeCloses, 0);
+                        if (failsafeInvalid > 0)
+                            _context.statManager().addRateData("ntcp.failsafeInvalid", failsafeInvalid, 0);
                     } catch (ClosedSelectorException cse) {
                         continue;
                     }

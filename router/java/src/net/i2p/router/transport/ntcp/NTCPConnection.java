@@ -1277,4 +1277,11 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             }
         }
     }
+
+    public String toString() {
+        return "NTCP Connection to " +
+               (_remotePeer == null ? "unknown " : _remotePeer.calculateHash().toBase64().substring(0,6)) +
+               " inbound? " + _isInbound + " established? " + _established +
+               " created " + DataHelper.formatDuration(getTimeSinceCreated()) + " ago";
+    }
 }
