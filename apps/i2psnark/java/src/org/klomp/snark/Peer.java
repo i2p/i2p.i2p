@@ -332,9 +332,9 @@ public class Peer implements Comparable
       {
         // try to save partial piece
         if (this.deregister) {
-          PeerListener p = state.listener;
+          PeerListener p = s.listener;
           if (p != null) {
-            p.savePeerPartial(state);
+            p.savePeerPartial(s);
             p.markUnrequested(this);
           }
         }
