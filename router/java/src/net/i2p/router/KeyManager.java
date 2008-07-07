@@ -30,6 +30,8 @@ import net.i2p.util.Log;
 
 /**
  * Maintain all of the key pairs for the router.
+ * Router keys are written to files in a backup directory.
+ * LeaseSet keys are not written to files.
  *
  */
 public class KeyManager {
@@ -48,7 +50,10 @@ public class KeyManager {
     private final static String KEYFILE_PUBLIC_ENC = "publicEncryption.key";
     private final static String KEYFILE_PRIVATE_SIGNING = "privateSigning.key";
     private final static String KEYFILE_PUBLIC_SIGNING = "publicSigning.key";
-    private final static long DELAY = 5*60*1000;
+    // Doesn't seem like we need to periodically back up,
+    // since we don't store leaseSet keys,
+    // but for now just make it a long time.
+    private final static long DELAY = 7*24*60*60*1000;
     
     public KeyManager(RouterContext context) {
         _context = context;
@@ -100,8 +105,6 @@ public class KeyManager {
         synchronized (_leaseSetKeys) {
             _leaseSetKeys.put(dest.calculateHash(), keys);
         }
-        if (dest != null)
-            queueWrite();
     }
    
     private void queueWrite() {
@@ -119,8 +122,6 @@ public class KeyManager {
         synchronized (_leaseSetKeys) {
             rv = (LeaseSetKeys)_leaseSetKeys.remove(dest.calculateHash());
         }
-        if (dest != null)
-            queueWrite();
         return rv;
     }
     
@@ -169,14 +170,14 @@ public class KeyManager {
             syncVerificationKey(keyDir);
         }
 
-        private void syncPrivateKey(File keyDir) {
+        private synchronized void syncPrivateKey(File keyDir) {
             File keyFile = new File(keyDir, KeyManager.KEYFILE_PRIVATE_ENC);
             boolean exists = (_privateKey != null);
             if (!exists)
                 _privateKey = new PrivateKey();
             _privateKey = (PrivateKey)syncKey(keyFile, _privateKey, exists);
         }
-        private void syncPublicKey(File keyDir) {
+        private synchronized void syncPublicKey(File keyDir) {
             File keyFile = new File(keyDir, KeyManager.KEYFILE_PUBLIC_ENC);
             boolean exists = (_publicKey != null);
             if (!exists)
@@ -184,14 +185,14 @@ public class KeyManager {
             _publicKey = (PublicKey)syncKey(keyFile, _publicKey, exists);
         }
 
-        private void syncSigningKey(File keyDir) {
+        private synchronized void syncSigningKey(File keyDir) {
             File keyFile = new File(keyDir, KeyManager.KEYFILE_PRIVATE_SIGNING);
             boolean exists = (_signingPrivateKey != null);
             if (!exists)
                 _signingPrivateKey = new SigningPrivateKey();
             _signingPrivateKey = (SigningPrivateKey)syncKey(keyFile, _signingPrivateKey, exists);
         }
-        private void syncVerificationKey(File keyDir) {
+        private synchronized void syncVerificationKey(File keyDir) {
             File keyFile = new File(keyDir, KeyManager.KEYFILE_PUBLIC_SIGNING);
             boolean exists = (_signingPublicKey != null);
             if (!exists)
