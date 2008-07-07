@@ -45,7 +45,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
         _clientInboundPools = new HashMap(4);
         _clientOutboundPools = new HashMap(4);
-        _loadTestManager = new LoadTestManager(_context);
+        if (! LoadTestManager.FORCE_DISABLE)
+            _loadTestManager = new LoadTestManager(_context);
         
         _isShutdown = false;
         _executor = new BuildExecutor(ctx, this);
@@ -305,7 +306,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         buildComplete();
-        _loadTestManager.addTunnelTestCandidate(cfg);
+        if (_loadTestManager != null)
+            _loadTestManager.addTunnelTestCandidate(cfg);
         if (cfg.getLength() > 1) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {

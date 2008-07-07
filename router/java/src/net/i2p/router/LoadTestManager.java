@@ -79,7 +79,7 @@ public class LoadTestManager {
     private static final boolean DEFAULT_ENABLE = false;
 
     /** disable all load testing for the moment */
-    private static final boolean FORCE_DISABLE = true;
+    public static final boolean FORCE_DISABLE = true;
 
     public static boolean isEnabled(I2PAppContext ctx) { 
         if (FORCE_DISABLE) return false;
