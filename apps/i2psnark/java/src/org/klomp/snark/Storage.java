@@ -468,9 +468,10 @@ public class Storage
           }
         else if (length == 0)
           allocateFile(i);
-        else
-          throw new IOException("File '" + names[i]
-                                + "' exists, but has wrong length");
+        else {
+          Snark.debug("File '" + names[i] + "' exists, but has wrong length - repairing corruption", Snark.ERROR);
+          rafs[i].setLength(lengths[i]);
+        }
       }
 
     // Check which pieces match and which don't

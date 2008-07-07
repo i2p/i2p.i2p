@@ -677,7 +677,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
         out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
         out.write("Data directory: <input type=\"text\" size=\"40\" name=\"dataDir\" value=\"" + dataDir + "\" ");
-        out.write("title=\"Directory to store torrents and data\" disabled=\"true\" /><br />\n");
+        out.write("title=\"Directory to store torrents and data\" disabled=\"true\" /> <i>(Edit i2psnark.config and restart to change)</i><br />\n");
         out.write("Auto start: <input type=\"checkbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
                   + "title=\"If true, automatically start torrents that are added\" />");
