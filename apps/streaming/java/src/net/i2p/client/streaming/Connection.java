@@ -415,8 +415,8 @@ public class Connection {
                 }
             }
             if ( (_outboundPackets.size() <= 0) && (_activeResends != 0) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("All outbound packets acked, clearing " + _activeResends);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("All outbound packets acked, clearing " + _activeResends);
                 _activeResends = 0;
             }
             _outboundPackets.notifyAll();
@@ -869,7 +869,7 @@ public class Connection {
             buf.append(Packet.toId(_receiveStreamId));
         else
             buf.append("unknown");
-        buf.append("<-->");
+        buf.append('/');
         if (_sendStreamId > 0)
             buf.append(Packet.toId(_sendStreamId));
         else
@@ -879,7 +879,7 @@ public class Connection {
         buf.append(" rtt: ").append(_options.getRTT());
         buf.append(" rto: ").append(_options.getRTO());
         // not synchronized to avoid some kooky races
-        buf.append(" unacked outbound: ").append(_outboundPackets.size()).append(" ");
+        buf.append(" unacked out: ").append(_outboundPackets.size()).append(" ");
         /*
         buf.append(" unacked outbound: ");
         synchronized (_outboundPackets) {
@@ -890,7 +890,7 @@ public class Connection {
             buf.append("] ");
         }
          */
-        buf.append("unacked inbound? ").append(getUnackedPacketsReceived());
+        buf.append("unacked in: ").append(getUnackedPacketsReceived());
         if (_inputStream != null) {
             buf.append(" [high ");
             buf.append(_inputStream.getHighestBlockId());
@@ -913,7 +913,7 @@ public class Connection {
         }
         if (getCloseReceivedOn() > 0)
             buf.append(" close received");
-        buf.append(" acked packets ").append(getAckedPackets());
+        buf.append(" acked: ").append(getAckedPackets());
         
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
         
@@ -992,8 +992,8 @@ public class Connection {
                     // we want to resend this packet, but there are already active
                     // resends in the air and we dont want to make a bad situation 
                     // worse.  wait another second
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Delaying resend of " + _packet + " as there are " 
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Delaying resend of " + _packet + " as there are " 
                                   + _activeResends + " active resends already in play");
                     RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
                     _nextSendTime = 1000 + _context.clock().now();
@@ -1056,8 +1056,8 @@ public class Connection {
                 }
                 
                 if (numSends - 1 <= _options.getMaxResends()) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Resend packet " + _packet + " time " + numSends + 
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Resend packet " + _packet + " time " + numSends + 
                                   " activeResends: " + _activeResends + 
                                   " (wsize "
                                   + newWindowSize + " lifetime " 
