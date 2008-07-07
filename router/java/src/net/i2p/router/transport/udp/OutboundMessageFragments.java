@@ -384,8 +384,8 @@ public class OutboundMessageFragments {
                 _packetsRetransmitted += toSend; // lifetime for the transport
                 _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
                 _context.statManager().addRateData("udp.packetsRetransmitted", state.getLifetime(), peer.getPacketsTransmitted());
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Retransmitting " + state + " to " + peer);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Retransmitting " + state + " to " + peer);
                 _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), toSend);
             }
             return rv;

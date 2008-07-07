@@ -90,8 +90,8 @@ public class EstablishmentManager {
     InboundEstablishState getInboundState(RemoteHostId from) {
         synchronized (_inboundStates) {
             InboundEstablishState state = (InboundEstablishState)_inboundStates.get(from);
-            if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("No inbound states for " + from + ", with remaining: " + _inboundStates);
+            // if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
+            //     _log.debug("No inbound states for " + from + ", with remaining: " + _inboundStates);
             return state;
         }
     }
@@ -99,8 +99,8 @@ public class EstablishmentManager {
     OutboundEstablishState getOutboundState(RemoteHostId from) {
         synchronized (_outboundStates) {
             OutboundEstablishState state = (OutboundEstablishState)_outboundStates.get(from);
-            if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("No outbound states for " + from + ", with remaining: " + _outboundStates);
+            // if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
+            //     _log.debug("No outbound states for " + from + ", with remaining: " + _outboundStates);
             return state;
         }
     }
@@ -654,6 +654,8 @@ public class EstablishmentManager {
                 }
             }
             if (removed != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Send intro for " + _state.getRemoteHostId().toString() + " timed out");
                 _context.statManager().addRateData("udp.sendIntroRelayTimeout", 1, 0);
                 notifyActivity();
             }
@@ -759,8 +761,8 @@ public class EstablishmentManager {
                     if (cur.getNextSendTime() <= now) {
                         // our turn...
                         inboundState = cur;
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Processing inbound that wanted activity");
+                        // if (_log.shouldLog(Log.DEBUG))
+                        //     _log.debug("Processing inbound that wanted activity");
                         break;
                     } else {
                         // nothin to do but wait for them to send us
@@ -856,8 +858,8 @@ public class EstablishmentManager {
                     if (cur.getNextSendTime() <= now) {
                         // our turn...
                         outboundState = cur;
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound wants activity: " + cur);
+                        // if (_log.shouldLog(Log.DEBUG))
+                        //     _log.debug("Outbound wants activity: " + cur);
                         break;
                     } else {
                         // nothin to do but wait for them to send us
@@ -871,8 +873,8 @@ public class EstablishmentManager {
                         }
                         if ( (nextSendTime <= 0) || (when < nextSendTime) )
                             nextSendTime = when;
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound doesn't want activity: " + cur + " (next=" + (when-now) + ")");
+                        // if (_log.shouldLog(Log.DEBUG))
+                        //     _log.debug("Outbound doesn't want activity: " + cur + " (next=" + (when-now) + ")");
                     }
                 }
             }
@@ -1017,9 +1019,9 @@ public class EstablishmentManager {
             } catch (InterruptedException ie) {
                 interrupted = true;
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("After waiting w/ nextSend=" + nextSendTime 
-                           + " and delay=" + delay + " and interrupted=" + interrupted);
+            // if (_log.shouldLog(Log.DEBUG))
+            //     _log.debug("After waiting w/ nextSend=" + nextSendTime 
+            //                + " and delay=" + delay + " and interrupted=" + interrupted);
         }
     }
 }

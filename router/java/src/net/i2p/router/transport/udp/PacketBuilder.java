@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -204,6 +205,12 @@ public class PacketBuilder {
         return packet;
     }
     
+    // We use this for keepalive purposes.
+    // It doesn't generate a reply, but that's ok.
+    public UDPPacket buildPing(PeerState peer) {
+        return buildACK(peer, new ArrayList(0));
+    }
+
     private static final int ACK_PRIORITY = 1;
     
     /**

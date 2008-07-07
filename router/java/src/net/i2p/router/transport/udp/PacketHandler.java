@@ -422,12 +422,12 @@ public class PacketHandler {
             long skew = recvOn - sendOn;
             if (skew > GRACE_PERIOD) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Packet too far in the future: " + new Date(sendOn/1000) + ": " + packet);
+                    _log.warn("Packet too far in the past: " + new Date(sendOn/1000) + ": " + packet);
                 _context.statManager().addRateData("udp.droppedInvalidSkew", skew, packet.getExpiration());
                 return;
             } else if (skew < 0 - GRACE_PERIOD) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Packet too far in the past: " + new Date(sendOn/1000) + ": " + packet);
+                    _log.warn("Packet too far in the future: " + new Date(sendOn/1000) + ": " + packet);
                 _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew, packet.getExpiration());
                 return;
             }

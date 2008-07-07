@@ -29,8 +29,9 @@ public class IntroductionManager {
         _builder = new PacketBuilder(ctx, transport);
         _outbound = Collections.synchronizedMap(new HashMap(128));
         _inbound = new ArrayList(128);
-        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000 });
-        ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a request to relay to someone else?", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000 });
+        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", new long[] { 10*60*1000 });
+        ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", new long[] { 10*60*1000 });
+        ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", new long[] { 10*60*1000 });
     }
     
     public void reset() {
@@ -77,19 +78,25 @@ public class IntroductionManager {
      * The picked peers have their info tacked on to the ssuOptions parameter for
      * use in the SSU RouterAddress.
      *
+     * Try to use "good" peers (i.e. reachable, active)
+     *
+     * Also, ping all idle peers that were introducers in the last 2 hours,
+     * to keep the connection up, since the netDb can have quite stale information,
+     * and we want to keep our introducers valid.
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
         List peers = null;
         int start = _context.random().nextInt(Integer.MAX_VALUE);
         synchronized (_inbound) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Picking inbound out of " + _inbound);
+                _log.debug("Picking inbound out of " + _inbound.size());
             if (_inbound.size() <= 0) return 0;
             peers = new ArrayList(_inbound);
         }
         int sz = peers.size();
         start = start % sz;
         int found = 0;
+        long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);
         for (int i = 0; i < sz && found < howMany; i++) {
             PeerState cur = (PeerState)peers.get((start + i) % sz);
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
@@ -104,6 +111,22 @@ public class IntroductionManager {
                     _log.info("Picked peer has no SSU address: " + ri);
                 continue;
             }
+            if (_context.profileOrganizer().isFailing(cur.getRemotePeer()) ||
+                _context.shitlist().isShitlisted(cur.getRemotePeer()) ||
+                _transport.wasUnreachable(cur.getRemotePeer())) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Peer is failing, shistlisted or was unreachable: " + cur);
+                continue;
+            }
+            // Try to pick active peers...
+            if (cur.getLastReceiveTime() < inactivityCutoff || cur.getLastSendTime() < inactivityCutoff) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Peer is idle too long: " + cur);
+                continue;
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Picking introducer: " + cur);
+            cur.setIntroducerTime();
             UDPAddress ura = new UDPAddress(ra);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + found, cur.getRemoteHostId().toHostString());
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + found, String.valueOf(cur.getRemotePort()));
@@ -111,6 +134,21 @@ public class IntroductionManager {
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + found, String.valueOf(cur.getTheyRelayToUsAs()));
             found++;
         }
+
+        // Try to keep the connection up for two hours after we made anybody an introducer
+        long pingCutoff = _context.clock().now() - (2 * 60 * 60 * 1000);
+        inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 4);
+        for (int i = 0; i < sz; i++) {
+            PeerState cur = (PeerState)peers.get(i);
+            if (cur.getIntroducerTime() > pingCutoff &&
+                cur.getLastSendTime() < inactivityCutoff) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Pinging introducer: " + cur);
+                cur.setLastSendTime(_context.clock().now());
+                _transport.send(_builder.buildPing(cur));
+            }
+        }
+
         return found;
     }
     
@@ -124,7 +162,6 @@ public class IntroductionManager {
     }
     
     public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
-        _context.statManager().addRateData("udp.receiveRelayRequest", 1, 0);
         if (_context.router().isHidden())
             return;
         long tag = reader.getRelayRequestReader().readTag();
@@ -133,8 +170,11 @@ public class IntroductionManager {
             _log.info("Receive relay request from " + alice 
                       + " for tag " + tag
                       + " and relaying with " + charlie);
-        if (charlie == null)
+        if (charlie == null) {
+            _context.statManager().addRateData("udp.receiveRelayRequestBadTag", 1, 0);
             return;
+        }
+        _context.statManager().addRateData("udp.receiveRelayRequest", 1, 0);
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
         reader.getRelayRequestReader().readAliceIntroKey(key, 0);
         SessionKey aliceIntroKey = new SessionKey(key);

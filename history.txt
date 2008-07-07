@@ -1,3 +1,31 @@
+2008-07-07 zzz
+    * i2psnark:
+      - Repair corrupted files with wrong length rather than die
+      - Register shutdown hook to properly shutdown torrents when
+        the router shuts down, hopefully will reduce corruption
+      - Add Galen tracker
+      - Add a note about how to chane directory
+    * HTTP Proxy: Don't show jump links for unknown jump hosts
+    * KeyManager:
+      - Don't write router key backup when leaseSet keys are updated
+      - Synchronize to prevent concurrent writes (thanks Galen!)
+      - Backup keys every 7 days instead of every 5 minutes
+    * LoadTestManager: Don't instantiate, it's disabled 
+    * Router console: Flag placeholder pages as noncacheable
+    * Streaming lib:
+      - Change some logging from WARN to INFO
+      - Clean up toString()
+    * SSU:
+      - Try to pick better introducers by checking shitlist,
+        wasUnreachable list, failing list, and idle times
+      - To keep introducer connections up and valid,
+        periodically send a "ping" (a data packet with no data and no acks)
+        to everybody that has been an introducer in the last two hours
+      - Add a stat udp.receiveRelayRequestBadTag, make udp.receiveRelayRequest only for good ones
+      - Remove some 60s and 5m stats, leave only the 10m ones
+      - Narrow the range for the retransmit time after an allocation fail
+      - Adjust some logging
+
 2008-06-30 zzz
     * configstats.jsp: Fix NPE when no stats checked (thanks nothome27!)
     * i2psnark:

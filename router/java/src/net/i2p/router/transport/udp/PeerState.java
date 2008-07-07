@@ -192,6 +192,8 @@ public class PeerState {
     private volatile int _consecutiveRejections = 0;
     /** is it inbound? **/
     private boolean _isInbound;
+    /** Last time it was made an introducer **/
+    private long _lastIntroducerTime;
 
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
@@ -271,6 +273,7 @@ public class PeerState {
         _outboundMessages = new ArrayList(32);
         _dead = false;
         _isInbound = false;
+        _lastIntroducerTime = 0;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -558,6 +561,8 @@ public class PeerState {
     public int getConsecutiveSendRejections() { return _consecutiveRejections; }
     public boolean isInbound() { return _isInbound; }
     public void setInbound() { _isInbound = true; }
+    public long getIntroducerTime() { return _lastIntroducerTime; }
+    public void setIntroducerTime() { _lastIntroducerTime = _context.clock().now(); }
     
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }
@@ -850,8 +855,8 @@ public class PeerState {
             recalculateTimeouts(lifetime);
             adjustMTU();
         }
-        else if (_log.shouldLog(Log.WARN))
-            _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
+        else if (_log.shouldLog(Log.INFO))
+            _log.info("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
         
         _context.statManager().addRateData("udp.sendBps", _sendBps, lifetime);
     }
@@ -1327,7 +1332,8 @@ public class PeerState {
                     _log.warn("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
                               + " available=" + getSendWindowBytesRemaining()
                               + " for message " + state.getMessageId() + ": " + state);
-                state.setNextSendTime(now+(_context.random().nextInt(2*ACKSender.ACK_FREQUENCY))); //(now + 1024) & ~SECOND_MASK);
+                state.setNextSendTime(now + (ACKSender.ACK_FREQUENCY / 2) +
+                                      _context.random().nextInt(ACKSender.ACK_FREQUENCY)); //(now + 1024) & ~SECOND_MASK);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
                 //_throttle.choke(peer.getRemotePeer());

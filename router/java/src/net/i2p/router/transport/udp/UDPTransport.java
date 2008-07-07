@@ -1934,7 +1934,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public String toString() { return "UDP bid @ " + getLatencyMs(); }
     }
     
-    private static final int EXPIRE_TIMEOUT = 30*60*1000;
+    public static final int EXPIRE_TIMEOUT = 30*60*1000;
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
         private List _expirePeers;
