@@ -672,6 +672,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 if (showAddrHelper) {
                     out.write("<br><br>Click a link below to look for an address helper by using a \"jump\" service:<br>".getBytes());
                     for (int i = 0; i < jumpServers.length; i++) {
+                        // Skip jump servers we don't know
+                        String jumphost = jumpServers[i].substring(7);  // "http://"
+                        jumphost = jumphost.substring(0, jumphost.indexOf('/'));
+                        try {
+                            Destination dest = I2PTunnel.destFromName(jumphost);
+                            if (dest == null) continue;
+                        } catch (DataFormatException dfe) {
+                            continue;
+                        }
+
                         out.write("<br><a href=\"".getBytes());
                         out.write(jumpServers[i].getBytes());
                         out.write(uri.getBytes());
