@@ -127,8 +127,8 @@ public class MergeTypedPropertiesTask extends Task {
 			while (strtokString.hasMoreTokens())
 				_propertiesOut.setProperty(strtokString.nextToken().trim(), "");
 
-			for (Enumeration enum = _propertiesIn.elements(); enum.hasMoreElements(); ) {
-				property = (String) enum.nextElement();
+			for (Enumeration enumm = _propertiesIn.elements(); enumm.hasMoreElements(); ) {
+				property = (String) enumm.nextElement();
 
 				if (_onlyExpected && !_propertiesOut.containsKey(property))
 					continue;
