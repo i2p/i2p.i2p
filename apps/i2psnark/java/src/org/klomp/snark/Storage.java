@@ -312,7 +312,7 @@ public class Storage
             if (lm <= 0 || lm > savedTime)
                 useSavedBitField = false;
         }
-        if (base.exists() && !base.canWrite())  // hope we can get away with this, if we are only seeding...
+        if (base.exists() && ((useSavedBitField && savedBitField.complete()) || !base.canWrite()))
             rafs[0] = new RandomAccessFile(base, "r");
         else
             rafs[0] = new RandomAccessFile(base, "rw");
@@ -341,7 +341,7 @@ public class Storage
                 if (lm <= 0 || lm > savedTime)
                     useSavedBitField = false;
             }
-            if (f.exists() && !f.canWrite()) // see above re: only seeding
+            if (f.exists() && ((useSavedBitField && savedBitField.complete()) || !f.canWrite()))
                 rafs[i] = new RandomAccessFile(f, "r");
             else
                 rafs[i] = new RandomAccessFile(f, "rw");
