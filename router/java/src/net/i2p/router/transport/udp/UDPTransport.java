@@ -916,7 +916,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (pref != null) && "always".equals(pref);
     }
     
-    private static final int MAX_IDLE_TIME = 5*60*1000;
+    // We used to have MAX_IDLE_TIME = 5m, but this causes us to drop peers
+    // and lose the old introducer tags, causing introduction fails,
+    // so we keep the max time long to give the introducer keepalive code
+    // in the IntroductionManager a chance to work.
+    public static final int EXPIRE_TIMEOUT = 30*60*1000;
+    private static final int MAX_IDLE_TIME = EXPIRE_TIMEOUT;
     
     public String getStyle() { return STYLE; }
     public void send(OutNetMessage msg) { 
@@ -1938,8 +1943,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public Transport getTransport() { return UDPTransport.this; }
         public String toString() { return "UDP bid @ " + getLatencyMs(); }
     }
-    
-    public static final int EXPIRE_TIMEOUT = 30*60*1000;
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
         private List _expirePeers;
