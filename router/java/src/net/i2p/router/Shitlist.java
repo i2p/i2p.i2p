@@ -289,8 +289,7 @@ public class Shitlist {
                 buf.append("<br />\n");
                 buf.append(entry.cause);
             }
-            // future
-            // buf.append(" (<a href=\"configblock.jsp?peer=").append(key.toBase64()).append("#unsh\">unshitlist now</a>)");
+            buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64()).append("#unsh\">unshitlist now</a>)");
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");

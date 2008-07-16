@@ -130,11 +130,25 @@ class ProfileOrganizerRenderer {
             }
             
             buf.append("<td align=\"right\">").append(num(prof.getSpeedValue()));
-            //buf.append('/').append(num(prof.getOldSpeedValue()));
-            buf.append("</td>");
-            buf.append("<td align=\"right\">").append(num(prof.getCapacityValue())).append("</td>");
-            buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
-            buf.append("<td>");
+            long bonus = prof.getSpeedBonus();
+            if (bonus != 0) {
+                if (bonus > 0)
+                    buf.append(" (+");
+                else
+                    buf.append(" (");
+                buf.append(bonus).append(')');
+            }
+            buf.append("</td><td align=\"right\">").append(num(prof.getCapacityValue()));
+            bonus = prof.getCapacityBonus();
+            if (bonus != 0) {
+                if (bonus > 0)
+                    buf.append(" (+");
+                else
+                    buf.append(" (");
+                buf.append(bonus).append(')');
+            }
+            buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
+            buf.append("</td><td>");
             if (_context.shitlist().isShitlisted(peer)) buf.append("Shitlist");
             if (prof.getIsFailing()) buf.append(" Failing");
             if (_context.commSystem().wasUnreachable(peer)) buf.append(" Unreachable");
@@ -150,7 +164,8 @@ class ProfileOrganizerRenderer {
             //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
             buf.append("<td nowrap><a href=\"netdb.jsp#").append(peer.toBase64().substring(0,6)).append("\">netDb</a>");
-            buf.append("/<a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a></td>\n");
+            buf.append("/<a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("/<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
         }
         buf.append("</table>");
