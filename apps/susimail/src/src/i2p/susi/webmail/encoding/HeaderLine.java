@@ -294,10 +294,10 @@ public class HeaderLine implements Encoding {
 	}
 	public static void main( String[] args ) throws EncodingException {
 		String text = "Subject: test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test \r\n" +
-		"From: Sm�rebr�d <smoerebroed@mail.i2p>\r\n" +
-		"To: ���� <lalala@mail.i2p>\r\n";
+		"From: Smörebröd <smoerebroed@mail.i2p>\r\n" +
+		"To: äöüß <lalala@mail.i2p>\r\n";
 		HeaderLine hl = new HeaderLine();
 		System.out.println( hl.encode( text ) );
-		System.out.println( hl.encode( "test ���" ) );
+		System.out.println( hl.encode( "test ÄÖÜ" ) );
 	}
 }
