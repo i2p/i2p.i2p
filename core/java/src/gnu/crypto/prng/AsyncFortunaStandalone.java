@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  * fortuna instance that tries to avoid blocking if at all possible by using separate
@@ -17,6 +18,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     private final int status[] = new int[BUFFERS];
     private int nextBuf = 0;
     private I2PAppContext _context;
+    private Log _log;
 
     private static final int STATUS_NEED_FILL = 0;
     private static final int STATUS_FILLING = 1;
@@ -30,6 +32,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         _context = context;
         context.statManager().createRateStat("prng.bufferWaitTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
         context.statManager().createRateStat("prng.bufferFillTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        _log = context.logManager().getLog(AsyncFortunaStandalone.class);
     }
     
     public void startup() {
@@ -69,8 +72,8 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
                 waited = System.currentTimeMillis()-before;
             }
             _context.statManager().addRateData("prng.bufferWaitTime", waited, 0);
-            if (waited > 10*1000)
-                System.out.println(Thread.currentThread().getName() + ": Took " + waited
+            if (waited > 10*1000 && _log.shouldLog(Log.WARN))
+                _log.warn(Thread.currentThread().getName() + ": Took " + waited
                                    + "ms for a full PRNG buffer to be found");
             //System.out.println(Thread.currentThread().getName() + ": Switching to prng buffer " + nextBuf);
             buffer = asyncBuffers[nextBuf];
