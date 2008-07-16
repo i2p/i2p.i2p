@@ -6,15 +6,12 @@
 
 package net.i2p.aum.http;
 
-import java.lang.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
-import net.i2p.data.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
+import net.i2p.client.streaming.I2PSocket;
 
 /**
  *

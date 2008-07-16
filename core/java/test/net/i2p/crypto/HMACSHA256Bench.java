@@ -29,10 +29,11 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.Properties;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
-import java.util.Properties;
 
 public class HMACSHA256Bench {
         public static void main(String args[]) {

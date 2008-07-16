@@ -22,10 +22,10 @@
 package addressbook;
 
 import javax.servlet.GenericServlet;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  * A wrapper for addressbook to allow it to be started as a web application.

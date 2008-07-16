@@ -1,28 +1,20 @@
 package net.i2p.sam;
 
-import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-
-import java.util.Map;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
-import net.i2p.util.I2PThread;
-
 import net.i2p.sam.client.SAMEventHandler;
-import net.i2p.sam.client.SAMClientEventListenerImpl;
 import net.i2p.sam.client.SAMReader;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Sit around on a SAM destination, receiving lots of data and sending lots of

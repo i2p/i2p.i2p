@@ -6,10 +6,12 @@
 
 package net.i2p.aum.q;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import net.i2p.aum.*;
+import net.i2p.aum.SimpleFile;
 
 /**
  * Thread which performs a single background job for a nod

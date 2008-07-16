@@ -1,17 +1,33 @@
 package net.i2p.router.transport.ntcp;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.channels.SelectionKey;
+import java.nio.ByteBuffer;
+
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DHSessionKeyBuilder;
-import net.i2p.data.*;
+import net.i2p.data.Base64;
+import net.i2p.data.Certificate;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
+import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
-import java.nio.ByteBuffer;
 
 /*
  * Alice                   contacts                      Bob

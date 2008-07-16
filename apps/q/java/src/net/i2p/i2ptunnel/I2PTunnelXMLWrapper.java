@@ -1,20 +1,12 @@
 package net.i2p.i2ptunnel;
 
-import org.apache.xmlrpc.*;
-import java.lang.*;
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
-
-
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.Base64;
-import net.i2p.util.*;
-import net.i2p.util.*;
-import net.i2p.data.*;
-import net.i2p.i2ptunnel.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**

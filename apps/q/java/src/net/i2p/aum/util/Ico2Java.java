@@ -1,9 +1,9 @@
 package net.i2p.aum.util;
 
-import java.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.InputStream;
 
 /**
  * development utility - converts Favicon.ico to

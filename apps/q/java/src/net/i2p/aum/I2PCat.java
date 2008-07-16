@@ -3,18 +3,26 @@
 
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.util.Properties;
 
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.naming.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.*;
-
-import net.i2p.util.*;
+import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
+import net.i2p.client.naming.HostsTxtNamingService;
+import net.i2p.client.streaming.I2PServerSocket;
+import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
 /**
  * A I2P equivalent of the much-beloved 'netcat' utility.

@@ -10,17 +10,21 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.Log;
-
-import net.i2p.data.RouterInfo;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Manage the current state of the statistics

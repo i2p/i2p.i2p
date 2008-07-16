@@ -1,13 +1,12 @@
 package net.i2p.client.streaming;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
-import java.text.SimpleDateFormat;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;

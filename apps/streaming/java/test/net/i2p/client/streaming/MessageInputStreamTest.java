@@ -1,6 +1,5 @@
 package net.i2p.client.streaming;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;

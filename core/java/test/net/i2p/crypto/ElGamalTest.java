@@ -8,27 +8,23 @@ package net.i2p.crypto;
  *
  */
  
-import net.i2p.I2PAppContext;
-import net.i2p.data.Hash;
-import net.i2p.data.SessionKey;
-import net.i2p.data.Base64;
-import net.i2p.data.PublicKey;
-import net.i2p.data.PrivateKey;
-import net.i2p.data.DataHelper;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.SessionTag;
-import net.i2p.util.RandomSource;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
-import java.util.Set;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
+import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
+import net.i2p.util.RandomSource;
 
 public class ElGamalTest extends TestCase{
     private I2PAppContext _context;

@@ -1,12 +1,23 @@
 package org.klomp.snark.web;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -14,7 +25,14 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import org.klomp.snark.*;
+
+import org.klomp.snark.I2PSnarkUtil;
+import org.klomp.snark.MetaInfo;
+import org.klomp.snark.Peer;
+import org.klomp.snark.Snark;
+import org.klomp.snark.SnarkManager;
+import org.klomp.snark.Storage;
+import org.klomp.snark.TrackerClient;
 
 /**
  *

@@ -6,17 +6,14 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Properties;
 
-import org.apache.xmlrpc.*;
-
-import net.i2p.*;
-import net.i2p.data.*;
-
-import net.i2p.aum.*;
-import net.i2p.aum.http.*;
+import net.i2p.I2PException;
+import net.i2p.aum.I2PXmlRpcServerFactory;
+import net.i2p.aum.http.I2PHttpServer;
+import net.i2p.aum.http.MiniHttpServer;
+import net.i2p.data.DataFormatException;
 
 /**
  *

@@ -8,14 +8,8 @@ package net.i2p.data;
  *
  */
 
-import java.util.Date;
 import java.io.ByteArrayOutputStream;
-
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.Lease;
-import net.i2p.data.Hash;
-import net.i2p.data.TunnelId;
+import java.util.Date;
 
 /**
  * Test harness for loading / storing Lease objects

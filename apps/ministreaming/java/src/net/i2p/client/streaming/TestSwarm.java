@@ -1,15 +1,16 @@
 package net.i2p.client.streaming;
 
-import java.io.InputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.data.Destination;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Sit around on a destination, receiving lots of data and sending lots of

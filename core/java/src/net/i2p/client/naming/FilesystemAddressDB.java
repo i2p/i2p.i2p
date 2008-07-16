@@ -1,10 +1,14 @@
 package net.i2p.client.naming;
 
-import java.util.Collection;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.Collection;
 import java.util.Iterator;
-import java.io.*;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Address;

@@ -2,15 +2,14 @@ package net.i2p.router.transport.udp;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.DatagramPacket;
-
 import java.util.ArrayList;
 import java.util.List;
+
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Lowest level component to pull raw UDP datagrams off the wire as fast

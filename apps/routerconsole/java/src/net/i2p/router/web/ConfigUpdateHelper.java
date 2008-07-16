@@ -1,7 +1,7 @@
 package net.i2p.router.web;
 
-import net.i2p.data.DataHelper;
 import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 
 public class ConfigUpdateHelper {

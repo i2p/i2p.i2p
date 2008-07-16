@@ -9,16 +9,15 @@ package net.i2p.util;
  *
  */
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
 import net.i2p.data.Base64;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Singleton for whatever PRNG i2p uses.  

@@ -9,7 +9,6 @@ package net.i2p.router.transport.ntcp;
  */
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 import net.i2p.data.DataHelper;

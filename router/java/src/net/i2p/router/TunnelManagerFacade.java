@@ -8,12 +8,12 @@ package net.i2p.router;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  * Build and maintain tunnels throughout the network.

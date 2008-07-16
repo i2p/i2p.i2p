@@ -1,15 +1,7 @@
 
 package net.i2p.aum;
 
-import org.apache.xmlrpc.*;
-import java.lang.*;
-import java.io.*;
-
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.util.*;
-import net.i2p.data.*;
+import org.apache.xmlrpc.WebServer;
 
 /**
  * Provides a means for programs in any language to dynamically manage

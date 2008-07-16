@@ -5,12 +5,11 @@ import java.util.Properties;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
-import net.i2p.util.Log;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.util.Log;
 
 /**
  * Simple job to monitor the floodfill pool.

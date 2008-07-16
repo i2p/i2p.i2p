@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import net.i2p.router.RouterContext;
+import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.StatManager;
-import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 public class ConfigStatsHelper {

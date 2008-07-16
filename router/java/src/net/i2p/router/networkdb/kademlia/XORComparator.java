@@ -1,6 +1,7 @@
 package net.i2p.router.networkdb.kademlia;
 
 import java.util.Comparator;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 

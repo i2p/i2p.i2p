@@ -8,16 +8,15 @@ package net.i2p.crypto;
  *
  */
  
+import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
-import net.i2p.util.RandomSource;
+import net.i2p.data.DataHelper;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
+import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.data.DataHelper;
-import net.i2p.data.Signature;
-import net.i2p.data.PublicKey;
-import net.i2p.data.PrivateKey;
-
-import junit.framework.TestCase;
+import net.i2p.util.RandomSource;
 
 public class KeyGeneratorTest extends TestCase{
     public void testKeyGen(){

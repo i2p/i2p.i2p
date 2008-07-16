@@ -1,6 +1,12 @@
 package net.i2p.syndie;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
+
 import net.i2p.data.Hash;
 import net.i2p.syndie.data.BlogURI;
 import net.i2p.syndie.data.ThreadNode;

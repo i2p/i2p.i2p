@@ -20,8 +20,14 @@
 
 package org.klomp.snark;
 
-import java.util.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Timer;
 
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;

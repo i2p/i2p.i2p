@@ -6,20 +6,17 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.lang.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.Serializable;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.TreeSet;
 
-import net.i2p.*;
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.*;
-import net.i2p.crypto.*;
-
-import net.i2p.aum.*;
+import net.i2p.aum.Mimetypes;
+import net.i2p.crypto.DSAEngine;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 
 
 /**

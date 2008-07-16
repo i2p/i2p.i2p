@@ -13,10 +13,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import net.i2p.I2PAppContext;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
-import net.i2p.util.Log;
 
 /**
  * Ugly little accessor for the edit page

@@ -3,6 +3,7 @@ package org.klomp.snark.web;
 import java.io.File;
 
 import net.i2p.util.FileUtil;
+
 import org.mortbay.jetty.Server;
 
 public class RunStandalone {

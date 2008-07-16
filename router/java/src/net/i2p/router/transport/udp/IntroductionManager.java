@@ -1,11 +1,16 @@
 package net.i2p.router.transport.udp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import net.i2p.data.Base64;
-import net.i2p.data.SessionKey;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 

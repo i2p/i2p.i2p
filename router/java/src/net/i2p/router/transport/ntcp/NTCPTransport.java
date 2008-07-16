@@ -1,9 +1,7 @@
 package net.i2p.router.transport.ntcp;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.net.InetSocketAddress;
-import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.text.DecimalFormat;
@@ -16,15 +14,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.Vector;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
-import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.*;
+import net.i2p.router.transport.CommSystemFacadeImpl;
+import net.i2p.router.transport.Transport;
+import net.i2p.router.transport.TransportBid;
+import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 

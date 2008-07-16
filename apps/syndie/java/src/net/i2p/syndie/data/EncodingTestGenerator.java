@@ -1,9 +1,15 @@
 package net.i2p.syndie.data;
 
-import java.io.*;
-import java.util.*;
-import net.i2p.data.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 
 /**
  * Create a new blog metadata & set of entries using some crazy UTF8 encoded chars,

@@ -20,9 +20,8 @@
 
 package org.klomp.snark;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 import net.i2p.util.Log;
 

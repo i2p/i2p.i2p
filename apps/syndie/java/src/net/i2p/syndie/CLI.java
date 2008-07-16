@@ -1,11 +1,26 @@
 package net.i2p.syndie;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.sml.*;
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.syndie.data.Attachment;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.EntryContainer;
+import net.i2p.syndie.sml.HTMLRenderer;
 
 /**
  */

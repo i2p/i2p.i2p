@@ -1,11 +1,9 @@
 package net.i2p.router.transport.udp;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import net.i2p.data.Base64;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;

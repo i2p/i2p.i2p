@@ -11,10 +11,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;

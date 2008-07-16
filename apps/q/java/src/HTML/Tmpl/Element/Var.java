@@ -35,8 +35,9 @@
 package HTML.Tmpl.Element;
 import java.util.Hashtable;
 import java.util.NoSuchElementException;
-import HTML.Tmpl.Util;
+
 import HTML.Template;
+import HTML.Tmpl.Util;
 
 public class Var extends Element
 {

@@ -8,18 +8,11 @@ package net.i2p.data;
  *
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.Destination;
-import net.i2p.data.Payload;
 import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SessionId;
-import net.i2p.util.Log;
 
 /**
  * Test harness for loading / storing SendMessageMessage objects

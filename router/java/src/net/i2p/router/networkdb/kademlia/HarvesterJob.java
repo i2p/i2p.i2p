@@ -10,11 +10,11 @@ import java.util.TreeMap;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.util.Log;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.SendMessageDirectJob;
+import net.i2p.util.Log;
 
 /**
  * Simple job to try to keep our peer references up to date by aggressively

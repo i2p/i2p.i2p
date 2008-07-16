@@ -9,9 +9,6 @@ package net.i2p.client;
  *
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.MessagePayloadMessage;

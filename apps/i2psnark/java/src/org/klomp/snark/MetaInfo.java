@@ -22,20 +22,22 @@ package org.klomp.snark;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
-import org.klomp.snark.bencode.*;
+import net.i2p.crypto.SHA1;
 import net.i2p.data.Base64;
 import net.i2p.util.Log;
-import net.i2p.crypto.SHA1;
+
+import org.klomp.snark.bencode.BDecoder;
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.BEncoder;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 
 /**
  * Note: this class is buggy, as it doesn't propogate custom meta fields into the bencoded

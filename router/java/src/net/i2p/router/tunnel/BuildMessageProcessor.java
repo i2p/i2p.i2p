@@ -1,9 +1,14 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
-import net.i2p.router.RouterContext;
+import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.SessionKey;
+import net.i2p.data.i2np.BuildRequestRecord;
+import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.util.DecayingBloomFilter;
 import net.i2p.util.Log;
 

@@ -1,10 +1,18 @@
 package net.i2p.util;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 /**
  * Simple helper for uploading files and such via HTTP POST (rfc 1867)

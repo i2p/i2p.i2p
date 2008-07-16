@@ -6,21 +6,46 @@
 
 package net.i2p.aum.q;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-import java.util.jar.*;
-import java.net.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-import org.apache.xmlrpc.*;
+import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
+import net.i2p.aum.EmbargoedQueue;
+import net.i2p.aum.I2PXmlRpcClient;
+import net.i2p.aum.I2PXmlRpcClientFactory;
+import net.i2p.aum.I2PXmlRpcServer;
+import net.i2p.aum.PrivDestination;
+import net.i2p.aum.PropertiesFile;
+import net.i2p.aum.SimpleFile;
+import net.i2p.aum.SimpleSemaphore;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PClientFactory;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
 
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.*;
-import net.i2p.crypto.*;
-
-import net.i2p.aum.*;
+import org.apache.xmlrpc.XmlRpcException;
 
 //import gnu.crypto.hash.*;
 

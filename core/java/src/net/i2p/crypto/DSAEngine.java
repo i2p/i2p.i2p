@@ -29,13 +29,11 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;

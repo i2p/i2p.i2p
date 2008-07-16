@@ -6,9 +6,17 @@
 
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.NoSuchElementException;
+import java.util.Properties;
 
 /**
  * builds on Properties with methods to load/save directly to/from file

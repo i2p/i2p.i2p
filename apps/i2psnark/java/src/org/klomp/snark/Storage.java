@@ -20,10 +20,13 @@
 
 package org.klomp.snark;
 
-import java.io.*;
-import java.util.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import net.i2p.crypto.SHA1;
 

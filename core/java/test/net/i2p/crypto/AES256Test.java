@@ -8,12 +8,11 @@ package net.i2p.crypto;
  *
  */
  
-import net.i2p.data.SessionKey;
-import net.i2p.data.DataHelper;
-import net.i2p.I2PAppContext;
-import net.i2p.util.RandomSource;
-
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.SessionKey;
+import net.i2p.util.RandomSource;
 
 /**
  * @author Comwiz

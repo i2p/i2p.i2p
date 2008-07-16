@@ -1,7 +1,13 @@
 package net.i2p.syndie.data;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.i2p.data.DataHelper;
 
 /**

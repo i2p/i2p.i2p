@@ -1,16 +1,33 @@
 package net.i2p.router;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import net.i2p.I2PAppContext;
-import net.i2p.util.*;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.message.*;
-import net.i2p.router.tunnel.*;
-import net.i2p.router.tunnel.pool.*;
-import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.data.Certificate;
+import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
+import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.DeliveryInstructions;
+import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.router.message.GarlicMessageBuilder;
+import net.i2p.router.message.PayloadGarlicConfig;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
+import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Coordinate some tests of peers to see how much load they can handle.  If 

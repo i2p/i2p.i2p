@@ -4,8 +4,8 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 import net.i2p.data.Address;
+import net.i2p.util.Log;
 
 public abstract class AddressDB {
     

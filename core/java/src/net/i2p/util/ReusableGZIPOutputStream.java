@@ -1,12 +1,10 @@
 package net.i2p.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.zip.GZIPOutputStream;
 import java.util.zip.GZIPInputStream;
+
 import net.i2p.data.DataHelper;
 
 /**

@@ -11,9 +11,6 @@ package net.i2p.client;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import net.i2p.client.I2PClientFactory;
-import net.i2p.client.I2PClient;
-
 import junit.framework.TestCase;
 
 

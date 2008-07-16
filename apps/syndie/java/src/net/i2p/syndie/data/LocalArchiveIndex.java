@@ -1,8 +1,14 @@
 package net.i2p.syndie.data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.syndie.Archive;
 import net.i2p.util.Log;
 

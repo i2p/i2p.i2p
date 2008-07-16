@@ -30,9 +30,16 @@
 
 
 package HTML.Tmpl.Parsers;
-import java.util.*;
-import HTML.Tmpl.Element.*;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
 import HTML.Tmpl.Util;
+import HTML.Tmpl.Element.Element;
+import HTML.Tmpl.Element.If;
+import HTML.Tmpl.Element.Loop;
+import HTML.Tmpl.Element.Unless;
 
 public class Parser
 {

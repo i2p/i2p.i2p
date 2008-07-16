@@ -8,10 +8,17 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.*;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
-import net.i2p.router.*;
+import java.util.Date;
+
+import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.router.JobImpl;
+import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**

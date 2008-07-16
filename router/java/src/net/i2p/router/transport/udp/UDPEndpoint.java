@@ -1,6 +1,5 @@
 package net.i2p.router.transport.udp;
 
-import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;

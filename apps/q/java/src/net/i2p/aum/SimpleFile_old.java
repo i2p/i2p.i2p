@@ -1,11 +1,9 @@
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
-
-import net.i2p.data.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * SimpleFile - subclass of File which adds some python-like

@@ -8,12 +8,6 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.Certificate;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.Destination;
-import net.i2p.data.PublicKey;
-import net.i2p.data.SigningPublicKey;
 
 /**
  * Test harness for loading / storing Hash objects

@@ -8,12 +8,8 @@ package net.i2p.data;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.PublicKey;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Test harness for loading / storing PublicKey objects

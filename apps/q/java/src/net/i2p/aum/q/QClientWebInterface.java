@@ -6,15 +6,19 @@
 
 package net.i2p.aum.q;
 
-import java.lang.*;
-import java.lang.reflect.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.Socket;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
+import net.i2p.aum.http.HtmlPage;
+import net.i2p.aum.http.I2PHttpRequestHandler;
+import net.i2p.aum.http.MiniHttpServer;
 import HTML.Template;
-
-import net.i2p.aum.http.*;
 
 
 /**

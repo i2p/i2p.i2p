@@ -8,8 +8,6 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
 import net.i2p.data.i2cp.AbuseReason;
 import net.i2p.data.i2cp.AbuseSeverity;
 import net.i2p.data.i2cp.MessageId;

@@ -9,13 +9,12 @@ package net.i2p.crypto;
  *
  */
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;

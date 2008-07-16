@@ -6,8 +6,8 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Implements an Iterator for index files

@@ -1,14 +1,15 @@
 package net.i2p.syndie.sml;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.File;
+import java.util.List;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetName;
-import net.i2p.data.*;
-import net.i2p.syndie.*;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.web.*;
+import net.i2p.data.Base64;
+import net.i2p.data.Hash;
+import net.i2p.syndie.data.SafeURL;
+import net.i2p.syndie.web.AddressesServlet;
+import net.i2p.syndie.web.ArchiveViewerBean;
 
 /**
  *

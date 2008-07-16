@@ -1,19 +1,13 @@
 
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-import org.apache.xmlrpc.*;
+import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.Base64;
-import net.i2p.util.*;
-import net.i2p.data.*;
+import org.apache.xmlrpc.XmlRpcClient;
 
 
 /**

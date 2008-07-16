@@ -1,6 +1,9 @@
 package net.i2p.syndie.data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * List of threads, ordered with the most recently updated thread first.

@@ -6,8 +6,8 @@
 
 package net.i2p.aum.q;
 
-import java.util.*;
-import java.math.*;
+import java.math.BigInteger;
+import java.util.Comparator;
 
 /**
  * implements a Comparator class which compares two QPeerRec objects

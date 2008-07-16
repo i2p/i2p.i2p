@@ -1,12 +1,20 @@
 package net.i2p.syndie;
 
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
 
-import net.i2p.data.*;
-import net.i2p.syndie.data.*;
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.SessionKey;
+import net.i2p.syndie.data.Attachment;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.Entry;
+import net.i2p.syndie.data.EntryContainer;
 
 /**
  * To cut down on unnecessary IO/cpu load, extract entries onto the disk for 

@@ -3,11 +3,9 @@ package net.i2p.util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.zip.CRC32;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
-import java.util.zip.GZIPInputStream;
 
 /**
  * GZIP implementation per 

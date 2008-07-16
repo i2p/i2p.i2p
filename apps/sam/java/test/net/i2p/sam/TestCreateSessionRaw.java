@@ -1,13 +1,12 @@
 package net.i2p.sam;
 
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 public class TestCreateSessionRaw {
     private static Log _log = new Log(TestCreateSessionRaw.class);

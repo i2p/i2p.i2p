@@ -8,11 +8,7 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
-import net.i2p.data.i2cp.SessionId;
 
 /**
  * Test harness for loading / storing Hash objects

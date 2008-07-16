@@ -41,22 +41,19 @@ exception statement from your version.  */
 
 package gnu.crypto.prng;
 
+import gnu.crypto.hash.Sha256Standalone;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
 import java.security.InvalidKeyException;
-
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import gnu.crypto.hash.Sha256Standalone;
-import net.i2p.crypto.CryptixRijndael_Algorithm;
 import net.i2p.crypto.CryptixAESKeyCache;
+import net.i2p.crypto.CryptixRijndael_Algorithm;
 
 /**
  * The Fortuna continuously-seeded pseudo-random number generator. This

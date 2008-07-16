@@ -1,12 +1,20 @@
 package net.i2p.syndie;
 
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
 import net.i2p.I2PAppContext;
-import net.i2p.client.naming.PetNameDB;
 import net.i2p.client.naming.PetName;
-import net.i2p.data.*;
+import net.i2p.client.naming.PetNameDB;
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.syndie.web.AddressesServlet;
 
 /**

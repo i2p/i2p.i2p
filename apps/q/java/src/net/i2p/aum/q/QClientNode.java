@@ -6,20 +6,18 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Vector;
 
-import org.apache.xmlrpc.*;
-
-import net.i2p.*;
-import net.i2p.data.*;
-
-import net.i2p.aum.*;
-import net.i2p.aum.http.*;
-
-import HTML.Template;
+import net.i2p.I2PException;
+import net.i2p.aum.Mimetypes;
+import net.i2p.aum.http.I2PHttpServer;
+import net.i2p.aum.http.MiniHttpServer;
+import net.i2p.data.DataFormatException;
 
 /**
  * Implements Q client nodes.

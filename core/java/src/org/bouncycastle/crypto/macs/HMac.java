@@ -27,11 +27,11 @@ package org.bouncycastle.crypto.macs;
  */
 
 //import org.bouncycastle.crypto.CipherParameters;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
-//import org.bouncycastle.crypto.params.KeyParameter;
-import java.util.Arrays;
-import java.util.ArrayList;
 
 /**
  * HMAC implementation based on RFC2104

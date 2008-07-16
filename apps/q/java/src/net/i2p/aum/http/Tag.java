@@ -6,9 +6,11 @@
 
 package net.i2p.aum.http;
 
-import java.lang.*;
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * Base class for building up quick-n-dirty HTML by code alone;

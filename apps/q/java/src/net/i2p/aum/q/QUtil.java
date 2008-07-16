@@ -6,10 +6,11 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-
-import net.i2p.*;
-import net.i2p.data.*;
+import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 
 /**
  * A general collection of static utility methods

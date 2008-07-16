@@ -1,8 +1,9 @@
 package net.i2p.syndie;
 
-import java.util.*;
-import net.i2p.data.*;
-import net.i2p.syndie.data.*;
+import java.util.Comparator;
+
+import net.i2p.data.DataHelper;
+import net.i2p.syndie.data.BlogURI;
 
 /** sort BlogURI instances with the highest entryId first */
 public class NewestEntryFirstComparator implements Comparator {

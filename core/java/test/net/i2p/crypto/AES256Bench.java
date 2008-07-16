@@ -29,9 +29,9 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import net.i2p.data.SessionKey;
-import net.i2p.data.DataHelper;
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.SessionKey;
 
 public class AES256Bench {
     private static I2PAppContext _context = new I2PAppContext();

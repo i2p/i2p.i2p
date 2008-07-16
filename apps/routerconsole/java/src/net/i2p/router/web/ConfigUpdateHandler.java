@@ -1,11 +1,8 @@
 package net.i2p.router.web;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.crypto.TrustedUpdate;
-import net.i2p.router.Router;
-import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerTask;
-import net.i2p.util.Log;
+import net.i2p.data.DataHelper;
 
 /**
  *

@@ -2,15 +2,10 @@
 
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.IOException;
 
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.*;
+import net.i2p.I2PException;
+import net.i2p.data.Destination;
 
 /**
  * A simple program which runs the EchoServer and EchoClient

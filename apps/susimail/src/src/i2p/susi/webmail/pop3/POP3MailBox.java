@@ -23,15 +23,15 @@
  */
 package i2p.susi.webmail.pop3;
 
+import i2p.susi.debug.Debug;
+import i2p.susi.util.ReadBuffer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-
-import i2p.susi.debug.Debug;
-import i2p.susi.util.*;
 
 /**
  * @author susi23

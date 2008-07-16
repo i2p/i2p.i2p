@@ -8,27 +8,11 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.Iterator;
-import java.util.Set;
-
-import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
-import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
-import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.data.i2np.DatabaseSearchReplyMessage;
-import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.TunnelGatewayMessage;
-import net.i2p.router.Job;
-import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
-import net.i2p.util.Log;
 
 /**
  * Handle a lookup for a key received from a remote peer.  Needs to be implemented

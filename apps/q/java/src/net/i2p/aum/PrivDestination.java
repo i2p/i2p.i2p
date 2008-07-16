@@ -1,19 +1,23 @@
 
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.data.*;
-
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
+import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PClientFactory;
 import net.i2p.data.Base64;
-import net.i2p.util.*;
-import net.i2p.data.*;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataStructureImpl;
+import net.i2p.data.Destination;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PublicKey;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
+import net.i2p.util.Log;
 
 /**
  * A convenience class for encapsulating and manipulating I2P private keys

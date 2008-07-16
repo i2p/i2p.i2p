@@ -21,15 +21,15 @@
 package org.klomp.snark;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-import org.klomp.snark.bencode.*;
-
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
-import net.i2p.data.DataFormatException;
+
+import org.klomp.snark.bencode.BDecoder;
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 
 public class PeerID implements Comparable
 {

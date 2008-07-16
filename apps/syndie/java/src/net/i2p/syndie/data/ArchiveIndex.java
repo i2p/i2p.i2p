@@ -1,10 +1,30 @@
 package net.i2p.syndie.data;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
+import net.i2p.data.Base64;
+import net.i2p.data.Hash;
 import net.i2p.syndie.Archive;
 import net.i2p.syndie.BlogManager;
 import net.i2p.util.Log;

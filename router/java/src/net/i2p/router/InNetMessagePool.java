@@ -11,13 +11,13 @@ package net.i2p.router;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
-import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.DatabaseLookupMessage;
+import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.DatabaseSearchReplyMessage;
-import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.TunnelCreateMessage;
 import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.data.i2np.TunnelDataMessage;

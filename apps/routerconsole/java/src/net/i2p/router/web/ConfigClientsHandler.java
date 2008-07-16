@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import net.i2p.data.DataFormatException;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.util.Log;

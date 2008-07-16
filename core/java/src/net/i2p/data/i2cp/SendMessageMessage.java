@@ -17,7 +17,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Payload;
-import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.util.Log;
 
 /**

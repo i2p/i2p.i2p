@@ -29,10 +29,10 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
-import net.i2p.I2PAppContext;
 
 public class ElGamalBench {
     private static I2PAppContext _context = new I2PAppContext();

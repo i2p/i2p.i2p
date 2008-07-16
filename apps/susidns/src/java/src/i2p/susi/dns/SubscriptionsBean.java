@@ -32,8 +32,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Properties;
 
 public class SubscriptionsBean

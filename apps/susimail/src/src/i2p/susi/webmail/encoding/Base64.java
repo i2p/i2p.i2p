@@ -23,12 +23,12 @@
  */
 package i2p.susi.webmail.encoding;
 
+import i2p.susi.util.ReadBuffer;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringBufferInputStream;
-
-import i2p.susi.util.ReadBuffer;
 
 /**
  * @author susi

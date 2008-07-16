@@ -23,9 +23,9 @@
  */
 package i2p.susi.webmail;
 
-import java.util.Hashtable;
-
 import i2p.susi.webmail.pop3.POP3MailBox;
+
+import java.util.Hashtable;
 
 /**
  * @author user

@@ -9,15 +9,12 @@ package net.i2p.util;
  *
  */
 
+import gnu.crypto.prng.AsyncFortunaStandalone;
+
 import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
-
-import gnu.crypto.prng.AsyncFortunaStandalone;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  * Wrapper around GNU-Crypto's Fortuna PRNG.  This seeds from /dev/urandom and

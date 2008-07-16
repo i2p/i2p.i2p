@@ -1,6 +1,7 @@
 package gnu.crypto.prng;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.i2p.I2PAppContext;
 

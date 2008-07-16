@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
-import net.i2p.data.Hash;
 import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;

@@ -24,7 +24,6 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;

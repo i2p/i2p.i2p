@@ -8,8 +8,8 @@ package net.i2p.router.networkdb;
  *
  */
 
-import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.DataStructure;
@@ -25,9 +25,8 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.RouterContext;
 import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
+import net.i2p.router.RouterContext;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 

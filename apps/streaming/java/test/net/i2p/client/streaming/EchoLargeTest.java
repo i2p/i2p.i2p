@@ -1,10 +1,9 @@
 package net.i2p.client.streaming;
 
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -12,7 +11,6 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base64;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 

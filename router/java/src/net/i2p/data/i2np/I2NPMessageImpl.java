@@ -11,7 +11,6 @@ package net.i2p.data.i2np;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.HashMap;
 import java.util.Map;
 

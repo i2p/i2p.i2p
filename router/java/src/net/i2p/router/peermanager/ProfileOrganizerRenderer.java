@@ -2,12 +2,8 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.Writer;
-
-import java.lang.Math;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Locale;
@@ -18,7 +14,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
-import net.i2p.router.peermanager.DBHistory;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 

@@ -1,10 +1,11 @@
 package net.i2p.util;
 
-import org.xlattice.crypto.filters.BloomSHA1;
+import java.util.Random;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 
-import java.util.Random;
+import org.xlattice.crypto.filters.BloomSHA1;
 
 /**
  * Series of bloom filters which decay over time, allowing their continual use

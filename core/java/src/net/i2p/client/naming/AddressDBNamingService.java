@@ -3,8 +3,8 @@ package net.i2p.client.naming;
 import java.util.Iterator;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Destination;
 import net.i2p.data.Address;
+import net.i2p.data.Destination;
 
 public class AddressDBNamingService extends NamingService {
     

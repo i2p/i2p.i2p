@@ -6,13 +6,13 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import org.apache.xmlrpc.*;
+import org.apache.xmlrpc.XmlRpcClient;
+import org.apache.xmlrpc.XmlRpcException;
 
 /**
  * <p>The official Java API for client applications wishing to access the Q

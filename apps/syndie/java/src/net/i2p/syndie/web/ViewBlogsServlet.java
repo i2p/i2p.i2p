@@ -1,18 +1,27 @@
 package net.i2p.syndie.web;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import net.i2p.I2PAppContext;
-import net.i2p.client.naming.*;
-import net.i2p.data.*;
-import net.i2p.syndie.*;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.sml.*;
+import net.i2p.client.naming.PetName;
+import net.i2p.client.naming.PetNameDB;
+import net.i2p.data.Hash;
+import net.i2p.syndie.Archive;
+import net.i2p.syndie.BlogManager;
+import net.i2p.syndie.NewestEntryFirstComparator;
+import net.i2p.syndie.User;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.FilteredThreadIndex;
+import net.i2p.syndie.data.ThreadIndex;
+import net.i2p.syndie.data.ThreadNode;
+import net.i2p.syndie.sml.HTMLRenderer;
 
 /**
  * List the blogs known in the archive

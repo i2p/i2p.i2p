@@ -1,10 +1,10 @@
 package net.i2p.crypto;
 
 import java.util.Random;
+
 import net.i2p.I2PAppContext;
 import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
-import net.i2p.util.Log;
 
 /**
  *

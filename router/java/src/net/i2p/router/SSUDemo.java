@@ -1,11 +1,21 @@
 package net.i2p.router;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
+import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
+import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageException;
+import net.i2p.data.i2np.I2NPMessageImpl;
 
 /**
  * Demo of a stripped down router - no tunnels, no netDb, no i2cp, no peer profiling,

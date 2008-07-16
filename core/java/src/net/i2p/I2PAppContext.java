@@ -23,10 +23,10 @@ import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
-import net.i2p.util.LogManager;
-import net.i2p.util.RandomSource;
-import net.i2p.util.PooledRandomSource;
 import net.i2p.util.FortunaRandomSource;
+import net.i2p.util.LogManager;
+import net.i2p.util.PooledRandomSource;
+import net.i2p.util.RandomSource;
 
 /**
  * <p>Provide a base scope for accessing singletons that I2P exposes.  Rather than

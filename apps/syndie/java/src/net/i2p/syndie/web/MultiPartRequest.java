@@ -1,8 +1,6 @@
 // see below for license info
 package net.i2p.syndie.web;
 
-import org.mortbay.servlet.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

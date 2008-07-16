@@ -8,8 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -18,10 +16,10 @@ import java.util.Properties;
 
 import net.i2p.CoreVersion;
 import net.i2p.data.DataHelper;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 
 /**
  * Maintain the statistics about the router

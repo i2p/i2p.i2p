@@ -1,9 +1,12 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;

@@ -1,6 +1,8 @@
 package net.i2p.syndie;
 
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
+
 import net.i2p.syndie.sml.SMLParser;
 
 public class HeaderReceiver implements SMLParser.EventReceiver {

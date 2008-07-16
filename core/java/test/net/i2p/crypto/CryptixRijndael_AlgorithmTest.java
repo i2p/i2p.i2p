@@ -10,9 +10,8 @@ package net.i2p.crypto;
  */
 
 
-import net.i2p.data.DataHelper;
-
 import junit.framework.TestCase;
+import net.i2p.data.DataHelper;
 
 public class CryptixRijndael_AlgorithmTest extends TestCase {
     public void testCRA() throws Exception{

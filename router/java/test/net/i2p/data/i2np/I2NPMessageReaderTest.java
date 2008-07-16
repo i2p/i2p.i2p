@@ -13,13 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.i2p.data.DataFormatException;
-import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.I2NPMessageReader;
-import net.i2p.router.RouterContext;
-
 import junit.framework.TestCase;
+import net.i2p.data.DataFormatException;
+import net.i2p.router.RouterContext;
 
 /**
  * Test harness for loading / storing I2NP DatabaseStore message objects

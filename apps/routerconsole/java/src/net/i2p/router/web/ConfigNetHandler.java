@@ -1,27 +1,11 @@
 package net.i2p.router.web;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.File;
-import java.io.FileOutputStream;
-
-import java.net.URL;
-import java.net.URLConnection;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import net.i2p.time.Timestamper;
-import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.router.Router;
-import net.i2p.router.LoadTestManager;
 import net.i2p.data.RouterInfo;
-import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerTask;
+import net.i2p.router.LoadTestManager;
+import net.i2p.router.Router;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
+import net.i2p.time.Timestamper;
 
 /**
  * Handler to deal with form submissions from the main config form and act

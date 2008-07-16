@@ -9,11 +9,11 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;

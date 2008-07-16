@@ -1,7 +1,10 @@
 package net.i2p.syndie.data;
 
-import java.util.*;
-import net.i2p.data.*;
+import java.util.Comparator;
+
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 
 /**
  *

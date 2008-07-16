@@ -20,10 +20,6 @@
 
 package org.klomp.snark;
 
-import java.security.Provider;
-import java.security.Security;
-
-import org.klomp.snark.bencode.*;
 
 /**
  * Main snark startup class for staticly linking with gcj.

@@ -18,7 +18,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import net.i2p.data.*;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.stat.Rate;

@@ -8,20 +8,19 @@ package net.i2p.util;
  *
  */
 
-import java.util.Properties;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.PrintStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-
-import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
+import java.io.PrintStream;
+import java.util.Properties;
 
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 
 /**

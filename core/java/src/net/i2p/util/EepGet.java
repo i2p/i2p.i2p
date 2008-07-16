@@ -9,16 +9,13 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.SocketTimeout;
 
 /**
  * EepGet [-p localhost:4444] 

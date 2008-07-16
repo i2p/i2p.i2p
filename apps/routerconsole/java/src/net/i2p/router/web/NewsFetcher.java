@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;

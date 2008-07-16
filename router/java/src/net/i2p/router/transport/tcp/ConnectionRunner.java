@@ -2,10 +2,11 @@ package net.i2p.router.transport.tcp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DateMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;

@@ -2,10 +2,10 @@ package net.i2p.data;
 
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;

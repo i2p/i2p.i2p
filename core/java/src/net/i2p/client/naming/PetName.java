@@ -1,6 +1,9 @@
 package net.i2p.client.naming;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import net.i2p.data.DataHelper;
 
 /**

@@ -12,7 +12,8 @@ package net.i2p.crypto;
  */
 //package com.bitzi.util;
  
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
  
 public class SHA1Test {
     

@@ -1,17 +1,20 @@
 package net.i2p.router.web;
 
-import java.io.*;
-import java.util.*;
+import java.awt.Color;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-import net.i2p.stat.*;
-import net.i2p.router.*;
+import net.i2p.router.RouterContext;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
-import java.awt.Color;
+import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
-import org.jrobin.graph.RrdGraphDefTemplate;
-import org.jrobin.core.RrdException;
 
 /**
  *

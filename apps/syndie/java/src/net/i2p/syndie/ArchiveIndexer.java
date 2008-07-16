@@ -1,12 +1,27 @@
 package net.i2p.syndie;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.sml.*;
+import net.i2p.data.Base64;
+import net.i2p.data.Hash;
+import net.i2p.syndie.data.ArchiveIndex;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.EntryContainer;
+import net.i2p.syndie.data.LocalArchiveIndex;
+import net.i2p.syndie.sml.HTMLRenderer;
+import net.i2p.syndie.sml.SMLParser;
 import net.i2p.util.Log;
 
 /**

@@ -9,7 +9,6 @@ import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessageStatusMessage;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
 /**

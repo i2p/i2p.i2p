@@ -8,16 +8,10 @@ package net.i2p.crypto;
  *
  */
 
-import java.security.InvalidKeyException;
-
+import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
-import net.i2p.util.ByteCache;
-import net.i2p.crypto.CryptixAESEngine;
-
-import junit.framework.TestCase;
 
 public class CryptixAESEngineTest extends TestCase{
     public void testED() {

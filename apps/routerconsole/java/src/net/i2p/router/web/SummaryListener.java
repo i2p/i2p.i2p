@@ -1,6 +1,8 @@
 package net.i2p.router.web;
 
-import java.io.*;
+import java.awt.Color;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -9,17 +11,15 @@ import net.i2p.stat.RateStat;
 import net.i2p.stat.RateSummaryListener;
 import net.i2p.util.Log;
 
+import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
-import org.jrobin.core.RrdBackendFactory;
+import org.jrobin.core.RrdException;
 import org.jrobin.core.RrdMemoryBackendFactory;
 import org.jrobin.core.Sample;
-
-import java.awt.Color;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 import org.jrobin.graph.RrdGraphDefTemplate;
-import org.jrobin.core.RrdException;
 
 class SummaryListener implements RateSummaryListener {
     private I2PAppContext _context;

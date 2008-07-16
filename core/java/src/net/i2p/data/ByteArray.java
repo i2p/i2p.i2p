@@ -10,7 +10,6 @@ package net.i2p.data;
  */
 
 import java.io.Serializable;
-import net.i2p.data.Base64;
 
 /**
  * Wrap up an array of bytes so that they can be compared and placed in hashes,

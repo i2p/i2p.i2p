@@ -1,10 +1,20 @@
 package net.i2p.syndie;
 
-import java.io.*;
-import java.util.*;
-import net.i2p.*;
-import net.i2p.data.*;
-import net.i2p.syndie.data.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import net.i2p.I2PAppContext;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.EntryContainer;
 import net.i2p.util.EepPost;
 
 /**

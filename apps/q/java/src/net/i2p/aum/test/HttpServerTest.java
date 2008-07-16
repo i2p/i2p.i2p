@@ -4,8 +4,8 @@
  */
 package net.i2p.aum.test;
 
-import java.util.*;
-import net.i2p.aum.http.*;
+import net.i2p.aum.http.MiniHttpRequestPage;
+import net.i2p.aum.http.MiniHttpServer;
 
 public class HttpServerTest extends MiniHttpRequestPage {
     

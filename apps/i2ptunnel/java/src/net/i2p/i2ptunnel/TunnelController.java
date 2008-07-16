@@ -1,9 +1,8 @@
 package net.i2p.i2ptunnel;
 
-import java.io.IOException;
 import java.io.File;
 import java.io.FileOutputStream;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

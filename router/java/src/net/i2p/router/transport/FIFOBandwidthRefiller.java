@@ -1,6 +1,8 @@
 package net.i2p.router.transport;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 

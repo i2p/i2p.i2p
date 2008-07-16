@@ -9,7 +9,6 @@ package net.i2p.util;
  */
 
 import java.io.ByteArrayInputStream;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 

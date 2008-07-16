@@ -6,16 +6,22 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.lang.*;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
-import org.apache.xmlrpc.*;
+import net.i2p.aum.I2PXmlRpcClientFactory;
+import net.i2p.aum.PropertiesFile;
+import net.i2p.aum.SimpleFile;
+import net.i2p.data.Destination;
 
-import net.i2p.data.*;
-
-import net.i2p.aum.*;
+import org.apache.xmlrpc.XmlRpcClient;
 
 /**
  * <p>Command Line Interface (CLI) for starting/stopping Q nodes,

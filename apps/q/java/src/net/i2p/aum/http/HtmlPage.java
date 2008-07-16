@@ -6,9 +6,9 @@
 
 package net.i2p.aum.http;
 
-import java.util.*;
+import java.util.Enumeration;
 
-import net.i2p.aum.*;
+import net.i2p.aum.DupHashtable;
 
 /**
  * Framework for building up a page of HTML by method calls alone, breaking

@@ -6,9 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import net.i2p.I2PAppContext;
-
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
 
 /**
  * basic unit tests for the DataHelper

@@ -3,9 +3,7 @@ package net.i2p.router.transport.tcp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.Socket;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +13,8 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessageReader;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.stat.RateStat;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**

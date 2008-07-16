@@ -1,12 +1,18 @@
 package net.i2p.syndie;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.sml.SMLParser;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.EntryContainer;
+import net.i2p.syndie.data.ThreadIndex;
+import net.i2p.syndie.data.ThreadNode;
 import net.i2p.syndie.sml.HTMLRenderer;
+import net.i2p.syndie.sml.SMLParser;
 
 /**
  *

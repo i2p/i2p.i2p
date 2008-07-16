@@ -1,13 +1,16 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.*;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
-import net.i2p.router.*;
-import net.i2p.router.tunnel.*;
-import net.i2p.router.peermanager.TunnelHistory;
-import net.i2p.util.Log;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
+import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelManagerFacade;
+import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.stat.StatManager;
+import net.i2p.util.Log;
 
 /**
  * Single threaded controller of the tunnel creation process, spanning all tunnel pools.

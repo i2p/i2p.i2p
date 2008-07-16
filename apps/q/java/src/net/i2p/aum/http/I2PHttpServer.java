@@ -6,15 +6,16 @@
 
 package net.i2p.aum.http;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Properties;
 
-import net.i2p.*;
-import net.i2p.data.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-
-import net.i2p.aum.*;
+import net.i2p.I2PException;
+import net.i2p.aum.PrivDestination;
+import net.i2p.client.streaming.I2PServerSocket;
+import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.data.DataFormatException;
 
 /**
  *

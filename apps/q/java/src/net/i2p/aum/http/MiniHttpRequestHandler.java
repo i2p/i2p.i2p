@@ -7,12 +7,19 @@
 
 package net.i2p.aum.http;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.URLDecoder;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import net.i2p.aum.*;
+import net.i2p.aum.DupHashtable;
+import net.i2p.aum.Mimetypes;
 
 public abstract class MiniHttpRequestHandler implements Runnable {
     final static String CRLF = "\r\n";

@@ -1,11 +1,30 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.*;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
-import net.i2p.router.*;
-import net.i2p.router.tunnel.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.BuildRequestRecord;
+import net.i2p.data.i2np.BuildResponseRecord;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.TunnelBuildMessage;
+import net.i2p.data.i2np.TunnelBuildReplyMessage;
+import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.router.HandlerJobBuilder;
+import net.i2p.router.Job;
+import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
+import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.TunnelHistory;
+import net.i2p.router.tunnel.BuildMessageProcessor;
+import net.i2p.router.tunnel.BuildReplyHandler;
+import net.i2p.router.tunnel.HopConfig;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;

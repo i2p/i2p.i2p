@@ -1,15 +1,24 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.networkdb.kademlia.PeerSelector;
-import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**

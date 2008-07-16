@@ -3,9 +3,9 @@ package net.i2p.router.tunnel;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
+import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Receive the inbound tunnel message, removing all of the layers

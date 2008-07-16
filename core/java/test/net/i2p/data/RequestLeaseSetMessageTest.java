@@ -10,10 +10,6 @@ package net.i2p.data;
 
 import java.util.Date;
 
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.Hash;
-import net.i2p.data.TunnelId;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.SessionId;
 

@@ -9,6 +9,7 @@ package net.i2p.router.networkdb;
  */
 
 import java.util.Date;
+
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;

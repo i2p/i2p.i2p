@@ -25,7 +25,6 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**

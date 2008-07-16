@@ -8,13 +8,9 @@ package net.i2p.data;
  *
  */
 
-import java.io.OutputStream;
-import java.io.InputStream;
 import java.io.IOException;
-
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.DataStructureImpl;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import junit.framework.TestCase;
 

@@ -1,11 +1,14 @@
 package net.i2p.syndie.data;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.syndie.Archive;
+import net.i2p.data.Hash;
 import net.i2p.syndie.BlogManager;
 
 /**

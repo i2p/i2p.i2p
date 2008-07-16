@@ -20,16 +20,25 @@
 
 package org.klomp.snark;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import org.klomp.snark.bencode.*;
-
-import net.i2p.data.Destination;
-import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PServerSocket;
+import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
+
+import org.klomp.snark.bencode.BDecoder;
 
 /**
  * Main Snark program startup class.

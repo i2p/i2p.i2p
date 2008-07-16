@@ -1,13 +1,16 @@
 package net.i2p.router.tunnel;
 
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.router.TunnelInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 
 /**
  * Coordinate the info that the tunnel creator keeps track of, including what 

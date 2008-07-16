@@ -23,13 +23,13 @@
  */
 package i2p.susi.webmail.encoding;
 
+import i2p.susi.util.HexTable;
+import i2p.susi.util.ReadBuffer;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringBufferInputStream;
-
-import i2p.susi.util.HexTable;
-import i2p.susi.util.ReadBuffer;
 
 /**
  * @author susi
@@ -294,10 +294,10 @@ public class HeaderLine implements Encoding {
 	}
 	public static void main( String[] args ) throws EncodingException {
 		String text = "Subject: test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test \r\n" +
-		"From: Smörebröd <smoerebroed@mail.i2p>\r\n" +
-		"To: äüöß <lalala@mail.i2p>\r\n";
+		"From: Smï¿½rebrï¿½d <smoerebroed@mail.i2p>\r\n" +
+		"To: ï¿½ï¿½ï¿½ï¿½ <lalala@mail.i2p>\r\n";
 		HeaderLine hl = new HeaderLine();
 		System.out.println( hl.encode( text ) );
-		System.out.println( hl.encode( "test äöü" ) );
+		System.out.println( hl.encode( "test ï¿½ï¿½ï¿½" ) );
 	}
 }

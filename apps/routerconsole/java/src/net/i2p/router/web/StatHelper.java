@@ -1,9 +1,8 @@
 package net.i2p.router.web;
 
+import java.io.Writer;
 import java.util.Iterator;
 import java.util.Set;
-
-import java.io.Writer;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;

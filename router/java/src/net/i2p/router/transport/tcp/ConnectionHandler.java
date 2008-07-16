@@ -9,9 +9,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.Properties;
 
@@ -20,12 +18,12 @@ import net.i2p.crypto.AESOutputStream;
 import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
-import net.i2p.data.DataHelper;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
-import net.i2p.data.RouterInfo;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.BandwidthLimitedInputStream;

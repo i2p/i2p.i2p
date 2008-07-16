@@ -1,10 +1,27 @@
 package net.i2p.router.networkdb.kademlia;
 
-import java.util.*;
-import net.i2p.router.*;
-import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
-import net.i2p.data.i2np.*;
-import net.i2p.data.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.i2p.data.DataStructure;
+import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.i2np.DatabaseLookupMessage;
+import net.i2p.data.i2np.DatabaseSearchReplyMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.Job;
+import net.i2p.router.JobImpl;
+import net.i2p.router.MessageSelector;
+import net.i2p.router.OutNetMessage;
+import net.i2p.router.ReplyJob;
+import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**

@@ -10,6 +10,7 @@ package net.i2p.data;
  */
 
 import gnu.crypto.hash.Sha256Standalone;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -32,10 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.zip.GZIPInputStream;
 
 import net.i2p.util.ByteCache;
-import net.i2p.util.CachingByteArrayOutputStream;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.ReusableGZIPOutputStream;

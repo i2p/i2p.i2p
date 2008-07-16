@@ -2,9 +2,6 @@ package net.i2p.router.transport.udp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
@@ -14,7 +11,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
-import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 

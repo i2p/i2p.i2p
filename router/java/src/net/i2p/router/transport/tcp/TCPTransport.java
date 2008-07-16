@@ -2,6 +2,7 @@ package net.i2p.router.transport.tcp;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import java.text.SimpleDateFormat;
-
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -20,9 +19,9 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.TransportImpl;
-import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.Transport;
+import net.i2p.router.transport.TransportBid;
+import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 

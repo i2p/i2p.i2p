@@ -2,8 +2,8 @@ package net.i2p.client.naming;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;

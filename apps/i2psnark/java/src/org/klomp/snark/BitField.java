@@ -20,9 +20,6 @@
 
 package org.klomp.snark;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Container of a byte array representing set and unset bits.

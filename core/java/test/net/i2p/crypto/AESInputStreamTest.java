@@ -10,20 +10,13 @@ package net.i2p.crypto;
  
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
+import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-
-import junit.framework.TestCase;
 /**
  * @author Comwiz
  */

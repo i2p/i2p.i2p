@@ -1,12 +1,8 @@
 package net.i2p.client.naming;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Properties;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 public class PetNameNamingService extends NamingService {

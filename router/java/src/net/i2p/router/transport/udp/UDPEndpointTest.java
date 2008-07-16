@@ -1,8 +1,6 @@
 package net.i2p.router.transport.udp;
 
-import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

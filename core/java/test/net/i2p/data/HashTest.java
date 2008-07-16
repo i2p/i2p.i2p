@@ -8,9 +8,6 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.Hash;
 
 /**
  * Test harness for loading / storing Hash objects

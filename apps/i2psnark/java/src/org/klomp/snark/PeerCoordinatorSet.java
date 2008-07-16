@@ -1,6 +1,9 @@
 package org.klomp.snark;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Hmm, any guesses as to what this is?  Used by the multitorrent functionality

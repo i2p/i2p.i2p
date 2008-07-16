@@ -10,13 +10,13 @@
 package net.i2p.apps.systray;
 
 import java.awt.Frame;
+
+import net.i2p.util.SimpleTimer;
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;
 import snoozesoft.systray4j.SysTrayMenuItem;
 import snoozesoft.systray4j.SysTrayMenuListener;
-
-import net.i2p.util.SimpleTimer;
 
 /**
  * A system tray control for launching the I2P router console.

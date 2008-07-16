@@ -8,11 +8,9 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
-
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
+import net.i2p.data.Hash;
 
 /**
  * Test KBucketSet

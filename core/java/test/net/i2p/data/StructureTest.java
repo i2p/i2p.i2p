@@ -8,15 +8,8 @@ package net.i2p.data;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
+import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 

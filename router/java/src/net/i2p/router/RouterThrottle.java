@@ -1,7 +1,6 @@
 package net.i2p.router;
 
 import net.i2p.data.Hash;
-import net.i2p.data.i2np.TunnelCreateMessage;
 
 /**
  * Gatekeeper for deciding whether to throttle the further processing 

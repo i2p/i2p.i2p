@@ -1,9 +1,26 @@
 package net.i2p.syndie.data;
 
-import java.io.*;
-import java.util.*;
-import net.i2p.data.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 
 /**

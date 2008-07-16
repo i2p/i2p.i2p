@@ -1,6 +1,7 @@
 package net.i2p.client.streaming;
 
 import java.util.Arrays;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -9,7 +10,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**

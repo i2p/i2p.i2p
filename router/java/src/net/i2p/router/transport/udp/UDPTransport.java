@@ -1,32 +1,37 @@
 package net.i2p.router.transport.udp;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-
-import java.io.IOException;
-import java.io.Writer;
-
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeSet;
+import java.util.Vector;
 
-import java.util.*;
-
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.RouterContext;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
-import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportBid;
+import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 

@@ -1,13 +1,11 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.i2p.util.Log;
 import net.i2p.stat.StatManager;
+import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the stats config form and act

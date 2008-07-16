@@ -15,9 +15,8 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.router.JobImpl;
-import net.i2p.router.RouterContext;
 import net.i2p.router.Router;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**

@@ -3,7 +3,6 @@ package net.i2p.stat;
 import java.io.IOException;
 import java.util.Properties;
 
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
 /**

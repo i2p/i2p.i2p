@@ -14,8 +14,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.StructureTest;
 import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.DeliveryInstructions;
-import net.i2p.util.Log;
 
 /**
  * Test harness for loading / storing DeliveryInstructions objects

@@ -1,19 +1,43 @@
 package net.i2p.syndie.web;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
 import net.i2p.I2PAppContext;
-import net.i2p.client.naming.*;
-import net.i2p.data.*;
-import net.i2p.syndie.*;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.sml.*;
+import net.i2p.client.naming.PetName;
+import net.i2p.client.naming.PetNameDB;
+import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
+import net.i2p.syndie.Archive;
+import net.i2p.syndie.BlogManager;
+import net.i2p.syndie.User;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.FilteredThreadIndex;
+import net.i2p.syndie.data.ThreadIndex;
+import net.i2p.syndie.data.ThreadNode;
+import net.i2p.syndie.sml.HTMLRenderer;
+import net.i2p.syndie.sml.ThreadedHTMLRenderer;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 

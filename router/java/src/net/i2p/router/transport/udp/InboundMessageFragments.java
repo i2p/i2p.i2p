@@ -1,15 +1,10 @@
 package net.i2p.router.transport.udp;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.DecayingBloomFilter;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**

@@ -2,11 +2,14 @@ package net.i2p.router.web;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
-import net.i2p.stat.Rate;
 import net.i2p.router.RouterContext;
+import net.i2p.stat.Rate;
 
 public class GraphHelper {
     private RouterContext _context;

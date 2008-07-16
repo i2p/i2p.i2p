@@ -1,16 +1,17 @@
 package net.i2p.router.tunnel;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;

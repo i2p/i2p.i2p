@@ -9,11 +9,7 @@ package net.i2p.util;
  *
  */
 
-import java.security.SecureRandom;
-
 import net.i2p.I2PAppContext;
-import net.i2p.crypto.EntropyHarvester;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 
 /**

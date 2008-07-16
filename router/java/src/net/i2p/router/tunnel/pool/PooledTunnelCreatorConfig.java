@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.*;
+import java.util.Properties;
+
 import net.i2p.data.Hash;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;

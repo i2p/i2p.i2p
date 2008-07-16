@@ -2,10 +2,11 @@ package net.i2p.router.web;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.i2p.data.Hash;
+
 import net.i2p.data.DataFormatException;
-import net.i2p.util.Log;
+import net.i2p.data.Hash;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the tunnel config form and act

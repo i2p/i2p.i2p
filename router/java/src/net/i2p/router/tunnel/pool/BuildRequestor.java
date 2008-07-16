@@ -1,13 +1,19 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.*;
-import net.i2p.data.*;
-import net.i2p.data.i2np.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.MessageSelector;
-import net.i2p.router.JobImpl;
-import net.i2p.router.ReplyJob;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.tunnel.BuildMessageGenerator;
 import net.i2p.util.Log;

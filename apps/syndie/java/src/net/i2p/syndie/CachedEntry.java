@@ -1,10 +1,28 @@
 package net.i2p.syndie;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.syndie.data.*;
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.SessionKey;
+import net.i2p.data.Signature;
+import net.i2p.syndie.data.Attachment;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.Entry;
+import net.i2p.syndie.data.EntryContainer;
 
 /**
  * Lazy loading wrapper for an entry, pulling data out of a cached & extracted dir,

@@ -6,15 +6,11 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.lang.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Hashtable;
 
-import net.i2p.*;
-import net.i2p.data.*;
-
-import net.i2p.aum.*;
+import net.i2p.I2PException;
+import net.i2p.data.DataFormatException;
 
 
 /**

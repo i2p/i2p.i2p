@@ -7,10 +7,11 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import net.i2p.data.DataHelper;
-import net.i2p.router.Router;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.apps.systray.UrlLauncher;
+import net.i2p.data.DataHelper;
+import net.i2p.router.Router;
+
 import org.tanukisoftware.wrapper.WrapperManager;
 
 /**

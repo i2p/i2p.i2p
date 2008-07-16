@@ -1,18 +1,13 @@
 package net.i2p.aum;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.IOException;
+import java.util.Properties;
 
-import org.apache.xmlrpc.*;
-
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.data.Base64;
-import net.i2p.util.*;
-import net.i2p.data.*;
+import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
+import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.DataFormatException;
+import net.i2p.util.Log;
 
 
 /**

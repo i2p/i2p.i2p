@@ -1,13 +1,13 @@
 package net.i2p.crypto;
 
-import java.util.Arrays;
+import gnu.crypto.hash.Sha256Standalone;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
-
-import gnu.crypto.hash.Sha256Standalone;
 
 /** 
  * Defines a wrapper for SHA-256 operation.  All the good stuff occurs

@@ -6,10 +6,13 @@
 
 package net.i2p.aum.q;
 
-import java.*;
-import java.lang.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Date;
+import java.util.Iterator;
 
 /**
  * <p>Implements a binary-searchable file for storing (time, hash) records.

@@ -1,12 +1,11 @@
 package net.i2p.router.transport.udp;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.DatagramPacket;
-
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
-import net.i2p.data.Base64;
+
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.I2PThread;

@@ -1,6 +1,7 @@
 package net.i2p.syndie.sml;
 
-import java.util.*;
+import java.util.List;
+
 import net.i2p.data.DataHelper;
 
 /** contains intermediary rendering state */

@@ -1,17 +1,28 @@
 package net.i2p.syndie.web;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.*;
-import net.i2p.syndie.*;
-import net.i2p.syndie.data.*;
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.syndie.Archive;
+import net.i2p.syndie.BlogManager;
+import net.i2p.syndie.data.ArchiveIndex;
+import net.i2p.syndie.data.BlogInfo;
+import net.i2p.syndie.data.BlogURI;
 
 /**
  *

@@ -20,7 +20,11 @@
 
 package org.klomp.snark;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.TimerTask;
 
 /**
  * TimerTask that checks for good/bad up/downloader. Works together

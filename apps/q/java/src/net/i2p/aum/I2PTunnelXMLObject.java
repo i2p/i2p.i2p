@@ -1,15 +1,7 @@
 package net.i2p.aum;
 
-import org.apache.xmlrpc.*;
-import java.lang.*;
-import java.io.*;
-import java.util.*;
+import java.util.Hashtable;
 
-import net.i2p.*;
-import net.i2p.client.*;
-import net.i2p.client.streaming.*;
-import net.i2p.util.*;
-import net.i2p.data.*;
 import net.i2p.i2ptunnel.I2PTunnelXMLWrapper;
 
 /**

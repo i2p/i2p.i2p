@@ -5,14 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.data.ByteArray;
-import net.i2p.data.DataHelper;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;

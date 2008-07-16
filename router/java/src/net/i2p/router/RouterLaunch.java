@@ -1,6 +1,8 @@
 package net.i2p.router;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
 public class RouterLaunch {
     public static void main(String args[]) {

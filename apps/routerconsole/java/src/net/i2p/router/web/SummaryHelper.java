@@ -11,14 +11,14 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.transport.ntcp.NTCPAddress;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 
 /**
  * Simple helper to query the appropriate router for data necessary to render

@@ -11,19 +11,14 @@ package net.i2p.client.datagram;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import net.i2p.client.datagram.I2PDatagramMaker;
-import net.i2p.client.datagram.I2PDatagramDissector;
-import net.i2p.client.datagram.I2PInvalidDatagramException;
-import net.i2p.client.I2PClientFactory;
-import net.i2p.client.I2PClient;
-import net.i2p.client.I2PSession;
-import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
-import net.i2p.data.Destination;
-import net.i2p.data.DataFormatException;
-import net.i2p.crypto.DSAEngine;
-
 import junit.framework.TestCase;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PClientFactory;
+import net.i2p.client.I2PSession;
+import net.i2p.crypto.DSAEngine;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 
 
 /**

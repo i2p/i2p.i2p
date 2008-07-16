@@ -8,17 +8,14 @@ package net.i2p.router.transport;
  *
  */
 
-import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import java.util.Random;
 import java.util.Properties;
+import java.util.Random;
 
 import junit.framework.TestCase;
+import net.i2p.router.RouterContext;
 
 /**
  * Stress out the bandwidth limiter by running a series of push and pull tests

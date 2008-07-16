@@ -9,6 +9,7 @@ package net.i2p.data.i2np;
  */
 
 import java.io.IOException;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;

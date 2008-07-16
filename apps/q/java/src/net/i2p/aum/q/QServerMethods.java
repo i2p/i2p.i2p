@@ -6,9 +6,9 @@
 
 package net.i2p.aum.q;
 
-import java.lang.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**

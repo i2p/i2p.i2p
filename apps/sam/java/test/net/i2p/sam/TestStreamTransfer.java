@@ -1,19 +1,18 @@
 package net.i2p.sam;
 
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-
-import java.util.Map;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * <ol>

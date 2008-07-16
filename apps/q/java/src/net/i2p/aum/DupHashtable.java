@@ -6,8 +6,8 @@
 
 package net.i2p.aum;
 
-import java.*;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * similar in some ways to Properties, except that duplicate keys

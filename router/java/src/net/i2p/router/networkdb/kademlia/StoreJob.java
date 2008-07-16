@@ -8,7 +8,10 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;

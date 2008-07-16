@@ -8,22 +8,14 @@ package net.i2p.client;
  *
  */
 
-import java.util.HashSet;
-import java.util.Set;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
-import net.i2p.client.I2PSession;
-import net.i2p.client.I2PSessionImpl;
-import net.i2p.client.I2PSessionImpl2;
-import net.i2p.client.I2PSessionException;
-import net.i2p.client.I2PClient;
-import net.i2p.client.I2PClientFactory;
-import net.i2p.client.I2PSessionListener;
-import net.i2p.data.Destination;
-import net.i2p.I2PAppContext;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
+import net.i2p.data.Destination;
 
 
 /**

@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
+
 import net.i2p.data.SessionKey;
 
 /**

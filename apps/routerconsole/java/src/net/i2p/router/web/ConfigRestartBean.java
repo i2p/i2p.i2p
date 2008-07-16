@@ -3,8 +3,6 @@ package net.i2p.router.web;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerTask;
-import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
 
 /**
  * simple helper to control restarts/shutdowns in the left hand nav

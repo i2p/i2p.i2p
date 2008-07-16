@@ -10,16 +10,14 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Properties;
 
 import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.PircBot;

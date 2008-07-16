@@ -8,8 +8,6 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -23,8 +21,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.i2p.data.Base64;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Destination;
@@ -39,11 +35,11 @@ import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
-import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.Log;
 
 /**

@@ -1,5 +1,7 @@
 package net.i2p.router.transport.udp;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,15 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
-import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.Job;
+import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Contain all of the state about a UDP connection to a peer.

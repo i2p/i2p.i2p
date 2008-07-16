@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
@@ -16,28 +15,23 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
-import net.i2p.data.Payload;
 import net.i2p.data.i2cp.MessageId;
-
 import net.i2p.data.i2np.DataMessage;
-import net.i2p.data.i2np.DeliveryStatusMessage;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
-
-import net.i2p.router.message.PayloadGarlicConfig;
-
+import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.JobImpl;
+import net.i2p.router.MessageSelector;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.MessageSelector;
-
 import net.i2p.util.Log;
 
 /**

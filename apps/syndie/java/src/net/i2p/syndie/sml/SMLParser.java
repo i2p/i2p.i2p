@@ -1,9 +1,12 @@
 package net.i2p.syndie.sml;
 
-import java.lang.String;
-import java.util.*;
-import net.i2p.syndie.data.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.i2p.I2PAppContext;
+import net.i2p.syndie.data.SafeURL;
 import net.i2p.util.Log;
 
 /**

@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;

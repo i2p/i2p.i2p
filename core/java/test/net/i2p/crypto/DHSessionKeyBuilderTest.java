@@ -11,12 +11,10 @@ package net.i2p.crypto;
 
 import java.math.BigInteger;
 
-import net.i2p.data.DataHelper;
-import net.i2p.data.SessionKey;
-import net.i2p.I2PAppContext;
-import net.i2p.util.RandomSource;
-
 import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
+import net.i2p.data.SessionKey;
+import net.i2p.util.RandomSource;
 
 public class DHSessionKeyBuilderTest extends TestCase {
     public void testDHSessionKeyBuilder(){

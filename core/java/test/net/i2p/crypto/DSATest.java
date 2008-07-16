@@ -9,12 +9,12 @@ package net.i2p.crypto;
  */
  
 import java.io.ByteArrayInputStream;
+
+import junit.framework.TestCase;
+import net.i2p.I2PAppContext;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.I2PAppContext;
-
-import junit.framework.TestCase;
 
 public class DSATest extends TestCase{
     private I2PAppContext _context;

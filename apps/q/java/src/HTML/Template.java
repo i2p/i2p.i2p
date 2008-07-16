@@ -34,13 +34,28 @@
 */
 
 package HTML;
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.util.EmptyStackException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import HTML.Tmpl.Element.*;
-import HTML.Tmpl.Parsers.*;
-import HTML.Tmpl.Util;
 import HTML.Tmpl.Filter;
+import HTML.Tmpl.Util;
+import HTML.Tmpl.Element.Conditional;
+import HTML.Tmpl.Element.Element;
+import HTML.Tmpl.Element.If;
+import HTML.Tmpl.Element.Var;
+import HTML.Tmpl.Parsers.Parser;
 
 /**
  * Use HTML Templates with java.

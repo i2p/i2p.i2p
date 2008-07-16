@@ -13,13 +13,13 @@ package net.i2p.aum.http;
   // server implements HTTP GET method
   //***************************************
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
-import java.lang.reflect.*;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-import org.apache.xmlrpc.*;
+import org.apache.xmlrpc.XmlRpcServer;
 
 public class MiniHttpServer extends Thread
 {

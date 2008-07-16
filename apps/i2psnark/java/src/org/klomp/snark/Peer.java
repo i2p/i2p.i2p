@@ -20,15 +20,15 @@
 
 package org.klomp.snark;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Map;
-
-import org.klomp.snark.bencode.*;
 
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class Peer implements Comparable

@@ -8,15 +8,12 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.util.Date;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
-import net.i2p.data.StructureTest;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.RouterInfoTest;
-import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.StructureTest;
 import net.i2p.util.Clock;
 
 /**

@@ -3,9 +3,6 @@ package net.i2p.router.web;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-
-import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,9 +14,9 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
-import net.i2p.util.I2PThread;
 import net.i2p.util.EepGet;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Handler to deal with reseed requests.  This will reseed from the URL

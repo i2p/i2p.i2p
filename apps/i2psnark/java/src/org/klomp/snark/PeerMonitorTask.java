@@ -20,7 +20,8 @@
 
 package org.klomp.snark;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.TimerTask;
 
 /**
  * TimerTask that monitors the peers and total up/download speeds.

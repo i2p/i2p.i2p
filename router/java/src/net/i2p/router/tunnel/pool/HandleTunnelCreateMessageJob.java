@@ -3,8 +3,8 @@ package net.i2p.router.tunnel.pool;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicMessage;
@@ -15,13 +15,13 @@ import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.RouterContext;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.message.SendMessageDirectJob;
-import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.peermanager.TunnelHistory;
+import net.i2p.router.tunnel.HopConfig;
 import net.i2p.util.Log;
 
 /**

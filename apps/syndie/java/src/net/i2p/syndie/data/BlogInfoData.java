@@ -1,7 +1,12 @@
 package net.i2p.syndie.data;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import net.i2p.client.naming.PetName;
 import net.i2p.data.DataHelper;
 

@@ -1,8 +1,9 @@
 package net.i2p.router.web;
 
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Properties;
+import java.util.Set;
+
 import net.i2p.data.Destination;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;

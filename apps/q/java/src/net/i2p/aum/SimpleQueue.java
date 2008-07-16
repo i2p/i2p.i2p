@@ -6,9 +6,7 @@
 
 package net.i2p.aum;
 
-import java.*;
-import java.lang.*;
-import java.util.*;
+import java.util.Vector;
 
 /**
  * Implements simething similar to python's 'Queue' class

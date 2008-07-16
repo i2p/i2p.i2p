@@ -1,9 +1,7 @@
 package net.i2p.router;
 
-import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
-import net.i2p.router.RouterContext;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Alternate location for determining the time which takes into account an offset.

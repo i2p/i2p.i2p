@@ -22,14 +22,15 @@ package org.klomp.snark;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
-import org.klomp.snark.bencode.*;
+import org.klomp.snark.bencode.BDecoder;
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 
 public class TrackerInfo
 {

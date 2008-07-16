@@ -1,6 +1,8 @@
 package net.i2p.syndie.data;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+
 import net.i2p.data.Hash;
 
 /**

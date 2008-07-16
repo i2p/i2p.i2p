@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel;
 
 import java.util.HashSet;
+
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 

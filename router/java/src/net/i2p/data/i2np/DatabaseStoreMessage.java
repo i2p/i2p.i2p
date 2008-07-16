@@ -10,6 +10,7 @@ package net.i2p.data.i2np;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;

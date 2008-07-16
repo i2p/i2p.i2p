@@ -10,25 +10,26 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
+
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.OutNetMessage;
 import net.i2p.router.CommSystemFacade;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.util.Log;
 
 public class TransportManager implements TransportEventListener {

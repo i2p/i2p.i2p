@@ -1,6 +1,8 @@
 package net.i2p.router.tunnel;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;

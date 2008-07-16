@@ -15,9 +15,8 @@ package net.i2p.crypto;
  * put("MessageDigest.SHA-1", "com.bitzi.util.SHA1");
  */
 //package com.bitzi.util;
-import java.security.*;
-//--+---+1--+---+--2+---+---+3--+---+--4+---+---+5--+---+--6+---+---+7--+---+--
-//34567890123456789012345678901234567890123456789012345678901234567890123456789
+import java.security.DigestException;
+import java.security.MessageDigest;
  
 /**
  * <p>The FIPS PUB 180-2 standard specifies four secure hash algorithms (SHA-1,

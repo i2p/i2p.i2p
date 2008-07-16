@@ -1,18 +1,25 @@
 package net.i2p.syndie.web;
 
-import java.io.*;
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
-import net.i2p.data.*;
-import net.i2p.syndie.*;
-import net.i2p.syndie.data.*;
+import net.i2p.data.Base64;
+import net.i2p.data.Hash;
+import net.i2p.syndie.Archive;
+import net.i2p.syndie.BlogManager;
+import net.i2p.syndie.data.BlogURI;
 
 /**
  * Dump out a whole series of blog metadata and entries as a zip stream.  All metadata

@@ -1,9 +1,16 @@
 package net.i2p.syndie.data;
 
-import java.util.*;
-import net.i2p.syndie.*;
-import net.i2p.data.*;
-import net.i2p.client.naming.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import net.i2p.client.naming.PetName;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
+import net.i2p.syndie.Archive;
+import net.i2p.syndie.User;
 
 /**
  *

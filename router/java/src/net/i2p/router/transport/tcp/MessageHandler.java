@@ -3,9 +3,9 @@ package net.i2p.router.transport.tcp;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
-import net.i2p.data.i2np.I2NPMessageReader;
-import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DateMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageReader;
 import net.i2p.router.Router;
 import net.i2p.util.Log;
 

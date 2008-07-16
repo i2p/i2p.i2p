@@ -12,15 +12,6 @@ import java.util.HashSet;
 import java.util.Properties;
 
 import net.i2p.crypto.KeyGenerator;
-import net.i2p.data.Certificate;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.PrivateKey;
-import net.i2p.data.PublicKey;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
-import net.i2p.data.SigningPrivateKey;
-import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 
 /**

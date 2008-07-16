@@ -8,10 +8,9 @@ package net.i2p.crypto;
  *
  */
 
+import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
 import net.i2p.data.SessionKey;
-
-import junit.framework.TestCase;
 
 public class HMACSHA256Test extends TestCase{
     private I2PAppContext _context;

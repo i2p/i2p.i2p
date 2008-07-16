@@ -9,13 +9,8 @@ package net.i2p.router.tunnel;
  */
 
 import java.util.ArrayList;
+
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
-import net.i2p.data.Hash;
-import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.DataMessage;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.util.Log;
 
 /**
  * Test the batching behavior of the preprocessor with one, two, or three 

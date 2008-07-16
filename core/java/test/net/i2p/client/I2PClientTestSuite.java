@@ -8,10 +8,9 @@ package net.i2p.client;
  *
  */
  
-import net.i2p.client.datagram.DatagramTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import net.i2p.client.datagram.DatagramTest;
 
 /**
  * @author Comwiz

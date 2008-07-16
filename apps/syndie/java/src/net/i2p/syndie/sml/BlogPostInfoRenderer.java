@@ -1,15 +1,31 @@
 package net.i2p.syndie.sml;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetName;
 import net.i2p.client.naming.PetNameDB;
-import net.i2p.data.*;
-import net.i2p.syndie.*;
-import net.i2p.syndie.data.*;
-import net.i2p.syndie.web.*;
+import net.i2p.data.Base64;
+import net.i2p.data.Hash;
+import net.i2p.syndie.Archive;
+import net.i2p.syndie.BlogManager;
+import net.i2p.syndie.User;
+import net.i2p.syndie.data.Attachment;
+import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.EntryContainer;
+import net.i2p.syndie.data.SafeURL;
+import net.i2p.syndie.web.AddressesServlet;
+import net.i2p.syndie.web.ViewBlogServlet;
 import net.i2p.util.Log;
 
 /**

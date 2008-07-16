@@ -1,8 +1,8 @@
 package org.klomp.snark;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Piece implements Comparable {
 

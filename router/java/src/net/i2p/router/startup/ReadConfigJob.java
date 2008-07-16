@@ -9,6 +9,7 @@ package net.i2p.router.startup;
  */
 
 import java.io.File;
+
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 

@@ -1,10 +1,10 @@
 package net.i2p.syndie;
 
 import javax.servlet.GenericServlet;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  * A wrapper for syndie updater to allow it to be started as a web application.

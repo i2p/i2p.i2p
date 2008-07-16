@@ -8,18 +8,8 @@ package net.i2p.data;
  *
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.Destination;
-import net.i2p.data.Hash;
-import net.i2p.data.Payload;
-import net.i2p.data.SessionKey;
-import net.i2p.util.Log;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Test harness for loading / storing Payload objects

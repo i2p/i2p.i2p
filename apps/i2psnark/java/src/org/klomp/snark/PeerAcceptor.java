@@ -20,8 +20,12 @@
 
 package org.klomp.snark;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.SequenceInputStream;
 import java.util.Iterator;
 
 import net.i2p.client.streaming.I2PSocket;

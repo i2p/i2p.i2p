@@ -1,7 +1,7 @@
 package net.i2p.client.streaming;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;

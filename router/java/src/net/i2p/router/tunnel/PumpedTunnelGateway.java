@@ -7,10 +7,8 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Router;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 
 /**
  * Serve as the gatekeeper for a tunnel, accepting messages, coallescing and/or

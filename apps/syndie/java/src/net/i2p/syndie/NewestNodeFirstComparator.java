@@ -1,7 +1,8 @@
 package net.i2p.syndie;
 
-import java.util.*;
-import net.i2p.data.*;
+import java.util.Comparator;
+
+import net.i2p.data.DataHelper;
 
 /** sort ThreadNodeImpl instances with the highest entryId first */
 public class NewestNodeFirstComparator implements Comparator {

@@ -5,11 +5,10 @@ import java.util.List;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
+import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.I2PThread;

@@ -6,12 +6,12 @@
 
 package net.i2p.aum.q;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 
-import net.i2p.*;
-import net.i2p.data.*;
-import net.i2p.util.*;
-import net.i2p.aum.*;
+import net.i2p.aum.PropertiesFile;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
 
 /**
  * Wrapper for a peer record file.

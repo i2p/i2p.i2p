@@ -1,19 +1,27 @@
 package org.klomp.snark;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
-import net.i2p.util.EepGet;
 import net.i2p.client.I2PSession;
-import net.i2p.data.*;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
+import net.i2p.data.Hash;
+import net.i2p.util.EepGet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * I2P specific helpers for I2PSnark

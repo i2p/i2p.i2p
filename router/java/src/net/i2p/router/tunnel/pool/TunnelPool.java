@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,11 +13,9 @@ import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.TunnelId;
-
-import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;

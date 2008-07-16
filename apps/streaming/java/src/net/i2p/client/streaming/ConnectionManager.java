@@ -9,12 +9,11 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Coordinate all of the connections for a single local destination.

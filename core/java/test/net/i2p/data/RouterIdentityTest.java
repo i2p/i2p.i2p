@@ -10,13 +10,6 @@ package net.i2p.data;
 
 import java.io.ByteArrayOutputStream;
 
-import net.i2p.data.Certificate;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
-import net.i2p.data.PublicKey;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.SigningPublicKey;
-
 /**
  * Test harness for loading / storing Hash objects
  *

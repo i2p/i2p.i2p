@@ -20,20 +20,16 @@
 
 package org.klomp.snark.bencode;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.EOFException;
-import java.io.UnsupportedEncodingException;
-
 import java.math.BigInteger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Decodes a bencoded stream to <code>BEValue</code>s.

@@ -21,11 +21,11 @@
 
 package addressbook;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.EepGet;

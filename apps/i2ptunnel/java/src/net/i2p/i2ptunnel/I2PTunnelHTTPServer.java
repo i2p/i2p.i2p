@@ -3,18 +3,17 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
-import java.util.zip.Deflater;
 
-import net.i2p.I2PAppContext;
-import net.i2p.I2PException;
-import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataHelper;
 import net.i2p.util.EventDispatcher;
