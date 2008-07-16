@@ -1,10 +1,22 @@
+2008-07-16 zzz
+    * configpeer.jsp: New
+    * i2psnark: Open completed files read-only the first time
+    * profiles.jsp: Show bonuses, link to configpeer.jsp
+    * PRNG: Move logging from wrapper to router log
+    * SSU:
+        Don't proactively reconnect until 30m idle, so
+        we don't lose introducer tags prematurely
+
+2008-07-16 Oldaris
+    * Imports cleanup
+
 2008-07-07 zzz
     * i2psnark:
       - Repair corrupted files with wrong length rather than die
       - Register shutdown hook to properly shutdown torrents when
         the router shuts down, hopefully will reduce corruption
       - Add Galen tracker
-      - Add a note about how to chane directory
+      - Add a note about how to change directory
     * HTTP Proxy: Don't show jump links for unknown jump hosts
     * KeyManager:
       - Don't write router key backup when leaseSet keys are updated

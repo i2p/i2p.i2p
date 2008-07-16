@@ -61,8 +61,11 @@ Distribute files to download locations and to www.i2p2.i2p
 Website files to change:
 	Sync with mtn.i2p2.i2p
 	announcements.html
+	announcements_de.html
 	download.html (change SHA1s)
+	download_de.html (change SHA1s)
 	index.html
+	index_de.html
 	hosts.txt (copy from mtn)
 	Sync with mtn.i2p2.i2p
 
