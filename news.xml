@@ -24,16 +24,6 @@ for an adversary to gather meaningful statistics for a predecessor attack.
 Improvements to applications like I2PSnark and the Router Console are also introduced.
 </p>
 
-<p>
-&#149;
-2008-04-20: <b><a href="http://trac.i2p2.i2p/">We are now using Trac as bugtracker</a></b>
-</p>
-
-<p>
-&#149;
-2008-02-05: <b><a href="http://www.i2p2.i2p/upgrade-0.6.1.30.html">Upgrading from 0.6.1.30 and Earlier Releases</a></b>
-</p>
-
 <!--
 &#149;
 2007-04-10:

@@ -1,3 +1,12 @@
+2008-07-30 zzz
+    * Blocklists:
+      - New, disabled by default, except for blocking of
+        forever-shitlisted peers. See source for instructions
+        and file format.
+    * Transport - Reject peers from inbound connections:
+      - Check IP against blocklist
+      - Check router hash against forever-shitlist, then block IP
+
 2008-07-16 zzz
     * configpeer.jsp: New
     * i2psnark: Open completed files read-only the first time

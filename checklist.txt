@@ -67,6 +67,7 @@ Website files to change:
 	index.html
 	index_de.html
 	hosts.txt (copy from mtn)
+        release-x.y.z.html (new)
 	Sync with mtn.i2p2.i2p
 
 Copy news.xml to subscription location

@@ -259,6 +259,7 @@ public class Router {
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
+        _context.blocklist().startup();
         
         // let the timestamper get us sync'ed
         long before = System.currentTimeMillis();
@@ -380,8 +381,8 @@ public class Router {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());
         bwLim = (int)(((float)bwLim) * getSharePercentage());
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         
         if (bwLim < 12) {
             ri.addCapability(CAPABILITY_BW12);

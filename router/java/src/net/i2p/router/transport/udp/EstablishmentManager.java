@@ -266,6 +266,11 @@ public class EstablishmentManager {
             
             state = (InboundEstablishState)_inboundStates.get(from);
             if (state == null) {
+                if (_context.blocklist().isBlocklisted(from.getIP())) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Receive session request from blocklisted IP: " + from);
+                    return; // drop the packet
+                }
                 state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
                 isNew = true;
@@ -793,7 +798,16 @@ public class EstablishmentManager {
                         sendCreated(inboundState);
                     break;
                 case InboundEstablishState.STATE_CONFIRMED_COMPLETELY:
-                    if (inboundState.getConfirmedIdentity() != null) {
+                    RouterIdentity remote = inboundState.getConfirmedIdentity();
+                    if (remote != null) {
+                        if (_context.shitlist().isShitlistedForever(remote.calculateHash())) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Dropping inbound connection from permanently shitlisted peer: " + remote.calculateHash().toBase64());
+                            // So next time we will not accept the con, rather than doing the whole handshake
+                            _context.blocklist().add(inboundState.getSentIP());
+                            inboundState.fail();
+                            break;
+                        }
                         handleCompletelyEstablished(inboundState);
                         break;
                     } else {

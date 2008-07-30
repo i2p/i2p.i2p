@@ -56,6 +56,7 @@ public class RouterContext extends I2PAppContext {
     private TunnelDispatcher _tunnelDispatcher;
     private StatisticsManager _statPublisher;
     private Shitlist _shitlist;
+    private Blocklist _blocklist;
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
@@ -126,6 +127,7 @@ public class RouterContext extends I2PAppContext {
         _tunnelDispatcher = new TunnelDispatcher(this);
         _statPublisher = new StatisticsManager(this);
         _shitlist = new Shitlist(this);
+        _blocklist = new Blocklist(this);
         _messageValidator = new MessageValidator(this);
         //_throttle = new RouterThrottleImpl(this);
         _throttle = new RouterDoSThrottle(this);
@@ -249,6 +251,7 @@ public class RouterContext extends I2PAppContext {
      * who does this peer hate?
      */
     public Shitlist shitlist() { return _shitlist; }
+    public Blocklist blocklist() { return _blocklist; }
     /**
      * The router keeps track of messages it receives to prevent duplicates, as
      * well as other criteria for "validity".

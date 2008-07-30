@@ -546,6 +546,15 @@ public class EstablishState {
             Signature sig = new Signature(s);
             _verified = _context.dsa().verifySignature(sig, toVerify, alice.getSigningPublicKey());
             if (_verified) {
+                if (_context.shitlist().isShitlistedForever(alice.calculateHash())) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Dropping inbound connection from permanently shitlisted peer: " + alice.calculateHash().toBase64());
+                    // So next time we will not accept the con from this IP,
+                    // rather than doing the whole handshake
+                    _context.blocklist().add(_con.getChannel().socket().getInetAddress().getAddress());
+                    fail("Peer is shitlisted forever: " + alice.calculateHash().toBase64());
+                    return;
+                }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix() + "verification successful for " + _con);
                                 

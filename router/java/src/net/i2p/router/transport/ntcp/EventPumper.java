@@ -383,6 +383,14 @@ public class EventPumper implements Runnable {
         try {
             SocketChannel chan = servChan.accept();
             chan.configureBlocking(false);
+            if (_context.blocklist().isBlocklisted(chan.socket().getInetAddress().getAddress())) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Receive session request from blocklisted IP: " + chan.socket().getInetAddress());
+                // need to add this stat first
+                // _context.statManager().addRateData("ntcp.connectBlocklisted", 1, 0);
+                try { chan.close(); } catch (IOException ioe) { }
+                return;
+            }
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
             NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
             if (_log.shouldLog(Log.DEBUG))
