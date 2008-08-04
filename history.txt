@@ -1,3 +1,8 @@
+2008-08-04 zzz
+    * Floodfill Peer Selector:
+      - Avoid peers whose netdb is old, or have a recent failed store,
+        or are forever-shitlisted
+
 2008-07-30 zzz
     * Blocklists:
       - New, disabled by default, except for blocking of

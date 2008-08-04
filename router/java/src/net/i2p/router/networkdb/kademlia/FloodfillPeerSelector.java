@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 class FloodfillPeerSelector extends PeerSelector {
@@ -78,6 +79,9 @@ class FloodfillPeerSelector extends PeerSelector {
             // it isn't direct, so who cares if they're shitlisted
             //if (_context.shitlist().isShitlisted(entry))
             //    return;
+            // ... unless they are really bad
+            if (_context.shitlist().isShitlistedForever(entry))
+                return;
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
             //if (info == null)
             //    return;
@@ -98,8 +102,35 @@ class FloodfillPeerSelector extends PeerSelector {
         public List get(int howMany) {
             Collections.shuffle(_floodfillMatches, _context.random());
             List rv = new ArrayList(howMany);
-            for (int i = 0; i < howMany && i < _floodfillMatches.size(); i++) {
-                rv.add(_floodfillMatches.get(i));
+            List badff = new ArrayList(howMany);
+            int found = 0;
+            long now = _context.clock().now();
+            // Only add in "good" floodfills here...
+            // Let's say published in last 3h and no failed sends in last 30m
+            // (Forever shitlisted ones are excluded in add() above)
+            for (int i = 0; found < howMany && i < _floodfillMatches.size(); i++) {
+                Hash entry = (Hash) _floodfillMatches.get(i);
+                RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
+                if (info != null && now - info.getPublished() > 3*60*60*1000) {
+                    badff.add(entry);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Skipping, published a while ago: " + entry);
+                } else {
+                    PeerProfile prof = _context.profileOrganizer().getProfile(entry);
+                    if (prof != null && now - prof.getLastSendFailed() < 30*60*1000) {
+                        badff.add(entry);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Skipping, recent failed send: " + entry);
+                    } else {
+                        rv.add(entry);
+                        found++;
+                    }
+                }
+            }
+            // Put the "bad" floodfills at the end of the floodfills but before the kademlias
+            for (int i = 0; found < howMany && i < badff.size(); i++) {
+                rv.add(badff.get(i));
+                found++;
             }
             for (int i = rv.size(); i < howMany; i++) {
                 if (_sorted.size() <= 0)
