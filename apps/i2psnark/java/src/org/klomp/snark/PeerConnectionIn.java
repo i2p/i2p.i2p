@@ -77,9 +77,12 @@ class PeerConnectionIn implements Runnable
         
             // Wait till we hear something...
             // The length of a complete message in bytes.
+            // The biggest is the piece message, for which the length is the
+            // request size (32K) plus 9. (we could also check if Storage.MAX_PIECES / 8
+            // in the bitfield message is bigger but it's currently 5000/8 = 625 so don't bother)
             int i = din.readInt();
             lastRcvd = System.currentTimeMillis();
-            if (i < 0)
+            if (i < 0 || i > PeerState.PARTSIZE + 9)
               throw new IOException("Unexpected length prefix: " + i);
 
             if (i == 0)
