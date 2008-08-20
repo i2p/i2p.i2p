@@ -383,6 +383,14 @@ public class EventPumper implements Runnable {
         try {
             SocketChannel chan = servChan.accept();
             chan.configureBlocking(false);
+
+            if (!_transport.allowConnection()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Receive session request but at connection limit: " + chan.socket().getInetAddress());
+                try { chan.close(); } catch (IOException ioe) { }
+                return;
+            }
+
             if (_context.blocklist().isBlocklisted(chan.socket().getInetAddress().getAddress())) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Receive session request from blocklisted IP: " + chan.socket().getInetAddress());
@@ -391,6 +399,7 @@ public class EventPumper implements Runnable {
                 try { chan.close(); } catch (IOException ioe) { }
                 return;
             }
+
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
             NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
             if (_log.shouldLog(Log.DEBUG))

@@ -275,6 +275,14 @@ public class Blocklist {
         byte[] ip2;
         int start1 = 0;
         int end1 = buf.length();
+        if (end1 <= 0)
+            return null;  // blank
+        if (buf.charAt(end1 - 1) == '\r') {  // DataHelper.readLine leaves the \r on there
+            buf.deleteCharAt(end1 - 1);
+            end1--;
+        }
+        if (end1 <= 0)
+            return null;  // blank
         int start2 = -1;
         int mask = -1;
         String comment = null;
@@ -302,6 +310,8 @@ public class Blocklist {
                 mask = index + 1;
             }
         }
+        if (end1 - start1 <= 0)
+            return null;  // blank
         try {
             InetAddress pi = InetAddress.getByName(buf.substring(start1, end1));
             if (pi == null) return null;

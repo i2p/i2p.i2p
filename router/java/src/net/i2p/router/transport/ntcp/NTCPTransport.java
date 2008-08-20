@@ -286,6 +286,12 @@ public class NTCPTransport extends TransportImpl {
             }
         }
         
+        if (!allowConnection()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + ", max connection limit reached");
+            return null;
+        }
+
         //if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
         //    return null; // dont talk to yourself
     
@@ -294,6 +300,19 @@ public class NTCPTransport extends TransportImpl {
         return _slowBid;
     }
     
+    private static final int DEFAULT_MAX_CONNECTIONS = 500;
+    public boolean allowConnection() {
+        int max = DEFAULT_MAX_CONNECTIONS;
+        String mc = _context.getProperty("i2np.ntcp.maxConnections");
+        if (mc != null) {
+            try {
+                  max = Integer.parseInt(mc);
+            } catch (NumberFormatException nfe) {}
+        }
+        return countActivePeers() < max;
+    }
+
+
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
     /** async afterSend call, which can take some time w/ jobs, etc */
     private class SendFinisher implements SimpleTimer.TimedEvent {
