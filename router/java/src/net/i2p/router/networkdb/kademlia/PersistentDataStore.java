@@ -126,7 +126,7 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     /*
-     * Queue up writes, write up to 300 files every 10 minutes
+     * Queue up writes, write up to 600 files every 10 minutes
      */
     private class Writer implements Runnable {
         private Map _keys;
@@ -171,7 +171,7 @@ class PersistentDataStore extends TransientDataStore {
                     write(key, data);
                 key = null;
                 data = null;
-                if (count >= 300)
+                if (count >= 600)
                     count = 0;
                 if (count == 0)
                     try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}

@@ -2,6 +2,8 @@
     * Blocklists: Handle blank lines and \r\n in blocklist.txt
     * NTCP: Add connection limit, set by i2np.ntcp.maxConnections,
       default is 500 (very high for now)
+    * Persistent data store: Increase write limit from 300 to 600
+      so floodfill routers don't get backed up
 
 2008-08-13 zzz
     * i2psnark: Fix OOM vulnerability by checking incoming message length
