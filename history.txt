@@ -1,3 +1,8 @@
+* 2008-08-24  0.6.3 released
+
+2008-08-24 Complication
+    * Update versions, package release
+
 2008-08-20 zzz
     * Blocklists: Handle blank lines and \r\n in blocklist.txt
     * NTCP: Add connection limit, set by i2np.ntcp.maxConnections,
