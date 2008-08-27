@@ -203,6 +203,15 @@ public class TransportManager implements TransportEventListener {
         return false;
     }    
     
+    public boolean isEstablished(Hash dest) {
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            if (t.isEstablished(dest))
+                return true;
+        }
+        return false;
+    }    
+    
     /**
      * Was the peer UNreachable (outbound only) on any transport,
      * based on the last time we tried it for each transport?

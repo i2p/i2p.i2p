@@ -1266,6 +1266,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
+    public boolean isEstablished(Hash dest) {
+        return getPeerState(dest) != null;
+    }
+
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.

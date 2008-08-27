@@ -50,4 +50,5 @@ public interface Transport {
     public boolean wasUnreachable(Hash dest);
     
     public boolean isUnreachable(Hash peer);
+    public boolean isEstablished(Hash peer);
 }

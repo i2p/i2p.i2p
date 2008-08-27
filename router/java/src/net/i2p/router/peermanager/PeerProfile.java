@@ -94,12 +94,15 @@ public class PeerProfile {
     /**
      * Is this peer active at the moment (sending/receiving messages within the 
      * given period?)
+     * Also mark active if it is connected, as this will tend to encourage use
+     * of already-connected peers.
      */
     public boolean getIsActive(long period) {
         if ( (getSendSuccessSize().getRate(period).getCurrentEventCount() > 0) ||
              (getSendSuccessSize().getRate(period).getLastEventCount() > 0) ||
              (getReceiveSize().getRate(period).getCurrentEventCount() > 0) ||
-             (getReceiveSize().getRate(period).getLastEventCount() > 0) )
+             (getReceiveSize().getRate(period).getLastEventCount() > 0) ||
+             _context.commSystem().isEstablished(_peer) )
             return true;
         else
             return false;

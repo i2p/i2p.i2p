@@ -56,6 +56,7 @@ public abstract class CommSystemFacade implements Service {
     public void recheckReachability() {}
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean wasUnreachable(Hash dest) { return false; }
+    public boolean isEstablished(Hash dest) { return false; }
     
     /** 
      * Tell other transports our address changed

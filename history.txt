@@ -1,3 +1,13 @@
+2008-08-27 zzz
+    * Floodfill Peer Selector: Prefer already-connected floodfill
+      peer for direct RouterInfo stores, to mimimize floodfill
+      connections
+    * Peer Profiles: Classify connected peers as "active",
+      which will help improve the fast pool
+    * Transport Manager: Add isEstablished(Hash)
+    * NTCP: Reduce max idle time from 20m to 15m
+    * NetDb stats: Post-0.6.3 clean up
+
 * 2008-08-24  0.6.3 released
 
 2008-08-24 Complication

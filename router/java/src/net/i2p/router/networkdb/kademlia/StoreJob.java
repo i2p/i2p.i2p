@@ -141,7 +141,16 @@ class StoreJob extends JobImpl {
         if (toCheck > getParallelization())
             toCheck = getParallelization();
 
-        List closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        // We are going to send the RouterInfo directly, rather than through a lease,
+        // so select a floodfill peer we are already connected to.
+        // This will help minimize active connections for floodfill peers and allow
+        // the network to scale.
+        // Perhaps the ultimate solution is to send RouterInfos through a lease also.
+        List closestHashes;
+        if (_state.getData() instanceof RouterInfo) 
+            closestHashes = getMostReliableRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        else
+            closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
         if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
             if (_state.getPending().size() <= 0) {
                 if (_log.shouldLog(Log.INFO))
@@ -214,6 +223,13 @@ class StoreJob extends JobImpl {
         KBucketSet ks = _facade.getKBuckets();
         if (ks == null) return new ArrayList();
         return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, ks);
+    }
+
+    private List getMostReliableRouters(Hash key, int numClosest, Set alreadyChecked) {
+        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
+        KBucketSet ks = _facade.getKBuckets();
+        if (ks == null) return new ArrayList();
+        return _peerSelector.selectMostReliablePeers(rkey, numClosest, alreadyChecked, ks);
     }
 
     /**

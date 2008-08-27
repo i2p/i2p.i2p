@@ -31,14 +31,22 @@ class FloodfillPeerSelector extends PeerSelector {
      *
      * @return List of Hash for the peers selected
      */
+    public List selectMostReliablePeers(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+        return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, true);
+    }
+
     public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+        return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, false);
+    }
+
+    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
         peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
         if (kbuckets == null) return new ArrayList();
         kbuckets.getAll(matches);
-        List rv = matches.get(maxNumRouters);
+        List rv = matches.get(maxNumRouters, preferConnected);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " 
                        + rv + " (not including " + peersToIgnore + ") [allHashes.size = " 
@@ -100,9 +108,14 @@ class FloodfillPeerSelector extends PeerSelector {
         }
         /** get the first $howMany entries matching */
         public List get(int howMany) {
+            return get(howMany, false);
+        }
+
+        public List get(int howMany, boolean preferConnected) {
             Collections.shuffle(_floodfillMatches, _context.random());
             List rv = new ArrayList(howMany);
             List badff = new ArrayList(howMany);
+            List unconnectedff = new ArrayList(howMany);
             int found = 0;
             long now = _context.clock().now();
             // Only add in "good" floodfills here...
@@ -121,11 +134,20 @@ class FloodfillPeerSelector extends PeerSelector {
                         badff.add(entry);
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Skipping, recent failed send: " + entry);
+                    } else if (preferConnected && !_context.commSystem().isEstablished(entry)) {
+                        unconnectedff.add(entry);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Skipping, unconnected: " + entry);
                     } else {
                         rv.add(entry);
                         found++;
                     }
                 }
+            }
+            // Put the unconnected floodfills after the connected floodfills
+            for (int i = 0; found < howMany && i < unconnectedff.size(); i++) {
+                rv.add(unconnectedff.get(i));
+                found++;
             }
             // Put the "bad" floodfills at the end of the floodfills but before the kademlias
             for (int i = 0; found < howMany && i < badff.size(); i++) {

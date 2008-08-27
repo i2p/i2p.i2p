@@ -336,8 +336,12 @@ public class NTCPTransport extends TransportImpl {
     }
 
     private boolean isEstablished(RouterIdentity peer) {
+        return isEstablished(peer.calculateHash());
+    }
+    
+    public boolean isEstablished(Hash dest) {
         synchronized (_conLock) {
-            NTCPConnection con = (NTCPConnection)_conByIdent.get(peer.calculateHash());
+            NTCPConnection con = (NTCPConnection)_conByIdent.get(dest);
             return (con != null) && con.isEstablished() && !con.isClosed();
         }
     }
