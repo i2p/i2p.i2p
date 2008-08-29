@@ -89,6 +89,7 @@ public class TunnelPool {
         _alive = false;
         _lastSelectionPeriod = 0;
         _lastSelected = null;
+        _context.statManager().removeRateStat(_rateName);
     }
 
     TunnelPoolManager getManager() { return _manager; }

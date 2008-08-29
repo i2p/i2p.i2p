@@ -112,6 +112,13 @@ public class StatManager {
         }
     }
 
+    // Hope this doesn't cause any problems with unsynchronized accesses like addRateData() ...
+    public void removeRateStat(String name) {
+        synchronized (_rateStats) {
+            _rateStats.remove(name);
+        }
+    }
+
     /** update the given frequency statistic, taking note that an event occurred (and recalculating all frequencies) */
     public void updateFrequency(String name) {
         FrequencyStat freq = (FrequencyStat) _frequencyStats.get(name);
