@@ -67,12 +67,6 @@ class BuildExecutor implements Runnable {
     }
     
     private int allowed() {
-        StringBuffer buf = null;
-        if (_log.shouldLog(Log.DEBUG)) {
-            buf = new StringBuffer(128);
-            buf.append("Allowed: ");
-        }
-
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
         if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
@@ -99,38 +93,35 @@ class BuildExecutor implements Runnable {
             }
             concurrent = _currentlyBuilding.size();
             allowed -= concurrent;
-            if (buf != null)
-                buf.append(allowed).append(" ").append(_currentlyBuilding.toString());
         }
         
         if (expired != null) {
             for (int i = 0; i < expired.size(); i++) {
                 PooledTunnelCreatorConfig cfg = (PooledTunnelCreatorConfig)expired.get(i);
-                // note the fact that this tunnel request timed out in the peers' profiles.
-                // or... not.
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Timed out waiting for reply asking for " + cfg);
 
                 // Iterate through peers in the tunnel, get their bandwidth tiers,
                 // record for each that a peer of the given tier expired
+                // Also note the fact that this tunnel request timed out in the peers' profiles.
                 for (int iPeer = 0; iPeer < cfg.getLength(); iPeer++) {
                     // Look up peer
                     Hash peer = cfg.getPeer(iPeer);
                     // Avoid recording ourselves
-                    if (peer.toBase64().equals(_context.routerHash().toBase64())) {
-                        if (_log.shouldLog(Log.DEBUG)) _log.debug("Not recording our own expiry in stats.");
+                    if (peer.toBase64().equals(_context.routerHash().toBase64()))
                         continue;
-                    }
                     // Look up routerInfo
                     RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
                     // Default and detect bandwidth tier
                     String bwTier = "Unknown";
                     if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized
-                        else if (_log.shouldLog(Log.WARN)) _log.warn("Failed detecting bwTier, null routerInfo for: " + peer);
                     // Record that a peer of the given tier expired
                     _context.statManager().addRateData("tunnel.tierExpire" + bwTier, 1, 0);
+                    didNotReply(cfg.getReplyMessageId(), peer);
+                    // Blame everybody since we don't know whose fault it is.
+                    // (it could be our exploratory tunnel's fault too...)
+                    _context.profileManager().tunnelTimedOut(peer);
                 }
-
 
                 TunnelPool pool = cfg.getTunnelPool();
                 if (pool != null)
@@ -139,13 +130,8 @@ class BuildExecutor implements Runnable {
                     _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1, 0);
                 else
                     _context.statManager().addRateData("tunnel.buildClientExpire", 1, 0);
-                for (int j = 0; j < cfg.getLength(); j++)
-                    didNotReply(cfg.getReplyMessageId(), cfg.getPeer(j));
             }
         }
-        
-        //if (buf != null)
-        //    _log.debug(buf.toString());
         
         _context.statManager().addRateData("tunnel.concurrentBuilds", concurrent, 0);
         
@@ -167,7 +153,7 @@ class BuildExecutor implements Runnable {
 
 
     // Estimated cost of tunnel build attempt, bytes
-    private static final int BUILD_BANDWIDTH_ESTIMATE_BYTES = 5*1024;
+    // private static final int BUILD_BANDWIDTH_ESTIMATE_BYTES = 5*1024;
 
     /**
      * Don't even try to build tunnels if we're saturated

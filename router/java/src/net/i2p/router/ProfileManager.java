@@ -55,6 +55,13 @@ public interface ProfileManager {
     void tunnelRejected(Hash peer, long responseTimeMs, int severity);
     
     /**
+     * Note that a router timed out joining a tunnel
+     * 
+     * @param peer who rejected us
+     */
+    void tunnelTimedOut(Hash peer);
+    
+    /**
      * Note that a tunnel that the router is participating in
      * was successfully tested with the given round trip latency
      *

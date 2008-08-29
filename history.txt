@@ -1,3 +1,10 @@
+2008-08-29 zzz
+    * Tunnel BuildExecutor: Debug cleanup
+    * Profiles: Penalize capacity when tunnel build request times out
+    * Shutdown: Call the shutdown hooks before the router shutdown
+      rather than after
+    * Stats: Remove tunnel.Bps.* stats when the tunnel pool is closed
+
 2008-08-27 zzz
     * Floodfill Peer Selector: Prefer already-connected floodfill
       peer for direct RouterInfo stores, to mimimize floodfill

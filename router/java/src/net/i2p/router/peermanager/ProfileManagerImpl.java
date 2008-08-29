@@ -104,6 +104,18 @@ public class ProfileManagerImpl implements ProfileManager {
     }
     
     /**
+     * Note that a router did not respond to a tunnel join. 
+     *
+     * Since TunnelHistory doesn't have a timeout stat, pretend we were
+     * rejected for bandwidth reasons.
+     */
+    public void tunnelTimedOut(Hash peer) {
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.getTunnelHistory().incrementRejected(TunnelHistory.TUNNEL_REJECT_BANDWIDTH);
+    }
+    
+    /**
      * Note that a tunnel that the router is participating in
      * was successfully tested with the given round trip latency
      *
