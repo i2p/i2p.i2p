@@ -796,6 +796,16 @@ public class Router {
         _isAlive = false;
         _context.random().saveSeed();
         I2PThread.removeOOMEventListener(_oomListener);
+        // Run the shutdown hooks first in case they want to send some goodbye messages
+        // Maybe we need a delay after this too?
+        try {
+            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
+                Runnable task = (Runnable)iter.next();
+                task.run();
+            }
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Error running shutdown task", t);
+        }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
         //try { _context.adminManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the admin manager", t); }        
         try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
@@ -811,14 +821,6 @@ public class Router {
         try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         RouterContext.listContexts().remove(_context);
         dumpStats();
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
-                task.run();
-            }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
-        }
         finalShutdown(exitCode);
     }
 
