@@ -31,7 +31,7 @@ class RouterThrottleImpl implements RouterThrottle {
     private static int THROTTLE_EVENT_LIMIT = 30;
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final String DEFAULT_MAX_TUNNELS = "3000";  // Unless share BW > 300KBps, BW limit will kick in first
+    private static final String DEFAULT_MAX_TUNNELS = "2500";  // Unless share BW > 250KBps, BW limit will kick in first
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
 
     /** tunnel acceptance */
@@ -213,8 +213,9 @@ class RouterThrottleImpl implements RouterThrottle {
         if (rs != null) {
             r = rs.getRate(10*60*1000);
             if (r != null) {
-                if (r.getLastEventCount() > 0)
-                    messagesPerTunnel = r.getAverageValue();
+                long count = r.getLastEventCount() + r.getCurrentEventCount();
+                if (count > 0)
+                    messagesPerTunnel = (r.getLastTotalValue() + r.getCurrentTotalValue()) / count;
                 else
                     messagesPerTunnel = r.getLifetimeAverageValue();
             }
