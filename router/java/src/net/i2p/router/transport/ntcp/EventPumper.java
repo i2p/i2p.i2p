@@ -422,15 +422,19 @@ public class EventPumper implements Runnable {
                 _context.statManager().addRateData("ntcp.connectSuccessful", 1, 0);
             } else {
                 con.close();
+                _transport.markUnreachable(con.getRemotePeer().calculateHash());
                 _context.statManager().addRateData("ntcp.connectFailedTimeout", 1, 0);
             }
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Error processing connection", ioe);
+        } catch (IOException ioe) {   // this is the usual failure path for a timeout or connect refused
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Failed outbound connection to " + con.getRemotePeer().calculateHash(), ioe);
             con.close();
+            //_context.shitlist().shitlistRouter(con.getRemotePeer().calculateHash(), "Error connecting", NTCPTransport.STYLE);
+            _transport.markUnreachable(con.getRemotePeer().calculateHash());
             _context.statManager().addRateData("ntcp.connectFailedTimeoutIOE", 1, 0);
         } catch (NoConnectionPendingException ncpe) {
-	    // ignore
-	}
+            // ignore
+        }
     }
     
     private void processRead(SelectionKey key) {
