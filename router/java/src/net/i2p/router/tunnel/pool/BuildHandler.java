@@ -251,9 +251,6 @@ class BuildHandler {
                     return;
                 }
                 int howBad = statuses[record];
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
-                
                 // If this tunnel member isn't ourselves
                 if (!peer.toBase64().equals(_context.routerHash().toBase64())) {
                     // Look up routerInfo
@@ -268,6 +265,8 @@ class BuildHandler {
                     } else {
                         _context.statManager().addRateData("tunnel.tierReject" + bwTier, 1, 0);
                     }
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
                 }
 
                 if (howBad == 0) {
@@ -430,6 +429,7 @@ class BuildHandler {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Request " + _state.msg.getUniqueId() 
                           + " could no be satisfied, as the next peer could not be found: " + _nextPeer.toBase64());
+            // ???  should we blame the peer here?   getContext().profileManager().tunnelTimedOut(_nextPeer);
             getContext().messageHistory().tunnelRejected(_state.fromHash, new TunnelId(_req.readReceiveTunnelId()), _nextPeer, 
                                                          "rejected because we couldn't find " + _nextPeer.toBase64() + ": " +
                                                          _state.msg.getUniqueId() + "/" + _req.readNextTunnelId());
