@@ -47,6 +47,7 @@ public class Shitlist {
     
     public final static long SHITLIST_DURATION_MS = 40*60*1000; // 40 minute shitlist
     public final static long SHITLIST_DURATION_MAX = 60*60*1000;
+    public final static long SHITLIST_DURATION_PARTIAL = 20*60*1000;
     public final static long SHITLIST_DURATION_FOREVER = 181l*24*60*60*1000; // will get rounded down to 180d on console
     
     public Shitlist(RouterContext context) {
@@ -101,7 +102,7 @@ public class Shitlist {
     }
     public boolean shitlistRouter(Hash peer, String reason) { return shitlistRouter(peer, reason, null); }
     public boolean shitlistRouter(Hash peer, String reason, String transport) {
-        return shitlistRouter(peer, reason, null, false);
+        return shitlistRouter(peer, reason, transport, false);
     }
     public boolean shitlistRouterForever(Hash peer, String reason) {
         return shitlistRouter(peer, reason, null, true);
@@ -117,11 +118,14 @@ public class Shitlist {
         }
         boolean wasAlready = false;
         if (_log.shouldLog(Log.INFO))
-            _log.info("Shitlisting router " + peer.toBase64(), new Exception("Shitlist cause: " + reason));
+            _log.info("Shitlisting router " + peer.toBase64() +
+               ((transport != null) ? " on transport " + transport : ""), new Exception("Shitlist cause: " + reason));
         
         Entry e = new Entry();
         if (forever) {
             e.expireOn = _context.clock().now() + SHITLIST_DURATION_FOREVER;
+        else if (transport != null) {
+            e.expireOn = _context.clock().now() + SHITLIST_DURATION_PARTIAL;
         } else {
             long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
             PeerProfile prof = _context.profileOrganizer().getProfile(peer);
@@ -153,8 +157,10 @@ public class Shitlist {
                 if (e.transports != null) {
                     if (old.transports != null)
                         e.transports.addAll(old.transports);
-                    else   
+                    else {
                         e.transports = null;
+                        e.cause = reason;
+                    }
                 }
             }
             _entries.put(peer, e);
@@ -270,21 +276,16 @@ public class Shitlist {
         }
         buf.append("<ul>");
         
-        int partial = 0;
         for (Iterator iter = entries.keySet().iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
             Entry entry = (Entry)entries.get(key);
-            if ( (entry.transports != null) && (entry.transports.size() > 0) ) {
-                partial++;
-                continue;
-            }
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
             buf.append(" (<a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
             buf.append(" expiring in ");
             buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
             Set transports = entry.transports;
             if ( (transports != null) && (transports.size() > 0) )
-                buf.append(" on the following transports: ").append(transports);
+                buf.append(" on the following transport: ").append(transports);
             if (entry.cause != null) {
                 buf.append("<br />\n");
                 buf.append(entry.cause);
@@ -293,11 +294,6 @@ public class Shitlist {
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
-        if (partial > 0) {
-            buf.append("<i>Partial shitlisted peers (only blocked on some transports): ");
-            buf.append(partial);
-            buf.append("</i>\n");
-        }
         out.write(buf.toString());
         out.flush();
     }
