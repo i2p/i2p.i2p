@@ -124,7 +124,7 @@ public class Shitlist {
         Entry e = new Entry();
         if (forever) {
             e.expireOn = _context.clock().now() + SHITLIST_DURATION_FOREVER;
-        else if (transport != null) {
+        } else if (transport != null) {
             e.expireOn = _context.clock().now() + SHITLIST_DURATION_PARTIAL;
         } else {
             long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
