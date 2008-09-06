@@ -1,3 +1,14 @@
+2008-09-06 zzz
+    * EepGet command line: Fix byte counts after a failed resume
+    * NTCP: Mark unreachable on outbound connection timeout
+    * Shitlist: Fix partial shitlisting (still unused though)
+    * Summary Bar: Warn if firewalled and floodfill
+    * Throttle: Combine current and last bw measurement,
+      reduce default max tunnels to 2500 (was 3000)
+    * Tunnel BuildHandler: Logging cleanup
+    * UpdateHandler: Cleanup, clarify failure message
+    * DataHelper: Prepare for 999 day uptime :)
+
 2008-08-29 zzz
     * Tunnel BuildExecutor: Debug cleanup
     * Profiles: Penalize capacity when tunnel build request times out

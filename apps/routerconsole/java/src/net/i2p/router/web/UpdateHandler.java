@@ -121,7 +121,6 @@ public class UpdateHandler {
             try {
                 proxyPort = Integer.parseInt(port);
             } catch (NumberFormatException nfe) {
-                System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
                 return;
             }
             try {
@@ -135,7 +134,6 @@ public class UpdateHandler {
                 get.fetch();
             } catch (Throwable t) {
                 _context.logManager().getLog(UpdateHandler.class).error("Error updating", t);
-                System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             }
         }
         
@@ -176,15 +174,14 @@ public class UpdateHandler {
                 err = err + " from " + url;
                 _log.log(Log.CRIT, err);
                 _status = "<b>" + err + "</b>";
-                System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             }
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
-            _log.log(Log.CRIT, "Update from " + url + " did not download completely (" + bytesTransferred + " with " 
-                               + bytesRemaining + " after " + currentAttempt + " tries)");
+            // don't display bytesTransferred as it is meaningless
+            _log.log(Log.CRIT, "Update from " + url + " did not download completely (" +
+                               bytesRemaining + " remaining after " + currentAttempt + " tries)");
 
             _status = "<b>Transfer failed</b>";
-            System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
         }
         public void headerReceived(String url, int attemptNum, String key, String val) {}
         public void attempting(String url) {}

@@ -214,12 +214,17 @@ public class EepGet {
     public static interface StatusListener {
         /**
          *  alreadyTransferred - total of all attempts, not including currentWrite
-         *                       If nonzero on the first call, a partial file of that length was found
+         *                       If nonzero on the first call, a partial file of that length was found,
+         *                       _and_ the server supports resume.
+         *                       If zero on a subsequent call after some bytes are transferred
+         *                       (and presumably after an attemptFailed), the server does _not_
+         *                       support resume and we had to start over.
          *                       To track _actual_ transfer if the output file could already exist,
          *                       the listener should keep its own counter,
          *                       or subtract the initial alreadyTransferred value.
+         *                       And watch out for alreadyTransferred resetting if a resume failed...
          *  currentWrite - since last call to the listener
-         *  bytesTransferred - includes headers, retries, redirects, ...
+         *  bytesTransferred - includes headers, retries, redirects, discarded partial downloads, ...
          *  bytesRemaining - on this attempt only, currentWrite already subtracted -
          *                   or -1 if chunked encoding or server does not return a length
          *
@@ -239,6 +244,7 @@ public class EepGet {
         private long _startedOn;
         private long _written;
         private long _previousWritten;
+        private long _discarded;
         private long _lastComplete;
         private boolean _firstTime;
         private DecimalFormat _pct = new DecimalFormat("00.0%");
@@ -251,6 +257,7 @@ public class EepGet {
             _lineSize = lineSize;
             _written = 0;
             _previousWritten = 0;
+            _discarded = 0;
             _lastComplete = _context.clock().now();
             _startedOn = _lastComplete;
             _firstTime = true;
@@ -262,6 +269,12 @@ public class EepGet {
                     System.out.println("File found with length " + alreadyTransferred + ", resuming");
                 }
                 _firstTime = false;
+            }
+            if (_written == 0 && alreadyTransferred == 0 && _previousWritten > 0) {
+                // boo
+                System.out.println("Server does not support resume, discarding " + _previousWritten + " bytes");
+                _discarded += _previousWritten;
+                _previousWritten = 0;
             }
             for (int i = 0; i < currentWrite; i++) {
                 _written++;
@@ -318,10 +331,12 @@ public class EepGet {
             } else {
                 if ( bytesRemaining > 0 ) {
                     System.out.println("== Transfer of " + url + " completed with " + transferred
-                            + " transferred and " + (bytesRemaining - bytesTransferred) + " remaining");
+                            + " transferred and " + (bytesRemaining - bytesTransferred) + " remaining" +
+                            (_discarded > 0 ? (" and " + _discarded + " bytes discarded") : ""));
                 } else {
                     System.out.println("== Transfer of " + url + " completed with " + transferred
-                            + " bytes transferred");
+                            + " bytes transferred" +
+                            (_discarded > 0 ? (" and " + _discarded + " bytes discarded") : ""));
                 }
                 if (transferred > 0)
                     System.out.println("== Output saved to " + outputFile + " (" + alreadyTransferred + " bytes)");
@@ -616,6 +631,8 @@ public class EepGet {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("rc: " + responseCode + " for " + _actualURL);
+        if(_transferFailed)
+            _log.error("Already failed for " + _actualURL);
         boolean rcOk = false;
         switch (responseCode) {
             case 200: // full
