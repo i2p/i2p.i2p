@@ -16,6 +16,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -131,10 +132,11 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
                     return "WARN-Firewalled with Inbound TCP Enabled";
-                else if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
+                if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
+                    return "WARN-Firewalled and Floodfill";
+                if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                     return "WARN-Firewalled and Fast";
-                else
-                    return "Firewalled";
+                return "Firewalled";
             case CommSystemFacade.STATUS_HOSED:
                 return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
