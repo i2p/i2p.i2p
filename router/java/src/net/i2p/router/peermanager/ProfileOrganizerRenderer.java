@@ -163,7 +163,7 @@ class ProfileOrganizerRenderer {
             buf.append("&nbsp</td>");
             //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
-            buf.append("<td nowrap><a href=\"netdb.jsp#").append(peer.toBase64().substring(0,6)).append("\">netDb</a>");
+            buf.append("<td nowrap><a href=\"netdb.jsp?r=").append(peer.toBase64().substring(0,6)).append("\">netDb</a>");
             buf.append("/<a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
             buf.append("/<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");

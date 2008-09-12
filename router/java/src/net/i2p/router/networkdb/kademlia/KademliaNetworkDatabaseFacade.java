@@ -130,6 +130,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
         context.statManager().createRateStat("netDb.lookupLeaseSetDeferred", "how many lookups are deferred for a single leaseSet lookup?", "NetworkDatabase", new long[] { 60*1000, 5*60*1000 });
+        context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 10*60*1000 });
     }
     
     protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
@@ -203,12 +204,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_initialized) return;
         synchronized (_exploreKeys) {
             _exploreKeys.removeAll(toRemove);
+            _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
         }
     }
     public void queueForExploration(Set keys) {
         if (!_initialized) return;
         synchronized (_exploreKeys) {
             _exploreKeys.addAll(keys);
+            _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
         }
     }
     
@@ -297,7 +300,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // fire off a group of searches from the explore pool
             _context.jobQueue().addJob(_exploreJob);
             // if configured to do so, periodically try to get newer routerInfo stats
-            if (_harvestJob == null)
+            if (_harvestJob == null && "true".equals(_context.getProperty(HarvesterJob.PROP_ENABLED)))
                 _harvestJob = new HarvesterJob(_context, this);
             _context.jobQueue().addJob(_harvestJob);
         } else {
@@ -943,9 +946,32 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
 
+    public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
+        StringBuffer buf = new StringBuffer(4*1024);
+        buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
+        if (".".equals(routerPrefix)) {
+            renderRouterInfo(buf, _context.router().getRouterInfo(), true);
+        } else {
+            boolean notFound = true;
+            Set routers = getRouters();
+            for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
+                RouterInfo ri = (RouterInfo)iter.next();
+                Hash key = ri.getIdentity().getHash();
+                if (key.toBase64().startsWith(routerPrefix)) {
+                    renderRouterInfo(buf, ri, false);
+                    notFound = false;
+                }
+            }
+            if (notFound)
+                buf.append("Router ").append(routerPrefix).append(" not found in network database");
+        }
+        out.write(buf.toString());
+        out.flush();
+    }
+
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(10*1024);
-        buf.append("<h2>Kademlia Network DB Contents</h2>\n");
+        StringBuffer buf = new StringBuffer(getKnownRouters() * 2048);
+        buf.append("<h2>Network Database Contents</h2>\n");
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
             out.write(buf.toString());

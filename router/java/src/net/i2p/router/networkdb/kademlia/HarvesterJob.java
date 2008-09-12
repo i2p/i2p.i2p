@@ -41,7 +41,7 @@ class HarvesterJob extends JobImpl {
     /** background job, who cares */
     private static final int PRIORITY = 100;
     
-    private static final String PROP_ENABLED = "netDb.shouldHarvest";
+    public static final String PROP_ENABLED = "netDb.shouldHarvest";
 
     private boolean harvestDirectly() { 
         return Boolean.valueOf(getContext().getProperty("netDb.harvestDirectly", "false")).booleanValue();

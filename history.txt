@@ -1,3 +1,18 @@
+2008-09-11 zzz
+    * Blocklist: Fix a log message format
+    * HarvesterJob: Don't instantiate if disabled
+    * i2psnark:
+      - Add config i2psnark.linkPrefix to enable access to completed
+        torrents from a different machine - examples:
+           i2psnark.linkPrefix=file://///localserver/path/to/files/
+           i2psnark.linkPrefix=http://localwebserver/path/
+        (Stop i2psnark, add to i2psnark.config, restart)
+      - Remove Galen and NickyB trackers
+    * NetDb: Add netDb.exploreKeySet stat
+    * netdb.jsp: Add parameter ?r=xxxxxx to view a single routerinfo,
+      and ?r=. to view our own; change links on other pages too
+    * Transport: Make 0.0.0.0/8 and 169.254.0.0/16 private
+
 2008-09-06 zzz
     * EepGet command line: Fix byte counts after a failed resume
     * NTCP: Mark unreachable on outbound connection timeout

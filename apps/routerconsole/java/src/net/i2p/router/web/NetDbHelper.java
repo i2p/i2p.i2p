@@ -10,6 +10,8 @@ import net.i2p.router.RouterContext;
 public class NetDbHelper {
     private RouterContext _context;
     private Writer _out;
+    private String _routerPrefix;
+
     /**
      * Configure this bean to query a particular router context
      *
@@ -27,15 +29,22 @@ public class NetDbHelper {
     public NetDbHelper() {}
     
     public void setWriter(Writer writer) { _out = writer; }
+    public void setRouter(String r) { _routerPrefix = r; }
     
     public String getNetDbSummary() {
         try {
             if (_out != null) {
-                _context.netDb().renderStatusHTML(_out);
+                if (_routerPrefix != null)
+                    _context.netDb().renderRouterInfoHTML(_out, _routerPrefix);
+                else
+                    _context.netDb().renderStatusHTML(_out);
                 return "";
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
-                _context.netDb().renderStatusHTML(new OutputStreamWriter(baos));
+                if (_routerPrefix != null)
+                    _context.netDb().renderRouterInfoHTML(new OutputStreamWriter(baos), _routerPrefix);
+                else
+                    _context.netDb().renderStatusHTML(new OutputStreamWriter(baos));
                 return new String(baos.toByteArray());
             }
         } catch (IOException ioe) {

@@ -280,7 +280,7 @@ public class Shitlist {
             Hash key = (Hash)iter.next();
             Entry entry = (Entry)entries.get(key);
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
-            buf.append(" (<a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
+            buf.append(" (<a href=\"netdb.jsp?r=").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
             buf.append(" expiring in ");
             buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
             Set transports = entry.transports;

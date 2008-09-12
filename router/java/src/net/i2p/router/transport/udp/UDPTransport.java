@@ -1687,7 +1687,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             String name = peer.getRemotePeer().toBase64().substring(0,6);
             buf.append("<td valign=\"top\" nowrap=\"nowrap\"><code>");
-            buf.append("<a href=\"netdb.jsp#");
+            buf.append("<a href=\"netdb.jsp?r=");
             buf.append(name);
             buf.append("\">");
             buf.append(name);

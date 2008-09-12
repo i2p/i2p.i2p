@@ -600,7 +600,7 @@ public class NTCPTransport extends TransportImpl {
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
             String name = con.getRemotePeer().calculateHash().toBase64().substring(0,6);
-            buf.append("<tr><td><code><a href=\"netdb.jsp#").append(name).append("\">").append(name);
+            buf.append("<tr><td><code><a href=\"netdb.jsp?r=").append(name).append("\">").append(name);
             buf.append("</code></td><td align=\"center\"><code>");
             if (con.isInbound())
                 buf.append("in");
