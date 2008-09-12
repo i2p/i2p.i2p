@@ -154,8 +154,8 @@ public abstract class TransportImpl implements Transport {
         if (msToSend > 1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("afterSend slow: [success=" + sendSuccessful + "] " + msg.getMessageSize() + "byte " 
-                          + msg.getMessageType() + " " + msg.getMessageId() + " from " 
-                          + _context.routerHash().toBase64().substring(0,6) + " took " + msToSend 
+                          + msg.getMessageType() + " " + msg.getMessageId() + " to " 
+                          + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + " took " + msToSend 
                           + "/" + msg.getTransmissionTime());
         }
         //if (true) 
@@ -484,6 +484,8 @@ public abstract class TransportImpl implements Transport {
             if ( ((addr[0]&0xFF) == 172) && ((addr[1]&0xFF) >= 16) && ((addr[1]&0xFF) <= 31) ) return false;
             if ( ((addr[0]&0xFF) == 192) && ((addr[1]&0xFF) == 168) ) return false;
             if ((addr[0]&0xFF) >= 224) return false; // no multicast
+            if ((addr[0]&0xFF) == 0) return false;
+            if ( ((addr[0]&0xFF) == 169) && ((addr[1]&0xFF) == 254) ) return false;
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             return false;
