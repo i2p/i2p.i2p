@@ -444,7 +444,7 @@ public class Blocklist {
             return;
         if (add(toInt(ip)))
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Adding IP to blocklist: " + ip[0] + '.' + ip[1] + '.' + ip[2] + '.' + ip[3]);
+                _log.error("Adding IP to blocklist: " + (ip[0]&0xff) + '.' + (ip[1]&0xff) + '.' + (ip[2]&0xff) + '.' + (ip[3]&0xff));
     }
 
     private boolean add(int ip) {
