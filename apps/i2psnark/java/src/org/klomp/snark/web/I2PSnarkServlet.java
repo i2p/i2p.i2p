@@ -486,7 +486,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
         if (remaining == 0)
-            out.write("<a href=\"file:///" + _manager.getDataDir().getAbsolutePath() + File.separatorChar + snark.meta.getName() 
+            out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
                       + "\" title=\"Download the completed file\">");
         out.write(filename);
         if (remaining == 0)
