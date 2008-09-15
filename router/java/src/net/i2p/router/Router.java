@@ -806,10 +806,10 @@ public class Router {
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Error running shutdown task", t);
         }
+        try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
         //try { _context.adminManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the admin manager", t); }        
         try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
-        try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel manager", t); }
         try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel dispatcher", t); }
         try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
@@ -1199,6 +1199,8 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps(), 0);
         getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps(), 0);
         
+        getContext().tunnelDispatcher().updateParticipatingStats();
+
         getContext().statManager().coalesceStats();
 
         RateStat receiveRate = getContext().statManager().getRate("transport.receiveMessageSize");

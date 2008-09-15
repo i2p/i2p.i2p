@@ -27,6 +27,7 @@ public class HopConfig {
     private long _expiration;
     private Map _options;
     private long _messagesProcessed;
+    private long _oldMessagesProcessed;
     
     /** IV length for {@link #getReplyIV} */
     public static final int REPLY_IV_LENGTH = 16;
@@ -42,6 +43,7 @@ public class HopConfig {
         _expiration = -1;
         _options = null;
         _messagesProcessed = 0;
+        _oldMessagesProcessed = 0;
     }
     
     /** what tunnel ID are we receiving on? */
@@ -115,6 +117,11 @@ public class HopConfig {
     /** take note of a message being pumped through this tunnel */
     public void incrementProcessedMessages() { _messagesProcessed++; }
     public long getProcessedMessagesCount() { return _messagesProcessed; }
+    public long getRecentMessagesCount() {
+        long rv = _messagesProcessed - _oldMessagesProcessed;
+        _oldMessagesProcessed = _messagesProcessed;
+        return rv;
+    }
     
     public String toString() {
         StringBuffer buf = new StringBuffer(64);

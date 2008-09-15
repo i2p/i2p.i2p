@@ -200,13 +200,10 @@ public class TunnelDispatcher implements Service {
         synchronized (_participants) {
             _participants.put(recvId, participant);
         }
-        int numParticipants = 0;
         synchronized (_participatingConfig) {
             _participatingConfig.put(recvId, cfg);
-            numParticipants = _participatingConfig.size();
         }
         _context.messageHistory().tunnelJoined("participant", cfg);
-        _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
         _context.statManager().addRateData("tunnel.joinParticipant", 1, 0);
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
@@ -224,13 +221,10 @@ public class TunnelDispatcher implements Service {
         synchronized (_outboundEndpoints) {
             _outboundEndpoints.put(recvId, endpoint);
         }
-        int numParticipants = 0;
         synchronized (_participatingConfig) {
             _participatingConfig.put(recvId, cfg);
-            numParticipants = _participatingConfig.size();
         }
         _context.messageHistory().tunnelJoined("outboundEndpoint", cfg);
-        _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
         _context.statManager().addRateData("tunnel.joinOutboundEndpoint", 1, 0);
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
@@ -254,13 +248,10 @@ public class TunnelDispatcher implements Service {
         synchronized (_inboundGateways) {
             _inboundGateways.put(recvId, gw);
         }
-        int numParticipants = 0;
         synchronized (_participatingConfig) {
             _participatingConfig.put(recvId, cfg);
-            numParticipants = _participatingConfig.size();
         }
         _context.messageHistory().tunnelJoined("inboundGateway", cfg);
-        _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
         _context.statManager().addRateData("tunnel.joinInboundGateway", 1, 0);
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
@@ -338,19 +329,14 @@ public class TunnelDispatcher implements Service {
             _log.debug("removing " + cfg);
         
         boolean removed = false;
-        int numParticipants = 0;
         synchronized (_participatingConfig) {
             removed = (null != _participatingConfig.remove(recvId));
-            numParticipants = _participatingConfig.size();
         }
         if (!removed) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Participating tunnel, but no longer listed in participatingConfig? " + cfg);
         }
         
-        _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
-        _context.statManager().addRateData("tunnel.participatingMessageCount", cfg.getProcessedMessagesCount(), 10*60*1000);
-
         synchronized (_participants) {
             removed = (null != _participants.remove(recvId));
         }
@@ -547,6 +533,35 @@ public class TunnelDispatcher implements Service {
         }
     }
 
+    /**
+     * Generate a current estimate of usage per-participating-tunnel lifetime.
+     * The stats code calls this every 20s.
+     * This is better than waiting until the tunnel expires to update the rate,
+     * as we want this to be current because it's an important part of
+     * the throttle code.
+     */
+    public void updateParticipatingStats() {
+        List participating = listParticipatingTunnels();
+        int size = participating.size();
+        long count = 0;
+        long tcount = 0;
+        long tooYoung = _context.clock().now() - 60*1000;
+        long tooOld = tooYoung - 9*60*1000;
+        for (int i = 0; i < size; i++) {
+            HopConfig cfg = (HopConfig)participating.get(i);
+            long c = cfg.getRecentMessagesCount();
+            long created = cfg.getCreation();
+            if (created > tooYoung || created < tooOld)
+                continue;
+            tcount++;
+            count += c;
+        }
+        // This is called every 20s from Router.java, with 11m tunnel lifetime, so *= 33
+        if (tcount > 0)
+            count = count * 33 / tcount;
+        _context.statManager().addRateData("tunnel.participatingMessageCount", count, 20*1000);
+        _context.statManager().addRateData("tunnel.participatingTunnels", size, 0);
+    }
 
     private static final int DROP_BASE_INTERVAL = 40 * 1000;
     private static final int DROP_RANDOM_BOOST = 10 * 1000;

@@ -139,7 +139,7 @@ class RouterThrottleImpl implements RouterThrottle {
                             _log.warn("Probabalistically refusing tunnel request (avg=" + avg
                                       + " current=" + numTunnels + ")");
                         _context.statManager().addRateData("router.throttleTunnelProbTooFast", (long)(numTunnels-avg), 0);
-                        setTunnelStatus("Rejecting " + ((int) probAccept*100) + "% of tunnels: High number of requests");
+                        setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of tunnels: High number of requests");
                         return TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
                     }
                 } else {
@@ -211,7 +211,7 @@ class RouterThrottleImpl implements RouterThrottle {
         r = null;
         double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
         if (rs != null) {
-            r = rs.getRate(10*60*1000);
+            r = rs.getRate(60*1000);
             if (r != null) {
                 long count = r.getLastEventCount() + r.getCurrentEventCount();
                 if (count > 0)
