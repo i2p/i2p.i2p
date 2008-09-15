@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.Date;
+import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -58,6 +59,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         
         String invalidMessage = null;
         boolean wasNew = false;
+        RouterInfo prevNetDb = null;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
    
@@ -83,8 +85,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));
             try {
-                RouterInfo match = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
-                wasNew = ((null == match) || (match.getPublished() < _message.getRouterInfo().getPublished()));
+                prevNetDb = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
+                wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < _message.getRouterInfo().getPublished()));
                 getContext().profileManager().heardAbout(_message.getKey());
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
@@ -122,6 +124,24 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     } else {
                         // don't flood it *again*
                         getContext().statManager().addRateData("netDb.storeFloodOld", 1, 0);
+                    }
+                }
+
+                // Check new routerinfo address against blocklist
+                if (wasNew) {
+                    if (prevNetDb == null) {
+                        if ((!getContext().shitlist().isShitlistedForever(_fromHash)) &&
+                            getContext().blocklist().isBlocklisted(_fromHash) &&
+                            _log.shouldLog(Log.ERROR))
+                                _log.error("Blocklisting new peer " + _fromHash);
+                    } else {
+                        Set oldAddr = prevNetDb.getAddresses();
+                        Set newAddr = _message.getRouterInfo().getAddresses();
+                        if (newAddr != null && (!newAddr.equals(oldAddr)) &&
+                            (!getContext().shitlist().isShitlistedForever(_fromHash)) &&
+                            getContext().blocklist().isBlocklisted(_fromHash) &&
+                            _log.shouldLog(Log.ERROR))
+                                _log.error("New address received, Blocklisting old peer " + _fromHash);
                     }
                 }
             } else {
