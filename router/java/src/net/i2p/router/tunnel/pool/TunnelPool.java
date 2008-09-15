@@ -233,6 +233,23 @@ public class TunnelPool {
         }
     }
     
+    /**
+     * Do we really need more fallbacks?
+     * Used to prevent a zillion of them
+     */
+    public boolean needFallback() {
+        int needed = _settings.getBackupQuantity() + _settings.getQuantity();
+        int fallbacks = 0;
+        synchronized (_tunnels) {
+            for (int i = 0; i < _tunnels.size(); i++) {
+                TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                if (info.getLength() <= 1 && ++fallbacks >= needed)
+                    return false;
+            }
+        }
+        return true;
+    }
+    
     /** list of tunnelInfo instances of tunnels currently being built */
     public List listPending() { synchronized (_inProgress) { return new ArrayList(_inProgress); } }
     

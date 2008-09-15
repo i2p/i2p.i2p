@@ -221,15 +221,15 @@ class BuildExecutor implements Runnable {
         
         int pendingRemaining = 0;
         
-        long loopBegin = 0;
-        long beforeHandleInboundReplies = 0;
-        long afterHandleInboundReplies = 0;
-        long afterBuildZeroHop = 0;
+        //long loopBegin = 0;
+        //long beforeHandleInboundReplies = 0;
+        //long afterHandleInboundReplies = 0;
+        //long afterBuildZeroHop = 0;
         long afterBuildReal = 0;
         long afterHandleInbound = 0;
                 
         while (!_manager.isShutdown()){
-            loopBegin = System.currentTimeMillis();
+            //loopBegin = System.currentTimeMillis();
             try {
                 _repoll = pendingRemaining > 0; // resets repoll to false unless there are inbound requeusts pending
                 _manager.listPools(pools);
@@ -242,9 +242,9 @@ class BuildExecutor implements Runnable {
                         wanted.add(pool);
                 }
 
-                beforeHandleInboundReplies = System.currentTimeMillis();
+                //beforeHandleInboundReplies = System.currentTimeMillis();
                 _handler.handleInboundReplies();
-                afterHandleInboundReplies = System.currentTimeMillis();
+                //afterHandleInboundReplies = System.currentTimeMillis();
                 
                 // allowed() also expires timed out requests (for new style requests)
                 int allowed = allowed();
@@ -254,7 +254,7 @@ class BuildExecutor implements Runnable {
 
                 // zero hop ones can run inline
                 allowed = buildZeroHopTunnels(wanted, allowed);
-                afterBuildZeroHop = System.currentTimeMillis();
+                //afterBuildZeroHop = System.currentTimeMillis();
                 
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
@@ -286,6 +286,14 @@ class BuildExecutor implements Runnable {
                             //    continue;
                             PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
                             if (cfg != null) {
+                                // 0hops are taken care of above, these are nonstandard 0hops
+                                if (cfg.getLength() <= 1 && !pool.needFallback()) {
+                                    if (_log.shouldLog(Log.DEBUG))
+                                        _log.debug("We don't need more fallbacks for " + pool);
+                                    i--; //0hop, we can keep going, as there's no worry about throttling
+                                    pool.buildComplete(cfg);
+                                    continue;
+                                }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
                                 synchronized (_currentlyBuilding) {
@@ -293,9 +301,6 @@ class BuildExecutor implements Runnable {
                                 }
                                 buildTunnel(pool, cfg);
                                 realBuilt++;
-                                // 0hops are taken care of above, these are nonstandard 0hops
-                                //if (cfg.getLength() <= 1)
-                                //    i--; //0hop, we can keep going, as there's no worry about throttling
                                 
                                 // we want replies to go to the top of the queue
                                 _handler.handleInboundReplies();
@@ -303,14 +308,15 @@ class BuildExecutor implements Runnable {
                                 i--;
                             }
                         }
-                    } else {
+                    }
+                        // wait whether we built tunnels or not
                         try {
                             synchronized (_currentlyBuilding) {
                                 if (!_repoll) {
                                     //if (_log.shouldLog(Log.DEBUG))
                                     //    _log.debug("Nothin' doin (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
                                     //if (allowed <= 0)
-                                        _currentlyBuilding.wait(_context.random().nextInt(2*1000));
+                                        _currentlyBuilding.wait(2000 + _context.random().nextInt(2*1000));
                                     //else // wanted <= 0
                                     //    _currentlyBuilding.wait(_context.random().nextInt(30*1000));
                                 }
@@ -318,7 +324,6 @@ class BuildExecutor implements Runnable {
                         } catch (InterruptedException ie) {
                             // someone wanted to build something
                         }
-                    }
                 }
                 
                 afterBuildReal = System.currentTimeMillis();
