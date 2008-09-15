@@ -58,7 +58,7 @@ public class LogsHelper {
     }
     
     public String getServiceLogs() {
-        String str = FileUtil.readTextFile("wrapper.log", 500, false);
+        String str = FileUtil.readTextFile("wrapper.log", 250, false);
         if (str == null) 
             return "";
         else {

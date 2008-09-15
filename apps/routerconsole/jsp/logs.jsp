@@ -16,13 +16,10 @@
  <h4>Router logs:</h4>
  <jsp:getProperty name="logsHelper" property="logs" />
  <hr />
- <h4>Connection logs:</h4><a name="connectionlogs"> </a>
- <jsp:getProperty name="logsHelper" property="connectionLogs" />
- <hr />
  <h4>Critical logs:</h4><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
  <hr />
- <h4>Service logs:</h4><a name="servicelogs"> </a>
+ <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div>
 

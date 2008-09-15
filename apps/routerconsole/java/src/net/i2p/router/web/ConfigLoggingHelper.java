@@ -52,7 +52,7 @@ public class ConfigLoggingHelper {
             sortedLogs.add(prefix);
         }
         
-        buf.append("<textarea name=\"levels\" rows=\"20\" cols=\"70\">");
+        buf.append("<textarea name=\"levels\" rows=\"20\" cols=\"90\">");
         for (Iterator iter = sortedLogs.iterator(); iter.hasNext(); ) {
             String prefix = (String)iter.next();
             String level = limits.getProperty(prefix);

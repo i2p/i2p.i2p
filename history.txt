@@ -1,4 +1,23 @@
-2008-09-11 zzz
+2008-09-15 zzz
+    * FloodOnlySearchJob:
+      - Ask non-floodfill peers if we don't know any floodfills
+      - Lookup hashes in the DatabaseSearchReplyMessage if we
+        don't know enough floodfills
+    * NetDb: Check new routers against blocklist
+    * Router: Shutdown clients first
+    * Throttle:
+      - Use 60s rather than 10m tunnel.participatingMessageCount stat
+      - Fix a summary bar message
+    * Tunnel Dispatcher: Update tunnel.participatingMessageCount
+      every 20s, rather than at tunnel expiration, to maintain
+      a more current stat
+    * Tunnel Pool:
+      - Prevent excess zero-hop tunnels
+      - Always wait before looping in BuildExecutor
+    * configlogging.jsp: Increase box width
+    * logs.jsp: Remove unused connection log, cut wrapper log output in half
+
+2008-09-12 zzz
     * Blocklist: Fix a log message format
     * HarvesterJob: Don't instantiate if disabled
     * i2psnark:
