@@ -1,3 +1,14 @@
+2008-09-18 zzz
+    * Throttle:
+      - Correctly check inbound and outbound total bw limits separately
+      - Fix up and actually use the tunnel.participatingMessageCount stat,
+        favor it if lower than the total bw stat, so that
+        client traffic isn't included for throttle decisions
+      - Reduce min message count from 60 to 40
+    * Tunnel Dispatcher:
+      - Add tunnel.participatingBandwidth stat
+      - Remove all 3h and 24h stats
+
 2008-09-15 zzz
     * FloodOnlySearchJob:
       - Ask non-floodfill peers if we don't know any floodfills

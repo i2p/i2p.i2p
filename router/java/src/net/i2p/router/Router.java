@@ -1112,6 +1112,15 @@ public class Router {
         }
         return 0;
     }
+    public int get1sRateIn() {
+        RouterContext ctx = _context;
+        if (ctx != null) {
+            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
+            if (bw != null)
+                return (int) bw.getReceiveBps();
+        }
+        return 0;
+    }
 
     public int get15sRate() { return get15sRate(false); }
     public int get15sRate(boolean outboundOnly) {
@@ -1124,6 +1133,15 @@ public class Router {
                     return out;
                 return (int)Math.max(out, bw.getReceiveBps15s());
             }
+        }
+        return 0;
+    }
+    public int get15sRateIn() {
+        RouterContext ctx = _context;
+        if (ctx != null) {
+            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
+            if (bw != null)
+                return (int) bw.getReceiveBps15s();
         }
         return 0;
     }
@@ -1148,6 +1166,20 @@ public class Router {
             recv = (int)rs.getRate(1*60*1000).getAverageValue();
         return Math.max(send, recv);
     }
+    public int get1mRateIn() {
+        RouterContext ctx = _context;
+        if (ctx == null)
+            return 0;
+        StatManager mgr = ctx.statManager();
+        if (mgr == null)
+            return 0;
+        RateStat rs = mgr.getRate("bw.recvRate");
+        int recv = 0;
+        if (rs != null)
+            recv = (int)rs.getRate(1*60*1000).getAverageValue();
+        return recv;
+    }
+
     public int get5mRate() { return get5mRate(false); }
     public int get5mRate(boolean outboundOnly) {
         int send = 0;

@@ -58,58 +58,61 @@ public class TunnelDispatcher implements Service {
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRateStat("tunnel.participatingTunnels", 
                                          "How many tunnels are we participating in?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundPeer", 
                                          "How many messages we send out a tunnel targetting a peer?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundTunnel", 
                                          "How many messages we send out a tunnel targetting a tunnel?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchInbound", 
                                          "How many messages we send through our tunnel gateway?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchParticipant", 
                                          "How many messages we send through a tunnel we are participating in?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchEndpoint", 
                                          "How many messages we receive as the outbound endpoint of a tunnel?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinOutboundGateway", 
                                          "How many tunnels we join as the outbound gateway?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinOutboundGatewayZeroHop", 
                                          "How many zero hop tunnels we join as the outbound gateway?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinInboundEndpoint", 
                                          "How many tunnels we join as the inbound endpoint?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinInboundEndpointZeroHop", 
                                          "How many zero hop tunnels we join as the inbound endpoint?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinParticipant", 
                                          "How many tunnels we join as a participant?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinOutboundEndpoint", 
                                          "How many tunnels we join as the outbound endpoint?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.joinInboundGateway", 
                                          "How many tunnels we join as the inbound gateway?", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchGatewayTime", 
                                          "How long it takes to dispatch a TunnelGatewayMessage", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchDataTime", 
                                          "How long it takes to dispatch a TunnelDataMessage", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundTime", 
                                          "How long it takes to dispatch an outbound message", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundZeroHopTime", 
                                          "How long it takes to dispatch an outbound message through a zero hop tunnel", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.participatingBandwidth", 
+                                         "Participating traffic", "Tunnels", 
+                                         new long[] { 60*1000l, 60*10*1000l });
         ctx.statManager().createRateStat("tunnel.participatingMessageCount", 
                                          "How many messages are sent through a participating tunnel?", "Tunnels", 
-                                         new long[] { 60*1000l, 60*10*1000l, 60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*1000l, 60*10*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
                                          "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
@@ -535,31 +538,35 @@ public class TunnelDispatcher implements Service {
 
     /**
      * Generate a current estimate of usage per-participating-tunnel lifetime.
-     * The stats code calls this every 20s.
+     * The router code calls this every 20s.
      * This is better than waiting until the tunnel expires to update the rate,
      * as we want this to be current because it's an important part of
      * the throttle code.
+     * Stay a little conservative by taking the counts only for tunnels 1-10m old
+     * and computing the average from that.
      */
     public void updateParticipatingStats() {
         List participating = listParticipatingTunnels();
         int size = participating.size();
         long count = 0;
+        long bw = 0;
         long tcount = 0;
         long tooYoung = _context.clock().now() - 60*1000;
         long tooOld = tooYoung - 9*60*1000;
         for (int i = 0; i < size; i++) {
             HopConfig cfg = (HopConfig)participating.get(i);
             long c = cfg.getRecentMessagesCount();
+            bw += c;
             long created = cfg.getCreation();
             if (created > tooYoung || created < tooOld)
                 continue;
             tcount++;
             count += c;
         }
-        // This is called every 20s from Router.java, with 11m tunnel lifetime, so *= 33
         if (tcount > 0)
-            count = count * 33 / tcount;
+            count = count * 30 / tcount;
         _context.statManager().addRateData("tunnel.participatingMessageCount", count, 20*1000);
+        _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/20, 20*1000);
         _context.statManager().addRateData("tunnel.participatingTunnels", size, 0);
     }
 

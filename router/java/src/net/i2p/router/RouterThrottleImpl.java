@@ -182,9 +182,10 @@ class RouterThrottleImpl implements RouterThrottle {
                     return TunnelHistory.TUNNEL_REJECT_PROBABALISTIC_REJECT;
                 }
             } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Accepting tunnel request, since 60m test time average is " + avg10m
-                              + " and past 1m only has " + avg1m + ")");
+                // not yet...
+                //if (_log.shouldLog(Log.INFO))
+                //    _log.info("Accepting tunnel request, since 60m test time average is " + avg10m
+                //              + " and past 1m only has " + avg1m + ")");
             }
         }
         
@@ -201,7 +202,6 @@ class RouterThrottleImpl implements RouterThrottle {
                     return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                 }
             } catch (NumberFormatException nfe) {
-                // no default, ignore it
             }
         }
 
@@ -260,14 +260,15 @@ class RouterThrottleImpl implements RouterThrottle {
         // ok, all is well, let 'er in
         _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, 60*10*1000);
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Accepting a new tunnel request (now allocating " + bytesAllocated + " bytes across " + numTunnels 
-                       + " tunnels with lag of " + lag + ")");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Accepting a new tunnel request (now allocating " + bytesAllocated + " bytes across " + numTunnels 
+        //               + " tunnels with lag of " + lag + ")");
         return TUNNEL_ACCEPT;
     }
 
-    private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 60; // .1KBps
+    private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
+    private static final String LIMIT_STR = "Rejecting tunnels: Bandwidth limit";
     
     /**
      * with bytesAllocated already accounted for across the numTunnels existing
@@ -276,46 +277,61 @@ class RouterThrottleImpl implements RouterThrottle {
      *
      */
     private boolean allowTunnel(double bytesAllocated, int numTunnels) {
-        int maxKBps = Math.min(_context.bandwidthLimiter().getOutboundKBytesPerSecond(), _context.bandwidthLimiter().getInboundKBytesPerSecond());
-        int used1s = _context.router().get1sRate(); // dont throttle on the 1s rate, its too volatile
-        int used15s = _context.router().get15sRate();
-        int used1m = _context.router().get1mRate(); // dont throttle on the 1m rate, its too slow
-        int used = Math.min(used15s,used1s);
+        int maxKBpsIn = _context.bandwidthLimiter().getInboundKBytesPerSecond();
+        int maxKBpsOut = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        int maxKBps = Math.min(maxKBpsIn, maxKBpsOut);
+        int usedIn = Math.min(_context.router().get1sRateIn(), _context.router().get15sRateIn());
+        int usedOut = Math.min(_context.router().get1sRate(true), _context.router().get15sRate(true));
+        int used = Math.max(usedIn, usedOut);
+        int used1mIn = _context.router().get1mRateIn();
+        int used1mOut = _context.router().get1mRate(true);
 
+        // Check the inbound and outbound total bw available (separately)
+        int availBps = (maxKBpsIn*1024) - usedIn;
+        availBps = Math.min(availBps, (maxKBpsOut*1024) - usedOut);
+        if (availBps < MIN_AVAILABLE_BPS) {
+            if (_log.shouldLog(Log.WARN)) _log.warn("Reject, avail (" + availBps + ") less than min");
+            setTunnelStatus(LIMIT_STR);
+            return false;
+        }
+
+        // Now compute the share bw available, using
+        // the bytes-allocated estimate for the participating tunnels
+        // (if lower than the total bw, which it should be),
+        // since some of the total used bandwidth may be for local clients
         double share = _context.router().getSharePercentage();
-        int availBps = (int)(((maxKBps*1024)*share) - used); //(int)(((maxKBps*1024) - used) * getSharePercentage());
+        used = Math.min(used, (int) (bytesAllocated / (10*60)));
+        availBps = Math.min(availBps, (int)(((maxKBps*1024)*share) - used));
 
         // Write stats before making decisions
         _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
-        long overage = used1m - (maxKBps*1024);
+        // Now see if 1m rates are too high
+        long overage = used1mIn - (maxKBpsIn*1024);
+        overage = Math.max(overage, used1mOut - (maxKBpsOut*1024));
         if ( (overage > 0) && 
              ((overage/(float)(maxKBps*1024f)) > _context.random().nextFloat()) ) {
-                
-            if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + used1m + ") indicates overload.");
+            if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + overage + " over) indicates overload.");
+            setTunnelStatus(LIMIT_STR);
             return false;
         }
 
-//      if (true) {
-            // ok, ignore any predictions of 'bytesAllocated', since that makes poorly
-            // grounded conclusions about future use (or even the bursty use).  Instead,
-            // simply say "do we have the bw to handle a new request"?
             float maxBps = maxKBps * 1024f;
             float pctFull = (maxBps - availBps) / (maxBps);
             double probReject = Math.pow(pctFull, 16); // steep curve 
             double rand = _context.random().nextFloat();
-            boolean reject = (availBps < MIN_AVAILABLE_BPS) || (rand <= probReject);
+            boolean reject = rand <= probReject;
             if (reject && _log.shouldLog(Log.WARN))
-                _log.warn("reject = " + reject + " avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                _log.warn("Reject avail/maxK/used " + availBps + "/" + maxKBps + "/" 
                           + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
-                          + "rand = " + rand + " est = " + bytesAllocated + " share = " + (float)share);
+                          + " rand = " + rand + " est = " + bytesAllocated);
             else if (_log.shouldLog(Log.DEBUG))
-                _log.debug("reject = " + reject + " avail/maxK/used " + availBps + "/" + maxKBps + "/" 
+                _log.debug("Accept avail/maxK/used " + availBps + "/" + maxKBps + "/" 
                            + used + " pReject = " + probReject + " pFull = " + pctFull + " numTunnels = " + numTunnels 
-                           + "rand = " + rand + " est = " + bytesAllocated + " share = " + (float)share);
+                           + " rand = " + rand + " est = " + bytesAllocated);
             if (probReject >= 0.9)
-                setTunnelStatus("Rejecting tunnels: Bandwidth limit");
+                setTunnelStatus(LIMIT_STR);
             else if (probReject >= 0.5)
                 setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
             else if(probReject >= 0.1)
@@ -323,7 +339,6 @@ class RouterThrottleImpl implements RouterThrottle {
             else
                 setTunnelStatus("Accepting tunnels");
             return !reject;
-//      }
         
         
         /*
