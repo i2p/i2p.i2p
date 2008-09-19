@@ -1,3 +1,10 @@
+2008-09-19 zzz
+    * Tunnels:
+      - Add missing message accounting for inbound gateways,
+        we were underestimating participating traffic because of it,
+        and the tunnels were classified "inactive"
+      - Add participating tunnel role on tunnels.jsp
+
 2008-09-18 zzz
     * Throttle:
       - Correctly check inbound and outbound total bw limits separately

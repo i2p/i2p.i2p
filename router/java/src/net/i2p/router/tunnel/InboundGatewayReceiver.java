@@ -33,6 +33,7 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
             }
         }
         
+        _config.incrementProcessedMessages();
         TunnelDataMessage msg = new TunnelDataMessage(_context);
         msg.setData(encrypted);
         msg.setTunnelId(_config.getSendTunnel());

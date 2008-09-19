@@ -448,7 +448,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.write("<h2><a name=\"participating\">Participating tunnels</a>:</h2><table border=\"1\">\n");
         out.write("<tr><td><b>Receive on</b></td><td><b>From</b></td><td>"
                   + "<b>Send on</b></td><td><b>To</b></td><td><b>Expiration</b></td>"
-                  + "<td><b>Usage</b></td></tr>\n");
+                  + "<td><b>Usage</b></td><td><b>Role</b></td></tr>\n");
         long processed = 0;
         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");
         if (rs != null)
@@ -468,21 +468,27 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             if (cfg.getReceiveFrom() != null)
                 out.write("<td>" + cfg.getReceiveFrom().toBase64().substring(0,4) +"</td>");
             else
-                out.write("<td>n/a</td>");
+                out.write("<td>&nbsp;</td>");
             if (cfg.getSendTunnel() != null)
                 out.write("<td>" + cfg.getSendTunnel().getTunnelId() +"</td>");
             else
-                out.write("<td>n/a</td>");
+                out.write("<td>&nbsp;</td>");
             if (cfg.getSendTo() != null)
                 out.write("<td>" + cfg.getSendTo().toBase64().substring(0,4) +"</td>");
             else
-                out.write("<td>n/a</td>");
+                out.write("<td>&nbsp;</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
             if (timeLeft > 0)
                 out.write("<td align=right>" + DataHelper.formatDuration(timeLeft) + "</td>");
             else
                 out.write("<td align=right>(grace period)</td>");
             out.write("<td align=right>" + cfg.getProcessedMessagesCount() + "KB</td>");
+            if (cfg.getSendTo() == null)
+                out.write("<td>Outbound Endpoint</td>");
+            else if (cfg.getReceiveFrom() == null)
+                out.write("<td>Inbound Gateway</td>");
+            else
+                out.write("<td>Participant</td>");
             out.write("</tr>\n");
             processed += cfg.getProcessedMessagesCount();
         }
