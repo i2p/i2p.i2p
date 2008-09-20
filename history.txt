@@ -1,3 +1,8 @@
+2008-09-20 zzz
+    * NetDb: Fix the totally broken "check new routers against blocklist"
+      code from 3 checkins ago
+    * tunnels.jsp: Sort participating tunnels by usage, display rate
+
 2008-09-19 zzz
     * Tunnels:
       - Add missing message accounting for inbound gateways,

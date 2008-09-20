@@ -3,10 +3,13 @@ package net.i2p.router.tunnel.pool;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -444,18 +447,19 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             renderPool(out, in, outPool);
         }
         
-        List participating = _context.tunnelDispatcher().listParticipatingTunnels();
+        Set participating = new TreeSet(new TunnelComparator());
+        participating.addAll(_context.tunnelDispatcher().listParticipatingTunnels());
         out.write("<h2><a name=\"participating\">Participating tunnels</a>:</h2><table border=\"1\">\n");
         out.write("<tr><td><b>Receive on</b></td><td><b>From</b></td><td>"
                   + "<b>Send on</b></td><td><b>To</b></td><td><b>Expiration</b></td>"
-                  + "<td><b>Usage</b></td><td><b>Role</b></td></tr>\n");
+                  + "<td><b>Usage</b></td><td><b>Rate</b></td><td><b>Role</b></td></tr>\n");
         long processed = 0;
         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");
         if (rs != null)
             processed = (long)rs.getRate(10*60*1000).getLifetimeTotalValue();
         int inactive = 0;
-        for (int i = 0; i < participating.size(); i++) {
-            HopConfig cfg = (HopConfig)participating.get(i);
+        for (Iterator iter = participating.iterator(); iter.hasNext(); ) {
+            HopConfig cfg = (HopConfig)iter.next();
             if (cfg.getProcessedMessagesCount() <= 0) {
                 inactive++;
                 continue;
@@ -483,6 +487,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             else
                 out.write("<td align=right>(grace period)</td>");
             out.write("<td align=right>" + cfg.getProcessedMessagesCount() + "KB</td>");
+            int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
+            if (lifetime <= 0)
+                lifetime = 1;
+            if (lifetime > 10*60)
+                lifetime = 10*60;
+            int bps = 1024 * (int) cfg.getProcessedMessagesCount() / lifetime;
+            out.write("<td align=right>" + bps + "Bps</td>");
             if (cfg.getSendTo() == null)
                 out.write("<td>Outbound Endpoint</td>");
             else if (cfg.getReceiveFrom() == null)
@@ -497,6 +508,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.write("Lifetime bandwidth usage: " + processed + "KB<br />\n");
     }
     
+    class TunnelComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return (int) (((HopConfig)r).getProcessedMessagesCount() - ((HopConfig)l).getProcessedMessagesCount());
+        }
+    }
+
     private void renderPool(Writer out, TunnelPool in, TunnelPool outPool) throws IOException {
         List tunnels = null;
         if (in == null)

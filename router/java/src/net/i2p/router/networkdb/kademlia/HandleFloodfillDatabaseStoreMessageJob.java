@@ -81,13 +81,31 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1, 0);
+            Hash key = _message.getKey();
             if (_log.shouldLog(Log.INFO))
-                _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
+                _log.info("Handling dbStore of router " + key + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));
             try {
-                prevNetDb = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
+                prevNetDb = getContext().netDb().store(key, _message.getRouterInfo());
                 wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < _message.getRouterInfo().getPublished()));
-                getContext().profileManager().heardAbout(_message.getKey());
+                // Check new routerinfo address against blocklist
+                if (wasNew) {
+                    if (prevNetDb == null) {
+                        if ((!getContext().shitlist().isShitlistedForever(key)) &&
+                            getContext().blocklist().isBlocklisted(key) &&
+                            _log.shouldLog(Log.ERROR))
+                                _log.error("Blocklisting new peer " + key);
+                    } else {
+                        Set oldAddr = prevNetDb.getAddresses();
+                        Set newAddr = _message.getRouterInfo().getAddresses();
+                        if (newAddr != null && (!newAddr.equals(oldAddr)) &&
+                            (!getContext().shitlist().isShitlistedForever(key)) &&
+                            getContext().blocklist().isBlocklisted(key) &&
+                            _log.shouldLog(Log.ERROR))
+                                _log.error("New address received, Blocklisting old peer " + key);
+                    }
+                }
+                getContext().profileManager().heardAbout(key);
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }
@@ -127,23 +145,6 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     }
                 }
 
-                // Check new routerinfo address against blocklist
-                if (wasNew) {
-                    if (prevNetDb == null) {
-                        if ((!getContext().shitlist().isShitlistedForever(_fromHash)) &&
-                            getContext().blocklist().isBlocklisted(_fromHash) &&
-                            _log.shouldLog(Log.ERROR))
-                                _log.error("Blocklisting new peer " + _fromHash);
-                    } else {
-                        Set oldAddr = prevNetDb.getAddresses();
-                        Set newAddr = _message.getRouterInfo().getAddresses();
-                        if (newAddr != null && (!newAddr.equals(oldAddr)) &&
-                            (!getContext().shitlist().isShitlistedForever(_fromHash)) &&
-                            getContext().blocklist().isBlocklisted(_fromHash) &&
-                            _log.shouldLog(Log.ERROR))
-                                _log.error("New address received, Blocklisting old peer " + _fromHash);
-                    }
-                }
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
