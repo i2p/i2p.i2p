@@ -176,6 +176,7 @@ public abstract class TunnelPeerSelector {
         // Defaults changed to true for inbound only in filterUnreachable below.
 
         Set peers = new HashSet(1);
+        peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
         if (filterUnreachable(ctx, isInbound, isExploratory)) {
             List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);

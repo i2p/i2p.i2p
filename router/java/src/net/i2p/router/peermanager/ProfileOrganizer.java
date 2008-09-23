@@ -478,6 +478,25 @@ public class ProfileOrganizer {
     }
 
     /**
+     * Get the peers that have recently rejected us for bandwidth
+     * recent == last 20s
+     *
+     */
+    public List selectPeersRecentlyRejecting() { 
+        synchronized (_reorganizeLock) {
+            long cutoff = _context.clock().now() - (20*1000);
+            int count = _notFailingPeers.size();
+            List l = new ArrayList(count / 128);
+            for (Iterator iter = _notFailingPeers.values().iterator(); iter.hasNext(); ) {
+                PeerProfile prof = (PeerProfile) iter.next();
+                if (prof.getTunnelHistory().getLastRejectedBandwidth() > cutoff)
+                    l.add(prof.getPeer());
+            }
+            return l;
+        }
+    }
+
+    /**
      * Find the hashes for all peers we are actively profiling
      *
      */
