@@ -3,13 +3,12 @@ package net.i2p.router.tunnel.pool;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -447,8 +446,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             renderPool(out, in, outPool);
         }
         
-        Set participating = new TreeSet(new TunnelComparator());
-        participating.addAll(_context.tunnelDispatcher().listParticipatingTunnels());
+        List participating = _context.tunnelDispatcher().listParticipatingTunnels();
+        Collections.sort(participating, new TunnelComparator());
         out.write("<h2><a name=\"participating\">Participating tunnels</a>:</h2><table border=\"1\">\n");
         out.write("<tr><td><b>Receive on</b></td><td><b>From</b></td><td>"
                   + "<b>Send on</b></td><td><b>To</b></td><td><b>Expiration</b></td>"
@@ -458,8 +457,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (rs != null)
             processed = (long)rs.getRate(10*60*1000).getLifetimeTotalValue();
         int inactive = 0;
-        for (Iterator iter = participating.iterator(); iter.hasNext(); ) {
-            HopConfig cfg = (HopConfig)iter.next();
+        for (int i = 0; i < participating.size(); i++) {
+            HopConfig cfg = (HopConfig)participating.get(i);
             if (cfg.getProcessedMessagesCount() <= 0) {
                 inactive++;
                 continue;

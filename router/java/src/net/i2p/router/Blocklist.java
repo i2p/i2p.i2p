@@ -631,12 +631,22 @@ public class Blocklist {
     }
 
     private String toStr(long entry) {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuffer buf = new StringBuffer(32);
         for (int i = 7; i >= 0; i--) {
             buf.append((entry >> (8*i)) & 0xff);
             if (i == 4)
                 buf.append('-');
             else if (i > 0)
+                buf.append('.');
+        }
+        return buf.toString();
+    }
+
+    private String toStr(int ip) {
+        StringBuffer buf = new StringBuffer(16);
+        for (int i = 3; i >= 0; i--) {
+            buf.append((ip >> (8*i)) & 0xff);
+            if (i > 0)
                 buf.append('.');
         }
         return buf.toString();
@@ -742,6 +752,40 @@ public class Blocklist {
             }
         }
         // We already shitlisted in shitlist(peer), that's good enough
+    }
+
+    public void renderStatusHTML(Writer out) throws IOException {
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("<h2>IP Blocklist</h2>");
+        Set singles = new TreeSet();
+        synchronized(_singleIPBlocklist) {
+            singles.addAll(_singleIPBlocklist);
+        }
+        if (singles.size() > 0) {
+            buf.append("<table><tr><td><b>Transient IPs</b></td></tr>");
+            for (Iterator iter = singles.iterator(); iter.hasNext(); ) {
+                 int ip = ((Integer) iter.next()).intValue();
+                 buf.append("<tr><td>").append(toStr(ip)).append("</td></tr>\n");
+            }
+            buf.append("</table>");
+        }
+        if (_blocklistSize > 0) {
+            buf.append("<table><tr><td align=center colspan=2><b>IPs from Blocklist File</b></td></tr><tr><td align=center><b>From</b></td><td align=center><b>To</b></td></tr>");
+            for (int i = 0; i < _blocklistSize; i++) {
+                 int from = getFrom(_blocklist[i]);
+                 buf.append("<tr><td align=right>").append(toStr(from)).append("</td><td align=right>");
+                 int to = getTo(_blocklist[i]);
+                 if (to != from)
+                     buf.append(toStr(to)).append("</td></tr>\n");
+                 else
+                     buf.append("&nbsp</td></tr>\n");
+            }
+            buf.append("</table>");
+        } else {
+            buf.append("<br>No blocklist file entries");
+        }
+        out.write(buf.toString());
+        out.flush();
     }
 
     public static void main(String args[]) {

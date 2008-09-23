@@ -1,3 +1,11 @@
+2008-09-23 zzz
+    * config.jsp: Add some reachability help
+    * configpeer.jsp: Add blocklist info
+    * help.jsp: Add link to German FAQ
+    * tunnels.jsp: Fix inactive participating count
+    * SearchReplyJob: Don't look up references to shitlisted peers
+    * TunnelPeerSelector: Avoid a peer for 20s after a reject or timeout
+
 2008-09-20 zzz
     * NetDb: Fix the totally broken "check new routers against blocklist"
       code from 3 checkins ago

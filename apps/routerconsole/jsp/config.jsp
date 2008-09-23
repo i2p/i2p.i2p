@@ -105,6 +105,41 @@
  <p><b>Note: changing any of these settings will terminate all of your connections and effectively
     restart your router.</b>
  <hr />
+ <b>Reachability Help: </b>
+ <p>
+ While I2P will work adequately behind a firewall, your speeds and network integration will generally improve
+ if you open up your port (generally 8887) to both UDP and TCP, and enable inbound TCP above.
+ If you think you have opened up your firewall and I2P still thinks you are firewalled, remember
+ that you may have multiple firewalls, for example both software packages and external hardware routers.
+ <ul>
+ <li><b>OK</b> - Your UDP port does not appear to be firewalled.
+ <li><b>Firewalled</b> - Your UDP port appears to be firewalled.
+     As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error.
+     However, if it appears consistently, you should check whether both your external and internal
+     firewalls are open on port 8887.
+ <li><b>Testing</b> - The router is currently testing whether your UDP port is firewalled.
+ <li><b>WARN - Firewalled and Fast</b> - You have configured I2P to share more than 128KBps of bandwidth,
+     but you are firewalled. While I2P will work fine in this configuration, if you really have
+     over 128KBps of bandwidth to share, it will be much more helpful to the network if
+     you open your firewall.
+ <li><b>WARN - Firewalled and Floodfill</b> - You have configured I2P to be a floodfill router, but
+     you are firewalled. For best participation as a floodfill router, you should open your firewall.
+ <li><b>WARN - Firewalled with Inbound TCP Enabled</b> - You have configured inbound TCP, however
+     your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well.
+     If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact
+     you via TCP, which will hurt the network. Please open your firewall or disable inbound TCP above.
+ <li><b>ERR - Private TCP Address</b> - You must never advertise an unroutable IP address such as
+     127.0.0.1 or 192.168.1.1 as your external address. Correct the address or disable inbound TCP above.
+ <li><b>ERR - SymmetricNAT</b> - I2P detected that you are firewalled by a Symmetric NAT.
+     I2P does not work behind this type of firewall.
+ <li><b>ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart</b> -
+     I2P was unable to bind to port 8887 or other configured port.
+     Check to see if another program is using port 8887. If so, stop that program or configure
+     I2P to use a different port. This may be a transient error, if the other program is no longer
+     using the port. However, a restart is always required after this error.
+ </ul>
+ </p>
+ <hr />
 <!--
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />

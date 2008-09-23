@@ -13,7 +13,9 @@
 <div class="main" id="main">
 <h2>Help</h2>
 Sorry, there's no help text here yet, so check out the
-<a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>.
+<a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
+or the
+<a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.
 <br />
 
 <h2>Legal stuff</h2>
