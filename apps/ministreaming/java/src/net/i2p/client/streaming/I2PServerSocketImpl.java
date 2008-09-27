@@ -17,33 +17,19 @@ import net.i2p.util.Log;
  *
  */
 class I2PServerSocketImpl implements I2PServerSocket {
-
     private final static Log _log = new Log(I2PServerSocketImpl.class);
     private I2PSocketManager mgr;
     /** list of sockets waiting for the client to accept them */
     private List pendingSockets = Collections.synchronizedList(new ArrayList(4));
+    
     /** have we been closed */
     private volatile boolean closing = false;
+    
     /** lock on this when accepting a pending socket, and wait on it for notification of acceptance */
     private Object socketAcceptedLock = new Object();
     /** lock on this when adding a new socket to the pending list, and wait on it accordingly */
     private Object socketAddedLock = new Object();
     
-	/**
-	 * Set Sock Option accept timeout stub, does nothing
-	 * @param x
-	 */
-	public void setSoTimeout(long x) {
-	}
-
-	/**
-	 * Get Sock Option accept timeout stub, does nothing
-	 * @return timeout
-	 */
-	public long getSoTimeout() {
-		return -1;
-	}
-
     public I2PServerSocketImpl(I2PSocketManager mgr) {
         this.mgr = mgr;
     }
@@ -61,22 +47,19 @@ class I2PServerSocketImpl implements I2PServerSocket {
      * @throws ConnectException if the I2PServerSocket is closed
      */
     public I2PSocket accept() throws I2PException, ConnectException {
-		if(_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug("accept() called, pending: " + pendingSockets.size());
-		}
+        
         I2PSocket ret = null;
         
         while ( (ret == null) && (!closing) ){
             while (pendingSockets.size() <= 0) {
-				if(closing) {
-					throw new ConnectException("I2PServerSocket closed");
-				}
+                if (closing) throw new ConnectException("I2PServerSocket closed");
                 try {
                     synchronized(socketAddedLock) {
                         socketAddedLock.wait();
                     }
-				} catch(InterruptedException ie) {
-				}
+                } catch (InterruptedException ie) {}
             }
             synchronized (pendingSockets) {
                 if (pendingSockets.size() > 0) {
@@ -90,9 +73,8 @@ class I2PServerSocketImpl implements I2PServerSocket {
             }
         }
         
-		if(_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug("TIMING: handed out accept result " + ret.hashCode());
-		}
         return ret;
     }
     
@@ -106,13 +88,12 @@ class I2PServerSocketImpl implements I2PServerSocket {
      *         or the socket was closed
      */
     public boolean addWaitForAccept(I2PSocket s, long timeoutMs) {
-		if(_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug("addWaitForAccept [new socket arrived [" + s.toString() + "], pending: " + pendingSockets.size());
-		}
+        
         if (closing) {
-			if(_log.shouldLog(Log.WARN)) {
+            if (_log.shouldLog(Log.WARN))
                 _log.warn("Already closing the socket");
-			}
             return false;
         }
         
@@ -129,16 +110,14 @@ class I2PServerSocketImpl implements I2PServerSocket {
         while (pendingSockets.contains(s)) {
             long now = clock.now();
             if (now >= end) {
-				if(_log.shouldLog(Log.INFO)) {
+                if (_log.shouldLog(Log.INFO))
                     _log.info("Expired while waiting for accept (time elapsed =" + (now - start) + "ms) for socket " + s.toString());
-				}
                 pendingSockets.remove(s);
                 return false;
             }
             if (closing) {
-				if(_log.shouldLog(Log.WARN)) {
+                if (_log.shouldLog(Log.WARN))
                     _log.warn("Server socket closed while waiting for accept");
-				}
                 pendingSockets.remove(s);
                 return false;
             }
@@ -147,13 +126,11 @@ class I2PServerSocketImpl implements I2PServerSocket {
                 synchronized (socketAcceptedLock) {
                     socketAcceptedLock.wait(remaining);
                 }
-			} catch(InterruptedException ie) {
-			}
+            } catch (InterruptedException ie) {}
         }
         long now = clock.now();
-		if(_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.DEBUG))
             _log.info("Socket accepted after " + (now-start) + "ms for socket " + s.toString());
-		}
         return true;
     }
     
@@ -169,7 +146,5 @@ class I2PServerSocketImpl implements I2PServerSocket {
         }
     }
     
-	public I2PSocketManager getManager() {
-		return mgr;
-	}
+    public I2PSocketManager getManager() { return mgr; }
 }

@@ -11,7 +11,6 @@ import net.i2p.data.Destination;
  *
  */
 public class I2PSocketFull implements I2PSocket {
-
     private Connection _connection;
     private I2PSocket.SocketErrorListener _listener;
     private Destination _remotePeer;
@@ -25,12 +24,9 @@ public class I2PSocketFull implements I2PSocket {
         }
     }
     
-
     public void close() throws IOException {
         Connection c = _connection;
-		if(c == null) {
-			return;
-		}
+        if (c == null) return;
         if (c.getIsConnected()) {
             OutputStream out = c.getOutputStream();
             if (out != null) {
@@ -48,71 +44,58 @@ public class I2PSocketFull implements I2PSocket {
         destroy();
     }
     
-	Connection getConnection() {
-		return _connection;
-	}
+    Connection getConnection() { return _connection; }
     
     public InputStream getInputStream() {
         Connection c = _connection;
-		if(c != null) {
+        if (c != null)
             return c.getInputStream();
-		} else {
+        else
             return null;
     }
-	}
     
     public I2PSocketOptions getOptions() {
         Connection c = _connection;
-		if(c != null) {
+        if (c != null)
             return c.getOptions();
-		} else {
+        else
             return null;
     }
-	}
     
     public OutputStream getOutputStream() throws IOException {
         Connection c = _connection;
-		if(c != null) {
+        if (c != null)
             return c.getOutputStream();
-		} else {
+        else
             return null;
     }
-	}
     
-	public Destination getPeerDestination() {
-		return _remotePeer;
-	}
+    public Destination getPeerDestination() { return _remotePeer; }
     
     public long getReadTimeout() {
         I2PSocketOptions opts = getOptions();
-		if(opts != null) {
+        if (opts != null) 
             return opts.getReadTimeout();
-		} else {
+        else 
             return -1;
     }
-	}
     
-	public Destination getThisDestination() {
-		return _localPeer;
-	}
+    public Destination getThisDestination() { return _localPeer; }
     
     public void setOptions(I2PSocketOptions options) {
         Connection c = _connection;
-		if(c == null) {
-			return;
-		}
-		if(options instanceof ConnectionOptions) {
+        if (c == null) return;
+        
+        if (options instanceof ConnectionOptions)
             c.setOptions((ConnectionOptions)options);
-		} else {
+        else
             c.setOptions(new ConnectionOptions(options));
     }
-	}
     
     public void setReadTimeout(long ms) {
         Connection c = _connection;
-		if(c == null) {
-			return;
-		}
+        if (c == null) return;
+        
         c.getInputStream().setReadTimeout((int)ms);
         c.getOptions().setReadTimeout(ms);
     }
@@ -133,17 +116,14 @@ public class I2PSocketFull implements I2PSocket {
         Connection c = _connection;
         _connection = null; 
         _listener = null;
-		if(c != null) {
+        if (c != null)
             c.disconnectComplete();
     }
-	}
-
     public String toString() {
         Connection c = _connection;
-		if(c == null) {
+        if (c == null)
             return super.toString();
-		} else {
+        else
             return c.toString();
     }
-}
 }

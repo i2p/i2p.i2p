@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -21,7 +20,6 @@ import net.i2p.util.Log;
  *
  */
 public class StreamSinkServer {
-
     private Log _log;
     private String _sinkDir;
     private String _destFile;
@@ -38,7 +36,6 @@ public class StreamSinkServer {
     public StreamSinkServer(String sinkDir, String ourDestFile) {
         this(sinkDir, ourDestFile, null, -1, 3);
     }
-
     public StreamSinkServer(String sinkDir, String ourDestFile, String i2cpHost, int i2cpPort, int handlers) {
         _sinkDir = sinkDir;
         _destFile = ourDestFile;
@@ -55,15 +52,13 @@ public class StreamSinkServer {
      */
     public void runServer() {
         I2PSocketManager mgr = null;
-		if(_i2cpHost != null) {
+        if (_i2cpHost != null)
             mgr = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, new Properties());
-		} else {
+        else 
             mgr = I2PSocketManagerFactory.createManager();
-		}
         Destination dest = mgr.getSession().getMyDestination();
-		if(_log.shouldLog(Log.INFO)) {
+        if (_log.shouldLog(Log.INFO))
             _log.info("Listening for connections on: " + dest.calculateHash().toBase64());
-		}
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_destFile);
@@ -75,12 +70,7 @@ public class StreamSinkServer {
             _log.error("Error formatting the destination", dfe);
             return;
         } finally {
-			if(fos != null) {
-				try {
-					fos.close();
-				} catch(IOException ioe) {
-				}
-			}
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
         
         I2PServerSocket sock = mgr.getServerSocket();
@@ -101,28 +91,22 @@ public class StreamSinkServer {
      *
      */
     private class ClientRunner implements Runnable {
-
         private I2PServerSocket _socket;
-
         public ClientRunner(I2PServerSocket socket) {
             _socket = socket;
         }
-
         public void run() {
             while (true) {
                 try {
                     I2PSocket socket = _socket.accept();
-					if(socket != null) {
+                    if (socket != null)
                         handle(socket);
-					}
                 } catch (I2PException ie) {
                     _log.error("Error accepting connection", ie);
                     return;
                 } catch (ConnectException ce) {
                     _log.error("Connection already dropped", ce);
                     return;
-				} catch(SocketTimeoutException ste) {
-					// ignored
                 }       
             }
         }
@@ -131,14 +115,12 @@ public class StreamSinkServer {
             FileOutputStream fos = null;
             try {
                 File sink = new File(_sinkDir);
-				if(!sink.exists()) {
+                if (!sink.exists())
                     sink.mkdirs();
-				}
                 File cur = File.createTempFile("clientSink", ".dat", sink);
                 fos = new FileOutputStream(cur);
-				if(_log.shouldLog(Log.DEBUG)) {
+                if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Writing to " + cur.getAbsolutePath());
-				}
             } catch (IOException ioe) {
                 _log.error("Error creating sink", ioe);
                 return;
@@ -153,28 +135,17 @@ public class StreamSinkServer {
                 while ( (read = in.read(buf)) != -1) {
                     //_fos.write(buf, 0, read);
                     written += read;
-					if(_log.shouldLog(Log.DEBUG)) {
+                    if (_log.shouldLog(Log.DEBUG))
                         _log.debug("read and wrote " + read + " (" + written + ")");
                 }
-				}
                 fos.write(("written: [" + written + "]\n").getBytes());
                 long lifetime = System.currentTimeMillis() - start;
                 _log.info("Got EOF from client socket [written=" + written + " lifetime=" + lifetime + "]");
             } catch (IOException ioe) {
                 _log.error("Error writing the sink", ioe);
             } finally {
-				if(fos != null) {
-					try {
-						fos.close();
-					} catch(IOException ioe) {
-					}
-				}
-				if(sock != null) {
-					try {
-						sock.close();
-					} catch(IOException ioe) {
-					}
-				}
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+                if (sock != null) try { sock.close(); } catch (IOException ioe) {}
                 _log.debug("Client socket closed");
             }
         }
@@ -203,8 +174,7 @@ public class StreamSinkServer {
                 if (args.length == 5) {
                     try {
                         handlers = Integer.parseInt(args[4]);
-					} catch(NumberFormatException nfe) {
-					}
+                    } catch (NumberFormatException nfe) {}
                 }
                 try { 
                     int port = Integer.parseInt(args[1]);
@@ -216,8 +186,7 @@ public class StreamSinkServer {
             default:
                 System.out.println("Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile [handlers]");
         }
-		if(server != null) {
+        if (server != null)
             server.runServer();
     }
-}
 }
