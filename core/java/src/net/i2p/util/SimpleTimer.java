@@ -25,9 +25,11 @@ public class SimpleTimer {
     /** event (TimedEvent) to event time (Long) mapping */
     private Map _eventTimes;
     private List _readyEvents;
-    
+    private SimpleStore runn;
+
     protected SimpleTimer() { this("SimpleTimer"); }
     protected SimpleTimer(String name) {
+        runn = new SimpleStore(true);
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SimpleTimer.class);
         _events = new TreeMap();
@@ -38,13 +40,28 @@ public class SimpleTimer {
         runner.setDaemon(true);
         runner.start();
         for (int i = 0; i < 3; i++) {
-            I2PThread executor = new I2PThread(new Executor(_context, _log, _readyEvents));
+            I2PThread executor = new I2PThread(new Executor(_context, _log, _readyEvents, runn));
             executor.setName(name + "Executor " + i);
             executor.setDaemon(true);
             executor.start();
         }
     }
     
+    /**
+     * Removes the SimpleTimer.
+     */
+    public void removeSimpleTimer() {
+        synchronized(_events) {
+            runn.setAnswer(false);
+            _events.notifyAll();
+        }
+    }
+
+    /**
+     * 
+     * @param event
+     * @param timeoutMs
+     */
     public void reschedule(TimedEvent event, long timeoutMs) {
         addEvent(event, timeoutMs, false);
     }
@@ -55,9 +72,13 @@ public class SimpleTimer {
      * for the earlier of the two timeouts, which may be before this stated 
      * timeout.  If this is not the desired behavior, call removeEvent first.
      *
+     * @param event
+     * @param timeoutMs 
      */
     public void addEvent(TimedEvent event, long timeoutMs) { addEvent(event, timeoutMs, true); }
     /**
+     * @param event 
+     * @param timeoutMs 
      * @param useEarliestTime if its already scheduled, use the earlier of the 
      *                        two timeouts, else use the later
      */
@@ -143,12 +164,12 @@ public class SimpleTimer {
     
     private long _occurredTime;
     private long _occurredEventCount;
-    private TimedEvent _recentEvents[] = new TimedEvent[5];
-    
+    // not used
+    //  private TimedEvent _recentEvents[] = new TimedEvent[5];
     private class SimpleTimerRunner implements Runnable {
         public void run() {
             List eventsToFire = new ArrayList(1);
-            while (true) {
+            while(runn.getAnswer()) {
                 try {
                     synchronized (_events) {
                         //if (_events.size() <= 0)
@@ -158,8 +179,10 @@ public class SimpleTimer {
                         long now = System.currentTimeMillis();
                         long nextEventDelay = -1;
                         Object nextEvent = null;
-                        while (true) {
-                            if (_events.size() <= 0) break;
+                        while(runn.getAnswer()) {
+                            if(_events.size() <= 0) {
+                                break;
+                            }
                             Long when = (Long)_events.firstKey();
                             if (when.longValue() <= now) {
                                 TimedEvent evt = (TimedEvent)_events.remove(when);

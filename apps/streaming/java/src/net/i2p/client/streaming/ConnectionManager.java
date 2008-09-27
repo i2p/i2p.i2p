@@ -39,6 +39,7 @@ public class ConnectionManager {
     private ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
     private Object _connectionLock;
+    private long SoTimeout;
     
     public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
         _context = context;
@@ -58,6 +59,9 @@ public class ConnectionManager {
         _maxConcurrentStreams = maxConcurrent;
         _defaultOptions = defaultOptions;
         _numWaiting = 0;
+        /** Socket timeout for accept() */
+        SoTimeout = -1;
+
         _context.statManager().createRateStat("stream.con.lifetimeMessagesSent", "How many messages do we send on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeMessagesReceived", "How many messages do we receive on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeBytesSent", "How many bytes do we send on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -90,6 +94,22 @@ public class ConnectionManager {
         return null;
     }
     
+    /**
+     * Set the socket accept() timeout.
+     * @param x
+     */
+    public void MsetSoTimeout(long x) {
+        SoTimeout = x;
+    }
+
+    /**
+     * Get the socket accept() timeout.
+     * @return
+     */
+    public long MgetSoTimeout() {
+        return SoTimeout;
+    }
+
     public void setAllowIncomingConnections(boolean allow) { 
         _connectionHandler.setActive(allow);
     }

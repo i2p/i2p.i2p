@@ -12,6 +12,7 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -219,6 +220,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Error accepting", ce);
                     // not killing the server..
+                } catch(SocketTimeoutException ste) {
+                    // ignored, we never set the timeout
                 }
             }
         }

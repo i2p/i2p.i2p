@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -107,6 +108,8 @@ public class StreamSinkServer {
                 } catch (ConnectException ce) {
                     _log.error("Connection already dropped", ce);
                     return;
+                } catch(SocketTimeoutException ste) {
+                    // ignored
                 }       
             }
         }

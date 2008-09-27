@@ -30,6 +30,21 @@ class I2PServerSocketImpl implements I2PServerSocket {
     /** lock on this when adding a new socket to the pending list, and wait on it accordingly */
     private Object socketAddedLock = new Object();
     
+    /**
+     * Set Sock Option accept timeout stub, does nothing
+     * @param x
+     */
+    public void setSoTimeout(long x) {
+    }
+
+    /**
+     * Get Sock Option accept timeout stub, does nothing
+     * @return timeout
+     */
+    public long getSoTimeout() {
+        return -1;
+    }
+
     public I2PServerSocketImpl(I2PSocketManager mgr) {
         this.mgr = mgr;
     }

@@ -1,6 +1,7 @@
 package net.i2p.client.streaming;
 
 import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -44,6 +45,14 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _context = null;
         _session = null;
     }
+
+    /**
+     * 
+     * @param context
+     * @param session
+     * @param opts
+     * @param name
+     */
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
         this();
         init(context, session, opts, name);
@@ -54,6 +63,11 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     
     /**
      *
+     * 
+     * @param context
+     * @param session
+     * @param opts
+     * @param name 
      */
     public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
@@ -96,17 +110,27 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return _connectionManager;
     }
 
-    public I2PSocket receiveSocket() throws I2PException {
+    /**
+     * 
+     * @return
+     * @throws net.i2p.I2PException
+     * @throws java.net.SocketTimeoutException
+     */
+    public I2PSocket receiveSocket() throws I2PException, SocketTimeoutException {
         verifySession();
-        Connection con = _connectionManager.getConnectionHandler().accept(-1);
-        if (_log.shouldLog(Log.DEBUG))
+        Connection con = _connectionManager.getConnectionHandler().accept(_connectionManager.MgetSoTimeout());
+        if(_log.shouldLog(Log.DEBUG)) {
             _log.debug("receiveSocket() called: " + con);
+        }
         if (con != null) {
             I2PSocketFull sock = new I2PSocketFull(con);
             con.setSocket(sock);
             return sock;
         } else { 
+            if(_connectionManager.MgetSoTimeout() == -1) {
             return null;
+        }
+            throw new SocketTimeoutException("I2PSocket timed out");
         }
     }
     
@@ -114,6 +138,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * Ping the specified peer, returning true if they replied to the ping within 
      * the timeout specified, false otherwise.  This call blocks.
      *
+     * 
+     * @param peer
+     * @param timeoutMs
+     * @return 
      */
     public boolean ping(Destination peer, long timeoutMs) {
         return _connectionManager.ping(peer, timeoutMs);

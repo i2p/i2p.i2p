@@ -8,12 +8,16 @@ class Executor implements Runnable {
     private I2PAppContext _context;
     private Log _log;
     private List _readyEvents;
-    public Executor(I2PAppContext ctx, Log log, List events) {
+    private SimpleStore runn;
+
+    public Executor(I2PAppContext ctx, Log log, List events, SimpleStore x) {
         _context = ctx;
         _readyEvents = events;
+        runn = x;
     }
+
     public void run() {
-        while (true) {
+        while(runn.getAnswer()) {
             SimpleTimer.TimedEvent evt = null;
             synchronized (_readyEvents) {
                 if (_readyEvents.size() <= 0) 
