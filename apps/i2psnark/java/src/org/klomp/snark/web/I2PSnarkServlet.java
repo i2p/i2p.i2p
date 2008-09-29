@@ -87,7 +87,8 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<table border=\"0\" width=\"100%\">\n");
         out.write("<tr><td><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>\n");
         out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
-        int count = 0;
+        out.write("<tr><td><a href=\"http://codevoid.i2p/forums/5\" class=\"snarkRefresh\">Wishlist</a>\n");
+        int count = 1;
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
