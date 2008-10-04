@@ -1,3 +1,6 @@
+2008-09-29 zzz
+    * i2psnark: Add codevoid link, remove mastertracker
+
 2008-09-23 zzz
     * config.jsp: Add some reachability help
     * configpeer.jsp: Add blocklist info
