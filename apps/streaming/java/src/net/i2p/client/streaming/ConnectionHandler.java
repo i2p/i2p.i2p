@@ -95,7 +95,11 @@ class ConnectionHandler {
                         try { _synQueue.wait(); } catch (InterruptedException ie) {}
                     } else {
                         long remaining = expiration - _context.clock().now();
-                        if (remaining < 0)
+// BUGFIX
+// The specified amount of real time has elapsed, more or less. 
+// If timeout is zero, however, then real time is not taken into consideration 
+// and the thread simply waits until notified.
+                        if (remaining < 1)
                             break;
                         try { _synQueue.wait(remaining); } catch (InterruptedException ie) {}
                     }

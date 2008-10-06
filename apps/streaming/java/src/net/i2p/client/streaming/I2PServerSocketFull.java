@@ -1,8 +1,6 @@
 package net.i2p.client.streaming;
 
 import java.net.SocketTimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.i2p.I2PException;
 
 /**

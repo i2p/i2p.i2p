@@ -128,8 +128,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             return sock;
         } else { 
             if(_connectionManager.MgetSoTimeout() == -1) {
-            return null;
-        }
+                return null;
+            }
             throw new SocketTimeoutException("I2PSocket timed out");
         }
     }
