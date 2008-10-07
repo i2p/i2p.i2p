@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2008-08-24 12:00:00 $">
- <i2p.release version="0.6.3" date="2008/08/24" minVersion="0.6"
+<i2p.news date="$Date: 2008-10-05 12:00:00 $">
+ <i2p.release version="0.6.4" date="2008/10/05" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,18 +11,22 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2008-08-24: <b>0.6.3 <a href="http://www.i2p2.i2p/release-0.6.3.html">Released</a></b>
+2008-10-05: <b>0.6.4 <a href="http://www.i2p2.i2p/release-0.6.4.html">Released</a></b>
 </p><p>
-The 0.6.3 release introduces multiple bugfixes, optimizations and security improvements.
-Routers will start monitoring the number of well-behaved NetDB peers,
-volunteering as one if a shortage develops and they can.
-Well-behaved NetDB nodes are preferred stronger, and ill-behaved nodes
-blacklisted more effectively. LeaseSets are handled more efficiently,
-new fixes should enable the correct operation of UDP introducers.
-I2P also gains preliminary support for permanent IP blocklists,
-and a new peer connection limiter. Improvements to the Router Console
-should make configuring client applications easier and I2PSnark
-will now resist corrupt data better.</p>
+The 0.6.4 release adds performance and stability improvements.
+Floodfill peers which are already connected, are preferred
+for RouterInfo stores, and references to new floodfill peers
+obtained from ordinary peers in case of shortage.
+
+Preference for already connected peers is generally increased
+by considering them active. Timeouts during tunnel joins
+are now counted against peer profiles.
+
+Improvements to the shutdown handler, tunnel builder,
+router throttling, collection of tunnel pool statistics,
+as well as router console and I2PSnark improvements
+(and texts to explain reachability issues) are also included.
+</p>
 
 <!--
 &#149;

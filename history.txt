@@ -4,6 +4,11 @@
     * Fixed SimpleTimer class to allow exit.
     * BOB (Basic Open Bridge) added.
 
+* 2008-10-05  0.6.4 released
+
+2008-10-05 Complication
+    * Update versions, package release
+
 2008-09-29 zzz
     * i2psnark: Add codevoid link, remove mastertracker
 
