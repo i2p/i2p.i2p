@@ -1,3 +1,9 @@
+2008-10-07 sponge
+    * Bugfixes and additions to streaming.
+    * Added SimpleStore class in utils.
+    * Fixed SimpleTimer class to allow exit.
+    * BOB (Basic Open Bridge) added.
+
 2008-09-29 zzz
     * i2psnark: Add codevoid link, remove mastertracker
 
