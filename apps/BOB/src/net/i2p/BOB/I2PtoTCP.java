@@ -89,18 +89,15 @@ public class I2PtoTCP implements Runnable {
 				}
 			}
 
-		} catch(UnknownHostException ex) {
-			// OOPS!
-		} catch(IOException ex) {
-			// OOPS!
+		} catch(Exception e) {
 		}
 		try {
 			I2P.close();
-		} catch(IOException ex) {
+		} catch(Exception e) {
 		}
 		try {
 			sock.close();
-		} catch(IOException ex) {
+		} catch(Exception e) {
 		}
 	}
 }

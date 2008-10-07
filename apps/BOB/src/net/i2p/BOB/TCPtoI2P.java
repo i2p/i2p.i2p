@@ -33,7 +33,6 @@ import java.net.Socket;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 
@@ -56,9 +55,9 @@ public class TCPtoI2P implements Runnable {
 	 * 
 	 * @param in
 	 * @return line of text as a String
-	 * @throws java.io.IOException
+	 * @throws Exception 
 	 */
-	public static String Lread(InputStream in) throws IOException {
+	public static String Lread(InputStream in) throws Exception {
 		String S;
 		int b;
 		char c;
@@ -163,23 +162,19 @@ public class TCPtoI2P implements Runnable {
 					Emsg("ERROR " + e.toString(), out);
 				}
 
-			} catch(DataFormatException e) {
-				Emsg("ERROR " + e.toString(), out);
-			} catch(NullPointerException e) {
+			} catch(Exception e) {
 				Emsg("ERROR " + e.toString(), out);
 			}
 		} catch(IOException ioe) {
 		}
 		try {
 			I2P.close();
-		} catch(IOException ex) {
-		} catch(NullPointerException e) {
+		} catch(Exception e) {
 		}
 
 		try {
 			sock.close();
-		} catch(IOException ex) {
-		} catch(NullPointerException e) {
+		} catch(Exception e) {
 		}
 	}
 }
