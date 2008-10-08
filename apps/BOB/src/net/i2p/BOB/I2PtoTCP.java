@@ -23,11 +23,9 @@
  */
 package net.i2p.BOB;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import net.i2p.client.streaming.I2PSocket;
 
 /**

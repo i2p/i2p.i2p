@@ -80,7 +80,7 @@ public class TCPio implements Runnable {
 					/* according to the specs:
 					 * 
 					 * The total number of bytes read into the buffer, 
-					 * or -1 is there is no more data because the end of 
+					 * or -1 if there is no more data because the end of 
 					 * the stream has been reached.
 					 * 
 					 */

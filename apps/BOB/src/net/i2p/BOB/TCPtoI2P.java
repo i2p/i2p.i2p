@@ -100,12 +100,10 @@ public class TCPtoI2P implements Runnable {
 	 * @throws java.io.IOException
 	 */
 	private void Emsg(String e, OutputStream out) throws IOException {
-		System.out.println("ERROR TCPtoI2P: " + e);
+// Debugging		System.out.println("ERROR TCPtoI2P: " + e);
 		out.write("ERROR".concat(e).getBytes());
 		out.write(13); // cr
 		out.flush();
-		sock.close();
-
 	}
 
 	/**
@@ -152,7 +150,8 @@ public class TCPtoI2P implements Runnable {
 							// nop
 						}
 					}
-				} catch(I2PException e) {
+
+				} catch(I2PException e) {					
 					Emsg("ERROR " + e.toString(), out);
 				} catch(ConnectException e) {
 					Emsg("ERROR " + e.toString(), out);
