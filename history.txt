@@ -1,3 +1,7 @@
+2008-10-08 sponge
+    * Update version to -2
+    * Bugfixes and additions to BOB
+
 2008-10-07 sponge
     * Bugfixes and additions to streaming.
     * Added SimpleStore class in utils.
