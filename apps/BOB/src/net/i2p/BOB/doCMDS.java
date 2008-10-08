@@ -31,11 +31,8 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
@@ -234,9 +231,9 @@ public class doCMDS implements Runnable {
 	 * @return true if the tunnel is active
 	 */
 	public boolean tunnelactive(nickname Arg) {
-		return (Arg.get(P_STARTING).equals(true) ||
-			Arg.get(P_STOPPING).equals(true) ||
-			Arg.get(P_RUNNING).equals(true));
+		return (Arg.get(P_STARTING).equals(Boolean.TRUE) ||
+			Arg.get(P_STOPPING).equals(Boolean.TRUE) ||
+			Arg.get(P_RUNNING).equals(Boolean.TRUE));
 
 	}
 
@@ -358,7 +355,7 @@ public class doCMDS implements Runnable {
 							if(tunnelactive(nickinfo)) {
 								out.println("ERROR tunnel is active");
 							} else {
-								nickinfo.add(P_QUIET, (Boolean.parseBoolean(Arg) == true));
+								nickinfo.add(P_QUIET, new Boolean(Boolean.parseBoolean(Arg) == true));
 								out.println("OK Quiet set");
 							}
 						} else {
@@ -407,10 +404,10 @@ public class doCMDS implements Runnable {
 							nickinfo = new nickname();
 							database.add(Arg, nickinfo);
 							nickinfo.add(P_NICKNAME, Arg);
-							nickinfo.add(P_STARTING, false);
-							nickinfo.add(P_RUNNING, false);
-							nickinfo.add(P_STOPPING, false);
-							nickinfo.add(P_QUIET, false);
+							nickinfo.add(P_STARTING, Boolean.FALSE);
+							nickinfo.add(P_RUNNING, Boolean.FALSE);
+							nickinfo.add(P_STOPPING, Boolean.FALSE);
+							nickinfo.add(P_QUIET, Boolean.FALSE);
 							nickinfo.add(P_INHOST, "localhost");
 							nickinfo.add(P_OUTHOST, "localhost");
 							Properties Q = props;
@@ -468,7 +465,7 @@ public class doCMDS implements Runnable {
 								try {
 									prt = Integer.parseInt(Arg);
 									if(prt > 1 && prt < 65536) {
-										nickinfo.add(P_INPORT, prt);
+										nickinfo.add(P_INPORT, new Integer(prt));
 									}
 								} catch(NumberFormatException nfe) {
 									out.println("ERROR not a number");
@@ -495,7 +492,7 @@ public class doCMDS implements Runnable {
 								try {
 									prt = Integer.parseInt(Arg);
 									if(prt > 1 && prt < 65536) {
-										nickinfo.add(P_OUTPORT, prt);
+										nickinfo.add(P_OUTPORT, new Integer(prt));
 									}
 								} catch(NumberFormatException nfe) {
 									out.println("ERROR not a number");
@@ -550,7 +547,7 @@ public class doCMDS implements Runnable {
 								try {
 									tunnel = new MUXlisten(nickinfo, _log);
 									Thread t = new Thread(tunnel);
-									nickinfo.add(P_STARTING, true);
+									nickinfo.add(P_STARTING, Boolean.TRUE);
 									t.start();
 									out.println("OK tunnel starting");
 								} catch(I2PException e) {
@@ -565,8 +562,8 @@ public class doCMDS implements Runnable {
 					} else if(Command.equals(C_stop)) {
 						// Stop the tunnel, if it is running
 						if(ns) {
-							if(nickinfo.get(P_RUNNING).equals(true) && nickinfo.get(P_STOPPING).equals(false)) {
-								nickinfo.add(P_STOPPING, true);
+							if(nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE)) {
+								nickinfo.add(P_STOPPING, Boolean.TRUE);
 								out.println("OK tunnel stopping");
 							} else {
 								out.println("ERROR tunnel is inactive");

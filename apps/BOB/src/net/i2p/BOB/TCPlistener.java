@@ -75,7 +75,7 @@ public class TCPlistener implements Runnable {
 			ServerSocket listener = new ServerSocket(Integer.parseInt(info.get("INPORT").toString()), backlog, InetAddress.getByName(info.get("INHOST").toString()));
 			Socket server = new Socket();
 			listener.setSoTimeout(1000);
-			while(info.get("RUNNING").equals(true)) {
+			while(info.get("RUNNING").equals(Boolean.TRUE)) {
 //				System.out.println("Thread count " + Thread.activeCount());
 				try {
 					server = listener.accept();

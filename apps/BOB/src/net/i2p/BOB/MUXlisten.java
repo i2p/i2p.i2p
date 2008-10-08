@@ -57,7 +57,7 @@ public class MUXlisten implements Runnable {
 	MUXlisten(nickname info, Log _log) throws I2PException, IOException {
 		this.info = info;
 		this._log = _log;
-		this.info.add("STARTING", true);
+		this.info.add("STARTING", Boolean.TRUE);
 
 		N = this.info.get("NICKNAME").toString();
 		prikey = new ByteArrayInputStream((byte[])info.get("KEYS"));
@@ -71,8 +71,8 @@ public class MUXlisten implements Runnable {
 	public void run() {
 
 		tg = new ThreadGroup(N);
-		info.add("RUNNING", true);
-		info.add("STARTING", false);
+		info.add("RUNNING", Boolean.TRUE);
+		info.add("STARTING", Boolean.FALSE);
 
 		// toss the connections to a new threads.
 		// will wrap with TCP and UDP when UDP works
@@ -89,7 +89,7 @@ public class MUXlisten implements Runnable {
 			q.start();
 		}
 
-		while(info.get("STOPPING").equals(false)) {
+		while(info.get("STOPPING").equals(Boolean.FALSE)) {
 			try {
 				Thread.sleep(1000); //sleep for 1000 ms (One second)
 			} catch(InterruptedException e) {
@@ -97,7 +97,7 @@ public class MUXlisten implements Runnable {
 			}
 		}
 
-		info.add("RUNNING", false);
+		info.add("RUNNING", Boolean.FALSE);
 		// wait for child threads and thread groups to die
 		while (tg.activeCount() + tg.activeGroupCount() != 0) {
 			try {
@@ -111,8 +111,8 @@ public class MUXlisten implements Runnable {
 		tg.destroy();
 		// Zap reference to the ThreadGroup so the JVM can GC it.
 		tg = null;
-		info.add("STOPPING", false);
-		info.add("STARTING", false);
+		info.add("STOPPING", Boolean.FALSE);
+		info.add("STARTING", Boolean.FALSE);
 
 	}
 }

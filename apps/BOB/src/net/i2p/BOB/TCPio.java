@@ -64,7 +64,7 @@ public class TCPio implements Runnable {
 		int b;
 		byte a[] = new byte[1];
 		try {
-			while(info.get("RUNNING").equals(true)) {
+			while(info.get("RUNNING").equals(Boolean.TRUE)) {
 				b = Ain.read(a, 0, 1);
 				// System.out.println(info.get("NICKNAME").toString() + " " + b);
 				if(b > 0) {

@@ -65,7 +65,7 @@ public class I2PtoTCP implements Runnable {
 			OutputStream Iout = I2P.getOutputStream();
 			I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
 
-			if(info.get("QUIET").equals(false)) {
+			if(info.get("QUIET").equals(Boolean.FALSE)) {
 				// tell who is connecting
 				out.write(I2P.getPeerDestination().toBase64().getBytes());
 				out.write(10); // nl

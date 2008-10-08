@@ -74,7 +74,7 @@ public class I2Plistener implements Runnable {
 		if(info.exists("INPORT")) {
 			tgwatch = 2;
 		}
-		while(info.get("RUNNING").equals(true)) {
+		while(info.get("RUNNING").equals(Boolean.TRUE)) {
 			try {
 				try {
 					sessSocket = serverSocket.accept();
