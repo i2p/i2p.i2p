@@ -46,7 +46,7 @@ public class doCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-6";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-8pre";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -58,6 +58,7 @@ public class doCMDS implements Runnable {
 	private nickname nickinfo;
 	private Log _log;
 	/* database strings */
+	private static final String P_DEST = "DESTINATION";
 	private static final String P_INHOST = "INHOST";
 	private static final String P_INPORT = "INPORT";
 	private static final String P_KEYS = "KEYS";
@@ -72,12 +73,14 @@ public class doCMDS implements Runnable {
 	/* command strings */
 	private static final String C_help = "help";
 	private static final String C_clear = "clear";
+	private static final String C_getdest = "getdest";
 	private static final String C_getkeys = "getkeys";
 	private static final String C_getnick = "getnick";
 	private static final String C_inhost = "inhost";
 	private static final String C_inport = "inport";
 	private static final String C_list = "list";
 	private static final String C_newkeys = "newkeys";
+	private static final String C_option = "option";
 	private static final String C_outhost = "outhost";
 	private static final String C_outport = "outport";
 	private static final String C_quiet = "quiet";
@@ -93,15 +96,17 @@ public class doCMDS implements Runnable {
 	private static final String C_ALL[][] = {
 		{C_help, C_help + " <command> * Get help on a command."},
 		{C_clear, C_clear + " * Clear the current nickname out of the list."},
+		{C_getdest, C_getdest + " * Return the destination for the current nickname."},
 		{C_getkeys, C_getkeys + " * Return the keypair for the current nickname."},
 		{C_getnick, C_getnick + " tunnelname * Set the nickname from the database."},
 		{C_inhost, C_inhost + " hostname | IP * Set the inbound hostname or IP."},
 		{C_inport, C_inport + " port_number * Set the inbound port number nickname listens on."},
 		{C_list, C_list + " * List all tunnels."},
 		{C_newkeys, C_newkeys + " * Generate a new keypair for the current nickname."},
+		{C_option, C_option + " I2CPoption=something * Set an I2CP option. NOTE: Don't use any spaces."},
 		{C_outhost, C_outhost + " hostname | IP * Set the outbound hostname or IP."},
 		{C_outport, C_outport + " port_number * Set the outbound port that nickname contacts."},
-		{C_quiet, C_quiet + " *"},
+		{C_quiet, C_quiet + " True | False * Don't send to the application the incoming destination."},
 		{C_quit, C_quit + " * Quits this session with BOB."},
 		{C_setkeys, C_setkeys + " BASE64_keypair * Sets the keypair for the current nickname."},
 		{C_setnick, C_setnick + " nickname * Create a new nickname."},
@@ -112,12 +117,14 @@ public class doCMDS implements Runnable {
 		{"", "COMMANDS: " + // this is ugly, but...
 			C_help + " " +
 			C_clear + " " +
+			C_getdest + " " +
 			C_getkeys + " " +
 			C_getnick + " " +
 			C_inhost + " " +
 			C_inport + " " +
 			C_list + " " +
 			C_newkeys + " " +
+			C_option + " " +
 			C_outhost + " " +
 			C_outport + " " +
 			C_quiet + " " +
@@ -133,7 +140,7 @@ public class doCMDS implements Runnable {
 	};
 
 	/**
-	 * 
+	 *
 	 * @param server
 	 * @param props
 	 * @param database
@@ -146,9 +153,9 @@ public class doCMDS implements Runnable {
 		this._log = _log;
 	}
 
-	/** 
+	/**
 	 * Try to print info from the database
-	 * 
+	 *
 	 * @param out
 	 * @param info
 	 * @param key
@@ -164,7 +171,7 @@ public class doCMDS implements Runnable {
 
 	/**
 	 * Print true or false if an object exists
-	 * 
+	 *
 	 * @param out
 	 * @param info
 	 * @param key
@@ -176,7 +183,7 @@ public class doCMDS implements Runnable {
 
 	/**
 	 * Print an error message
-	 * 
+	 *
 	 * @param out
 	 */
 	public void nns(PrintStream out) {
@@ -185,7 +192,7 @@ public class doCMDS implements Runnable {
 
 	/**
 	 * Dump various information from the database
-	 * 
+	 *
 	 * @param out
 	 * @param info
 	 */
@@ -219,7 +226,7 @@ public class doCMDS implements Runnable {
 
 	/**
 	 * Is this nickname's tunnel active?
-	 * 
+	 *
 	 * @param Arg
 	 * @return true if the tunnel is active
 	 */
@@ -232,7 +239,7 @@ public class doCMDS implements Runnable {
 
 	/**
 	 * Does the base64 information look OK
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 */
@@ -247,7 +254,7 @@ public class doCMDS implements Runnable {
 	/**
 	 * The actual parser.
 	 * It probabbly needs a rewrite into functions, but I kind-of like inline code.
-	 * 
+	 *
 	 */
 	public void run() {
 		dk = ns = ip = op = false;
@@ -283,7 +290,16 @@ public class doCMDS implements Runnable {
 								out.println("OK " + C_ALL[i][1]);
 							}
 						}
-
+					} else if(Command.equals(C_getdest)) {
+						if(ns) {
+							if(dk) {
+								out.println("OK " + nickinfo.get(P_DEST));
+							} else {
+								out.println("ERROR keys not set.");
+							}
+						} else {
+							nns(out);
+						}
 					} else if(Command.equals(C_list)) {
 						// Produce a formatted list of all nicknames
 						for(int i = 0; i < database.getcount(); i++) {
@@ -311,8 +327,9 @@ public class doCMDS implements Runnable {
 									d = I2PClientFactory.createClient().createDestination(prikey);
 									dk = true;
 									nickinfo.add(P_KEYS, prikey.toByteArray());
+									nickinfo.add(P_DEST, d.toBase64());
 									// System.out.println(prikey.toByteArray().length);
-									out.println("OK " + d.toBase64());
+									out.println("OK " + nickinfo.get(P_DEST));
 								} catch(IOException ioe) {
 									BOB.error("Error generating keys" + ioe);
 									out.println("ERROR generating keys");
@@ -394,6 +411,26 @@ public class doCMDS implements Runnable {
 							out.println("OK Nickname set to " + Arg);
 						} else {
 							out.println("ERROR tunnel is active");
+						}
+					} else if(Command.equals(C_option)) {
+						if(ns) {
+							if(tunnelactive(nickinfo)) {
+								out.println("ERROR tunnel is active");
+							} else {
+								StringTokenizer otoken = new StringTokenizer(Arg, "="); // use a space as a delimiter
+								if(otoken.countTokens() != 2) {
+									out.println("ERROR to many or no options.");
+								} else {
+									String pname = otoken.nextToken();
+									String pval = otoken.nextToken();
+									Properties Q = (Properties)nickinfo.get(P_PROPERTIES);
+									Q.setProperty(pname, pval);
+									nickinfo.add(P_PROPERTIES, Q);
+									out.println("OK " + pname + " set to " + pval);
+								} 
+							}
+						} else {
+							nns(out);
 						}
 					} else if(Command.equals(C_getnick)) {
 						// Get the nickname to work with...
@@ -504,8 +541,8 @@ public class doCMDS implements Runnable {
 								try {
 									tunnel = new MUXlisten(nickinfo, _log);
 									Thread t = new Thread(tunnel);
-									t.start();
 									nickinfo.add(P_STARTING, true);
+									t.start();
 									out.println("OK tunnel starting");
 								} catch(I2PException e) {
 									out.println("ERROR starting tunnel: " + e);
