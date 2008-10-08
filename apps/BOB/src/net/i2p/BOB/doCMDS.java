@@ -31,8 +31,11 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
@@ -46,7 +49,7 @@ public class doCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-8pre";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-8";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -367,11 +370,17 @@ public class doCMDS implements Runnable {
 							if(tunnelactive(nickinfo)) {
 								out.println("ERROR tunnel is active");
 							} else {
-								prikey = new ByteArrayOutputStream();
-								prikey.write(net.i2p.data.Base64.decode(Arg));
+								try {
+									prikey = new ByteArrayOutputStream();
+									prikey.write(net.i2p.data.Base64.decode(Arg));
+									d.fromBase64(Arg);
+								} catch(Exception ex) {
+									Arg = "";
+								}
 								if((Arg.length() == 884) && is64ok(Arg)) {
 									nickinfo.add(P_KEYS, prikey.toByteArray());
-									out.println("OK Keys set");
+									nickinfo.add(P_DEST, d.toBase64());
+									out.println("OK " + nickinfo.get(P_DEST));
 									dk = true;
 								} else {
 									out.println("ERROR not in BASE64 format");
@@ -427,7 +436,7 @@ public class doCMDS implements Runnable {
 									Q.setProperty(pname, pval);
 									nickinfo.add(P_PROPERTIES, Q);
 									out.println("OK " + pname + " set to " + pval);
-								} 
+								}
 							}
 						} else {
 							nns(out);
