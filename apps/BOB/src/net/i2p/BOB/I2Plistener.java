@@ -40,7 +40,7 @@ import net.i2p.util.Log;
  */
 public class I2Plistener implements Runnable {
 
-	private nickname info;
+	private nickname info,  database;
 	private Log _log;
 	private int tgwatch;
 	public I2PSocketManager socketManager;
@@ -50,9 +50,11 @@ public class I2Plistener implements Runnable {
 	 * Constructor
 	 * @param S
 	 * @param info
+	 * @param database
 	 * @param _log
 	 */
-	I2Plistener(I2PSocketManager S, nickname info, Log _log) {
+	I2Plistener(I2PSocketManager S, nickname info, nickname database, Log _log) {
+		this.database = database;
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
@@ -62,38 +64,48 @@ public class I2Plistener implements Runnable {
 
 	/**
 	 * Simply listen on I2P port, and thread connections
-	 * 
-	 * @throws RuntimeException 
+	 *
+	 * @throws RuntimeException
 	 */
 	public void run() throws RuntimeException {
 		boolean g = false;
 		I2PSocket sessSocket = null;
 
-		// needed to hack in this method :-/
 		serverSocket.setSoTimeout(1000);
+		database.getReadLock();
+		info.getReadLock();
 		if(info.exists("INPORT")) {
 			tgwatch = 2;
 		}
-		while(info.get("RUNNING").equals(Boolean.TRUE)) {
+		info.releaseReadLock();
+		database.releaseReadLock();
+		boolean spin = true;
+		while(spin) {
+
+			database.getReadLock();
+			info.getReadLock();
+			spin = info.get("RUNNING").equals(Boolean.TRUE);
+			info.releaseReadLock();
+			database.releaseReadLock();
 			try {
 				try {
 					sessSocket = serverSocket.accept();
 					g = true;
 				} catch(ConnectException ce) {
 					g = false;
-				} catch (SocketTimeoutException ste) {
+				} catch(SocketTimeoutException ste) {
 					g = false;
 				}
 				if(g) {
 					g = false;
 					// toss the connection to a new thread.
-					I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info);
+					I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database);
 					Thread t = new Thread(conn_c, "BOBI2PtoTCP");
 					t.start();
 				}
 
 			} catch(I2PException e) {
-				System.out.println("Exception "+e);
+			//	System.out.println("Exception " + e);
 			}
 		}
 

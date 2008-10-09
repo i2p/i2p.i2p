@@ -21,7 +21,6 @@
  *
  * ...for any additional details and liscense questions.
  */
-
 package net.i2p.BOB;
 
 /**
@@ -29,17 +28,54 @@ package net.i2p.BOB;
  * 
  * @author sponge
  */
-public class  nickname  {
+public class nickname {
 
-	private Object[][] data;
-	private int index = 0;
-
+	private static final int maxWritersWaiting = 2;
+	private volatile Object[][] data;
+	private volatile int index, writersWaiting, readers;
+	private volatile boolean writingInProgress;
 	/**
 	 * make initial NULL object
 	 * 
 	 */
 	public nickname() {
-		data = new Object[1][2];
+		this.data = new Object[1][2];
+		this.index = this.writersWaiting = this.readers = 0;
+		this.writingInProgress = false;
+	}
+
+	synchronized public void getReadLock() {
+		while(writingInProgress | (writersWaiting >= maxWritersWaiting)) {
+			try {
+				wait();
+			} catch(InterruptedException ie) {
+			}
+			readers++;
+		}
+	}
+
+	synchronized public void releaseReadLock() {
+		readers--;
+		if((readers == 0) & (writersWaiting > 0)) {
+			notifyAll();
+		}
+	}
+
+	synchronized public void getWriteLock() {
+		writersWaiting++;
+		while((readers > 0) | writingInProgress) {
+			try {
+				wait();
+			} catch(InterruptedException ie) {
+			}
+		}
+		writersWaiting--;
+		writingInProgress = true;
+	}
+
+	synchronized public void releaseWriteLock() {
+		writingInProgress = false;
+		notifyAll();
 	}
 
 	/**
@@ -74,7 +110,7 @@ public class  nickname  {
 		}
 		olddata = new Object[index + 2][2];
 		// copy to olddata, skipping 'k'
-		for(i = 0      , l = 0; l < index; i++, l++) {
+		for(i = 0          , l = 0; l < index; i++, l++) {
 			if(i == k) {
 				l++;
 				didsomething++;

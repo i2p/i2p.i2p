@@ -1,3 +1,7 @@
+2008-10-09 sponge
+    * Update version to -3
+    * BOB database threadlocking fixes
+
 2008-10-08 sponge
     * Update version to -2
     * Bugfixes and additions to BOB

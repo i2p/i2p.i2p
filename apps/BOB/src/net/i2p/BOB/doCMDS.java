@@ -46,7 +46,7 @@ public class doCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-8";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-9";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -153,6 +153,42 @@ public class doCMDS implements Runnable {
 		this._log = _log;
 	}
 
+	private void rlock() {
+		rlock(nickinfo);
+	}
+
+	private void rlock(nickname Arg) {
+		database.getReadLock();
+		Arg.getReadLock();
+	}
+
+	private void runlock() {
+		runlock(nickinfo);
+	}
+
+	private void runlock(nickname Arg) {
+		Arg.releaseReadLock();
+		database.releaseReadLock();
+	}
+
+	private void wlock() {
+		wlock(nickinfo);
+	}
+
+	private void wlock(nickname Arg) {
+		database.getWriteLock();
+		Arg.getWriteLock();
+	}
+
+	private void wunlock() {
+		wunlock(nickinfo);
+	}
+
+	private void wunlock(nickname Arg) {
+		Arg.releaseWriteLock();
+		database.releaseWriteLock();
+	}
+
 	/**
 	 * Try to print info from the database
 	 *
@@ -161,12 +197,17 @@ public class doCMDS implements Runnable {
 	 * @param key
 	 */
 	public void trypnt(PrintStream out, nickname info, Object key) {
-		out.print(" " + key + ": ");
-		if(info.exists(key)) {
-			out.print(info.get(key));
-		} else {
-			out.print("not_set");
+		rlock(info);
+		try {
+			out.print(" " + key + ": ");
+			if(info.exists(key)) {
+				out.print(info.get(key));
+			} else {
+				out.print("not_set");
+			}
+		} catch(Exception e) {
 		}
+		runlock(info);
 	}
 
 	/**
@@ -177,8 +218,13 @@ public class doCMDS implements Runnable {
 	 * @param key
 	 */
 	public void tfpnt(PrintStream out, nickname info, Object key) {
-		out.print(" " + key + ": ");
-		out.print(info.exists(key));
+		rlock(info);
+		try {
+			out.print(" " + key + ": ");
+			out.print(info.exists(key));
+		} catch(Exception e) {
+		}
+		runlock(info);
 	}
 
 	/**
@@ -197,6 +243,7 @@ public class doCMDS implements Runnable {
 	 * @param info
 	 */
 	public void nickprint(PrintStream out, nickname info) {
+		rlock(info);
 		trypnt(out, info, P_NICKNAME);
 		trypnt(out, info, P_STARTING);
 		trypnt(out, info, P_RUNNING);
@@ -207,21 +254,28 @@ public class doCMDS implements Runnable {
 		trypnt(out, info, P_INHOST);
 		trypnt(out, info, P_OUTPORT);
 		trypnt(out, info, P_OUTHOST);
-		out.println();
-
+		try {
+			out.println();
+		} catch(Exception e) {
+		}
+		runlock(info);
 	}
 
 	/**
 	 * Print information on a specific record, indicated by nickname
 	 * @param out
-	 * @param database
 	 * @param Arg
 	 */
-	public void ttlpnt(PrintStream out, nickname database, Object Arg) {
+	public void ttlpnt(PrintStream out, Object Arg) {
+		database.getReadLock();
 		if(database.exists(Arg)) {
-			out.print("DATA");
+			try {
+				out.print("DATA");
+			} catch(Exception e) {
+			}
 			nickprint(out, (nickname)database.get(Arg));
 		}
+		database.releaseReadLock();
 	}
 
 	/**
@@ -231,10 +285,12 @@ public class doCMDS implements Runnable {
 	 * @return true if the tunnel is active
 	 */
 	public boolean tunnelactive(nickname Arg) {
-		return (Arg.get(P_STARTING).equals(Boolean.TRUE) ||
+		rlock(Arg);
+		boolean retval = (Arg.get(P_STARTING).equals(Boolean.TRUE) ||
 			Arg.get(P_STOPPING).equals(Boolean.TRUE) ||
 			Arg.get(P_RUNNING).equals(Boolean.TRUE));
-
+		runlock(Arg);
+		return retval;
 	}
 
 	/**
@@ -267,7 +323,6 @@ public class doCMDS implements Runnable {
 			out.println("BOB " + BOBversion);
 			out.println("OK");
 			while((line = in.readLine()) != null) {
-				System.gc(); // yes, this does make a huge difference...
 				StringTokenizer token = new StringTokenizer(line, " "); // use a space as a delimiter
 				String Command = "";
 				String Arg = "";
@@ -293,7 +348,12 @@ public class doCMDS implements Runnable {
 					} else if(Command.equals(C_getdest)) {
 						if(ns) {
 							if(dk) {
-								out.println("OK " + nickinfo.get(P_DEST));
+								rlock();
+								try {
+									out.println("OK " + nickinfo.get(P_DEST));
+								} catch(Exception e) {
+								}
+								runlock();
 							} else {
 								out.println("ERROR keys not set.");
 							}
@@ -302,16 +362,23 @@ public class doCMDS implements Runnable {
 						}
 					} else if(Command.equals(C_list)) {
 						// Produce a formatted list of all nicknames
+						database.getReadLock();
 						for(int i = 0; i < database.getcount(); i++) {
 							try {
 								info = (nickname)database.getnext(i);
-							} catch(RuntimeException b) {
+							} catch(Exception b) {
 								break; // something bad happened.
 							}
+							try {
 
-							out.print("DATA");
+								out.print("DATA");
+							} catch(Exception e) {
+							}
+							info.getReadLock();
 							nickprint(out, info);
+							info.releaseReadLock();
 						}
+						database.releaseReadLock();
 						out.println("OK Listing done");
 					} else if(Command.equals(C_quit)) {
 						// End the command session
@@ -325,11 +392,17 @@ public class doCMDS implements Runnable {
 									// Make a new PublicKey and PrivateKey
 									prikey = new ByteArrayOutputStream();
 									d = I2PClientFactory.createClient().createDestination(prikey);
-									dk = true;
+									wlock();
 									nickinfo.add(P_KEYS, prikey.toByteArray());
 									nickinfo.add(P_DEST, d.toBase64());
-									// System.out.println(prikey.toByteArray().length);
-									out.println("OK " + nickinfo.get(P_DEST));
+									dk = true;
+									wunlock();
+									rlock();
+									try {
+										out.println("OK " + nickinfo.get(P_DEST));
+									} catch(Exception e) {
+									}
+									runlock();
 								} catch(IOException ioe) {
 									BOB.error("Error generating keys" + ioe);
 									out.println("ERROR generating keys");
@@ -345,7 +418,9 @@ public class doCMDS implements Runnable {
 						// Return public key
 						if(dk) {
 							prikey = new ByteArrayOutputStream();
+							rlock();
 							prikey.write(((byte[])nickinfo.get(P_KEYS)));
+							runlock();
 							out.println("OK " + net.i2p.data.Base64.encode(prikey.toByteArray()));
 						} else {
 							out.println("ERROR no public key has been set");
@@ -355,7 +430,9 @@ public class doCMDS implements Runnable {
 							if(tunnelactive(nickinfo)) {
 								out.println("ERROR tunnel is active");
 							} else {
+								wlock();
 								nickinfo.add(P_QUIET, new Boolean(Boolean.parseBoolean(Arg) == true));
+								wunlock();
 								out.println("OK Quiet set");
 							}
 						} else {
@@ -375,10 +452,17 @@ public class doCMDS implements Runnable {
 									Arg = "";
 								}
 								if((Arg.length() == 884) && is64ok(Arg)) {
+									wlock();
 									nickinfo.add(P_KEYS, prikey.toByteArray());
 									nickinfo.add(P_DEST, d.toBase64());
-									out.println("OK " + nickinfo.get(P_DEST));
 									dk = true;
+									wunlock();
+									rlock();
+									try {
+										out.println("OK " + nickinfo.get(P_DEST));
+									} catch(Exception e) {
+									}
+									runlock();
 								} else {
 									out.println("ERROR not in BASE64 format");
 								}
@@ -388,20 +472,22 @@ public class doCMDS implements Runnable {
 						}
 					} else if(Command.equals(C_setnick)) {
 						ns = dk = ip = op = false;
+						database.getReadLock();
 						try {
 							nickinfo = (nickname)database.get(Arg);
 							if(!tunnelactive(nickinfo)) {
 								nickinfo = null;
 								ns = true;
 							}
-						} catch(RuntimeException b) {
+						} catch(Exception b) {
 							nickinfo = null;
 							ns = true;
 						}
-
+						database.releaseReadLock();
 						// Clears and Sets the initial nickname structure to work with
 						if(ns) {
 							nickinfo = new nickname();
+							wlock();
 							database.add(Arg, nickinfo);
 							nickinfo.add(P_NICKNAME, Arg);
 							nickinfo.add(P_STARTING, Boolean.FALSE);
@@ -410,10 +496,11 @@ public class doCMDS implements Runnable {
 							nickinfo.add(P_QUIET, Boolean.FALSE);
 							nickinfo.add(P_INHOST, "localhost");
 							nickinfo.add(P_OUTHOST, "localhost");
-							Properties Q = props;
-							Q.setProperty("inbound.nickname", (String)nickinfo.get(P_NICKNAME));
-							Q.setProperty("outbound.nickname", (String)nickinfo.get(P_NICKNAME));
+							Properties Q = new Properties(props);
+							Q.setProperty("inbound.nickname", Arg);
+							Q.setProperty("outbound.nickname", Arg);
 							nickinfo.add(P_PROPERTIES, Q);
+							wunlock();
 							out.println("OK Nickname set to " + Arg);
 						} else {
 							out.println("ERROR tunnel is active");
@@ -429,9 +516,13 @@ public class doCMDS implements Runnable {
 								} else {
 									String pname = otoken.nextToken();
 									String pval = otoken.nextToken();
+									rlock();
 									Properties Q = (Properties)nickinfo.get(P_PROPERTIES);
+									runlock();
 									Q.setProperty(pname, pval);
+									wlock();
 									nickinfo.add(P_PROPERTIES, Q);
+									wunlock();
 									out.println("OK " + pname + " set to " + pval);
 								}
 							}
@@ -440,16 +531,20 @@ public class doCMDS implements Runnable {
 						}
 					} else if(Command.equals(C_getnick)) {
 						// Get the nickname to work with...
+						database.getReadLock();
 						try {
 							nickinfo = (nickname)database.get(Arg);
 							ns = true;
 						} catch(RuntimeException b) {
 							nns(out);
 						}
+						database.releaseReadLock();
 						if(ns) {
+							rlock();
 							dk = nickinfo.exists(P_KEYS);
 							ip = nickinfo.exists(P_INPORT);
 							op = nickinfo.exists(P_OUTPORT);
+							runlock();
 							// Finally say OK.
 							out.println("OK Nickname set to " + Arg);
 						}
@@ -461,6 +556,7 @@ public class doCMDS implements Runnable {
 								out.println("ERROR tunnel is active");
 							} else {
 								int prt;
+								wlock();
 								nickinfo.kill(P_INPORT);
 								try {
 									prt = Integer.parseInt(Arg);
@@ -470,7 +566,10 @@ public class doCMDS implements Runnable {
 								} catch(NumberFormatException nfe) {
 									out.println("ERROR not a number");
 								}
+								wunlock();
+								rlock();
 								ip = nickinfo.exists(P_INPORT);
+								runlock();
 								if(ip) {
 									out.println("OK inbound port set");
 								} else {
@@ -488,6 +587,7 @@ public class doCMDS implements Runnable {
 								out.println("ERROR tunnel is active");
 							} else {
 								int prt;
+								wlock();
 								nickinfo.kill(P_OUTPORT);
 								try {
 									prt = Integer.parseInt(Arg);
@@ -497,7 +597,10 @@ public class doCMDS implements Runnable {
 								} catch(NumberFormatException nfe) {
 									out.println("ERROR not a number");
 								}
+								wunlock();
+								rlock();
 								ip = nickinfo.exists(P_OUTPORT);
+								runlock();
 								if(ip) {
 									out.println("OK outbound port set");
 								} else {
@@ -512,7 +615,9 @@ public class doCMDS implements Runnable {
 							if(tunnelactive(nickinfo)) {
 								out.println("ERROR tunnel is active");
 							} else {
+								wlock();
 								nickinfo.add(P_INHOST, Arg);
+								wunlock();
 								out.println("OK inhost set");
 							}
 						} else {
@@ -523,7 +628,9 @@ public class doCMDS implements Runnable {
 							if(tunnelactive(nickinfo)) {
 								out.println("ERROR tunnel is active");
 							} else {
+								wlock();
 								nickinfo.add(P_OUTHOST, Arg);
+								wunlock();
 								out.println("OK outhost set");
 							}
 						} else {
@@ -533,7 +640,9 @@ public class doCMDS implements Runnable {
 						// Get the current nickname properties
 						if(ns) {
 							out.print("OK");
+							rlock();
 							nickprint(out, nickinfo);
+							runlock();
 						} else {
 							nns(out);
 						}
@@ -545,9 +654,8 @@ public class doCMDS implements Runnable {
 							} else {
 								MUXlisten tunnel;
 								try {
-									tunnel = new MUXlisten(nickinfo, _log);
+									tunnel = new MUXlisten(database, nickinfo, _log);
 									Thread t = new Thread(tunnel);
-									nickinfo.add(P_STARTING, Boolean.TRUE);
 									t.start();
 									out.println("OK tunnel starting");
 								} catch(I2PException e) {
@@ -562,10 +670,15 @@ public class doCMDS implements Runnable {
 					} else if(Command.equals(C_stop)) {
 						// Stop the tunnel, if it is running
 						if(ns) {
-							if(nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE)) {
+							rlock();
+							if(nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
+								runlock();
+								wlock();
 								nickinfo.add(P_STOPPING, Boolean.TRUE);
+								wunlock();
 								out.println("OK tunnel stopping");
 							} else {
+								runlock();
 								out.println("ERROR tunnel is inactive");
 							}
 						} else {
@@ -577,7 +690,9 @@ public class doCMDS implements Runnable {
 							if(tunnelactive(nickinfo)) {
 								out.println("ERROR tunnel is active");
 							} else {
+								database.getWriteLock();
 								database.kill(nickinfo.get(P_NICKNAME));
+								database.releaseWriteLock();
 								dk = ns = ip = op = false;
 								out.println("OK cleared");
 							}
@@ -588,7 +703,7 @@ public class doCMDS implements Runnable {
 						if(database.exists(Arg)) {
 							// Show status of a nickname
 							out.print("OK ");
-							ttlpnt(out, database, Arg);
+							ttlpnt(out, Arg);
 						} else {
 							nns(out);
 						}

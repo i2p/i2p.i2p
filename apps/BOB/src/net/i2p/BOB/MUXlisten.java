@@ -39,7 +39,7 @@ import net.i2p.util.Log;
  */
 public class MUXlisten implements Runnable {
 
-	private nickname info;
+	private nickname database,  info;
 	private Log _log;
 	private I2PSocketManager socketManager;
 	private ByteArrayInputStream prikey;
@@ -50,18 +50,31 @@ public class MUXlisten implements Runnable {
 	 * Constructor
 	 * 
 	 * @param info
+	 * @param database
 	 * @param _log
 	 * @throws net.i2p.I2PException
 	 * @throws java.io.IOException
 	 */
-	MUXlisten(nickname info, Log _log) throws I2PException, IOException {
+	MUXlisten(nickname database, nickname info, Log _log) throws I2PException, IOException {
+		this.database = database;
 		this.info = info;
 		this._log = _log;
-		this.info.add("STARTING", Boolean.TRUE);
 
+		this.database.getReadLock();
+		this.info.getReadLock();
 		N = this.info.get("NICKNAME").toString();
 		prikey = new ByteArrayInputStream((byte[])info.get("KEYS"));
-		socketManager = I2PSocketManagerFactory.createManager(prikey, (Properties)info.get("PROPERTIES"));
+		Properties Q = (Properties)info.get("PROPERTIES");
+		this.database.releaseReadLock();
+		this.info.releaseReadLock();
+
+		this.database.getWriteLock();
+		this.info.getWriteLock();
+		this.info.add("STARTING", Boolean.TRUE);
+		this.info.releaseWriteLock();
+		this.database.releaseWriteLock();
+		
+		socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
 	}
 
 	/**
@@ -70,49 +83,82 @@ public class MUXlisten implements Runnable {
 	 */
 	public void run() {
 
-		tg = new ThreadGroup(N);
+		this.database.getWriteLock();
+		this.info.getWriteLock();
 		info.add("RUNNING", Boolean.TRUE);
 		info.add("STARTING", Boolean.FALSE);
+		this.info.releaseWriteLock();
+		this.database.releaseWriteLock();
 
-		// toss the connections to a new threads.
-		// will wrap with TCP and UDP when UDP works
-		if(info.exists("OUTPORT")) {
-			// I2P -> TCP
-			I2Plistener conn = new I2Plistener(socketManager, info, _log);
-			Thread t = new Thread(tg, conn, "BOBI2Plistener " + N);
-			t.start();
-		}
-		if(info.exists("INPORT")) {
-			// TCP -> I2P
-			TCPlistener conn = new TCPlistener(socketManager, info, _log);
-			Thread q = new Thread(tg, conn,"BOBTCPlistener" + N);
-			q.start();
-		}
+		try {
+			tg = new ThreadGroup(N);
 
-		while(info.get("STOPPING").equals(Boolean.FALSE)) {
-			try {
-				Thread.sleep(1000); //sleep for 1000 ms (One second)
-			} catch(InterruptedException e) {
-				// nop
+			// toss the connections to a new threads.
+			// will wrap with TCP and UDP when UDP works
+			this.database.getReadLock();
+			this.info.getReadLock();
+			boolean go_out = info.exists("OUTPORT");
+			boolean come_in = info.exists("INPORT");
+			this.database.releaseReadLock();
+			this.info.releaseReadLock();
+
+			if(go_out) {
+				// I2P -> TCP
+				I2Plistener conn = new I2Plistener(socketManager, info, database, _log);
+				Thread t = new Thread(tg, conn, "BOBI2Plistener " + N);
+				t.start();
 			}
+
+			if(come_in) {
+				// TCP -> I2P
+				TCPlistener conn = new TCPlistener(socketManager, info, database, _log);
+				Thread q = new Thread(tg, conn, "BOBTCPlistener" + N);
+				q.start();
+			}
+
+			boolean spin = true;
+			while(spin) {
+				try {
+					Thread.sleep(1000); //sleep for 1000 ms (One second)
+				} catch(InterruptedException e) {
+					// nop
+				}
+
+				this.database.getReadLock();
+				this.info.getReadLock();
+				spin = info.get("STOPPING").equals(Boolean.FALSE);
+				this.database.releaseReadLock();
+				this.info.releaseReadLock();
+			}
+
+			this.database.getWriteLock();
+			this.info.getWriteLock();
+			info.add("RUNNING", Boolean.FALSE);
+			this.info.releaseWriteLock();
+			this.database.releaseWriteLock();
+
+			// wait for child threads and thread groups to die
+			while(tg.activeCount() + tg.activeGroupCount() != 0) {
+				try {
+					Thread.sleep(1000); //sleep for 1000 ms (One second)
+				} catch(InterruptedException ex) {
+					// nop
+				}
+			}
+			tg.destroy();
+			// Zap reference to the ThreadGroup so the JVM can GC it.
+			tg = null;
+		} catch(Exception e) {
 		}
 
-		info.add("RUNNING", Boolean.FALSE);
-		// wait for child threads and thread groups to die
-		while (tg.activeCount() + tg.activeGroupCount() != 0) {
-			try {
-				Thread.sleep(1000); //sleep for 1000 ms (One second)
-			} catch(InterruptedException ex) {
-				// nop
-			}			
-		}
-		
 		socketManager.destroySocketManager();
-		tg.destroy();
-		// Zap reference to the ThreadGroup so the JVM can GC it.
-		tg = null;
-		info.add("STOPPING", Boolean.FALSE);
+		// zero out everything, just incase.
+		this.database.getWriteLock();
+		this.info.getWriteLock();
 		info.add("STARTING", Boolean.FALSE);
-
+		info.add("STOPPING", Boolean.FALSE);
+		info.add("RUNNING", Boolean.FALSE);
+		this.info.releaseWriteLock();
+		this.database.releaseWriteLock();
 	}
 }

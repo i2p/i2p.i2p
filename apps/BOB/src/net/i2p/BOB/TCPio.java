@@ -36,19 +36,21 @@ public class TCPio implements Runnable {
 
 	private InputStream Ain;
 	private OutputStream Aout;
-	private nickname info;
+	private nickname info,  database;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param Ain
 	 * @param Aout
-	 * @param db
+	 * @param info
+	 * @param database
 	 */
-	TCPio(InputStream Ain, OutputStream Aout, nickname db) {
+	TCPio(InputStream Ain, OutputStream Aout, nickname info, nickname database) {
 		this.Ain = Ain;
 		this.Aout = Aout;
-		this.info = db;
+		this.info = info;
+		this.database = database;
 	}
 
 	/**
@@ -63,13 +65,20 @@ public class TCPio implements Runnable {
 	public void run() {
 		int b;
 		byte a[] = new byte[1];
+		boolean spin = true;
 		try {
-			while(info.get("RUNNING").equals(Boolean.TRUE)) {
+			while(spin) {
+				database.getReadLock();
+				info.getReadLock();
+				spin = info.get("RUNNING").equals(Boolean.TRUE);
+				info.releaseReadLock();
+				database.releaseReadLock();
+
 				b = Ain.read(a, 0, 1);
 				// System.out.println(info.get("NICKNAME").toString() + " " + b);
 				if(b > 0) {
-					Aout.write(a,0,1);
-					// Aout.flush(); too slow!
+					Aout.write(a, 0, 1);
+				// Aout.flush(); too slow!
 				} else if(b == 0) {
 					try {
 						// Thread.yield();
@@ -87,7 +96,7 @@ public class TCPio implements Runnable {
 					return;
 				}
 			}
-		} catch(IOException e) {
+		} catch(Exception e) {
 		}
 	}
 }
