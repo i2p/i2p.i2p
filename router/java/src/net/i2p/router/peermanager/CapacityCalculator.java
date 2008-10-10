@@ -100,6 +100,13 @@ public class CapacityCalculator extends Calculator {
         long eventCount = 0;
         if (curAccepted != null)
             eventCount = curAccepted.getCurrentEventCount() + curAccepted.getLastEventCount();
+        // Punish for rejections.
+        // We don't want to simply do eventCount -= rejected or we get to zero with 50% rejection,
+        // and we don't want everybody to be at zero during times of congestion.
+        if (eventCount > 0) {
+            long rejected = curRejected.getCurrentEventCount() + curRejected.getLastEventCount();
+            eventCount = eventCount * eventCount / (eventCount + rejected);
+        }
         double stretch = ((double)ESTIMATE_PERIOD) / period;
         double val = eventCount * stretch;
         long failed = 0;
@@ -115,12 +122,6 @@ public class CapacityCalculator extends Calculator {
             //else
             val -= failed * stretch;
         }
-        
-        //if ( (period <= 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) ) {
-        //    //System.out.println("10m period has rejected " + (curRejected.getCurrentEventCount() + curRejected.getLastEventCount()) + " times");
-        //    return 0.0d;
-        //} else
-            val -= stretch * (curRejected.getCurrentEventCount() + curRejected.getLastEventCount());
         
         val += GROWTH_FACTOR;
         
