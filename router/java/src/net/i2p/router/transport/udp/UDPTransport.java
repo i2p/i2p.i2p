@@ -630,11 +630,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                 }
                 markUnreachable(peerHash);
-                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network");
+                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network, version = " + dsm.getRouterInfo().getOption("router.version"));
                 //_context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net");
+                    _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net: " + dsm.getRouterInfo());
                 return;
             } else {
                 if (dsm.getRouterInfo() != null) {
@@ -1718,9 +1718,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 */
             buf.append("</a>&nbsp;");
             if (peer.isInbound())
-                buf.append("&lt; ");
+                buf.append("in ");
             else
-                buf.append("&gt; ");
+                buf.append("out ");
             if (peer.getWeRelayToThemAs() > 0)
                 buf.append("^");
             else
