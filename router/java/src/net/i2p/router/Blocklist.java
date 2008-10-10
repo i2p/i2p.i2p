@@ -765,7 +765,7 @@ public class Blocklist {
             buf.append("<table><tr><td><b>Transient IPs</b></td></tr>");
             for (Iterator iter = singles.iterator(); iter.hasNext(); ) {
                  int ip = ((Integer) iter.next()).intValue();
-                 buf.append("<tr><td>").append(toStr(ip)).append("</td></tr>\n");
+                 buf.append("<tr><td align=right>").append(toStr(ip)).append("</td></tr>\n");
             }
             buf.append("</table>");
         }
