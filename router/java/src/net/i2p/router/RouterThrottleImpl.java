@@ -87,7 +87,8 @@ class RouterThrottleImpl implements RouterThrottle {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are shutting down ASAP");
             setTunnelStatus("Rejecting tunnels: Shutting down");
-            return TunnelHistory.TUNNEL_REJECT_CRIT;
+            // Don't use CRIT because this tells everybody we are shutting down
+            return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
         
         // Don't use CRIT because we don't want peers to think we're failing
