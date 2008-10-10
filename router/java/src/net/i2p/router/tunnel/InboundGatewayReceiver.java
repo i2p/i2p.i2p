@@ -22,6 +22,8 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
         return receiveEncrypted(encrypted, false);
     }
     public long receiveEncrypted(byte[] encrypted, boolean alreadySearched) {
+        if (!alreadySearched)
+            _config.incrementProcessedMessages();
         if (_target == null) {
             _target = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
             if (_target == null) {
@@ -33,7 +35,9 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
             }
         }
         
-        _config.incrementProcessedMessages();
+        if (_context.tunnelDispatcher().shouldDropParticipatingMessage())
+            return -1;
+        _config.incrementSentMessages();
         TunnelDataMessage msg = new TunnelDataMessage(_context);
         msg.setData(encrypted);
         msg.setTunnelId(_config.getSendTunnel());

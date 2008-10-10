@@ -28,6 +28,8 @@ public class HopConfig {
     private Map _options;
     private long _messagesProcessed;
     private long _oldMessagesProcessed;
+    private long _messagesSent;
+    private long _oldMessagesSent;
     
     /** IV length for {@link #getReplyIV} */
     public static final int REPLY_IV_LENGTH = 16;
@@ -44,6 +46,8 @@ public class HopConfig {
         _options = null;
         _messagesProcessed = 0;
         _oldMessagesProcessed = 0;
+        _messagesSent = 0;
+        _oldMessagesSent = 0;
     }
     
     /** what tunnel ID are we receiving on? */
@@ -115,11 +119,19 @@ public class HopConfig {
     public void setOptions(Map options) { _options = options; }
     
     /** take note of a message being pumped through this tunnel */
+    /** "processed" is for incoming and "sent" is for outgoing (could be dropped in between) */
     public void incrementProcessedMessages() { _messagesProcessed++; }
     public long getProcessedMessagesCount() { return _messagesProcessed; }
     public long getRecentMessagesCount() {
         long rv = _messagesProcessed - _oldMessagesProcessed;
         _oldMessagesProcessed = _messagesProcessed;
+        return rv;
+    }
+    public void incrementSentMessages() { _messagesSent++; }
+    public long getSentMessagesCount() { return _messagesSent; }
+    public long getRecentSentMessagesCount() {
+        long rv = _messagesSent - _oldMessagesSent;
+        _oldMessagesSent = _messagesSent;
         return rv;
     }
     

@@ -41,6 +41,11 @@ public class OutboundTunnelEndpoint {
                            + " to be forwarded on to "
                            + (toRouter != null ? toRouter.toBase64().substring(0,4) : "")
                            + (toTunnel != null ? toTunnel.getTunnelId() + "" : ""));
+            // don't drop it if we are the target
+            if ((!_context.routerHash().equals(toRouter)) &&
+                _context.tunnelDispatcher().shouldDropParticipatingMessage())
+                return;
+            _config.incrementSentMessages();
             _outDistributor.distribute(msg, toRouter, toTunnel);
         }
     }

@@ -75,6 +75,7 @@ public class TunnelParticipant {
         }
         
         if ( (_config != null) && (_config.getSendTo() != null) ) {
+            _config.incrementProcessedMessages();
             RouterInfo ri = _nextHopCache;
             if (ri == null)
                 ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
@@ -82,10 +83,10 @@ public class TunnelParticipant {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send off to nextHop directly (" + _config.getSendTo().toBase64().substring(0,4) 
                               + " for " + msg);
-                _config.incrementProcessedMessages();
                 send(_config, msg, ri);
-                if (_config != null)
-                    incrementThroughput(_config.getReceiveFrom());
+                // see comments below
+                //if (_config != null)
+                //    incrementThroughput(_config.getReceiveFrom());
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Lookup the nextHop (" + _config.getSendTo().toBase64().substring(0,4) 
@@ -109,6 +110,7 @@ public class TunnelParticipant {
      * influence who we spend our time profiling is dangerous, so this will be disabled for
      * now.
      */
+/****
     private void incrementThroughput(Hash prev) {
         if (true) return;
         long now = System.currentTimeMillis();
@@ -123,6 +125,7 @@ public class TunnelParticipant {
             _periodMessagesTransferred++;
         }
     }
+****/
     
     public int getCompleteCount() { 
         if (_handler != null)
@@ -147,6 +150,9 @@ public class TunnelParticipant {
     }
 
     private void send(HopConfig config, TunnelDataMessage msg, RouterInfo ri) {
+        if (_context.tunnelDispatcher().shouldDropParticipatingMessage())
+            return;
+        _config.incrementSentMessages();
         long oldId = msg.getUniqueId();
         long newId = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         _context.messageHistory().wrap("TunnelDataMessage", oldId, "TunnelDataMessage", newId);

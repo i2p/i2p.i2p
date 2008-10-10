@@ -18,6 +18,8 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.Service;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -109,6 +111,12 @@ public class TunnelDispatcher implements Service {
                                          new long[] { 60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.participatingBandwidth", 
                                          "Participating traffic", "Tunnels", 
+                                         new long[] { 60*1000l, 60*10*1000l });
+        ctx.statManager().createRateStat("tunnel.participatingBandwidthOut", 
+                                         "Participating traffic", "Tunnels", 
+                                         new long[] { 60*1000l, 60*10*1000l });
+        ctx.statManager().createRateStat("tunnel.participatingMessageDropped", 
+                                         "Dropped for exceeding share limit", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
         ctx.statManager().createRateStat("tunnel.participatingMessageCount", 
                                          "How many messages are sent through a participating tunnel?", "Tunnels", 
@@ -550,6 +558,7 @@ public class TunnelDispatcher implements Service {
         int size = participating.size();
         long count = 0;
         long bw = 0;
+        long bwOut = 0;
         long tcount = 0;
         long tooYoung = _context.clock().now() - 60*1000;
         long tooOld = tooYoung - 9*60*1000;
@@ -557,6 +566,7 @@ public class TunnelDispatcher implements Service {
             HopConfig cfg = (HopConfig)participating.get(i);
             long c = cfg.getRecentMessagesCount();
             bw += c;
+            bwOut += cfg.getRecentSentMessagesCount();
             long created = cfg.getCreation();
             if (created > tooYoung || created < tooOld)
                 continue;
@@ -567,7 +577,62 @@ public class TunnelDispatcher implements Service {
             count = count * 30 / tcount;
         _context.statManager().addRateData("tunnel.participatingMessageCount", count, 20*1000);
         _context.statManager().addRateData("tunnel.participatingBandwidth", bw*1024/20, 20*1000);
+        _context.statManager().addRateData("tunnel.participatingBandwidthOut", bwOut*1024/20, 20*1000);
         _context.statManager().addRateData("tunnel.participatingTunnels", size, 0);
+    }
+
+    /**
+     * Implement random early discard (RED) to enforce the share bandwidth limit.
+     * For now, this does not enforce the available bandwidth,
+     * we leave that to Throttle.
+     * This is similar to the code in ../RouterThrottleImpl.java
+     * We drop in proportion to how far over the limit we are.
+     * Perhaps an exponential function would be better?
+     */
+    public boolean shouldDropParticipatingMessage() {
+        RateStat rs = _context.statManager().getRate("tunnel.participatingBandwidth");
+        if (rs == null)
+            return false;
+        Rate r = rs.getRate(60*1000);
+        if (r == null)
+            return false;
+        // weight current period higher
+        long count = r.getLastEventCount() + (3 * r.getCurrentEventCount());
+        int bw = 0;
+        if (count > 0)
+            bw = (int) ((r.getLastTotalValue() + (3 * r.getCurrentTotalValue())) / count);
+        else
+            bw = (int) r.getLifetimeAverageValue();
+
+        int usedIn = Math.min(_context.router().get1sRateIn(), _context.router().get15sRateIn());
+        usedIn = Math.min(usedIn, bw);
+        if (usedIn <= 0)
+            return false;
+        int usedOut = Math.min(_context.router().get1sRate(true), _context.router().get15sRate(true));
+        usedOut = Math.min(usedOut, bw);
+        if (usedOut <= 0)
+            return false;
+        int used = Math.min(usedIn, usedOut);
+        int maxKBps = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
+                               _context.bandwidthLimiter().getOutboundKBytesPerSecond());
+        float share = (float) _context.router().getSharePercentage();
+
+        // start dropping at 95% of the limit
+        float maxBps = maxKBps * share * 1024f * 0.95f;
+        float pctDrop = (used - maxBps) / used;
+        if (pctDrop <= 0)
+            return false;
+        float rand = _context.random().nextFloat();
+        boolean reject = rand <= pctDrop;
+        if (reject) {
+            if (_log.shouldLog(Log.WARN)) {
+                int availBps = (int) (((maxKBps*1024)*share) - used);
+                _log.warn("Drop part. msg. avail/max/used " + availBps + "/" + (int) maxBps + "/" 
+                          + used + " %Drop = " + pctDrop);
+            }
+            _context.statManager().addRateData("tunnel.participatingMessageDropped", 1, 0);
+        }
+        return reject;
     }
 
     private static final int DROP_BASE_INTERVAL = 40 * 1000;
@@ -685,9 +750,9 @@ public class TunnelDispatcher implements Service {
                     // already scheduled for the future, and before this expiration
                 }
             }
-            if (_log.shouldLog(Log.INFO)) {
+            if (_log.shouldLog(Log.DEBUG)) {
                 long now = getContext().clock().now();
-                _log.info("Scheduling leave in " + DataHelper.formatDuration(dropTime.longValue()-now) +": " + cfg);
+                _log.debug("Scheduling leave in " + DataHelper.formatDuration(dropTime.longValue()-now) +": " + cfg);
             }
         }
         

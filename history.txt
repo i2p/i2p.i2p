@@ -1,3 +1,17 @@
+2008-10-10 zzz
+    * Profiles: Reduce reject penalty in
+      capacity calculation to avoid a congestion collapse
+    * Throttle: Change reject to BANDWIDTH from CRIT on shutdown
+      for improved anonymity
+    * Tunnels: Implement random discard to enforce share limit
+    * Tunnel Tests: Add time for outbound delay, to avoid
+      congestion collapse
+    * UDPPacketReader: Adjust logging
+    * build files: Change to source=1.5, target=1.5
+    * configpeer.jsp: Table cleanup
+    * i2psnark: Change default tunnel length from 1+1 to 2+0
+    * peers.jsp: Change <,> to in,out for UDP
+
 2008-10-09 sponge
     * Update version to -3
     * BOB database threadlocking fixes
