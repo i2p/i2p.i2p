@@ -15,7 +15,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.3" target="1.3" 
+            debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj">
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
@@ -82,7 +82,7 @@
             <arg value="../jsp/" />
         </java>
         
-        <javac debug="true" deprecation="on" source="1.3" target="1.3" 
+        <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                destdir="../jsp/WEB-INF/classes/" 
                srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <classpath>

@@ -12,7 +12,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.3" target="1.3" 
+            debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../../router/java/build/router.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
     </target>
@@ -36,7 +36,7 @@
         </zip>
     </target>
     <target name="standalone_prep" depends="war">
-        <javac debug="true" deprecation="on" source="1.3" target="1.3" 
+        <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                destdir="./build" srcdir="src/" includes="org/klomp/snark/web/RunStandalone.java" >
             <classpath>
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />

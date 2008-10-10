@@ -24,7 +24,7 @@
  	</path>
  	<target name="compile">
 		<mkdir dir="${bin}" />
-		<javac debug="true" deprecation="on" source="1.3" target="1.3"
+		<javac debug="true" deprecation="on" source="1.5" target="1.5"
  			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" />
 	</target>
     <target name="precompilejsp">
@@ -42,7 +42,7 @@
             <arg value="-webapp" />
             <arg value="./jsp" />
         </java>
-        <javac debug="true" deprecation="on" source="1.3" target="1.3" 
+        <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                destdir="${bin}" srcdir="./WEB-INF/classes" includes="**/*.java" classpathref="cp">
          </javac>
         <copy file="WEB-INF/web-template.xml" tofile="WEB-INF/web-out.xml" />
