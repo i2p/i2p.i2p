@@ -212,7 +212,11 @@ class TestJob extends JobImpl {
         // Minimum is 7.5s (since a 0-hop could be the expl. tunnel, but only >= 1-hop client tunnels are tested)
         // Network average for success is about 1.5s.
         // Another possibility - make configurable via pool options
-        return 2500 * (_outTunnel.getLength() + _replyTunnel.getLength());
+        //
+        // Try to prevent congestion collapse (failing all our tunnels and then clogging our outbound
+        // with new tunnel build requests) by adding in three times the average outbound delay.
+        int delay = 3 * (int) getContext().statManager().getRate("transport.sendProcessingTime").getRate(60*1000).getAverageValue();
+        return delay + (2500 * (_outTunnel.getLength() + _replyTunnel.getLength()));
     }
 
     private void scheduleRetest() { scheduleRetest(false); }
