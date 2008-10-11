@@ -124,6 +124,8 @@
             use="true" 
             group="SDK net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:freenet.support.CPUInformation,
                    Streaming net.i2p.client.streaming,
+                   BOB net.i2p.BOB,
+                   SAM net.i2p.sam:net.i2p.sam.client,
                    RouterConsole net.i2p.router.web,
                    Router net.i2p.router:net.i2p.router.*:net.i2p.data.i2np,
                    Systray net.i2p.apps.systray,
