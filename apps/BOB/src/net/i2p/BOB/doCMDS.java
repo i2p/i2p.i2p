@@ -151,7 +151,7 @@ public class doCMDS implements Runnable {
 	 */
 	doCMDS(Socket server, Properties props, nickname database, Log _log) {
 		this.server = server;
-		this.props = props;
+		this.props = new Properties(props);
 		this.database = database;
 		this._log = _log;
 	}
