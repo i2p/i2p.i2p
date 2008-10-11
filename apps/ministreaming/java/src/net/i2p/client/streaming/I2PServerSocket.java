@@ -12,6 +12,7 @@ import net.i2p.I2PException;
 public interface I2PServerSocket {
     /**
      * Closes the socket.
+     * @throws I2PException 
      */
     public void close() throws I2PException;
 
@@ -31,18 +32,19 @@ public interface I2PServerSocket {
 
     /**
      * Set Sock Option accept timeout
-     * @param x
+     * @param x timeout in ms
      */
     public void setSoTimeout(long x);
 
     /**
      * Get Sock Option accept timeout
-     * @return timeout
+     * @return timeout in ms
      */
     public long getSoTimeout();
 
     /**
      * Access the manager which is coordinating the server socket
+     * @return I2PSocketManager
      */
     public I2PSocketManager getManager();
 }

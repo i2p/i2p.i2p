@@ -166,6 +166,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
                     return;
                 case DATA_IN:
                     sendIncoming(id, payload);
+		    return;
                 case CHAFF:
                     // ignore
                     return;
@@ -423,7 +424,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
      */
     private void handleUnknown(int type, String id, byte payload[]) {
         _log.error(getName() + ": \n\n=============== Unknown packet! " + "============" 
-                   + "\nType: " + (int) type
+                   + "\nType: " + type
                    + "\nID:   " + getReadableForm(id) 
                    + "\nBase64'ed Data: " + Base64.encode(payload)
                    + "\n\n\n");

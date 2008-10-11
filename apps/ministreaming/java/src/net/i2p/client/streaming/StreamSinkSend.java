@@ -110,6 +110,7 @@ public class StreamSinkSend {
      *  <li><b>writeDelayMs</b>: how long to wait between each .write (0 for no delay)</li>
      *  <li><b>serverDestFile</b>: file containing the StreamSinkServer's binary Destination</li>
      * </ul>
+     * @param args sendFile writeDelayMs serverDestFile
      */
     public static void main(String args[]) {
         if (args.length != 3) {

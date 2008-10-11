@@ -31,14 +31,14 @@ class I2PServerSocketImpl implements I2PServerSocket {
     private Object socketAddedLock = new Object();
     
     /**
-     * Set Sock Option accept timeout stub, does nothing
+     * Set Sock Option accept timeout stub, does nothing in ministreaming
      * @param x
      */
     public void setSoTimeout(long x) {
     }
 
     /**
-     * Get Sock Option accept timeout stub, does nothing
+     * Get Sock Option accept timeout stub, does nothing in ministreaming
      * @return timeout
      */
     public long getSoTimeout() {

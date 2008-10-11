@@ -161,6 +161,7 @@ public class StreamSinkServer {
      *  <li><b>ourDestFile</b>: filename to write our binary destination to</li>
      *  <li><b>numHandlers</b>: how many concurrent connections to handle</li>
      * </ul>
+     * @param args [i2cpHost i2cpPort] sinkDir ourDestFile [numHandlers]
      */
     public static void main(String args[]) {
         StreamSinkServer server = null;

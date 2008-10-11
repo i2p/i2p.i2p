@@ -18,8 +18,8 @@ import net.i2p.util.Log;
 
 /**
  * Simple streaming lib test app that connects to a given destination and sends 
- * it a particular amount of random data, then disconnects.  See the {@link #main}
- *
+ * it a particular amount of random data, then disconnects.
+ * @see #main(java.lang.String[])
  */
 public class StreamSinkClient {
     private Log _log;
@@ -124,6 +124,7 @@ public class StreamSinkClient {
      *  <li><b>serverDestFile</b>: file containing the StreamSinkServer's binary Destination</li>
      *  <li><b>concurrentSends</b>: how many concurrent threads should send to the server at once</li>
      * </ul>
+     * @param args [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile [concurrentSends]
      */
     public static void main(String args[]) {
         StreamSinkClient client = null;

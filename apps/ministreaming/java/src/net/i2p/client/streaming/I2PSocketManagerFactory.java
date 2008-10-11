@@ -43,6 +43,7 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the local machine on the default port (7654).
      * 
+     * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(Properties opts) {
@@ -53,6 +54,8 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the specified host and port
      * 
+     * @param host I2CP host
+     * @param port I2CP port
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String host, int port) {
@@ -63,6 +66,9 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the given machine reachable through the given port.
      *
+     * @param i2cpHost I2CP host
+     * @param i2cpPort I2CP port
+     * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String i2cpHost, int i2cpPort, Properties opts) {
@@ -85,6 +91,7 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
      *
+     * @param myPrivateKeyStream private key stream
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream) {
@@ -95,6 +102,8 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
      *
+     * @param myPrivateKeyStream private key stream
+     * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream, Properties opts) {
@@ -106,6 +115,10 @@ public class I2PSocketManagerFactory {
      * stream and connected to the I2CP router on the specified machine on the given
      * port
      *
+     * @param myPrivateKeyStream private key stream
+     * @param i2cpHost I2CP host
+     * @param i2cpPort I2CP port
+     * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream, String i2cpHost, int i2cpPort,

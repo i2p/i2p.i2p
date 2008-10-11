@@ -13,31 +13,34 @@ import net.i2p.data.Destination;
  */
 public interface I2PSocket {
     /**
-     * Return the Destination of this side of the socket.
+     * @return the Destination of this side of the socket.
      */
     public Destination getThisDestination();
 
     /**
-     * Return the destination of the peer.
+     * @return the destination of the peer.
      */
     public Destination getPeerDestination();
 
     /**
-     * Return an InputStream to read from the socket.
+     * @return an InputStream to read from the socket.
+     * @throws IOException on failure
      */
     public InputStream getInputStream() throws IOException;
 
     /**
-     * Return an OutputStream to write into the socket.
+     * @return an OutputStream to write into the socket.
+     * @throws IOException on failure
      */
     public OutputStream getOutputStream() throws IOException;
 
     /** 
-     * Retrieve this socket's configuration
+     * @return socket's configuration
      */
     public I2PSocketOptions getOptions();
     /** 
      * Configure the socket
+     * @param options I2PSocketOptions to set
      */
     public void setOptions(I2PSocketOptions options);
     
@@ -54,11 +57,13 @@ public interface I2PSocket {
      * the socket wait forever).  This is simply a helper to adjust the 
      * I2PSocketOptions
      *
+     * @param ms timeout in ms
      */
     public void setReadTimeout(long ms);
 
     /**
      * Closes the socket if not closed yet
+     * @throws IOException on failure
      */
     public void close() throws IOException;
     

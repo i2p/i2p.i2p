@@ -245,10 +245,12 @@ class ByteCollector {
      *
      * @return the, uh, string
      */
+    @Override
     public String toString() {
         return new String(toByteArray());
     }
 
+    @Override
     public int hashCode() {
         int h = 0;
         for (int i = 0; i < size; i++) {
@@ -263,6 +265,7 @@ class ByteCollector {
      * @return true if and only if both are the same size and the 
      *         byte arrays they contain are equal.
      */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof ByteCollector) {
             ByteCollector by = (ByteCollector) o;

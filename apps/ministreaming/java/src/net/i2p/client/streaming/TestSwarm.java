@@ -24,9 +24,9 @@ public class TestSwarm {
     private Log _log;
     private String _destFile;
     private String _peerDestFiles[];
-    private String _conOptions;
     private I2PSocketManager _manager;
-    private boolean _dead;
+    private String _conOptions; // unused? used elsewhere?
+    private boolean _dead; // unused? used elsewhere?
     
     public static void main(String args[]) {
         if (args.length < 1) {

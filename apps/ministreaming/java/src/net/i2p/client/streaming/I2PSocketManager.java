@@ -48,6 +48,7 @@ public interface I2PSocketManager {
      * @param peer Destination to connect to
      * @param options I2P socket options to be used for connecting
      *
+     * @return new connected socket
      * @throws ConnectException if the peer refuses the connection
      * @throws NoRouteToHostException if the peer is not found or not reachable
      * @throws InterruptedIOException if the connection timeouts
@@ -62,6 +63,7 @@ public interface I2PSocketManager {
      *
      * @param peer Destination to connect to
      *
+     * @return new connected socket
      * @throws ConnectException if the peer refuses the connection
      * @throws NoRouteToHostException if the peer is not found or not reachable
      * @throws InterruptedIOException if the connection timeouts
@@ -80,6 +82,7 @@ public interface I2PSocketManager {
     /**
      * Retrieve a set of currently connected I2PSockets, either initiated locally or remotely.
      *
+     * @return a set of currently connected I2PSockets
      */
     public Set listSockets();
 
@@ -87,6 +90,9 @@ public interface I2PSocketManager {
      * Ping the specified peer, returning true if they replied to the ping within 
      * the timeout specified, false otherwise.  This call blocks.
      *
+     * @param peer Destination to ping
+     * @param timeoutMs timeout in ms
+     * @return success or failure
      */
     public boolean ping(Destination peer, long timeoutMs);
 

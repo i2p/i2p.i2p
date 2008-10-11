@@ -335,6 +335,10 @@ class I2PSocketImpl implements I2PSocket {
             throw new RuntimeException("Incorrect read() result");
         }
 
+        // I have to ask if this method is really needed, since the JDK has this already,
+	// including the timeouts. Perhaps the need is for debugging more than anything
+	// else?
+        @Override
         public int read(byte[] b, int off, int len) throws IOException {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getStreamPrefix() + "Read called for " + len + " bytes (avail=" 
@@ -397,6 +401,10 @@ class I2PSocketImpl implements I2PSocket {
             return read.length;
         }
 
+	/**
+	 * @return 0 if empty, > 0 if there is data.
+	 */
+        @Override
         public int available() {
             synchronized (bc) {
                 return bc.getCurrentSize();
@@ -471,6 +479,7 @@ class I2PSocketImpl implements I2PSocket {
             }
         }
         
+        @Override
         public void close() throws IOException {
             super.close();
             notifyClosed();
@@ -496,11 +505,15 @@ class I2PSocketImpl implements I2PSocket {
             write(new byte[] { (byte) b});
         }
 
+	// This override is faster than the built in JDK, 
+	// but there are other variations not handled
+        @Override
         public void write(byte[] b, int off, int len) throws IOException {
             _bytesWritten += len;
             sendTo.queueData(b, off, len, true);
         }
 
+        @Override
         public void close() {
             sendTo.notifyClosed();
         }
@@ -580,6 +593,7 @@ class I2PSocketImpl implements I2PSocket {
             return true;
         }
 
+        @Override
         public void run() {
             byte[] buffer = new byte[MAX_PACKET_SIZE];
             ByteCollector bc = new ByteCollector();
@@ -657,5 +671,6 @@ class I2PSocketImpl implements I2PSocket {
         }
     }
     
+    @Override
     public String toString() { return "" + hashCode(); }
 }
