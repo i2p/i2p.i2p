@@ -30,18 +30,18 @@ import net.i2p.client.streaming.I2PSocket;
 
 /**
  * Process I2P->TCP
- * 
+ *
  * @author sponge
  */
 public class I2PtoTCP implements Runnable {
 
 	private I2PSocket I2P;
-	private nickname info, database;
+	private nickname info,  database;
 	private Socket sock;
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param I2Psock
 	 * @param info
 	 * @param database
@@ -54,7 +54,7 @@ public class I2PtoTCP implements Runnable {
 
 	/**
 	 * I2P stream to TCP stream thread starter
-	 * 
+	 *
 	 */
 	public void run() {
 

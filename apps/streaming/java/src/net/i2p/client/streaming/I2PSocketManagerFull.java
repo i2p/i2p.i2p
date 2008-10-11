@@ -181,6 +181,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @param peer Destination to connect to
      * @param options I2P socket options to be used for connecting
      *
+     * @return I2PSocket if successful
      * @throws NoRouteToHostException if the peer is not found or not reachable
      * @throws I2PException if there is some other I2P-related problem
      */
@@ -215,6 +216,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      *
      * @param peer Destination to connect to
      *
+     * @return I2PSocket if successful
      * @throws NoRouteToHostException if the peer is not found or not reachable
      * @throws I2PException if there is some other I2P-related problem
      */

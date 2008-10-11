@@ -39,7 +39,7 @@ import net.i2p.util.SimpleTimer;
 /**
  *
  * BOB, main command socket listener, launches the command parser engine.
- * 
+ *
  * @author sponge
  */
 public class BOB {
@@ -53,7 +53,7 @@ public class BOB {
 
 	/**
 	 * Log a warning
-	 * 
+	 *
 	 * @param arg
 	 */
 	public static void warn(String arg) {
@@ -63,7 +63,7 @@ public class BOB {
 
 	/**
 	 * Log an error
-	 * 
+	 *
 	 * @param arg
 	 */
 	public static void error(String arg) {
@@ -73,7 +73,7 @@ public class BOB {
 
 	/**
 	 * Listen for incoming connections and handle them
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {

@@ -113,7 +113,7 @@ public class ConnectionManager {
     public void setAllowIncomingConnections(boolean allow) { 
         _connectionHandler.setActive(allow);
     }
-    /** should we acceot connections, or just reject everyone? */
+    /** @return if we should accept connections */
     public boolean getAllowIncomingConnections() {
         return _connectionHandler.getActive();
     }

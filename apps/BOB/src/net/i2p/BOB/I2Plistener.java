@@ -58,16 +58,15 @@ public class I2Plistener implements Runnable {
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
-		serverSocket = socketManager.getServerSocket();
+		serverSocket = this.socketManager.getServerSocket();
 		tgwatch = 1;
 	}
 
 	/**
 	 * Simply listen on I2P port, and thread connections
 	 *
-	 * @throws RuntimeException
 	 */
-	public void run() throws RuntimeException {
+	public void run() {
 		boolean g = false;
 		I2PSocket sessSocket = null;
 
@@ -105,7 +104,7 @@ public class I2Plistener implements Runnable {
 				}
 
 			} catch(I2PException e) {
-			//	System.out.println("Exception " + e);
+				//	System.out.println("Exception " + e);
 			}
 		}
 
@@ -123,7 +122,8 @@ public class I2Plistener implements Runnable {
 				// nop
 				}
 		}
-//		System.out.println("STOP Thread count " + Thread.activeCount());
+
+		//		System.out.println("STOP Thread count " + Thread.activeCount());
 		// need to kill off the socket manager too.
 		I2PSession session = socketManager.getSession();
 		if(session != null) {
@@ -134,7 +134,5 @@ public class I2Plistener implements Runnable {
 			}
 //			System.out.println("destroySession Thread count " + Thread.activeCount());
 		}
-
-
 	}
 }

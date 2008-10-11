@@ -25,18 +25,19 @@ package net.i2p.BOB;
 
 /**
  * Internal database to relate nicknames to options to values
- * 
+ *
  * @author sponge
  */
 public class nickname {
 
 	private static final int maxWritersWaiting = 2;
 	private volatile Object[][] data;
-	private volatile int index, writersWaiting, readers;
+	private volatile int index,  writersWaiting,  readers;
 	private volatile boolean writingInProgress;
+
 	/**
 	 * make initial NULL object
-	 * 
+	 *
 	 */
 	public nickname() {
 		this.data = new Object[1][2];
@@ -94,7 +95,7 @@ public class nickname {
 
 	/**
 	 * Delete an object from array if it exists
-	 * 
+	 *
 	 * @param key
 	 */
 	public synchronized void kill(Object key) {
@@ -110,7 +111,7 @@ public class nickname {
 		}
 		olddata = new Object[index + 2][2];
 		// copy to olddata, skipping 'k'
-		for(i = 0          , l = 0; l < index; i++, l++) {
+		for(i = 0            , l = 0; l < index; i++, l++) {
 			if(i == k) {
 				l++;
 				didsomething++;
@@ -126,7 +127,7 @@ public class nickname {
 
 	/**
 	 * Add object to the array, deletes the old one if it exists
-	 * 
+	 *
 	 * @param key
 	 * @param val
 	 */
@@ -149,7 +150,7 @@ public class nickname {
 
 	/**
 	 * Get the object, and return it, throws RuntimeException
-	 * 
+	 *
 	 * @param key
 	 * @return Object
 	 * @throws java.lang.RuntimeException
@@ -165,7 +166,7 @@ public class nickname {
 
 	/**
 	 * returns true if an object exists, else returns false
-	 * 
+	 *
 	 * @param key
 	 * @return true if an object exists, else returns false
 	 */
@@ -180,7 +181,7 @@ public class nickname {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param i index
 	 * @return an indexed Object
 	 * @throws java.lang.RuntimeException

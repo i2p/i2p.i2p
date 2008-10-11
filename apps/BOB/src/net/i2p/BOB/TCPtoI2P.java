@@ -37,7 +37,7 @@ import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 
 /**
- * 
+ *
  * Process TCP->I2P
  *
  * @author sponge
@@ -45,17 +45,17 @@ import net.i2p.i2ptunnel.I2PTunnel;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	private nickname info, database;
+	private nickname info,  database;
 	private Socket sock;
 	private I2PSocketManager socketManager;
 
 	/**
-	 * This is a more forgiving readline, 
+	 * This is a more forgiving readline,
 	 * it works on unbuffered streams
-	 * 
+	 *
 	 * @param in
 	 * @return line of text as a String
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static String Lread(InputStream in) throws Exception {
 		String S;
@@ -85,7 +85,7 @@ public class TCPtoI2P implements Runnable {
 	 * @param i2p
 	 * @param socket
 	 * @param info
-	 * @param database 
+	 * @param database
 	 */
 	TCPtoI2P(I2PSocketManager i2p, Socket socket, nickname info, nickname database) {
 		this.sock = socket;
@@ -96,7 +96,7 @@ public class TCPtoI2P implements Runnable {
 
 	/**
 	 * Print an error message to out
-	 * 
+	 *
 	 * @param e
 	 * @param out
 	 * @throws java.io.IOException
@@ -153,7 +153,7 @@ public class TCPtoI2P implements Runnable {
 						}
 					}
 
-				} catch(I2PException e) {					
+				} catch(I2PException e) {
 					Emsg("ERROR " + e.toString(), out);
 				} catch(ConnectException e) {
 					Emsg("ERROR " + e.toString(), out);

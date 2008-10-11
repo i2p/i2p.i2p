@@ -40,7 +40,7 @@ public class TCPio implements Runnable {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param Ain
 	 * @param Aout
 	 * @param info
@@ -60,7 +60,7 @@ public class TCPio implements Runnable {
 	 * Copy from source to destination...
 	 * and yes, we are totally OK to block here on writes,
 	 * The OS has buffers, and I intend to use them.
-	 * 
+	 *
 	 */
 	public void run() {
 		int b;
@@ -87,11 +87,11 @@ public class TCPio implements Runnable {
 					}
 				} else {
 					/* according to the specs:
-					 * 
-					 * The total number of bytes read into the buffer, 
-					 * or -1 if there is no more data because the end of 
+					 *
+					 * The total number of bytes read into the buffer,
+					 * or -1 if there is no more data because the end of
 					 * the stream has been reached.
-					 * 
+					 *
 					 */
 					return;
 				}

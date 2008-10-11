@@ -21,7 +21,6 @@
  *
  * ...for any additional details and liscense questions.
  */
-
 package net.i2p.BOB;
 
 import java.io.DataInputStream;
@@ -34,10 +33,9 @@ import net.i2p.client.I2PSessionListener;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
-
 /**
  * UDP IO on I2P
- * 
+ *
  *  FIX ME: Untested, and incomplete!
  *  I have no personal need to UDP yet,
  *  however alot of p2p apps pretty much demand it.
@@ -55,24 +53,26 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 	private I2PSession _session;
 	private Destination _peerDestination;
 	private boolean up;
-	
-/**
- * Constructor
- * @param info
- * @param _log
- * @param socket
- * @param _session
- */	UDPIOthread(nickname info, Log _log, Socket socket, I2PSession _session) {
+
+	/**
+	 * Constructor
+	 * @param info
+	 * @param _log
+	 * @param socket
+	 * @param _session
+	 */
+	UDPIOthread(nickname info, Log _log, Socket socket, I2PSession _session) {
 		this.info = info;
 		this._log = _log;
 		this.socket = socket;
 		this._session = _session;
 
 	}
-/**
- * 
- */
- public void run() {
+
+	/**
+	 *
+	 */
+	public void run() {
 		byte data[] = new byte[1024];
 		up = true;
 		try {
@@ -103,12 +103,13 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 			}
 		}
 	}
-/**
- * 
- * @param session
- * @param msgId
- * @param size
- */
+
+	/**
+	 *
+	 * @param session
+	 * @param msgId
+	 * @param size
+	 */
 	public void messageAvailable(I2PSession session, int msgId, long size) {
 //		_log.debug("Message available: id = " + msgId + " size = " + size);
 		try {
@@ -123,22 +124,21 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 	}
 
 	// Great, can these be used to kill ourselves.
-
 	/** required by {@link I2PSessionListener I2PSessionListener} to notify of disconnect */
 	public void disconnected(I2PSession session) {
 		_log.debug("Disconnected");
-		// up = false;
+	// up = false;
 	}
 
 	/** required by {@link I2PSessionListener I2PSessionListener} to notify of error */
 	public void errorOccurred(I2PSession session, String message, Throwable error) {
 		_log.debug("Error occurred: " + message, error);
-		// up = false;
+	// up = false;
 	}
 
 	/** required by {@link I2PSessionListener I2PSessionListener} to notify of abuse */
 	public void reportAbuse(I2PSession session, int severity) {
 		_log.debug("Abuse reported of severity " + severity);
-		// up = false;
+	// up = false;
 	}
 }

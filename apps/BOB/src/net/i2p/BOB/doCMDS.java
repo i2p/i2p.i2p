@@ -70,6 +70,9 @@ public class doCMDS implements Runnable {
 	private static final String P_RUNNING = "RUNNING";
 	private static final String P_STARTING = "STARTING";
 	private static final String P_STOPPING = "STOPPING";
+//	private static final String P_INSTATE = "INSTATE";
+//	private static final String P_OUTSTATE = "OUTSTATE";
+
 	/* command strings */
 	private static final String C_help = "help";
 	private static final String C_clear = "clear";
@@ -490,6 +493,8 @@ public class doCMDS implements Runnable {
 							wlock();
 							database.add(Arg, nickinfo);
 							nickinfo.add(P_NICKNAME, Arg);
+//							nickinfo.add(P_INSTATE,new Boolean(false));
+//							nickinfo.add(P_OUTSTATE,new Boolean(false));
 							nickinfo.add(P_STARTING, Boolean.FALSE);
 							nickinfo.add(P_RUNNING, Boolean.FALSE);
 							nickinfo.add(P_STOPPING, Boolean.FALSE);

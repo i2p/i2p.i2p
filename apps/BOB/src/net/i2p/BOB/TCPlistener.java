@@ -41,7 +41,7 @@ import net.i2p.util.Log;
  */
 public class TCPlistener implements Runnable {
 
-	private nickname info, database;
+	private nickname info,  database;
 	private Log _log;
 	private int tgwatch;
 	public I2PSocketManager socketManager;
@@ -65,11 +65,12 @@ public class TCPlistener implements Runnable {
 
 	/**
 	 * Simply listen on TCP port, and thread connections
-	 * @throws java.lang.RuntimeException
+	 *
 	 */
-	public void run() throws RuntimeException {
+	public void run() {
 		boolean g = false;
-				database.getReadLock();
+		boolean spin = true;
+		database.getReadLock();
 		info.getReadLock();
 		if(info.exists("OUTPORT")) {
 			tgwatch = 2;
@@ -79,15 +80,14 @@ public class TCPlistener implements Runnable {
 			ServerSocket listener = new ServerSocket(Integer.parseInt(info.get("INPORT").toString()), backlog, InetAddress.getByName(info.get("INHOST").toString()));
 			Socket server = new Socket();
 			listener.setSoTimeout(1000);
-		info.releaseReadLock();
-		database.releaseReadLock();
-		boolean spin = true;
-		while(spin) {
-			database.getReadLock();
-			info.getReadLock();
-			spin = info.get("RUNNING").equals(Boolean.TRUE);
 			info.releaseReadLock();
 			database.releaseReadLock();
+			while(spin) {
+				database.getReadLock();
+				info.getReadLock();
+				spin = info.get("RUNNING").equals(Boolean.TRUE);
+				info.releaseReadLock();
+				database.releaseReadLock();
 //				System.out.println("Thread count " + Thread.activeCount());
 				try {
 					server = listener.accept();
@@ -101,11 +101,24 @@ public class TCPlistener implements Runnable {
 					Thread t = new Thread(conn_c, "BOBTCPtoI2P");
 					t.start();
 					g = false;
-				} 
+				}
 			}
 			listener.close();
 		} catch(IOException ioe) {
-			// throw new RuntimeException(ioe);
+			// Fatal failure, cause a stop event
+			database.getReadLock();
+			info.getReadLock();
+			spin = info.get("RUNNING").equals(Boolean.TRUE);
+			info.releaseReadLock();
+			database.releaseReadLock();
+			if(spin) {
+				database.getWriteLock();
+				info.getWriteLock();
+				info.add("STOPPING", new Boolean(true));
+				info.add("RUNNING", new Boolean(false));
+				info.releaseWriteLock();
+				database.releaseWriteLock();
+			}
 		}
 
 //System.out.println("STOP!");

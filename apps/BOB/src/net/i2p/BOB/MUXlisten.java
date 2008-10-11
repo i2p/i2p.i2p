@@ -34,7 +34,7 @@ import net.i2p.util.Log;
 /**
  *
  * Multiplex listeners for TCP and I2P
- * 
+ *
  * @author sponge
  */
 public class MUXlisten implements Runnable {
@@ -48,7 +48,7 @@ public class MUXlisten implements Runnable {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param info
 	 * @param database
 	 * @param _log
@@ -73,13 +73,13 @@ public class MUXlisten implements Runnable {
 		this.info.add("STARTING", Boolean.TRUE);
 		this.info.releaseWriteLock();
 		this.database.releaseWriteLock();
-		
+
 		socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
 	}
 
 	/**
 	 * MUX sockets, fire off a thread to connect, get destination info, and do I/O
-	 * 
+	 *
 	 */
 	public void run() {
 

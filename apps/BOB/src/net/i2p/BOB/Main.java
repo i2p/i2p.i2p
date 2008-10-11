@@ -21,7 +21,6 @@
  *
  * ...for any additional details and liscense questions.
  */
-
 package net.i2p.BOB;
 
 import net.i2p.client.streaming.RetransmissionTimer;
@@ -29,11 +28,10 @@ import net.i2p.util.SimpleTimer;
 
 /**
  * Start from command line
- * 
+ *
  * @author sponge
  *
  */
-
 public class Main {
 
 	/**
