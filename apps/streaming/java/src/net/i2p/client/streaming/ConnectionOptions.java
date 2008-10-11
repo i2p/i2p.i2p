@@ -94,6 +94,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         }
     }
     
+	@Override
     protected void init(Properties opts) {
         super.init(opts);
         _trend = new int[TREND_COUNT];
@@ -118,6 +119,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
     }
     
+	@Override
     public void setProperties(Properties opts) {
         super.setProperties(opts);
         if (opts == null) return;
@@ -164,6 +166,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * until the output stream is flushed, the buffer fills, 
      * or that many milliseconds pass.
      *
+     * @return how long to wait before actually attempting to connect
      */
     public int getConnectDelay() { return _connectDelay; }
     public void setConnectDelay(int delayMs) { _connectDelay = delayMs; }
@@ -173,6 +176,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * or can we deal with signatures on the SYN and FIN packets
      * only?
      *
+     * @return if we want signatures on all packets.
      */
     public boolean getRequireFullySigned() { return _fullySigned; }
     public void setRequireFullySigned(boolean sign) { _fullySigned = sign; }
@@ -180,6 +184,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     /** 
      * How many messages will we send before waiting for an ACK?
      *
+     * @return Maximum amount of messages that can be in-flight
      */
     public int getWindowSize() { return _windowSize; }
     public void setWindowSize(int numMsgs) { 
@@ -195,12 +200,15 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         _windowSize = numMsgs; 
     }
     
-    /** after how many consecutive messages should we ack? */
+    /** after how many consecutive messages should we ack?
+     * @return receive window size.
+     */
     public int getReceiveWindow() { return _receiveWindow; } 
     public void setReceiveWindow(int numMsgs) { _receiveWindow = numMsgs; }
     
     /**
      * What to set the round trip time estimate to (in milliseconds)
+     * @return round trip time estimate in ms
      */
     public int getRTT() { return _rtt; }
     public void setRTT(int ms) { 
@@ -229,6 +237,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have
      * 3 consecutive rtt decreases, we are trending downwards (-1), else we're stable.
      *
+     * @return positive/flat/negative trend in round trip time
      */
     public int getRTTTrend() {
         synchronized (_trend) {
@@ -255,7 +264,9 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setRTT(smoothed);
     }
     
-    /** How long after sending a packet will we wait before resending? */
+    /** How long after sending a packet will we wait before resending?
+     * @return delay for a retransmission in ms
+     */
     public int getResendDelay() { return _resendDelay; }
     public void setResendDelay(int ms) { _resendDelay = ms; }
     
@@ -265,11 +276,14 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * (_lastSendTime+_sendAckDelay), send an ACK of what
      * we have received so far.
      *
+     * @return ACK delay in ms
      */
     public int getSendAckDelay() { return _sendAckDelay; }
     public void setSendAckDelay(int delayMs) { _sendAckDelay = delayMs; }
     
-    /** What is the largest message we want to send or receive? */
+    /** What is the largest message we want to send or receive?
+     * @return Maximum message size (MTU/MRU)
+     */
     public int getMaxMessageSize() { return _maxMessageSize; }
     public void setMaxMessageSize(int bytes) { _maxMessageSize = bytes; }
     
@@ -277,13 +291,15 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * how long we want to wait before any data is transferred on the
      * connection in either direction
      *
+     * @return how long to wait before any data is transferred in either direction in ms
      */
     public int getChoke() { return _choke; }
     public void setChoke(int ms) { _choke = ms; }
 
     /**
      * What profile do we want to use for this connection?
-     *
+     * TODO: Only bulk is supported so far.
+     * @return the profile of the connection.
      */
     public int getProfile() { return _profile; }
     public void setProfile(int profile) { 
@@ -295,6 +311,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     /**
      * How many times will we try to send a message before giving up?
      *
+     * @return Maximum retrys before failing a sent message.
      */
     public int getMaxResends() { return _maxResends; }
     public void setMaxResends(int numSends) { _maxResends = numSends; }
@@ -302,6 +319,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     /**
      * What period of inactivity qualifies as "too long"?
      *
+     * @return period of inactivity qualifies as "too long"
      */
     public int getInactivityTimeout() { return _inactivityTimeout; }
     public void setInactivityTimeout(int timeout) { _inactivityTimeout = timeout; }
@@ -322,6 +340,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     /** 
      * how much data are we willing to accept in our buffer?
      *
+     * @return size of the buffer used to accept data
      */
     public int getInboundBufferSize() { return _inboundBufferSize; }
     public void setInboundBufferSize(int bytes) { _inboundBufferSize = bytes; }
@@ -331,6 +350,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * of 1/(windowSize*factor).  In standard TCP, window sizes are in bytes,
      * while in I2P, window sizes are in messages, so setting factor=maxMessageSize
      * mimics TCP, but using a smaller factor helps grow a little more rapidly.
+     * @return window size to grow by to attempt to avoid congestion.
      */
     public int getCongestionAvoidanceGrowthRateFactor() { return _congestionAvoidanceGrowthRateFactor; }
     public void setCongestionAvoidanceGrowthRateFactor(int factor) { _congestionAvoidanceGrowthRateFactor = factor; }
@@ -340,10 +360,12 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * of 1/(factor).  In standard TCP, window sizes are in bytes,
      * while in I2P, window sizes are in messages, so setting factor=maxMessageSize
      * mimics TCP, but using a smaller factor helps grow a little more rapidly.
+     * @return slow start window size to grow by to attempt to avoid sending many small packets.
      */
     public int getSlowStartGrowthRateFactor() { return _slowStartGrowthRateFactor; }
     public void setSlowStartGrowthRateFactor(int factor) { _slowStartGrowthRateFactor = factor; }
     
+	@Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("conDelay=").append(_connectDelay);

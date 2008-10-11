@@ -107,7 +107,9 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     }
     public SimpleTimer.TimedEvent getResendEvent() { return _resendEvent; }
     
-    /** how long after packet creation was it acked? */
+    /** how long after packet creation was it acked?
+     * @return how long after packet creation the packet was ACKed in ms
+     */
     public int getAckTime() {
         if (_ackOn <= 0) 
             return -1;
@@ -130,6 +132,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     
     public void setResendPacketEvent(SimpleTimer.TimedEvent evt) { _resendEvent = evt; }
     
+	@Override
     public StringBuffer formatAsString() {
         StringBuffer buf = super.formatAsString();
         

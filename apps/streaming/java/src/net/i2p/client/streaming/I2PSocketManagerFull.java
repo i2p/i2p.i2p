@@ -112,7 +112,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      * 
-     * @return
+     * @return connected I2PSocket
      * @throws net.i2p.I2PException
      * @throws java.net.SocketTimeoutException
      */
@@ -141,7 +141,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * 
      * @param peer
      * @param timeoutMs
-     * @return 
+     * @return true on success, false on failure
      */
     public boolean ping(Destination peer, long timeoutMs) {
         return _connectionManager.ping(peer, timeoutMs);
@@ -246,6 +246,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     /**
      * Retrieve a set of currently connected I2PSockets, either initiated locally or remotely.
      *
+     * @return set of currently connected I2PSockets
      */
     public Set listSockets() {
         Set connections = _connectionManager.listConnections();

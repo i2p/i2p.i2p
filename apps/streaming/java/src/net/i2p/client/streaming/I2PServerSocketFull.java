@@ -16,7 +16,7 @@ public class I2PServerSocketFull implements I2PServerSocket {
     
     /**
      * 
-     * @return
+     * @return I2PSocket
      * @throws net.i2p.I2PException
      * @throws SocketTimeoutException 
      */

@@ -119,6 +119,7 @@ public class I2PSocketFull implements I2PSocket {
         if (c != null)
             c.disconnectComplete();
     }
+	@Override
     public String toString() {
         Connection c = _connection;
         if (c == null)

@@ -574,7 +574,9 @@ public class Connection {
     }
     
     private boolean _remotePeerSet = false;
-    /** who are we talking with */
+    /** who are we talking with
+     * @return peer Destination
+     */
     public Destination getRemotePeer() { return _remotePeer; }
     public void setRemotePeer(Destination peer) { 
         if (_remotePeerSet) throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
@@ -583,7 +585,9 @@ public class Connection {
     }
     
     private boolean _sendStreamIdSet = false;
-    /** what stream do we send data to the peer on? */
+    /** what stream do we send data to the peer on?
+     * @return non-global stream sending ID
+     */
     public long getSendStreamId() { return _sendStreamId; }
     public void setSendStreamId(long id) { 
         if (_sendStreamIdSet) throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
@@ -592,7 +596,9 @@ public class Connection {
     }
     
     private boolean _receiveStreamIdSet = false;
-    /** stream the peer sends data to us on. (may be null) */
+    /** The stream ID of a peer connection that sends data to us. (may be null)
+     * @return receive stream ID, or null if there isn't one
+     */
     public long getReceiveStreamId() { return _receiveStreamId; }
     public void setReceiveStreamId(long id) { 
         if (_receiveStreamIdSet) throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
@@ -601,15 +607,33 @@ public class Connection {
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     
-    /** when did we last send anything to the peer? */
+    /** When did we last send anything to the peer?
+     * @return Last time we sent data
+     */
     public long getLastSendTime() { return _lastSendTime; }
+    /** Set the time we sent data.
+     * @param when The time we sent data
+     */
     public void setLastSendTime(long when) { _lastSendTime = when; }
     
-    /** what was the last packet Id sent to the peer? */
+    /** What was the last packet Id sent to the peer?
+     * @return The last sent packet ID
+     */
     public long getLastSendId() { return _lastSendId; }
+    /** Set the packet Id that was sent to a peer.
+     * @param id The packet ID
+     */
     public void setLastSendId(long id) { _lastSendId = id; }
     
+    /**
+     * Retrieve the current ConnectionOptions.
+     * @return the current ConnectionOptions
+     */
     public ConnectionOptions getOptions() { return _options; }
+    /**
+     * Set the ConnectionOptions.
+     * @param opts ConnectionOptions
+     */
     public void setOptions(ConnectionOptions opts) { _options = opts; }
         
     public I2PSession getSession() { return _connectionManager.getSession(); }
@@ -641,6 +665,7 @@ public class Connection {
      * Time when the scheduler next want to send a packet, or -1 if 
      * never.  This should be set when we want to send on timeout, for 
      * instance, or want to delay an ACK.
+     * @return the next time the scheduler will want to send a packet, or -1 if never.
      */
     public long getNextSendTime() { return _nextSendTime; }
     public void setNextSendTime(long when) { 
@@ -665,7 +690,9 @@ public class Connection {
         }
     }
     
-    /** how many packets have we sent and the other side has ACKed? */
+    /** how many packets have we sent and the other side has ACKed?
+     * @return Count of how many packets ACKed.
+     */
     public long getAckedPackets() { return _ackedPackets; }
     public long getCreatedOn() { return _createdOn; }
     public long getCloseSentOn() { return _closeSentOn; }
@@ -681,7 +708,9 @@ public class Connection {
     
     public void incrementUnackedPacketsReceived() { _unackedPacketsReceived++; }
     public int getUnackedPacketsReceived() { return _unackedPacketsReceived; }
-    /** how many packets have we sent but not yet received an ACK for? */
+    /** how many packets have we sent but not yet received an ACK for?
+     * @return Count of packets in-flight.
+     */
     public int getUnackedPacketsSent() { 
         synchronized (_outboundPackets) { 
             return _outboundPackets.size(); 
@@ -857,11 +886,16 @@ public class Connection {
         }
     }
     
-    /** stream that the local peer receives data on */
+    /** stream that the local peer receives data on
+     * @return the inbound message stream
+     */
     public MessageInputStream getInputStream() { return _inputStream; }
-    /** stream that the local peer sends data to the remote peer on */
+    /** stream that the local peer sends data to the remote peer on
+     * @return the outbound message stream
+     */
     public MessageOutputStream getOutputStream() { return _outputStream; }
     
+	@Override
     public String toString() { 
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Connection ");
@@ -927,7 +961,7 @@ public class Connection {
      * fired to reschedule event notification
      */
     class ConEvent implements SimpleTimer.TimedEvent {
-        private Exception _addedBy;
+        private Exception _addedBy; // unused?
         public ConEvent() { 
             //_addedBy = new Exception("added by");
         }

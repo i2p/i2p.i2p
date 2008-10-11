@@ -104,7 +104,7 @@ public class ConnectionManager {
 
     /**
      * Get the socket accept() timeout.
-     * @return
+     * @return accept timeout in ms.
      */
     public long MgetSoTimeout() {
         return SoTimeout;
@@ -121,6 +121,7 @@ public class ConnectionManager {
     /**
      * Create a new connection based on the SYN packet we received.
      *
+     * @param synPacket SYN packet to process
      * @return created Connection with the packet's data already delivered to
      *         it, or null if the syn's streamId was already taken
      */
@@ -190,7 +191,9 @@ public class ConnectionManager {
      * Build a new connection to the given peer.  This blocks if there is no
      * connection delay, otherwise it returns immediately.
      *
-     * @return new connection, or null if we have exceeded our limit 
+     * @param peer Destination to contact
+     * @param opts Connection's options
+     * @return new connection, or null if we have exceeded our limit
      */
     public Connection connect(Destination peer, ConnectionOptions opts) {
         Connection con = null;
@@ -293,6 +296,7 @@ public class ConnectionManager {
     /**
      * Drop the (already closed) connection on the floor.
      *
+     * @param con Connection to drop.
      */
     public void removeConnection(Connection con) {
         boolean removed = false;
@@ -319,7 +323,9 @@ public class ConnectionManager {
         }
     }
     
-    /** return a set of Connection objects */
+    /** return a set of Connection objects
+     * @return set of Connection objects
+     */
     public Set listConnections() {
         synchronized (_connectionLock) {
             return new HashSet(_connectionByInboundId.values());

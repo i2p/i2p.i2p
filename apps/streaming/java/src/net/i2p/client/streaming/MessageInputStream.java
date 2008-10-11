@@ -73,7 +73,9 @@ public class MessageInputStream extends InputStream {
         _cache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
     }
     
-    /** What is the highest block ID we've completely received through? */
+    /** What is the highest block ID we've completely received through?
+     * @return highest data block ID completely received
+     */
     public long getHighestReadyBockId() { 
         // not synchronized as it doesnt hurt to read a too-low value
         return _highestReadyBlockId; 
@@ -89,6 +91,7 @@ public class MessageInputStream extends InputStream {
      * past the highest ready ID and below the highest received message 
      * ID.  This may return null if there are no such IDs.
      *
+     * @return array of message ID holes, or null if none
      */
     public long[] getNacks() {
         synchronized (_dataLock) {
@@ -128,6 +131,7 @@ public class MessageInputStream extends InputStream {
      * Ascending list of block IDs greater than the highest
      * ready block ID, or null if there aren't any.
      *
+     * @return block IDs greater than the highest ready block ID, or null if there aren't any.
      */
     public long[] getOutOfOrderBlocks() {
         long blocks[] = null;
@@ -146,7 +150,9 @@ public class MessageInputStream extends InputStream {
         return blocks;
     }
     
-    /** how many blocks have we received that we still have holes before? */
+    /** how many blocks have we received that we still have holes before?
+     * @return Count of blocks received that still have holes
+     */
     public int getOutOfOrderBlockCount() { 
         synchronized (_dataLock) { 
             return _notYetReadyBlocks.size(); 
@@ -156,6 +162,7 @@ public class MessageInputStream extends InputStream {
     /** 
      * how long a read() call should block (if less than 0, block indefinitely,
      * but if it is 0, do not block at all)
+     * @return how long read calls should block, 0 or less indefinitely block
      */
     public int getReadTimeout() { return _readTimeout; }
     public void setReadTimeout(int timeout) {
@@ -203,6 +210,8 @@ public class MessageInputStream extends InputStream {
      * A new message has arrived - toss it on the appropriate queue (moving 
      * previously pending messages to the ready queue if it fills the gap, etc).
      *
+     * @param messageId ID of the message
+     * @param payload message payload
      * @return true if this is a new packet, false if it is a dup
      */
     public boolean messageReceived(long messageId, ByteArray payload) {
@@ -260,10 +269,12 @@ public class MessageInputStream extends InputStream {
             return _oneByte[0];
     }
     
+	@Override
     public int read(byte target[]) throws IOException {
         return read(target, 0, target.length);
     }
     
+	@Override
     public int read(byte target[], int offset, int length) throws IOException {
         if (_locallyClosed) throw new IOException("Already locally closed");
         throwAnyError();
@@ -360,6 +371,7 @@ public class MessageInputStream extends InputStream {
         return length;
     }
     
+	@Override
     public int available() throws IOException {
         if (_locallyClosed) throw new IOException("Already closed, you wanker");
         throwAnyError();
@@ -383,6 +395,7 @@ public class MessageInputStream extends InputStream {
      * How many bytes are queued up for reading (or sitting in the out-of-order
      * buffer)?
      *
+     * @return Count of bytes waiting to be read
      */
     public int getTotalQueuedSize() {
         synchronized (_dataLock) {
@@ -418,6 +431,7 @@ public class MessageInputStream extends InputStream {
         }
     }
     
+	@Override
     public void close() {
         synchronized (_dataLock) {
             //while (_readyDataBlocks.size() > 0)

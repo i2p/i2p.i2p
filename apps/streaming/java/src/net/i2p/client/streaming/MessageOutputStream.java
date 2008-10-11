@@ -77,10 +77,12 @@ public class MessageOutputStream extends OutputStream {
     public int getWriteTimeout() { return _writeTimeout; }
     public void setBufferSize(int size) { _nextBufferSize = size; }
     
+	@Override
     public void write(byte b[]) throws IOException {
         write(b, 0, b.length);
     }
     
+	@Override
     public void write(byte b[], int off, int len) throws IOException {
         if (_closed) throw new IOException("Already closed");
         if (_log.shouldLog(Log.DEBUG))
@@ -159,7 +161,7 @@ public class MessageOutputStream extends OutputStream {
         int periods = (int)Math.floor((now - _sendPeriodBeginTime) / 1000d);
         if (periods > 0) {
             // first term decays on slow transmission
-            _sendBps = (int)(((float)0.9f*((float)_sendBps/(float)periods)) + ((float)0.1f*((float)_sendPeriodBytes/(float)periods)));
+            _sendBps = (int)((0.9f*((float)_sendBps/(float)periods)) + (0.1f*((float)_sendPeriodBytes/(float)periods)));
             _sendPeriodBytes = len;
             _sendPeriodBeginTime = now;
             _context.statManager().addRateData("stream.sendBps", _sendBps, 0);
@@ -255,9 +257,12 @@ public class MessageOutputStream extends OutputStream {
      * delivered.
      *
      * @throws IOException if the write fails
-     * @throws InterruptedIOException if the write times out
      */
+	@Override
     public void flush() throws IOException {
+     /* @throws InterruptedIOException if the write times out
+      * Documented here, but doesn't belong in the javadoc. 
+      */
         long begin = _context.clock().now();
         WriteStatus ws = null;
         synchronized (_dataLock) {

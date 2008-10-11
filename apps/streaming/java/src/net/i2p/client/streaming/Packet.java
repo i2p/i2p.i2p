@@ -149,7 +149,9 @@ public class Packet {
     public Packet() { }
     
     private boolean _sendStreamIdSet = false;
-    /** what stream do we send data to the peer on? */
+    /** what stream do we send data to the peer on?
+     * @return stream ID we use to send data
+     */
     public long getSendStreamId() { return _sendStreamId; }
     public void setSendStreamId(long id) { 
         if ( (_sendStreamIdSet) && (_sendStreamId > 0) )
@@ -162,6 +164,7 @@ public class Packet {
     /** 
      * stream the replies should be sent on.  this should be 0 if the
      * connection is still being built.
+     * @return stream ID we use to get data, zero if the connection is still being built.
      */
     public long getReceiveStreamId() { return _receiveStreamId; }
     public void setReceiveStreamId(long id) { 
@@ -171,7 +174,9 @@ public class Packet {
         _receiveStreamId = id; 
     }
     
-    /** 0-indexed sequence number for this Packet in the sendStream */
+    /** 0-indexed sequence number for this Packet in the sendStream
+     * @return 0-indexed sequence number for current Packet in current sendStream
+     */
     public long getSequenceNum() { return _sequenceNum; }
     public void setSequenceNum(long num) { _sequenceNum = num; }
     
@@ -181,6 +186,7 @@ public class Packet {
      * connection packet (where receiveStreamId is the unknown id) or
      * if FLAG_NO_ACK is set.
      *
+     * @return The highest packet sequence number received on receiveStreamId
      */
     public long getAckThrough() { 
         if (isFlagSet(FLAG_NO_ACK))
@@ -198,6 +204,7 @@ public class Packet {
      * List of packet sequence numbers below the getAckThrough() value
      * have not been received.  this may be null.
      *
+     * @return List of packet sequence numbers not ACKed, or null if there are none.
      */
     public long[] getNacks() { return _nacks; }
     public void setNacks(long nacks[]) { _nacks = nacks; }
@@ -207,13 +214,16 @@ public class Packet {
      * resending this packet (if it hasn't yet been ACKed).  The 
      * value is seconds since the packet was created.
      *
+     * @return Delay before resending a packet in seconds.
      */
     public int getResendDelay() { return _resendDelay; }
     public void setResendDelay(int numSeconds) { _resendDelay = numSeconds; }
     
     public static final int MAX_PAYLOAD_SIZE = 32*1024;
     
-    /** get the actual payload of the message.  may be null */
+    /** get the actual payload of the message.  may be null
+     * @return the payload of the message, null if none.
+     */
     public ByteArray getPayload() { return _payload; }
     public void setPayload(ByteArray payload) { 
         _payload = payload; 
@@ -232,7 +242,10 @@ public class Packet {
         return _payload;
     }
 
-    /** is a particular flag set on this packet? */
+    /** is a particular flag set on this packet?
+     * @param flag bitmask of any flag(s)
+     * @return true if set, false if not.
+     */
     public boolean isFlagSet(int flag) { return 0 != (_flags & flag); }
     public void setFlag(int flag) { _flags |= flag; }
     public void setFlag(int flag, boolean set) { 
@@ -243,14 +256,18 @@ public class Packet {
     }
     public void setFlags(int flags) { _flags = flags; } 
 
-    /** the signature on the packet (only included if the flag for it is set) */
+    /** the signature on the packet (only included if the flag for it is set)
+     * @return signature on the packet if the flag for signatures is set
+     */
     public Signature getOptionalSignature() { return _optionSignature; }
     public void setOptionalSignature(Signature sig) { 
         setFlag(FLAG_SIGNATURE_INCLUDED, sig != null);
         _optionSignature = sig; 
     }
 
-    /** the sender of the packet (only included if the flag for it is set) */
+    /** the sender of the packet (only included if the flag for it is set)
+     * @return the sending Destination
+     */
     public Destination getOptionalFrom() { return _optionFrom; }
     public void setOptionalFrom(Destination from) { 
         setFlag(FLAG_FROM_INCLUDED, from != null);
@@ -262,6 +279,7 @@ public class Packet {
      * How many milliseconds the sender of this packet wants the recipient
      * to wait before sending any more data (only valid if the flag for it is
      * set) 
+     * @return How long the sender wants the recipient to wait before sending any more data in ms.
      */
     public int getOptionalDelay() { return _optionDelay; }
     public void setOptionalDelay(int delayMs) {
@@ -276,6 +294,7 @@ public class Packet {
     /**
      * What is the largest payload the sender of this packet wants to receive?
      *
+     * @return Maximum payload size sender can receive (MRU)
      */
     public int getOptionalMaxSize() { return _optionMaxSize; }
     public void setOptionalMaxSize(int numBytes) { 
@@ -287,6 +306,9 @@ public class Packet {
      * Write the packet to the buffer (starting at the offset) and return
      * the number of bytes written.
      *
+     * @param buffer bytes to write to a destination
+     * @param offset starting point in the buffer to send
+     * @return Count actually written
      * @throws IllegalStateException if there is data missing or otherwise b0rked
      */
     public int writePacket(byte buffer[], int offset) throws IllegalStateException {
@@ -370,6 +392,8 @@ public class Packet {
     
     /**
      * how large would this packet be if we wrote it
+     * @return How large the current packet would be
+     * @throws IllegalStateException 
      */
     public int writtenSize() throws IllegalStateException {
         int size = 0;
@@ -497,7 +521,10 @@ public class Packet {
     /**
      * Determine whether the signature on the data is valid.  
      *
-     * @return true if the signature exists and validates against the data, 
+     * @param ctx Application context
+     * @param from the Destination the data came from
+     * @param buffer data to validate with signature
+     * @return true if the signature exists and validates against the data,
      *         false otherwise.
      */
     public boolean verifySignature(I2PAppContext ctx, Destination from, byte buffer[]) {
@@ -530,6 +557,11 @@ public class Packet {
      * Sign and write the packet to the buffer (starting at the offset) and return
      * the number of bytes written.
      *
+     * @param buffer data to be written
+     * @param offset starting point in the buffer
+     * @param ctx Application Context
+     * @param key signing key
+     * @return Count of bytes written
      * @throws IllegalStateException if there is data missing or otherwise b0rked
      */
     public int writeSignedPacket(byte buffer[], int offset, I2PAppContext ctx, SigningPrivateKey key) throws IllegalStateException {
@@ -560,6 +592,7 @@ public class Packet {
         return size;
     }
     
+	@Override
     public String toString() {
         StringBuffer str = formatAsString();
         return str.toString();

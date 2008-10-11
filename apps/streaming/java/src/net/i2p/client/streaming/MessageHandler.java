@@ -70,6 +70,7 @@ public class MessageHandler implements I2PSessionListener {
     /**
      * Notify the client that the session has been terminated
      *
+     * @param session that has been terminated
      */
     public void disconnected(I2PSession session) {
         if (_log.shouldLog(Log.ERROR))
@@ -90,6 +91,9 @@ public class MessageHandler implements I2PSessionListener {
     /**
      * Notify the client that some error occurred
      *
+     * @param session of the client
+     * @param message to send to the client about the error
+     * @param error the actual error
      */
     public void errorOccurred(I2PSession session, String message, Throwable error) {
         if (_log.shouldLog(Log.WARN))
