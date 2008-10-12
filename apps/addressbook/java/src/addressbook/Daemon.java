@@ -160,7 +160,8 @@ public class Daemon {
         settings = ConfigParser.parse(settingsFile, defaultSettings);
         // wait
         try {
-            Thread.currentThread().sleep(5*60*1000);
+            Thread.sleep(5*60*1000);
+	    // Static method, and redundent Thread.currentThread().sleep(5*60*1000);
         } catch (InterruptedException ie) {}
         
         while (true) {

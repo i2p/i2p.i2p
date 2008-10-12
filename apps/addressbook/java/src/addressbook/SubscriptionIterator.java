@@ -41,6 +41,8 @@ public class SubscriptionIterator implements Iterator {
      * 
      * @param subscriptions
      *            List of Subscription objects that represent address books.
+     * @param proxyHost proxy hostname
+     * @param proxyPort proxt port number
      */
     public SubscriptionIterator(List subscriptions, String proxyHost, int proxyPort) {
         this.subIterator = subscriptions.iterator();

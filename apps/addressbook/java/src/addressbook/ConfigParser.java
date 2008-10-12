@@ -213,8 +213,7 @@ public class ConfigParser {
      * 
      * @param file
      *            A File to attempt to parse.
-     * @param string
-     *            A List to use as the default, if file fails.
+     * @param list list of files to parse
      * @return A List consisting of one element for each line in file, or if
      *         file cannot be read, list.
      */

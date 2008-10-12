@@ -60,6 +60,9 @@ public class SubscriptionList {
      * @param lastModifiedFile
      *            A file containg the last-modified headers used for conditional
      *            GET. The file is in the format "url=leastmodified".
+     * @param defaultSubs default subscription file
+     * @param proxyHost proxy hostname
+     * @param proxyPort proxy port number
      */
     public SubscriptionList(File locationsFile, File etagsFile,
             File lastModifiedFile, List defaultSubs, String proxyHost, 

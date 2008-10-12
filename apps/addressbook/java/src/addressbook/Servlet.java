@@ -44,6 +44,7 @@ public class Servlet extends GenericServlet {
     /* (non-Javadoc)
      * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
      */
+    @Override
     public void init(ServletConfig config) {
         try {
             super.init(config);

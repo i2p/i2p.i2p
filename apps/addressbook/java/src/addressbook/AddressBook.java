@@ -57,7 +57,7 @@ public class AddressBook {
         this.addresses = addresses;
     }
 
-    /**
+    /*
      * Construct an AddressBook from the contents of the file at url. If the
      * remote file cannot be read, construct an empty AddressBook
      * 
@@ -81,6 +81,7 @@ public class AddressBook {
         new File("addressbook.tmp").delete();
     }
 */
+    static final long MAX_SUB_SIZE = 3 * 1024 * 1024l; //about 5,000 hosts
     /**
      * Construct an AddressBook from the Subscription subscription. If the
      * address book at subscription has not changed since the last time it was
@@ -89,8 +90,9 @@ public class AddressBook {
      * 
      * @param subscription
      *            A Subscription instance pointing at a remote address book.
+     * @param proxyHost hostname of proxy
+     * @param proxyPort port number of proxy
      */
-    static final long MAX_SUB_SIZE = 3 * 1024 * 1024l; //about 5,000 hosts
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
         this.location = subscription.getLocation();
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
@@ -152,6 +154,7 @@ public class AddressBook {
      * 
      * @return A String representing the contents of the AddressBook.
      */
+    @Override
     public String toString() {
         return this.addresses.toString();
     }
@@ -195,6 +198,7 @@ public class AddressBook {
      * 
      * @param other
      *            An AddressBook to merge with.
+     * @param overwrite True to overwrite
      * @param log
      *            The log to write messages about new addresses or conflicts to.
      */

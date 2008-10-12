@@ -149,9 +149,11 @@
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
+                <pathelement location="apps/jrobin/jrobin-1.4.0.jar" />
                 <pathelement location="installer/lib/wrapper/win32/wrapper.jar" />
-                <pathelement location="core/lib/junit.jar" />
+                <pathelement location="core/lib/junit.jar" />                
             </classpath>
         </javadoc>
     </target>
