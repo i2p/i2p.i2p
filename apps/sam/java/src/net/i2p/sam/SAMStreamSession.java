@@ -83,6 +83,9 @@ public class SAMStreamSession {
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws SAMException 
      */
     public SAMStreamSession(String dest, String dir, Properties props,
                             SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
@@ -100,6 +103,9 @@ public class SAMStreamSession {
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws SAMException 
      */
     public SAMStreamSession(InputStream destStream, String dir,
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
@@ -182,6 +188,7 @@ public class SAMStreamSession {
      * @param dest Base64-encoded Destination to connect to
      * @param props Options to be used for connection
      *
+     * @return true if successful
      * @throws DataFormatException if the destination is not valid
      * @throws SAMInvalidDirectionException if trying to connect through a
      *                                      receive-only session
@@ -189,6 +196,7 @@ public class SAMStreamSession {
      * @throws NoRouteToHostException if the destination can't be reached
      * @throws InterruptedIOException if the connection timeouts
      * @throws I2PException if there's another I2P-related error
+     * @throws IOException 
      */
     public boolean connect ( int id, String dest, Properties props ) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedIOException, SAMInvalidDirectionException, IOException {
         if (!canCreate) {
@@ -224,9 +232,11 @@ public class SAMStreamSession {
     /**
      * Send bytes through a SAM STREAM session.
      *
-     * @param data Bytes to be sent
-     *
+     * @param id Stream Id
+     * @param in Datastream input
+     * @param size Count of bytes to send
      * @return True if the data was queued for sending, false otherwise
+     * @throws IOException 
      */
     public boolean sendBytes(int id, InputStream in, int size) throws IOException { 
         StreamSender sender = getSender(id);
@@ -264,6 +274,7 @@ public class SAMStreamSession {
      * Close a connection managed by the SAM STREAM session.
      *
      * @param id Connection id
+     * @return true on success
      */
     public boolean closeConnection(int id) {
         if (!checkSocketHandlerId(id)) {
@@ -323,6 +334,7 @@ public class SAMStreamSession {
      * Get a SAM STREAM session socket handler.
      *
      * @param id Handler id
+     * @return SAM StreamSender handler
      */
     protected SAMStreamSessionSocketReader getSocketReader ( int id ) {
         synchronized (handlersMapLock) {
@@ -339,6 +351,7 @@ public class SAMStreamSession {
      * Check whether a SAM STREAM session socket handler id is still in use.
      *
      * @param id Handler id
+     * @return True if in use
      */
     protected boolean checkSocketHandlerId ( int id ) {
         synchronized (handlersMapLock) {
@@ -503,7 +516,8 @@ public class SAMStreamSession {
          * Create a new SAM STREAM session socket reader
          *
          * @param s Socket to be handled
-         * @param id Unique id assigned to the handler
+	 * @param id Unique id assigned to the handler
+	 * @throws IOException 
          */
         public SAMStreamSessionSocketReader ( I2PSocket s, int id ) throws IOException {}
 
@@ -526,7 +540,8 @@ public class SAMStreamSession {
          * Create a new SAM STREAM session socket reader
          *
          * @param s Socket to be handled
-         * @param id Unique id assigned to the handler
+	 * @param id Unique id assigned to the handler
+	 * @throws IOException 
          */
 
         public SAMv1StreamSessionSocketReader ( I2PSocket s, int id ) throws IOException {
@@ -541,6 +556,7 @@ public class SAMStreamSession {
          * Stop a SAM STREAM session socket reader thead immediately.
          *
          */
+        @Override
         public void stopRunning() {
             _log.debug("stopRunning() invoked on socket reader " + id);
             synchronized (runningLock) {
@@ -551,6 +567,7 @@ public class SAMStreamSession {
             }
         }
 
+        @Override
         public void run() {
             _log.debug("run() called for socket reader " + id);
 
@@ -605,8 +622,8 @@ public class SAMStreamSession {
         /**
 	 * Send bytes through the SAM STREAM session socket sender
 	 *
-	 * @param data Data to be sent
-	 *
+	 * @param in Data input stream
+	 * @param size Count of bytes to send
 	 * @throws IOException if the client didnt provide enough data
 	 */
         public void sendBytes ( InputStream in, int size ) throws IOException {}
@@ -655,10 +672,9 @@ public class SAMStreamSession {
         /**
          * Send bytes through the SAM STREAM session socket sender
          *
-         * @param data Data to be sent
-         *
          * @throws IOException if the client didnt provide enough data
          */
+        @Override
         public void sendBytes(InputStream in, int size) throws IOException {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Handler " + _id + ": sending " + size + " bytes");
@@ -679,6 +695,7 @@ public class SAMStreamSession {
          * Stop a SAM STREAM session socket sender thread immediately
          *
          */
+        @Override
         public void stopRunning() {
             _log.debug("stopRunning() invoked on socket sender " + _id);
             synchronized (runningLock) {
@@ -701,11 +718,13 @@ public class SAMStreamSession {
          * Stop a SAM STREAM session socket sender gracefully: stop the
          * sender thread once all pending data has been sent.
          */
+        @Override
         public void shutDownGracefully() {
             _log.debug("shutDownGracefully() invoked on socket sender " + _id);
             _shuttingDownGracefully = true;
         }
 
+        @Override
         public void run() {
             _log.debug("run() called for socket sender " + _id);
             ByteArray data = null;

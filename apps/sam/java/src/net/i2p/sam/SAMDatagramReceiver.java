@@ -20,7 +20,9 @@ public interface SAMDatagramReceiver {
     /**
      * Send a byte array to a SAM client.
      *
+     * @param sender Destination
      * @param data Byte array to be received
+     * @throws IOException 
      */
     public void receiveDatagramBytes(Destination sender, byte data[]) throws IOException;
 

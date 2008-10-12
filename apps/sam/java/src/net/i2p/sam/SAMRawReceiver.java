@@ -20,6 +20,7 @@ public interface SAMRawReceiver {
      * regarding the sender.
      *
      * @param data Byte array to be received
+     * @throws IOException 
      */
     public void receiveRawBytes(byte data[]) throws IOException;
 

@@ -40,6 +40,9 @@ public class SAMDatagramSession extends SAMMessageSession {
      * @param dest Base64-encoded destination (private key)
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
      */
     public SAMDatagramSession(String dest, Properties props,
                               SAMDatagramReceiver recv) throws IOException, 
@@ -56,6 +59,9 @@ public class SAMDatagramSession extends SAMMessageSession {
      * @param destStream Input stream containing the destination keys
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
      */
     public SAMDatagramSession(InputStream destStream, Properties props,
                               SAMDatagramReceiver recv) throws IOException, 
@@ -69,9 +75,11 @@ public class SAMDatagramSession extends SAMMessageSession {
     /**
      * Send bytes through a SAM DATAGRAM session.
      *
+     * @param dest Destination
      * @param data Bytes to be sent
      *
      * @return True if the data was sent, false otherwise
+     * @throws DataFormatException 
      */
     public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
         if (data.length > DGRAM_SIZE_MAX)

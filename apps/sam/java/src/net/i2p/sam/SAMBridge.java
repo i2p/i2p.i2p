@@ -90,6 +90,7 @@ public class SAMBridge implements Runnable {
     /**
      * Retrieve the destination associated with the given name
      *
+     * @param name name of the destination
      * @return null if the name does not exist, or if it is improperly formatted
      */
     public Destination getDestination(String name) {
@@ -113,6 +114,7 @@ public class SAMBridge implements Runnable {
      * as a base64 string (Destination+PrivateKey+SessionPrivateKey, as I2CP 
      * stores it).
      *
+     * @param name Name of the destination
      * @return null if the name does not exist, else the stream
      */
     public String getKeystream(String name) {
@@ -126,6 +128,8 @@ public class SAMBridge implements Runnable {
     /**
      * Specify that the given keystream should be used for the given name
      *
+     * @param name Name of the destination
+     * @param stream  Name of the stream
      */
     public void addKeystream(String name, String stream) {
         synchronized (nameToPrivKeys) {
@@ -194,7 +198,8 @@ public class SAMBridge implements Runnable {
      * name=val options are passed to the I2CP code to build a session, 
      * allowing the bridge to specify an alternate I2CP host and port, tunnel
      * depth, etc.
-     */ 
+     * @param args [[listenHost ]listenPort[ name=val]*]
+     */
     public static void main(String args[]) {
         String keyfile = DEFAULT_SAM_KEYFILE;
         int port = SAM_LISTENPORT;

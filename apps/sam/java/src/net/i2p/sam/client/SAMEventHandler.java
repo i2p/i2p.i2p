@@ -26,6 +26,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         _log = ctx.logManager().getLog(getClass());
     }
     
+	@Override
     public void helloReplyReceived(boolean ok) {
         synchronized (_helloLock) {
             if (ok)
@@ -36,6 +37,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
+	@Override
     public void sessionStatusReceived(String result, String destination, String msg) {
         synchronized (_sessionCreateLock) {
             if (SAMReader.SAMClientEventListener.SESSION_STATUS_OK.equals(result))
@@ -46,6 +48,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
+	@Override
     public void namingReplyReceived(String name, String result, String value, String msg) {
         synchronized (_namingReplyLock) {
             if (SAMReader.SAMClientEventListener.NAMING_REPLY_OK.equals(result)) 
@@ -56,6 +59,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
+	@Override
     public void unknownMessageReceived(String major, String minor, Properties params) {
         _log.error("wrt, [" + major + "] [" + minor + "] [" + params + "]");
     }
@@ -68,6 +72,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     /**
      * Wait for the connection to be established, returning true if everything 
      * went ok
+     * @return true if everything ok
      */
     public boolean waitForHelloReply() {
         while (true) {
@@ -85,6 +90,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     /**
      * Wait for the session to be created, returning true if everything went ok
      *
+     * @return true if everything ok
      */
     public boolean waitForSessionCreateReply() {
         while (true) {
@@ -104,6 +110,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
      * not able to be retrieved.
      *
      * @param name name to be looked for, or "ME"
+     * @return destination found matching the name, or null
      */
     public String waitForNamingReply(String name) {
         while (true) {

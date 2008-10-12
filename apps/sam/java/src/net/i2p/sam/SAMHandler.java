@@ -51,6 +51,7 @@ public abstract class SAMHandler implements Runnable {
      * @param verMajor SAM major version to manage
      * @param verMinor SAM minor version to manage
      * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
+     * @throws IOException 
      */
     protected SAMHandler(Socket s,
                          int verMajor, int verMinor, Properties i2cpProps) throws IOException {
@@ -82,6 +83,8 @@ public abstract class SAMHandler implements Runnable {
     /**
      * Get the input stream of the socket connected to the SAM client
      *
+     * @return input stream
+     * @throws IOException 
      */
     protected final InputStream getClientSocketInputStream() throws IOException {
         return socket.getInputStream();
@@ -93,6 +96,7 @@ public abstract class SAMHandler implements Runnable {
      * you're doing.
      *
      * @param data A byte array to be written
+     * @throws IOException 
      */
     protected final void writeBytes(byte[] data) throws IOException {
         synchronized (socketWLock) {
@@ -105,6 +109,7 @@ public abstract class SAMHandler implements Runnable {
      * If you're crazy enough to write to the raw socket, grab the write lock
      * with getWriteLock(), synchronize against it, and write to the getOut()
      *
+     * @return socket Write lock object
      */
     protected Object getWriteLock() { return socketWLock; }
     protected OutputStream getOut() { return socketOS; }
@@ -134,6 +139,7 @@ public abstract class SAMHandler implements Runnable {
     /**
      * Close the socket connected to the SAM client.
      *
+     * @throws IOException 
      */
     protected final void closeClientSocket() throws IOException {
         if (socket != null)
@@ -167,6 +173,7 @@ public abstract class SAMHandler implements Runnable {
      *
      * @return A String describing the handler;
      */
+    @Override
     public final String toString() {
         return ("SAM handler (class: " + this.getClass().getName()
                 + "; SAM version: " + verMajor + "." + verMinor

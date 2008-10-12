@@ -78,6 +78,7 @@ public class SAMStreamSink {
     
     private class SinkEventHandler extends SAMEventHandler {
         public SinkEventHandler(I2PAppContext ctx) { super(ctx); }
+		@Override
         public void streamClosedReceived(String result, int id, String message) {
             Sink sink = null;
             synchronized (_remotePeers) {
@@ -90,6 +91,7 @@ public class SAMStreamSink {
                 _log.error("wtf, not connected to " + id + " but we were just closed?");
             }
         }
+		@Override
         public void streamDataReceived(int id, byte data[], int offset, int length) {
             Sink sink = null;
             synchronized (_remotePeers) {
@@ -101,6 +103,7 @@ public class SAMStreamSink {
                 _log.error("wtf, not connected to " + id + " but we received " + length + "?");
             }
         }
+		@Override
         public void streamConnectedReceived(String dest, int id) {  
             _log.debug("Connection " + id + " received from " + dest);
 

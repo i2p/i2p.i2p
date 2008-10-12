@@ -33,6 +33,9 @@ public class SAMRawSession extends SAMMessageSession {
      * @param dest Base64-encoded destination (private key)
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
      */
     public SAMRawSession(String dest, Properties props,
                          SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
@@ -47,6 +50,9 @@ public class SAMRawSession extends SAMMessageSession {
      * @param destStream Input stream containing the destination keys
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
      */
     public SAMRawSession(InputStream destStream, Properties props,
                          SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
@@ -61,6 +67,7 @@ public class SAMRawSession extends SAMMessageSession {
      * @param data Bytes to be sent
      *
      * @return True if the data was sent, false otherwise
+     * @throws DataFormatException 
      */
     public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
         if (data.length > RAW_SIZE_MAX)

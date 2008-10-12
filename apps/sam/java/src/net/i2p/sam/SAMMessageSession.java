@@ -43,6 +43,9 @@ public abstract class SAMMessageSession {
      *
      * @param dest Base64-encoded destination (private key)
      * @param props Properties to setup the I2P session
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
      */
     protected SAMMessageSession(String dest, Properties props) throws IOException, DataFormatException, I2PSessionException {
         ByteArrayInputStream bais;
@@ -57,6 +60,9 @@ public abstract class SAMMessageSession {
      *
      * @param destStream Input stream containing the destination keys
      * @param props Properties to setup the I2P session
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
      */
     protected SAMMessageSession(InputStream destStream, Properties props) throws IOException, DataFormatException, I2PSessionException {
         initSAMMessageSession(destStream, props);
@@ -84,9 +90,11 @@ public abstract class SAMMessageSession {
     /**
      * Send bytes through a SAM message-based session.
      *
+     * @param dest Destination
      * @param data Bytes to be sent
      *
      * @return True if the data was sent, false otherwise
+     * @throws DataFormatException 
      */
     public abstract boolean sendBytes(String dest, byte[] data) throws DataFormatException;
 
@@ -94,9 +102,11 @@ public abstract class SAMMessageSession {
      * Actually send bytes through the SAM message-based session I2PSession
      * (er...).
      *
+     * @param dest Destination
      * @param data Bytes to be sent
      *
      * @return True if the data was sent, false otherwise
+     * @throws DataFormatException 
      */
     protected boolean sendBytesThroughMessageSession(String dest, byte[] data) throws DataFormatException {
 	Destination d = new Destination();
@@ -124,6 +134,7 @@ public abstract class SAMMessageSession {
 
     /**
      * Handle a new received message
+     * @param msg Message payload
      */
     protected abstract void messageReceived(byte[] msg);
     
@@ -156,7 +167,8 @@ public abstract class SAMMessageSession {
          * Create a new SAM message-based session handler
          *
          * @param destStream Input stream containing the destination keys
-         * @param props Properties to setup the I2P session
+	 * @param props Properties to setup the I2P session
+	 * @throws I2PSessionException 
          */
         public SAMMessageSessionHandler(InputStream destStream, Properties props) throws I2PSessionException {
             _log.debug("Instantiating new SAM message-based session handler");

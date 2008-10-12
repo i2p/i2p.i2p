@@ -54,7 +54,7 @@ public class SAMStreamSend {
         _samHost = samHost;
         _samPort = samPort;
         _destFile = destFile;
-        _dataFile = dataFile;;
+        _dataFile = dataFile;
         _conOptions = "";
         _eventHandler = new SendEventHandler(_context);
         _remotePeers = new HashMap();

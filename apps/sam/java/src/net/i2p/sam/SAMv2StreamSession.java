@@ -47,6 +47,9 @@ public class SAMv2StreamSession extends SAMStreamSession
 		 * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
 		 * @param props Properties to setup the I2P session
 		 * @param recv Object that will receive incoming data
+		 * @throws IOException
+		 * @throws DataFormatException
+		 * @throws SAMException 
 		 */
 		public SAMv2StreamSession ( String dest, String dir, Properties props,
 		                            SAMStreamReceiver recv ) throws IOException, DataFormatException, SAMException
@@ -61,6 +64,9 @@ public class SAMv2StreamSession extends SAMStreamSession
 		 * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
 		 * @param props Properties to setup the I2P session
 		 * @param recv Object that will receive incoming data
+		 * @throws IOException
+		 * @throws DataFormatException
+		 * @throws SAMException 
 		 */
 		public SAMv2StreamSession ( InputStream destStream, String dir,
 		                            Properties props,  SAMStreamReceiver recv ) throws IOException, DataFormatException, SAMException
@@ -81,6 +87,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 		 * @return true if the communication with the SAM client is ok
 		 */
 
+		@Override
 		public boolean connect ( int id, String dest, Properties props )
 		throws DataFormatException, SAMInvalidDirectionException
 		{
@@ -215,13 +222,20 @@ public class SAMv2StreamSession extends SAMStreamSession
 		/**
 				* Lets us push data through the stream without blocking, (even after exceeding
 				* the I2PSocket's buffer)
-		*/
+		 * 
+		 * @param s I2PSocket
+		 * @param id Socket ID
+		 * @return v2StreamSender
+		 * @throws IOException 
+		 */
 
+		@Override
 		protected StreamSender newStreamSender ( I2PSocket s, int id ) throws IOException
 		{
 			return new v2StreamSender ( s, id ) ;
 		}
 
+		@Override
 		protected SAMStreamSessionSocketReader 
 				newSAMStreamSessionSocketReader(I2PSocket s, int id ) throws IOException
 		{
@@ -256,10 +270,11 @@ public class SAMv2StreamSession extends SAMStreamSession
 				/**
 						* Send bytes through the SAM STREAM session socket sender
 						*
-						* @param data Data to be sent
-						*
-						* @throws IOException if the client didnt provide enough data
+				 * @param in Data stream of data to send
+				 * @param size Count of bytes to send
+				 * @throws IOException if the client didnt provide enough data
 				*/
+				@Override
 				public void sendBytes ( InputStream in, int size ) throws IOException
 				{
 					if ( _log.shouldLog ( Log.DEBUG ) )
@@ -303,6 +318,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 						* Stop a SAM STREAM session socket sender thread immediately
 						*
 				*/
+				@Override
 				public void stopRunning()
 				{
 					_log.debug ( "stopRunning() invoked on socket sender " + _id );
@@ -335,12 +351,14 @@ public class SAMv2StreamSession extends SAMStreamSession
 						* Stop a SAM STREAM session socket sender gracefully: stop the
 						* sender thread once all pending data has been sent.
 				*/
+				@Override
 				public void shutDownGracefully()
 				{
 					_log.debug ( "shutDownGracefully() invoked on socket sender " + _id );
 					_shuttingDownGracefully = true;
 				}
 
+				@Override
 				public void run()
 				{
 					_log.debug ( "run() called for socket sender " + _id );
@@ -420,12 +438,14 @@ public class SAMv2StreamSession extends SAMStreamSession
 
 
 		/**
-				* Send bytes through a SAM STREAM session.
-				*
-				* @param data Bytes to be sent
-				*
-				* @return True if the data was queued for sending, false otherwise
+		 * Send bytes through a SAM STREAM session.
+		 *
+		 * @param id Stream ID
+		 * @param limit limitation
+		 * @param nolimit true to limit
+		 * @return True if the data was queued for sending, false otherwise
 		*/
+		@Override
 		public boolean setReceiveLimit ( int id, long limit, boolean nolimit )
 		{
 			SAMStreamSessionSocketReader reader = getSocketReader ( id );
