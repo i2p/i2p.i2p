@@ -1,0 +1,72 @@
+<p align=right><font size="-1"><a href="/index.jsp?lang=en">English</a> | Deutsch</font></p>
+<p>Wenn Du gerade I2P gestartet hast, sollten die "Active:" Zahlen links in den n&auml;chsten paar Minuten anwachsen und Du siehst dann dort ein "shared clients" lokales Ziel gelistet (falls nicht, <a href="#trouble">siehe Unten</a>). Sobald das erscheint, kannst Du:</p>
+<ul>
+ <li><b>"Eepsites" besuchen</b> - In I2P sind anonym gehostete Websites - 
+     Stelle Deinen Browser so ein, &uuml;ber den <b>HTTP proxy: localhost port 4444</b> zu surfen, dann besuche eine Eepsite - 
+     <ul>
+         <li><a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p</a> und
+             <a href="http://perv.i2p/stats.cgi">perv.i2p</a>: Webseiten, die aktive Eepsites beobachten</li>
+         <li><a href="http://forum.i2p/">forum.i2p</a>: Eine sichere und anonyme Verbindung zu <a href="http://forum.i2p2.de/">forum.i2p2.de</a></li>
+         <li><a href="http://www.i2p2.i2p/">www.i2p2.i2p</a> und der Spiegel <a href="http://i2p-projekt.i2p">i2p-projekt.i2p</a>:
+              Sichere und anonyme Verbindung zu <a href="http://www.i2p2.de/">www.i2p2.de</a></li>
+         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>: Eine anonym gehostete Suchseite f&uuml;r Eepsites</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>: Ugha's Eepsite, ein &ouml;ffentliches Wiki mit vielen Links</li>
+         <li><a href="http://fproxy.tino.i2p">fproxy.tino.i2p</a>: Freenet proxy</li>
+     </ul>
+     Es gibt viel mehr Eepsites - folge einfach den Links die du findest,
+     bookmarke Deine Favoriten und besuche sie oft!</li>
+ <li><b>Im Internet surfen</b> - Es gibt einen HTTP "outproxy" in I2P in Deinem
+     HTTP proxy auf Port 4444 - Konfiguriere Deine Browser's Proxy Einstellung 
+     darauf (siehe Oben) und besuche jede normale URL - Deine Anfrage wird 
+     durch das I2P Netzwerk geroutet.</li>
+ <li><b>Daten austauschen</b> - Es gibt eine <a href="i2psnark/">Portierung</a> des
+     <a href="http://www.klomp.org/snark/">Snark</a> <a href="http://www.bittorrent.com/">BitTorrent</a>
+     Clients.</li>
+ <li><b>Anonyme Email</b> - Postman hat ein Email System aufgebaut, das 
+     kompatibel mit normalen  Email-Clients (POP3 / SMTP) ist, welches erlaubt, 
+     Email innerhalb von I2P sowie Email von und zum normalen Internet zu 
+     schicken!  Hole Dir Dein Emailkonto auf <a href="http://hq.postman.i2p/">hq.postman.i2p</a>.
+     Im Verbund dazu haben wir <a href="/susimail/susimail">susimail</a>, ein 
+     Internet-Browser basierter, anonymer pop3/smtp Client, fertig eingerichtet 
+     f&uuml;r Postman's Email Service.</li>
+ <li><b>Anonymer Chat</b> - Starte Deinen Lieblings IRC Client und verbinde ihn 
+     mit dem Server <b>localhost Port 6668</b>.  Das richtet Dich auf auf einen 
+     von zwei anonym gehosteten IRC Servern, aber weder Du noch die wissen wer 
+     der Andere ist.</li>
+ <li><b>Anonymer Blog</b> - Probiere <a href="http://syndie.i2p2.de/">Syndie</a> aus</li>
+ <li>und Vieles mehr</li>
+</ul>
+
+<h2>Willst Du Deine eigene Epsite?</h2>
+
+<p>Wir bringen Software mit, damit Du Deine eigene Eepsite laufen lassen kannst 
+   - Eine 
+<a href="http://jetty.mortbay.org/">Jetty</a> Instanz horcht auf 
+<a href="http://localhost:7658/">http://localhost:7658/</a>. Platziere einfach 
+   Deine Dateien in das <code>eepsite/docroot/</code> Verzeichnis (oder jedes 
+   standart JSP/Servlet <code>.war</code> unter <code>eepsite/webapps</code>, 
+   oder CGI Scripte unter <code>eepsite/cgi-bin</code>) und schon sind sie 
+   verf&uuml;gbar.  Nach dem Start des <a href="/i2ptunnel/">Eepsite tunnels</a>
+   der darauf zeigt ist Deine Eepsite f&uuml;r Andere verf&uuml;gbar. 
+   Detailierte Instruktionen zum Start Deiner eigenen Eepsite sind auf
+   <a href="http://localhost:7658/">Deine tempor&auml;re Eepsite</a>.
+</p>
+
+<h2><a name="trouble">Troubleshooting</a></h2>
+
+<p>Sei geduldig - Am Anfang des ersten Starts kann I2P lange brauchen, da es 
+  dann Verbindungen sucht. Falls nach 30 Minuten Deine 
+  "Active: connected/recent" Zahl noch immer weniger als 10 Verbindungen 
+  aufzeigt, solltest Du Port 8887 auf Deiner Firewall &ouml;ffnen um 
+  f&uuml;r bessere Verbindung zu sorgen.
+  Wenn Du gar keine Eepsites bekommst (auch nicht 
+  <a href="http://www.i2p2.i2p/">www.i2p2.i2p</a>), stelle sicher, dass Dein 
+  Internet Browser auf den Proxy localhost Port 4444 eingestellt ist.
+  Vielleicht m&ouml;chtest Du auch die Informationen lesen, die auf der 
+  <a href="http://www.i2p2.i2p/">I2P website</a> sind, Nachrichten lesen und 
+  ins <a href="http://forum.i2p2.de/">I2P discussion forum</a> posten, oder 
+  chatten auf #i2p or #i2p-chat beim IRC auf 
+  <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, irc.postman.i2p 
+  oder irc.freshcoffee.i2p (die verbunden sind).</p>
+
+<p><b>&Uuml;brigens, diese Seite kannst Du &auml;ndern indem Du "docs/readme_de.html" editierst</b></p>

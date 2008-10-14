@@ -31,6 +31,7 @@ if (System.getProperty("router.consoleNonce") == null) {
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
+ <jsp:setProperty name="contenthelper" property="lang" value="<%=request.getParameter("lang")%>" />
  <jsp:getProperty name="contenthelper" property="content" />
 </div>
 

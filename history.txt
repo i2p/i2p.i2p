@@ -1,3 +1,11 @@
+2008-10-14 zzz
+    * index.jsp: Add multilanguage support for readme.html;
+      add readme_de.html (thanks devzero!)
+    * configupdate.jsp, configadvanced.jsp:
+      Disable word wrap in textareas
+    * install*.txt: Update for 1.5
+    * summary.jsp: Remove failing peer count
+
 2008-10-10 zzz
     * Profiles: Reduce reject penalty in
       capacity calculation to avoid a congestion collapse

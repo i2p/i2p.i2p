@@ -268,6 +268,7 @@
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
+        <copy file="readme_de.html" todir="pkg-temp/docs/" />
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
@@ -345,6 +346,9 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+        <!-- New readme_de.html file - For one release only, remove after 0.6.5 is out -->
+        <mkdir dir="pkg-temp/docs" />
+        <copy file="readme_de.html" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter">
         <delete dir="pkg-temp" />
