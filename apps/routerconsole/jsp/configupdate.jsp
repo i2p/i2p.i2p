@@ -44,9 +44,9 @@
  eepProxy host: <input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /><br />
  eepProxy port: <input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></p>
  <p>Update URLs:<br />
- <textarea name="updateURL" cols="90" rows="4"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></p>
+ <textarea name="updateURL" cols="90" rows="4" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></p>
  <p>Trusted keys:</br />
- <textarea name="trustedKeys" cols="90" rows="4"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></p>
+ <textarea name="trustedKeys" cols="90" rows="4" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></p>
  <br />
  <input type="submit" name="action" value="Save" />
  </form>

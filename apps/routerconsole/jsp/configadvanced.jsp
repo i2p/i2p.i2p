@@ -28,7 +28,7 @@
     System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
- <textarea rows="20" cols="100" name="config"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br />
+ <textarea rows="20" cols="100" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br />
  <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" /><!-- <br />
  <b>Force restart:</b> <input type="checkbox" name="restart" value="force" /> <i>(specify this
  if the changes made above require the router to reset itself - e.g. you are updating TCP ports 
