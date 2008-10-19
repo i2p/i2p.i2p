@@ -1,3 +1,17 @@
+2008-10-20 zzz
+    * configclients.jsp: Handle clients with no args
+    * index.jsp: Add readme_nl.html (thanks mathiasdm!),
+      readme_sv.html (thanks hottuna!)
+    * Big findbugs cleanup
+    * Client: Prevent a race causing session reconnect
+    * FloodfillMonitor:
+       - Don't become ff if clock skew is high
+       - Rebuild routerinfo immediately when ff status changes
+    * FloodOnlySearchJob: Recover better if the floodfills
+      you know are no longer floodfill or are gone
+    * Installer: Bump min JRE to 1.5
+    * ShellCommand: Fix main()
+
 2008-10-14 zzz
     * index.jsp: Add multilanguage support for readme.html;
       add readme_de.html (thanks devzero!)

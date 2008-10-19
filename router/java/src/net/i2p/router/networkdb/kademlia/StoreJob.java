@@ -308,10 +308,6 @@ class StoreJob extends JobImpl {
             return;
         }
         TunnelId replyTunnelId = replyTunnel.getReceiveTunnelId(0);
-        if (replyTunnel == null) {
-            _log.warn("No reply inbound tunnels available!");
-            return;
-        }
         msg.setReplyToken(token);
         msg.setReplyTunnel(replyTunnelId);
         msg.setReplyGateway(replyTunnel.getPeer(0));

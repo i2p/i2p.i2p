@@ -107,7 +107,11 @@ public class ConfigParser {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
                 fileStream));
-        return ConfigParser.parse(input);
+        Map rv = ConfigParser.parse(input);
+        try {
+            fileStream.close();
+        } catch (IOException ioe) {}
+        return rv;
     }
 
     /**
@@ -138,7 +142,7 @@ public class ConfigParser {
      *         cannot be read, map.
      */
     public static Map parse(File file, Map map) {
-        Map result = new HashMap();
+        Map result;
         try {
             result = ConfigParser.parse(file);
         } catch (IOException exp) {
@@ -188,7 +192,11 @@ public class ConfigParser {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
                 fileStream));
-        return ConfigParser.parseSubscriptions(input);
+        List rv = ConfigParser.parseSubscriptions(input);
+        try {
+            fileStream.close();
+        } catch (IOException ioe) {}
+        return rv;
     }
 
     /**
@@ -218,7 +226,7 @@ public class ConfigParser {
      *         file cannot be read, list.
      */
     public static List parseSubscriptions(File file, List list) {
-        List result = new LinkedList();
+        List result;
         try {
             result = ConfigParser.parseSubscriptions(file);
         } catch (IOException exp) {

@@ -76,7 +76,7 @@ public class Frequency {
             long duration = now() - _start;
             if ((duration <= 0) || (_count <= 0)) return 0;
            
-            return duration / _count;
+            return duration / (double) _count;
         }
     }
 

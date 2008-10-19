@@ -38,8 +38,8 @@ public class ConfigBean implements Serializable {
 	/*
 	 * as this is not provided as constant in addressbook, we define it here
 	 */
-	public static String addressbookPrefix = "addressbook/";
-	public static String configFileName = addressbookPrefix + "config.txt";
+	public static final String addressbookPrefix = "addressbook/";
+	public static final String configFileName = addressbookPrefix + "config.txt";
 	
 	private String action, config;
 	private String serial, lastSerial;
@@ -80,8 +80,9 @@ public class ConfigBean implements Serializable {
 		File file = new File( configFileName );
 		if( file != null && file.isFile() ) {
 			StringBuffer buf = new StringBuffer();
+			BufferedReader br = null;
 			try {
-				BufferedReader br = new BufferedReader( new FileReader( file ) );
+				br = new BufferedReader( new FileReader( file ) );
 				String line;
 				while( ( line = br.readLine() ) != null ) {
 					buf.append( line );
@@ -95,6 +96,9 @@ public class ConfigBean implements Serializable {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				if (br != null)
+					try { br.close(); } catch (IOException ioe) {}
 			}
 		}
 	}

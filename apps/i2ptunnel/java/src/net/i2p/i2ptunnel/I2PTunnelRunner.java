@@ -216,9 +216,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     private void removeRef() {
         if (sockList != null) {
             synchronized (slock) {
-                boolean removed = sockList.remove(i2ps);
-                //System.out.println("Removal of i2psocket " + i2ps + " successful? " 
-                //                   + removed + " remaining: " + sockList.size());
+                sockList.remove(i2ps);
             }
         }
     }

@@ -508,8 +508,6 @@ public class EepGet {
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + "/" + _redirectLocation;
                     if ( (_actualURL.indexOf('?') < 0) && (query.length() > 0) )
                         _actualURL = _actualURL + "?" + query;
-                    else
-                        _actualURL = _actualURL;
                 }
             } catch (MalformedURLException mue) {
                 throw new IOException("Redirected from an invalid URL");
@@ -772,7 +770,7 @@ public class EepGet {
                 _log.warn("ERR: status "+  line);
             return -1;
         }
-        String protocol = tok.nextToken(); // ignored
+        tok.nextToken(); // ignored (protocol)
         if (!tok.hasMoreTokens()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("ERR: status "+  line);
@@ -874,7 +872,7 @@ public class EepGet {
         
         timeout.setSocket(_proxy);
         
-        _proxyOut.write(DataHelper.getUTF8(req.toString()));
+        _proxyOut.write(DataHelper.getUTF8(req));
         _proxyOut.flush();
         
         if (_log.shouldLog(Log.DEBUG))

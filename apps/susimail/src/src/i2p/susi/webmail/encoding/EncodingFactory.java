@@ -35,7 +35,7 @@ import java.util.Set;
  */
 public class EncodingFactory {
 	
-	public static String CONFIG_ENCODING = "encodings";
+	public static final String CONFIG_ENCODING = "encodings";
 	
 	private static Hashtable encodings = null;
 	

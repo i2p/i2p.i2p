@@ -54,14 +54,17 @@ public class Log {
      *            A String containing a message to append to the log.
      */
     public void append(String entry) {
+        BufferedWriter bw = null;
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(this.file,
+            bw = new BufferedWriter(new FileWriter(this.file,
                     true));
             String timestamp = new Date().toString();
             bw.write(timestamp + " -- " + entry);
             bw.newLine();
-            bw.close();
         } catch (IOException exp) {
+        } finally {
+            if (bw != null)
+                try { bw.close(); } catch (IOException ioe) {}
         }
     }
 

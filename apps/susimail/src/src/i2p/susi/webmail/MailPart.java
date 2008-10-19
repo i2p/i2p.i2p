@@ -76,6 +76,8 @@ public class MailPart {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		if (decodedHeaders == null)
+			return;
 		headerLines = new String( decodedHeaders.content, decodedHeaders.offset, decodedHeaders.length ).split( "\r\n" );
 
 		for( int i = 0; i < headerLines.length; i++ )

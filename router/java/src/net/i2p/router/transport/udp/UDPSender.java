@@ -101,13 +101,13 @@ public class UDPSender {
      * @return number of packets queued
      */
     public int add(UDPPacket packet, int blockTime) {
-        long expiration = _context.clock().now() + blockTime;
+        //long expiration = _context.clock().now() + blockTime;
         int remaining = -1;
         long lifetime = -1;
         boolean added = false;
         int removed = 0;
         while ( (_keepRunning) && (remaining < 0) ) {
-            try {
+            //try {
                 synchronized (_outboundQueue) {
                     // clear out any too-old packets
                     UDPPacket head = null;
@@ -123,12 +123,13 @@ public class UDPSender {
                         }
                     }
                     
-                    if (true || (_outboundQueue.size() < MAX_QUEUED)) {
+                    //if (true || (_outboundQueue.size() < MAX_QUEUED)) {
                         lifetime = packet.getLifetime();
                         _outboundQueue.add(packet);
                         added = true;
                         remaining = _outboundQueue.size();
                         _outboundQueue.notifyAll();
+                    /*****
                     } else {
                         long remainingTime = expiration - _context.clock().now();
                         if (remainingTime > 0) {
@@ -139,8 +140,9 @@ public class UDPSender {
                         }
                         lifetime = packet.getLifetime();
                     }
+                    *****/
                 }
-            } catch (InterruptedException ie) {}
+            //} catch (InterruptedException ie) {}
         }
         _context.statManager().addRateData("udp.sendQueueSize", remaining, lifetime);
         if (!added)

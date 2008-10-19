@@ -362,6 +362,8 @@ public class FragmentHandler {
     }
     
     private void receiveComplete(FragmentedMessage msg) {
+        if (msg == null)
+            return;
         _completed++;
         String stringified = null;
         if (_log.shouldLog(Log.DEBUG))
@@ -370,8 +372,6 @@ public class FragmentHandler {
             int fragmentCount = msg.getFragmentCount();
             // toByteArray destroys the contents of the message completely
             byte data[] = msg.toByteArray();
-            if (msg == null)
-                return;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("RECV(" + data.length + "): " + Base64.encode(data)  
                            + " " + _context.sha().calculateHash(data).toBase64());

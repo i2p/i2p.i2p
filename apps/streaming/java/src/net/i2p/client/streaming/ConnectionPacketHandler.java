@@ -261,10 +261,7 @@ public class ConnectionPacketHandler {
             _context.statManager().addRateData("stream.con.packetsAckedPerMessageReceived", acked.size(), highestRTT);
         }
 
-        if (packet != null)
-            return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0), choke);
-        else
-            return adjustWindow(con, false, -1, numResends, (acked != null ? acked.size() : 0), choke);
+        return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0), choke);
     }
     
     

@@ -48,9 +48,8 @@ class I2PClientImpl implements I2PClient {
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         Destination d = new Destination();
         d.setCertificate(cert);
-        PublicKey publicKey = new PublicKey();
         Object keypair[] = KeyGenerator.getInstance().generatePKIKeypair();
-        publicKey = (PublicKey) keypair[0];
+        PublicKey publicKey = (PublicKey) keypair[0];
         PrivateKey privateKey = (PrivateKey) keypair[1];
         Object signingKeys[] = KeyGenerator.getInstance().generateSigningKeypair();
         SigningPublicKey signingPubKey = (SigningPublicKey) signingKeys[0];

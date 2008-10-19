@@ -102,7 +102,7 @@ public class POP3MailBox {
 	private ReadBuffer getHeader( int id ) {
 		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "getHeader(" + id + ")");
-			Integer idObj = new Integer(id);
+			Integer idObj = Integer.valueOf(id);
 			ReadBuffer header = null;
 			if (id >= 1 && id <= mails) {
 				/*
@@ -155,7 +155,7 @@ public class POP3MailBox {
 	private ReadBuffer getBody(int id) {
 		synchronized( synchronizer ) {
 			Debug.debug(Debug.DEBUG, "getBody(" + id + ")");
-			Integer idObj = new Integer(id);
+			Integer idObj = Integer.valueOf(id);
 			ReadBuffer body = null;
 			if (id >= 1 && id <= mails) {
 				body = (ReadBuffer)bodyList.get(idObj);
@@ -236,7 +236,7 @@ public class POP3MailBox {
 			/*
 			 * find value in hashtable
 			 */
-			Integer resultObj = (Integer) sizes.get(new Integer(id));
+			Integer resultObj = (Integer) sizes.get(Integer.valueOf(id));
 			if (resultObj != null)
 				result = resultObj.intValue();
 			return result;
@@ -277,7 +277,7 @@ public class POP3MailBox {
 			
 			readBuffer = sendCmdNa( "UIDL", DEFAULT_BUFSIZE );
 			if( readBuffer != null ) {
-				String[] lines = new String( readBuffer.toString() ).split( "\r\n" );
+				String[] lines = readBuffer.toString().split( "\r\n" );
 				
 				for( int i = 0; i < lines.length; i++ ) {
 					int j = lines[i].indexOf( " " );
@@ -285,7 +285,7 @@ public class POP3MailBox {
 						try {
 							int n = Integer.parseInt( lines[i].substring( 0, j ) );
 							String uidl = lines[i].substring( j+1 );
-							uidlToID.put( uidl, new Integer( n ) );
+							uidlToID.put( uidl, Integer.valueOf( n ) );
 							uidlList.add( n-1, uidl );
 						}
 						catch( NumberFormatException nfe ) {
@@ -319,7 +319,7 @@ public class POP3MailBox {
 					if (j != -1) {
 						int key = Integer.parseInt(lines[i].substring(0, j));
 						int value =	Integer.parseInt(lines[i].substring(j + 1));
-						sizes.put(new Integer(key), new Integer(value));
+						sizes.put(Integer.valueOf(key), Integer.valueOf(value));
 					}
 				}
 			}
@@ -389,7 +389,7 @@ public class POP3MailBox {
 					updateSizes();
 				}
 				else {
-					lastError = new String( lastLine );
+					lastError = lastLine;
 					close();
 				}
 			}

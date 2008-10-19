@@ -52,8 +52,8 @@ class RouterWatchdog implements Runnable {
     
     private void dumpStatus() {
         if (_log.shouldLog(Log.ERROR)) {
-            Job cur = _context.jobQueue().getLastJob();
             /*
+            Job cur = _context.jobQueue().getLastJob();
             if (cur != null) 
                 _log.error("Most recent job: " + cur);
             _log.error("Last job began: " 

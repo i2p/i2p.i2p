@@ -164,7 +164,7 @@ public class CPUID {
         public boolean IsC3Compatible() { return false; }
     }
     protected static class VIAC3Impl extends CPUIDCPUInfo implements CPUInfo {
-        public boolean isC3Compatible() { return true; }
+        public boolean IsC3Compatible() { return true; }
         public String getCPUModelString() { return "VIA C3"; }
     }
     protected static class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo

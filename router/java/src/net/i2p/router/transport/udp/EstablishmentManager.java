@@ -168,10 +168,10 @@ public class EstablishmentManager {
                 if (_outboundStates.size() >= getMaxConcurrentEstablish()) {
                     List queued = (List)_queuedOutbound.get(to);
                     if (queued == null) {
+                        queued = new ArrayList(1);
                         if (_queuedOutbound.size() > MAX_QUEUED_OUTBOUND) {
                             rejected = true;
                         } else {
-                            queued = new ArrayList(1);
                             _queuedOutbound.put(to, queued);
                         }
                     }
@@ -336,11 +336,11 @@ public class EstablishmentManager {
      */
     PeerState receiveData(OutboundEstablishState state) {
         state.dataReceived();
-        int active = 0;
-        int admitted = 0;
-        int remaining = 0;
+        //int active = 0;
+        //int admitted = 0;
+        //int remaining = 0;
         synchronized (_outboundStates) {
-            active = _outboundStates.size();
+            //active = _outboundStates.size();
             _outboundStates.remove(state.getRemoteHostId());
             if (_queuedOutbound.size() > 0) {
                 // there shouldn't have been queued messages for this active state, but just in case...
@@ -350,9 +350,9 @@ public class EstablishmentManager {
                         state.addMessage((OutNetMessage)queued.get(i));
                 }
                 
-                admitted = locked_admitQueued();
+                //admitted = locked_admitQueued();
             }
-            remaining = _queuedOutbound.size();
+            //remaining = _queuedOutbound.size();
         }
         //if (admitted > 0)
         //    _log.log(Log.CRIT, "Admitted " + admitted + " with " + remaining + " remaining queued and " + active + " active");
@@ -598,7 +598,6 @@ public class EstablishmentManager {
     }
 
     private void sendRequest(OutboundEstablishState state) {
-        long now = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send request to: " + state.getRemoteHostId().toString());
         UDPPacket packet = _builder.buildSessionRequestPacket(state);
@@ -703,7 +702,6 @@ public class EstablishmentManager {
     }
     
     private void sendConfirmation(OutboundEstablishState state) {
-        long now = _context.clock().now();
         boolean valid = state.validateSessionCreated();
         if (!valid) // validate clears fields on failure
             return;
@@ -841,11 +839,11 @@ public class EstablishmentManager {
         long now = _context.clock().now();
         long nextSendTime = -1;
         OutboundEstablishState outboundState = null;
-        int admitted = 0;
-        int remaining = 0;
-        int active = 0;
+        //int admitted = 0;
+        //int remaining = 0;
+        //int active = 0;
         synchronized (_outboundStates) {
-            active = _outboundStates.size();
+            //active = _outboundStates.size();
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("# outbound states: " + _outboundStates.size());
             for (Iterator iter = _outboundStates.values().iterator(); iter.hasNext(); ) {
@@ -891,8 +889,8 @@ public class EstablishmentManager {
                 }
             }
             
-            admitted = locked_admitQueued();    
-            remaining = _queuedOutbound.size();
+            //admitted = locked_admitQueued();    
+            //remaining = _queuedOutbound.size();
         }
 
         //if (admitted > 0)

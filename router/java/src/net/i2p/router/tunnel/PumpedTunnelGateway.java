@@ -60,13 +60,10 @@ public class PumpedTunnelGateway extends TunnelGateway {
      */
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
-        long startAdd = System.currentTimeMillis();
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);
         long beforeLock = System.currentTimeMillis();
-        long afterAdded = -1;
         synchronized (_prequeue) {
             _prequeue.add(cur);
-            afterAdded = System.currentTimeMillis();
         }
         _pumper.wantsPumping(this);
         if (_log.shouldLog(Log.DEBUG))

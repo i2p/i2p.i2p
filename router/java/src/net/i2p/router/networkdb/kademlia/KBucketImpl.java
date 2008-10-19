@@ -58,7 +58,7 @@ class KBucketImpl implements KBucket {
         // we want to make sure we've got the cache in place before calling cachedXor
         _local.prepareCache();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Local hash reset to " + (local == null ? "null" : DataHelper.toHexString(local.getData())));
+            _log.debug("Local hash reset to " + DataHelper.toHexString(local.getData()));
     }
     
     private byte[] distanceFromLocal(Hash key) {

@@ -177,7 +177,6 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         if (_connection == null) 
             throw new IllegalStateException("Cannot wait for accept with no connection");
         long before = _context.clock().now();
-        long expiration = before+maxWaitMs;
         int queued = _connection.getUnackedPacketsSent();
         int window = _connection.getOptions().getWindowSize();
         boolean accepted = _connection.packetSendChoke(maxWaitMs);

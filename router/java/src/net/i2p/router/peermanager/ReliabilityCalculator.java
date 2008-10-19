@@ -67,7 +67,7 @@ public class ReliabilityCalculator extends Calculator {
         
         val -= profile.getCommError().getRate(24*60*60*1000).getCurrentEventCount() * 1;
         
-        long now = _context.clock().now();
+        //long now = _context.clock().now();
         
         long timeSinceRejection = 61*60*1000; // now - profile.getTunnelHistory().getLastRejected();
         if (timeSinceRejection > 60*60*1000) {

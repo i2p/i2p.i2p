@@ -47,13 +47,13 @@ public class Base64 {
         return (source != null ? encode(source.getBytes()) : "");
     }
     public static String encode(byte[] source) {
-        return (source != null ? encode(source, 0, (source != null ? source.length : 0)) : "");
+        return (source != null ? encode(source, 0, source.length) : "");
     }
     public static String encode(byte[] source, int off, int len) {
         return (source != null ? encode(source, off, len, false) : "");
     }
     public static String encode(byte[] source, boolean useStandardAlphabet) {
-        return (source != null ? encode(source, 0, (source != null ? source.length : 0), useStandardAlphabet) : "");
+        return (source != null ? encode(source, 0, source.length, useStandardAlphabet) : "");
     }
     public static String encode(byte[] source, int off, int len, boolean useStandardAlphabet) {
         return (source != null ? safeEncode(source, off, len, useStandardAlphabet) : "");
@@ -241,9 +241,11 @@ public class Base64 {
      * @return four byte array in Base64 notation.
      * @since 1.3
      */
+/***** unused
     private static byte[] encode3to4(byte[] threeBytes) {
         return encode3to4(threeBytes, 3);
     } // end encodeToBytes
+******/
 
     /**
      * Encodes up to the first three bytes of array <var>threeBytes</var>
@@ -379,9 +381,11 @@ public class Base64 {
      * @param source The data to convert
      * @since 1.4
      */
+/***** unused
     private static String encodeBytes(byte[] source) {
         return encodeBytes(source, false); // don't add newlines
     } // end encodeBytes
+******/
 
     /**
      * Same as encodeBytes, except uses a filesystem / URL friendly set of characters,
@@ -435,9 +439,11 @@ public class Base64 {
      * @param len Length of data to convert
      * @since 1.4
      */
+/***** unused
     private static String encodeBytes(byte[] source, int off, int len) {
         return encodeBytes(source, off, len, true);
     } // end encodeBytes
+******/
 
     private static String encodeBytes(byte[] source, int off, int len, boolean breakLines) {
         StringBuffer buf = new StringBuffer( (len*4)/3 );
@@ -455,7 +461,7 @@ public class Base64 {
      * @since 1.4
      */
     private static void encodeBytes(byte[] source, int off, int len, boolean breakLines, StringBuffer out, byte alpha[]) {
-        int len43 = len * 4 / 3;
+        //int len43 = len * 4 / 3;
         //byte[] outBuff = new byte[(len43) // Main 4:3
         //                          + ((len % 3) > 0 ? 4 : 0) // Account for padding
         //                          + (breakLines ? (len43 / MAX_LINE_LENGTH) : 0)]; // New lines      
@@ -494,9 +500,11 @@ public class Base64 {
      * @return the encoded string
      * @since 1.3
      */
+/***** unused
     private static String encodeString(String s) {
         return encodeString(s, true);
     } // end encodeString
+******/
 
     /**
      * Encodes a string in Base64 notation with line breaks
@@ -525,6 +533,7 @@ public class Base64 {
      * @return array with decoded values
      * @since 1.3
      */
+/***** unused
     private static byte[] decode4to3(byte[] fourBytes) {
         byte[] outBuff1 = new byte[3];
         int count = decode4to3(fourBytes, 0, outBuff1, 0);
@@ -535,6 +544,7 @@ public class Base64 {
 
         return outBuff2;
     }
+******/
 
     /**
      * Decodes four bytes from array <var>source</var>

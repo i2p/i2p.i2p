@@ -23,7 +23,7 @@ import net.i2p.util.Log;
 public class BuildMessageGenerator {
     // cached, rather than creating lots of temporary Integer objects whenever we build a tunnel
     public static final Integer ORDER[] = new Integer[TunnelBuildMessage.RECORD_COUNT];
-    static { for (int i = 0; i < ORDER.length; i++) ORDER[i] = new Integer(i); }
+    static { for (int i = 0; i < ORDER.length; i++) ORDER[i] = Integer.valueOf(i); }
     
     /** return null if it is unable to find a router's public key (etc) */
     public TunnelBuildMessage createInbound(RouterContext ctx, TunnelCreatorConfig cfg) {

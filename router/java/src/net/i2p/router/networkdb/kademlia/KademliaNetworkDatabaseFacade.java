@@ -777,7 +777,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         if (o == null) {
-            boolean removed = _kb.remove(dbEntry);
+            _kb.remove(dbEntry);
             _context.peerManager().removeCapabilities(dbEntry);
             // if we dont know the key, lets make sure it isn't a now-dead peer
         }
@@ -1054,9 +1054,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                     }
                     Integer val = (Integer)routerVersions.get(routerVersion);
                     if (val == null)
-                        routerVersions.put(routerVersion, new Integer(1));
+                        routerVersions.put(routerVersion, Integer.valueOf(1));
                     else
-                        routerVersions.put(routerVersion, new Integer(val.intValue() + 1));
+                        routerVersions.put(routerVersion, Integer.valueOf(val.intValue() + 1));
                 }
             }
         }

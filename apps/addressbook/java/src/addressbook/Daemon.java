@@ -125,7 +125,6 @@ public class Daemon {
     
     public void run(String[] args) {
         String settingsLocation = "config.txt";
-        Map settings = new HashMap();
         String home;
         if (args.length > 0) {
             home = args[0];
@@ -157,7 +156,7 @@ public class Daemon {
         
         File settingsFile = new File(homeFile, settingsLocation);
         
-        settings = ConfigParser.parse(settingsFile, defaultSettings);
+        Map settings = ConfigParser.parse(settingsFile, defaultSettings);
         // wait
         try {
             Thread.sleep(5*60*1000);

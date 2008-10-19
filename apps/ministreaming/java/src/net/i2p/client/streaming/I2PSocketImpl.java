@@ -384,7 +384,7 @@ class I2PSocketImpl implements I2PSocket {
                 }
             }
             if (read.length > len) throw new RuntimeException("BUG");
-            if ( (inStreamClosed) && ( (read == null) || (read.length <= 0) ) )
+            if ( (inStreamClosed) && (read.length <= 0) )
                 return -1;
             
             System.arraycopy(read, 0, b, off, read.length);

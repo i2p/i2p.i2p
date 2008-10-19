@@ -41,7 +41,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     
     /** unsynchronized as its pretty much read only (except at startup) */
     private static final Map _builders = new HashMap(8);
-    public static final void registerBuilder(Builder builder, int type) { _builders.put(new Integer(type), builder); }
+    public static final void registerBuilder(Builder builder, int type) { _builders.put(Integer.valueOf(type), builder); }
     /** interface for extending the types of messages handled */
     public interface Builder {
         /** instantiate a new I2NPMessage to be populated shortly */
@@ -103,7 +103,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
             readMessage(buffer, 0, size, type);
-            long time = _context.clock().now() - start;
+            //long time = _context.clock().now() - start;
             //if (time > 50)
             //    _context.statManager().addRateData("i2np.readTime", time, time);
             _read = true;
@@ -148,7 +148,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
         readMessage(data, cur, size, type);
         cur += size;
-        long time = _context.clock().now() - start;
+        //long time = _context.clock().now() - start;
         //if (time > 50)
         //    _context.statManager().addRateData("i2np.readTime", time, time);
         _read = true;
@@ -228,7 +228,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             off += 2;
             System.arraycopy(h.getData(), 0, buffer, off, CHECKSUM_LENGTH);
 
-            long time = _context.clock().now() - start;
+            //long time = _context.clock().now() - start;
             //if (time > 50)
             //    _context.statManager().addRateData("i2np.writeTime", time, time);
 
@@ -370,7 +370,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             case TunnelBuildReplyMessage.MESSAGE_TYPE:
                 return new TunnelBuildReplyMessage(context);
             default:
-                Builder builder = (Builder)_builders.get(new Integer(type));
+                Builder builder = (Builder)_builders.get(Integer.valueOf(type));
                 if (builder == null)
                     return null;
                 else

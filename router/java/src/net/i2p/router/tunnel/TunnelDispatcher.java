@@ -510,7 +510,7 @@ public class TunnelDispatcher implements Service {
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
                                + msg, new Exception("cause"));
             }
-            long tid1 = (outboundTunnel != null ? outboundTunnel.getTunnelId() : -1);
+            long tid1 = outboundTunnel.getTunnelId();
             long tid2 = (targetTunnel != null ? targetTunnel.getTunnelId() : -1);
             _context.messageHistory().tunnelDispatched(msg.getUniqueId(), tid1, tid2, targetPeer, "outbound gateway");
             gw.add(msg, targetPeer, targetTunnel);

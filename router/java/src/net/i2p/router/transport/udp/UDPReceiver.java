@@ -34,7 +34,7 @@ public class UDPReceiver {
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
-        _id = ++_id;
+        _id++;
         _name = name;
         _inboundQueue = new ArrayList(128);
         _socket = socket;

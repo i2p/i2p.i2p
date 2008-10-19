@@ -50,7 +50,7 @@ class MessageState {
 
     public void receive(int status) {
         synchronized (_receivedStatus) {
-            _receivedStatus.add(new Integer(status));
+            _receivedStatus.add(Integer.valueOf(status));
             _receivedStatus.notifyAll();
         }
     }

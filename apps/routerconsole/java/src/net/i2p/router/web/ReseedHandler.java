@@ -226,7 +226,6 @@ public class ReseedHandler {
     
         /* Since we don't return a value, we should always throw an exception if something fails. */
         private void fetchSeed(String seedURL, String peer) throws Exception {
-            Log log = I2PAppContext.getGlobalContext().logManager().getLog(ReseedHandler.class);
             URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
 
             byte data[] = readURL(url);

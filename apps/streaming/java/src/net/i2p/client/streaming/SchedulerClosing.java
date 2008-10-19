@@ -34,9 +34,10 @@ class SchedulerClosing extends SchedulerImpl {
     }
     
     public boolean accept(Connection con) {
+        if (con == null)
+            return false;
         long timeSinceClose = _context.clock().now() - con.getCloseSentOn();
-        boolean ok = (con != null) && 
-                     (!con.getResetSent()) && 
+        boolean ok = (!con.getResetSent()) && 
                      (!con.getResetReceived()) &&
                      ( (con.getCloseSentOn() > 0) || (con.getCloseReceivedOn() > 0) ) &&
                      (timeSinceClose < Connection.DISCONNECT_TIMEOUT) &&

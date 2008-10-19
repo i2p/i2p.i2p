@@ -289,7 +289,6 @@ public class Router {
                 log.debug("Config file: " + filename, new Exception("location"));
         }
         Properties props = new Properties();
-        FileInputStream fis = null;
         try {
             File f = new File(filename);
             if (f.canRead()) {
@@ -303,8 +302,6 @@ public class Router {
         } catch (Exception ioe) {
             if (log != null)
                 log.error("Error loading the router configuration from " + filename, ioe);
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
         return props;
     }

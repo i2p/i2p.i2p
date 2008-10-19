@@ -346,7 +346,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (UnknownHostException uhe) {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
 
@@ -355,7 +355,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
 
@@ -363,19 +363,19 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
             I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
             serv.startRunning();
             addtask(serv);
-            notifyEvent("serverTaskId", new Integer(serv.getId()));
+            notifyEvent("serverTaskId", Integer.valueOf(serv.getId()));
             return;
         } else {
             l.log("server <host> <port> <privkeyfile>");
             l.log("  creates a server that sends all incoming data\n" + "  of its destination to host:port.");
-            notifyEvent("serverTaskId", new Integer(-1));
+            notifyEvent("serverTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -401,7 +401,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (UnknownHostException uhe) {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
 
@@ -410,7 +410,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
 
@@ -420,21 +420,21 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[3]);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
             I2PTunnelHTTPServer serv = new I2PTunnelHTTPServer(serverHost, portNum, privKeyFile, args[3], spoofedHost, l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
             serv.startRunning();
             addtask(serv);
-            notifyEvent("serverTaskId", new Integer(serv.getId()));
+            notifyEvent("serverTaskId", Integer.valueOf(serv.getId()));
             return;
         } else {
             l.log("httpserver <host> <port> <spoofedhost> <privkeyfile>");
             l.log("  creates an HTTP server that sends all incoming data\n" 
                   + "  of its destination to host:port., filtering the HTTP\n" 
                   + "  headers so it looks like the request is to the spoofed host.");
-            notifyEvent("serverTaskId", new Integer(-1));
+            notifyEvent("serverTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -458,7 +458,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (UnknownHostException uhe) {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
 
@@ -467,7 +467,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
-                notifyEvent("serverTaskId", new Integer(-1));
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
                 return;
             }
 
@@ -475,11 +475,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
             serv.setReadTimeout(readTimeout);
             serv.startRunning();
             addtask(serv);
-            notifyEvent("serverTaskId", new Integer(serv.getId()));
+            notifyEvent("serverTaskId", Integer.valueOf(serv.getId()));
         } else {
             l.log("textserver <host> <port> <privkey>");
             l.log("  creates a server that sends all incoming data\n" + "  of its destination to host:port.");
-            notifyEvent("textserverTaskId", new Integer(-1));
+            notifyEvent("textserverTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -507,7 +507,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
-                notifyEvent("clientTaskId", new Integer(-1));
+                notifyEvent("clientTaskId", Integer.valueOf(-1));
                 return;
             }
             I2PTunnelTask task;
@@ -515,11 +515,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
             try {
                 task = new I2PTunnelClient(portNum, args[1], l, ownDest, (EventDispatcher) this, this);
                 addtask(task);
-                notifyEvent("clientTaskId", new Integer(task.getId()));
+                notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 _log.error(getPrefix() + "Invalid I2PTunnel config to create a client [" + host + ":"+ port + "]", iae);
                 l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
-                notifyEvent("clientTaskId", new Integer(-1));
+                notifyEvent("clientTaskId", Integer.valueOf(-1));
             }
         } else {
             l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>[ <sharedClient>]");
@@ -528,7 +528,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                   + "  a comma delimited list of pubkeys, it will rotate among them\n"
                   + "  randomlyl. sharedClient indicates if this client shares \n"
                   + "   with other clients (true of false)");
-            notifyEvent("clientTaskId", new Integer(-1));
+            notifyEvent("clientTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -550,7 +550,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
-                notifyEvent("httpclientTaskId", new Integer(-1));
+                notifyEvent("httpclientTaskId", Integer.valueOf(-1));
                 return;
             }
             
@@ -582,11 +582,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
             try {
                 task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
                 addtask(task);
-                notifyEvent("httpclientTaskId", new Integer(task.getId()));
+                notifyEvent("httpclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ port + "]", iae);
                 l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
-                notifyEvent("httpclientTaskId", new Integer(-1));
+                notifyEvent("httpclientTaskId", Integer.valueOf(-1));
             }
         } else {
             l.log("httpclient <port> [<sharedClient>] [<proxy>]");
@@ -595,7 +595,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             l.log("  <proxy> (optional) indicates a proxy server to be used");
             l.log("  when trying to access an address out of the .i2p domain");
             l.log("  (the default proxy is squid.i2p).");
-            notifyEvent("httpclientTaskId", new Integer(-1));
+            notifyEvent("httpclientTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -617,7 +617,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
-                notifyEvent("ircclientTaskId", new Integer(-1));
+                notifyEvent("ircclientTaskId", Integer.valueOf(-1));
                 return;
             }
             
@@ -639,17 +639,17 @@ public class I2PTunnel implements Logging, EventDispatcher {
             try {
                 task = new I2PTunnelIRCClient(port, args[1],l, ownDest, (EventDispatcher) this, this);
                 addtask(task);
-                notifyEvent("ircclientTaskId", new Integer(task.getId()));
+                notifyEvent("ircclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 _log.error(getPrefix() + "Invalid I2PTunnel config to create an ircclient [" + host + ":"+ port + "]", iae);
                 l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
-                notifyEvent("ircclientTaskId", new Integer(-1));
+                notifyEvent("ircclientTaskId", Integer.valueOf(-1));
             }
         } else {
             l.log("ircclient <port> [<sharedClient>]");
             l.log("  creates a client that filter IRC protocol.");
             l.log("  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)");
-            notifyEvent("ircclientTaskId", new Integer(-1));
+            notifyEvent("ircclientTaskId", Integer.valueOf(-1));
         }
     }
     
@@ -672,18 +672,18 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
-                notifyEvent("sockstunnelTaskId", new Integer(-1));
+                notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
                 return;
             }
 
             I2PTunnelTask task;
             task = new I2PSOCKSTunnel(port, l, ownDest, (EventDispatcher) this, this);
             addtask(task);
-            notifyEvent("sockstunnelTaskId", new Integer(task.getId()));
+            notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
         } else {
             l.log("sockstunnel <port>");
             l.log("  creates a tunnel that distributes SOCKS requests.");
-            notifyEvent("sockstunnelTaskId", new Integer(-1));
+            notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -967,7 +967,6 @@ public class I2PTunnel implements Logging, EventDispatcher {
             l.log("   try to resolve the name into a destination key");
             notifyEvent("lookupResult", "invalidUsage");
         } else {
-            String target = args[0];
             try {
                 Destination dest = destFromName(args[0]);
                 if (dest == null) {
@@ -998,13 +997,13 @@ public class I2PTunnel implements Logging, EventDispatcher {
             // pings always use the main destination
             task = new I2Ping(allargs, l, false, (EventDispatcher) this, this);
             addtask(task);
-            notifyEvent("pingTaskId", new Integer(task.getId()));
+            notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
             l.log("ping <opts> <dest>");
             l.log("ping <opts> -h");
             l.log("ping <opts> -l <destlistfile>");
             l.log("   Tests communication with peers.\n" + "   opts can be -ns (nosync) or not.");
-            notifyEvent("pingTaskId", new Integer(-1));
+            notifyEvent("pingTaskId", Integer.valueOf(-1));
         }
     }
 
@@ -1083,7 +1082,6 @@ public class I2PTunnel implements Logging, EventDispatcher {
     public static void makeKey(OutputStream writeTo, OutputStream pubDest, Logging l) {
         try {
             l.log("Generating new keys...");
-            ByteArrayOutputStream priv = new ByteArrayOutputStream(), pub = new ByteArrayOutputStream();
             I2PClient client = I2PClientFactory.createClient();
             Destination d = client.createDestination(writeTo);
             l.log("Secret key saved.");
@@ -1107,7 +1105,6 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public static void showKey(InputStream readFrom, OutputStream pubDest, Logging l) {
         try {
-            I2PClient client = I2PClientFactory.createClient();
             Destination d = new Destination();
             d.readBytes(readFrom);
             l.log("Public key: " + d.toBase64());

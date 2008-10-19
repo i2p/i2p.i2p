@@ -69,7 +69,6 @@ class ExpireRoutersJob extends JobImpl {
     private Set selectKeysToExpire() {
         Set possible = getNotInUse();
         Set expiring = new HashSet(16);
-        long earliestPublishDate = getContext().clock().now() - EXPIRE_DELAY;
         
         for (Iterator iter = possible.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();

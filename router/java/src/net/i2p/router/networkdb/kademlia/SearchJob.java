@@ -284,7 +284,7 @@ class SearchJob extends JobImpl {
                     } else if (!(ds instanceof RouterInfo)) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " 
-                                      + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
+                                      + peer + " : " + ds.getClass().getName());
                         _state.replyTimeout(peer);
                     } else {
                         RouterInfo ri = (RouterInfo)ds;
@@ -375,10 +375,10 @@ class SearchJob extends JobImpl {
 
         getContext().statManager().addRateData("netDb.searchMessageCount", 1, 0);
 
-        if (_isLease || true) // always send searches out tunnels
+        //if (_isLease || true) // always send searches out tunnels
             sendLeaseSearch(router);
-        else
-            sendRouterSearch(router);
+        //else
+        //    sendRouterSearch(router);
     }
     
     

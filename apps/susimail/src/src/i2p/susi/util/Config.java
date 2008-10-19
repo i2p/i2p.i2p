@@ -26,6 +26,7 @@ package i2p.susi.util;
 import i2p.susi.debug.Debug;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -78,10 +79,15 @@ public class Config {
 		} catch (Exception e) {
 			Debug.debug( Debug.DEBUG, "Could not open WEB-INF/classes/susimail.properties (possibly in jar), reason: " + e.getMessage() );
 		}
+                FileInputStream fis = null;
 		try {
-			config.load( new FileInputStream( "susimail.config" ) );
+			fis = new FileInputStream( "susimail.config" );
+			config.load( fis );
 		} catch (Exception e) {
 			Debug.debug( Debug.DEBUG, "Could not open susimail.config, reason: " + e.getMessage() );
+		} finally {
+			if (fis != null)
+				try { fis.close(); } catch (IOException ioe) {}
 		}
 	}
 	/**

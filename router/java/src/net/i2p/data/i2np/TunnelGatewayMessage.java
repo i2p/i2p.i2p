@@ -95,7 +95,7 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
         if (_tunnelId.getTunnelId() <= 0) 
             throw new I2NPMessageException("Invalid tunnel Id " + _tunnelId);
         
-        int size = (int)DataHelper.fromLong(data, curIndex, 2);
+        DataHelper.fromLong(data, curIndex, 2);
         curIndex += 2;
         curIndex = handler.readMessage(data, curIndex);
         _msg = handler.lastRead();

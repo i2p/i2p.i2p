@@ -102,25 +102,25 @@ public class ElGamalEngine {
         System.arraycopy(hash.getData(), 0, d2, 1, Hash.HASH_LENGTH);
         System.arraycopy(data, 0, d2, 1+Hash.HASH_LENGTH, data.length);
         
-        long t0 = _context.clock().now();
+        //long t0 = _context.clock().now();
         BigInteger m = new NativeBigInteger(1, d2);
-        long t1 = _context.clock().now();
+        //long t1 = _context.clock().now();
         if (m.compareTo(CryptoConstants.elgp) >= 0)
             throw new IllegalArgumentException("ARGH.  Data cannot be larger than the ElGamal prime.  FIXME");
-        long t2 = _context.clock().now();
+        //long t2 = _context.clock().now();
         BigInteger aalpha = new NativeBigInteger(1, publicKey.getData());
-        long t3 = _context.clock().now();
+        //long t3 = _context.clock().now();
         BigInteger yk[] = getNextYK();
         BigInteger k = yk[1];
         BigInteger y = yk[0];
 
-        long t7 = _context.clock().now();
+        //long t7 = _context.clock().now();
         BigInteger d = aalpha.modPow(k, CryptoConstants.elgp);
-        long t8 = _context.clock().now();
+        //long t8 = _context.clock().now();
         d = d.multiply(m);
-        long t9 = _context.clock().now();
+        //long t9 = _context.clock().now();
         d = d.mod(CryptoConstants.elgp);
-        long t10 = _context.clock().now();
+        //long t10 = _context.clock().now();
 
         byte[] ybytes = y.toByteArray();
         byte[] dbytes = d.toByteArray();

@@ -214,9 +214,6 @@ public class StatisticsManager implements Service {
         return stats;
     }
     
-    private void includeRate(String rateName, Properties stats) {
-        includeRate(rateName, stats, null);
-    }
     private void includeRate(String rateName, Properties stats, long selectedPeriods[]) {
         includeRate(rateName, stats, selectedPeriods, false);
     }
@@ -272,7 +269,6 @@ public class StatisticsManager implements Service {
             buf.append(num(rate.getLastEventCount())).append(';');
             if (numPeriods > 0) {
                 double avgFrequency = rate.getLifetimeEventCount() / (double)numPeriods;
-                double peakFrequency = rate.getExtremeEventCount();
                 buf.append(num(avgFrequency)).append(';');
                 buf.append(num(rate.getExtremeEventCount())).append(';');
                 buf.append(num((double)rate.getLifetimeEventCount())).append(';');

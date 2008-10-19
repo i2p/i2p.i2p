@@ -84,9 +84,6 @@ public class SubmitMessageHistoryJob extends JobImpl {
                 return;
             }
             long size = dataFile.length();
-            int expectedSend = 512; // 512 for HTTP overhead
-            if (size > 0)
-                expectedSend += (int)size/10; // compression
             FileInputStream fin = new FileInputStream(dataFile);
             BandwidthLimitedInputStream in = new BandwidthLimitedInputStream(getContext(), fin, null, true);
             boolean sent = HTTPSendData.postData(url, size, in);

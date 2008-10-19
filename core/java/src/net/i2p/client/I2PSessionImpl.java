@@ -408,7 +408,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         public void available(long msgId, int size) {
             synchronized (AvailabilityNotifier.this) {
                 _pendingIds.add(new Long(msgId));
-                _pendingSizes.add(new Integer(size));
+                _pendingSizes.add(Integer.valueOf(size));
                 AvailabilityNotifier.this.notifyAll();
             }
         }

@@ -24,7 +24,7 @@ public final class ByteCache {
      * @param size how large should the objects cached be?
      */
     public static ByteCache getInstance(int cacheSize, int size) {
-        Integer sz = new Integer(size);
+        Integer sz = Integer.valueOf(size);
         ByteCache cache = null;
         synchronized (_caches) {
             if (!_caches.containsKey(sz))

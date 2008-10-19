@@ -86,7 +86,7 @@ public class I2NPMessageHandler {
      *          message - if it is an unknown type or has improper formatting, etc.
      */
     public I2NPMessage readMessage(byte data[]) throws IOException, I2NPMessageException {
-        int offset = readMessage(data, 0);
+        readMessage(data, 0);
         return lastRead();
     }
     public int readMessage(byte data[], int offset) throws IOException, I2NPMessageException {

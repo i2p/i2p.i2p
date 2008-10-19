@@ -85,8 +85,10 @@ public class UrlLauncher {
                     new File("browser.reg").delete();
                 } catch (Exception e) {
                     // Defaults to IE.
+                } finally {
+                    if (bufferedReader != null)
+                        try { bufferedReader.close(); } catch (IOException ioe) {}
                 }
-
                 if (_shellCommand.executeSilentAndWaitTimed(browserString + " " + url, 5))
                     return true;
 

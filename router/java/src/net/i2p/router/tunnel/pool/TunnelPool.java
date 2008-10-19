@@ -336,13 +336,11 @@ public class TunnelPool {
     public void tunnelFailed(PooledTunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.WARN))
             _log.warn(toString() + ": Tunnel failed: " + cfg);
-        int remaining = 0;
         LeaseSet ls = null;
         synchronized (_tunnels) {
             _tunnels.remove(cfg);
             if (_settings.isInbound() && (_settings.getDestination() != null) )
                 ls = locked_buildNewLeaseSet();
-            remaining = _tunnels.size();
             if (_lastSelected == cfg) {
                 _lastSelected = null;
                 _lastSelectionPeriod = 0;
@@ -403,12 +401,10 @@ public class TunnelPool {
     void refreshLeaseSet() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(toString() + ": refreshing leaseSet on tunnel expiration (but prior to grace timeout)");
-        int remaining = 0;
         LeaseSet ls = null;
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             synchronized (_tunnels) {
                 ls = locked_buildNewLeaseSet();
-                remaining = _tunnels.size();
             }
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);

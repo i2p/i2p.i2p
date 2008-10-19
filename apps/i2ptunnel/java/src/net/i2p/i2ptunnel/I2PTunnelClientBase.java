@@ -217,10 +217,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
     protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel) {
         Properties props = new Properties();
-        if (tunnel == null)
-            props.putAll(System.getProperties());
-        else
-            props.putAll(tunnel.getClientOptions());
+        props.putAll(tunnel.getClientOptions());
         int portNum = 7654;
         if (tunnel.port != null) {
             try {

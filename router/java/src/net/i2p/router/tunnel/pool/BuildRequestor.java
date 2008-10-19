@@ -25,7 +25,7 @@ class BuildRequestor {
     private static final List ORDER = new ArrayList(BuildMessageGenerator.ORDER.length);
     static {
         for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++)
-            ORDER.add(new Integer(i));
+            ORDER.add(Integer.valueOf(i));
     }
     private static final int PRIORITY = 500;
     static final int REQUEST_TIMEOUT = 10*1000;

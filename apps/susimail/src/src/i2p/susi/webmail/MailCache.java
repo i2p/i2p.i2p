@@ -36,7 +36,6 @@ public class MailCache {
 	public static final boolean FETCH_ALL = false;
 	
 	private POP3MailBox mailbox;
-	private String error;
 	private Hashtable mails;
 	private Object synchronizer;
 	

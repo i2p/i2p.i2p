@@ -63,7 +63,6 @@ public class OutboundMessageRegistry {
     public List getOriginalMessages(I2NPMessage message) {
         ArrayList matchedSelectors = null;
         ArrayList removedSelectors = null;
-        long beforeSync = _context.clock().now();
         synchronized (_selectors) {
             for (int i = 0; i < _selectors.size(); i++) {
                 MessageSelector sel = (MessageSelector)_selectors.get(i);

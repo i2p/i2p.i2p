@@ -220,10 +220,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (actuallyWait)
             state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
                           _context.clock().now() + getTimeout());
-        long afterWaitFor = _context.clock().now();
-        long inRemovingSync = 0;
+        //long afterWaitFor = _context.clock().now();
+        //long inRemovingSync = 0;
         synchronized (_sendingStates) {
-            inRemovingSync = _context.clock().now();
+            //inRemovingSync = _context.clock().now();
             _sendingStates.remove(state);
         }
         long afterRemovingSync = _context.clock().now();

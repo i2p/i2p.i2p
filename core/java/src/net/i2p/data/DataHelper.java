@@ -671,8 +671,6 @@ public class DataHelper {
 
     public final static byte[] xor(byte lhs[], byte rhs[]) {
         if ((lhs == null) || (rhs == null) || (lhs.length != rhs.length)) return null;
-        byte rv[] = new byte[lhs.length];
-        
         byte diff[] = new byte[lhs.length];
         xor(lhs, 0, rhs, 0, diff, 0, lhs.length);
         return diff;
@@ -821,9 +819,8 @@ public class DataHelper {
             DataStructure struct = (DataStructure) iter.next();
             tm.put(struct.calculateHash().toString(), struct);
         }
-        for (Iterator iter = tm.keySet().iterator(); iter.hasNext();) {
-            Object k = iter.next();
-            rv.add(tm.get(k));
+        for (Iterator iter = tm.values().iterator(); iter.hasNext();) {
+            rv.add(iter.next());
         }
         return rv;
     }

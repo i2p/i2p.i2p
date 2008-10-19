@@ -556,7 +556,6 @@ public class WebMail extends HttpServlet
 	private void processLogin( SessionObject sessionObject, RequestWrapper request )
 	{
 		if( sessionObject.state == STATE_AUTH ) {
-			String login = request.getParameter( LOGIN );
 			String user = request.getParameter( USER );
 			String pass = request.getParameter( PASS );
 			String host = request.getParameter( HOST );
@@ -1330,8 +1329,9 @@ public class WebMail extends HttpServlet
 				}
 			}
 			if( content != null ) {
+				ZipOutputStream zip = null;
 				try {
-					ZipOutputStream zip = new ZipOutputStream( response.getOutputStream() );
+					zip = new ZipOutputStream( response.getOutputStream() );
 					String name;
 					if( part.filename != null )
 						name = part.filename;
@@ -1350,6 +1350,9 @@ public class WebMail extends HttpServlet
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} finally {
+					if ( zip != null)
+						try { zip.close(); } catch (IOException ioe) {}
 				}
 			}
 		}

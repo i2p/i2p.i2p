@@ -162,7 +162,7 @@ public class EepPost {
     }
     
     private void sendFile(OutputStream out, String separator, String field, File file) throws IOException {
-        long len = file.length();
+        //long len = file.length();
         out.write(("--" + separator + CRLF).getBytes());
         out.write(("Content-Disposition: form-data; name=\"" + field + "\"; filename=\"" + file.getName() + "\"" + CRLF).getBytes());
         //out.write(("Content-length: " + len + "\n").getBytes());

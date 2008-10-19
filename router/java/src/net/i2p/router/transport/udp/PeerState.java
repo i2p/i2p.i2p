@@ -903,9 +903,10 @@ public class PeerState {
     
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted(int packets) { 
-        long now = _context.clock().now();
-        if (true || _retransmissionPeriodStart + 1000 <= now) {
+        //long now = _context.clock().now();
+        //if (true || _retransmissionPeriodStart + 1000 <= now) {
             _packetsRetransmitted += packets;
+        /*****
         } else {
             _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
             //_packetsPeriodTransmitted = _packetsTransmitted - _retransmissionPeriodStart;
@@ -913,21 +914,24 @@ public class PeerState {
             _retransmissionPeriodStart = now;
             _packetsRetransmitted = packets;
         }
+        *****/
         congestionOccurred();
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
         adjustMTU();
         //_rto *= 2; 
     }
     public void packetsTransmitted(int packets) { 
-        long now = _context.clock().now();
+        //long now = _context.clock().now();
         _packetsTransmitted += packets; 
         //_packetsPeriodTransmitted += packets;
+        /*****
         if (false && _retransmissionPeriodStart + 1000 <= now) {
             _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
             _retransmissionPeriodStart = 0;
             _packetsPeriodRetransmitted = (int)_packetsRetransmitted;
             _packetsRetransmitted = 0;
         }
+        *****/
     }
     /** how long does it usually take to get a message ACKed? */
     public int getRTT() { return _rtt; }

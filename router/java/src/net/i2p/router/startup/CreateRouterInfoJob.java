@@ -41,7 +41,7 @@ public class CreateRouterInfoJob extends JobImpl {
     public void runJob() {
         _log.debug("Creating the new router info");
         // create a new router info and store it where LoadRouterInfoJob looks
-        RouterInfo info = createRouterInfo();
+        createRouterInfo();
         getContext().jobQueue().addJob(_next);
     }
     

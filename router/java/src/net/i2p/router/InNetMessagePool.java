@@ -209,7 +209,7 @@ public class InNetMessagePool implements Service {
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Message expiring on " 
-                                      + (messageBody != null ? (messageBody.getMessageExpiration()+"") : " [unknown]")
+                                      + messageBody.getMessageExpiration()
                                       + " was not handled by a HandlerJobBuilder - DROPPING: " + messageBody, 
                                       new Exception("f00!"));
                         _context.statManager().addRateData("inNetPool.dropped", 1, 0);

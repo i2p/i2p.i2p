@@ -85,9 +85,11 @@ public class AddressbookBean
 		if( properties.size() > 0 &&  currentTime - configLastLoaded < 10000 )
 			return;
 		
+		FileInputStream fis = null;
 		try {
 			properties.clear();
-			properties.load( new FileInputStream( ConfigBean.configFileName ) );
+			fis = new FileInputStream( ConfigBean.configFileName );
+			properties.load( fis );
 			// added in 0.5, for compatibility with 0.4 config.txt
 			if( properties.getProperty(PRIVATE_BOOK) == null)
 				properties.setProperty(PRIVATE_BOOK, DEFAULT_PRIVATE_BOOK);
@@ -95,6 +97,9 @@ public class AddressbookBean
 		}
 		catch (Exception e) {
 			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+		} finally {
+			if (fis != null)
+				try { fis.close(); } catch (IOException ioe) {}
 		}	
 	}
 	public String getFileName()
@@ -143,9 +148,10 @@ public class AddressbookBean
 		addressbook = new Properties();
 		
 		String message = "";
-		
+		FileInputStream fis = null;
 		try {
-			addressbook.load( new FileInputStream( getFileName() ) );
+			fis =  new FileInputStream( getFileName() );
+			addressbook.load( fis );
 			LinkedList list = new LinkedList();
 			Enumeration e = addressbook.keys();
 			while( e.hasMoreElements() ) {
@@ -182,8 +188,10 @@ public class AddressbookBean
 		}
 		catch (Exception e) {
 			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+		} finally {
+			if (fis != null)
+				try { fis.close(); } catch (IOException ioe) {}
 		}
-		
 		if( message.length() > 0 )
 			message = "<p>" + message + "</p>";
 		return message;
@@ -243,7 +251,11 @@ public class AddressbookBean
 	{
 		String filename = properties.getProperty( getBook() + "_addressbook" );
 		
-		addressbook.store( new FileOutputStream( ConfigBean.addressbookPrefix + filename  ), null );
+		FileOutputStream fos = new FileOutputStream( ConfigBean.addressbookPrefix + filename  );
+		addressbook.store( fos, null );
+		try {
+			fos.close();
+		} catch (IOException ioe) {}
 	}
 	public String getFilter() {
 		return filter;

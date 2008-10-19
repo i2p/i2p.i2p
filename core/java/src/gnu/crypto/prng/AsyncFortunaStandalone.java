@@ -150,10 +150,10 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
             lastReseed = System.currentTimeMillis();
           }
         generator.nextBytes(buf);
-        long now = System.currentTimeMillis();
-        long diff = now-lastRefill;
-        lastRefill = now;
-        long refillTime = now-start;
+        //long now = System.currentTimeMillis();
+        //long diff = now-lastRefill;
+        //lastRefill = now;
+        //long refillTime = now-start;
         //System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
     }
     

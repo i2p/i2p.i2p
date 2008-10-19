@@ -97,7 +97,7 @@ public class RequestWrapper {
 				cachedParameterNames = new Hashtable();
 				String[] partNames = multiPartRequest.getPartNames();
 				for( int i = 0; i < partNames.length; i++ )
-					cachedParameterNames.put( partNames[i], new Integer( i ) );
+					cachedParameterNames.put( partNames[i], Integer.valueOf( i ) );
 			}
 			return cachedParameterNames.keys();
 		}

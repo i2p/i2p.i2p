@@ -369,7 +369,7 @@ public class JobQueue {
                               + _queueRunners.size() + " to " + numThreads);
                 for (int i = _queueRunners.size(); i < numThreads; i++) {
                     JobQueueRunner runner = new JobQueueRunner(_context, i);
-                    _queueRunners.put(new Integer(i), runner);
+                    _queueRunners.put(Integer.valueOf(i), runner);
                     Thread t = new I2PThread(runner);
                     t.setName("JobQueue"+(_runnerId++));
                     //t.setPriority(I2PThread.MAX_PRIORITY-1);
@@ -390,7 +390,7 @@ public class JobQueue {
         }
     }
         
-    void removeRunner(int id) { _queueRunners.remove(new Integer(id)); }
+    void removeRunner(int id) { _queueRunners.remove(Integer.valueOf(id)); }
     
     /**
      * Responsible for moving jobs from the timed queue to the ready queue, 

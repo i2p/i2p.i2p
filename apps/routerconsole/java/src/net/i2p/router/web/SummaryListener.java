@@ -156,7 +156,6 @@ class SummaryRenderer {
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         long end = ctx.clock().now() - 60*1000;
         long start = end - 60*1000*SummaryListener.PERIODS;
-        long begin = System.currentTimeMillis();
         try {
             RrdGraphDefTemplate template = new RrdGraphDefTemplate(filename);
             RrdGraphDef def = template.getRrdGraphDef();

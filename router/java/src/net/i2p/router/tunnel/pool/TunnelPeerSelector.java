@@ -103,7 +103,6 @@ public abstract class TunnelPeerSelector {
         Log log = ctx.logManager().getLog(ClientPeerSelector.class);
         List rv = new ArrayList();
         StringTokenizer tok = new StringTokenizer(peers, ",");
-        Hash h = new Hash();
         while (tok.hasMoreTokens()) {
             String peerStr = tok.nextToken();
             Hash peer = new Hash();
@@ -307,7 +306,6 @@ public abstract class TunnelPeerSelector {
     private static char[] getExcludeCaps(RouterContext ctx) {
         String excludeCaps = ctx.getProperty("router.excludePeerCaps", 
                                              String.valueOf(Router.CAPABILITY_BW12));
-        Set peers = new HashSet();
         if (excludeCaps != null) {
             char excl[] = excludeCaps.toCharArray();
             return excl;
@@ -342,7 +340,6 @@ public abstract class TunnelPeerSelector {
         String val = peer.getOption("stat_uptime");
         if (val != null) {
             long uptimeMs = 0;
-            if (val != null) {
                 long factor = 1;
                 if (val.endsWith("ms")) {
                     factor = 1;
@@ -362,10 +359,6 @@ public abstract class TunnelPeerSelector {
                 }
                 try { uptimeMs = Long.parseLong(val); } catch (NumberFormatException nfe) {}
                 uptimeMs *= factor;
-            } else {
-                // not publishing an uptime, so exclude it
-                return true;
-            }
 
             long infoAge = ctx.clock().now() - peer.getPublished();
             if (infoAge < 0) {
@@ -391,7 +384,7 @@ public abstract class TunnelPeerSelector {
                 }
             }
         } else {
-            // not publishing stats, so exclude it
+            // not publishing an uptime, so exclude it
             return true;
         }
     }

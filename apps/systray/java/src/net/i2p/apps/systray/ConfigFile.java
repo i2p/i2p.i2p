@@ -54,36 +54,36 @@ public class ConfigFile {
     private boolean readConfigFile() {
 
         FileInputStream fileInputStream = null;
-
+        boolean rv = true;
         try {
             fileInputStream = new FileInputStream(_configFile);
             _properties.load(fileInputStream);
         } catch (Exception e) {
-            return false;
+            rv = false;
         }
         try {
             fileInputStream.close();
         } catch (IOException e) {
             // No worries.
         }
-        return true;
+        return rv;
     }
 
     private boolean writeConfigFile() {
 
         FileOutputStream fileOutputStream = null;
-
+        boolean rv = true;
         try {
             fileOutputStream = new FileOutputStream(_configFile);
             _properties.store(fileOutputStream, null);
         } catch (Exception e) {
-            return false;
+            rv = false;
         }
         try {
             fileOutputStream.close();
         } catch (IOException e) {
             // No worries.
         }
-        return true;
+        return rv;
     }
 }

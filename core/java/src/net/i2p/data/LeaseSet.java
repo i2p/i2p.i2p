@@ -224,6 +224,8 @@ public class LeaseSet extends DataStructureImpl {
     }
 
     private byte[] getBytes() {
+        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null))
+            return null;
         int len = PublicKey.KEYSIZE_BYTES  // dest
                 + SigningPublicKey.KEYSIZE_BYTES // dest
                 + 4 // cert
@@ -233,9 +235,6 @@ public class LeaseSet extends DataStructureImpl {
                 + _leases.size() * 44; // leases
         ByteArrayOutputStream out = new ByteArrayOutputStream(len);
         try {
-            if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null))
-                return null;
-
             _destination.writeBytes(out);
             _encryptionKey.writeBytes(out);
             _signingKey.writeBytes(out);

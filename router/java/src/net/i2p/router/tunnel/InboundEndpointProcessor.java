@@ -77,7 +77,7 @@ public class InboundEndpointProcessor {
         RouterContext ctx = null;
         if (_context instanceof RouterContext)
             ctx = (RouterContext)_context;
-        if ( (ctx != null) && (_config != null) && (_config.getLength() > 0) ) {
+        if ( (ctx != null) && (_config.getLength() > 0) ) {
             int rtt = 0; // dunno... may not be related to an rtt
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received a " + length + "byte message through tunnel " + _config);

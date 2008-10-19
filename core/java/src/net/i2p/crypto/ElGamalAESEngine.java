@@ -448,7 +448,7 @@ public class ElGamalAESEngine {
         System.arraycopy(elgEncr, 0, rv, 0, elgEncr.length);
         System.arraycopy(aesEncr, 0, rv, elgEncr.length, aesEncr.length);
         //_log.debug("Return length: " + rv.length);
-        long finish = _context.clock().now();
+        //long finish = _context.clock().now();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("after the elgEngine.encrypt took a total of " + (finish - after) + "ms");
         return rv;

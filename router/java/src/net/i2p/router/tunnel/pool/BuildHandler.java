@@ -245,7 +245,7 @@ class BuildHandler {
             // For each peer in the tunnel
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
-                int record = order.indexOf(new Integer(i));
+                int record = order.indexOf(Integer.valueOf(i));
                 if (record < 0) {
                     _log.error("Bad status index " + i);
                     return;
@@ -483,7 +483,7 @@ class BuildHandler {
         int proactiveDrops = countProactiveDrops();
         long recvDelay = System.currentTimeMillis()-state.recvTime;
         if (response == 0) {
-            float pDrop = recvDelay / (BuildRequestor.REQUEST_TIMEOUT*3);
+            float pDrop = ((float) recvDelay) / (float) (BuildRequestor.REQUEST_TIMEOUT*3);
             pDrop = (float)Math.pow(pDrop, 16);
             if (_context.random().nextFloat() < pDrop) { // || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
                 _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, proactiveDrops);
@@ -648,7 +648,7 @@ class BuildHandler {
                            + ", waiting ids: " + ids + ", found matching tunnel? " + (cfg != null), 
                            null);//new Exception("source"));
             if (cfg != null) {
-                BuildEndMessageState state = new BuildEndMessageState(cfg, receivedMessage, from, fromHash);
+                BuildEndMessageState state = new BuildEndMessageState(cfg, receivedMessage);
                 if (HANDLE_REPLIES_INLINE) {
                     handleRequestAsInboundEndpoint(state);
                 } else {
@@ -737,10 +737,10 @@ class BuildHandler {
                 _log.debug("Receive tunnel build reply message " + receivedMessage.getUniqueId() + " from "
                            + (fromHash != null ? fromHash.toBase64() : from != null ? from.calculateHash().toBase64() : "a tunnel"));
             if (HANDLE_REPLIES_INLINE) {
-                handleReply(new BuildReplyMessageState(receivedMessage, from, fromHash));
+                handleReply(new BuildReplyMessageState(receivedMessage));
             } else {
                 synchronized (_inboundBuildReplyMessages) {
-                    _inboundBuildReplyMessages.add(new BuildReplyMessageState(receivedMessage, from, fromHash));
+                    _inboundBuildReplyMessages.add(new BuildReplyMessageState(receivedMessage));
                 }
                 _exec.repoll();
             }
@@ -764,13 +764,9 @@ class BuildHandler {
     /** replies for outbound tunnels that we have created */
     private class BuildReplyMessageState {
         TunnelBuildReplyMessage msg;
-        RouterIdentity from;
-        Hash fromHash;
         long recvTime;
-        public BuildReplyMessageState(I2NPMessage m, RouterIdentity f, Hash h) {
+        public BuildReplyMessageState(I2NPMessage m) {
             msg = (TunnelBuildReplyMessage)m;
-            from = f;
-            fromHash = h;
             recvTime = System.currentTimeMillis();
         }
     }
@@ -778,14 +774,10 @@ class BuildHandler {
     private class BuildEndMessageState {
         TunnelBuildMessage msg;
         PooledTunnelCreatorConfig cfg;
-        RouterIdentity from;
-        Hash fromHash;
         long recvTime;
-        public BuildEndMessageState(PooledTunnelCreatorConfig c, I2NPMessage m, RouterIdentity f, Hash h) {
+        public BuildEndMessageState(PooledTunnelCreatorConfig c, I2NPMessage m) {
             cfg = c;
             msg = (TunnelBuildMessage)m;
-            from = f;
-            fromHash = h;
             recvTime = System.currentTimeMillis();
         }
     }

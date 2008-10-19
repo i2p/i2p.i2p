@@ -75,7 +75,7 @@ public class I2PSocketManagerFactory {
         I2PClient client = I2PClientFactory.createClient();
         ByteArrayOutputStream keyStream = new ByteArrayOutputStream(512);
         try {
-            Destination dest = client.createDestination(keyStream);
+            client.createDestination(keyStream);
             ByteArrayInputStream in = new ByteArrayInputStream(keyStream.toByteArray());
             return createManager(in, i2cpHost, i2cpPort, opts);
         } catch (IOException ioe) {

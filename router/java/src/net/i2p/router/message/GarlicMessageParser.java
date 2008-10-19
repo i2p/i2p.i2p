@@ -61,7 +61,6 @@ public class GarlicMessageParser {
     }
     
     private CloveSet readCloveSet(byte data[]) throws DataFormatException {
-        Set cloves = new HashSet();
         int offset = 0;
         
         CloveSet set = new CloveSet();

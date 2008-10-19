@@ -37,7 +37,6 @@ import java.util.Properties;
 public class SubscriptionsBean
 {
 	private String action, fileName, content, serial, lastSerial;
-	private boolean saved;
 	
 	Properties properties;
 	
@@ -53,13 +52,18 @@ public class SubscriptionsBean
 		if( properties.size() > 0 &&  currentTime - configLastLoaded < 10000 )
 			return;
 		
+		FileInputStream fis = null;
 		try {
 			properties.clear();
-			properties.load( new FileInputStream( ConfigBean.configFileName ) );
+			fis = new FileInputStream( ConfigBean.configFileName );
+			properties.load( fis );
 			configLastLoaded = currentTime;
 		}
 		catch (Exception e) {
 			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
+		} finally {
+			if (fis != null)
+				try { fis.close(); } catch (IOException ioe) {}
 		}	
 	}
 	public String getAction() {
@@ -83,21 +87,24 @@ public class SubscriptionsBean
 		File file = new File( getFileName() );
 		if( file != null && file.isFile() ) {
 			StringBuffer buf = new StringBuffer();
+			BufferedReader br = null;
 			try {
-				BufferedReader br = new BufferedReader( new FileReader( file ) );
+				br = new BufferedReader( new FileReader( file ) );
 				String line;
 				while( ( line = br.readLine() ) != null ) {
 					buf.append( line );
 					buf.append( "\n" );
 				}
 				content = buf.toString();
-				saved = true;
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				if (br != null)
+					try { br.close(); } catch (IOException ioe) {}
 			}
 		}
 	}
@@ -110,7 +117,6 @@ public class SubscriptionsBean
 			out.print( content );
 			out.flush();
 			out.close();
-			saved = true;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -148,7 +154,6 @@ public class SubscriptionsBean
 	}
 	public void setContent(String content) {
 		this.content = content;
-		this.saved = false;
 		
 		/*
 		 * as this is a property file we need a newline at the end of the last line!

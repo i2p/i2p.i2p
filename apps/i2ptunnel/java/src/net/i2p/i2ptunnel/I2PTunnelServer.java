@@ -70,11 +70,16 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             _usePool = "true".equalsIgnoreCase(usePool);
         else
             _usePool = DEFAULT_USE_POOL;
+        FileInputStream fis = null;
         try {
-            init(host, port, new FileInputStream(privkey), privkeyname, l);
+            fis = new FileInputStream(privkey);
+            init(host, port, fis, privkeyname, l);
         } catch (IOException ioe) {
             _log.error("Error starting server", ioe);
             notifyEvent("openServerResult", "error");
+        } finally {
+            if (fis != null)
+                try { fis.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -92,7 +97,6 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         this.l = l;
         this.remoteHost = host;
         this.remotePort = port;
-        I2PClient client = I2PClientFactory.createClient();
         Properties props = new Properties();
         props.putAll(getTunnel().getClientOptions());
         int portNum = 7654;
