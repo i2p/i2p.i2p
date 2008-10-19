@@ -133,9 +133,15 @@ class FloodOnlySearchJob extends FloodSearchJob {
                  } else
                      ffp.add(0, peer);
             }
+            // This will help us recover if the router just started and all the floodfills
+            // have changed since the last time we were running
+            if (floodfillPeers.size() - failcount <= 2)
+                _shouldProcessDSRM = true;
             if (_log.shouldLog(Log.INFO) && failcount > 0)
                 _log.info(getJobId() + ": " + failcount + " of " + floodfillPeers.size() + " floodfills are not heard from, unprofiled, failing, unreachable or shitlisted");
             floodfillPeers = ffp;
+        } else {
+            _shouldProcessDSRM = true;
         }
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
