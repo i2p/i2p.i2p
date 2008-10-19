@@ -4,6 +4,7 @@
 
 <html><head>
 <title>I2P Router Console - home</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" href="default.css" type="text/css" />
 <link rel="shortcut icon" href="favicon.ico" />
 </head><body>
