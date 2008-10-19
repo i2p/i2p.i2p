@@ -344,13 +344,8 @@ public class ShellCommand {
             System.err.println("Usage: ShellCommand commandline");
             return;
         }
-        ShellCommand cmd = new ShellCommand();
-        StringBuffer command = new StringBuffer(64);
-        for (int i = 0; i < args.length; i++) {
-            command.append("\"").append(args[i]).append("\" ");
-        }
 	try {
-        cmd.executeSilent(command.toString());
+            Runtime.getRuntime().exec(args);
 	} catch (IOException ioe) { ioe.printStackTrace(); } 
         return;
     }
