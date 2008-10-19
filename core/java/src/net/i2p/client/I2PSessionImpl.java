@@ -92,6 +92,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** whether the session connection has already been closed (or not yet opened) */
     private boolean _closed;
 
+    /** whether the session connection is in the process of being closed */
+    private boolean _closing;
+
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
     /** lock that we wait upon, that the SetDateMessageHandler notifies */
@@ -125,6 +128,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _log = context.logManager().getLog(I2PSessionImpl.class);
         _handlerMap = new I2PClientMessageHandlerMap(context);
         _closed = true;
+        _closing = false;
         _producer = new I2CPMessageProducer(context);
         _availabilityNotifier = new AvailabilityNotifier();
         _availableMessages = new HashMap();
@@ -564,6 +568,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         if (_closed) return;
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
+        _closing = true;   // we use this to prevent a race
         if (sendDisconnect) {
             try {
                 _producer.disconnect(this);
@@ -573,6 +578,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
         _availabilityNotifier.stopNotifying();
         _closed = true;
+        _closing = false;
         closeSocket();
         if (_sessionListener != null) _sessionListener.disconnected(this);
     }
@@ -607,7 +613,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     protected void disconnect() {
-        if (_closed) return;
+        if (_closed || _closing) return;
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnect() called", new Exception("Disconnect"));
         if (shouldReconnect()) {
             if (reconnect()) {
