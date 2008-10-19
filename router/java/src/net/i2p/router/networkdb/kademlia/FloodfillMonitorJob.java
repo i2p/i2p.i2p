@@ -39,8 +39,11 @@ class FloodfillMonitorJob extends JobImpl {
     
     public String getName() { return "Monitor the floodfill pool"; }
     public void runJob() {
+        boolean wasFF = _facade.floodfillEnabled();
         boolean ff = shouldBeFloodfill();
         _facade.setFloodfillEnabled(ff);
+        if (ff != wasFF)
+            getContext().router().rebuildRouterInfo();
         if (_log.shouldLog(Log.INFO))
             _log.info("Should we be floodfill? " + ff);
         requeue((REQUEUE_DELAY / 2) + getContext().random().nextInt(REQUEUE_DELAY));
@@ -115,6 +118,7 @@ class FloodfillMonitorJob extends JobImpl {
         happy = happy && _facade.getKnownRouters() >= 200;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
         happy = happy && getContext().tunnelManager().getParticipatingCount() >= 100;
+        happy = happy && Math.abs(getContext().clock().getOffset()) < 10*1000;
         // We need an address and no introducers
         if (happy) {
             RouterAddress ra = getContext().router().getRouterInfo().getTargetAddress("SSU");
