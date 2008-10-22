@@ -25,6 +25,8 @@ package net.i2p.BOB;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Properties;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -45,9 +47,12 @@ public class MUXlisten implements Runnable {
 	private ByteArrayInputStream prikey;
 	private ThreadGroup tg;
 	private String N;
-
+	private ServerSocket listener;
+	private int backlog = 50; // should this be more? less?
+	boolean go_out;
+	boolean come_in;
 	/**
-	 * Constructor
+	 * Constructor Will fail if INPORT is occupied.
 	 *
 	 * @param info
 	 * @param database
@@ -56,6 +61,8 @@ public class MUXlisten implements Runnable {
 	 * @throws java.io.IOException
 	 */
 	MUXlisten(nickname database, nickname info, Log _log) throws I2PException, IOException {
+		int port = 0;
+		InetAddress host = null;
 		this.database = database;
 		this.info = info;
 		this._log = _log;
@@ -68,13 +75,28 @@ public class MUXlisten implements Runnable {
 		this.database.releaseReadLock();
 		this.info.releaseReadLock();
 
+		this.database.getReadLock();
+		this.info.getReadLock();
+		this.go_out = info.exists("OUTPORT");
+		this.come_in = info.exists("INPORT");
+		if(this.come_in) {
+			port = Integer.parseInt(info.get("INPORT").toString());
+			host = InetAddress.getByName(info.get("INHOST").toString());
+		}
+		this.database.releaseReadLock();
+		this.info.releaseReadLock();
+
+		socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
+		if(this.come_in) {
+			this.listener = new ServerSocket(port, backlog, host);
+		}
+		
+		// Everything is OK as far as we can tell.
 		this.database.getWriteLock();
 		this.info.getWriteLock();
 		this.info.add("STARTING", Boolean.TRUE);
 		this.info.releaseWriteLock();
 		this.database.releaseWriteLock();
-
-		socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
 	}
 
 	/**
@@ -95,12 +117,6 @@ public class MUXlisten implements Runnable {
 
 			// toss the connections to a new threads.
 			// will wrap with TCP and UDP when UDP works
-			this.database.getReadLock();
-			this.info.getReadLock();
-			boolean go_out = info.exists("OUTPORT");
-			boolean come_in = info.exists("INPORT");
-			this.database.releaseReadLock();
-			this.info.releaseReadLock();
 
 			if(go_out) {
 				// I2P -> TCP
@@ -111,7 +127,7 @@ public class MUXlisten implements Runnable {
 
 			if(come_in) {
 				// TCP -> I2P
-				TCPlistener conn = new TCPlistener(socketManager, info, database, _log);
+				TCPlistener conn = new TCPlistener(listener, socketManager, info, database, _log);
 				Thread q = new Thread(tg, conn, "BOBTCPlistener" + N);
 				q.start();
 			}

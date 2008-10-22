@@ -24,7 +24,6 @@
 package net.i2p.BOB;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -46,7 +45,7 @@ public class TCPlistener implements Runnable {
 	private int tgwatch;
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
-	private int backlog = 50; // should this be more? less?
+	private ServerSocket listener;
 
 	/**
 	 * Constructor
@@ -55,11 +54,12 @@ public class TCPlistener implements Runnable {
 	 * @param database
 	 * @param _log
 	 */
-	TCPlistener(I2PSocketManager S, nickname info, nickname database, Log _log) {
+	TCPlistener(ServerSocket listener, I2PSocketManager S, nickname info, nickname database, Log _log) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
+		this.listener = listener;
 		tgwatch = 1;
 	}
 
@@ -77,7 +77,6 @@ public class TCPlistener implements Runnable {
 		}
 		try {
 //			System.out.println("Starting thread count " + Thread.activeCount());
-			ServerSocket listener = new ServerSocket(Integer.parseInt(info.get("INPORT").toString()), backlog, InetAddress.getByName(info.get("INHOST").toString()));
 			Socket server = new Socket();
 			listener.setSoTimeout(1000);
 			info.releaseReadLock();

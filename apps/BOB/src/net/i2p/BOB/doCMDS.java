@@ -493,8 +493,6 @@ public class doCMDS implements Runnable {
 							wlock();
 							database.add(Arg, nickinfo);
 							nickinfo.add(P_NICKNAME, Arg);
-//							nickinfo.add(P_INSTATE,new Boolean(false));
-//							nickinfo.add(P_OUTSTATE,new Boolean(false));
 							nickinfo.add(P_STARTING, Boolean.FALSE);
 							nickinfo.add(P_RUNNING, Boolean.FALSE);
 							nickinfo.add(P_STOPPING, Boolean.FALSE);
