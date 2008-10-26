@@ -54,6 +54,10 @@ class FloodfillMonitorJob extends JobImpl {
         if (getContext().getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null)
             return false;
 
+        // Hidden trumps netDb.floodfillParticipant=true
+        if (getContext().router().isHidden())
+            return false;
+
         String enabled = getContext().getProperty(PROP_FLOODFILL_PARTICIPANT, "auto");
         if ("true".equals(enabled))
             return true;
@@ -70,7 +74,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (getContext().router().getRouterInfo().getCapabilities().indexOf("O") < 0)
             return false;
 
-        // This list may include ourselves...
+        // This list will not include ourselves...
         List floodfillPeers = _facade.getFloodfillPeers();
         long now = getContext().clock().now();
         // We know none at all! Must be our turn...
@@ -99,10 +103,8 @@ class FloodfillMonitorJob extends JobImpl {
         int ffcount = floodfillPeers.size();
         int failcount = 0;
         long before = now - 60*60*1000;
-        for (int i = 0; i < floodfillPeers.size(); i++) {
+        for (int i = 0; i < ffcount; i++) {
             Hash peer = (Hash)floodfillPeers.get(i);
-            if (peer.equals(getContext().routerHash()))
-                continue;
             PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
             if (profile == null || profile.getLastHeardFrom() < before ||
                 profile.getIsFailing() || getContext().shitlist().isShitlisted(peer) ||
@@ -110,6 +112,8 @@ class FloodfillMonitorJob extends JobImpl {
                 failcount++;
         }
 
+        if (wasFF)
+            ffcount++;
         int good = ffcount - failcount;
         boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf("R") >= 0;
         // Use the same job lag test as in RouterThrottleImpl

@@ -54,6 +54,7 @@ class FloodfillPeerSelector extends PeerSelector {
         return rv;
     }
     
+    /** Returned list will not include our own hash */
     public List selectFloodfillParticipants(KBucketSet kbuckets) {
         if (kbuckets == null) return new ArrayList();
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, null, 0);

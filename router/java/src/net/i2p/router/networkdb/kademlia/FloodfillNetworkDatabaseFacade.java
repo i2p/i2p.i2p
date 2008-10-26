@@ -67,7 +67,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
-        if (localRouterInfo.isHidden()) return; // DE-nied!
+        if (_context.router().isHidden()) return; // DE-nied!
         super.publish(localRouterInfo);
         sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
     }
@@ -248,7 +248,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
     }
     
-    /** list of the Hashes of currently known floodfill peers */
+    /** list of the Hashes of currently known floodfill peers;
+      * Returned list will not include our own hash.
+      */
     public List getFloodfillPeers() {
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         return sel.selectFloodfillParticipants(getKBuckets());
