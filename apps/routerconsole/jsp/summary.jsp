@@ -14,7 +14,7 @@
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Reachability:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><%
+ <b>Reachability:</b> <a href="config.jsp#help"><jsp:getProperty name="helper" property="reachability" /></a><%
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
         out.print("<br />" + update.getStatus());

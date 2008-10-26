@@ -105,7 +105,7 @@
  <p><b>Note: changing any of these settings will terminate all of your connections and effectively
     restart your router.</b>
  <hr />
- <b>Reachability Help: </b>
+ <b><a name="help">Reachability Help:</a></b>
  <p>
  While I2P will work adequately behind a firewall, your speeds and network integration will generally improve
  if you open up your port (generally 8887) to both UDP and TCP, and enable inbound TCP above.
@@ -118,6 +118,8 @@
      However, if it appears consistently, you should check whether both your external and internal
      firewalls are open on port 8887.
  <li><b>Testing</b> - The router is currently testing whether your UDP port is firewalled.
+ <li><b>Hidden</b> - The router is not configured to publish its address,
+     therefore it does not expect incoming connections.
  <li><b>WARN - Firewalled and Fast</b> - You have configured I2P to share more than 128KBps of bandwidth,
      but you are firewalled. While I2P will work fine in this configuration, if you really have
      over 128KBps of bandwidth to share, it will be much more helpful to the network if
@@ -128,6 +130,8 @@
      your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well.
      If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact
      you via TCP, which will hurt the network. Please open your firewall or disable inbound TCP above.
+ <li><b>ERR - Clock Skew</b> - Your system's clock is skewed, which will make it difficult
+     to participate in the network. Correct your clock setting if this error persists.
  <li><b>ERR - Private TCP Address</b> - You must never advertise an unroutable IP address such as
      127.0.0.1 or 192.168.1.1 as your external address. Correct the address or disable inbound TCP above.
  <li><b>ERR - SymmetricNAT</b> - I2P detected that you are firewalled by a Symmetric NAT.

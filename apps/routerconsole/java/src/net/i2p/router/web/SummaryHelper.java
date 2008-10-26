@@ -119,7 +119,9 @@ public class SummaryHelper {
     public String getReachability() {
         if (!_context.clock().getUpdatedSuccessfully())
             return "ERR-ClockSkew";
-        
+        if (_context.router().isHidden())
+            return "Hidden";
+
         int status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
