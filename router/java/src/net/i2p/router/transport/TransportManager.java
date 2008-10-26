@@ -358,7 +358,7 @@ public class TransportManager implements TransportEventListener {
             if (t.getCurrentAddress() != null)
                 buf.append(t.getCurrentAddress()).append("\n\n");
             else
-                buf.append(t.getStyle()).append(" is used for outbound connections only");
+                buf.append(t.getStyle()).append(" is used for outbound connections only\n\n");
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
