@@ -441,8 +441,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             if (name == null)
                 name = client.toBase64().substring(0,4);
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
-                      + "\">Client tunnels</a> for " + name + " (<a href=\"/configtunnels.jsp#"
-                      + client.toBase64().substring(0,4) +"\">config</a>):</h2>\n");
+                      + "\">Client tunnels</a> for " + name);
+            if (_context.clientManager().isLocal(client))
+                out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">config</a>):</h2>\n");
+            else
+                out.write(" (dead):</h2>\n");
             renderPool(out, in, outPool);
         }
         
