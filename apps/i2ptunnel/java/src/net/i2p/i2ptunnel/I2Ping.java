@@ -20,7 +20,7 @@ import net.i2p.util.Log;
 public class I2Ping extends I2PTunnelTask implements Runnable {
     private final static Log _log = new Log(I2Ping.class);
 
-    private static final int PING_COUNT = 3;
+    private int PING_COUNT = 3;
     private static final int CPING_COUNT = 5;
     private static final int PING_TIMEOUT = 5000;
 
@@ -29,6 +29,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
     private int MAX_SIMUL_PINGS = 10; // not really final...
 
     private boolean countPing = false;
+    private boolean reportTimes = true;
 
     private I2PSocketManager sockMgr;
     private Logging l;
@@ -82,6 +83,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
     }
 
     public void runCommand(String cmd) throws InterruptedException, IOException {
+      while (true) {
         if (cmd.startsWith("-t ")) { // timeout
             cmd = cmd.substring(3);
             int pos = cmd.indexOf(" ");
@@ -92,8 +94,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 timeout = Long.parseLong(cmd.substring(0, pos));
                 cmd = cmd.substring(pos + 1);
             }
-        }
-        if (cmd.startsWith("-m ")) { // max simultaneous pings
+        } else if (cmd.startsWith("-m ")) { // max simultaneous pings
             cmd = cmd.substring(3);
             int pos = cmd.indexOf(" ");
             if (pos == -1) {
@@ -103,18 +104,26 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 MAX_SIMUL_PINGS = Integer.parseInt(cmd.substring(0, pos));
                 cmd = cmd.substring(pos + 1);
             }
-        }
-        if (cmd.startsWith("-c ")) { // "count" ping
+        } else if (cmd.startsWith("-n ")) { // number of pings
+            cmd = cmd.substring(3);
+            int pos = cmd.indexOf(" ");
+            if (pos == -1) {
+                l.log("Syntax error");
+                return;
+            } else {
+                PING_COUNT = Integer.parseInt(cmd.substring(0, pos));
+                cmd = cmd.substring(pos + 1);
+            }
+        } else if (cmd.startsWith("-c ")) { // "count" ping
             countPing = true;
             cmd = cmd.substring(3);
-        }
-        if (cmd.equals("-h")) { // ping all hosts
+        } else if (cmd.equals("-h")) { // ping all hosts
             cmd = "-l hosts.txt";
-        }
-        if (cmd.startsWith("-l ")) { // ping a list of hosts
+        } else if (cmd.startsWith("-l ")) { // ping a list of hosts
             BufferedReader br = new BufferedReader(new FileReader(cmd.substring(3)));
             String line;
             List pingHandlers = new ArrayList();
+            int i = 0;
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("#")) continue; // comments
                 if (line.startsWith(";")) continue;
@@ -123,17 +132,21 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                     line = line.substring(0, line.indexOf("="));
                 }
                 pingHandlers.add(new PingHandler(line));
+                if (++i > 1)
+                    reportTimes = false;
             }
             br.close();
             for (Iterator it = pingHandlers.iterator(); it.hasNext();) {
                 Thread t = (Thread) it.next();
                 t.join();
             }
-
+            return;
         } else {
             Thread t = new PingHandler(cmd);
             t.join();
+            return;
         }
+      }
     }
 
     public boolean close(boolean forced) {
@@ -163,7 +176,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 }
                 lastPingTime = System.currentTimeMillis();
             }
-            boolean sent = sockMgr.ping(dest, PING_TIMEOUT);
+            boolean sent = sockMgr.ping(dest, timeout);
             synchronized (simulLock) {
                 simulPings--;
                 simulLock.notifyAll();
@@ -193,6 +206,9 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                     }
                     return;
                 }
+                int pass = 0;
+                int fail = 0;
+                long totalTime = 0;
                 int cnt = countPing ? CPING_COUNT : PING_COUNT;
                 StringBuffer pingResults = new StringBuffer(2 * cnt + destination.length() + 3);
                 for (int i = 0; i < cnt; i++) {
@@ -206,9 +222,27 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                             pingResults.append("+ ");
                         }
                     } else {
-                        pingResults.append(sent ? "+ " : "- ");
+                        if (reportTimes) {
+                            if (sent) {
+                                pass++;
+                                long rtt = System.currentTimeMillis() - lastPingTime;
+                                totalTime += rtt;
+                                l.log((i+1) + ": + " + rtt + " ms");
+                            } else {
+                                fail++;
+                                l.log((i+1) + ": -");
+                            }
+                        } else {
+                            pingResults.append(sent ? "+ " : "- ");
+                        }
                     }
                     //		    System.out.println(sent+" -> "+destination);
+                }
+                if (reportTimes) {
+                    pingResults.append("  ").append(pass).append(" received ");
+                    if (pass > 0)
+                        pingResults.append("(average time ").append(totalTime/pass).append(" ms) ");
+                    pingResults.append("and ").append(fail).append(" lost for destination: ");
                 }
                 pingResults.append("  ").append(destination);
                 synchronized (lock) { // Logger is not thread safe

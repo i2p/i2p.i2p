@@ -284,6 +284,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("Command list:");
         l.log("config <i2phost> <i2pport>");
         l.log("listen_on <ip>");
+        l.log("clientoptions[ key=value]*");
         l.log("read_timeout <msecs>");
         l.log("owndest yes|no");
         l.log("ping <args>");
@@ -1000,9 +1001,14 @@ public class I2PTunnel implements Logging, EventDispatcher {
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
             l.log("ping <opts> <dest>");
-            l.log("ping <opts> -h");
-            l.log("ping <opts> -l <destlistfile>");
-            l.log("   Tests communication with peers.\n" + "   opts can be -ns (nosync) or not.");
+            l.log("ping <opts> -h (pings all hosts in hosts.txt)");
+            l.log("ping <opts> -l <destlistfile> (pings a list of hosts in a file)");
+            l.log("   Options:\n" +
+                  "     -c (require 5 consecutive pings to report success)\n" +
+                  "     -m maxSimultaneousPings (default 10)\n" +
+                  "     -n numberOfPings (default 3)\n" +
+                  "     -t timeout (ms, default 5000)\n");
+            l.log("   Tests communication with peers.\n");
             notifyEvent("pingTaskId", Integer.valueOf(-1));
         }
     }
