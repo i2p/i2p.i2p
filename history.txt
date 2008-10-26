@@ -1,3 +1,41 @@
+2008-10-27 zzz
+    * config.jsp: Add more help
+    * peers.jsp: Clean up 'Listening on' formatting
+    * profiles.jsp: Don't override locale number format
+    * netdb.jsp: Indicate if hidden
+    * summary.jsp: Indicate if hidden
+    * i2ptunnel/edit.jsp: Disable word wrap in textarea
+    * Blocklist: Change logging from ERROR to WARN
+    * FloodfillMonitor:
+       - Fix ff count (we forgot ourselves)
+       - Don't become ff if hidden
+    * HandleFloodfillDatabaseLookupMessageJob:
+      Send back your routerinfo with the DSRM if not ff to
+      spread the word that you aren't ff anymore
+    * I2Ping:
+       - Add -n count option
+       - Add rtt output
+       - Enhance help
+       - Fix option handling
+    * More findbugs cleanups
+    * NetDb:
+       - Fix behavior when router.isHidden=true
+       - Delay StartExplorersJob for 10m at startup
+       - Update dbLookup profile stats in FloodOnlySearchJob
+         and FloodfillVerifyStoreJob
+       - Fix response time store in profile in SearchJob
+    * Stats:
+       - Remove unused tunnel.buildSuccess and tunnel.buildFailure
+       - Remove tunnel.buildRequestTime and 5m rate stats from
+         netDb, effective in next release
+    * UDP:
+       - Don't do peer tests when hidden
+       - Don't offer to introduce when hidden
+       - Don't continually rebuild routerInfo when hidden
+       - Don't continually rebuild routerInfo when
+         i2np.udp.internalPort is set but i2np.udp.port is not
+       - Remove some unused functions
+
 2008-10-20 zzz
     * configclients.jsp: Handle clients with no args
     * index.jsp: Add readme_nl.html (thanks mathiasdm!),

@@ -36,9 +36,10 @@ public class StatsGenerator {
         buf.setLength(0);
         
         Map groups = _context.statManager().getStatsByGroup();
-        for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
-            String group = (String)iter.next();
-            Set stats = (Set)groups.get(group);
+        for (Iterator iter = groups.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String group = (String)entry.getKey();
+            Set stats = (Set)entry.getValue();
             buf.append("<option value=\"/oldstats.jsp#").append(group).append("\">");
             buf.append(group).append("</option>\n");
             for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {

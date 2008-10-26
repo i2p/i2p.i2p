@@ -120,9 +120,10 @@ public class OrderedProperties extends Properties {
 
     public void putAll(Map data) {
         if (data == null) return;
-        for (Iterator iter = data.keySet().iterator(); iter.hasNext();) {
-            Object key = iter.next();
-            Object val = data.get(key);
+        for (Iterator iter = data.entrySet().iterator(); iter.hasNext();) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            Object key = entry.getKey();
+            Object val = entry.getValue();
             put(key, val);
         }
     }

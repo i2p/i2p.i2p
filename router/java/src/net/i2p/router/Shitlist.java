@@ -276,9 +276,10 @@ public class Shitlist {
         }
         buf.append("<ul>");
         
-        for (Iterator iter = entries.keySet().iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            Entry entry = (Entry)entries.get(key);
+        for (Iterator iter = entries.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry mentry = (Map.Entry)iter.next();
+            Hash key = (Hash)mentry.getKey();
+            Entry entry = (Entry)mentry.getValue();
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
             buf.append(" (<a href=\"netdb.jsp?r=").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
             buf.append(" expiring in ");

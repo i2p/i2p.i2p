@@ -90,9 +90,10 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<tr><td><a href=\"http://codevoid.i2p/forums/5\" class=\"snarkRefresh\">Wishlist</a>\n");
         int count = 1;
         Map trackers = _manager.getTrackers();
-        for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String baseURL = (String)trackers.get(name);
+        for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String name = (String)entry.getKey();
+            String baseURL = (String)entry.getValue();
             int e = baseURL.indexOf('=');
             if (e < 0)
                 continue;
@@ -496,9 +497,10 @@ public class I2PSnarkServlet extends HttpServlet {
         String announce = snark.meta.getAnnounce();
         if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr")) {
             Map trackers = _manager.getTrackers();
-            for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
-                String name = (String)iter.next();
-                String baseURL = (String)trackers.get(name);
+            for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry entry = (Map.Entry)iter.next();
+                String name = (String)entry.getKey();
+                String baseURL = (String)entry.getValue();
                 if (!baseURL.startsWith(announce))
                     continue;
                 int e = baseURL.indexOf('=');
@@ -668,9 +670,10 @@ public class I2PSnarkServlet extends HttpServlet {
                   + "\" title=\"File to seed (must be within the specified path)\" /><br />\n");
         out.write("Tracker: <select name=\"announceURL\"><option value=\"\">Select a tracker</option>\n");
         Map trackers = _manager.getTrackers();
-        for (Iterator iter = trackers.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String announceURL = (String)trackers.get(name);
+        for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String name = (String)entry.getKey();
+            String announceURL = (String)entry.getValue();
             int e = announceURL.indexOf('=');
             if (e > 0)
                 announceURL = announceURL.substring(0, e);
@@ -741,9 +744,10 @@ public class I2PSnarkServlet extends HttpServlet {
                   + I2PSnarkUtil.instance().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" /> <br />\n");
         StringBuffer opts = new StringBuffer(64);
         Map options = new TreeMap(I2PSnarkUtil.instance().getI2CPOptions());
-        for (Iterator iter = options.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = (String)options.get(key);
+        for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String key = (String)entry.getKey();
+            String val = (String)entry.getValue();
             opts.append(key).append('=').append(val).append(' ');
         }
         out.write("I2CP opts: <input type=\"text\" name=\"i2cpOpts\" size=\"80\" value=\""

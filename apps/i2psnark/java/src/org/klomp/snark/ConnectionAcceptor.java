@@ -120,6 +120,8 @@ public class ConnectionAcceptor implements Runnable
             if (serverSocket == null)
                 try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
         }
+        if(stop)
+            break;
         try
           {
             I2PSocket socket = serverSocket.accept();

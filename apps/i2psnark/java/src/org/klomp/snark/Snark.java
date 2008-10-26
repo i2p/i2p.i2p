@@ -255,8 +255,8 @@ public class Snark
     if (slistener == null)
       slistener = this;
 
-    if (clistener == null)
-      clistener = this;
+    //if (clistener == null)
+    //  clistener = this;
 
     this.torrent = torrent;
     this.rootDataDir = rootDir;
@@ -312,9 +312,9 @@ public class Snark
     // Figure out what the torrent argument represents.
     meta = null;
     File f = null;
+    InputStream in = null;
     try
       {
-        InputStream in = null;
         f = new File(torrent);
         if (f.exists())
           in = new FileInputStream(f);
@@ -364,8 +364,11 @@ public class Snark
          */
         else
           fatal("Cannot open '" + torrent + "'", ioe);
-      }
-    
+      } finally {
+          if (in != null)
+              try { in.close(); } catch (IOException ioe) {}
+      }    
+
     debug(meta.toString(), INFO);
     
     // When the metainfo torrent was created from an existing file/dir
@@ -721,7 +724,7 @@ public class Snark
       {
         // Use the MetaInfo from the storage since our own might not
         // yet be setup correctly.
-        MetaInfo meta = storage.getMetaInfo();
+        //MetaInfo meta = storage.getMetaInfo();
         //if (meta != null)
         //  System.out.print("Checking existing "
         //                   + meta.getPieces()

@@ -30,7 +30,7 @@ import java.util.TimerTask;
 class PeerMonitorTask extends TimerTask
 {
   final static long MONITOR_PERIOD = 10 * 1000; // Ten seconds.
-  private final long KILOPERSECOND = 1024 * (MONITOR_PERIOD / 1000);
+  private static final long KILOPERSECOND = 1024 * (MONITOR_PERIOD / 1000);
 
   private final PeerCoordinator coordinator;
 

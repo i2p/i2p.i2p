@@ -408,7 +408,7 @@ public class MetaInfo
     info.put("name", name);
     if (name_utf8 != null)
         info.put("name.utf-8", name_utf8);
-    info.put("piece length", new Integer(piece_length));
+    info.put("piece length", Integer.valueOf(piece_length));
     info.put("pieces", piece_hashes);
     if (files == null)
       info.put("length", new Long(length));
@@ -434,9 +434,10 @@ public class MetaInfo
     Map info = createInfoMap();
     StringBuffer buf = new StringBuffer(128);
     buf.append("info: ");
-    for (Iterator iter = info.keySet().iterator(); iter.hasNext(); ) {
-        String key = (String)iter.next();
-        Object val = info.get(key);
+    for (Iterator iter = info.entrySet().iterator(); iter.hasNext(); ) {
+        Map.Entry entry = (Map.Entry)iter.next();
+        String key = (String)entry.getKey();
+        Object val = entry.getValue();
         buf.append(key).append('=');
         if (val instanceof byte[])
             buf.append(Base64.encode((byte[])val, true));

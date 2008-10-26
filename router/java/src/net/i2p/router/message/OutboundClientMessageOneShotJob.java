@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -632,9 +633,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private void cleanLeaseSetCache(HashMap tc) {
         long now = getContext().clock().now();
         List deleteList = new ArrayList();
-        for (Iterator iter = tc.keySet().iterator(); iter.hasNext(); ) {
-            String k = (String) iter.next();
-            LeaseSet l = (LeaseSet) tc.get(k);
+        for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String k = (String) entry.getKey();
+            LeaseSet l = (LeaseSet) entry.getValue();
             if (l.getEarliestLeaseDate() < now)
                 deleteList.add(k);
         }
@@ -650,9 +652,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private void cleanLeaseCache(HashMap tc) {
         List deleteList = new ArrayList();
-        for (Iterator iter = tc.keySet().iterator(); iter.hasNext(); ) {
-            String k = (String) iter.next();
-            Lease l = (Lease) tc.get(k);
+        for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String k = (String) entry.getKey();
+            Lease l = (Lease) entry.getValue();
             if (l.isExpired(Router.CLOCK_FUDGE_FACTOR))
                 deleteList.add(k);
         }
@@ -668,9 +671,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private void cleanTunnelCache(HashMap tc) {
         List deleteList = new ArrayList();
-        for (Iterator iter = tc.keySet().iterator(); iter.hasNext(); ) {
-            String k = (String) iter.next();
-            TunnelInfo tunnel = (TunnelInfo) tc.get(k);
+        for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String k = (String) entry.getKey();
+            TunnelInfo tunnel = (TunnelInfo) entry.getValue();
             if (!getContext().tunnelManager().isValidTunnel(sourceFromHashPair(k), tunnel))
                 deleteList.add(k);
         }

@@ -584,9 +584,10 @@ public class LogManager {
                 limits.put(lim.getRootName(), Log.toLevelString(lim.getLimit()));
             }
         }
-        for (Iterator iter = limits.keySet().iterator(); iter.hasNext(); ) {
-            String path = (String)iter.next();
-            String lim = (String)limits.get(path);
+        for (Iterator iter = limits.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String path = (String)entry.getKey();
+            String lim = (String)entry.getValue();
             buf.append(PROP_RECORD_PREFIX).append(path);
             buf.append('=').append(lim).append('\n');
         }

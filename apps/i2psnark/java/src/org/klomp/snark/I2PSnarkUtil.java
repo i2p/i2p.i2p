@@ -185,7 +185,8 @@ public class I2PSnarkUtil {
             out = File.createTempFile("i2psnark", "url", new File("."));
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            out.delete();
+            if (out != null)
+                out.delete();
             return null;
         }
         String fetchURL = url;
