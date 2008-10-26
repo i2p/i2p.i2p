@@ -120,6 +120,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
     
+    private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
+
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(getClass());
@@ -298,6 +300,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_exploreJob == null)
                 _exploreJob = new StartExplorersJob(_context, this);
             // fire off a group of searches from the explore pool
+            // Don't start it right away, so we don't send searches for random keys
+            // out our 0-hop exploratory tunnels (generating direct connections to
+            // one or more floodfill peers within seconds of startup).
+            // We're trying to minimize the ff connections to lessen the load on the 
+            // floodfills, and in any case let's try to build some real expl. tunnels first.
+            // No rush, it only runs every 30m.
+            _exploreJob.getTiming().setStartAfter(_context.clock().now() + EXPLORE_JOB_DELAY);
             _context.jobQueue().addJob(_exploreJob);
             // if configured to do so, periodically try to get newer routerInfo stats
             if (_harvestJob == null && "true".equals(_context.getProperty(HarvesterJob.PROP_ENABLED)))
@@ -530,7 +539,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_initialized) return;
         // This isn't really used for anything
         // writeMyInfo(localRouterInfo);
-        if (localRouterInfo.isHidden()) return; // DE-nied!
+        if (_context.router().isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
         synchronized (_explicitSendKeys) {
@@ -1064,9 +1073,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (versions.size() > 0) {
             buf.append("<table border=\"1\">\n");
             buf.append("<tr><td><b>Core version</b></td><td><b>Router version</b></td><td><b>Number</b></td></tr>\n");
-            for (Iterator iter = versions.keySet().iterator(); iter.hasNext(); ) {
-                String coreVersion = (String)iter.next();
-                Map routerVersions = (Map)versions.get(coreVersion);
+            for (Iterator iter = versions.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry entry = (Map.Entry)iter.next();
+                String coreVersion = (String)entry.getKey();
+                Map routerVersions = (Map)entry.getValue();
                 for (Iterator routerIter = routerVersions.keySet().iterator(); routerIter.hasNext(); ) {
                     String routerVersion = (String)routerIter.next();
                     Integer num = (Integer)routerVersions.get(routerVersion);
@@ -1083,16 +1093,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {
         String hash = info.getIdentity().getHash().toBase64();
+        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
         if (isUs) {
-            buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
             buf.append("<a name=\"our-info\" /a><b>Our info: ").append(hash).append("</b><br />\n");
         } else {
-            buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
             buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");
         }
         
         long age = _context.clock().now() - info.getPublished();
-        if (age > 0)
+        if (isUs && _context.router().isHidden())
+            buf.append("Hidden, Updated: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
+        else if (age > 0)
             buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
         else
             buf.append("Published: <i>in ").append(DataHelper.formatDuration(0-age)).append("???</i><br />\n");
