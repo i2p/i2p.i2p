@@ -82,7 +82,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         }
 
         // If we are hidden we should not get queries, log and return
-        if (getContext().router().getRouterInfo().isHidden()) {
+        if (getContext().router().isHidden()) {
             if (_log.shouldLog(Log.ERROR)) {
                 _log.error("Uninvited dbLookup received with replies going to " + fromKey
                            + " (tunnel " + _message.getReplyTunnel() + ")");
@@ -211,7 +211,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         sendMessage(msg, toPeer, replyTunnel);
     }
     
-    private void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
+    protected void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending closest routers to key " + key.toBase64() + ": # peers = " 
                        + routerInfoSet.size() + " tunnel " + replyTunnel);
@@ -228,7 +228,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         sendMessage(msg, toPeer, replyTunnel); // should this go via garlic messages instead?
     }
     
-    private void sendMessage(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
+    protected void sendMessage(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
         if (replyTunnel != null) {
             sendThroughTunnel(message, toPeer, replyTunnel);
         } else {

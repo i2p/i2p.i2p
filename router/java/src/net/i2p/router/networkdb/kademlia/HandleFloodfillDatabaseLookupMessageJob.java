@@ -8,11 +8,17 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Set;
+
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
+
 
 /**
  * Handle a lookup for a key received from a remote peer.  Needs to be implemented
@@ -27,5 +33,26 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
     protected boolean answerAllQueries() {
         if (!FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) return false;
         return FloodfillNetworkDatabaseFacade.isFloodfill(getContext().router().getRouterInfo());
+    }
+
+    /**
+     * We extend this here to send our routerInfo back as well, if we are not floodfill.
+     * This gets the word out to routers that we are no longer floodfill, so they
+     * will stop bugging us.
+     */
+    protected void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
+        super.sendClosest(key, routerInfoSet, toPeer, replyTunnel);
+
+        // go away, you got the wrong guy, send our RI back unsolicited
+        if (!FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) {
+            // We could just call sendData(myhash, myri, toPeer, replyTunnel) but
+            // that would increment the netDb.lookupsHandled and netDb.lookupsMatched stats
+            DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
+            RouterInfo me = getContext().router().getRouterInfo();
+            msg.setKey(me.getIdentity().getHash());
+            msg.setRouterInfo(me);
+            msg.setValueType(DatabaseStoreMessage.KEY_TYPE_ROUTERINFO);
+            sendMessage(msg, toPeer, replyTunnel);
+        }
     }
 }
