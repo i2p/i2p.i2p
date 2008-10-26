@@ -91,6 +91,8 @@ public class StatisticsManager implements Service {
         }
     }
     
+    static final boolean CommentOutIn065 = RouterVersion.VERSION.equals("0.6.4");
+
     /** Retrieve a snapshot of the statistics that should be published */
     public Properties publishStatistics() { 
         Properties stats = new Properties();
@@ -139,9 +141,6 @@ public class StatisticsManager implements Service {
             //includeRate("tunnel.smallFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             //includeRate("tunnel.testFailedTime", stats, new long[] { 10*60*1000 });
             
-            includeRate("tunnel.buildFailure", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.buildSuccess", stats, new long[] { 60*60*1000 });
-
             //includeRate("tunnel.batchDelaySent", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("tunnel.batchMultipleCount", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("tunnel.corruptMessage", stats, new long[] { 60*60*1000l, 3*60*60*1000l });
@@ -187,6 +186,7 @@ public class StatisticsManager implements Service {
             //includeRate("udp.packetDequeueTime", stats, new long[] { 60*1000 });
             //includeRate("udp.packetVerifyTime", stats, new long[] { 60*1000 });
             
+         if(CommentOutIn065)
             includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
             includeRate("tunnel.buildClientExpire", stats, new long[] { 10*60*1000 });
             includeRate("tunnel.buildClientReject", stats, new long[] { 10*60*1000 });
@@ -280,7 +280,7 @@ public class StatisticsManager implements Service {
     private void includeThroughput(Properties stats) {
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
         if (sendRate != null) {
-            if (_context.router().getUptime() > 5*60*1000) {
+            if (CommentOutIn065 && _context.router().getUptime() > 5*60*1000) {
                 Rate r = sendRate.getRate(5*60*1000);
                 if (r != null)
                     stats.setProperty("stat_bandwidthSendBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
@@ -294,7 +294,7 @@ public class StatisticsManager implements Service {
         
         RateStat recvRate = _context.statManager().getRate("bw.recvRate");
         if (recvRate != null) {
-            if (_context.router().getUptime() > 5*60*1000) {
+            if (CommentOutIn065 && _context.router().getUptime() > 5*60*1000) {
                 Rate r = recvRate.getRate(5*60*1000);
                 if (r != null)
                     stats.setProperty("stat_bandwidthReceiveBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");

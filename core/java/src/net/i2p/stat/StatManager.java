@@ -50,7 +50,7 @@ public class StatManager {
         "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout" +
         "tunnel.buildClientExpire,tunnel.buildClientReject,tunnel.buildClientSuccess," +
         "tunnel.buildExploratoryExpire,tunnel.buildExploratoryReject,tunnel.buildExploratorySuccess," +
-        "tunnel.buildRatio.*,tunnel.buildFailure,tunnel.buildSuccess,tunnel.corruptMessage," +
+        "tunnel.buildRatio.*,tunnel.corruptMessage," +
         "tunnel.decryptRequestTime,tunnel.fragmentedDropped,tunnel.participatingMessageCount,"+
         "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime," +
         "tunnel.participatingBandwidth,udp.sendPacketSize,udp.packetsRetransmitted" ;
