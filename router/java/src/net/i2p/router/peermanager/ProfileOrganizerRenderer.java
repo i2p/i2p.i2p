@@ -307,19 +307,20 @@ class ProfileOrganizerRenderer {
         
     }
     
-    private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
+    private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
+    private final static String na = "n/a";
 
     String avg (PeerProfile prof, long rate) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
-                return "0ms";
+                return na;
             Rate r = rs.getRate(rate);
             if (r == null)
-                return "0ms";
+                return na;
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             if (c == 0)
-                return "0ms";
+                return na;
             double d = r.getCurrentTotalValue() + r.getLastTotalValue();
             return Math.round(d/c) + "ms";
     }
@@ -327,10 +328,10 @@ class ProfileOrganizerRenderer {
     String davg (DBHistory dbh, long rate) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
-                return num(0d);
+                return na;
             Rate r = rs.getRate(rate);
             if (r == null)
-                return num(0d);
+                return na;
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             return "" + c;
     }

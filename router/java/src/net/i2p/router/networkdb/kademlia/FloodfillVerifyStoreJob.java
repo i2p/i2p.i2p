@@ -25,6 +25,7 @@ import net.i2p.util.Log;
 public class FloodfillVerifyStoreJob extends JobImpl {
     private Log _log;
     private Hash _key;
+    private Hash _target;
     private FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
     private long _sendTime;
@@ -44,8 +45,8 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     }
     public String getName() { return "Verify netdb store"; }
     public void runJob() { 
-        Hash target = pickTarget();
-        if (target == null) return;
+        _target = pickTarget();
+        if (_target == null) return;
         
         DatabaseLookupMessage lookup = buildLookup();
         if (lookup == null) return;
@@ -60,7 +61,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         _sendTime = getContext().clock().now();
         _expiration = _sendTime + VERIFY_TIMEOUT;
         getContext().messageRegistry().registerPending(new VerifyReplySelector(), new VerifyReplyJob(getContext()), new VerifyTimeoutJob(getContext()), VERIFY_TIMEOUT);
-        getContext().tunnelDispatcher().dispatchOutbound(lookup, outTunnel.getSendTunnelId(0), target);
+        getContext().tunnelDispatcher().dispatchOutbound(lookup, outTunnel.getSendTunnelId(0), _target);
     }
     
     private Hash pickTarget() {
@@ -121,12 +122,20 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         }
         public String getName() { return "Handle floodfill verification reply"; }
         public void runJob() {
+            long delay = getContext().clock().now() - _sendTime;
             if (_message instanceof DatabaseStoreMessage) {
                 // store ok, w00t!
-                getContext().statManager().addRateData("netDb.floodfillVerifyOK", getContext().clock().now() - _sendTime, 0);
+                // Hmm should we verify it's as recent as the one we sent???
+                getContext().profileManager().dbLookupSuccessful(_target, delay);
+                getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
             } else {
                 // store failed, boo, hiss!
-                getContext().statManager().addRateData("netDb.floodfillVerifyFail", getContext().clock().now() - _sendTime, 0);
+                if (_message instanceof DatabaseSearchReplyMessage) {
+                    // assume 0 old, all new, 0 invalid, 0 dup
+                    getContext().profileManager().dbLookupReply(_target,  0,
+                                ((DatabaseSearchReplyMessage)_message).getNumReplies(), 0, 0, delay);
+                }
+                getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
                 resend();
             }
         }        
@@ -149,6 +158,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         }
         public String getName() { return "Floodfill verification timeout"; }
         public void runJob() { 
+            getContext().profileManager().dbLookupFailed(_target);
             getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime, 0);
             resend(); 
         }

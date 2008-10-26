@@ -809,6 +809,10 @@ class SearchReplyJob extends JobImpl {
         _newPeers = 0;
         _duplicatePeers = 0;
         _repliesPendingVerification = 0;
+        if (duration > 0)
+            _duration = duration;
+        else
+            _duration = 0;
     }
     public String getName() { return "Process Reply for Kademlia Search"; }
     public void runJob() {
