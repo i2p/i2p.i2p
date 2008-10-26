@@ -129,7 +129,7 @@
                 <label for="localDestination" accesskey="L">
                     <span class="accessKey">L</span>ocal destination:
                 </label>
-                <input type="text" size="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" value="<%=editBean.getDestinationBase64(curTunnel)%>" class="freetext" />               
+                <textarea rows="1" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
                 <span class="comment">(if known)</span>
             </div>
             
