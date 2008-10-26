@@ -93,16 +93,16 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     if (prevNetDb == null) {
                         if ((!getContext().shitlist().isShitlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(key) &&
-                            _log.shouldLog(Log.ERROR))
-                                _log.error("Blocklisting new peer " + key);
+                            _log.shouldLog(Log.WARN))
+                                _log.warn("Blocklisting new peer " + key);
                     } else {
                         Set oldAddr = prevNetDb.getAddresses();
                         Set newAddr = _message.getRouterInfo().getAddresses();
                         if (newAddr != null && (!newAddr.equals(oldAddr)) &&
                             (!getContext().shitlist().isShitlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(key) &&
-                            _log.shouldLog(Log.ERROR))
-                                _log.error("New address received, Blocklisting old peer " + key);
+                            _log.shouldLog(Log.WARN))
+                                _log.warn("New address received, Blocklisting old peer " + key);
                     }
                 }
                 getContext().profileManager().heardAbout(key);

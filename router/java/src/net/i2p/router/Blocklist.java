@@ -125,8 +125,8 @@ public class Blocklist {
                 if (isBlocklisted(peer))
                     count++;
             }
-            if (count > 0 && _log.shouldLog(Log.ERROR))
-                _log.error("Blocklisted " + count + " routers in the netDb.");
+            if (count > 0 && _log.shouldLog(Log.WARN))
+                _log.warn("Blocklisted " + count + " routers in the netDb.");
             for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash) iter.next();
                 String reason = "Blocklisted by router hash";
@@ -246,13 +246,13 @@ public class Blocklist {
             return;
         }
         _blocklistSize = count - removed;
-        if (_log.shouldLog(Log.ERROR)) {
-            _log.error("Removed " + badcount + " bad entries and comment lines");
-            _log.error("Read " + count + " valid entries from the blocklist " + BLFile);
-            _log.error("Merged " + removed + " overlapping entries");
-            _log.error("Result is " + _blocklistSize + " entries");
-            _log.error("Blocking " + ipcount + " IPs and " + peercount + " hashes");
-            _log.error("Blocklist processing finished, time: " + (_context.clock().now() - start));
+        if (_log.shouldLog(Log.WARN)) {
+            _log.warn("Removed " + badcount + " bad entries and comment lines");
+            _log.warn("Read " + count + " valid entries from the blocklist " + BLFile);
+            _log.warn("Merged " + removed + " overlapping entries");
+            _log.warn("Result is " + _blocklistSize + " entries");
+            _log.warn("Blocking " + ipcount + " IPs and " + peercount + " hashes");
+            _log.warn("Blocklist processing finished, time: " + (_context.clock().now() - start));
         }
     }
 
@@ -443,8 +443,8 @@ public class Blocklist {
         if (ip.length != 4)
             return;
         if (add(toInt(ip)))
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Adding IP to blocklist: " + (ip[0]&0xff) + '.' + (ip[1]&0xff) + '.' + (ip[2]&0xff) + '.' + (ip[3]&0xff));
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Adding IP to blocklist: " + (ip[0]&0xff) + '.' + (ip[1]&0xff) + '.' + (ip[2]&0xff) + '.' + (ip[3]&0xff));
     }
 
     private boolean add(int ip) {
@@ -737,8 +737,8 @@ public class Blocklist {
                                 reason = reason + '.';
                         }
                         reason = reason + " blocklisted by entry \"" + buf + "\"";
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Shitlisting " + peer + " " + reason);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Shitlisting " + peer + " " + reason);
                         _context.shitlist().shitlistRouterForever(peer, reason);
                         return;
                     }
