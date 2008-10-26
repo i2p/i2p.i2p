@@ -69,7 +69,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /** summary info to distribute */
     private RouterAddress _externalAddress;
-    /** port number on which we can be reached, or -1 */
+    /** port number on which we can be reached, or -1 for error, or 0 for unset */
     private int _externalListenPort;
     /** IP address of externally reachable host, or null */
     private InetAddress _externalListenHost;
@@ -224,11 +224,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Selecting an arbitrary port to bind to: " + port);
                 _context.router().setConfigSetting(PROP_INTERNAL_PORT, port+"");
-                // attempt to use it as our external port - this will be overridden by
-                // externalAddressReceived(...)
-                _context.router().setConfigSetting(PROP_EXTERNAL_PORT, port+"");
-                _context.router().saveConfig();
             }
+            // attempt to use it as our external port - this will be overridden by
+            // externalAddressReceived(...)
+            _context.router().setConfigSetting(PROP_EXTERNAL_PORT, port+"");
+            _context.router().saveConfig();
         } else {
             port = _externalListenPort;
             if (_log.shouldLog(Log.INFO))
@@ -989,21 +989,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         shutdown();
     }
     
-    void setExternalListenPort(int port) { _externalListenPort = port; }
-    void setExternalListenHost(InetAddress addr) { _externalListenHost = addr; }
-    void setExternalListenHost(byte addr[]) throws UnknownHostException { 
-        _externalListenHost = InetAddress.getByAddress(addr); 
-    }
-
     private boolean explicitAddressSpecified() {
         return (_context.getProperty(PROP_EXTERNAL_HOST) != null);
     }
     
     void rebuildExternalAddress() { rebuildExternalAddress(true); }
     void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
-        if (_context.router().isHidden())
-            return;
-        
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         String port = _context.getProperty(PROP_EXTERNAL_PORT);
@@ -1024,6 +1015,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
             
+        if (_context.router().isHidden())
+            return;
+        
         Properties options = new Properties(); 
         boolean directIncluded = false;
         if ( allowDirectUDP() && (_externalListenPort > 0) && (_externalListenHost != null) && (isValid(_externalListenHost.getAddress())) ) {
@@ -2090,9 +2084,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final String PROP_SHOULD_TEST = "i2np.udp.shouldTest";
     
     private boolean shouldTest() {
-        if (true) return true;
-        String val = _context.getProperty(PROP_SHOULD_TEST);
-        return ( (val != null) && ("true".equals(val)) );
+        return ! _context.router().isHidden();
+        //String val = _context.getProperty(PROP_SHOULD_TEST);
+        //return ( (val != null) && ("true".equals(val)) );
     }
     
     private class PeerTestEvent implements SimpleTimer.TimedEvent {

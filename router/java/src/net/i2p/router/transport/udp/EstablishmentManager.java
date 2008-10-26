@@ -278,7 +278,8 @@ public class EstablishmentManager {
             }
         }
         if (isNew) {
-            if (!_transport.introducersRequired()) {
+            // we don't expect inbound connections when hidden, but it could happen
+            if ((!_context.router().isHidden()) && !_transport.introducersRequired()) {
                 long tag = _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
                 if (_log.shouldLog(Log.INFO))
