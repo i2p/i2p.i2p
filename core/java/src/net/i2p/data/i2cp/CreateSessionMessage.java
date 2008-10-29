@@ -70,6 +70,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof CreateSessionMessage)) {
             CreateSessionMessage msg = (CreateSessionMessage) object;
@@ -79,6 +80,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[CreateSessionMessage: ");

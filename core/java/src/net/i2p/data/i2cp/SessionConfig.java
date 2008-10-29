@@ -59,6 +59,7 @@ public class SessionConfig extends DataStructureImpl {
     /**
      * Retrieve the destination for which this session is supposed to connect
      *
+     * @return Destination for this session
      */
     public Destination getDestination() {
         return _destination;
@@ -68,6 +69,7 @@ public class SessionConfig extends DataStructureImpl {
      * Determine when this session was authorized by the destination (so we can
      * prevent replay attacks)
      *
+     * @return Date
      */
     public Date getCreationDate() {
         return _creationDate;
@@ -80,6 +82,7 @@ public class SessionConfig extends DataStructureImpl {
     /**
      * Retrieve any configuration options for the session
      * 
+     * @return Properties of this session
      */
     public Properties getOptions() {
         return _options;
@@ -88,6 +91,7 @@ public class SessionConfig extends DataStructureImpl {
     /**
      * Configure the session with the given options
      *
+     * @param options Properties for this session
      */
     public void setOptions(Properties options) {
         _options = options;
@@ -104,6 +108,8 @@ public class SessionConfig extends DataStructureImpl {
     /**
      * Sign the structure using the supplied private key 
      *
+     * @param signingKey SigningPrivateKey to sign with
+     * @throws DataFormatException
      */
     public void signSessionConfig(SigningPrivateKey signingKey) throws DataFormatException {
         byte data[] = getBytes();
@@ -197,6 +203,7 @@ public class SessionConfig extends DataStructureImpl {
         _signature.writeBytes(out);
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionConfig)) {
             SessionConfig cfg = (SessionConfig) object;
@@ -209,6 +216,7 @@ public class SessionConfig extends DataStructureImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer("[SessionConfig: ");
         buf.append("\n\tDestination: ").append(getDestination());

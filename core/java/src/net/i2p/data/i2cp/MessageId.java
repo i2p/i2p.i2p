@@ -52,15 +52,18 @@ public class MessageId extends DataStructureImpl {
         DataHelper.writeLong(out, 4, _messageId);
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof MessageId)) return false;
         return DataHelper.eq(getMessageId(), ((MessageId) object).getMessageId());
     }
 
+    @Override
     public int hashCode() {
         return (int)getMessageId();
     }
 
+    @Override
     public String toString() {
         return "[MessageId: " + getMessageId() + "]";
     }

@@ -121,7 +121,9 @@ public class MessageStatusMessage extends I2CPMessageImpl {
     
     /** 
      * Override to reduce mem churn
+     * @throws IOException 
      */
+    @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         int len = 2 + // sessionId
                   4 + // messageId
@@ -150,6 +152,7 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof MessageStatusMessage)) {
             MessageStatusMessage msg = (MessageStatusMessage) object;
@@ -161,6 +164,7 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[MessageStatusMessage: ");

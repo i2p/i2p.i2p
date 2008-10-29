@@ -49,15 +49,18 @@ public class SessionId extends DataStructureImpl {
         DataHelper.writeLong(out, 2, _sessionId);
     }
 
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof SessionId)) return false;
         return getSessionId() == ((SessionId) obj).getSessionId();
     }
 
+    @Override
     public int hashCode() {
         return getSessionId();
     }
 
+    @Override
     public String toString() {
         return "[SessionId: " + getSessionId() + "]";
     }

@@ -49,15 +49,18 @@ public class AbuseReason extends DataStructureImpl {
         DataHelper.writeString(out, _reason);
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof AbuseReason)) return false;
         return DataHelper.eq(getReason(), ((AbuseReason) object).getReason());
     }
 
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getReason());
     }
 
+    @Override
     public String toString() {
         return "[AbuseReason: " + getReason() + "]";
     }

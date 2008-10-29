@@ -82,6 +82,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionStatusMessage)) {
             SessionStatusMessage msg = (SessionStatusMessage) object;
@@ -91,6 +92,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[SessionStatusMessage: ");
