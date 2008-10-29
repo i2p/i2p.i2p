@@ -91,21 +91,26 @@ public class I2CPMessageReader {
          * Notify the listener that a message has been received from the given
          * reader
          *
-         */
+	 * @param reader I2CPMessageReader to notify
+	 * @param message the I2CPMessage
+	 */
         public void messageReceived(I2CPMessageReader reader, I2CPMessage message);
 
         /**
          * Notify the listener that an exception was thrown while reading from the given
          * reader
          *
-         */
+	 * @param reader I2CPMessageReader to notify
+	 * @param error Exception that was thrown
+	 */
         public void readError(I2CPMessageReader reader, Exception error);
 
         /**
          * Notify the listener that the stream the given reader was running off
          * closed
          *
-         */
+	 * @param reader I2CPMessageReader to notify
+	 */
         public void disconnected(I2CPMessageReader reader);
     }
 

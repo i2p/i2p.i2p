@@ -108,6 +108,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof ReportAbuseMessage)) {
             ReportAbuseMessage msg = (ReportAbuseMessage) object;
@@ -118,6 +119,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[ReportAbuseMessage: ");

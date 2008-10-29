@@ -50,15 +50,18 @@ public class AbuseSeverity extends DataStructureImpl {
         DataHelper.writeLong(out, 1, _severityId);
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof AbuseSeverity)) return false;
         return DataHelper.eq(getSeverity(), ((AbuseSeverity) object).getSeverity());
     }
 
+    @Override
     public int hashCode() {
         return getSeverity();
     }
 
+    @Override
     public String toString() {
         return "[AbuseSeverity: " + getSeverity() + "]";
     }

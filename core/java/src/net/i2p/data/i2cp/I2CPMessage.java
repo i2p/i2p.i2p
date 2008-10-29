@@ -52,6 +52,7 @@ public interface I2CPMessage extends DataStructure {
      * Write the current message to the output stream as a full message following
      * the specification from the I2CP definition.
      * 
+     * @param out OutputStream
      * @throws I2CPMessageException if the current object doesn't have sufficient data
      *          to write a properly formatted message.
      * @throws IOException if there is a problem writing to the stream
@@ -61,6 +62,7 @@ public interface I2CPMessage extends DataStructure {
     /**
      * Return the unique identifier for this type of APIMessage, as specified in the 
      * network specification document under #ClientAccessLayerMessages
+     * @return unique identifier for this type of APIMessage
      */
     public int getType();
 }

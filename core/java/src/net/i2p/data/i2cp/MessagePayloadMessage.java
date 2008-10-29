@@ -80,7 +80,9 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
      * Write out the full message to the stream, including the 4 byte size and 1 
      * byte type header.
      *
+     * @throws IOException 
      */
+    @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         if (_sessionId <= 0)
             throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
@@ -106,6 +108,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof MessagePayloadMessage)) {
             MessagePayloadMessage msg = (MessagePayloadMessage) object;
@@ -117,6 +120,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[MessagePayloadMessage: ");

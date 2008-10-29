@@ -79,7 +79,9 @@ public class SendMessageMessage extends I2CPMessageImpl {
     /**
      * Read the body into the data structures
      *
+     * @throws IOException 
      */
+    @Override
     public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
         if (type != getType())
             throw new I2CPMessageException("Invalid message type (found: " + type + " supported: " + getType()
@@ -107,7 +109,9 @@ public class SendMessageMessage extends I2CPMessageImpl {
      * Write out the full message to the stream, including the 4 byte size and 1 
      * byte type header.  Override the parent so we can be more mem efficient
      *
+     * @throws IOException 
      */
+    @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         if ((_sessionId == null) || (_destination == null) || (_payload == null) || (_nonce <= 0))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -129,6 +133,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SendMessageMessage)) {
             SendMessageMessage msg = (SendMessageMessage) object;
@@ -140,6 +145,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[SendMessageMessage: ");

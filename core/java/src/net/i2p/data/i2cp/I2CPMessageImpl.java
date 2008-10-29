@@ -32,6 +32,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
     /**
      * Validate the type and size of the message, and then read the message into the data structures.  <p />
      *
+     * @throws IOException 
      */
     public void readMessage(InputStream in) throws I2CPMessageException, IOException {
         int length = 0;
@@ -53,6 +54,8 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
     /**
      * Read the body into the data structures
      *
+     * @param length number of bytes in the message payload
+     * @throws IOException
      */
     public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
         if (type != getType())
@@ -77,6 +80,10 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      * Read in the payload part of the message (after the initial 4 byte size and 1
      * byte type)
      *
+     * @param buf InputStream
+     * @param size payload size
+     * @throws I2CPMessageException
+     * @throws IOException
      */
     protected abstract void doReadMessage(InputStream buf, int size) throws I2CPMessageException, IOException;
 
@@ -84,6 +91,9 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      * Write out the payload part of the message (not including the 4 byte size and
      * 1 byte type)
      *
+     * @return byte array
+     * @throws I2CPMessageException
+     * @throws IOException
      */
     protected abstract byte[] doWriteMessage() throws I2CPMessageException, IOException;
 
@@ -91,6 +101,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      * Write out the full message to the stream, including the 4 byte size and 1 
      * byte type header.
      *
+     * @throws IOException 
      */
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         byte[] data = doWriteMessage();
