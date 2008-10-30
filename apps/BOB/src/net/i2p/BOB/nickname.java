@@ -30,10 +30,8 @@ package net.i2p.BOB;
  */
 public class nickname {
 
-	private static final int maxWritersWaiting = 2;
 	private volatile Object[][] data;
 	private volatile int index,  writersWaiting,  readers;
-	private volatile boolean writingInProgress;
 
 	/**
 	 * make initial NULL object
@@ -42,40 +40,35 @@ public class nickname {
 	public nickname() {
 		this.data = new Object[1][2];
 		this.index = this.writersWaiting = this.readers = 0;
-		this.writingInProgress = false;
 	}
 
 	synchronized public void getReadLock() {
-		while(writingInProgress | (writersWaiting >= maxWritersWaiting)) {
+		while((writersWaiting != 0)) {
 			try {
 				wait();
 			} catch(InterruptedException ie) {
 			}
-			readers++;
 		}
+		readers++;
 	}
 
 	synchronized public void releaseReadLock() {
 		readers--;
-		if((readers == 0) & (writersWaiting > 0)) {
-			notifyAll();
-		}
+		notifyAll();
 	}
 
 	synchronized public void getWriteLock() {
 		writersWaiting++;
-		while((readers > 0) | writingInProgress) {
+		while(readers != 0 && writersWaiting != 1 ) {
 			try {
 				wait();
 			} catch(InterruptedException ie) {
 			}
 		}
-		writersWaiting--;
-		writingInProgress = true;
 	}
 
 	synchronized public void releaseWriteLock() {
-		writingInProgress = false;
+		writersWaiting--;
 		notifyAll();
 	}
 
@@ -84,7 +77,7 @@ public class nickname {
 	 * @param key
 	 * @return an objects index
 	 */
-	public synchronized int idx(Object key) {
+	public int idx(Object key) {
 		for(int i = 0; i < index; i++) {
 			if(key.equals(data[i][0])) {
 				return i;
@@ -98,7 +91,7 @@ public class nickname {
 	 *
 	 * @param key
 	 */
-	public synchronized void kill(Object key) {
+	public void kill(Object key) {
 
 		int i, j, k, l;
 		Object[][] olddata;
@@ -131,7 +124,7 @@ public class nickname {
 	 * @param key
 	 * @param val
 	 */
-	public synchronized void add(Object key, Object val) {
+	public void add(Object key, Object val) {
 		Object[][] olddata;
 		int i, j;
 		i = 0;
@@ -155,7 +148,7 @@ public class nickname {
 	 * @return Object
 	 * @throws java.lang.RuntimeException
 	 */
-	public synchronized Object get(Object key) throws RuntimeException {
+	public Object get(Object key) throws RuntimeException {
 		for(int i = 0; i < index; i++) {
 			if(key.equals(data[i][0])) {
 				return data[i][1];
@@ -170,7 +163,7 @@ public class nickname {
 	 * @param key
 	 * @return true if an object exists, else returns false
 	 */
-	public synchronized boolean exists(Object key) {
+	public boolean exists(Object key) {
 		for(int i = 0; i < index; i++) {
 			if(key.equals(data[i][0])) {
 				return true;
@@ -186,7 +179,7 @@ public class nickname {
 	 * @return an indexed Object
 	 * @throws java.lang.RuntimeException
 	 */
-	public synchronized Object getnext(int i) throws RuntimeException {
+	public Object getnext(int i) throws RuntimeException {
 		if(i < index && i > -1) {
 			return data[i][1];
 		}
@@ -196,7 +189,7 @@ public class nickname {
 	/**
 	 * @return the count of how many objects
 	 */
-	public synchronized int getcount() {
+	public int getcount() {
 		return index;
 	}
 }

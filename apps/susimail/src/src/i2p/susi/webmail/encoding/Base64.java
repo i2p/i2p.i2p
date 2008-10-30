@@ -42,8 +42,8 @@ public class Base64 implements Encoding {
 		return "base64";
 	}
 	/**
-	 * @param string
 	 * @return
+	 * @throws EncodingException 
 	 */
 	public String encode( byte in[] ) throws EncodingException
 	{
@@ -172,7 +172,7 @@ public class Base64 implements Encoding {
 	}
 
 	/**
-	 * @param str
+	 * @param text 
 	 * @return
 	 */
 	public ReadBuffer decode(String text) throws DecodingException {

@@ -36,37 +36,44 @@ public interface Encoding {
 	 * 
 	 * @param in
 	 * @return
+	 * @throws EncodingException 
 	 */
 	public String encode( byte in[] ) throws EncodingException;
 	/**
 	 * 
 	 * @param str
 	 * @return
+	 * @throws EncodingException 
 	 */
 	public String encode( String str ) throws EncodingException;
 	/**
 	 * 
 	 * @param in
 	 * @return
+	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( byte in[] ) throws DecodingException;
 	/**
 	 * 
 	 * @param in
-	 * @param size
+	 * @param offset 
+	 * @param length 
 	 * @return
+	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException;
 	/**
 	 * 
 	 * @param str
 	 * @return
+	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( String str ) throws DecodingException;
 	/**
 	 * 
 	 * @param in
 	 * @return
+	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( ReadBuffer in ) throws DecodingException;
 }
