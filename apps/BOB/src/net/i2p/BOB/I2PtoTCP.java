@@ -36,7 +36,7 @@ import net.i2p.client.streaming.I2PSocket;
 public class I2PtoTCP implements Runnable {
 
 	private I2PSocket I2P;
-	private nickname info,  database;
+	private NamedDB info,  database;
 	private Socket sock;
 
 	/**
@@ -46,10 +46,20 @@ public class I2PtoTCP implements Runnable {
 	 * @param info
 	 * @param database
 	 */
-	I2PtoTCP(I2PSocket I2Psock, nickname info, nickname database) {
+	I2PtoTCP(I2PSocket I2Psock, NamedDB info, NamedDB database) {
 		this.I2P = I2Psock;
 		this.info = info;
 		this.database = database;
+	}
+
+	private void rlock() throws Exception {
+		database.getReadLock();
+		info.getReadLock();
+	}
+
+	private void runlock() throws Exception {
+		database.releaseReadLock();
+		info.releaseReadLock();
 	}
 
 	/**
@@ -57,54 +67,72 @@ public class I2PtoTCP implements Runnable {
 	 *
 	 */
 	public void run() {
-
-		try {
-			database.getReadLock();
-			info.getReadLock();
-			String host = info.get("OUTHOST").toString();
-			int port = Integer.parseInt(info.get("OUTPORT").toString());
-			boolean tell = info.get("QUIET").equals(Boolean.FALSE);
-			info.releaseReadLock();
-			database.releaseReadLock();
-			sock = new Socket(host, port);
-			// make readers/writers
-			InputStream in = sock.getInputStream();
-			OutputStream out = sock.getOutputStream();
-			InputStream Iin = I2P.getInputStream();
-			OutputStream Iout = I2P.getOutputStream();
-			I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
-
-			if(tell) {
-				// tell who is connecting
-				out.write(I2P.getPeerDestination().toBase64().getBytes());
-				out.write(10); // nl
-				out.flush(); // not really needed, but...
-			}
-			// setup to cross the streams
-			TCPio conn_c = new TCPio(in, Iout, info, database); // app -> I2P
-			TCPio conn_a = new TCPio(Iin, out, info, database); // I2P -> app
-			Thread t = new Thread(conn_c, "TCPioA");
-			Thread q = new Thread(conn_a, "TCPioB");
-			// Fire!
-			t.start();
-			q.start();
-			while(t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
+		String host;
+		int port;
+		boolean tell;
+die:            {
+			try {
 				try {
-					Thread.sleep(10); //sleep for 10 ms
-				} catch(InterruptedException e) {
-					// nop
+					rlock();
+				} catch(Exception e) {
+					break die;
 				}
-			}
+				try {
+					host = info.get("OUTHOST").toString();
+					port = Integer.parseInt(info.get("OUTPORT").toString());
+					tell = info.get("QUIET").equals(Boolean.FALSE);
+				} catch(Exception e) {
+					runlock();
+					break die;
+				}
+				try {
+					runlock();
+				} catch(Exception e) {
+					break die;
+				}
+				sock = new Socket(host, port);
+				// make readers/writers
+				InputStream in = sock.getInputStream();
+				OutputStream out = sock.getOutputStream();
+				InputStream Iin = I2P.getInputStream();
+				OutputStream Iout = I2P.getOutputStream();
+				I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
 
-		} catch(Exception e) {
-		}
+				if(tell) {
+					// tell who is connecting
+					out.write(I2P.getPeerDestination().toBase64().getBytes());
+					out.write(10); // nl
+					out.flush(); // not really needed, but...
+				}
+				// setup to cross the streams
+				TCPio conn_c = new TCPio(in, Iout, info, database); // app -> I2P
+				TCPio conn_a = new TCPio(Iin, out, info, database); // I2P -> app
+				Thread t = new Thread(conn_c, "TCPioA");
+				Thread q = new Thread(conn_a, "TCPioB");
+				// Fire!
+				t.start();
+				q.start();
+				while(t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
+					try {
+						Thread.sleep(10); //sleep for 10 ms
+					} catch(InterruptedException e) {
+						// nop
+					}
+				}
+
+			} catch(Exception e) {
+				break die;
+			}
+		} // die
 		try {
 			I2P.close();
 		} catch(Exception e) {
+			tell = false;
 		}
 		try {
 			sock.close();
 		} catch(Exception e) {
+			tell = false;
 		}
 	}
 }

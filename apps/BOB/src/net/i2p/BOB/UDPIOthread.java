@@ -45,7 +45,7 @@ import net.i2p.util.Log;
  */
 public class UDPIOthread implements I2PSessionListener, Runnable {
 
-	private nickname info;
+	private NamedDB info;
 	private Log _log;
 	private Socket socket;
 	private DataInputStream in;
@@ -61,7 +61,7 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 	 * @param socket
 	 * @param _session
 	 */
-	UDPIOthread(nickname info, Log _log, Socket socket, I2PSession _session) {
+	UDPIOthread(NamedDB info, Log _log, Socket socket, I2PSession _session) {
 		this.info = info;
 		this._log = _log;
 		this.socket = socket;

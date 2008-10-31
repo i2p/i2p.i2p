@@ -113,7 +113,7 @@ public class BOB {
 	public final static String PROP_BOB_PORT = "BOB.port";
 	public final static String PROP_BOB_HOST = "BOB.host";
 	private static int maxConnections = 0;
-	private static nickname database;
+	private static NamedDB database;
 
 	/**
 	 * Log a warning
@@ -141,7 +141,7 @@ public class BOB {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		database = new nickname();
+		database = new NamedDB();
 		int i = 0;
 		boolean save = false;
 		// Set up all defaults to be passed forward to other threads.
@@ -212,10 +212,10 @@ public class BOB {
 			Socket server;
 
 			while((i++ < maxConnections) || (maxConnections == 0)) {
-				//doCMDS connection;
+				//DoCMDS connection;
 
 				server = listener.accept();
-				doCMDS conn_c = new doCMDS(server, props, database, _log);
+				DoCMDS conn_c = new DoCMDS(server, props, database, _log);
 				Thread t = new Thread(conn_c);
 				t.start();
 			}

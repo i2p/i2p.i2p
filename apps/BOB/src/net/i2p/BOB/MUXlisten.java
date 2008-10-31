@@ -41,7 +41,7 @@ import net.i2p.util.Log;
  */
 public class MUXlisten implements Runnable {
 
-	private nickname database,  info;
+	private NamedDB database,  info;
 	private Log _log;
 	private I2PSocketManager socketManager;
 	private ByteArrayInputStream prikey;
@@ -51,6 +51,7 @@ public class MUXlisten implements Runnable {
 	private int backlog = 50; // should this be more? less?
 	boolean go_out;
 	boolean come_in;
+
 	/**
 	 * Constructor Will fail if INPORT is occupied.
 	 *
@@ -60,7 +61,7 @@ public class MUXlisten implements Runnable {
 	 * @throws net.i2p.I2PException
 	 * @throws java.io.IOException
 	 */
-	MUXlisten(nickname database, nickname info, Log _log) throws I2PException, IOException {
+	MUXlisten(NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
 		int port = 0;
 		InetAddress host = null;
 		this.database = database;
@@ -90,7 +91,7 @@ public class MUXlisten implements Runnable {
 		if(this.come_in) {
 			this.listener = new ServerSocket(port, backlog, host);
 		}
-		
+
 		// Everything is OK as far as we can tell.
 		this.database.getWriteLock();
 		this.info.getWriteLock();
@@ -99,82 +100,143 @@ public class MUXlisten implements Runnable {
 		this.database.releaseWriteLock();
 	}
 
+	private void rlock() throws Exception {
+		database.getReadLock();
+		info.getReadLock();
+	}
+
+	private void runlock() throws Exception {
+		database.releaseReadLock();
+		info.releaseReadLock();
+	}
+
+	private void wlock() throws Exception {
+		database.getWriteLock();
+		info.getWriteLock();
+	}
+
+	private void wunlock() throws Exception {
+		info.releaseWriteLock();
+		database.releaseWriteLock();
+	}
+
 	/**
 	 * MUX sockets, fire off a thread to connect, get destination info, and do I/O
 	 *
 	 */
 	public void run() {
 
-		this.database.getWriteLock();
-		this.info.getWriteLock();
-		info.add("RUNNING", Boolean.TRUE);
-		info.add("STARTING", Boolean.FALSE);
-		this.info.releaseWriteLock();
-		this.database.releaseWriteLock();
-
 		try {
-			tg = new ThreadGroup(N);
-
-			// toss the connections to a new threads.
-			// will wrap with TCP and UDP when UDP works
-
-			if(go_out) {
-				// I2P -> TCP
-				I2Plistener conn = new I2Plistener(socketManager, info, database, _log);
-				Thread t = new Thread(tg, conn, "BOBI2Plistener " + N);
-				t.start();
+			wlock();
+			try {
+				info.add("RUNNING", Boolean.TRUE);
+				info.add("STARTING", Boolean.FALSE);
+			} catch(Exception e) {
+				wunlock();
+				return;
 			}
-
-			if(come_in) {
-				// TCP -> I2P
-				TCPlistener conn = new TCPlistener(listener, socketManager, info, database, _log);
-				Thread q = new Thread(tg, conn, "BOBTCPlistener" + N);
-				q.start();
-			}
-
-			boolean spin = true;
-			while(spin) {
-				try {
-					Thread.sleep(1000); //sleep for 1000 ms (One second)
-				} catch(InterruptedException e) {
-					// nop
-				}
-
-				this.database.getReadLock();
-				this.info.getReadLock();
-				spin = info.get("STOPPING").equals(Boolean.FALSE);
-				this.database.releaseReadLock();
-				this.info.releaseReadLock();
-			}
-
-			this.database.getWriteLock();
-			this.info.getWriteLock();
-			info.add("RUNNING", Boolean.FALSE);
-			this.info.releaseWriteLock();
-			this.database.releaseWriteLock();
-
-			// wait for child threads and thread groups to die
-			while(tg.activeCount() + tg.activeGroupCount() != 0) {
-				try {
-					Thread.sleep(1000); //sleep for 1000 ms (One second)
-				} catch(InterruptedException ex) {
-					// nop
-				}
-			}
-			tg.destroy();
-			// Zap reference to the ThreadGroup so the JVM can GC it.
-			tg = null;
 		} catch(Exception e) {
+			return;
+		}
+		try {
+			wunlock();
+		} catch(Exception e) {
+			return;
 		}
 
+quit:           {
+			try {
+				tg = new ThreadGroup(N);
+die:                            {
+					// toss the connections to a new threads.
+					// will wrap with TCP and UDP when UDP works
+
+					if(go_out) {
+						// I2P -> TCP
+						I2Plistener conn = new I2Plistener(socketManager, info, database, _log);
+						Thread t = new Thread(tg, conn, "BOBI2Plistener " + N);
+						t.start();
+					}
+
+					if(come_in) {
+						// TCP -> I2P
+						TCPlistener conn = new TCPlistener(listener, socketManager, info, database, _log);
+						Thread q = new Thread(tg, conn, "BOBTCPlistener" + N);
+						q.start();
+					}
+
+					boolean spin = true;
+					while(spin) {
+						try {
+							Thread.sleep(1000); //sleep for 1000 ms (One second)
+						} catch(InterruptedException e) {
+							// nop
+						}
+						try {
+							rlock();
+							try {
+								spin = info.get("STOPPING").equals(Boolean.FALSE);
+							} catch(Exception e) {
+								runlock();
+								break die;
+							}
+						} catch(Exception e) {
+							break die;
+						}
+						try {
+							runlock();
+						} catch(Exception e) {
+							break die;
+						}
+					}
+
+					try {
+						wlock();
+						try {
+							info.add("RUNNING", Boolean.FALSE);
+						} catch(Exception e) {
+							wunlock();
+							break die;
+						}
+					} catch(Exception e) {
+						break die;
+					}
+					try {
+						wunlock();
+					} catch(Exception e) {
+						break die;
+					}
+				} // die
+				// wait for child threads and thread groups to die
+				while(tg.activeCount() + tg.activeGroupCount() != 0) {
+					try {
+						Thread.sleep(1000); //sleep for 1000 ms (One second)
+					} catch(InterruptedException ex) {
+						// nop
+						}
+				}
+				tg.destroy();
+				// Zap reference to the ThreadGroup so the JVM can GC it.
+				tg = null;
+			} catch(Exception e) {
+				break quit;
+			}
+		} // quit
 		socketManager.destroySocketManager();
 		// zero out everything, just incase.
-		this.database.getWriteLock();
-		this.info.getWriteLock();
-		info.add("STARTING", Boolean.FALSE);
-		info.add("STOPPING", Boolean.FALSE);
-		info.add("RUNNING", Boolean.FALSE);
-		this.info.releaseWriteLock();
-		this.database.releaseWriteLock();
+		try {
+			wlock();
+			try {
+				info.add("STARTING", Boolean.FALSE);
+				info.add("STOPPING", Boolean.FALSE);
+				info.add("RUNNING", Boolean.FALSE);
+			} catch(Exception e) {
+				wunlock();
+				return;
+			}
+			wunlock();
+		} catch(Exception e) {
+			return;
+		}
 	}
 }

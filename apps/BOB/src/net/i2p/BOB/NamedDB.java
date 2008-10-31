@@ -28,7 +28,7 @@ package net.i2p.BOB;
  *
  * @author sponge
  */
-public class nickname {
+public class NamedDB {
 
 	private volatile Object[][] data;
 	private volatile int index,  writersWaiting,  readers;
@@ -37,7 +37,7 @@ public class nickname {
 	 * make initial NULL object
 	 *
 	 */
-	public nickname() {
+	public NamedDB() {
 		this.data = new Object[1][2];
 		this.index = this.writersWaiting = this.readers = 0;
 	}
@@ -76,8 +76,9 @@ public class nickname {
 	 * Find objects in the array, returns it's index or throws exception
 	 * @param key
 	 * @return an objects index
+	 * @throws ArrayIndexOutOfBoundsException when key does not exist
 	 */
-	public int idx(Object key) {
+	public int idx(Object key) throws ArrayIndexOutOfBoundsException {
 		for(int i = 0; i < index; i++) {
 			if(key.equals(data[i][0])) {
 				return i;
@@ -115,7 +116,6 @@ public class nickname {
 		}
 		index -= didsomething;
 		data = olddata;
-
 	}
 
 	/**

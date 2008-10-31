@@ -36,7 +36,7 @@ public class TCPio implements Runnable {
 
 	private InputStream Ain;
 	private OutputStream Aout;
-	private nickname info,  database;
+	private NamedDB info,  database;
 
 	/**
 	 * Constructor
@@ -46,16 +46,13 @@ public class TCPio implements Runnable {
 	 * @param info
 	 * @param database
 	 */
-	TCPio(InputStream Ain, OutputStream Aout, nickname info, nickname database) {
+	TCPio(InputStream Ain, OutputStream Aout, NamedDB info, NamedDB database) {
 		this.Ain = Ain;
 		this.Aout = Aout;
 		this.info = info;
 		this.database = database;
 	}
 
-	/**
-	 * kill off the streams, to hopefully cause an IOException in the thread in order to kill it.
-	 */
 	/**
 	 * Copy from source to destination...
 	 * and yes, we are totally OK to block here on writes,
@@ -73,17 +70,18 @@ public class TCPio implements Runnable {
 				spin = info.get("RUNNING").equals(Boolean.TRUE);
 				info.releaseReadLock();
 				database.releaseReadLock();
-
 				b = Ain.read(a, 0, 1);
 				// System.out.println(info.get("NICKNAME").toString() + " " + b);
 				if(b > 0) {
-					Aout.write(a, 0, 1);
-				// Aout.flush(); too slow!
+					Aout.write(a, 0, b);
 				} else if(b == 0) {
-					try {
-						// Thread.yield();
-						Thread.sleep(10);
-					} catch(InterruptedException ex) {
+					Thread.yield(); // this should act like a mini sleep.
+					if(Ain.available() == 0) {
+						try {
+							// Thread.yield();
+							Thread.sleep(10);
+						} catch(InterruptedException ex) {
+						}
 					}
 				} else {
 					/* according to the specs:
@@ -97,6 +95,8 @@ public class TCPio implements Runnable {
 				}
 			}
 		} catch(Exception e) {
+			// Eject!!! Eject!!!
+			return;
 		}
 	}
 }

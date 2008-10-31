@@ -45,7 +45,7 @@ import net.i2p.i2ptunnel.I2PTunnel;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	private nickname info,  database;
+	private NamedDB info,  database;
 	private Socket sock;
 	private I2PSocketManager socketManager;
 
@@ -57,7 +57,7 @@ public class TCPtoI2P implements Runnable {
 	 * @return line of text as a String
 	 * @throws Exception
 	 */
-	public static String Lread(InputStream in) throws Exception {
+	private static String lnRead(InputStream in) throws Exception {
 		String S;
 		int b;
 		char c;
@@ -87,7 +87,7 @@ public class TCPtoI2P implements Runnable {
 	 * @param info
 	 * @param database
 	 */
-	TCPtoI2P(I2PSocketManager i2p, Socket socket, nickname info, nickname database) {
+	TCPtoI2P(I2PSocketManager i2p, Socket socket, NamedDB info, NamedDB database) {
 		this.sock = socket;
 		this.info = info;
 		this.database = database;
@@ -119,7 +119,7 @@ public class TCPtoI2P implements Runnable {
 			InputStream in = sock.getInputStream();
 			OutputStream out = sock.getOutputStream();
 			try {
-				line = Lread(in);
+				line = lnRead(in);
 				input = line.toLowerCase();
 				Destination dest = null;
 

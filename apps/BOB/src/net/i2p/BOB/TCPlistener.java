@@ -40,7 +40,7 @@ import net.i2p.util.Log;
  */
 public class TCPlistener implements Runnable {
 
-	private nickname info,  database;
+	private NamedDB info,  database;
 	private Log _log;
 	private int tgwatch;
 	public I2PSocketManager socketManager;
@@ -54,7 +54,7 @@ public class TCPlistener implements Runnable {
 	 * @param database
 	 * @param _log
 	 */
-	TCPlistener(ServerSocket listener, I2PSocketManager S, nickname info, nickname database, Log _log) {
+	TCPlistener(ServerSocket listener, I2PSocketManager S, NamedDB info, NamedDB database, Log _log) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
