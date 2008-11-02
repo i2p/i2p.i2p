@@ -45,6 +45,7 @@ div.routersummary {
 	color: inherit;
 	font-size: small;
 	clear: left; /* fixes a bug in Opera */
+	overflow: auto;
 }
 
 div.warning {

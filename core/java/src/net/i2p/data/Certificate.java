@@ -36,6 +36,9 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_HASHCASH = 1;
     /** we should not be used for anything (don't use us in the netDb, in tunnels, or tell others about us) */
     public final static int CERTIFICATE_TYPE_HIDDEN = 2;
+    /** Signed with 40-byte Signature and (optional) 32-byte hash */
+    public final static int CERTIFICATE_TYPE_SIGNED = 3;
+    public final static int CERTIFICATE_LENGTH_SIGNED_WITH_HASH = Signature.SIGNATURE_BYTES + Hash.HASH_LENGTH;
 
     public Certificate() {
         _type = 0;
@@ -149,17 +152,27 @@ public class Certificate extends DataStructureImpl {
             buf.append("Null certificate");
         else if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH)
             buf.append("Hashcash certificate");
+        else if (getCertificateType() == CERTIFICATE_TYPE_HIDDEN)
+            buf.append("Hidden certificate");
+        else if (getCertificateType() == CERTIFICATE_TYPE_SIGNED)
+            buf.append("Signed certificate");
         else
-            buf.append("Unknown certificiate type (").append(getCertificateType()).append(")");
+            buf.append("Unknown certificate type (").append(getCertificateType()).append(")");
 
         if (_payload == null) {
             buf.append(" null payload");
         } else {
             buf.append(" payload size: ").append(_payload.length);
-            int len = 32;
-            if (len > _payload.length) len = _payload.length;
-            buf.append(" first ").append(len).append(" bytes: ");
-            buf.append(DataHelper.toString(_payload, len));
+            if (getCertificateType() == CERTIFICATE_TYPE_HASHCASH) {
+                buf.append(" Stamp: ").append(new String(_payload));
+            } else if (getCertificateType() == CERTIFICATE_TYPE_SIGNED && _payload.length == CERTIFICATE_LENGTH_SIGNED_WITH_HASH) {
+                buf.append(" Signed by hash: ").append(Base64.encode(_payload, Signature.SIGNATURE_BYTES, Hash.HASH_LENGTH));
+            } else {
+                int len = 32;
+                if (len > _payload.length) len = _payload.length;
+                buf.append(" first ").append(len).append(" bytes: ");
+                buf.append(DataHelper.toString(_payload, len));
+            }
         }
         buf.append("]");
         return buf.toString();

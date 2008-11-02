@@ -17,17 +17,17 @@ import java.io.OutputStream;
 import net.i2p.util.Log;
 
 /**
- * Defines an end point in the I2P network.  The Destination may move aroundn
+ * Defines an end point in the I2P network.  The Destination may move around
  * in the network, but messages sent to the Destination will find it
  *
  * @author jrandom
  */
 public class Destination extends DataStructureImpl {
-    private final static Log _log = new Log(Destination.class);
-    private Certificate _certificate;
-    private SigningPublicKey _signingKey;
-    private PublicKey _publicKey;
-    private Hash __calculatedHash;
+    protected final static Log _log = new Log(Destination.class);
+    protected Certificate _certificate;
+    protected SigningPublicKey _signingKey;
+    protected PublicKey _publicKey;
+    protected Hash __calculatedHash;
 
     public Destination() {
         setCertificate(null);

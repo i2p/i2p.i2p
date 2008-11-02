@@ -1,4 +1,22 @@
-2008-10-27 zzz
+2008-11-02 zzz
+    * Certificates:
+      - Add a signed Certificate type
+      - Add a main() to PrivateKeyFile to generate
+        Destinations with various Certificate types
+      - Add a VerifiedDestination class to check Certificates
+        of various types
+      - Add a HashCash library from http://www.nettgryppa.com/code/
+        (no distribution restrictions)
+      - Allow non-null Certificates in addressbook
+    * I2PTunnel: Move some wayward stats to the I2PTunnel group
+    * NamingServices: Implement caching in the abstract class
+    * NewsFetcher: Fix last updated time
+    * Streaming: Increase MTU to 1730 (was 960);
+      see ConnectionOptions.java for analysis
+    * Throttle: Reduce default max tunnels to 2000 (was 2500)
+    * clients.config: Disable SAM and BOB by default for new installs
+
+2008-10-26 zzz
     * config.jsp: Add more help
     * peers.jsp: Clean up 'Listening on' formatting
     * profiles.jsp: Don't override locale number format

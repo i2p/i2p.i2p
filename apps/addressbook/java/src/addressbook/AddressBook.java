@@ -159,6 +159,9 @@ public class AddressBook {
         return this.addresses.toString();
     }
 
+    private static final int MIN_DEST_LENGTH = 516;
+    private static final int MAX_DEST_LENGTH = MIN_DEST_LENGTH + 100;  // longer than any known cert type for now
+
     /**
      * Do basic validation of the hostname and dest
      * hostname was already converted to lower case by ConfigParser.parse()
@@ -184,8 +187,8 @@ public class AddressBook {
                 (! host.endsWith(".router.i2p")) &&
                 (! host.endsWith(".console.i2p")) &&
 
-		dest.length() == 516 &&
-                dest.endsWith("AAAA") &&
+		((dest.length() == MIN_DEST_LENGTH && dest.endsWith("AAAA")) ||
+		 (dest.length() > MIN_DEST_LENGTH && dest.length() <= MAX_DEST_LENGTH)) &&
                 dest.replaceAll("[a-zA-Z0-9~-]", "").length() == 0
                 ;	
     }
