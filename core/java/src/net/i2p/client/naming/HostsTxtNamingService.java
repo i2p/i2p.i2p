@@ -56,13 +56,18 @@ public class HostsTxtNamingService extends NamingService {
     }
         
     public Destination lookup(String hostname) {
-        // If it's long, assume it's a key.
-        if (hostname.length() >= 516)
-            return lookupBase64(hostname);
+        Destination d = getCache(hostname);
+        if (d != null)
+            return d;
 
-        // check the list each time, reloading the file on each
-        // lookup
-        
+        // If it's long, assume it's a key.
+        if (hostname.length() >= 516) {
+            d = lookupBase64(hostname);
+            // What the heck, cache these too
+            putCache(hostname, d);
+            return d;
+        }
+
         List filenames = getFilenames();
         for (int i = 0; i < filenames.size(); i++) { 
             String hostsfile = (String)filenames.get(i);
@@ -74,7 +79,9 @@ public class HostsTxtNamingService extends NamingService {
                     
                     String key = hosts.getProperty(hostname.toLowerCase());
                     if ( (key != null) && (key.trim().length() > 0) ) {
-                        return lookupBase64(key);
+                        d = lookupBase64(key);
+                        putCache(hostname, d);
+                        return d;
                     }
                     
                 } else {

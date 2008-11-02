@@ -7,7 +7,6 @@ package net.i2p.client.naming;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -38,7 +37,6 @@ public class EepGetNamingService extends NamingService {
 
     private final static String PROP_EEPGET_LIST = "i2p.naming.eepget.list";
     private final static String DEFAULT_EEPGET_LIST = "http://i2host.i2p/cgi-bin/i2hostquery?";
-    private static Properties _hosts;
     private final static Log _log = new Log(EepGetNamingService.class);
 
     /** 
@@ -49,7 +47,6 @@ public class EepGetNamingService extends NamingService {
      */
     public EepGetNamingService(I2PAppContext context) {
         super(context);
-        _hosts = new Properties();
     }
     
     private List getURLs() {
@@ -69,11 +66,9 @@ public class EepGetNamingService extends NamingService {
         hostname = hostname.toLowerCase();
 
         // check the cache
-        String key = _hosts.getProperty(hostname);
-        if (key != null) {
-            _log.error("Found in cache: " + hostname);
-            return lookupBase64(key);
-        }
+        Destination d = getCache(hostname);
+        if (d != null)
+            return d;
 
         List URLs = getURLs();
         if (URLs.size() == 0)
@@ -91,16 +86,18 @@ public class EepGetNamingService extends NamingService {
         // lookup
         for (int i = 0; i < URLs.size(); i++) { 
             String url = (String)URLs.get(i);
-            key = fetchAddr(url, hostname);	  	
+            String key = fetchAddr(url, hostname);	  	
             if (key != null) {
                 _log.error("Success: " + url + hostname);
-                _hosts.setProperty(hostname, key);  // cache
-                return lookupBase64(key);
+                d = lookupBase64(key);
+                putCache(hostname, d);
+                return d;
             }
         }
         return null;
     }
 
+    // FIXME allow larger Dests for non-null Certs
     private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
     private static final int MAX_RESPONSE = DEST_SIZE + 68 + 10; // allow for hostname= and some trailing stuff
     private String fetchAddr(String url, String hostname) {

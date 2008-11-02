@@ -5,7 +5,6 @@
 package net.i2p.client.naming;
 
 import java.io.InputStream;
-import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
@@ -47,7 +46,6 @@ public class ExecNamingService extends NamingService {
     private final static String DEFAULT_EXEC_CMD = "/usr/local/bin/i2presolve";
     private final static String PROP_SHELL_CMD = "i2p.naming.exec.shell";
     private final static String DEFAULT_SHELL_CMD = "/bin/bash";
-    private static Properties _hosts;
     private final static Log _log = new Log(ExecNamingService.class);
 
     /** 
@@ -58,7 +56,6 @@ public class ExecNamingService extends NamingService {
      */
     public ExecNamingService(I2PAppContext context) {
         super(context);
-        _hosts = new Properties();
     }
         
     public Destination lookup(String hostname) {
@@ -69,22 +66,22 @@ public class ExecNamingService extends NamingService {
         hostname = hostname.toLowerCase();
 
         // check the cache
-        String key = _hosts.getProperty(hostname);
-        if (key != null) {
-            _log.error("Found in cache: " + hostname);
-            return lookupBase64(key);
-        }
+        Destination d = getCache(hostname);
+        if (d != null)
+            return d;
 
         // lookup
-        key = fetchAddr(hostname);	  	
+        String key = fetchAddr(hostname);	  	
         if (key != null) {
             _log.error("Success: " + hostname);
-            _hosts.setProperty(hostname, key);  // cache
-            return lookupBase64(key);
+            d = lookupBase64(key);
+            putCache(hostname, d);
+            return d;
         }
         return null;
     }
 
+    // FIXME allow larger Dests for non-null Certs
     private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
     private static final int MAX_RESPONSE = DEST_SIZE + 68 + 10; // allow for hostname= and some trailing stuff
     private String fetchAddr(String hostname) {

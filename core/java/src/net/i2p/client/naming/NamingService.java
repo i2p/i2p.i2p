@@ -8,6 +8,10 @@
 package net.i2p.client.naming;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -21,10 +25,13 @@ public abstract class NamingService {
 
     private final static Log _log = new Log(NamingService.class);
     protected I2PAppContext _context;
+    private HashMap _cache;
 
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";
     private static final String DEFAULT_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
+
+    protected static final int CACHE_MAX_SIZE = 8;
 
     
     /** 
@@ -35,6 +42,7 @@ public abstract class NamingService {
      */
     protected NamingService(I2PAppContext context) {
         _context = context;
+        _cache = new HashMap(CACHE_MAX_SIZE);
     }
     private NamingService() { // nop
     }
@@ -88,5 +96,78 @@ public abstract class NamingService {
             instance = new DummyNamingService(context); // fallback
         }
         return instance;
+    }
+
+    /**
+     *  Provide basic caching for the service
+     *  The service may override the age and/or size limit
+     */
+    /** Don't know why a dest would ever change but keep this short anyway */
+    protected static final long CACHE_MAX_AGE = 60*1000;
+
+    private class CacheEntry {
+        public Destination dest;
+        public long exp;
+        public CacheEntry(Destination d) {
+            dest = d;
+            exp = _context.clock().now() + CACHE_MAX_AGE;
+        }
+        public boolean isExpired() {
+            return exp < _context.clock().now();
+        }
+    }
+
+    /**
+     * Clean up when full.
+     * Don't bother removing old entries unless full.
+     * Caller must synchronize on _cache.
+     */
+    private void cacheClean() {
+        if (_cache.size() < CACHE_MAX_SIZE)
+            return;
+        boolean full = true;
+        Object oldestKey = null;
+        long oldestExp = Long.MAX_VALUE;
+        ArrayList deleteList = new ArrayList(CACHE_MAX_SIZE);
+        for (Iterator iter = _cache.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry entry = (Map.Entry) iter.next();
+            CacheEntry ce = (CacheEntry) entry.getValue();
+            if (ce.isExpired()) {
+                deleteList.add(entry.getKey());
+                full = false;
+                continue;
+            }
+            if (oldestKey == null || ce.exp < oldestExp) {
+                oldestKey = entry.getKey();
+                oldestExp = ce.exp;
+            }
+        }
+        if (full && oldestKey != null)
+            deleteList.add(oldestKey);
+        for (Iterator iter = deleteList.iterator(); iter.hasNext(); ) {
+            _cache.remove(iter.next());
+        }
+    }
+
+    protected void putCache(String s, Destination d) {
+        if (d == null)
+            return;
+        synchronized (_cache) {
+            _cache.put(s, new CacheEntry(d));
+            cacheClean();
+        }
+    }
+
+    protected Destination getCache(String s) {
+        synchronized (_cache) {
+            CacheEntry ce = (CacheEntry) _cache.get(s);
+            if (ce == null)
+                return null;
+            if (ce.isExpired()) {
+                _cache.remove(s);
+                return null;
+            }
+            return ce.dest;
+        }
     }
 }
