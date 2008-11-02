@@ -47,9 +47,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     public HTTPResponseOutputStream(OutputStream raw) {
         super(raw);
         _context = I2PAppContext.getGlobalContext();
-        _context.statManager().createRateStat("i2ptunnel.httpCompressionRatio", "ratio of compressed size to decompressed size after transfer", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpCompressionRatio", "ratio of compressed size to decompressed size after transfer", "I2PTunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "I2PTunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "I2PTunnel", new long[] { 60*1000, 30*60*1000 });
         _log = _context.logManager().getLog(getClass());
         _cache = ByteCache.getInstance(8, CACHE_SIZE);
         _headerBuffer = _cache.acquire();
