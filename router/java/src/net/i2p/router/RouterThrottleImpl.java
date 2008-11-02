@@ -31,7 +31,7 @@ class RouterThrottleImpl implements RouterThrottle {
     private static int THROTTLE_EVENT_LIMIT = 30;
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final String DEFAULT_MAX_TUNNELS = "2500";  // Unless share BW > 250KBps, BW limit will kick in first
+    private static final int DEFAULT_MAX_TUNNELS = 2000;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
 
     /** tunnel acceptance */
@@ -190,20 +190,21 @@ class RouterThrottleImpl implements RouterThrottle {
             }
         }
         
-        String maxTunnels = _context.getProperty(PROP_MAX_TUNNELS, DEFAULT_MAX_TUNNELS);
+        int max = DEFAULT_MAX_TUNNELS;
+        String maxTunnels = _context.getProperty(PROP_MAX_TUNNELS);
         if (maxTunnels != null) {
             try {
-                int max = Integer.parseInt(maxTunnels);
-                if (numTunnels >= max) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Refusing tunnel request since we are already participating in " 
-                                  + numTunnels + " (our max is " + max + ")");
-                    _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels, 0);
-                    setTunnelStatus("Rejecting tunnels: Limit reached");
-                    return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
-                }
+                max = Integer.parseInt(maxTunnels);
             } catch (NumberFormatException nfe) {
             }
+        }
+        if (numTunnels >= max) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing tunnel request since we are already participating in " 
+                          + numTunnels + " (our max is " + max + ")");
+            _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels, 0);
+            setTunnelStatus("Rejecting tunnels: Limit reached");
+            return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
         // ok, we're not hosed, but can we handle the bandwidth requirements 
