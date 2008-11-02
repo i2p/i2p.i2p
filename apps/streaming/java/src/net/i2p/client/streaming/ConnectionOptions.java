@@ -59,6 +59,110 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     
     static final int MIN_WINDOW_SIZE = 1;
     
+    /**
+     *  OK, here is the calculation on the message size to fit in a single
+     *  tunnel message without fragmentation.
+     *  This is based on documentation, the code, and logging, however there are still
+     *  some parts that could use more research.
+     *
+     *  1024 Tunnel Message
+     *  - 21 Header (see router/tunnel/BatchedPreprocessor.java)
+     * -----
+     *  1003 Tunnel Payload
+     *  - 39 Unfragmented instructions (see router/tunnel/TrivialPreprocessor.java)
+     * -----
+     *   964 Unfragmented I2NP Message
+     *  - 20 ??
+     * -----
+     *   944 Garlic Message padded to 16 bytes
+     *  -  0 Pad to 16 bytes (why?)
+     * -----
+     *   944 Garlic Message (assumes no bundled leaseSet or keys)
+     *  - 71 Garlic overhead
+     * -----
+     *   873 Tunnel Data Message
+     *  - 84 ??
+     * -----
+     *   789 Gzipped I2NP message
+     *  - 23 Gzip 10 byte header, 5 byte block header, 8 byte trailer (yes we always use gzip, but it
+     *       probably isn't really compressing, just adding the headers and trailer, since
+     *       HTTP Server already compresses, and most P2P files aren't compressible.
+     *       (see client/I2PSessionImpl2.java, util/ReusableGZipOutputStream.java, and the gzip and deflate specs)
+     * -----
+     *   766
+     *  - 28 Streaming header (24 min, but leave room for a nack or other optional things) (See Packet.java)
+     * -----
+     *   738 Streaming message size
+     *
+     *
+     * FOR TWO TUNNEL MESSAGES:
+     *
+     *  2048 2 Tunnel Messages
+     *  - 42 2 Headers
+     * -----
+     *  2006 Tunnel Payload
+     *  - 50 Fragmented instructions (43 for first + 7 for second)
+     * -----
+     *  1956 Unfragmented I2NP Message
+     *  - 20 ??
+     * -----
+     *  1936 Garlic Message padded to 16 bytes
+     *  1936
+     *  -  0 Pad to 16 bytes
+     * -----
+     *  1936 Garlic Message
+     *  - 71 Garlic overhead
+     * -----
+     *  1865 Tunnel Data Message
+     *  - 84 ??
+     * -----
+     *  1781 Gzipped I2NP message
+     *  - 23 Gzip header
+     * -----
+     *  1758
+     *  - 28 Streaming header
+     * -----
+     *  1730 Streaming message size to fit in 2 tunnel messages
+     *
+     *
+     * Similarly:
+     *   3 msgs: 2722
+     *   4 msgs: 3714
+     *
+     *
+     * Before release 0.6.1.14 this was 4096.
+     * From release 0.6.1.14 through release 0.6.4, this was 960.
+     * It was claimed in the comment that this fit in
+     * a single tunnel message (and the checkin comment says the goal was to
+     * increase reliability at the expense of throughput),
+     * clearly from the math above that was not correct.
+     * (Before 0.6.2, the reply leaseSet was bundled with every message, so it didn't even
+     * fit in TWO tunnel messages - more like 2 1/3)
+     *
+     * Now, it's not clear how often we will get the ideal situation (no reply leaseSet bundling,
+     * no key bundling, and especially not having a small message ahead of you, which will then cause
+     * fragmentation for all subsequent messages until the queue is emptied - BatchedPreprocessor
+     * doesn't do reordering, and it isn't clear to me if it could). In particular the initial
+     * messages in a new stream are much larger due to the leaseSet and key bundling.
+     * But for long-lived streams (like with i2psnark) this should pay dividends.
+     * The tunnel.batch* stats should provide some data for test comparisons.
+     *
+     * As MTU and MRU are identical and are negotiated to the lowest value
+     * for the two ends, you can't do widespread testing of a higher value.
+     * Unless we change to allow MTU and MRU to be different,
+     * which would be a pain because it would mess up our buffer scheme.
+     * Both 738 and 1730 have been tested to verify that the math above is correct.
+     * So let's try 1730 for release 0.6.5. This will allow for 738 testing as well,
+     * with i2p.streaming.maxMessageSize=738 (in configadvanced.jsp, or in i2ptunnel, or
+     * i2psnark, for example).
+     *
+     * Not that an isolated single packet is very common, but
+     * in this case, 960 was 113.3% total overhead.
+     * Compared to 738 (38.8% overhead) and 1730 (18.4%).
+     *
+     */
+    public static final int DEFAULT_MAX_MESSAGE_SIZE = 1730;
+
     public ConnectionOptions() {
         super();
     }
@@ -102,7 +206,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
-        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 960)); // 960 fits inside a single tunnel message
+        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, DEFAULT_MAX_MESSAGE_SIZE));
         setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
