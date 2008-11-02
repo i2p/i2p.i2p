@@ -221,9 +221,11 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             _log.info("News fetched from " + url + " with " + (alreadyTransferred+bytesTransferred));
         
         File temp = new File(TEMP_NEWS_FILE);
+        long now = _context.clock().now();
         if (temp.exists()) {
             boolean copied = FileUtil.copy(TEMP_NEWS_FILE, NEWS_FILE, true);
             if (copied) {
+                _lastUpdated = now;
                 temp.delete();
                 checkForUpdates();
             } else {
@@ -234,7 +236,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
-        _lastFetch = _context.clock().now();
+        _lastFetch = now;
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
