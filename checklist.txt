@@ -72,4 +72,4 @@ Website files to change:
 
 Copy news.xml to subscription location
 
-Announce on #i2p, forum.i2p, Syndie
+Announce on #i2p, forum.i2p, Syndie, freshmeat
