@@ -37,93 +37,6 @@ import net.i2p.crypto.DSAEngine;
  */
 
 public class PrivateKeyFile {
-    public PrivateKeyFile(File file, I2PClient client) {
-        this.file = file;
-        this.client = client;
-        this.dest = null;
-        this.privKey = null;
-        this.signingPrivKey = null;
-    }
-    
-    
-    /** Also reads in the file to get the privKay and signingPrivKey, 
-     *  which aren't available from I2PClient.
-     */
-    public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
-        if(!this.file.exists()) {
-            FileOutputStream out = new FileOutputStream(this.file);
-            this.client.createDestination(out);
-            out.close();
-        }
-        return getDestination();
-    }
-    
-    /** Also sets the local privKay and signingPrivKey */
-    public Destination getDestination() throws I2PSessionException, IOException, DataFormatException {
-        if (dest == null) {
-            I2PSession s = open();
-            if (s != null) {
-                this.dest = new VerifiedDestination(s.getMyDestination());
-                this.privKey = s.getDecryptionKey();
-                this.signingPrivKey = s.getPrivateKey();
-            }
-        }
-        return this.dest;
-    }
-    
-    public PrivateKey getPrivKey() { return this.privKey; }
-    public SigningPrivateKey getSigningPrivKey() { return this.signingPrivKey; }
-
-    public I2PSession open() throws I2PSessionException, IOException {
-        return this.open(new Properties());
-    }
-    public I2PSession open(Properties opts) throws I2PSessionException, IOException {
-        // open input file
-        FileInputStream in = new FileInputStream(this.file);
-        
-        // create sesssion
-        I2PSession s = this.client.createSession(in, opts);
-        
-        // close file
-        in.close();
-        
-        return s;
-    }
-    
-    /**
-     *  Copied from I2PClientImpl.createDestination()
-     */
-    public void write() throws IOException, DataFormatException {
-        FileOutputStream out = new FileOutputStream(this.file);
-        this.dest.writeBytes(out);
-        this.privKey.writeBytes(out);
-        this.signingPrivKey.writeBytes(out);
-        out.flush();
-        out.close();
-    }
-
-    public String toString() {
-        StringBuffer s = new StringBuffer(128);
-        s.append("Dest: ");
-        s.append(this.dest.toBase64());
-        s.append("\nContains: ");
-        s.append(this.dest);
-        s.append("\nPrivate Key: ");
-        s.append(this.privKey);
-        s.append("\nSigining Private Key: ");
-        s.append(this.signingPrivKey);
-        s.append("\n");
-        return s.toString();
-    }
-
-    private File file;
-    private I2PClient client;
-    private Destination dest;
-    private PrivateKey privKey;
-    private SigningPrivateKey signingPrivKey;
-
-    private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
-
     /**
      *  Create a new PrivateKeyFile, or modify an existing one, with various
      *  types of Certificates.
@@ -240,7 +153,93 @@ public class PrivateKeyFile {
             e.printStackTrace();
         }
     }
+    
+    
+    public PrivateKeyFile(File file, I2PClient client) {
+        this.file = file;
+        this.client = client;
+        this.dest = null;
+        this.privKey = null;
+        this.signingPrivKey = null;
+    }
+    
+    
+    /** Also reads in the file to get the privKay and signingPrivKey, 
+     *  which aren't available from I2PClient.
+     */
+    public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
+        if(!this.file.exists()) {
+            FileOutputStream out = new FileOutputStream(this.file);
+            this.client.createDestination(out);
+            out.close();
+        }
+        return getDestination();
+    }
+    
+    /** Also sets the local privKay and signingPrivKey */
+    public Destination getDestination() throws I2PSessionException, IOException, DataFormatException {
+        if (dest == null) {
+            I2PSession s = open();
+            if (s != null) {
+                this.dest = new VerifiedDestination(s.getMyDestination());
+                this.privKey = s.getDecryptionKey();
+                this.signingPrivKey = s.getPrivateKey();
+            }
+        }
+        return this.dest;
+    }
+    
+    public PrivateKey getPrivKey() {
+        return this.privKey;
+    }
+    public SigningPrivateKey getSigningPrivKey() {
+        return this.signingPrivKey;
+    }
+    
+    public I2PSession open() throws I2PSessionException, IOException {
+        return this.open(new Properties());
+    }
+    public I2PSession open(Properties opts) throws I2PSessionException, IOException {
+        // open input file
+        FileInputStream in = new FileInputStream(this.file);
+        
+        // create sesssion
+        I2PSession s = this.client.createSession(in, opts);
+        
+        // close file
+        in.close();
+        
+        return s;
+    }
+    
+    /**
+     *  Copied from I2PClientImpl.createDestination()
+     */
+    public void write() throws IOException, DataFormatException {
+        FileOutputStream out = new FileOutputStream(this.file);
+        this.dest.writeBytes(out);
+        this.privKey.writeBytes(out);
+        this.signingPrivKey.writeBytes(out);
+        out.flush();
+        out.close();
+    }
 
+    public String toString() {
+        StringBuffer s = new StringBuffer(128);
+        s.append("Dest: ");
+        s.append(this.dest.toBase64());
+        s.append("\nContains: ");
+        s.append(this.dest);
+        s.append("\nPrivate Key: ");
+        s.append(this.privKey);
+        s.append("\nSigining Private Key: ");
+        s.append(this.signingPrivKey);
+        s.append("\n");
+        return s.toString();
+    }
+    
+    
+    
     /**
      *  Sample code to verify a 3rd party signature.
      *  This just goes through all the hosts.txt files and tries everybody.
@@ -291,4 +290,15 @@ public class PrivateKeyFile {
     public static boolean checkSignature(Signature s, byte[] data, SigningPublicKey spk) {
         return DSAEngine.getInstance().verifySignature(s, data, spk);
     }
+    
+    
+    private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
+    
+    
+    
+    private File file;
+    private I2PClient client;
+    private Destination dest;
+    private PrivateKey privKey;
+    private SigningPrivateKey signingPrivKey; 
 }
