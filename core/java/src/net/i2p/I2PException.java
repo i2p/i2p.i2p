@@ -32,17 +32,20 @@ public class I2PException extends Exception {
         super(msg);
         _source = source;
     }
-
+    
+    @Override
     public void printStackTrace() {
         if (_source != null) _source.printStackTrace();
         super.printStackTrace();
     }
-
+    
+    @Override
     public void printStackTrace(PrintStream ps) {
         if (_source != null) _source.printStackTrace(ps);
         super.printStackTrace(ps);
     }
 
+    @Override
     public void printStackTrace(PrintWriter pw) {
         if (_source != null) _source.printStackTrace(pw);
         super.printStackTrace(pw);

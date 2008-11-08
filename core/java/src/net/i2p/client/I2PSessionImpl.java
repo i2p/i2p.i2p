@@ -231,6 +231,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws I2PSessionException if there is a configuration error or the router is
      *                             not reachable
      */
+    @Override
     public void connect() throws I2PSessionException {
         _closed = false;
         _availabilityNotifier.stopNotifying();
@@ -303,6 +304,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * notified the user that its available.
      *
      */
+    @Override
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
         int remaining = 0;
         MessagePayloadMessage msg = null;
@@ -321,6 +323,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Report abuse with regards to the given messageId
      */
+    @Override
     public void reportAbuse(int msgId, int severity) throws I2PSessionException {
         if (isClosed()) throw new I2PSessionException(getPrefix() + "Already closed");
         _producer.reportAbuse(this, msgId, severity);
@@ -332,8 +335,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * delivered successfully.  make this wait for at least ACCEPTED
      *
      */
+    @Override
     public abstract boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
-
+    
+    @Override
     public abstract boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, 
                                         Set tagsSent) throws I2PSessionException;
 
@@ -374,6 +379,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private class VerifyUsage implements SimpleTimer.TimedEvent {
         private Long _msgId;
         public VerifyUsage(Long id) { _msgId = id; }
+        
+        @Override
         public void timeReached() {
             MessagePayloadMessage removed = null;
             int remaining = 0;
@@ -412,6 +419,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 AvailabilityNotifier.this.notifyAll();
             }
         }
+        @Override
         public void run() {
             _alive = true;
             while (_alive) {
@@ -453,6 +461,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve notification of some I2CP message and handle it if possible
      *
      */
+    @Override
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
         I2CPMessageHandler handler = _handlerMap.getHandler(message.getType());
         if (handler == null) {
@@ -471,6 +480,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve notifiation of an error reading the I2CP stream
      *
      */
+    @Override
     public void readError(I2CPMessageReader reader, Exception error) {
         propogateError("There was an error reading data", error);
         disconnect();
@@ -479,16 +489,19 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Retrieve the destination of the session
      */
+    @Override
     public Destination getMyDestination() { return _myDestination; }
 
     /**
      * Retrieve the decryption PrivateKey 
      */
+    @Override
     public PrivateKey getDecryptionKey() { return _privateKey; }
 
     /**
      * Retrieve the signing SigningPrivateKey
      */
+    @Override
     public SigningPrivateKey getPrivateKey() { return _signingPrivateKey; }
 
     /**
@@ -508,9 +521,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     void setSessionId(SessionId id) { _sessionId = id; }
 
     /** configure the listener */
+    @Override
     public void setSessionListener(I2PSessionListener lsnr) { _sessionListener = lsnr; }
 
     /** has the session been closed (or not yet connected)? */
+    @Override
     public boolean isClosed() { return _closed; }
 
     /**
@@ -560,6 +575,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Tear down the session, and do NOT reconnect
      */
+    @Override
     public void destroySession() {
         destroySession(true);
     }
@@ -607,6 +623,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Recieve notification that the I2CP connection was disconnected
      */
+    @Override
     public void disconnected(I2CPMessageReader reader) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnected", new Exception("Disconnected"));
         disconnect();

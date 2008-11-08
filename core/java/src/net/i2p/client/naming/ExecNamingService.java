@@ -57,7 +57,8 @@ public class ExecNamingService extends NamingService {
     public ExecNamingService(I2PAppContext context) {
         super(context);
     }
-        
+    
+    @Override
     public Destination lookup(String hostname) {
         // If it's long, assume it's a key.
         if (hostname.length() >= DEST_SIZE)
@@ -125,7 +126,8 @@ public class ExecNamingService extends NamingService {
         }
         return null;
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         return null;
     }

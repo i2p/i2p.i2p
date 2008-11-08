@@ -23,10 +23,12 @@ class DummyNamingService extends NamingService {
     protected DummyNamingService(I2PAppContext context) { super(context); }
     private DummyNamingService() { super(null); }
     
+    @Override
     public Destination lookup(String hostname) {
         return lookupBase64(hostname);
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         return null;
     }

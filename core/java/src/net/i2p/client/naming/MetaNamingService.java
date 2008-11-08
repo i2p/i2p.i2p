@@ -33,6 +33,7 @@ public class MetaNamingService extends NamingService {
         }
     }
     
+    @Override
     public Destination lookup(String hostname) {
         Iterator iter = _services.iterator();
         while (iter.hasNext()) {
@@ -44,7 +45,8 @@ public class MetaNamingService extends NamingService {
         }
         return lookupBase64(hostname);
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         Iterator iter = _services.iterator();
         while (iter.hasNext()) {

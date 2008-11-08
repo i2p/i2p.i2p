@@ -39,7 +39,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         super(context, RequestLeaseSetMessage.MESSAGE_TYPE);
         _existingLeaseSets = new HashMap(32);
     }
-
+    
+    @Override
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
@@ -121,12 +122,14 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         public SigningPrivateKey getSigningPrivateKey() {
             return _signingPrivKey;
         }
-
+        
+        @Override
         public int hashCode() {
             return DataHelper.hashCode(_pubKey) + 7 * DataHelper.hashCode(_privKey) + 7 * 7
                    * DataHelper.hashCode(_signingPubKey) + 7 * 7 * 7 * DataHelper.hashCode(_signingPrivKey);
         }
-
+        
+        @Override
         public boolean equals(Object obj) {
             if ((obj == null) || !(obj instanceof LeaseInfo)) return false;
             LeaseInfo li = (LeaseInfo) obj;

@@ -131,6 +131,7 @@ public class ATalk implements I2PSessionListener, Runnable {
      * application is complete.
      *
      */
+    @Override
     public void run() {
         try {
             connect();
@@ -241,6 +242,7 @@ public class ATalk implements I2PSessionListener, Runnable {
      * message to the user.
      *
      */
+    @Override
     public void messageAvailable(I2PSession session, int msgId, long size) {
         _log.debug("Message available: id = " + msgId + " size = " + size);
         try {
@@ -351,16 +353,19 @@ public class ATalk implements I2PSessionListener, Runnable {
     }
 
     /** required by {@link I2PSessionListener I2PSessionListener} to notify of disconnect */
+    @Override
     public void disconnected(I2PSession session) {
         _log.debug("Disconnected");
     }
 
     /** required by {@link I2PSessionListener I2PSessionListener} to notify of error */
+    @Override
     public void errorOccurred(I2PSession session, String message, Throwable error) {
         _log.debug("Error occurred: " + message, error);
     }
 
     /** required by {@link I2PSessionListener I2PSessionListener} to notify of abuse */
+    @Override
     public void reportAbuse(I2PSession session, int severity) {
         _log.debug("Abuse reported of severity " + severity);
     }

@@ -45,7 +45,8 @@ public class PetNameNamingService extends NamingService {
         } catch (IOException ioe) {
         }
     }
-
+    
+    @Override
     public Destination lookup(String hostname) {
         PetName name = _petnameDb.getByName(hostname);
         if (name != null && name.getNetwork().equalsIgnoreCase("i2p")) {
@@ -54,7 +55,8 @@ public class PetNameNamingService extends NamingService {
             return lookupBase64(hostname);
         }
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         return _petnameDb.getByLocation(dest.toBase64()).getName();
     }

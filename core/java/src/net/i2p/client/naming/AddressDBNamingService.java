@@ -18,7 +18,8 @@ public class AddressDBNamingService extends NamingService {
     private AddressDBNamingService() {
         super(null);
     }
-
+    
+    @Override
     public Destination lookup(String hostname) {
         Address addr = _addressdb.get(hostname);
         if (addr != null) {
@@ -28,7 +29,8 @@ public class AddressDBNamingService extends NamingService {
             return lookupBase64(hostname);
         }
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         Iterator iter = _addressdb.hostnames().iterator();
         while (iter.hasNext()) {

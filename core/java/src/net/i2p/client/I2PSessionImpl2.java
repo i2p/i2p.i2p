@@ -69,22 +69,27 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     protected long getTimeout() {
         return SEND_TIMEOUT;
     }
-
+    
+    @Override
     public void destroySession(boolean sendDisconnect) {
         clearStates();
         super.destroySession(sendDisconnect);
     }
-
+    
+    @Override
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length);
     }
+    @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
         return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64));
     }
-
+    
+    @Override
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent);
     }
+    @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
@@ -97,6 +102,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     /**
      * pull the unencrypted AND DECOMPRESSED data 
      */
+    @Override
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
         byte compressed[] = super.receiveMessage(msgId);
         if (compressed == null) {
@@ -266,7 +272,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         return found;
     }
-
+    
+    @Override
     public void receiveStatus(int msgId, long nonce, int status) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Received status " + status + " for msgId " + msgId + " / " + nonce);
         MessageState state = null;
@@ -335,6 +342,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * to override this to clear out the message state
      *
      */
+    @Override
     protected boolean reconnect() {
         // even if we succeed in reconnecting, we want to clear the old states, 
         // since this will be a new sessionId

@@ -25,7 +25,8 @@ class MessageStatusMessageHandler extends HandlerImpl {
     public MessageStatusMessageHandler(I2PAppContext context) {
         super(context, MessageStatusMessage.MESSAGE_TYPE);
     }
-
+    
+    @Override
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         boolean skipStatus = true;
         if (_log.shouldLog(Log.DEBUG))

@@ -54,7 +54,8 @@ public class HostsTxtNamingService extends NamingService {
             rv.add(tok.nextToken());
         return rv;
     }
-        
+    
+    @Override
     public Destination lookup(String hostname) {
         Destination d = getCache(hostname);
         if (d != null)
@@ -94,7 +95,8 @@ public class HostsTxtNamingService extends NamingService {
         }
         return null;
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         String destkey = dest.toBase64();
         List filenames = getFilenames();

@@ -122,6 +122,7 @@ public class PetName {
         return false;
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(256);
         if (_name != null) buf.append(_name.trim());
@@ -142,6 +143,7 @@ public class PetName {
         return buf.toString();
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof PetName) ) return false;
         PetName pn = (PetName)obj;
@@ -150,6 +152,7 @@ public class PetName {
                DataHelper.eq(_network, pn._network) &&
                DataHelper.eq(_protocol, pn._protocol);
     }
+    @Override
     public int hashCode() {
         int rv = 0;
         rv += DataHelper.hashCode(_name);

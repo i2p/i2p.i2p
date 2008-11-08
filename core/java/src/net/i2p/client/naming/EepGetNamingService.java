@@ -57,7 +57,8 @@ public class EepGetNamingService extends NamingService {
             rv.add(tok.nextToken());
         return rv;
     }
-        
+    
+    @Override
     public Destination lookup(String hostname) {
         // If it's long, assume it's a key.
         if (hostname.length() >= DEST_SIZE)
@@ -135,7 +136,8 @@ public class EepGetNamingService extends NamingService {
         _log.error("Caught from: " + url + hostname);
         return null;
     }
-
+    
+    @Override
     public String reverseLookup(Destination dest) {
         return null;
     }

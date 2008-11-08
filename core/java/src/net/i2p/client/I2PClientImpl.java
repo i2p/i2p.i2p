@@ -33,6 +33,7 @@ class I2PClientImpl implements I2PClient {
     /**
      * Create the destination with a null payload
      */
+	@Override
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
         Certificate cert = new Certificate();
         cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
@@ -45,6 +46,7 @@ class I2PClientImpl implements I2PClient {
      * the PrivateKey and SigningPrivateKey to the destKeyStream
      *
      */
+	@Override
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         Destination d = new Destination();
         d.setCertificate(cert);
@@ -69,6 +71,7 @@ class I2PClientImpl implements I2PClient {
      * Create a new session (though do not connect it yet)
      *
      */
+	@Override
     public I2PSession createSession(InputStream destKeyStream, Properties options) throws I2PSessionException {
         return createSession(I2PAppContext.getGlobalContext(), destKeyStream, options);
     }

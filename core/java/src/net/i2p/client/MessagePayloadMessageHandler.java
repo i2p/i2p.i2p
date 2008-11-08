@@ -28,7 +28,8 @@ class MessagePayloadMessageHandler extends HandlerImpl {
     public MessagePayloadMessageHandler(I2PAppContext context) {
         super(context, MessagePayloadMessage.MESSAGE_TYPE);
     }
-
+    
+    @Override
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
