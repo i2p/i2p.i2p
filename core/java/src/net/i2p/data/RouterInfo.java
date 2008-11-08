@@ -486,7 +486,8 @@ public class RouterInfo extends DataStructureImpl {
             }
         }
     }
-
+    
+    @Override
     public synchronized void readBytes(InputStream in) throws DataFormatException, IOException {
         _identity = new RouterIdentity();
         _identity.readBytes(in);
@@ -515,7 +516,8 @@ public class RouterInfo extends DataStructureImpl {
 
         //_log.debug("Read routerInfo: " + toString());
     }
-
+    
+    @Override
     public synchronized void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_identity == null) throw new DataFormatException("Missing identity");
         if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
@@ -530,7 +532,8 @@ public class RouterInfo extends DataStructureImpl {
         //_log.debug("Writing routerInfo [len=" + data.length + "]: " + toString());
         out.write(data);
     }
-
+    
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterInfo)) return false;
         RouterInfo info = (RouterInfo) object;
@@ -541,7 +544,8 @@ public class RouterInfo extends DataStructureImpl {
                && DataHelper.eq(_options, info.getOptions()) 
                && DataHelper.eq(_peers, info.getPeers());
     }
-
+    
+    @Override
     public int hashCode() {
         if (!_hashCodeInitialized) {
             _hashCode = DataHelper.hashCode(_identity) + (int) getPublished();
@@ -549,7 +553,8 @@ public class RouterInfo extends DataStructureImpl {
         }
         return _hashCode;
     }
-
+    
+    @Override
     public String toString() {
         if (_stringified != null) return _stringified;
         StringBuffer buf = new StringBuffer(5*1024);

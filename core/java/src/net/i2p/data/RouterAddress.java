@@ -104,14 +104,16 @@ public class RouterAddress extends DataStructureImpl {
     public void setOptions(Properties options) {
         _options = options;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _cost = (int) DataHelper.readLong(in, 1);
         _expiration = DataHelper.readDate(in);
         _transportStyle = DataHelper.readString(in);
         _options = DataHelper.readProperties(in);
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_cost < 0) || (_transportStyle == null) || (_options == null))
             throw new DataFormatException("Not enough data to write a router address");
@@ -120,7 +122,8 @@ public class RouterAddress extends DataStructureImpl {
         DataHelper.writeString(out, _transportStyle);
         DataHelper.writeProperties(out, _options);
     }
-
+    
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
@@ -128,12 +131,14 @@ public class RouterAddress extends DataStructureImpl {
                && DataHelper.eq(getOptions(), addr.getOptions())
                && DataHelper.eq(getTransportStyle(), addr.getTransportStyle());
     }
-
+    
+    @Override
     public int hashCode() {
         return getCost() + DataHelper.hashCode(getTransportStyle()) + DataHelper.hashCode(getExpiration())
                + DataHelper.hashCode(getOptions());
     }
-
+    
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("[RouterAddress: ");

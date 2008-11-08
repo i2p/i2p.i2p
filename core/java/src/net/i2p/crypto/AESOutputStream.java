@@ -62,25 +62,29 @@ public class AESOutputStream extends FilterOutputStream {
         _writeBlock = new byte[BLOCK_SIZE];
         _writesSinceCommit = 0;
     }
-
+    
+    @Override
     public void write(int val) throws IOException {
         _cumulativeProvided++;
         _unencryptedBuf[_writesSinceCommit++] = (byte)(val & 0xFF);
         if (_writesSinceCommit == _unencryptedBuf.length)
             doFlush();
     }
-
+    
+    @Override
     public void write(byte src[]) throws IOException {
         write(src, 0, src.length);
     }
-
+    
+    @Override
     public void write(byte src[], int off, int len) throws IOException {
         // i'm too lazy to unroll this into the partial writes (dealing with
         // wrapping around the buffer size)
         for (int i = 0; i < len; i++)
             write(src[i+off]);
     }
-
+    
+    @Override
     public void close() throws IOException {
         flush();
         out.close();
@@ -88,7 +92,8 @@ public class AESOutputStream extends FilterOutputStream {
             _log.debug("Cumulative bytes provided to this stream / written out / padded: " 
                        + _cumulativeProvided + "/" + _cumulativeWritten + "/" + _cumulativePadding);
     }
-
+    
+    @Override
     public void flush() throws IOException {
         doFlush();
         out.flush();

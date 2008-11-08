@@ -111,7 +111,8 @@ public class Lease extends DataStructureImpl {
         if (_end == null) return true;
         return _end.getTime() < Clock.getInstance().now() - fudgeFactor;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _gateway = new Hash();
         _gateway.readBytes(in);
@@ -119,7 +120,8 @@ public class Lease extends DataStructureImpl {
         _tunnelId.readBytes(in);
         _end = DataHelper.readDate(in);
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_gateway == null) || (_tunnelId == null))
             throw new DataFormatException("Not enough data to write out a Lease");
@@ -128,7 +130,8 @@ public class Lease extends DataStructureImpl {
         _tunnelId.writeBytes(out);
         DataHelper.writeDate(out, _end);
     }
-
+    
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Lease)) return false;
         Lease lse = (Lease) object;
@@ -137,12 +140,14 @@ public class Lease extends DataStructureImpl {
                && DataHelper.eq(getGateway(), lse.getGateway());
 
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getEndDate()) + DataHelper.hashCode(getGateway())
                + DataHelper.hashCode(getTunnelId());
     }
-
+    
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Lease: ");

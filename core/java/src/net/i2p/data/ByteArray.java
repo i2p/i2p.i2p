@@ -53,7 +53,8 @@ public class ByteArray implements Serializable, Comparable {
     public void setValid(int valid) { _valid = valid; }
     public int getOffset() { return _offset; }
     public void setOffset(int offset) { _offset = offset; }
-
+    
+    @Override
     public final boolean equals(Object o) {
         if (o == null) return false;
         if (o instanceof ByteArray) {
@@ -73,15 +74,18 @@ public class ByteArray implements Serializable, Comparable {
         return (llen == rlen) && DataHelper.eq(lhs, loff, rhs, roff, llen);
     }
     
+    @Override
     public final int compareTo(Object obj) {
         if (obj.getClass() != getClass()) throw new ClassCastException("invalid object: " + obj);
         return DataHelper.compareTo(_data, ((ByteArray)obj).getData());
     }
-
+    
+    @Override
     public final int hashCode() {
         return DataHelper.hashCode(getData());
     }
-
+    
+    @Override
     public String toString() {
         return super.toString() + "/" + DataHelper.toString(getData(), 32) + "." + _valid;
     }

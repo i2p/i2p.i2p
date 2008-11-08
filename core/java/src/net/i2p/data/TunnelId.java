@@ -68,10 +68,12 @@ public class TunnelId extends DataStructureImpl {
     public int getType() { return _type; }
     public void setType(int type) { _type = type; }
     
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _tunnelId = DataHelper.readLong(in, 4);
     }
     
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_tunnelId < 0) throw new DataFormatException("Invalid tunnel ID: " + _tunnelId);
         DataHelper.writeLong(out, 4, _tunnelId);
@@ -82,15 +84,18 @@ public class TunnelId extends DataStructureImpl {
         return 4;
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelId))
             return false;
         return getTunnelId() == ((TunnelId)obj).getTunnelId();
     }
     
+    @Override
     public int hashCode() {
         return (int)getTunnelId(); 
     }
     
+    @Override
     public String toString() { return String.valueOf(getTunnelId()); }
 }

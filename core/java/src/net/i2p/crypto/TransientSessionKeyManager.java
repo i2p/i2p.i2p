@@ -75,6 +75,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
     private TransientSessionKeyManager() { this(null); }
     
     private class CleanupEvent implements SimpleTimer.TimedEvent {
+    	@Override
         public void timeReached() {
             long beforeExpire = _context.clock().now();
             int expired = aggressiveExpire();
@@ -130,6 +131,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * or null if a new session key should be generated.
      *
      */
+    @Override
     public SessionKey getCurrentKey(PublicKey target) {
         OutboundSession sess = getSession(target);
         if (sess == null) return null;
@@ -151,6 +153,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * when to expire that key begin with this call.
      *
      */
+    @Override
     public void createSession(PublicKey target, SessionKey key) {
         OutboundSession sess = new OutboundSession(target);
         sess.setCurrentKey(key);
@@ -164,6 +167,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * NOT be used)
      *
      */
+    @Override
     public SessionTag consumeNextAvailableTag(PublicKey target, SessionKey key) {
         OutboundSession sess = getSession(target);
         if (sess == null) {
@@ -187,6 +191,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * have been confirmed and are available
      *
      */
+    @Override
     public int getAvailableTags(PublicKey target, SessionKey key) {
         OutboundSession sess = getSession(target);
         if (sess == null) { return 0; }
@@ -200,6 +205,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * Determine how long the available tags will be available for before expiring, in 
      * milliseconds
      */
+    @Override
     public long getAvailableTimeLeft(PublicKey target, SessionKey key) {
         OutboundSession sess = getSession(target);
         if (sess == null) { return 0; }
@@ -219,6 +225,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * method after receiving an ack to a message delivering them)
      *
      */
+    @Override
     public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) {
         if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Tags delivered to set " + set + " on session " + sess);
@@ -241,6 +248,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * from corrupted tag sets and crashes
      *
      */
+    @Override
     public void failTags(PublicKey target) {
         removeSession(target);
     }
@@ -249,6 +257,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * Accept the given tags and associate them with the given key for decryption
      *
      */
+    @Override
     public void tagsReceived(SessionKey key, Set sessionTags) {
         int overage = 0;
         TagSet tagSet = new TagSet(sessionTags, key, _context.clock().now());
@@ -360,6 +369,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * matches
      *
      */
+    @Override
     public SessionKey consumeTag(SessionTag tag) {
         if (false) aggressiveExpire();
         synchronized (_inboundTagSets) {
@@ -711,7 +721,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         }
         
         public Exception getCreatedBy() { return _createdBy; }
-
+        
+        @Override
         public int hashCode() {
             long rv = 0;
             if (_key != null) rv = rv * 7 + _key.hashCode();
@@ -719,7 +730,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
             // no need to hashCode the tags, key + date should be enough
             return (int) rv;
         }
-
+        
+        @Override
         public boolean equals(Object o) {
             if ((o == null) || !(o instanceof TagSet)) return false;
             TagSet ts = (TagSet) o;

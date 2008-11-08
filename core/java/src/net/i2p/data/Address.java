@@ -42,13 +42,15 @@ public class Address extends DataStructureImpl {
         }
     }
     
+    @Override
     public void readBytes(InputStream in) throws DataFormatException,
             IOException {
         _hostname = DataHelper.readString(in);
         _destination = new Destination();
         _destination.readBytes(in);
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException,
             IOException {
         if ((_hostname == null) || (_destination == null)) 
@@ -57,6 +59,7 @@ public class Address extends DataStructureImpl {
         _destination.writeBytes(out);
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof Address)) return false;
         Address addr = (Address) obj;
@@ -64,11 +67,13 @@ public class Address extends DataStructureImpl {
         && DataHelper.eq(_destination, addr.getDestination());
     }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getHostname()) 
         + DataHelper.hashCode(getDestination());
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("[Address: ");

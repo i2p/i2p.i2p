@@ -35,7 +35,8 @@ public class SessionTag extends ByteArray {
         super();
         setData(val);
     }
-
+    
+    @Override
     public void setData(byte val[]) throws IllegalArgumentException {
         if (val == null) 
             throw new NullPointerException("SessionTags cannot be null");

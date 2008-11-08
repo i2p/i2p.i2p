@@ -71,7 +71,8 @@ public class Destination extends DataStructureImpl {
         _signingKey = key;
         __calculatedHash = null;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _publicKey = new PublicKey();
         _publicKey.readBytes(in);
@@ -81,7 +82,8 @@ public class Destination extends DataStructureImpl {
         _certificate.readBytes(in);
         __calculatedHash = null;
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the destination");
@@ -128,6 +130,7 @@ public class Destination extends DataStructureImpl {
         return PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES + _certificate.size();
     }
     
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Destination)) return false;
         Destination dst = (Destination) object;
@@ -135,12 +138,14 @@ public class Destination extends DataStructureImpl {
                && DataHelper.eq(getSigningPublicKey(), dst.getSigningPublicKey())
                && DataHelper.eq(getPublicKey(), dst.getPublicKey());
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getCertificate()) + DataHelper.hashCode(getSigningPublicKey())
                + DataHelper.hashCode(getPublicKey());
     }
-
+    
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Destination: ");
@@ -151,7 +156,8 @@ public class Destination extends DataStructureImpl {
         buf.append("]");
         return buf.toString();
     }
-
+    
+    @Override
     public Hash calculateHash() {
         if (__calculatedHash == null) __calculatedHash = super.calculateHash();
         return __calculatedHash;

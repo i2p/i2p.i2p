@@ -14,10 +14,12 @@ public class DummyDSAEngine extends DSAEngine {
         super(context);
     }
     
+    @Override
     public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
         return true;
     }
-
+    
+    @Override
     public Signature sign(byte data[], SigningPrivateKey signingKey) {
         Signature sig = new Signature();
         sig.setData(Signature.FAKE_SIGNATURE);

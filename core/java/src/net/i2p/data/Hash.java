@@ -127,6 +127,7 @@ public class Hash extends DataStructureImpl {
         _xorCache = null;
     }
     
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[HASH_LENGTH];
         _stringified = null;
@@ -134,22 +135,26 @@ public class Hash extends DataStructureImpl {
         int read = read(in, _data);
         if (read != HASH_LENGTH) throw new DataFormatException("Not enough bytes to read the hash");
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the hash to write out");
         if (_data.length != HASH_LENGTH) throw new DataFormatException("Invalid size of data in the private key");
         out.write(_data);
     }
-
+    
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof Hash)) return false;
         return DataHelper.eq(_data, ((Hash) obj)._data);
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(_data);
     }
-
+    
+    @Override
     public String toString() {
         if (_stringified == null) {
             StringBuffer buf = new StringBuffer(64);
@@ -165,6 +170,7 @@ public class Hash extends DataStructureImpl {
         return _stringified;
     }
     
+    @Override
     public String toBase64() {
         if (_base64ed == null) {
             _base64ed = super.toBase64();

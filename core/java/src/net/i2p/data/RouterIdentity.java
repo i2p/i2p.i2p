@@ -73,7 +73,8 @@ public class RouterIdentity extends DataStructureImpl {
     public boolean isHidden() {
         return (_certificate != null) && (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_HIDDEN);
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _publicKey = new PublicKey();
         _publicKey.readBytes(in);
@@ -83,7 +84,8 @@ public class RouterIdentity extends DataStructureImpl {
         _certificate.readBytes(in);
         __calculatedHash = null;
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the router identity");
@@ -91,7 +93,8 @@ public class RouterIdentity extends DataStructureImpl {
         _signingKey.writeBytes(out);
         _certificate.writeBytes(out);
     }
-
+    
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterIdentity)) return false;
         RouterIdentity ident = (RouterIdentity) object;
@@ -99,12 +102,14 @@ public class RouterIdentity extends DataStructureImpl {
                && DataHelper.eq(getSigningPublicKey(), ident.getSigningPublicKey())
                && DataHelper.eq(getPublicKey(), ident.getPublicKey());
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getCertificate()) + DataHelper.hashCode(getSigningPublicKey())
                + DataHelper.hashCode(getPublicKey());
     }
-
+    
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("[RouterIdentity: ");
@@ -115,7 +120,8 @@ public class RouterIdentity extends DataStructureImpl {
         buf.append("]");
         return buf.toString();
     }
-
+    
+    @Override
     public Hash calculateHash() {
         return getHash();
     }

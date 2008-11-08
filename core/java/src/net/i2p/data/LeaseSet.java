@@ -252,7 +252,8 @@ public class LeaseSet extends DataStructureImpl {
         byte rv[] = out.toByteArray();
         return rv;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _destination = new Destination();
         _destination.readBytes(in);
@@ -273,7 +274,8 @@ public class LeaseSet extends DataStructureImpl {
         _signature = new Signature();
         _signature.readBytes(in);
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null)
             || (_signature == null)) throw new DataFormatException("Not enough data to write out a LeaseSet");
@@ -299,7 +301,8 @@ public class LeaseSet extends DataStructureImpl {
              + 1
              + _leases.size() * (Hash.HASH_LENGTH + 4 + 8);
     }
-
+    
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof LeaseSet)) return false;
         LeaseSet ls = (LeaseSet) object;
@@ -310,14 +313,16 @@ public class LeaseSet extends DataStructureImpl {
                && DataHelper.eq(getDestination(), ls.getDestination());
 
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getEncryptionKey()) +
         //(int)_version +
                DataHelper.hashCode(_leases) + DataHelper.hashCode(getSignature())
                + DataHelper.hashCode(getSigningKey()) + DataHelper.hashCode(getDestination());
     }
-
+    
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[LeaseSet: ");

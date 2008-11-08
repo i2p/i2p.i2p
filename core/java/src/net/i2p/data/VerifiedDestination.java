@@ -153,6 +153,7 @@ public class VerifiedDestination extends Destination {
         return false;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append(super.toString());

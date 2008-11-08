@@ -53,28 +53,33 @@ public class PublicKey extends DataStructureImpl {
     public void setData(byte[] data) {
         _data = data;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[KEYSIZE_BYTES];
         int read = read(in, _data);
         if (read != KEYSIZE_BYTES) throw new DataFormatException("Not enough bytes to read the public key");
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the public key to write out");
         if (_data.length != KEYSIZE_BYTES) throw new DataFormatException("Invalid size of data in the public key");
         out.write(_data);
     }
-
+    
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof PublicKey)) return false;
         return DataHelper.eq(_data, ((PublicKey) obj)._data);
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(_data);
     }
-
+    
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("[PublicKey: ");

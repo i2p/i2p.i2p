@@ -46,6 +46,7 @@ public class DummyElGamalEngine extends ElGamalEngine {
      * @param publicKey public key encrypt to
      * @param data data to encrypt
      */
+    @Override
     public byte[] encrypt(byte data[], PublicKey publicKey) {
         if ((data == null) || (data.length >= 223))
             throw new IllegalArgumentException("Data to encrypt must be < 223 bytes at the moment");
@@ -72,6 +73,7 @@ public class DummyElGamalEngine extends ElGamalEngine {
      * @param privateKey private key to decrypt with
      * @return unencrypted data
      */
+    @Override
     public byte[] decrypt(byte encrypted[], PrivateKey privateKey) {
         if ((encrypted == null) || (encrypted.length > 514))
             throw new IllegalArgumentException("Data to decrypt must be <= 514 bytes at the moment");

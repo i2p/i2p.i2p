@@ -18,6 +18,7 @@ import org.bouncycastle.crypto.macs.HMac;
 public class HMAC256Generator extends HMACGenerator {
     public HMAC256Generator(I2PAppContext context) { super(context); }
     
+    @Override
     protected HMac acquire() {
         synchronized (_available) {
             if (_available.size() > 0)
@@ -30,8 +31,11 @@ public class HMAC256Generator extends HMACGenerator {
     }
     
     private class Sha256ForMAC extends Sha256Standalone implements Digest {
+    	@Override
         public String getAlgorithmName() { return "sha256 for hmac"; }
+    	@Override
         public int getDigestSize() { return 32; }
+    	@Override
         public int doFinal(byte[] out, int outOff) {
             byte rv[] = digest();
             System.arraycopy(rv, 0, out, outOff, rv.length);

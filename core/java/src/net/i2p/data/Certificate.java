@@ -66,7 +66,8 @@ public class Certificate extends DataStructureImpl {
     public void setPayload(byte[] payload) {
         _payload = payload;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _type = (int) DataHelper.readLong(in, 1);
         int length = (int) DataHelper.readLong(in, 2);
@@ -78,7 +79,8 @@ public class Certificate extends DataStructureImpl {
                                               + ")");
         }
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_type < 0) throw new DataFormatException("Invalid certificate type: " + _type);
         //if ((_type != 0) && (_payload == null)) throw new DataFormatException("Payload is required for non null type");
@@ -134,17 +136,18 @@ public class Certificate extends DataStructureImpl {
     public int size() {
         return 1 + 2 + (_payload != null ? _payload.length : 0);
     }
-
+    
+    @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Certificate)) return false;
         Certificate cert = (Certificate) object;
         return getCertificateType() == cert.getCertificateType() && DataHelper.eq(getPayload(), cert.getPayload());
     }
-
+    @Override
     public int hashCode() {
         return getCertificateType() + DataHelper.hashCode(getPayload());
     }
-
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("[Certificate: type: ");

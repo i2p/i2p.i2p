@@ -43,28 +43,33 @@ public class Signature extends DataStructureImpl {
     public void setData(byte[] data) {
         _data = data;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[SIGNATURE_BYTES];
         int read = read(in, _data);
         if (read != SIGNATURE_BYTES) throw new DataFormatException("Not enough bytes to read the signature");
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the signature to write out");
         if (_data.length != SIGNATURE_BYTES) throw new DataFormatException("Invalid size of data in the private key");
         out.write(_data);
     }
-
+    
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof Signature)) return false;
         return DataHelper.eq(_data, ((Signature) obj)._data);
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(_data);
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("[Signature: ");

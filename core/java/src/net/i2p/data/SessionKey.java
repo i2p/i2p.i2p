@@ -57,28 +57,33 @@ public class SessionKey extends DataStructureImpl {
      */
     public Object getPreparedKey() { return _preparedKey; }
     public void setPreparedKey(Object obj) { _preparedKey = obj; }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[KEYSIZE_BYTES];
         int read = read(in, _data);
         if (read != KEYSIZE_BYTES) throw new DataFormatException("Not enough bytes to read the session key");
     }
-
+    
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the session key to write out");
         if (_data.length != KEYSIZE_BYTES) throw new DataFormatException("Invalid size of data in the private key");
         out.write(_data);
     }
-
+    
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof SessionKey)) return false;
         return DataHelper.eq(_data, ((SessionKey) obj)._data);
     }
-
+    
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(_data);
     }
 
+    @Override
     public String toString() { 
         if (true) return super.toString(); 
         StringBuffer buf = new StringBuffer(64);
