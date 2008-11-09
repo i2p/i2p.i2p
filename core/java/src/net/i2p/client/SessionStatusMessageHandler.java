@@ -24,7 +24,6 @@ class SessionStatusMessageHandler extends HandlerImpl {
         super(context, SessionStatusMessage.MESSAGE_TYPE);
     }
     
-    @Override
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         _log.debug("Handle message " + message);
         SessionStatusMessage msg = (SessionStatusMessage) message;

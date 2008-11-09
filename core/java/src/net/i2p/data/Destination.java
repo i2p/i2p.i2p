@@ -72,7 +72,6 @@ public class Destination extends DataStructureImpl {
         __calculatedHash = null;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _publicKey = new PublicKey();
         _publicKey.readBytes(in);
@@ -83,7 +82,6 @@ public class Destination extends DataStructureImpl {
         __calculatedHash = null;
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the destination");

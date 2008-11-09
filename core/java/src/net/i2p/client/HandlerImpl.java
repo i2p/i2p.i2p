@@ -28,7 +28,6 @@ abstract class HandlerImpl implements I2CPMessageHandler {
         _log = new Log(getClass());
     }
     
-    @Override
     public int getType() {
         return _type;
     }

@@ -108,7 +108,6 @@ public final class ByteCache {
     }
     
     private class Cleanup implements SimpleTimer.TimedEvent {
-    	@Override
         public void timeReached() {
             if (System.currentTimeMillis() - _lastOverflow > EXPIRE_PERIOD) {
                 // we haven't exceeded the cache size in a few minutes, so lets

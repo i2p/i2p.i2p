@@ -253,7 +253,6 @@ public class LeaseSet extends DataStructureImpl {
         return rv;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _destination = new Destination();
         _destination.readBytes(in);
@@ -275,7 +274,6 @@ public class LeaseSet extends DataStructureImpl {
         _signature.readBytes(in);
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null)
             || (_signature == null)) throw new DataFormatException("Not enough data to write out a LeaseSet");

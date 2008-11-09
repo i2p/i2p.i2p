@@ -49,14 +49,12 @@ public class SigningPublicKey extends DataStructureImpl {
         _data = data;
     }
 
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[KEYSIZE_BYTES];
         int read = read(in, _data);
         if (read != KEYSIZE_BYTES) throw new DataFormatException("Not enough bytes to read the public key");
     }
 
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the public key to write out");
         if (_data.length != KEYSIZE_BYTES) throw new DataFormatException("Invalid size of data in the public key");

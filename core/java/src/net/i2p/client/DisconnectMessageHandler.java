@@ -23,7 +23,6 @@ class DisconnectMessageHandler extends HandlerImpl {
         super(context, DisconnectMessage.MESSAGE_TYPE);
     }
     
-    @Override
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         _log.debug("Handle message " + message);
         session.destroySession(false);

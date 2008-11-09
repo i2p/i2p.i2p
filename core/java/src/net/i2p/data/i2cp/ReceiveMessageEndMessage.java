@@ -69,7 +69,6 @@ public class ReceiveMessageEndMessage extends I2CPMessageImpl {
         return rv;
     }
 
-    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

@@ -105,7 +105,6 @@ public class RouterAddress extends DataStructureImpl {
         _options = options;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _cost = (int) DataHelper.readLong(in, 1);
         _expiration = DataHelper.readDate(in);
@@ -113,7 +112,6 @@ public class RouterAddress extends DataStructureImpl {
         _options = DataHelper.readProperties(in);
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_cost < 0) || (_transportStyle == null) || (_options == null))
             throw new DataFormatException("Not enough data to write a router address");

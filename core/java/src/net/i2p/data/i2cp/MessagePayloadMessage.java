@@ -106,7 +106,6 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         }
     }
 
-    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

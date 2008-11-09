@@ -74,7 +74,6 @@ public class RouterIdentity extends DataStructureImpl {
         return (_certificate != null) && (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_HIDDEN);
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _publicKey = new PublicKey();
         _publicKey.readBytes(in);
@@ -85,7 +84,6 @@ public class RouterIdentity extends DataStructureImpl {
         __calculatedHash = null;
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the router identity");

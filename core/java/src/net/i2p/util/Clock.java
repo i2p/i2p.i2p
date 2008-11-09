@@ -110,7 +110,7 @@ public class Clock implements Timestamper.UpdateListener {
     
     public boolean getUpdatedSuccessfully() { return _alreadyChanged; }
     
-    @Override
+    
     public void setNow(long realTime) {
         long diff = realTime - System.currentTimeMillis();
         setOffset(diff);

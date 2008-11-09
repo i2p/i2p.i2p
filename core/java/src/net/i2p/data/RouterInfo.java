@@ -487,7 +487,6 @@ public class RouterInfo extends DataStructureImpl {
         }
     }
     
-    @Override
     public synchronized void readBytes(InputStream in) throws DataFormatException, IOException {
         _identity = new RouterIdentity();
         _identity.readBytes(in);
@@ -517,7 +516,6 @@ public class RouterInfo extends DataStructureImpl {
         //_log.debug("Read routerInfo: " + toString());
     }
     
-    @Override
     public synchronized void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_identity == null) throw new DataFormatException("Missing identity");
         if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);

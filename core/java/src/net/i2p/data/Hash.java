@@ -127,7 +127,6 @@ public class Hash extends DataStructureImpl {
         _xorCache = null;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[HASH_LENGTH];
         _stringified = null;
@@ -136,7 +135,6 @@ public class Hash extends DataStructureImpl {
         if (read != HASH_LENGTH) throw new DataFormatException("Not enough bytes to read the hash");
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the hash to write out");
         if (_data.length != HASH_LENGTH) throw new DataFormatException("Invalid size of data in the private key");

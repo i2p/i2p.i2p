@@ -248,24 +248,20 @@ public class OrderedProperties extends Properties {
             _value = val;
         }
 
-        @Override
         public Object getKey() {
             return _key;
         }
 
-        @Override
         public Object getValue() {
             return _value;
         }
 
-        @Override
         public Object setValue(Object value) {
             Object old = _value;
             _value = value;
             return old;
         }
 
-        @Override
         public int compareTo(Object o) {
             if (o == null) return -1;
             if (o instanceof StringMapEntry) return ((String) getKey()).compareTo((String)((StringMapEntry) o).getKey());
@@ -359,7 +355,6 @@ public class OrderedProperties extends Properties {
             _props = props;
         }
 
-        @Override
         public void run() {
             int numRuns = 1000;
             _log.debug("Begin thrashing " + numRuns + " times");

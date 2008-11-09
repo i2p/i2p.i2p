@@ -109,7 +109,6 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
-    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

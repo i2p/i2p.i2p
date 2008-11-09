@@ -111,7 +111,6 @@ public class I2PThread extends Thread {
 
     public static void main(String args[]) {
         I2PThread t = new I2PThread(new Runnable() {
-        	@Override
             public void run() {
                 throw new NullPointerException("blah");
             }

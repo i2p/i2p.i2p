@@ -80,7 +80,6 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length);
     }
-    @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
         return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64));
     }
@@ -89,7 +88,6 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent);
     }
-    @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");

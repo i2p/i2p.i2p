@@ -206,7 +206,6 @@ public class DecayingBloomFilter {
     }
     
     private class DecayEvent implements SimpleTimer.TimedEvent {
-    	@Override
         public void timeReached() {
             if (_keepDecaying) {
                 decay();

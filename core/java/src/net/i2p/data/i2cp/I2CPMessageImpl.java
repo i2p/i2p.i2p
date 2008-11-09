@@ -34,7 +34,6 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      *
      * @throws IOException 
      */
-    @Override
     public void readMessage(InputStream in) throws I2CPMessageException, IOException {
         int length = 0;
         try {
@@ -58,7 +57,6 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      * @param length number of bytes in the message payload
      * @throws IOException
      */
-    @Override
     public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
         if (type != getType())
             throw new I2CPMessageException("Invalid message type (found: " + type + " supported: " + getType()
@@ -105,7 +103,6 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
      *
      * @throws IOException 
      */
-    @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         byte[] data = doWriteMessage();
         try {
@@ -117,7 +114,6 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
         out.write(data);
     }
 
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         try {
             readMessage(in);
@@ -126,7 +122,6 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
         }
     }
 
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         try {
             writeMessage(out);

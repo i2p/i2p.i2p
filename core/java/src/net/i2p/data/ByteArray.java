@@ -74,7 +74,6 @@ public class ByteArray implements Serializable, Comparable {
         return (llen == rlen) && DataHelper.eq(lhs, loff, rhs, roff, llen);
     }
     
-    @Override
     public final int compareTo(Object obj) {
         if (obj.getClass() != getClass()) throw new ClassCastException("invalid object: " + obj);
         return DataHelper.compareTo(_data, ((ByteArray)obj).getData());

@@ -262,7 +262,6 @@ public class EepGet {
             _startedOn = _lastComplete;
             _firstTime = true;
         }
-        @Override
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
             if (_firstTime) {
                 if (alreadyTransferred > 0) {
@@ -319,7 +318,6 @@ public class EepGet {
                 }
             }
         }
-        @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             long transferred;
             if (_firstTime)
@@ -358,7 +356,6 @@ public class EepGet {
                 System.out.println(buf.toString());
             }
         }
-        @Override
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             System.out.println();
             System.out.println("** " + new Date());
@@ -369,7 +366,6 @@ public class EepGet {
             _previousWritten += _written;
             _written = 0;
         }
-        @Override
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
             System.out.println("== " + new Date());
             System.out.println("== Transfer of " + url + " failed after " + currentAttempt + " attempts");
@@ -386,9 +382,7 @@ public class EepGet {
             buf.append("KBps");
             System.out.println(buf.toString());
         }
-        @Override
         public void attempting(String url) {}
-        @Override
         public void headerReceived(String url, int currentAttempt, String key, String val) {}
     }
     
@@ -424,7 +418,6 @@ public class EepGet {
                 timeout = new SocketTimeout(_fetchHeaderTimeout);
             final SocketTimeout stimeout = timeout; // ugly
             timeout.setTimeoutCommand(new Runnable() {
-            	@Override
                 public void run() {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("timeout reached on " + _url + ": " + stimeout);

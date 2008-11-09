@@ -40,7 +40,6 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         _existingLeaseSets = new HashMap(32);
     }
     
-    @Override
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);

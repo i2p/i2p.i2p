@@ -44,14 +44,12 @@ public class Signature extends DataStructureImpl {
         _data = data;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[SIGNATURE_BYTES];
         int read = read(in, _data);
         if (read != SIGNATURE_BYTES) throw new DataFormatException("Not enough bytes to read the signature");
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_data == null) throw new DataFormatException("No data in the signature to write out");
         if (_data.length != SIGNATURE_BYTES) throw new DataFormatException("Invalid size of data in the private key");

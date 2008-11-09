@@ -30,7 +30,6 @@ public class EepGetScheduler implements EepGet.StatusListener {
     
     public void fetch() {
         I2PThread t = new I2PThread(new Runnable() {
-        	@Override
         	public void run() {
         		fetchNext();
         	}
@@ -67,30 +66,24 @@ public class EepGetScheduler implements EepGet.StatusListener {
         get.fetch();
     }
     
-    @Override
     public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
         _listener.attemptFailed(url, bytesTransferred, bytesRemaining, currentAttempt, numRetries, cause);
     }
     
-    @Override
     public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
         _listener.bytesTransferred(alreadyTransferred, currentWrite, bytesTransferred, bytesRemaining, url);
     }
     
-    @Override
     public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
         _listener.transferComplete(alreadyTransferred, bytesTransferred, bytesRemaining, url, outputFile, notModified);
         fetchNext();
     }
     
-    @Override
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
         _listener.transferFailed(url, bytesTransferred, bytesRemaining, currentAttempt);
         fetchNext();
     }
-    @Override
     public void attempting(String url) { _listener.attempting(url); }
     
-    @Override
     public void headerReceived(String url, int attemptNum, String key, String val) {}
 }

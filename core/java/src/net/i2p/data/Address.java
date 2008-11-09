@@ -42,7 +42,6 @@ public class Address extends DataStructureImpl {
         }
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException,
             IOException {
         _hostname = DataHelper.readString(in);
@@ -50,7 +49,6 @@ public class Address extends DataStructureImpl {
         _destination.readBytes(in);
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException,
             IOException {
         if ((_hostname == null) || (_destination == null)) 

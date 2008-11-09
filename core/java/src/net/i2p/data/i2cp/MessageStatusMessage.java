@@ -150,7 +150,6 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         throw new UnsupportedOperationException("This shouldn't be called... use writeMessage(out)");
     }
 
-    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

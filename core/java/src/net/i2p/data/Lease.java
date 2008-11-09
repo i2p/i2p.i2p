@@ -112,7 +112,6 @@ public class Lease extends DataStructureImpl {
         return _end.getTime() < Clock.getInstance().now() - fudgeFactor;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _gateway = new Hash();
         _gateway.readBytes(in);
@@ -121,7 +120,6 @@ public class Lease extends DataStructureImpl {
         _end = DataHelper.readDate(in);
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_gateway == null) || (_tunnelId == null))
             throw new DataFormatException("Not enough data to write out a Lease");

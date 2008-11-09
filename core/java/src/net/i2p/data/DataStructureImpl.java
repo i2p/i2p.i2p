@@ -25,7 +25,6 @@ import net.i2p.util.Log;
 public abstract class DataStructureImpl implements DataStructure {
     private final static Log _log = new Log(DataStructureImpl.class);
     
-    @Override
     public String toBase64() {
         byte data[] = toByteArray();
         if (data == null)
@@ -33,19 +32,16 @@ public abstract class DataStructureImpl implements DataStructure {
 
         return Base64.encode(data);
     }
-    @Override
     public void fromBase64(String data) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         byte bytes[] = Base64.decode(data);
         fromByteArray(bytes);
     }
-    @Override
     public Hash calculateHash() {
         byte data[] = toByteArray();
         if (data != null) return SHA256Generator.getInstance().calculateHash(data);
         return null;
     }
-    @Override
     public byte[] toByteArray() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
@@ -59,7 +55,6 @@ public abstract class DataStructureImpl implements DataStructure {
             return null;
         }
     }
-    @Override
     public void fromByteArray(byte data[]) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         try {

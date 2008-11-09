@@ -67,7 +67,6 @@ public class Certificate extends DataStructureImpl {
         _payload = payload;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _type = (int) DataHelper.readLong(in, 1);
         int length = (int) DataHelper.readLong(in, 2);
@@ -80,7 +79,6 @@ public class Certificate extends DataStructureImpl {
         }
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_type < 0) throw new DataFormatException("Invalid certificate type: " + _type);
         //if ((_type != 0) && (_payload == null)) throw new DataFormatException("Payload is required for non null type");

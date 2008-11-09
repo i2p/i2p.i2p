@@ -16,7 +16,6 @@ class Executor implements Runnable {
         runn = x;
     }
 
-    @Override
     public void run() {
         while(runn.getAnswer()) {
             SimpleTimer.TimedEvent evt = null;

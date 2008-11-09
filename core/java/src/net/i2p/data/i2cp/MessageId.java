@@ -43,12 +43,10 @@ public class MessageId extends DataStructureImpl {
         _messageId = id;
     }
 
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _messageId = DataHelper.readLong(in, 4);
     }
 
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_messageId < 0) throw new DataFormatException("Invalid message ID: " + _messageId);
         DataHelper.writeLong(out, 4, _messageId);

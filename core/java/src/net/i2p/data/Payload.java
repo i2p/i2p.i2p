@@ -67,7 +67,6 @@ public class Payload extends DataStructureImpl {
             return 0;
     }
     
-    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         int size = (int) DataHelper.readLong(in, 4);
         if (size < 0) throw new DataFormatException("payload size out of range (" + size + ")");
@@ -78,7 +77,6 @@ public class Payload extends DataStructureImpl {
             _log.debug("read payload: " + read + " bytes");
     }
     
-    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_encryptedData == null) throw new DataFormatException("Not yet encrypted.  Please set the encrypted data");
         DataHelper.writeLong(out, 4, _encryptedData.length);

@@ -44,7 +44,6 @@ class LogWriter implements Runnable {
         _write = false;
     }
     
-    @Override
     public void run() {
         _write = true;
         try {
