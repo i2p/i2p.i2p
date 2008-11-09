@@ -99,7 +99,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * offline for a while, we'll have a chance of finding some live peers with the
      * previous references
      */
-    private final static long DONT_FAIL_PERIOD = 10*60*1000;
+    protected final static long DONT_FAIL_PERIOD = 10*60*1000;
     
     /** don't probe or broadcast data, just respond and search when explicitly needed */
     private boolean _quiet = false;
@@ -111,8 +111,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public final static String PROP_DB_DIR = "router.networkDatabase.dbDir";
     public final static String DEFAULT_DB_DIR = "netDb";
     
-    /** if we have less than 5 routers left, don't drop any more, even if they're failing or doing bad shit */
-    private final static int MIN_REMAINING_ROUTERS = 5;
+    /** if we have less than this many routers left, don't drop any more,
+     *  even if they're failing or doing bad shit.
+     */
+    protected final static int MIN_REMAINING_ROUTERS = 25;
     
     /** 
      * dont accept any dbDtore of a router over 24 hours old (unless we dont 
@@ -756,24 +758,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             isRouterInfo = true;
         
         if (isRouterInfo) {
-            if (((RouterInfo)o).getNetworkId() != Router.NETWORK_ID) {
-                // definitely drop them
-            } else {
-                int remaining = _kb.size();
-                if (remaining < MIN_REMAINING_ROUTERS) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Not removing " + dbEntry + " because we have so few routers left ("
-                                  + remaining + ") - perhaps a reseed is necessary?");
-                    return;
-                }
-                if (System.currentTimeMillis() < _started + DONT_FAIL_PERIOD) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Not failing the key " + dbEntry.toBase64()
-                                  + " since we've just started up and don't want to drop /everyone/");
-                    return;
-                }
-            }
-            
             lookupBeforeDropping(dbEntry, (RouterInfo)o);
             return;
         } else {
@@ -806,6 +790,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    /** don't use directly - see F.N.D.F. override */
     protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
         //bah, humbug.
         dropAfterLookupFailed(peer, info);

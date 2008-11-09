@@ -20,6 +20,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
@@ -256,7 +257,27 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return sel.selectFloodfillParticipants(getKBuckets());
     }
     
+    /** NTCP cons drop quickly but SSU takes a while, so it's prudent to keep this
+     *  a little higher than 1 or 2. */
+    protected final static int MIN_ACTIVE_PEERS = 5;
+
+    /** 
+      * Search for a newer router info, drop it from the db if the search fails,
+      * unless just started up or have bigger problems.
+      */
     protected void lookupBeforeDropping(Hash peer, RouterInfo info) {
+        // following are some special situations, we don't want to
+        // drop the peer in these cases
+        // yikes don't do this - stack overflow //  getFloodfillPeers().size() == 0 ||
+        if (info.getNetworkId() == Router.NETWORK_ID &&
+            (getKnownRouters() < MIN_REMAINING_ROUTERS ||
+             _context.router().getUptime() < DONT_FAIL_PERIOD ||
+             _context.commSystem().countActivePeers() <= MIN_ACTIVE_PEERS)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Not failing " + peer.toBase64() + " as we are just starting up or have problems");
+            return;
+        }
+
         if (_context.jobQueue().getMaxLag() > 500) {
             // don't try to overload ourselves (e.g. failing 3000 router refs at
             // once, and then firing off 3000 netDb lookup tasks)

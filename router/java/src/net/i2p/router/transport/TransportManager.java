@@ -311,8 +311,11 @@ public class TransportManager implements TransportEventListener {
             }
         }
         if (unreachableTransports >= _transports.size()) {
-            _context.statManager().addRateData("transport.shitlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
-            _context.shitlist().shitlistRouter(peer, "Unreachable on any transport");
+            // Don't shitlist if we aren't talking to anybody, as we may have a network connection issue
+            if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
+                _context.statManager().addRateData("transport.shitlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
+                _context.shitlist().shitlistRouter(peer, "Unreachable on any transport");
+            }
         } else if (rv == null) {
             _context.statManager().addRateData("transport.noBidsYetNotAllUnreachable", unreachableTransports, msg.getLifetime());
         }
