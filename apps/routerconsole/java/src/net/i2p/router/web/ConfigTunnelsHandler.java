@@ -76,7 +76,7 @@ public class ConfigTunnelsHandler extends FormHandler {
             }
             
             if ( (in == null) || (out == null) ) {
-                addFormError("Internal error (pool settings cound not be fuond for " + poolName + ")");
+                addFormError("Internal error (pool settings cound not be found for " + poolName + ")");
                 index++;
                 continue;
             }

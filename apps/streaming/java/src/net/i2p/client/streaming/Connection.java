@@ -950,6 +950,7 @@ public class Connection {
         buf.append(" acked: ").append(getAckedPackets());
         
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
+        buf.append(" MTU ").append(getOptions().getMaxMessageSize());
         
         buf.append("]");
         return buf.toString();

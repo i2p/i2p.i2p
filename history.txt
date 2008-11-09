@@ -1,3 +1,32 @@
+2008-11-09 zzz
+    * build.xml: Build speedups:
+      - Don't distclean in the updaterRouter target
+      - Don't make prepUpdate and prepupdateSmall depend
+        on distclean
+      - Don't make susimail build always clean
+      - Make pkg depend on distclean to be sure
+      - Clean out more routerconsole and susidns files in 'ant clean'
+      - i2ptunnel, routerconsole, susidns:
+        Only build WEB-INF when necessary
+      - systray: Only build jar when necessary
+      - Don't build i2psnark standalone for the updater target
+    * configclients.jsp: Provide a link when starting a webapp
+    * configtunnels.jsp:
+      - Code cleanup
+      - Add 4-hop option
+      - Remove +/- 0-2 option
+    * javadoc: Add some more package.html files
+    * I2PTunnelHTTPServer: Put the requestor's dest hash
+      in the request headers
+    * Jetty: Add a I2PRequestLog class to log request dest hash
+    * NetDb: Don't drop routerInfos if we have connectivity
+      issues or other problems
+    * NTCP: Lower idle timeout to 10m (was 15m)
+    * Routerconsole: Replace wtf msg w/ something nicer
+    * Tunnel BuildHandler: add config router.participantOnly,
+      set to true to refuse OBEP and IBGW roles, should
+      reduce connections significantly if set.
+
 2008-11-02 zzz
     * Certificates:
       - Add a signed Certificate type
