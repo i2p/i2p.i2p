@@ -80,13 +80,44 @@
         <delete dir="jetty-5.1.12" />
     </target>
 
-    <target name="build" depends="ensureJettylib" />
+    <target name="build" depends="jar" />
     <target name="builddep" />
-    <target name="compile" />
-    <target name="jar" />
-    <target name="clean" />
+    <target name="compile" depends="builddep, ensureJettylib" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac 
+            srcdir="./java/src" 
+            debug="true" deprecation="on" source="1.5" target="1.5" 
+            destdir="./build/obj" 
+            classpath="./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar" />
+    </target>
+    <target name="jar" depends="compile">
+        <jar destfile="./jettylib/org.mortbay.jetty.jar" basedir="./build/obj" includes="**/*.class" update="true" >
+        </jar>
+    </target>    
+    <target name="clean" >
+        <delete dir="./build" />
+    </target>    
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean">
         <echo message="Not actually deleting the jetty libs (since they're so large)" />
     </target>
+    <target name="javadoc" >
+        <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
+        <available property="jetty.zip.javadocExtracted" file="build/javadoc" type="dir" />
+        <ant target="fetchJettylib" />
+        <ant target="verifyJettylib" />
+        <ant target="extractJavadoc" />
+    </target>
+    <target name="extractJavadoc" unless="jetty.zip.javadocExtracted" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <unzip src="${jetty.filename}" dest="./build/javadoc" >
+            <patternset>
+                <include name="jetty-5.1.12/javadoc/" />
+            </patternset>
+            <mapper type="glob" from="jetty-5.1.12/javadoc/*" to="javadoc/*" />
+        </unzip>
+    </target>
+
 </project>

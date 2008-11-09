@@ -152,7 +152,7 @@
   <!-- Configure the Request Log                                       -->
   <!-- =============================================================== -->
   <Set name="RequestLog">
-    <New class="org.mortbay.http.NCSARequestLog">
+    <New class="org.mortbay.http.I2PRequestLog">
       <Arg>./eepsite/logs/yyyy_mm_dd.request.log</Arg>
       <Set name="retainDays">90</Set>
       <Set name="append">true</Set>
