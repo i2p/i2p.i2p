@@ -136,7 +136,7 @@ public class EventPumper implements Runnable {
                         int failsafeCloses = 0;
                         int failsafeInvalid = 0;
                                                                 // pointless if we do this every 2 seconds?
-                        long expireIdleWriteTime = 15*60*1000l; // + _context.random().nextLong(60*60*1000l);
+                        long expireIdleWriteTime = 10*60*1000l; // + _context.random().nextLong(60*60*1000l);
                         for (Iterator iter = all.iterator(); iter.hasNext(); ) {
                             try {
                                 SelectionKey key = (SelectionKey)iter.next();
