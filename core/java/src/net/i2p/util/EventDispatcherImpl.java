@@ -37,11 +37,13 @@ public class EventDispatcherImpl implements EventDispatcher {
     private boolean _ignore = false;
     private HashMap _events = new HashMap(4);
     private ArrayList _attached = new ArrayList();
-
+    
+    @Override
     public EventDispatcher getEventDispatcher() {
         return this;
     }
-
+    
+    @Override
     public void attachEventDispatcher(EventDispatcher ev) {
         if (ev == null) return;
         synchronized (_attached) {
@@ -49,7 +51,8 @@ public class EventDispatcherImpl implements EventDispatcher {
             _attached.add(ev);
         }
     }
-
+    
+    @Override
     public void detachEventDispatcher(EventDispatcher ev) {
         if (ev == null) return;
         synchronized (_attached) {
@@ -62,7 +65,8 @@ public class EventDispatcherImpl implements EventDispatcher {
             }
         }
     }
-
+    
+    @Override
     public void notifyEvent(String eventName, Object args) {
         if (_ignore) return;
         if (args == null) {
@@ -84,7 +88,8 @@ public class EventDispatcherImpl implements EventDispatcher {
             }
         }
     }
-
+    
+    @Override
     public Object getEventValue(String name) {
         if (_ignore) return null;
         Object val;
@@ -106,7 +111,8 @@ public class EventDispatcherImpl implements EventDispatcher {
 
         return set;
     }
-
+    
+    @Override
     public void ignoreEvents() {
         _ignore = true;
         synchronized (_events) {
@@ -114,11 +120,13 @@ public class EventDispatcherImpl implements EventDispatcher {
         }
         _events = null;
     }
-
+    
+    @Override
     public void unIgnoreEvents() {
         _ignore = false;
     }
-
+    
+    @Override
     public Object waitEventValue(String name) {
         if (_ignore) return null;
         Object val;

@@ -60,6 +60,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         verifyHeader();
     }
     
+    @Override
     public int read() throws IOException {
         if (_complete) {
             // shortcircuit so the inflater doesn't try to refill 
@@ -73,9 +74,11 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             return _buf1[0];
     }
     
+    @Override
     public int read(byte buf[]) throws IOException {
         return read(buf, 0, buf.length);
     }
+    @Override
     public int read(byte buf[], int off, int len) throws IOException {
         if (_complete) {
             // shortcircuit so the inflater doesn't try to refill 

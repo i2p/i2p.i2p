@@ -113,6 +113,7 @@ public class BufferedRandomSource extends RandomSource {
         }
     }
     
+    @Override
     public synchronized final void nextBytes(byte buf[]) { 
         int outOffset = 0;
         while (outOffset < buf.length) {
@@ -128,6 +129,7 @@ public class BufferedRandomSource extends RandomSource {
         }
     }
     
+    @Override
     public final int nextInt(int n) {
         if (n <= 0) return 0;
         int val = ((int)nextBits(countBits(n))) % n;
@@ -136,13 +138,15 @@ public class BufferedRandomSource extends RandomSource {
         else
             return val;
     }
-
+    
+    @Override
     public final int nextInt() { return nextInt(Integer.MAX_VALUE); }
         
     /**
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
      */
+    @Override
     public final long nextLong(long n) {
         if (n <= 0) return 0;
         long val = nextBits(countBits(n)) % n;
@@ -152,6 +156,7 @@ public class BufferedRandomSource extends RandomSource {
             return val;
     }
     
+    @Override
     public final long nextLong() { return nextLong(Long.MAX_VALUE); }
     
     static final int countBits(long val) {
@@ -172,22 +177,26 @@ public class BufferedRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public final boolean nextBoolean() { 
         return nextBits(1) != 0;
     }
     
     private static final double DOUBLE_DENOMENATOR = (double)(1L << 53);
     /** defined per javadoc ( ((nextBits(26)<<27) + nextBits(27)) / (1 << 53)) */
+    @Override
     public final double nextDouble() { 
         long top = (((long)nextBits(26) << 27) + nextBits(27));
         return top / DOUBLE_DENOMENATOR;
     }
     private static final float FLOAT_DENOMENATOR = (float)(1 << 24);
     /** defined per javadoc (nextBits(24) / ((float)(1 << 24)) ) */
+    @Override
     public float nextFloat() { 
         long top = nextBits(24);
         return top / FLOAT_DENOMENATOR;
     }
+    @Override
     public double nextGaussian() { 
         // bah, unbuffered
         return super.nextGaussian(); 

@@ -48,22 +48,26 @@ public class OrderedProperties extends Properties {
         _data = new HashMap();
     }
 
+    @Override
     public boolean contains(Object value) {
         return containsValue(value);
     }
 
+    @Override
     public boolean containsKey(Object key) {
         synchronized (_lock) {
             return _data.containsKey(key);
         }
     }
 
+    @Override
     public boolean containsValue(Object value) {
         synchronized (_lock) {
             return _data.containsValue(value);
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof OrderedProperties)) {
             synchronized (_lock) {
@@ -74,20 +78,24 @@ public class OrderedProperties extends Properties {
         return false;
     }
 
+    @Override
     public int hashCode() {
         synchronized (_lock) {
             return _data.hashCode();
         }
     }
 
+    @Override
     public boolean isEmpty() {
         return size() == 0;
     }
 
+    @Override
     public String getProperty(String key) {
         return getProperty((Object) key);
     }
 
+    @Override
     public Object get(Object key) {
         return getProperty(key);
     }
@@ -102,6 +110,7 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public Object setProperty(String key, String val) {
         if ((key == null) || (val == null)) throw new IllegalArgumentException("Null values are not supported");
         synchronized (_lock) {
@@ -111,6 +120,7 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public Object put(Object key, Object val) {
         if ((key == null) || (val == null)) throw new NullPointerException("Null values or keys are not allowed");
         if (!(key instanceof String) || !(val instanceof String))
@@ -118,6 +128,7 @@ public class OrderedProperties extends Properties {
         return setProperty((String) key, (String) val);
     }
 
+    @Override
     public void putAll(Map data) {
         if (data == null) return;
         for (Iterator iter = data.entrySet().iterator(); iter.hasNext();) {
@@ -128,6 +139,7 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public Object clone() {
         synchronized (_lock) {
             OrderedProperties rv = new OrderedProperties();
@@ -136,6 +148,7 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public void clear() {
         synchronized (_lock) {
             _order.clear();
@@ -143,12 +156,14 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public int size() {
         synchronized (_lock) {
             return _order.size();
         }
     }
 
+    @Override
     public Object remove(Object key) {
         synchronized (_lock) {
             _order.remove(key);
@@ -157,18 +172,21 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public Set keySet() {
         synchronized (_lock) {
             return Collections.unmodifiableSortedSet((TreeSet) _order.clone());
         }
     }
 
+    @Override
     public Set entrySet() {
         synchronized (_lock) {
             return Collections.unmodifiableSet(buildEntrySet((TreeSet) _order.clone()));
         }
     }
 
+    @Override
     public Collection values() {
         synchronized (_lock) {
             Collection values = new ArrayList(_data.size());
@@ -179,28 +197,35 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
     public Enumeration elements() {
         return Collections.enumeration(values());
     }
 
+    @Override
     public Enumeration keys() {
         return Collections.enumeration(keySet());
     }
 
+    @Override
     public Enumeration propertyNames() {
         return Collections.enumeration(keySet());
     }
 
+    @Override
     public void list(PrintStream out) { // nop
     }
 
+    @Override
     public void list(PrintWriter out) { // nop
     }
 
+    @Override
     public void load(InputStream in) { // nop
     }
 
     //public void save(OutputStream out, String header) {}
+    @Override
     public void store(OutputStream out, String header) { // nop
     }
 
@@ -223,20 +248,24 @@ public class OrderedProperties extends Properties {
             _value = val;
         }
 
+        @Override
         public Object getKey() {
             return _key;
         }
 
+        @Override
         public Object getValue() {
             return _value;
         }
 
+        @Override
         public Object setValue(Object value) {
             Object old = _value;
             _value = value;
             return old;
         }
 
+        @Override
         public int compareTo(Object o) {
             if (o == null) return -1;
             if (o instanceof StringMapEntry) return ((String) getKey()).compareTo((String)((StringMapEntry) o).getKey());
@@ -244,6 +273,7 @@ public class OrderedProperties extends Properties {
             return -2;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o == null) return false;
             if (!(o instanceof StringMapEntry)) return false;
@@ -329,6 +359,7 @@ public class OrderedProperties extends Properties {
             _props = props;
         }
 
+        @Override
         public void run() {
             int numRuns = 1000;
             _log.debug("Begin thrashing " + numRuns + " times");

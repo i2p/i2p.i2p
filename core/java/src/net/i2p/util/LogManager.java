@@ -655,6 +655,7 @@ public class LogManager {
         public ShutdownHook() {
             _id = ++__id;
         }
+        @Override
         public void run() {
             setName("Log " + _id + " shutdown ");
             shutdown();

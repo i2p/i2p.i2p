@@ -44,6 +44,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         _haveNextGaussian = false;
     }
     
+    @Override
     public synchronized void setSeed(byte buf[]) {
       _fortuna.addRandomBytes(buf);
     }
@@ -56,6 +57,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      * thats what it has been used for.
      *
      */
+    @Override
     public int nextInt(int n) {
         if (n == 0) return 0;
         int rv = signedNextInt(n);
@@ -64,7 +66,8 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         rv %= n;
         return rv;
     }
-
+    
+    @Override
     public int nextInt() { return signedNextInt(Integer.MAX_VALUE); }
 
     /**
@@ -107,6 +110,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
      */
+    @Override
     public long nextLong(long n) {
         if (n == 0) return 0;
         long rv = signedNextLong(n);
@@ -116,6 +120,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         return rv;
     }
     
+    @Override
     public long nextLong() { return signedNextLong(Long.MAX_VALUE); }
 
     /**
@@ -125,12 +130,14 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         return ((long)nextBits(32) << 32) + nextBits(32);
     }
 
+    @Override
     public synchronized boolean nextBoolean() { 
         // wasteful, might be worth caching the boolean byte later
         byte val = _fortuna.nextByte();
         return ((val & 0x01) == 1);
     }
 
+    @Override
     public synchronized void nextBytes(byte buf[]) { 
         _fortuna.nextBytes(buf);
     }
@@ -138,18 +145,21 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     /**
      * Implementation from sun's java.util.Random javadocs 
      */
+    @Override
     public double nextDouble() { 
         return (((long)nextBits(26) << 27) + nextBits(27)) / (double)(1L << 53);
     }
     /**
      * Implementation from sun's java.util.Random javadocs 
      */
+    @Override
     public float nextFloat() { 
         return nextBits(24) / ((float)(1 << 24));
     }
     /**
      * Implementation from sun's java.util.Random javadocs 
      */
+    @Override
     public synchronized double nextGaussian() { 
         if (_haveNextGaussian) {
             _haveNextGaussian = false;
@@ -185,14 +195,17 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         return (int)rv;
     }
     
+    @Override
     public EntropyHarvester harvester() { return this; }
  
     /** reseed the fortuna */
+    @Override
     public synchronized void feedEntropy(String source, long data, int bitoffset, int bits) {
         _fortuna.addRandomByte((byte)(data & 0xFF));
     }
  
-    /** reseed the fortuna */   
+    /** reseed the fortuna */
+    @Override
     public synchronized void feedEntropy(String source, byte[] data, int offset, int len) {
         _fortuna.addRandomBytes(data, offset, len);
     }

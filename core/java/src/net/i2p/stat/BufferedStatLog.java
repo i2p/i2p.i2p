@@ -51,6 +51,7 @@ public class BufferedStatLog implements StatLog {
         writer.start();
     }
     
+    @Override
     public void addData(String scope, String stat, long value, long duration) {
         if (DISABLE_LOGGING) return;
         if (!shouldLog(stat)) return;
@@ -122,6 +123,7 @@ public class BufferedStatLog implements StatLog {
     
     private class StatLogWriter implements Runnable {
         private SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
+        @Override
         public void run() {
             int writeStart = -1;
             int writeEnd = -1;

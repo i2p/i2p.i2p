@@ -49,6 +49,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
      * thats what it has been used for.
      *
      */
+    @Override
     public int nextInt(int n) {
         if (n == 0) return 0;
         int val = super.nextInt(n);
@@ -72,45 +73,54 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public boolean nextBoolean() { return super.nextBoolean(); }
     /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public void nextBytes(byte buf[]) { super.nextBytes(buf); }
     /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public double nextDouble() { return super.nextDouble(); }
     /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public float nextFloat() { return super.nextFloat(); }
     /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public double nextGaussian() { return super.nextGaussian(); }
     /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public int nextInt() { return super.nextInt(); }
     /**
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public long nextLong() { return super.nextLong(); }
     
     public EntropyHarvester harvester() { return _entropyHarvester; }
  
+    @Override
     public void feedEntropy(String source, long data, int bitoffset, int bits) {
         if (bitoffset == 0)
             setSeed(data);
     }
     
+    @Override
     public void feedEntropy(String source, byte[] data, int offset, int len) {
         if ( (offset == 0) && (len == data.length) ) {
             setSeed(data);

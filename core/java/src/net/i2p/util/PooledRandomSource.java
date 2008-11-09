@@ -89,6 +89,7 @@ public class PooledRandomSource extends RandomSource {
      * thats what it has been used for.
      *
      */
+    @Override
     public int nextInt(int n) {
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -100,6 +101,7 @@ public class PooledRandomSource extends RandomSource {
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
      */
+    @Override
     public long nextLong(long n) {
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -111,6 +113,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public boolean nextBoolean() { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -121,6 +124,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public void nextBytes(byte buf[]) { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -131,6 +135,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public double nextDouble() { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -141,6 +146,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public float nextFloat() { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -151,6 +157,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public double nextGaussian() { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -161,6 +168,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public int nextInt() { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -171,6 +179,7 @@ public class PooledRandomSource extends RandomSource {
      * override as synchronized, for those JVMs that don't always pull via
      * nextBytes (cough ibm)
      */
+    @Override
     public long nextLong() { 
         RandomSource prng = pickPRNG();
         synchronized (prng) {
@@ -178,6 +187,7 @@ public class PooledRandomSource extends RandomSource {
         }
     }
     
+    @Override
     public EntropyHarvester harvester() { 
         RandomSource prng = pickPRNG();
         return prng.harvester();

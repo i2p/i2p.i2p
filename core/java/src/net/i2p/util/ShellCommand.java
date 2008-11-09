@@ -59,6 +59,7 @@ public class ShellCommand {
             this.consumeOutput = consumeOutput;
         }
 
+        @Override
         public void run() {
             _commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
             if (_isTimerRunning) {
@@ -90,6 +91,7 @@ public class ShellCommand {
             this.bufferedReader = new BufferedReader(inputStreamReader);
         }
 
+        @Override
         public void run() {
 
             String streamData;
@@ -123,6 +125,7 @@ public class ShellCommand {
             this.bufferedReader = new BufferedReader(inputStreamReader);
         }
 
+        @Override
         public void run() {
 
             char[] buffer    = new char[BUFFER_SIZE];
@@ -159,6 +162,7 @@ public class ShellCommand {
             this.bufferedWriter = new BufferedWriter(outputStreamWriter);
         }
 
+        @Override
         public void run() {
 
             String input;

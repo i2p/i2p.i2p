@@ -91,25 +91,30 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         }
     }
     
+    @Override
     public void close() throws IOException {
         finish();
         super.close();
     }
+    @Override
     public void finish() throws IOException {
         ensureHeaderIsWritten();
         super.finish();
         writeFooter();
     }
     
+    @Override
     public void write(int b) throws IOException {
         ensureHeaderIsWritten();
         _crc32.update(b);
         _writtenSize++;
         super.write(b);
     }
+    @Override
     public void write(byte buf[]) throws IOException {
         write(buf, 0, buf.length);
     }
+    @Override
     public void write(byte buf[], int off, int len) throws IOException {
         ensureHeaderIsWritten();
         _crc32.update(buf, off, len);

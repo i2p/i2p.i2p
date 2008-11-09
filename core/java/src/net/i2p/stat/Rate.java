@@ -436,6 +436,7 @@ public class Rate {
         coalesce();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || (obj.getClass() != Rate.class)) return false;
         if (obj == this) return true;
@@ -451,6 +452,7 @@ public class Rate {
                && _lifetimeTotalEventTime == r.getLifetimeTotalEventTime();
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(2048);
         buf.append("\n\t total value: ").append(getLastTotalValue());

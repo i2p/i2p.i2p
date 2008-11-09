@@ -38,6 +38,7 @@ public class LookaheadInputStream extends FilterInputStream {
         boolean f = true;
     }
     
+    @Override
     public int read() throws IOException {
         if (_eofReached) 
             return -1; //throw new IOException("Already past the EOF");
@@ -52,9 +53,11 @@ public class LookaheadInputStream extends FilterInputStream {
         if (rv < 0) rv += 256;
         return rv;
     }
+    @Override
     public int read(byte buf[]) throws IOException {
         return read(buf, 0, buf.length);
     }
+    @Override
     public int read(byte buf[], int off, int len) throws IOException {
         if (_eofReached) 
             return -1;

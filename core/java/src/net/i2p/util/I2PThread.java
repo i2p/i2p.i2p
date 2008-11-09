@@ -62,7 +62,8 @@ public class I2PThread extends Thread {
         if (_log.shouldLog(level))
             _log.log(level, msg, t);
     }
-
+    
+    @Override
     public void run() {
         _name = Thread.currentThread().getName();
         log(Log.DEBUG, "New thread started: " + _name, _createdBy);
@@ -81,6 +82,7 @@ public class I2PThread extends Thread {
         log(Log.DEBUG, "Thread finished gracefully: " + _name);
     }
     
+    @Override
     protected void finalize() throws Throwable {
         log(Log.DEBUG, "Thread finalized: " + _name);
         super.finalize();
@@ -109,6 +111,7 @@ public class I2PThread extends Thread {
 
     public static void main(String args[]) {
         I2PThread t = new I2PThread(new Runnable() {
+        	@Override
             public void run() {
                 throw new NullPointerException("blah");
             }

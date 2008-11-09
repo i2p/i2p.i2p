@@ -43,7 +43,8 @@ class LogWriter implements Runnable {
     public void stopWriting() {
         _write = false;
     }
-
+    
+    @Override
     public void run() {
         _write = true;
         try {

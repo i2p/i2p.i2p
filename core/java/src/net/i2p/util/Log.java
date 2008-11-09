@@ -183,9 +183,11 @@ public class Log {
             _scopeClass = cls;
             _scopeCache = getScope(name, cls);
         }
+        @Override
         public int hashCode() {
             return _scopeCache.hashCode();
         }
+        @Override
         public boolean equals(Object obj) {
             if (obj == null) throw new NullPointerException("Null object scope?");
             if (obj instanceof LogScope) {

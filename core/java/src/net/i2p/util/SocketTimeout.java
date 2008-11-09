@@ -56,6 +56,7 @@ public class SocketTimeout implements SimpleTimer.TimedEvent {
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss.SSS");
     private static String ts(long when) { synchronized (_fmt) { return _fmt.format(new Date(when)); } }
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("started on ");

@@ -110,6 +110,7 @@ public class Timestamper implements Runnable {
         } catch (InterruptedException ie) {}
     }
     
+    @Override
     public void run() {
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         _log = _context.logManager().getLog(Timestamper.class);

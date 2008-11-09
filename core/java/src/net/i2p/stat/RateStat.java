@@ -84,12 +84,14 @@ public class RateStat {
         return null;
     }
 
+    @Override
     public int hashCode() {
         return _statName.hashCode();
     }
 
     private final static String NL = System.getProperty("line.separator");
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(4096);
         buf.append(getGroupName()).append('.').append(getName()).append(": ").append(getDescription()).append('\n');
@@ -104,6 +106,7 @@ public class RateStat {
         return buf.toString();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if ((obj == null) || (obj.getClass() != RateStat.class)) return false;
         RateStat rs = (RateStat) obj;
