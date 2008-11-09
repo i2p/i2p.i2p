@@ -62,7 +62,11 @@ public class ConfigTunnelsHelper {
         return buf.toString();
     }
 
-    static final int WARN_LENGTH = 4;
+    private static final int WARN_LENGTH = 4;
+    private static final int MAX_LENGTH = 4;
+    private static final int MAX_QUANTITY = 3;
+    private static final int MAX_VARIANCE = 2;
+    private static final int MIN_NEG_VARIANCE = -1;
     private void renderForm(StringBuffer buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
 
         buf.append("<tr><td colspan=\"3\"><b><a name=\"").append(prefix).append("\">");
@@ -82,151 +86,75 @@ public class ConfigTunnelsHelper {
         // tunnel depth
         buf.append("<tr><td>Depth</td>\n");
         buf.append("<td><select name=\"").append(index).append(".depthInbound\">\n");
-        buf.append("<option value=\"0\" ");
-        if (in.getLength() <= 0) buf.append(" selected=\"true\" ");
-        buf.append(">0 hops</option>\n");
-        buf.append("<option value=\"1\" ");
-        if (in.getLength() == 1) buf.append(" selected=\"true\" ");
-        buf.append(">1 hop</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (in.getLength() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">2 hops</option>\n");
-        buf.append("<option value=\"3\" ");
-        if (in.getLength() == 3) buf.append(" selected=\"true\" ");
-        buf.append(">3 hops</option>\n");
-        if (in.getLength() > 3)
-            buf.append("<option value=\"").append(in.getLength()).append("\">").append(in.getLength()).append(" hops</option>\n");
+        int now = in.getLength();
+        renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
+        if (now > MAX_LENGTH)
+            renderOptions(buf, now, now, now, "", "hop");
         buf.append("</td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".depthOutbound\">\n");
-        buf.append("<option value=\"0\" ");
-        if (out.getLength() <= 0) buf.append(" selected=\"true\" ");
-        buf.append(">0 hops</option>\n");
-        buf.append("<option value=\"1\" ");
-        if (out.getLength() == 1) buf.append(" selected=\"true\" ");
-        buf.append(">1 hop</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (out.getLength() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">2 hops</option>\n");
-        buf.append("<option value=\"3\" ");
-        if (out.getLength() == 3) buf.append(" selected=\"true\" ");
-        buf.append(">3 hops</option>\n");
-        if (out.getLength() > 3)
-            buf.append("<option value=\"").append(out.getLength()).append("\">").append(out.getLength()).append(" hops</option>\n");
+        now = out.getLength();
+        renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
+        if (now > MAX_LENGTH)
+            renderOptions(buf, now, now, now, "", "hop");
         buf.append("</td>\n");
         buf.append("</tr>\n");
 
         // tunnel depth variance
         buf.append("<tr><td>Randomization</td>\n");
         buf.append("<td><select name=\"").append(index).append(".varianceInbound\">\n");
-        buf.append("<option value=\"0\" ");
-        if (in.getLengthVariance() == 0) buf.append(" selected=\"true\" ");
-        buf.append(">0 hops</option>\n");
-        buf.append("<option value=\"-1\" ");
-        if (in.getLengthVariance() == -1) buf.append(" selected=\"true\" ");
-        buf.append(">+/- 0-1 hops</option>\n");
-        buf.append("<option value=\"-2\" ");
-        if (in.getLengthVariance() == -2) buf.append(" selected=\"true\" ");
-        buf.append(">+/- 0-2 hops</option>\n");
-        buf.append("<option value=\"1\" ");
-        if (in.getLengthVariance() == 1) buf.append(" selected=\"true\" ");
-        buf.append(">+ 0-1 hops</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (in.getLengthVariance() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">+ 0-2 hops</option>\n");
-        if (in.getLengthVariance() < -2)
-            buf.append("<option value=\"").append(in.getLengthVariance()).append("\">+/- 0-").append(in.getLengthVariance()).append(" hops</option>\n");
-        if (in.getLengthVariance() > 2)
-            buf.append("<option value=\"").append(in.getLengthVariance()).append("\">+ 0-").append(in.getLengthVariance()).append(" hops</option>\n");
+        now = in.getLengthVariance();
+        renderOptions(buf, 0, 0, now, "", "hop");
+        renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", "hop");
+        renderOptions(buf, MIN_NEG_VARIANCE, -1, now, "+/- 0", "hop");
+        if (now > MAX_VARIANCE)
+            renderOptions(buf, now, now, now, "+ 0-", "hop");
+        else if (now < MIN_NEG_VARIANCE)
+            renderOptions(buf, now, now, now, "+/- 0", "hop");
         buf.append("</td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".varianceOutbound\">\n");
-        buf.append("<option value=\"0\" ");
-        if (out.getLengthVariance() == 0) buf.append(" selected=\"true\" ");
-        buf.append(">0 hops</option>\n");
-        buf.append("<option value=\"-1\" ");
-        if (out.getLengthVariance() == -1) buf.append(" selected=\"true\" ");
-        buf.append(">+/- 0-1 hops</option>\n");
-        buf.append("<option value=\"-2\" ");
-        if (out.getLengthVariance() == -2) buf.append(" selected=\"true\" ");
-        buf.append(">+/- 0-2 hops</option>\n");
-        buf.append("<option value=\"1\" ");
-        if (out.getLengthVariance() == 1) buf.append(" selected=\"true\" ");
-        buf.append(">+ 0-1 hops</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (out.getLengthVariance() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">+ 0-2 hops</option>\n");
-        if (out.getLengthVariance() < -2)
-            buf.append("<option value=\"").append(out.getLengthVariance()).append("\">+/- 0-").append(out.getLengthVariance()).append(" hops</option>\n");
-        if (out.getLengthVariance() > 2)
-            buf.append("<option value=\"").append(out.getLengthVariance()).append("\">+ 0-").append(out.getLengthVariance()).append(" hops</option>\n");
+        now = out.getLengthVariance();
+        renderOptions(buf, 0, 0, now, "", "hop");
+        renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", "hop");
+        renderOptions(buf, MIN_NEG_VARIANCE, -1, now, "+/- 0", "hop");
+        if (now > MAX_VARIANCE)
+            renderOptions(buf, now, now, now, "+ 0-", "hop");
+        else if (now < MIN_NEG_VARIANCE)
+            renderOptions(buf, now, now, now, "+/- 0", "hop");
         buf.append("</td>\n");
 
         // tunnel quantity
         buf.append("<tr><td>Quantity</td>\n");
         buf.append("<td><select name=\"").append(index).append(".quantityInbound\">\n");
-        buf.append("<option value=\"1\" ");
-        if (in.getQuantity() <= 1) buf.append(" selected=\"true\" ");
-        buf.append(">1 tunnel</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (in.getQuantity() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">2 tunnels</option>\n");
-        buf.append("<option value=\"3\" ");
-        if (in.getQuantity() == 3) buf.append(" selected=\"true\" ");
-        buf.append(">3 tunnels</option>\n");
-        if (in.getQuantity() > 3)
-            buf.append("<option value=\"").append(in.getQuantity()).append("\">").append(in.getQuantity()).append(" tunnels</option>\n");
+        now = in.getQuantity();
+        renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
+        if (now > MAX_QUANTITY)
+            renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".quantityOutbound\">\n");
-        buf.append("<option value=\"1\" ");
-        if (out.getQuantity() <= 1) buf.append(" selected=\"true\" ");
-        buf.append(">1 tunnel</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (out.getQuantity() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">2 tunnels</option>\n");
-        buf.append("<option value=\"3\" ");
-        if (out.getQuantity() == 3) buf.append(" selected=\"true\" ");
-        buf.append(">3 tunnels</option>\n");
-        if (out.getQuantity() > 3)
-            buf.append("<option value=\"").append(out.getQuantity()).append("\">").append(out.getQuantity()).append(" tunnels</option>\n");
+        now = out.getQuantity();
+        renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
+        if (now > MAX_QUANTITY)
+            renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</td>\n");
         buf.append("</tr>\n");
 
         // tunnel backup quantity
         buf.append("<tr><td>Backup quantity</td>\n");
         buf.append("<td><select name=\"").append(index).append(".backupInbound\">\n");
-        buf.append("<option value=\"0\" ");
-        if (in.getBackupQuantity() <= 0) buf.append(" selected=\"true\" ");
-        buf.append(">0 tunnels</option>\n");
-        buf.append("<option value=\"1\" ");
-        if (in.getBackupQuantity() == 1) buf.append(" selected=\"true\" ");
-        buf.append(">1 tunnel</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (in.getBackupQuantity() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">2 tunnels</option>\n");
-        buf.append("<option value=\"3\" ");
-        if (in.getBackupQuantity() == 3) buf.append(" selected=\"true\" ");
-        buf.append(">3 tunnels</option>\n");
-        if (in.getBackupQuantity() > 3)
-            buf.append("<option value=\"").append(in.getBackupQuantity()).append("\">").append(in.getBackupQuantity()).append(" tunnels</option>\n");
+        now = in.getBackupQuantity();
+        renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
+        if (now > MAX_QUANTITY)
+            renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".backupOutbound\">\n");
-        buf.append("<option value=\"0\" ");
-        if (out.getBackupQuantity() <= 0) buf.append(" selected=\"true\" ");
-        buf.append(">0 tunnel</option>\n");
-        buf.append("<option value=\"1\" ");
-        if (out.getBackupQuantity() == 1) buf.append(" selected=\"true\" ");
-        buf.append(">1 tunnel</option>\n");
-        buf.append("<option value=\"2\" ");
-        if (out.getBackupQuantity() == 2) buf.append(" selected=\"true\" ");
-        buf.append(">2 tunnels</option>\n");
-        buf.append("<option value=\"3\" ");
-        if (out.getBackupQuantity() == 3) buf.append(" selected=\"true\" ");
-        buf.append(">3 tunnels</option>\n");
-        if (out.getBackupQuantity() > 3)
-            buf.append("<option value=\"").append(out.getBackupQuantity()).append("\">").append(out.getBackupQuantity()).append(" tunnels</option>\n");
+        now = in.getBackupQuantity();
+        renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
+        if (now > MAX_QUANTITY)
+            renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</td>\n");
         buf.append("</tr>\n");
 
@@ -254,5 +182,17 @@ public class ConfigTunnelsHelper {
         }
         buf.append("\"/></td></tr>\n");
         buf.append("<tr><td colspan=\"3\"><hr /></td></tr>\n");
+    }
+
+    private void renderOptions(StringBuffer buf, int min, int max, int now, String prefix, String name) {
+        for (int i = min; i <= max; i++) {
+            buf.append("<option value=\"").append(i).append("\" ");
+            if (i == now)
+                buf.append("selected=\"true\" ");
+            buf.append(">").append(prefix).append(i).append(' ').append(name);
+            if (i != 1 && i != -1)
+                buf.append('s');
+            buf.append("</option>\n");
+        }
     }
 }
