@@ -1,0 +1,49 @@
+<html><body>
+<p>
+The Invisible Internet Client Protocol (I2CP) allows applications simplified access to
+the I2P network without requiring them to deal with the issues involved with the
+Invisible Internet Network Protocol (I2NP). Specifically, it defines the wire level
+protocol as well as semantics for the messages passed between clients and the router
+for communicating with the router over bidirectional TCP/IP sockets. I2CP does not
+specify how the client libraries are created, what APIs they expose to applications, or
+even what language they're written in.
+</p>
+<h2>Requirements</h2>
+<p>
+I2CP requires that the client can access the router over bidirectional TCP sockets. In
+nearly all cases, these connections will be over to the local machine.
+</p>
+<h2>Threat Model</h2>
+<p>
+I2CP does not provide data confidentiality or handle lossy connections beyond what
+TCP has built in. For this reason, I2CP really should only be run between clients and
+routers on the same machine or over trusted networks. Secured I2CP transports may
+be added in the future. I2CP however does not expose any private keys across the
+wire - proof of authorization to collect messages for a Destination is provided by
+public key signatures.
+</p>
+<h1>Messages</h1>
+<p>
+These classes are the currently defined messages in the Invisible Internet Client
+Protocol (I2CP), though common data structures are located in the I2P Common Data
+Structure Specification. For simplicity, all I2CP messages begin with the same
+structure, though that structure is not listed below. Specifically, all I2CP messages
+transmitted begin with a 4 byte Integer specifying the entire size of the current
+message's body (the body being what's specified below), followed by a 1 byte
+Integer specifying the type of message (the id field below), after which the rest of
+the message is formatted according to the type of message, as specified below.
+</p><p>
+If there is a fatal error causing either the client or the router to desire to cancel sending
+a message part way through, it should drop its connection. Administrative sessions are
+not stateful (aka each administrative message from client to router must provide
+authentication), but normal client sessions are stateful and survive disconnects. Client
+sessions expire when either the client sends a DestroySessionMessage or the router
+times out the session according to its own configurable timer. If a client sends any
+message other than a CreateSessionMessage when there is no valid session, the
+router must reply with a SessionStatusMessage specifying that the session is not
+valid.
+</p><p>
+Note: the contents and bitbuckets for specific DataStructures are detailed in the
+I2P Data Structures Spec.
+</p>
+</body></html>
