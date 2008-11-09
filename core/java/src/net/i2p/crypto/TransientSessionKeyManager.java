@@ -75,7 +75,6 @@ class TransientSessionKeyManager extends SessionKeyManager {
     private TransientSessionKeyManager() { this(null); }
     
     private class CleanupEvent implements SimpleTimer.TimedEvent {
-    	@Override
         public void timeReached() {
             long beforeExpire = _context.clock().now();
             int expired = aggressiveExpire();
