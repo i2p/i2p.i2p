@@ -18,7 +18,7 @@
             includes="**/*.java"
             classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" />
     </target>
-    <target name="jar" depends="compile">
+    <target name="jar" depends="compile" unless="jar.uptodate">
         <mkdir dir="./build/jar_temp" />
         <copy todir="./build/jar_temp">
             <fileset dir="./build/obj" includes="**/*.class" />
@@ -31,6 +31,11 @@
         </jar>
         <delete dir="./build/jar_temp" />
     </target>
+
+    <uptodate property="jar.uptodate" targetfile="./build/systray.jar">
+        <srcfiles dir= "src" includes="**/*.java" />
+    </uptodate>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />

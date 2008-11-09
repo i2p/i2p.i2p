@@ -5,7 +5,7 @@
     <target name="builddep">
         <ant dir="../jetty/" target="build" />
     </target>
-    <target name="compile" depends="clean">
+    <target name="compile">
         <javac 
             srcdir="./src/src"
             debug="true" deprecation="off" source="1.5" target="1.5" 

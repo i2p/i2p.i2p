@@ -27,10 +27,11 @@
 		<javac debug="true" deprecation="on" source="1.5" target="1.5"
  			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" />
 	</target>
-    <target name="precompilejsp">
+    <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete file="WEB-INF/web-fragment.xml" />
         <delete file="WEB-INF/web-out.xml" />
     	<mkdir dir="${tmp}" />
+        <echo message="Ignore any warning about /WEB-INF/web.xml not found" />
         <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp">
             <arg value="-d" />
             <arg value="WEB-INF/classes" />
@@ -51,6 +52,11 @@
             <replacefilter token="&lt;!-- precompiled servlets --&gt;" value="${jspc.web.fragment}" />
         </replace>
     </target>
+
+    <uptodate property="precompilejsp.uptodate" targetfile="WEB-INF/web-out.xml">
+        <srcfiles dir= "." includes="jsp/*.jsp, WEB-INF/web-template.xml"/>
+    </uptodate>
+
     <target name="all" depends="compile,precompilejsp,war"/> 
     <target name="war"> 
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
@@ -74,7 +80,9 @@
       <delete>
         <fileset dir="." includes="**/*.class" />
         <fileset dir="." includes="tmp" />
+        <fileset dir="WEB-INF" includes="web-fragment.xml, web-out.xml" />
       </delete>
+      <delete dir="${bin}" />
     </target>
     <target name="distclean" depends="clean" />
 </project>

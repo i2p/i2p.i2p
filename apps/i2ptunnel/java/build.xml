@@ -30,7 +30,7 @@
              basedir="../jsp/" excludes="web.xml, *.java, *.jsp">
         </war>
     </target>
-    <target name="precompilejsp">
+    <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
         <delete file="../jsp/web-out.xml" />
@@ -72,6 +72,11 @@
             <replacefilter token="&lt;!-- precompiled servlets --&gt;" value="${jspc.web.fragment}" />
         </replace>
     </target>
+
+    <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
+        <srcfiles dir= "../jsp" includes="*.jsp, *.html, web.xml"/>
+    </uptodate>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
@@ -84,6 +89,9 @@
     </target>
     <target name="clean">
         <delete dir="./build" />
+        <delete dir="../jsp/WEB-INF/" />
+        <delete file="../jsp/web-fragment.xml" />
+        <delete file="../jsp/web-out.xml" />
     </target>
     <target name="cleandep" depends="clean">
 	<!-- ministreaming will clean core -->

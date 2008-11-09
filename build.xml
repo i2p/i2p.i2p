@@ -18,7 +18,11 @@
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
-    <target name="build" depends="builddep, jar, buildWEB" />
+    <target name="build" depends="build2">
+        <!-- so we don't build standalone for the updater -->
+        <ant dir="apps/i2psnark/java/" target="standalone" />
+    </target>
+    <target name="build2" depends="builddep, jar, buildWEB" />
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
     <target name="builddep" depends="builddepSmall">
@@ -27,7 +31,7 @@
         <ant dir="apps/sam/java/" target="jar" />
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
-        <ant dir="apps/i2psnark/java/" target="standalone" />
+        <ant dir="apps/i2psnark/java/" target="war" />
     </target>
     <target name="builddepSmall">
         <ant dir="core/java/" target="jar" />
@@ -40,8 +44,6 @@
         <ant dir="apps/addressbook/" target="war" />
     </target>
     <target name="buildrouter">
-        <ant dir="core/java/" target="distclean" />
-        <ant dir="router/java/" target="distclean" />
         <ant dir="core/java/" target="jar" />
         <ant dir="router/java/" target="jar" />
         <copy file="core/java/build/i2p.jar" todir="build/" />
@@ -183,7 +185,7 @@
             <fileset dir="." includes="**/*.java~" />
         </delete>
     </target>
-    <target name="pkg" depends="updater, tarball, installer" />
+    <target name="pkg" depends="distclean, updater, tarball, installer" />
     <target name="pkgclean">
         <delete dir="pkg-temp" />
         <delete>
@@ -326,7 +328,7 @@
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
-    <target name="prepupdate" depends="distclean, build, prepupdateSmall">
+    <target name="prepupdate" depends="build2, prepupdateSmall">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
@@ -337,7 +339,7 @@
         <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
     </target>
-    <target name="prepupdateSmall" depends="distclean, buildSmall">
+    <target name="prepupdateSmall" depends="buildSmall">
         <delete dir="pkg-temp" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />

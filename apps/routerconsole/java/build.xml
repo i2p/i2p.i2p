@@ -35,7 +35,6 @@
                 <attribute name="Class-Path" value="i2p.jar router.jar" />
             </manifest>
         </jar>
-        
         <delete dir="./tmpextract" />
         <unjar src="../../jrobin/jrobin-1.4.0.jar" dest="./tmpextract" />
         <jar destfile="./build/routerconsole.jar" basedir="./tmpextract" update="true" />
@@ -48,7 +47,7 @@
              basedir="../jsp/" excludes="web.xml, *.java, *.jsp, web-fragment.xml">
         </war>
     </target>
-    <target name="precompilejsp">
+    <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
         <delete file="../jsp/web-out.xml" />
@@ -109,6 +108,11 @@
             <replacefilter token="&lt;!-- precompiled servlets --&gt;" value="${jspc.web.fragment}" />
         </replace>
     </target>
+
+    <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
+        <srcfiles dir= "../jsp" includes="**/*.jsp, **/*.html, susimail/susimail, web.xml"/>
+    </uptodate>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
@@ -121,6 +125,9 @@
     </target>
     <target name="clean">
         <delete dir="./build" />
+        <delete dir="../jsp/WEB-INF/" />
+        <delete file="../jsp/web-fragment.xml" />
+        <delete file="../jsp/web-out.xml" />
     </target>
     <target name="cleandep" depends="clean">
 	<!-- router will clean core -->
