@@ -39,11 +39,13 @@ public class AbuseReason extends DataStructureImpl {
     public void setReason(String reason) {
         _reason = reason;
     }
-
+    
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _reason = DataHelper.readString(in);
     }
 
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_reason == null) throw new DataFormatException("Invalid abuse reason");
         DataHelper.writeString(out, _reason);

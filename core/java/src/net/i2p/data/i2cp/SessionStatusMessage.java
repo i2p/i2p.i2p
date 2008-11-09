@@ -55,6 +55,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         _status = status;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -65,6 +66,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -78,6 +80,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

@@ -44,6 +44,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         _sessionConfig = config;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         SessionConfig config = new SessionConfig();
         try {
@@ -54,6 +55,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         setSessionConfig(config);
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionConfig == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -66,6 +68,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

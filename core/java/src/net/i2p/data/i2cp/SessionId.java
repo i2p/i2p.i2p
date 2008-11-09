@@ -40,10 +40,12 @@ public class SessionId extends DataStructureImpl {
         _sessionId = id;
     }
 
+    @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _sessionId = (int) DataHelper.readLong(in, 2);
     }
 
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_sessionId < 0) throw new DataFormatException("Invalid session ID: " + _sessionId);
         DataHelper.writeLong(out, 2, _sessionId);

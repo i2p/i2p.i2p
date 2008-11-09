@@ -40,6 +40,7 @@ public class DisconnectMessage extends I2CPMessageImpl {
         _reason = reason;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _reason = DataHelper.readString(in);
@@ -48,6 +49,7 @@ public class DisconnectMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream(64);
         try {
@@ -58,6 +60,7 @@ public class DisconnectMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

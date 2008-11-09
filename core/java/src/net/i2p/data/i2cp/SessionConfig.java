@@ -185,6 +185,7 @@ public class SessionConfig extends DataStructureImpl {
         return out.toByteArray();
     }
 
+    @Override
     public void readBytes(InputStream rawConfig) throws DataFormatException, IOException {
         _destination = new Destination();
         _destination.readBytes(rawConfig);
@@ -194,6 +195,7 @@ public class SessionConfig extends DataStructureImpl {
         _signature.readBytes(rawConfig);
     }
 
+    @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_destination == null) || (_options == null) || (_signature == null) || (_creationDate == null))
             throw new DataFormatException("Not enough data to create the session config");

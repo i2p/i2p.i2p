@@ -49,6 +49,7 @@ public class ReceiveMessageEndMessage extends I2CPMessageImpl {
         _messageId = id;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = DataHelper.readLong(in, 2);
@@ -58,6 +59,7 @@ public class ReceiveMessageEndMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if ((_sessionId < 0) || (_messageId < 0))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -67,6 +69,7 @@ public class ReceiveMessageEndMessage extends I2CPMessageImpl {
         return rv;
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

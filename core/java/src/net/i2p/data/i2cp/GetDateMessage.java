@@ -26,15 +26,18 @@ public class GetDateMessage extends I2CPMessageImpl {
         super();
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         // noop
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         byte rv[] = new byte[0];
         return rv;
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

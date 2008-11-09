@@ -72,6 +72,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         _nonce = nonce;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         if (true) throw new IllegalStateException("wtf, do not run me");
     }
@@ -101,6 +102,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         throw new RuntimeException("wtf, dont run me");
     }
@@ -129,6 +131,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         }
     }
     
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

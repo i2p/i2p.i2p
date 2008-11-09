@@ -41,6 +41,7 @@ public class SetDateMessage extends I2CPMessageImpl {
         _date = date;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _date = DataHelper.readDate(in);
@@ -49,6 +50,7 @@ public class SetDateMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_date == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -61,6 +63,7 @@ public class SetDateMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

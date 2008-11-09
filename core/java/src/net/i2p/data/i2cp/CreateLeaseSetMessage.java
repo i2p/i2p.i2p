@@ -73,6 +73,7 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         _leaseSet = leaseSet;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -88,6 +89,7 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if ((_sessionId == null) || (_signingPrivateKey == null) || (_privateKey == null) || (_leaseSet == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -107,6 +109,7 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

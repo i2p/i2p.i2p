@@ -70,6 +70,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         _messageId = id;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -85,6 +86,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if ((_sessionId == null) || (_severity == null) || (_reason == null))
             throw new I2CPMessageException("Not enough information to construct the message");
@@ -104,6 +106,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         return os.toByteArray();
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

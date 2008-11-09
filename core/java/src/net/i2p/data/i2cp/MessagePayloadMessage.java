@@ -61,6 +61,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         _payload = payload;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = DataHelper.readLong(in, 2);
@@ -72,6 +73,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         throw new RuntimeException("go away, we dont want any");
     }
@@ -104,6 +106,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }

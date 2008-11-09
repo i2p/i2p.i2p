@@ -40,6 +40,7 @@ public class DestroySessionMessage extends I2CPMessageImpl {
         _sessionId = id;
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         SessionId id = new SessionId();
         try {
@@ -50,6 +51,7 @@ public class DestroySessionMessage extends I2CPMessageImpl {
         setSessionId(id);
     }
 
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");

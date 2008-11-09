@@ -106,6 +106,7 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         }
     }
 
+    @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = DataHelper.readLong(in, 2);
@@ -144,10 +145,12 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         }
     }
     
+    @Override
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         throw new UnsupportedOperationException("This shouldn't be called... use writeMessage(out)");
     }
 
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }
