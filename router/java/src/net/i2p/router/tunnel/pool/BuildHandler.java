@@ -460,6 +460,7 @@ class BuildHandler {
         return 0;
     }
     
+    private static final String PROP_REJECT_NONPARTICIPANT = "router.participantOnly";
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
         long nextId = req.readNextTunnelId();
@@ -497,6 +498,11 @@ class BuildHandler {
             }
         }
         
+        if (response == 0 && (isInGW || isOutEnd) &&
+            Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT))) {
+                response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        }
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Responding to " + state.msg.getUniqueId() + "/" + ourId
                        + " after " + recvDelay + "/" + proactiveDrops + " with " + response 
