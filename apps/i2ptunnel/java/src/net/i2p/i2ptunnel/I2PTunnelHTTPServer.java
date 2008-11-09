@@ -32,6 +32,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private final static Log _log = new Log(I2PTunnelHTTPServer.class);
     /** what Host: should we seem to be to the webserver? */
     private String _spoofHost;
+    private static final String HASH_HEADER = "X-I2P-DestHash";
 
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
@@ -71,6 +72,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             StringBuffer command = new StringBuffer(128);
             Properties headers = readHeaders(in, command);
+            headers.setProperty(HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
             if ( (_spoofHost != null) && (_spoofHost.trim().length() > 0) )
                 headers.setProperty("Host", _spoofHost);
             headers.setProperty("Connection", "close");
@@ -327,6 +329,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     name = "Accept-encoding";
                 else if ("X-Accept-encoding".equalsIgnoreCase(name))
                     name = "X-Accept-encoding";
+                else if (HASH_HEADER.equalsIgnoreCase(name))
+                    continue;     // Prevent spoofing
                 headers.setProperty(name, value);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Read the header [" + name + "] = [" + value + "]");
