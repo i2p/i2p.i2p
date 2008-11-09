@@ -101,7 +101,7 @@ public class ConfigClientsHandler extends FormHandler {
                     try {
                         s.addWebApplication("/"+ app, "./webapps/" + app + ".war").start();
                         // no passwords... initialize(wac);
-                        addFormNotice("WebApp " + app + " started");
+                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "<a> started");
                     } catch (Exception ioe) {
                         addFormError("Failed to start " + app + " " + ioe);
                     }
