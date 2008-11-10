@@ -420,6 +420,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    /**
+     *  This is fast and doesn't use synchronization,
+     *  but it includes both routerinfos and leasesets.
+     *  Use it to avoid deadlocks.
+     */
+    protected int getKBucketSetSize() {  
+        if (_kb == null) return 0;
+        return _kb.size();
+    }
+    
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         if (!_initialized) return;
         LeaseSet ls = lookupLeaseSetLocally(key);

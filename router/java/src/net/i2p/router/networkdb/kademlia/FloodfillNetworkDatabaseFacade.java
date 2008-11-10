@@ -269,8 +269,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // following are some special situations, we don't want to
         // drop the peer in these cases
         // yikes don't do this - stack overflow //  getFloodfillPeers().size() == 0 ||
+        // yikes2 don't do this either - deadlock! // getKnownRouters() < MIN_REMAINING_ROUTERS ||
         if (info.getNetworkId() == Router.NETWORK_ID &&
-            (getKnownRouters() < MIN_REMAINING_ROUTERS ||
+            (getKBucketSetSize() < MIN_REMAINING_ROUTERS ||
              _context.router().getUptime() < DONT_FAIL_PERIOD ||
              _context.commSystem().countActivePeers() <= MIN_ACTIVE_PEERS)) {
             if (_log.shouldLog(Log.WARN))
