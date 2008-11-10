@@ -31,6 +31,8 @@ public class PacketHandler {
         _lastDelay = _context.random().nextInt(30*1000);
     }
     
+/** what is the point of this ? */
+/*****
     private boolean choke(Packet packet) { 
         if (true) return true;
         //if ( (_dropped == 0) && true ) { //&& (_manager.getSent() <= 0) ) {
@@ -45,9 +47,7 @@ public class PacketHandler {
                 return false;
             } else {
                 // if (true) return true; // no lag, just drop
-                /*
-                int delay = _context.random().nextInt(5*1000);
-                */
+                // int delay = _context.random().nextInt(5*1000);
                 int delay = _context.random().nextInt(1*1000);
                 int delayFactor = _context.random().nextInt(100);
                 if (delayFactor > 80) {
@@ -85,10 +85,11 @@ public class PacketHandler {
             receivePacketDirect(_packet);
         }
     }
+*****/
     
     void receivePacket(Packet packet) {
-        boolean ok = choke(packet);
-        if (ok)
+        //boolean ok = choke(packet);
+        //if (ok)
             receivePacketDirect(packet);
     }
     
@@ -239,19 +240,20 @@ public class PacketHandler {
             }
             packet.releasePayload();
         } else {
-            //if (_log.shouldLog(Log.DEBUG) && !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
-            //    _log.debug("Packet received on an unknown stream (and not an ECHO or SYN): " + packet);
+            if (_log.shouldLog(Log.WARN) && !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+                _log.warn("Packet received on an unknown stream (and not an ECHO or SYN): " + packet);
             if (sendId <= 0) {
                 Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
                 if (con != null) {
                     if ( (con.getHighestAckedThrough() <= 5) && (packet.getSequenceNum() <= 5) ) {
-                        //if (_log.shouldLog(Log.DEBUG))
-                        //    _log.debug("Received additional packets before the syn on " + con + ": " + packet);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Received additional packet w/o SendStreamID after the syn on " + con + ": " + packet);
                         receiveKnownCon(con, packet);
                         return;
                     } else {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("hrmph, received while ack of syn was in flight on " + con + ": " + packet + " acked: " + con.getAckedPackets());
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("hrmph, received while ack of syn was in flight on " + con + ": " + packet + " acked: " + con.getAckedPackets());
+                        // allow unlimited packets without a SendStreamID for now
                         receiveKnownCon(con, packet);
                         return;
                     }
@@ -261,8 +263,17 @@ public class PacketHandler {
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                 _manager.getConnectionHandler().receiveNewSyn(packet);
             } else {
+                // We can get here on the 2nd+ packet if the 1st (SYN) packet
+                // is still on the _synQueue in the ConnectionHandler, and
+                // ConnectionManager.receiveConnection() hasn't run yet to put
+                // the StreamID on the getConnectionByOutboundId list.
+                // Then the 2nd packet gets discarded and has to be retransmitted.
+                //
+                // We fix this by putting this packet on the syn queue too!
+                // Then ConnectionHandler.accept() will check the connection list
+                // and call receivePacket() above instead of receiveConnection().
                 if (_log.shouldLog(Log.WARN)) {
-                    _log.warn("Packet belongs to no other cons: " + packet);
+                    _log.warn("Packet belongs to no other cons, putting on the syn queue: " + packet);
                 }
                 if (_log.shouldLog(Log.DEBUG)) {
                     StringBuffer buf = new StringBuffer(128);
@@ -274,7 +285,8 @@ public class PacketHandler {
                     _log.debug("connections: " + buf.toString() + " sendId: " 
                                + (sendId > 0 ? Packet.toId(sendId) : " unknown"));
                 }
-                packet.releasePayload();
+                //packet.releasePayload();
+                _manager.getConnectionHandler().receiveNewSyn(packet);
             }
         }
     }

@@ -25,12 +25,22 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         _connection = con;
     }
     
+    /**
+     * This tells the flusher in MessageOutputStream whether to flush.
+     * It won't flush if this returns true.
+     * It was: return con.getUnackedPacketsSent() > 0;
+     * But then, for data that fills more than one packet, the last part of
+     * the data isn't sent until all the previous packets are acked. Which is very slow.
+     *
+     * So let's send data along unless the outbound window is full.
+     *
+     * @return !flush
+     */
     public boolean writeInProcess() {
         Connection con = _connection;
         if (con != null)
-            return con.getUnackedPacketsSent() > 0;
-        else
-            return false;
+            return con.getUnackedPacketsSent() >= con.getOptions().getWindowSize();
+        return false;
     }
     
     /**

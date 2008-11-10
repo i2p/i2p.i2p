@@ -41,6 +41,10 @@ class ConnectionHandler {
     }
     public boolean getActive() { return _active; }
     
+    /**
+     * Non-SYN packets with a zero SendStreamID may also be queued here so 
+     * that they don't get thrown away while the SYN packet before it is queued.
+     */
     public void receiveNewSyn(Packet packet) {
         if (!_active) {
             if (_log.shouldLog(Log.WARN))
@@ -59,6 +63,8 @@ class ConnectionHandler {
     
     /**
      * Receive an incoming connection (built from a received SYN)
+     * Non-SYN packets with a zero SendStreamID may also be queued here so 
+     * that they don't get thrown away while the SYN packet before it is queued.
      *
      * @param timeoutMs max amount of time to wait for a connection (if less 
      *                  than 1ms, wait indefinitely)
@@ -111,14 +117,40 @@ class ConnectionHandler {
 
             if (syn != null) {
                 // deal with forged / invalid syn packets
-                Connection con = _manager.receiveConnection(syn);
-                if (con != null)
-                    return con;
+
+                // Handle both SYN and non-SYN packets in the queue
+                if (syn.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                    Connection con = _manager.receiveConnection(syn);
+                    if (con != null)
+                        return con;
+                } else {
+                    reReceivePacket(syn);
+                    // ... and keep looping
+                }
             }
             // keep looping...
         }
     }
-    
+
+    /**
+     *  We found a non-SYN packet that was queued in the syn queue,
+     *  check to see if it has a home now, else drop it ...
+     */
+    private void reReceivePacket(Packet packet) {
+        Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
+        if (con != null) {
+            // Send it through the packet handler again
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Found con for queued non-syn packet: " + packet);
+            _manager.getPacketHandler().receivePacket(packet);
+        } else {
+            // goodbye
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Did not find con for queued non-syn packet, dropping: " + packet);
+            packet.releasePayload();
+        }
+    }
+
     private void sendReset(Packet packet) {
         boolean ok = packet.verifySignature(_context, packet.getOptionalFrom(), null);
         if (!ok) {
@@ -152,8 +184,12 @@ class ConnectionHandler {
             }
             
             if (removed) {
-                // timeout - send RST
-                sendReset(_synPacket);
+                if (_synPacket.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+                    // timeout - send RST
+                    sendReset(_synPacket);
+                else
+                    // non-syn packet got stranded on the syn queue, send it to the con
+                    reReceivePacket(_synPacket);
             } else {
                 // handled.  noop
             }

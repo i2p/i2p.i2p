@@ -1,3 +1,16 @@
+2008-11-11 zzz
+    * Streaming - Fix several bugs and improve performance
+      when the initial data is larger than one MTU,
+      e.g. HTTP GETs with large URLs, CGI params or cookies,
+      or large HTTP POSTS:
+      - Don't reject additional packets received without a
+        send stream ID (i.e. sent before the SYN ACK was received)
+      - Put unknown non-SYN packets on the SYN queue also
+        so they won't be rejected
+      - Reduce flusher delay to 250ms (was 500)
+      - Flush unless window is full (was window is non-empty)
+    * NetDb: Fix a deadlock caused by last checkin
+
 2008-11-09 zzz
     * build.xml: Build speedups:
       - Don't distclean in the updaterRouter target

@@ -108,9 +108,12 @@ public class ConnectionPacketHandler {
         boolean isNew = false;
         boolean allowAck = true;
         
+        // We allow the SendStreamID to be 0 so that the originator can send
+        // multiple packets before he gets the first ACK back.
+        // If we want to limit the number of packets we receive without a
+        // SendStreamID, do it in PacketHandler.receiveUnknownCon().
         if ( (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) && 
-             ( (packet.getSendStreamId() <= 0) ||  
-               (packet.getReceiveStreamId() <= 0) ) )
+             (packet.getReceiveStreamId() <= 0) )
             allowAck = false;
 
         if (allowAck) {

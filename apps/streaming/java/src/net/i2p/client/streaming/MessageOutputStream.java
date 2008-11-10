@@ -43,10 +43,15 @@ public class MessageOutputStream extends OutputStream {
     private long _sendPeriodBytes;
     private int _sendBps;
     
+    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 250;
+
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
     }
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize) {
+        this(ctx, receiver, bufSize, DEFAULT_PASSIVE_FLUSH_DELAY);
+    }
+    public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize, int passiveFlushDelay) {
         super();
         _dataCache = ByteCache.getInstance(128, bufSize);
         _context = ctx;
@@ -57,7 +62,7 @@ public class MessageOutputStream extends OutputStream {
         _written = 0;
         _closed = false;
         _writeTimeout = -1;
-        _passiveFlushDelay = 500;
+        _passiveFlushDelay = passiveFlushDelay;
         _nextBufferSize = -1;
         _sendPeriodBeginTime = ctx.clock().now();
         _sendPeriodBytes = 0;
