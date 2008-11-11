@@ -9,6 +9,8 @@
         so they won't be rejected
       - Reduce flusher delay to 250ms (was 500)
       - Flush unless window is full (was window is non-empty)
+    * Streaming: Enforce a minimum MTU of 512
+    * I2PTunnel: Change "interactive" max window size to 16 (was 1)
     * NetDb: Fix a deadlock caused by last checkin
 
 2008-11-09 zzz

@@ -395,19 +395,6 @@ public class IndexBean {
             return "";
     }
     
-    public String getHTMLStreams(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            if (tunnel != 0 &&
-                "true".equalsIgnoreCase(tun.getSharedClient()) &&
-                isClient(tunnel))
-                return "Listed above";
-            else
-                return tun.getHTMLStreams();
-        } else
-            return "";
-    }
-    
     public String getSharedClient(int tunnel) {
     	TunnelController tun = getController(tunnel);
     	if (tun != null)
