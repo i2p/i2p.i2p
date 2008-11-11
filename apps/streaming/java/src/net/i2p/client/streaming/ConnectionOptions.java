@@ -162,6 +162,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      *
      */
     public static final int DEFAULT_MAX_MESSAGE_SIZE = 1730;
+    public static final int MIN_MESSAGE_SIZE = 512;
 
     public ConnectionOptions() {
         super();
@@ -389,7 +390,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return Maximum message size (MTU/MRU)
      */
     public int getMaxMessageSize() { return _maxMessageSize; }
-    public void setMaxMessageSize(int bytes) { _maxMessageSize = bytes; }
+    public void setMaxMessageSize(int bytes) { _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE); }
     
     /** 
      * how long we want to wait before any data is transferred on the

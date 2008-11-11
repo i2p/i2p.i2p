@@ -67,12 +67,17 @@ public class ConnectionPacketHandler {
         }
 
         if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
-            if (packet.getOptionalMaxSize() < con.getOptions().getMaxMessageSize()) {
+            int size = packet.getOptionalMaxSize();
+            if (size < ConnectionOptions.MIN_MESSAGE_SIZE) {
+                // log.error? connection reset?
+                size = ConnectionOptions.MIN_MESSAGE_SIZE;
+            }
+            if (size < con.getOptions().getMaxMessageSize()) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Reducing our max message size to " + packet.getOptionalMaxSize() 
+                    _log.info("Reducing our max message size to " + size 
                               + " from " + con.getOptions().getMaxMessageSize());
-                con.getOptions().setMaxMessageSize(packet.getOptionalMaxSize());
-                con.getOutputStream().setBufferSize(packet.getOptionalMaxSize());
+                con.getOptions().setMaxMessageSize(size);
+                con.getOutputStream().setBufferSize(size);
             }
         }
         
