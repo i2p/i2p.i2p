@@ -395,6 +395,19 @@ public class IndexBean {
             return "";
     }
     
+    public String getHTMLStreams(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            if (tunnel != 0 &&
+                "true".equalsIgnoreCase(tun.getSharedClient()) &&
+                isClient(tunnel))
+                return "Listed above";
+            else
+                return tun.getHTMLStreams();
+        } else
+            return "";
+    }
+    
     public String getSharedClient(int tunnel) {
     	TunnelController tun = getController(tunnel);
     	if (tun != null)
@@ -707,7 +720,11 @@ public class IndexBean {
             }
         } 
         if ("interactive".equals(_profile))
-            config.setProperty("option.i2p.streaming.maxWindowSize", "1");
+            // This was 1 which doesn't make much sense
+            // The real way to make it interactive is to make the streaming lib
+            // MessageInputStream flush faster but there's no option for that yet,
+            // Setting it to 16 instead of the default but not sure what good that is either.
+            config.setProperty("option.i2p.streaming.maxWindowSize", "16");
         else
             config.remove("option.i2p.streaming.maxWindowSize");
     }
