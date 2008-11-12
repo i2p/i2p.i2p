@@ -8,7 +8,18 @@
     <target name="builddeptest">
         <ant dir="../../core/java/" target="jarTest" />
     </target>
-    <target name="compile">
+    <target name="depend">
+        <depend
+            cache="../../build"
+            srcdir="./src" 
+            destdir="./build/obj" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../core/java/build/obj" />
+            </classpath>
+        </depend>
+    </target>
+    <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2p.jar" />

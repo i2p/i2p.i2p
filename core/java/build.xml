@@ -5,7 +5,14 @@
     <target name="builddep">
         <!-- noop, since the core doesnt depend on anything -->
     </target>
-    <target name="compile">
+    <target name="depend">
+        <depend
+            cache="../../build"
+            srcdir="./src" 
+            destdir="./build/obj" >
+        </depend>
+    </target>
+    <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" />

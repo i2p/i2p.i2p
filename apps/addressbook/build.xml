@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="addressbook" default="war" basedir=".">
 
-	<property name="src" value="java/src/addressbook"/>
+	<property name="src" value="java/src"/>
 	<property name="build" value="build"/>
 	<property name="dist"  location="dist"/>
 	<property name="jar" value="addressbook.jar"/>
@@ -19,7 +19,20 @@
 
 	<target name="distclean" depends="clean" />
 
-	<target name="compile" depends="init">
+        <target name="depend">
+            <depend
+                cache="../../build"
+                srcdir="${src}"
+                destdir="${build}" >
+                <!-- Depend on classes instead of jars where available -->
+                <classpath>
+                    <pathelement location="../../core/java/build/obj" />
+                    <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                </classpath>
+            </depend>
+        </target>
+
+	<target name="compile" depends="init, depend">
 		<javac debug="true" deprecation="on" source="1.5" target="1.5" 
                        srcdir="${src}" destdir="${build}">
             <classpath>
@@ -37,7 +50,7 @@
 		</jar>
 	</target>
 	
-	<target name="war" depends="compile">
+	<target name="war" depends="compile" unless="war.uptodate">
 		<mkdir dir="${dist}/tmp"/>
 		<mkdir dir="${dist}/tmp/WEB-INF"/>
 		<mkdir dir="${dist}/tmp/WEB-INF/classes"/>
@@ -48,4 +61,8 @@
 		<delete dir="${dist}/tmp"/>
 	</target>
 	
+        <uptodate property="war.uptodate" targetfile="${dist}/${war}">
+            <srcfiles dir= "." includes="${build}/**/*.class, web.xml"/>
+        </uptodate>
+
 </project>

@@ -7,7 +7,22 @@
         <ant dir="../../streaming/java/" target="build" />
 	<!-- streaming will build ministreaming and core -->
     </target>
-    <target name="compile">
+    <target name="depend">
+        <depend
+            cache="../../../build"
+            srcdir="./src" 
+            destdir="./build/obj" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="../../../router/java/build/obj" />
+                <pathelement location="../../ministreaming/java/build/obj" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+            </classpath>
+        </depend>
+    </target>
+    <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 

@@ -10,7 +10,32 @@
     <target name="prepare">
         <ant dir="../../jetty/" target="build" />
     </target>
-    <target name="compile" depends="prepare">
+    <target name="depend">
+        <depend
+            cache="../../../build"
+            srcdir="./src" 
+            destdir="./build/obj" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="../../../router/java/build/obj" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../systray/java/build/obj" />
+                <pathelement location="../../systray/java/lib/systray4j.jar" />
+                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
+                <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
+            </classpath>
+        </depend>
+        <!-- Force the dependency on the RouterVersion as depend doesn't recognize constant changes  -->
+        <dependset>
+             <srcfilelist dir="." files="../../../router/java/build/obj/net/i2p/router/RouterVersion.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/web/NewsFetcher.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/web/SummaryHelper.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
+        </dependset>
+    </target>
+    <target name="compile" depends="prepare, depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
