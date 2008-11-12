@@ -115,6 +115,16 @@ public class Blocklist {
                     return;
                 }
             }
+            for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
+                Hash peer = (Hash) iter.next();
+                String reason = "Blocklisted by router hash";
+                String comment = (String) _peerBlocklist.get(peer);
+                if (comment != null)
+                    reason = reason + ": " + comment;
+                _context.shitlist().shitlistRouterForever(peer, reason);
+            }
+            _peerBlocklist = null;
+
             if (_blocklistSize <= 0)
                 return;
             FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
@@ -127,15 +137,6 @@ public class Blocklist {
             }
             if (count > 0 && _log.shouldLog(Log.WARN))
                 _log.warn("Blocklisted " + count + " routers in the netDb.");
-            for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash) iter.next();
-                String reason = "Blocklisted by router hash";
-                String comment = (String) _peerBlocklist.get(peer);
-                if (comment != null)
-                    reason = reason + ": " + comment;
-                _context.shitlist().shitlistRouterForever(peer, reason);
-            }
-            _peerBlocklist = null;
         }
     }
 
