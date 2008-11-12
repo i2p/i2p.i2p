@@ -127,6 +127,7 @@ public class ConnectionManager {
      */
     public Connection receiveConnection(Packet synPacket) {
         Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, new ConnectionOptions(_defaultOptions));
+        con.setInbound();
         long receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
         boolean reject = false;
         int active = 0;
@@ -311,8 +312,15 @@ public class ConnectionManager {
             _connectionLock.notifyAll();
         }
         if (removed) {
-            _context.statManager().addRateData("stream.con.lifetimeMessagesSent", con.getLastSendId(), con.getLifetime());
-            _context.statManager().addRateData("stream.con.lifetimeMessagesReceived", con.getHighestAckedThrough(), con.getLifetime());
+            _context.statManager().addRateData("stream.con.lifetimeMessagesSent", 1+con.getLastSendId(), con.getLifetime());
+            MessageInputStream stream = con.getInputStream();
+            if (stream != null) {
+                long rcvd = 1 + stream.getHighestBlockId();
+                long nacks[] = stream.getNacks();
+                if (nacks != null)
+                    rcvd -= nacks.length;
+                _context.statManager().addRateData("stream.con.lifetimeMessagesReceived", rcvd, con.getLifetime());
+            }
             _context.statManager().addRateData("stream.con.lifetimeBytesSent", con.getLifetimeBytesSent(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeBytesReceived", con.getLifetimeBytesReceived(), con.getLifetime());
             _context.statManager().addRateData("stream.con.lifetimeDupMessagesSent", con.getLifetimeDupMessagesSent(), con.getLifetime());

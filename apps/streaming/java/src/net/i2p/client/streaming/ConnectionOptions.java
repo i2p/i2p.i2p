@@ -355,7 +355,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     }
     
     /** rtt = rtt*RTT_DAMPENING + (1-RTT_DAMPENING)*currentPacketRTT */
-    private static final double RTT_DAMPENING = 0.9;
+    /** This is the value specified in RFC 2988, let's try it */
+    private static final double RTT_DAMPENING = 0.875;
     
     public void updateRTT(int measuredValue) {
         _rttDev = _rttDev + (int)(0.25d*(Math.abs(measuredValue-_rtt)-_rttDev));

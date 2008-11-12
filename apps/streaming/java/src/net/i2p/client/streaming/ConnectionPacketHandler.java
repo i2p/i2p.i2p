@@ -23,10 +23,12 @@ public class ConnectionPacketHandler {
         _log = context.logManager().getLog(ConnectionPacketHandler.class);
         _context.statManager().createRateStat("stream.con.receiveMessageSize", "Size of a message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.con.receiveDuplicateSize", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("stream.con.packetsAckedPerMessageReceived", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.con.packetsAckedPerMessageReceived", "Avg number of acks in a message", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.sendsBeforeAck", "How many times a message was sent before it was ACKed?", "Stream", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.resetReceived", "How many messages had we sent successfully before receiving a RESET?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.trend", "What direction the RTT is trending in (with period = windowsize)", "Stream", new long[] { 60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.con.initialRTT.in", "What is the actual RTT for the first packet of an inbound conn?", "Stream", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.con.initialRTT.out", "What is the actual RTT for the first packet of an outbound conn?", "Stream", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     /** distribute a packet to the connection specified */
@@ -220,6 +222,8 @@ public class ConnectionPacketHandler {
         //if ( (nacks != null) && (nacks.length > 0) )
         //    con.getOptions().setRTT(con.getOptions().getRTT() + nacks.length*1000);
 
+        boolean firstAck = isNew && con.getHighestAckedThrough() < 0;
+
         int numResends = 0;
         List acked = null;
         // if we don't know the streamIds for both sides of the connection, there's no way we
@@ -265,6 +269,12 @@ public class ConnectionPacketHandler {
             }
             if (highestRTT > 0) {
                 con.getOptions().updateRTT(highestRTT);
+                if (firstAck) {
+                    if (con.isInbound())
+                        _context.statManager().addRateData("stream.con.initialRTT.in", highestRTT, 0);
+                    else
+                        _context.statManager().addRateData("stream.con.initialRTT.out", highestRTT, 0);
+                }
             }
             _context.statManager().addRateData("stream.con.packetsAckedPerMessageReceived", acked.size(), highestRTT);
         }

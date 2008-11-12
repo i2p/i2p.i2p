@@ -44,6 +44,7 @@ public class Connection {
     private int _unackedPacketsReceived;
     private long _congestionWindowEnd;
     private long _highestAckedThrough;
+    private boolean _isInbound;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
     private Map _outboundPackets;
     private PacketQueue _outboundQueue;
@@ -118,6 +119,7 @@ public class Connection {
         _connectLock = new Object();
         _activeResends = 0;
         _resetSentOn = -1;
+        _isInbound = false;
         _connectionEvent = new ConEvent();
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -470,6 +472,8 @@ public class Connection {
     }
     public boolean getResetReceived() { return _resetReceived; }
     
+    public void setInbound() { _isInbound = true; }
+    public boolean isInbound() { return _isInbound; }
     public boolean getIsConnected() { return _connected; }
     public boolean getHardDisconnected() { return _hardDisconnected; }
     public boolean getResetSent() { return _resetSent; }
@@ -908,6 +912,15 @@ public class Connection {
             buf.append(Packet.toId(_sendStreamId));
         else
             buf.append("unknown");
+        if (_isInbound)
+            buf.append(" from ");
+        else
+            buf.append(" to ");
+        if (_remotePeerSet)
+            buf.append(_remotePeer.calculateHash().toBase64().substring(0,4));
+        else
+            buf.append("unknown");
+        buf.append(" up ").append(DataHelper.formatDuration(_context.clock().now() - _createdOn));
         buf.append(" wsize: ").append(_options.getWindowSize());
         buf.append(" cwin: ").append(_congestionWindowEnd - _highestAckedThrough);
         buf.append(" rtt: ").append(_options.getRTT());
@@ -925,14 +938,13 @@ public class Connection {
         }
          */
         buf.append("unacked in: ").append(getUnackedPacketsReceived());
+        int missing = 0;
         if (_inputStream != null) {
-            buf.append(" [high ");
-            buf.append(_inputStream.getHighestBlockId());
             long nacks[] = _inputStream.getNacks();
-            if (nacks != null)
-                for (int i = 0; i < nacks.length; i++)
-                    buf.append(" ").append(nacks[i]);
-            buf.append("]");
+            if (nacks != null) {
+                missing = nacks.length;
+                buf.append(" [").append(missing).append(" missing]");
+            }
         }
         
         if (getResetSent())
@@ -947,7 +959,9 @@ public class Connection {
         }
         if (getCloseReceivedOn() > 0)
             buf.append(" close received");
-        buf.append(" acked: ").append(getAckedPackets());
+        buf.append(" sent: ").append(1 + _lastSendId);
+        if (_inputStream != null)
+            buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         
         buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
         buf.append(" MTU ").append(getOptions().getMaxMessageSize());
