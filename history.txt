@@ -1,3 +1,17 @@
+2008-11-13 zzz
+    * Streaming:
+      - Add more info to Connection.toString() for debugging
+      - Fix lifetimeMessages{Sent,Received} stats
+      - Reduce RTT damping to 0.875 (was 0.9)
+      - Add a stream.con.initialRTT.{in,out} stats
+    * Build files:
+      - Use the depend task with caching for more accurate dependencies
+      - Make sure the routerconsole gets the latest router version
+      - Fix addressbook repeated builds
+    * HTTPClient: Add config options to pass Via, Referer,
+      and User-Agent through
+    * Blocklists: Fix lists with hashes only
+
 2008-11-11 zzz
     * Streaming - Fix several bugs and improve performance
       when the initial data is larger than one MTU,
