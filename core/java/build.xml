@@ -5,7 +5,10 @@
     <target name="builddep">
         <!-- noop, since the core doesnt depend on anything -->
     </target>
-    <target name="depend">
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
         <depend
             cache="../../build"
             srcdir="./src" 

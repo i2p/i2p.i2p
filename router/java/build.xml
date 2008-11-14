@@ -8,7 +8,10 @@
     <target name="builddeptest">
         <ant dir="../../core/java/" target="jarTest" />
     </target>
-    <target name="depend">
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
         <depend
             cache="../../build"
             srcdir="./src" 

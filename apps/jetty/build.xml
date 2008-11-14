@@ -5,6 +5,7 @@
     <property name="jetty.md5" value="a61adc832be6baf2678935506743cfc3" />
     <property name="jetty.url" value="http://dist.codehaus.org/jetty/jetty-5.1.x/jetty-5.1.12.zip" />
     <property name="jetty.filename" value="jetty-5.1.12.zip" />
+    <property name="verified.filename" value="verified.txt" />
 
     <target name="all" depends="build" />
 
@@ -41,7 +42,9 @@
         <get src="${jetty.url}" verbose="true" dest="${jetty.filename}" />
     </target>
 
-    <target name="verifyJettylib" >
+    <uptodate property="verified.already" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+
+    <target name="verifyJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
             <and>
                 <checksum file="${jetty.filename}" algorithm="SHA" property="${jetty.sha1}" />
@@ -55,6 +58,7 @@
                 </not>
             </condition>
         </fail>
+        <touch file="${verified.filename}" />
     </target>
 
     <target name="extractJettylib" unless="jetty.zip.extracted" >
@@ -97,6 +101,7 @@
     </target>    
     <target name="clean" >
         <delete dir="./build" />
+        <delete file="${verified.filename}" />
     </target>    
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean">

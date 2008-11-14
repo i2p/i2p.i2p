@@ -5,7 +5,10 @@
     <target name="builddep">
         <ant dir="../../../core/java/" target="build" />
     </target>
-    <target name="depend">
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
         <depend
             cache="../../../build"
             srcdir="./src" 

@@ -6,7 +6,10 @@
         <ant dir="../../ministreaming/java/" target="build" />
 	<!-- ministreaming will build core -->
     </target>
-    <target name="depend">
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
         <depend
             cache="../../../build"
             srcdir="./src" 
