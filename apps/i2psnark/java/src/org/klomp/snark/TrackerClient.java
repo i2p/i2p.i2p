@@ -121,7 +121,7 @@ public class TrackerClient extends I2PThread
     // the primary tracker, that we don't add it twice.
     trackers = new ArrayList(2);
     trackers.add(new Tracker(meta.getAnnounce(), true));
-    List tlist = SnarkManager.instance().getOpenTrackers();
+    List tlist = I2PSnarkUtil.instance().getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {
              String url = (String)tlist.get(i);

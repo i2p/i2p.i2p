@@ -247,16 +247,19 @@ public class Snark
 
   Snark(String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener) { 
-    this(torrent, ip, user_port, slistener, clistener, true, "."); 
+    this(torrent, ip, user_port, slistener, clistener, null, true, "."); 
   }
-  Snark(String torrent, String ip, int user_port,
-        StorageListener slistener, CoordinatorListener clistener, boolean start, String rootDir)
+  public Snark(String torrent, String ip, int user_port,
+        StorageListener slistener, CoordinatorListener clistener,
+        CompleteListener complistener, boolean start, String rootDir)
   {
     if (slistener == null)
       slistener = this;
 
     //if (clistener == null)
     //  clistener = this;
+
+    completeListener = complistener;
 
     this.torrent = torrent;
     this.rootDataDir = rootDir;
@@ -379,7 +382,13 @@ public class Snark
           {
             activity = "Checking storage";
             storage = new Storage(meta, slistener);
-            storage.check(rootDataDir);
+            if (completeListener != null) {
+                storage.check(rootDataDir,
+                              completeListener.getSavedTorrentTime(this),
+                              completeListener.getSavedTorrentBitField(this));
+            } else {
+                storage.check(rootDataDir);
+            }
             // have to figure out when to reopen
             // if (!start)
             //    storage.close();
@@ -480,14 +489,15 @@ public class Snark
         pc.halt();
     Storage st = storage;
     if (st != null) {
-        if (storage.changed)
-            SnarkManager.instance().saveTorrentStatus(storage.getMetaInfo(), storage.getBitField());
+        boolean changed = storage.changed;
         try { 
             storage.close(); 
         } catch (IOException ioe) {
             System.out.println("Error closing " + torrent);
             ioe.printStackTrace();
         }
+        if (changed && completeListener != null)
+            completeListener.updateStatus(this);
     }
     if (pc != null)
         PeerCoordinatorSet.instance().remove(pc);
@@ -743,6 +753,8 @@ public class Snark
 
     allChecked = true;
     checking = false;
+    if (storage.changed && completeListener != null)
+        completeListener.updateStatus(this);
   }
   
   public void storageCompleted(Storage storage)
@@ -768,6 +780,10 @@ public class Snark
   
   public interface CompleteListener {
     public void torrentComplete(Snark snark);
+    public void updateStatus(Snark snark);
+    // not really listeners but the easiest way to get back to an optional SnarkManager
+    public long getSavedTorrentTime(Snark snark);
+    public BitField getSavedTorrentBitField(Snark snark);
   }
 
   /** Maintain a configurable total uploader cap

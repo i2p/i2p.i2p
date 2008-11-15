@@ -32,7 +32,7 @@ import java.util.TimerTask;
  */
 class PeerCheckerTask extends TimerTask
 {
-  private final long KILOPERSECOND = 1024*(PeerCoordinator.CHECK_PERIOD/1000);
+  private static final long KILOPERSECOND = 1024*(PeerCoordinator.CHECK_PERIOD/1000);
 
   private final PeerCoordinator coordinator;
 
@@ -246,6 +246,10 @@ class PeerCheckerTask extends TimerTask
 
 	// store the rates
 	coordinator.setRateHistory(uploaded, downloaded);
+
+        // close out unused files, but we don't need to do it every time
+        if (random.nextInt(4) == 0)
+            coordinator.getStorage().cleanRAFs();
 
       }
   }

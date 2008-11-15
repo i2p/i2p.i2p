@@ -39,11 +39,15 @@ public class Storage
   private long[] lengths;
   private RandomAccessFile[] rafs;
   private String[] names;
+  private Object[] RAFlock;  // lock on RAF access
+  private long[] RAFtime;    // when was RAF last accessed, or 0 if closed
+  private File[] RAFfile;    // File to make it easier to reopen
 
   private final StorageListener listener;
 
   private BitField bitfield; // BitField to represent the pieces
   private int needed; // Number of pieces needed
+  private boolean _probablyComplete;  // use this to decide whether to open files RO
 
   // XXX - Not always set correctly
   int piece_size;
@@ -68,6 +72,7 @@ public class Storage
     this.metainfo = metainfo;
     this.listener = listener;
     needed = metainfo.getPieces();
+    _probablyComplete = false;
     bitfield = new BitField(needed);
   }
 
@@ -119,7 +124,6 @@ public class Storage
         files.add(file);
       }
 
-    String name = baseFile.getName();
     if (files.size() == 1) // FIXME: ...and if base file not a directory or should this be the only check?
                            // this makes a bad metainfo if the directory has only one file in it
       {
@@ -133,7 +137,8 @@ public class Storage
 
   }
 
-  // Creates piece hases for a new storage.
+  // Creates piece hashes for a new storage.
+  // This does NOT create the files, just the hashes
   public void create() throws IOException
   {
 //    if (true) {
@@ -197,13 +202,7 @@ public class Storage
           piece_hashes[20 * i + j] = hash[j];
 
         bitfield.set(i);
-
-        if (listener != null)
-          listener.storageChecked(this, i, true);
       }
-
-    if (listener != null)
-      listener.storageAllChecked(this);
 
     // Reannounce to force recalculating the info_hash.
     metainfo = metainfo.reannounce(metainfo.getAnnounce());
@@ -218,6 +217,9 @@ public class Storage
     names = new String[size];
     lengths = new long[size];
     rafs = new RandomAccessFile[size];
+    RAFlock = new Object[size];
+    RAFtime = new long[size];
+    RAFfile = new File[size];
 
     int i = 0;
     Iterator it = files.iterator();
@@ -228,7 +230,8 @@ public class Storage
 	if (base.isDirectory() && names[i].startsWith(base.getPath()))
           names[i] = names[i].substring(base.getPath().length() + 1);
         lengths[i] = f.length();
-        rafs[i] = new RandomAccessFile(f, "r");
+        RAFlock[i] = new Object();
+        RAFfile[i] = f;
         i++;
       }
   }
@@ -289,10 +292,13 @@ public class Storage
    */
   public void check(String rootDir) throws IOException
   {
+    check(rootDir, 0, null);
+  }
+
+  /** use a saved bitfield and timestamp from a config file */
+  public void check(String rootDir, long savedTime, BitField savedBitField) throws IOException
+  {
     File base = new File(rootDir, filterName(metainfo.getName()));
-    // look for saved bitfield and timestamp in the config file
-    long savedTime = SnarkManager.instance().getSavedTorrentTime(metainfo);
-    BitField savedBitField = SnarkManager.instance().getSavedTorrentBitField(metainfo);
     boolean useSavedBitField = savedTime > 0 && savedBitField != null;
 
     List files = metainfo.getFiles();
@@ -306,16 +312,17 @@ public class Storage
         lengths = new long[1];
         rafs = new RandomAccessFile[1];
         names = new String[1];
+        RAFlock = new Object[1];
+        RAFtime = new long[1];
+        RAFfile = new File[1];
         lengths[0] = metainfo.getTotalLength();
+        RAFlock[0] = new Object();
+        RAFfile[0] = base;
         if (useSavedBitField) {
             long lm = base.lastModified();
             if (lm <= 0 || lm > savedTime)
                 useSavedBitField = false;
         }
-        if (base.exists() && ((useSavedBitField && savedBitField.complete()) || !base.canWrite()))
-            rafs[0] = new RandomAccessFile(base, "r");
-        else
-            rafs[0] = new RandomAccessFile(base, "rw");
         names[0] = base.getName();
       }
     else
@@ -331,20 +338,21 @@ public class Storage
         lengths = new long[size];
         rafs = new RandomAccessFile[size];
         names = new String[size];
+        RAFlock = new Object[size];
+        RAFtime = new long[size];
+        RAFfile = new File[size];
         for (int i = 0; i < size; i++)
           {
             File f = createFileFromNames(base, (List)files.get(i));
             lengths[i] = ((Long)ls.get(i)).longValue();
+            RAFlock[i] = new Object();
+            RAFfile[i] = f;
             total += lengths[i];
             if (useSavedBitField) {
                 long lm = base.lastModified();
                 if (lm <= 0 || lm > savedTime)
                     useSavedBitField = false;
             }
-            if (f.exists() && ((useSavedBitField && savedBitField.complete()) || !f.canWrite()))
-                rafs[i] = new RandomAccessFile(f, "r");
-            else
-                rafs[i] = new RandomAccessFile(f, "rw");
             names[i] = f.getName();
           }
 
@@ -357,11 +365,17 @@ public class Storage
     if (useSavedBitField) {
       bitfield = savedBitField;
       needed = metainfo.getPieces() - bitfield.count();
+      _probablyComplete = complete();
       Snark.debug("Found saved state and files unchanged, skipping check", Snark.NOTICE);
     } else {
+      // the following sets the needed variable
+      changed = true;
       checkCreateFiles();
-      SnarkManager.instance().saveTorrentStatus(metainfo, bitfield);
     }
+    if (complete())
+        Snark.debug("Torrent is complete", Snark.NOTICE);
+    else
+        Snark.debug("Still need " + needed + " out of " + metainfo.getPieces() + " pieces", Snark.NOTICE);
   }
 
   /**
@@ -379,11 +393,6 @@ public class Storage
         Snark.debug("Reopening file: " + base, Snark.NOTICE);
         if (!base.exists())
           throw new IOException("Could not reopen file " + base);
-
-        if (complete() || !base.canWrite())  // hope we can get away with this, if we are only seeding...
-            rafs[0] = new RandomAccessFile(base, "r");
-        else
-            rafs[0] = new RandomAccessFile(base, "rw");
       }
     else
       {
@@ -398,10 +407,6 @@ public class Storage
             File f = getFileFromNames(base, (List)files.get(i));
             if (!f.exists())
                 throw new IOException("Could not reopen file " + f);
-            if (complete() || !f.canWrite()) // see above re: only seeding
-                rafs[i] = new RandomAccessFile(f, "r");
-            else
-                rafs[i] = new RandomAccessFile(f, "rw");
           }
 
       }
@@ -453,27 +458,43 @@ public class Storage
     return base;
   }
 
+  /**
+   * This is called at the beginning, and at presumed completion,
+   * so we have to be careful about locking.
+   */
   private void checkCreateFiles() throws IOException
   {
     // Whether we are resuming or not,
     // if any of the files already exists we assume we are resuming.
     boolean resume = false;
 
+    _probablyComplete = true;
+    needed = metainfo.getPieces();
+
     // Make sure all files are available and of correct length
     for (int i = 0; i < rafs.length; i++)
       {
-        long length = rafs[i].length();
-        if(length == lengths[i])
+        long length = RAFfile[i].length();
+        if(RAFfile[i].exists() && length == lengths[i])
           {
             if (listener != null)
               listener.storageAllocated(this, length);
             resume = true; // XXX Could dynamicly check
           }
-        else if (length == 0)
-          allocateFile(i);
-        else {
+        else if (length == 0) {
+          changed = true;
+          synchronized(RAFlock[i]) {
+              allocateFile(i);
+          }
+        } else {
           Snark.debug("File '" + names[i] + "' exists, but has wrong length - repairing corruption", Snark.ERROR);
-          rafs[i].setLength(lengths[i]);
+          changed = true;
+          _probablyComplete = false; // to force RW
+          synchronized(RAFlock[i]) {
+              checkRAF(i);
+              rafs[i].setLength(lengths[i]);
+          }
+          // will be closed below
         }
       }
 
@@ -497,6 +518,17 @@ public class Storage
           }
       }
 
+    _probablyComplete = complete();
+    // close all the files so we don't end up with a zillion open ones;
+    // we will reopen as needed
+    for (int i = 0; i < rafs.length; i++) {
+      synchronized(RAFlock[i]) {
+        try {
+          closeRAF(i);
+        } catch (IOException ioe) {}
+      }
+    }
+
     if (listener != null) {
       listener.storageAllChecked(this);
       if (needed <= 0)
@@ -506,6 +538,8 @@ public class Storage
 
   private void allocateFile(int nr) throws IOException
   {
+    // caller synchronized
+    openRAF(nr, false);  // RW
     // XXX - Is this the best way to make sure we have enough space for
     // the whole file?
     listener.storageCreateFile(this, names[nr], lengths[nr]);
@@ -520,6 +554,7 @@ public class Storage
       }
     int size = (int)(lengths[nr] - i*ZEROBLOCKSIZE);
     rafs[nr].write(zeros, 0, size);
+    // caller will close rafs[nr]
     if (listener != null)
       listener.storageAllocated(this, size);
   }
@@ -535,12 +570,11 @@ public class Storage
     for (int i = 0; i < rafs.length; i++)
       {
         try {
-            synchronized(rafs[i])
-              {
-                rafs[i].close();
-              }
+          synchronized(RAFlock[i]) {
+            closeRAF(i);
+          }
         } catch (IOException ioe) {
-            I2PSnarkUtil.instance().debug("Error closing " + rafs[i], Snark.ERROR, ioe);
+            I2PSnarkUtil.instance().debug("Error closing " + RAFfile[i], Snark.ERROR, ioe);
             // gobble gobble
         }
       }
@@ -587,18 +621,10 @@ public class Storage
     if (!correctHash)
       return false;
 
-    boolean complete;
     synchronized(bitfield)
       {
         if (bitfield.get(piece))
           return true; // No need to store twice.
-        else
-          {
-            bitfield.set(piece);
-            needed--;
-            complete = needed == 0;
-          }
-
       }
 
     // Early typecast, avoid possibly overflowing a temp integer
@@ -618,8 +644,9 @@ public class Storage
       {
         int need = length - written;
         int len = (start + need < raflen) ? need : (int)(raflen - start);
-        synchronized(rafs[i])
+        synchronized(RAFlock[i])
           {
+            checkRAF(i);
             rafs[i].seek(start);
             rafs[i].write(bs, off + written, len);
           }
@@ -633,8 +660,21 @@ public class Storage
       }
 
     changed = true;
+
+    // do this after the write, so we know it succeeded, and we don't set the
+    // needed count to zero, which would cause checkRAF() to open the file readonly.
+    boolean complete = false;
+    synchronized(bitfield)
+      {
+        if (!bitfield.get(piece))
+          {
+            bitfield.set(piece);
+            needed--;
+            complete = needed == 0;
+          }
+      }
+
     if (complete) {
-//    listener.storageCompleted(this);
       // do we also need to close all of the files and reopen
       // them readonly?
 
@@ -649,11 +689,13 @@ public class Storage
       bitfield = new BitField(needed);
       checkCreateFiles();
       if (needed > 0) {
-        listener.setWantedPieces(this);
+        if (listener != null)
+            listener.setWantedPieces(this);
         Snark.debug("WARNING: Not really done, missing " + needed
                     + " pieces", Snark.WARNING);
       } else {
-        SnarkManager.instance().saveTorrentStatus(metainfo, bitfield);
+        if (listener != null)
+            listener.storageCompleted(this);
       }
     }
 
@@ -688,8 +730,9 @@ public class Storage
       {
         int need = length - read;
         int len = (start + need < raflen) ? need : (int)(raflen - start);
-        synchronized(rafs[i])
+        synchronized(RAFlock[i])
           {
+            checkRAF(i);
             rafs[i].seek(start);
             rafs[i].readFully(bs, read, len);
           }
@@ -704,4 +747,59 @@ public class Storage
 
     return length;
   }
+
+  /**
+   * Close unused RAFs - call periodically
+   */
+  private static final long RAFCloseDelay = 7*60*1000;
+  public void cleanRAFs() {
+    long cutoff = System.currentTimeMillis() - RAFCloseDelay;
+    for (int i = 0; i < RAFlock.length; i++) {
+      synchronized(RAFlock[i]) {
+        if (RAFtime[i] > 0 && RAFtime[i] < cutoff) {
+          try {
+             closeRAF(i);
+          } catch (IOException ioe) {}
+        }
+      }
+    }
+  }
+
+  /*
+   * For each of the following,
+   * caller must synchronize on RAFlock[i]
+   * ... except at the beginning if you're careful
+   */
+
+  /**
+   * This must be called before using the RAF to ensure it is open
+   */
+  private void checkRAF(int i) throws IOException {
+    if (RAFtime[i] > 0) {
+      RAFtime[i] = System.currentTimeMillis();
+      return;
+    }
+    openRAF(i);
+  }
+
+  private void openRAF(int i) throws IOException {
+    openRAF(i, _probablyComplete);
+  }
+
+  private void openRAF(int i, boolean readonly) throws IOException {
+    rafs[i] = new RandomAccessFile(RAFfile[i], (readonly || !RAFfile[i].canWrite()) ? "r" : "rw");
+    RAFtime[i] = System.currentTimeMillis();
+  }
+
+  /**
+   * Can be called even if not open
+   */
+  private void closeRAF(int i) throws IOException {
+    RAFtime[i] = 0;
+    if (rafs[i] == null)
+      return;
+    rafs[i].close();
+    rafs[i] = null;
+  }
+
 }

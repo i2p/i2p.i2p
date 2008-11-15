@@ -51,10 +51,6 @@ public class SnarkManager implements Snark.CompleteListener {
 
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
     public static final String DEFAULT_AUTO_START = "false";
-    public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
-    public static final String DEFAULT_USE_OPENTRACKERS = "true";
-    public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
-    public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
     public static final String DEFAULT_LINK_PREFIX = "file:///";
     
@@ -97,9 +93,6 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public boolean shouldAutoStart() {
         return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START+"")).booleanValue();
-    }
-    public boolean shouldUseOpenTrackers() {
-        return Boolean.valueOf(_config.getProperty(PROP_USE_OPENTRACKERS, DEFAULT_USE_OPENTRACKERS)).booleanValue();
     }
     public String linkPrefix() {
         return _config.getProperty(PROP_LINK_PREFIX, DEFAULT_LINK_PREFIX + getDataDir().getAbsolutePath() + File.separatorChar);
@@ -322,14 +315,14 @@ public class SnarkManager implements Snark.CompleteListener {
             addMessage("Adjusted autostart to " + autoStart);
             changed = true;
         }
-        if (shouldUseOpenTrackers() != useOpenTrackers) {
-            _config.setProperty(PROP_USE_OPENTRACKERS, useOpenTrackers + "");
+        if (I2PSnarkUtil.instance().shouldUseOpenTrackers() != useOpenTrackers) {
+            _config.setProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS, useOpenTrackers + "");
             addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect");
             changed = true;
         }
         if (openTrackers != null) {
-            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(getOpenTrackerString())) {
-                _config.setProperty(PROP_OPENTRACKERS, openTrackers.trim());
+            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(I2PSnarkUtil.instance().getOpenTrackerString())) {
+                _config.setProperty(I2PSnarkUtil.PROP_OPENTRACKERS, openTrackers.trim());
                 addMessage("Open Tracker list changed - torrent restart required to take effect");
                 changed = true;
             }
@@ -407,7 +400,7 @@ public class SnarkManager implements Snark.CompleteListener {
                         addMessage(rejectMessage);
                         return;
                     } else {
-                        torrent = new Snark(filename, null, -1, null, null, false, dataDir.getPath());
+                        torrent = new Snark(filename, null, -1, null, null, this, false, dataDir.getPath());
                         torrent.completeListener = this;
                         synchronized (_snarks) {
                             _snarks.put(filename, torrent);
@@ -438,7 +431,8 @@ public class SnarkManager implements Snark.CompleteListener {
     /**
      * Get the timestamp for a torrent from the config file
      */
-    public long getSavedTorrentTime(MetaInfo metainfo) {
+    public long getSavedTorrentTime(Snark snark) {
+        MetaInfo metainfo = snark.meta;
         byte[] ih = metainfo.getInfoHash();
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
@@ -457,7 +451,8 @@ public class SnarkManager implements Snark.CompleteListener {
      * Get the saved bitfield for a torrent from the config file.
      * Convert "." to a full bitfield.
      */
-    public BitField getSavedTorrentBitField(MetaInfo metainfo) {
+    public BitField getSavedTorrentBitField(Snark snark) {
+        MetaInfo metainfo = snark.meta;
         byte[] ih = metainfo.getInfoHash();
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
@@ -618,11 +613,17 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
     
+    /** two listeners */
     public void torrentComplete(Snark snark) {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
         addMessage("Download complete of " + f.getName() 
                    + (len < 5*1024*1024 ? " (size: " + (len/1024) + "KB)" : " (size: " + (len/(1024*1024l)) + "MB)"));
+        updateStatus(snark);
+    }
+    
+    public void updateStatus(Snark snark) {
+        saveTorrentStatus(snark.meta, snark.storage.getBitField());
     }
     
     private void monitorTorrents(File dir) {
@@ -704,26 +705,6 @@ public class SnarkManager implements Snark.CompleteListener {
         
         trackerMap = rv;
         return trackerMap;
-    }
-    
-    public String getOpenTrackerString() { 
-        return _config.getProperty(PROP_OPENTRACKERS, DEFAULT_OPENTRACKERS);
-    }
-
-    /** comma delimited list open trackers to use as backups */
-    /** sorted map of name to announceURL=baseURL */
-    public List getOpenTrackers() { 
-        if (!shouldUseOpenTrackers())
-            return null;
-        List rv = new ArrayList(1);
-        String trackers = getOpenTrackerString();
-        StringTokenizer tok = new StringTokenizer(trackers, ", ");
-        while (tok.hasMoreTokens())
-            rv.add(tok.nextToken());
-        
-        if (rv.size() <= 0)
-            return null;
-        return rv;
     }
     
     private static class TorrentFilenameFilter implements FilenameFilter {

@@ -690,8 +690,8 @@ public class I2PSnarkServlet extends HttpServlet {
         String uri = req.getRequestURI();
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean autoStart = _manager.shouldAutoStart();
-        boolean useOpenTrackers = _manager.shouldUseOpenTrackers();
-        String openTrackers = _manager.getOpenTrackerString();
+        boolean useOpenTrackers = I2PSnarkUtil.instance().shouldUseOpenTrackers();
+        String openTrackers = I2PSnarkUtil.instance().getOpenTrackerString();
         //int seedPct = 0;
        
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");

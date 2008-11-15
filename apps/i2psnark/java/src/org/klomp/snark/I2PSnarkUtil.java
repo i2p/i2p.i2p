@@ -2,12 +2,15 @@ package org.klomp.snark;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -44,6 +47,12 @@ public class I2PSnarkUtil {
     private int _maxUploaders;
     private int _maxUpBW;
     
+    public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
+    public static final boolean DEFAULT_USE_OPENTRACKERS = true;
+    public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
+    public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
+    public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
+
     private I2PSnarkUtil() {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(Snark.class);
@@ -53,6 +62,7 @@ public class I2PSnarkUtil {
         _shitlist = new HashSet(64);
         _configured = false;
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
+        _maxUpBW = DEFAULT_MAX_UP_BW;
     }
     
     /**
@@ -267,6 +277,36 @@ public class I2PSnarkUtil {
         return rv;
     }
     
+    public String getOpenTrackerString() { 
+        String rv = (String) _opts.get(PROP_OPENTRACKERS);
+        if (rv == null)
+            return DEFAULT_OPENTRACKERS;
+        return rv;
+    }
+
+    /** comma delimited list open trackers to use as backups */
+    /** sorted map of name to announceURL=baseURL */
+    public List getOpenTrackers() { 
+        if (!shouldUseOpenTrackers())
+            return null;
+        List rv = new ArrayList(1);
+        String trackers = getOpenTrackerString();
+        StringTokenizer tok = new StringTokenizer(trackers, ", ");
+        while (tok.hasMoreTokens())
+            rv.add(tok.nextToken());
+        
+        if (rv.size() <= 0)
+            return null;
+        return rv;
+    }
+    
+    public boolean shouldUseOpenTrackers() {
+        String rv = (String) _opts.get(PROP_USE_OPENTRACKERS);
+        if (rv == null)
+            return DEFAULT_USE_OPENTRACKERS;
+        return Boolean.valueOf(rv).booleanValue();
+    }
+
     /** hook between snark's logger and an i2p log */
     void debug(String msg, int snarkDebugLevel, Throwable t) {
         if (t instanceof OutOfMemoryError) {
