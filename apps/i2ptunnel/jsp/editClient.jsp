@@ -80,6 +80,10 @@
             <div id="portField" class="rowItem">
                 <label for="port" accesskey="P">
                     <span class="accessKey">P</span>ort:
+                    <% String value = editBean.getClientPort(curTunnel);
+                       if (value == null || "".equals(value.trim()))
+                           out.write(" <font color=\"red\">(required)</font>");
+                     %>
                 </label>
                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />               
             </div>
@@ -123,6 +127,10 @@
           %><div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
                     <span class="accessKey">T</span>unnel Destination:
+                    <% String value2 = editBean.getClientDestination(curTunnel);
+                       if (value2 == null || "".equals(value2.trim()))
+                           out.write(" <font color=\"red\">(required)</font>");
+                     %>
                 </label>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
                 <span class="comment">(name or destination)</span>

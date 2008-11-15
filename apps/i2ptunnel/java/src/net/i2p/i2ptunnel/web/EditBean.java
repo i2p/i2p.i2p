@@ -41,11 +41,11 @@ public class EditBean extends IndexBean {
         if (tun != null)
             return tun.getTargetHost();
         else
-            return "";
+            return "127.0.0.1";
     }
     public String getTargetPort(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getTargetPort() != null)
             return tun.getTargetPort();
         else
             return "";
@@ -59,7 +59,7 @@ public class EditBean extends IndexBean {
     }
     public String getPrivateKeyFile(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
         else
             return "";
