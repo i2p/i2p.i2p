@@ -3,6 +3,7 @@ package net.i2p.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 
 import net.i2p.data.DataHelper;
@@ -51,6 +52,10 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     public void reset() { 
         super.reset();
         _buffer.reset();
+        def.setLevel(Deflater.BEST_COMPRESSION);
+    }
+    public void setLevel(int level) { 
+        def.setLevel(level);
     }
     /** pull the contents of the stream written */
     public byte[] getData() { return _buffer.toByteArray(); }
