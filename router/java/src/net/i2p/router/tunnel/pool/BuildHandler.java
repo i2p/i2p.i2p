@@ -499,7 +499,7 @@ class BuildHandler {
         }
         
         if (response == 0 && (isInGW || isOutEnd) &&
-            Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT))) {
+            Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT)).booleanValue()) {
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
