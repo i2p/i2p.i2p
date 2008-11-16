@@ -37,6 +37,9 @@ public class SnarkManager implements Snark.CompleteListener {
     private I2PAppContext _context;
     private Log _log;
     private List _messages;
+    private I2PSnarkUtil _util;
+    private PeerCoordinatorSet _peerCoordinatorSet;
+    private ConnectionAcceptor _connectionAcceptor;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -63,6 +66,9 @@ public class SnarkManager implements Snark.CompleteListener {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new ArrayList(16);
+        _util = new I2PSnarkUtil(_context);
+        _peerCoordinatorSet = new PeerCoordinatorSet();
+        _connectionAcceptor = new ConnectionAcceptor(_util);
         loadConfig("i2psnark.config");
         int minutes = getStartupDelayMinutes();
         _messages.add("Adding torrents in " + minutes + (minutes == 1 ? " minute" : " minutes"));
@@ -73,6 +79,9 @@ public class SnarkManager implements Snark.CompleteListener {
             ((RouterContext)_context).router().addShutdownTask(new SnarkManagerShutdown());
     }
     
+    /** hook to I2PSnarkUtil for the servlet */
+    public I2PSnarkUtil util() { return _util; }
+
     private static final int MAX_MESSAGES = 5;
     public void addMessage(String message) {
         synchronized (_messages) {
@@ -162,16 +171,16 @@ public class SnarkManager implements Snark.CompleteListener {
             }
         }
         if (i2cpHost != null) {
-            I2PSnarkUtil.instance().setI2CPConfig(i2cpHost, i2cpPort, i2cpOpts);
+            _util.setI2CPConfig(i2cpHost, i2cpPort, i2cpOpts);
             _log.debug("Configuring with I2CP options " + i2cpOpts);
         }
         //I2PSnarkUtil.instance().setI2CPConfig("66.111.51.110", 7654, new Properties());
         String eepHost = _config.getProperty(PROP_EEP_HOST);
         int eepPort = getInt(PROP_EEP_PORT, 4444);
         if (eepHost != null)
-            I2PSnarkUtil.instance().setProxy(eepHost, eepPort);
-        I2PSnarkUtil.instance().setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
-        I2PSnarkUtil.instance().setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
+            _util.setProxy(eepHost, eepPort);
+        _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
+        _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
         getDataDir().mkdirs();
     }
     
@@ -191,12 +200,12 @@ public class SnarkManager implements Snark.CompleteListener {
                              String upLimit, String upBW, boolean useOpenTrackers, String openTrackers) {
         boolean changed = false;
         if (eepHost != null) {
-            int port = I2PSnarkUtil.instance().getEepProxyPort();
+            int port = _util.getEepProxyPort();
             try { port = Integer.parseInt(eepPort); } catch (NumberFormatException nfe) {}
-            String host = I2PSnarkUtil.instance().getEepProxyHost();
+            String host = _util.getEepProxyHost();
             if ( (eepHost.trim().length() > 0) && (port > 0) &&
-                 ((!host.equals(eepHost) || (port != I2PSnarkUtil.instance().getEepProxyPort()) )) ) {
-                I2PSnarkUtil.instance().setProxy(eepHost, port);
+                 ((!host.equals(eepHost) || (port != _util.getEepProxyPort()) )) ) {
+                _util.setProxy(eepHost, port);
                 changed = true;
                 _config.setProperty(PROP_EEP_HOST, eepHost);
                 _config.setProperty(PROP_EEP_PORT, eepPort+"");
@@ -204,11 +213,11 @@ public class SnarkManager implements Snark.CompleteListener {
             }
         }
         if (upLimit != null) {
-            int limit = I2PSnarkUtil.instance().getMaxUploaders();
+            int limit = _util.getMaxUploaders();
             try { limit = Integer.parseInt(upLimit); } catch (NumberFormatException nfe) {}
-            if ( limit != I2PSnarkUtil.instance().getMaxUploaders()) {
+            if ( limit != _util.getMaxUploaders()) {
                 if ( limit >= Snark.MIN_TOTAL_UPLOADERS ) {
-                    I2PSnarkUtil.instance().setMaxUploaders(limit);
+                    _util.setMaxUploaders(limit);
                     changed = true;
                     _config.setProperty(PROP_UPLOADERS_TOTAL, "" + limit);
                     addMessage("Total uploaders limit changed to " + limit);
@@ -218,11 +227,11 @@ public class SnarkManager implements Snark.CompleteListener {
             }
         }
         if (upBW != null) {
-            int limit = I2PSnarkUtil.instance().getMaxUpBW();
+            int limit = _util.getMaxUpBW();
             try { limit = Integer.parseInt(upBW); } catch (NumberFormatException nfe) {}
-            if ( limit != I2PSnarkUtil.instance().getMaxUpBW()) {
+            if ( limit != _util.getMaxUpBW()) {
                 if ( limit >= MIN_UP_BW ) {
-                    I2PSnarkUtil.instance().setMaxUpBW(limit);
+                    _util.setMaxUpBW(limit);
                     changed = true;
                     _config.setProperty(PROP_UPBW_MAX, "" + limit);
                     addMessage("Up BW limit changed to " + limit + "KBps");
@@ -232,8 +241,8 @@ public class SnarkManager implements Snark.CompleteListener {
             }
         }
         if (i2cpHost != null) {
-            int oldI2CPPort = I2PSnarkUtil.instance().getI2CPPort();
-            String oldI2CPHost = I2PSnarkUtil.instance().getI2CPHost();
+            int oldI2CPPort = _util.getI2CPPort();
+            String oldI2CPHost = _util.getI2CPHost();
             int port = oldI2CPPort;
             try { port = Integer.parseInt(i2cpPort); } catch (NumberFormatException nfe) {}
             String host = oldI2CPHost;
@@ -259,7 +268,7 @@ public class SnarkManager implements Snark.CompleteListener {
             
             if ( (i2cpHost.trim().length() > 0) && (port > 0) &&
                  ((!host.equals(i2cpHost) || 
-                  (port != I2PSnarkUtil.instance().getI2CPPort()) ||
+                  (port != _util.getI2CPPort()) ||
                   (!oldOpts.equals(opts)))) ) {
                 boolean snarksActive = false;
                 Set names = listTorrentFiles();
@@ -275,19 +284,19 @@ public class SnarkManager implements Snark.CompleteListener {
                     _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
                                + "] oldOpts [" + oldOpts + "]");
                 } else {
-                    if (I2PSnarkUtil.instance().connected()) {
-                        I2PSnarkUtil.instance().disconnect();
+                    if (_util.connected()) {
+                        _util.disconnect();
                         addMessage("Disconnecting old I2CP destination");
                     }
                     Properties p = new Properties();
                     p.putAll(opts);
                     addMessage("I2CP settings changed to " + i2cpHost + ":" + port + " (" + i2cpOpts.trim() + ")");
-                    I2PSnarkUtil.instance().setI2CPConfig(i2cpHost, port, p);
-                    boolean ok = I2PSnarkUtil.instance().connect();
+                    _util.setI2CPConfig(i2cpHost, port, p);
+                    boolean ok = _util.connect();
                     if (!ok) {
                         addMessage("Unable to connect with the new settings, reverting to the old I2CP settings");
-                        I2PSnarkUtil.instance().setI2CPConfig(oldI2CPHost, oldI2CPPort, oldOpts);
-                        ok = I2PSnarkUtil.instance().connect();
+                        _util.setI2CPConfig(oldI2CPHost, oldI2CPPort, oldOpts);
+                        ok = _util.connect();
                         if (!ok)
                             addMessage("Unable to reconnect with the old settings!");
                     } else {
@@ -315,13 +324,13 @@ public class SnarkManager implements Snark.CompleteListener {
             addMessage("Adjusted autostart to " + autoStart);
             changed = true;
         }
-        if (I2PSnarkUtil.instance().shouldUseOpenTrackers() != useOpenTrackers) {
+        if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
             _config.setProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS, useOpenTrackers + "");
             addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect");
             changed = true;
         }
         if (openTrackers != null) {
-            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(I2PSnarkUtil.instance().getOpenTrackerString())) {
+            if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
                 _config.setProperty(I2PSnarkUtil.PROP_OPENTRACKERS, openTrackers.trim());
                 addMessage("Open Tracker list changed - torrent restart required to take effect");
                 changed = true;
@@ -357,9 +366,9 @@ public class SnarkManager implements Snark.CompleteListener {
     public Snark getTorrent(String filename) { synchronized (_snarks) { return (Snark)_snarks.get(filename); } }
     public void addTorrent(String filename) { addTorrent(filename, false); }
     public void addTorrent(String filename, boolean dontAutoStart) {
-        if ((!dontAutoStart) && !I2PSnarkUtil.instance().connected()) {
+        if ((!dontAutoStart) && !_util.connected()) {
             addMessage("Connecting to I2P");
-            boolean ok = I2PSnarkUtil.instance().connect();
+            boolean ok = _util.connect();
             if (!ok) {
                 addMessage("Error connecting to I2P - check your I2CP settings");
                 return;
@@ -400,7 +409,9 @@ public class SnarkManager implements Snark.CompleteListener {
                         addMessage(rejectMessage);
                         return;
                     } else {
-                        torrent = new Snark(filename, null, -1, null, null, this, false, dataDir.getPath());
+                        torrent = new Snark(_util, filename, null, -1, null, null, this,
+                                            _peerCoordinatorSet, _connectionAcceptor,
+                                            false, dataDir.getPath());
                         torrent.completeListener = this;
                         synchronized (_snarks) {
                             _snarks.put(filename, torrent);
@@ -569,7 +580,7 @@ public class SnarkManager implements Snark.CompleteListener {
             if (remaining == 0) {
                 // should we disconnect/reconnect here (taking care to deal with the other thread's
                 // I2PServerSocket.accept() call properly?)
-                ////I2PSnarkUtil.instance().
+                ////_util.
             }
             if (!wasStopped)
                 addMessage("Torrent stopped: '" + sfile.getName() + "'");
@@ -645,7 +656,7 @@ public class SnarkManager implements Snark.CompleteListener {
             if (existingNames.contains(foundNames.get(i))) {
                 // already known.  noop
             } else {
-                if (shouldAutoStart() && !I2PSnarkUtil.instance().connect())
+                if (shouldAutoStart() && !_util.connect())
                     addMessage("Unable to connect to I2P");
                 addTorrent((String)foundNames.get(i), !shouldAutoStart());
             }

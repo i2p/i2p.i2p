@@ -34,6 +34,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
@@ -102,7 +103,7 @@ public class Snark
       public void outOfMemory(OutOfMemoryError err) {
           try {
               err.printStackTrace();
-              I2PSnarkUtil.instance().debug("OOM in the snark", Snark.ERROR, err);
+              System.out.println("OOM in the snark" + err);
           } catch (Throwable t) {
               System.out.println("OOM in the OOM");
           }
@@ -225,7 +226,7 @@ public class Snark
           }
         catch(IOException ioe)
           {
-            debug("ERROR while reading stdin: " + ioe, ERROR);
+            System.out.println("ERROR while reading stdin: " + ioe);
           }
         
         // Explicit shutdown.
@@ -244,22 +245,34 @@ public class Snark
   public CompleteListener completeListener;
   public boolean stopped;
   byte[] id;
+  public I2PSnarkUtil _util;
+  private PeerCoordinatorSet _peerCoordinatorSet;
 
-  Snark(String torrent, String ip, int user_port,
+  /** from main() via parseArguments() single torrent */
+  Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener) { 
-    this(torrent, ip, user_port, slistener, clistener, null, true, "."); 
+    this(util, torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
   }
-  public Snark(String torrent, String ip, int user_port,
+
+  /** single torrent */
+  Snark(I2PAppContext ctx, String torrent, String ip, int user_port,
+        StorageListener slistener, CoordinatorListener clistener) { 
+    this(new I2PSnarkUtil(ctx), torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
+  }
+
+  /** multitorrent */
+  public Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener,
-        CompleteListener complistener, boolean start, String rootDir)
+        CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
+        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
   {
     if (slistener == null)
       slistener = this;
 
-    //if (clistener == null)
-    //  clistener = this;
-
     completeListener = complistener;
+    _util = util;
+    _peerCoordinatorSet = peerCoordinatorSet;
+    acceptor = connectionAcceptor;
 
     this.torrent = torrent;
     this.rootDataDir = rootDir;
@@ -292,7 +305,7 @@ public class Snark
     while (i < 20)
       id[i++] = (byte)random.nextInt(256);
 
-    Snark.debug("My peer id: " + PeerID.idencode(id), Snark.INFO);
+    debug("My peer id: " + PeerID.idencode(id), Snark.INFO);
 
     int port;
     IOException lastException = null;
@@ -301,9 +314,9 @@ public class Snark
  * If we are starting,
  * startTorrent() will force a connect.
  *
-    boolean ok = I2PSnarkUtil.instance().connect();
+    boolean ok = util.connect();
     if (!ok) fatal("Unable to connect to I2P");
-    I2PServerSocket serversocket = I2PSnarkUtil.instance().getServerSocket();
+    I2PServerSocket serversocket = util.getServerSocket();
     if (serversocket == null)
         fatal("Unable to listen for I2P connections");
     else {
@@ -324,7 +337,7 @@ public class Snark
         else
           {
             activity = "Getting torrent";
-            File torrentFile = I2PSnarkUtil.instance().get(torrent, 3);
+            File torrentFile = _util.get(torrent, 3);
             if (torrentFile == null) {
                 fatal("Unable to fetch " + torrent);
                 if (false) return; // never reached - fatal(..) throws
@@ -348,7 +361,7 @@ public class Snark
         /*
             {
               // Try to create a new metainfo file
-             Snark.debug
+             debug
                ("Trying to create metainfo torrent for '" + torrent + "'",
                 NOTICE);
              try
@@ -381,7 +394,7 @@ public class Snark
         try
           {
             activity = "Checking storage";
-            storage = new Storage(meta, slistener);
+            storage = new Storage(_util, meta, slistener);
             if (completeListener != null) {
                 storage.check(rootDataDir,
                               completeListener.getSavedTorrentTime(this),
@@ -422,10 +435,10 @@ public class Snark
    * Start up contacting peers and querying the tracker
    */
   public void startTorrent() {
-    boolean ok = I2PSnarkUtil.instance().connect();
+    boolean ok = _util.connect();
     if (!ok) fatal("Unable to connect to I2P");
     if (coordinator == null) {
-        I2PServerSocket serversocket = I2PSnarkUtil.instance().getServerSocket();
+        I2PServerSocket serversocket = _util.getServerSocket();
         if (serversocket == null)
             fatal("Unable to listen for I2P connections");
         else {
@@ -434,12 +447,20 @@ public class Snark
         }
         debug("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient", NOTICE);
         activity = "Collecting pieces";
-        coordinator = new PeerCoordinator(id, meta, storage, this, this);
-        PeerCoordinatorSet set = PeerCoordinatorSet.instance();
-        set.add(coordinator);
-        ConnectionAcceptor acceptor = ConnectionAcceptor.instance();
-        acceptor.startAccepting(set, serversocket);
-        trackerclient = new TrackerClient(meta, coordinator);
+        coordinator = new PeerCoordinator(_util, id, meta, storage, this, this);
+        if (_peerCoordinatorSet != null) {
+            // multitorrent
+            _peerCoordinatorSet.add(coordinator);
+            if (acceptor != null) {
+                acceptor.startAccepting(_peerCoordinatorSet, serversocket);
+            } else {
+              // error
+            }
+        } else {
+            // single torrent
+            acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
+        }
+        trackerclient = new TrackerClient(_util, meta, coordinator);
     }
 
     stopped = false;
@@ -447,11 +468,12 @@ public class Snark
     if (coordinator.halted()) {
         // ok, we have already started and stopped, but the coordinator seems a bit annoying to
         // restart safely, so lets build a new one to replace the old
-        PeerCoordinatorSet set = PeerCoordinatorSet.instance();
-        set.remove(coordinator);
-        PeerCoordinator newCoord = new PeerCoordinator(coordinator.getID(), coordinator.getMetaInfo(), 
+        if (_peerCoordinatorSet != null)
+            _peerCoordinatorSet.remove(coordinator);
+        PeerCoordinator newCoord = new PeerCoordinator(_util, coordinator.getID(), coordinator.getMetaInfo(), 
                                                        coordinator.getStorage(), coordinator.getListener(), this);
-        set.add(newCoord);
+        if (_peerCoordinatorSet != null)
+            _peerCoordinatorSet.add(newCoord);
         coordinator = newCoord;
         coordinatorChanged = true;
     }
@@ -469,7 +491,7 @@ public class Snark
             }
             fatal("Could not reopen storage", ioe);
           }
-        TrackerClient newClient = new TrackerClient(coordinator.getMetaInfo(), coordinator);
+        TrackerClient newClient = new TrackerClient(_util, coordinator.getMetaInfo(), coordinator);
         if (!trackerclient.halted())
             trackerclient.halt();
         trackerclient = newClient;
@@ -499,8 +521,8 @@ public class Snark
         if (changed && completeListener != null)
             completeListener.updateStatus(this);
     }
-    if (pc != null)
-        PeerCoordinatorSet.instance().remove(pc);
+    if (pc != null && _peerCoordinatorSet != null)
+        _peerCoordinatorSet.remove(pc);
   }
 
   static Snark parseArguments(String[] args)
@@ -522,7 +544,8 @@ public class Snark
     String ip = null;
     String torrent = null;
 
-    boolean configured = I2PSnarkUtil.instance().configured();
+    I2PSnarkUtil util = new I2PSnarkUtil(I2PAppContext.getGlobalContext());
+    boolean configured = util.configured();
     
     int i = 0;
     while (i < args.length)
@@ -572,7 +595,7 @@ public class Snark
             String proxyHost = args[i+1];
             String proxyPort = args[i+2];
             if (!configured)
-                I2PSnarkUtil.instance().setProxy(proxyHost, Integer.parseInt(proxyPort));
+                util.setProxy(proxyHost, Integer.parseInt(proxyPort));
             i += 3;
           }
         else if (args[i].equals("--i2cp"))
@@ -594,7 +617,7 @@ public class Snark
                 }
             }
             if (!configured)
-                I2PSnarkUtil.instance().setI2CPConfig(i2cpHost, Integer.parseInt(i2cpPort), opts);
+                util.setI2CPConfig(i2cpHost, Integer.parseInt(i2cpPort), opts);
             i += 3 + (opts != null ? 1 : 0);
           }
         else
@@ -611,7 +634,7 @@ public class Snark
       else
         usage("Need exactly one <url>, <file> or <dir>.");
 
-    return new Snark(torrent, ip, user_port, slistener, clistener);
+    return new Snark(util, torrent, ip, user_port, slistener, clistener);
   }
   
   private static void usage(String s)
@@ -678,7 +701,7 @@ public class Snark
    */
   public void fatal(String s, Throwable t)
   {
-    I2PSnarkUtil.instance().debug(s, ERROR, t);
+    _util.debug(s, ERROR, t);
     //System.err.println("snark: " + s + ((t == null) ? "" : (": " + t)));
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
@@ -689,13 +712,12 @@ public class Snark
   /**
    * Show debug info if debug is true.
    */
-  public static void debug(String s, int level)
+  private void debug(String s, int level)
   {
-    I2PSnarkUtil.instance().debug(s, level, null);
-    //if (debug >= level)
-    //  System.out.println(s);
+    _util.debug(s, level, null);
   }
 
+  /** coordinatorListener */
   public void peerChange(PeerCoordinator coordinator, Peer peer)
   {
     // System.out.println(peer.toString());
@@ -742,7 +764,7 @@ public class Snark
         checking = true;
       }
     if (!checking)
-      Snark.debug("Got " + (checked ? "" : "BAD ") + "piece: " + num,
+      debug("Got " + (checked ? "" : "BAD ") + "piece: " + num,
                   Snark.INFO);
   }
 
@@ -759,7 +781,7 @@ public class Snark
   
   public void storageCompleted(Storage storage)
   {
-    Snark.debug("Completely received " + torrent, Snark.INFO);
+    debug("Completely received " + torrent, Snark.INFO);
     //storage.close();
     //System.out.println("Completely received: " + torrent);
     if (completeListener != null)
@@ -787,41 +809,40 @@ public class Snark
   }
 
   /** Maintain a configurable total uploader cap
+   * coordinatorListener
    */
   final static int MIN_TOTAL_UPLOADERS = 4;
   final static int MAX_TOTAL_UPLOADERS = 10;
-  public static boolean overUploadLimit(int uploaders) {
-    PeerCoordinatorSet coordinators = PeerCoordinatorSet.instance();
-    if (coordinators == null || uploaders <= 0)
+  public boolean overUploadLimit(int uploaders) {
+    if (_peerCoordinatorSet == null || uploaders <= 0)
       return false;
     int totalUploaders = 0;
-    for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
+    for (Iterator iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
       PeerCoordinator c = (PeerCoordinator)iter.next();
       if (!c.halted())
         totalUploaders += c.uploaders;
     }
-    int limit = I2PSnarkUtil.instance().getMaxUploaders();
-    // Snark.debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
+    int limit = _util.getMaxUploaders();
+    // debug("Total uploaders: " + totalUploaders + " Limit: " + limit, Snark.DEBUG);
     return totalUploaders > limit;
   }
 
-  public static boolean overUpBWLimit() {
-    PeerCoordinatorSet coordinators = PeerCoordinatorSet.instance();
-    if (coordinators == null)
+  public boolean overUpBWLimit() {
+    if (_peerCoordinatorSet == null)
       return false;
     long total = 0;
-    for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
+    for (Iterator iter = _peerCoordinatorSet.iterator(); iter.hasNext(); ) {
       PeerCoordinator c = (PeerCoordinator)iter.next();
       if (!c.halted())
         total += c.getCurrentUploadRate();
     }
-    long limit = 1024l * I2PSnarkUtil.instance().getMaxUpBW();
-    Snark.debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
+    long limit = 1024l * _util.getMaxUpBW();
+    debug("Total up bw: " + total + " Limit: " + limit, Snark.WARNING);
     return total > limit;
   }
 
-  public static boolean overUpBWLimit(long total) {
-    long limit = 1024l * I2PSnarkUtil.instance().getMaxUpBW();
+  public boolean overUpBWLimit(long total) {
+    long limit = 1024l * _util.getMaxUpBW();
     return total > limit;
   }
 }

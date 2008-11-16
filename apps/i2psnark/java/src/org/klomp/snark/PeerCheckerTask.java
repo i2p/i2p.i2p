@@ -35,9 +35,11 @@ class PeerCheckerTask extends TimerTask
   private static final long KILOPERSECOND = 1024*(PeerCoordinator.CHECK_PERIOD/1000);
 
   private final PeerCoordinator coordinator;
+  public I2PSnarkUtil _util;
 
-  PeerCheckerTask(PeerCoordinator coordinator)
+  PeerCheckerTask(I2PSnarkUtil util, PeerCoordinator coordinator)
   {
+    _util = util;
     this.coordinator = coordinator;
   }
 
@@ -102,8 +104,8 @@ class PeerCheckerTask extends TimerTask
 	    peer.setRateHistory(upload, download);
             peer.resetCounters();
 
-            Snark.debug(peer + ":", Snark.DEBUG);
-            Snark.debug(" ul: " + upload/KILOPERSECOND
+            _util.debug(peer + ":", Snark.DEBUG);
+            _util.debug(" ul: " + upload/KILOPERSECOND
                         + " dl: " + download/KILOPERSECOND
                         + " i: " + peer.isInterested()
                         + " I: " + peer.isInteresting()
@@ -129,7 +131,7 @@ class PeerCheckerTask extends TimerTask
                 // Check if it still wants pieces from us.
                 if (!peer.isInterested())
                   {
-                    Snark.debug("Choke uninterested peer: " + peer,
+                    _util.debug("Choke uninterested peer: " + peer,
                                 Snark.INFO);
                     peer.setChoking(true);
                     uploaders--;
@@ -141,7 +143,7 @@ class PeerCheckerTask extends TimerTask
                   }
                 else if (overBWLimitChoke)
                   {
-                    Snark.debug("BW limit (" + upload + "/" + uploaded + "), choke peer: " + peer,
+                    _util.debug("BW limit (" + upload + "/" + uploaded + "), choke peer: " + peer,
                                 Snark.INFO);
                     peer.setChoking(true);
                     uploaders--;
@@ -155,7 +157,7 @@ class PeerCheckerTask extends TimerTask
                 else if (peer.isInteresting() && peer.isChoked())
                   {
                     // If they are choking us make someone else a downloader
-                    Snark.debug("Choke choking peer: " + peer, Snark.DEBUG);
+                    _util.debug("Choke choking peer: " + peer, Snark.DEBUG);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -168,7 +170,7 @@ class PeerCheckerTask extends TimerTask
                 else if (!peer.isInteresting() && !coordinator.completed())
                   {
                     // If they aren't interesting make someone else a downloader
-                    Snark.debug("Choke uninteresting peer: " + peer, Snark.DEBUG);
+                    _util.debug("Choke uninteresting peer: " + peer, Snark.DEBUG);
                     peer.setChoking(true);
                     uploaders--;
                     coordinator.uploaders--;
@@ -183,7 +185,7 @@ class PeerCheckerTask extends TimerTask
                          && download == 0)
                   {
                     // We are downloading but didn't receive anything...
-                    Snark.debug("Choke downloader that doesn't deliver:"
+                    _util.debug("Choke downloader that doesn't deliver:"
                                 + peer, Snark.DEBUG);
                     peer.setChoking(true);
                     uploaders--;
@@ -222,7 +224,7 @@ class PeerCheckerTask extends TimerTask
             || uploaders > uploadLimit)
             && worstDownloader != null)
           {
-            Snark.debug("Choke worst downloader: " + worstDownloader,
+            _util.debug("Choke worst downloader: " + worstDownloader,
                         Snark.DEBUG);
 
             worstDownloader.setChoking(true);

@@ -30,4 +30,8 @@ public interface CoordinatorListener
    * Called when the PeerCoordinator notices a change in the state of a peer.
    */
   void peerChange(PeerCoordinator coordinator, Peer peer);
+
+  public boolean overUploadLimit(int uploaders);
+  public boolean overUpBWLimit();
+  public boolean overUpBWLimit(long total);
 }

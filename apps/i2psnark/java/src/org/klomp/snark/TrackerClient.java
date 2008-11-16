@@ -57,6 +57,7 @@ public class TrackerClient extends I2PThread
   private final static int MAX_CONSEC_FAILS = 5;    // slow down after this
   private final static int LONG_SLEEP = 30*60*1000; // sleep a while after lots of fails
 
+  private I2PSnarkUtil _util;
   private final MetaInfo meta;
   private final PeerCoordinator coordinator;
   private final int port;
@@ -66,10 +67,11 @@ public class TrackerClient extends I2PThread
 
   private List trackers;
 
-  public TrackerClient(MetaInfo meta, PeerCoordinator coordinator)
+  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator)
   {
     // Set unique name.
     super("TrackerClient-" + urlencode(coordinator.getID()));
+    _util = util;
     this.meta = meta;
     this.coordinator = coordinator;
 
@@ -98,13 +100,13 @@ public class TrackerClient extends I2PThread
   }
 
   private boolean verifyConnected() {
-    while (!stop && !I2PSnarkUtil.instance().connected()) {
-        boolean ok = I2PSnarkUtil.instance().connect();
+    while (!stop && !_util.connected()) {
+        boolean ok = _util.connect();
         if (!ok) {
             try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
         }
     }
-    return !stop && I2PSnarkUtil.instance().connected();
+    return !stop && _util.connected();
   }
   
   public void run()
@@ -121,7 +123,7 @@ public class TrackerClient extends I2PThread
     // the primary tracker, that we don't add it twice.
     trackers = new ArrayList(2);
     trackers.add(new Tracker(meta.getAnnounce(), true));
-    List tlist = I2PSnarkUtil.instance().getOpenTrackers();
+    List tlist = _util.getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {
              String url = (String)tlist.get(i);
@@ -136,7 +138,7 @@ public class TrackerClient extends I2PThread
              }
              if (meta.getAnnounce().startsWith(url.substring(0, slash)))
                 continue;
-             String dest = I2PSnarkUtil.instance().lookup(url.substring(7, slash));
+             String dest = _util.lookup(url.substring(7, slash));
              if (dest == null) {
                 _log.error("Announce host unknown: [" + url + "]");
                 continue;
@@ -264,7 +266,7 @@ public class TrackerClient extends I2PThread
                 catch (IOException ioe)
                   {
                     // Probably not fatal (if it doesn't last to long...)
-                    Snark.debug
+                    _util.debug
                       ("WARNING: Could not contact tracker at '"
                        + tr.announce + "': " + ioe, Snark.WARNING);
                     tr.trackerProblems = ioe.getMessage();
@@ -295,12 +297,12 @@ public class TrackerClient extends I2PThread
             // we could try and total the unique peers but that's too hard for now
             coordinator.trackerSeenPeers = maxSeenPeers;
             if (!started)
-                Snark.debug("         Retrying in one minute...", Snark.DEBUG);
+                _util.debug("         Retrying in one minute...", Snark.DEBUG);
           } // *** end of while loop
       } // try
     catch (Throwable t)
       {
-        I2PSnarkUtil.instance().debug("TrackerClient: " + t, Snark.ERROR, t);
+        _util.debug("TrackerClient: " + t, Snark.ERROR, t);
         if (t instanceof OutOfMemoryError)
             throw (OutOfMemoryError)t;
       }
@@ -332,15 +334,15 @@ public class TrackerClient extends I2PThread
       + "?info_hash=" + infoHash
       + "&peer_id=" + peerID
       + "&port=" + port
-      + "&ip=" + I2PSnarkUtil.instance().getOurIPString() + ".i2p"
+      + "&ip=" + _util.getOurIPString() + ".i2p"
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
       + "&left=" + left
       + ((event != NO_EVENT) ? ("&event=" + event) : "");
-    Snark.debug("Sending TrackerClient request: " + s, Snark.INFO);
+    _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
       
     tr.lastRequestTime = System.currentTimeMillis();
-    File fetched = I2PSnarkUtil.instance().get(s);
+    File fetched = _util.get(s);
     if (fetched == null) {
         throw new IOException("Error fetching " + s);
     }
@@ -352,7 +354,7 @@ public class TrackerClient extends I2PThread
 
         TrackerInfo info = new TrackerInfo(in, coordinator.getID(),
                                            coordinator.getMetaInfo());
-        Snark.debug("TrackerClient response: " + info, Snark.INFO);
+        _util.debug("TrackerClient response: " + info, Snark.INFO);
 
         String failure = info.getFailureReason();
         if (failure != null)

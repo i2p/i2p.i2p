@@ -44,6 +44,7 @@ public class Storage
   private File[] RAFfile;    // File to make it easier to reopen
 
   private final StorageListener listener;
+  private I2PSnarkUtil _util;
 
   private BitField bitfield; // BitField to represent the pieces
   private int needed; // Number of pieces needed
@@ -66,9 +67,10 @@ public class Storage
    *
    * @exception IOException when creating and/or checking files fails.
    */
-  public Storage(MetaInfo metainfo, StorageListener listener)
+  public Storage(I2PSnarkUtil util, MetaInfo metainfo, StorageListener listener)
     throws IOException
   {
+    _util = util;
     this.metainfo = metainfo;
     this.listener = listener;
     needed = metainfo.getPieces();
@@ -81,9 +83,10 @@ public class Storage
    * with an appropriate MetaInfo file as can be announced on the
    * given announce String location.
    */
-  public Storage(File baseFile, String announce, StorageListener listener)
+  public Storage(I2PSnarkUtil util, File baseFile, String announce, StorageListener listener)
     throws IOException
   {
+    _util = util;
     this.listener = listener;
     // Create names, rafs and lengths arrays.
     getFiles(baseFile);
@@ -236,7 +239,7 @@ public class Storage
       }
   }
 
-  private static void addFiles(List l, File f)
+  private void addFiles(List l, File f)
   {
     if (!f.isDirectory())
       l.add(f);
@@ -245,7 +248,7 @@ public class Storage
         File[] files = f.listFiles();
         if (files == null)
           {
-            Snark.debug("WARNING: Skipping '" + f 
+            _util.debug("WARNING: Skipping '" + f 
                         + "' not a normal file.", Snark.WARNING);
             return;
           }
@@ -305,7 +308,7 @@ public class Storage
     if (files == null)
       {
         // Create base as file.
-        Snark.debug("Creating/Checking file: " + base, Snark.NOTICE);
+        _util.debug("Creating/Checking file: " + base, Snark.NOTICE);
         if (!base.createNewFile() && !base.exists())
           throw new IOException("Could not create file " + base);
 
@@ -328,7 +331,7 @@ public class Storage
     else
       {
         // Create base as dir.
-        Snark.debug("Creating/Checking directory: " + base, Snark.NOTICE);
+        _util.debug("Creating/Checking directory: " + base, Snark.NOTICE);
         if (!base.mkdir() && !base.isDirectory())
           throw new IOException("Could not create directory " + base);
 
@@ -366,16 +369,16 @@ public class Storage
       bitfield = savedBitField;
       needed = metainfo.getPieces() - bitfield.count();
       _probablyComplete = complete();
-      Snark.debug("Found saved state and files unchanged, skipping check", Snark.NOTICE);
+      _util.debug("Found saved state and files unchanged, skipping check", Snark.NOTICE);
     } else {
       // the following sets the needed variable
       changed = true;
       checkCreateFiles();
     }
     if (complete())
-        Snark.debug("Torrent is complete", Snark.NOTICE);
+        _util.debug("Torrent is complete", Snark.NOTICE);
     else
-        Snark.debug("Still need " + needed + " out of " + metainfo.getPieces() + " pieces", Snark.NOTICE);
+        _util.debug("Still need " + needed + " out of " + metainfo.getPieces() + " pieces", Snark.NOTICE);
   }
 
   /**
@@ -390,14 +393,14 @@ public class Storage
     if (files == null)
       {
         // Reopen base as file.
-        Snark.debug("Reopening file: " + base, Snark.NOTICE);
+        _util.debug("Reopening file: " + base, Snark.NOTICE);
         if (!base.exists())
           throw new IOException("Could not reopen file " + base);
       }
     else
       {
         // Reopen base as dir.
-        Snark.debug("Reopening directory: " + base, Snark.NOTICE);
+        _util.debug("Reopening directory: " + base, Snark.NOTICE);
         if (!base.isDirectory())
           throw new IOException("Could not reopen directory " + base);
 
@@ -487,7 +490,7 @@ public class Storage
               allocateFile(i);
           }
         } else {
-          Snark.debug("File '" + names[i] + "' exists, but has wrong length - repairing corruption", Snark.ERROR);
+          _util.debug("File '" + names[i] + "' exists, but has wrong length - repairing corruption", Snark.ERROR);
           changed = true;
           _probablyComplete = false; // to force RW
           synchronized(RAFlock[i]) {
@@ -574,7 +577,7 @@ public class Storage
             closeRAF(i);
           }
         } catch (IOException ioe) {
-            I2PSnarkUtil.instance().debug("Error closing " + RAFfile[i], Snark.ERROR, ioe);
+            _util.debug("Error closing " + RAFfile[i], Snark.ERROR, ioe);
             // gobble gobble
         }
       }
@@ -595,7 +598,7 @@ public class Storage
     try {
       bs = new byte[len];
     } catch (OutOfMemoryError oom) {
-      I2PSnarkUtil.instance().debug("Out of memory, can't honor request for piece " + piece, Snark.WARNING, oom);
+      _util.debug("Out of memory, can't honor request for piece " + piece, Snark.WARNING, oom);
       return null;
     }
     getUncheckedPiece(piece, bs, off, len);
@@ -691,7 +694,7 @@ public class Storage
       if (needed > 0) {
         if (listener != null)
             listener.setWantedPieces(this);
-        Snark.debug("WARNING: Not really done, missing " + needed
+        _util.debug("WARNING: Not really done, missing " + needed
                     + " pieces", Snark.WARNING);
       } else {
         if (listener != null)

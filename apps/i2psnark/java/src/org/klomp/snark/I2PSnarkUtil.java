@@ -28,12 +28,13 @@ import net.i2p.util.SimpleTimer;
 
 /**
  * I2P specific helpers for I2PSnark
+ * We use this class as a sort of context for i2psnark
+ * so we can run multiple instances of single Snarks
+ * (but not multiple SnarkManagers, it is still static)
  */
 public class I2PSnarkUtil {
     private I2PAppContext _context;
     private Log _log;
-    private static I2PSnarkUtil _instance = new I2PSnarkUtil();
-    public static I2PSnarkUtil instance() { return _instance; }
     
     private boolean _shouldProxy;
     private String _proxyHost;
@@ -53,8 +54,8 @@ public class I2PSnarkUtil {
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
 
-    private I2PSnarkUtil() {
-        _context = I2PAppContext.getGlobalContext();
+    public I2PSnarkUtil(I2PAppContext ctx) {
+        _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
         _opts = new HashMap();
         setProxy("127.0.0.1", 4444);
@@ -233,6 +234,28 @@ public class I2PSnarkUtil {
         }
         return "unknown";
     }
+
+    /** Base64 only - static (no naming service) */
+    static Destination getDestinationFromBase64(String ip) {
+        if (ip == null) return null;
+        if (ip.endsWith(".i2p")) {
+            if (ip.length() < 520)
+                    return null;
+            try {
+                return new Destination(ip.substring(0, ip.length()-4)); // sans .i2p
+            } catch (DataFormatException dfe) {
+                return null;
+            }
+        } else {
+            try {
+                return new Destination(ip);
+            } catch (DataFormatException dfe) {
+                return null;
+            }
+        }
+    }
+
+    /** Base64 Hash or Hash.i2p or name.i2p using naming service */
     Destination getDestination(String ip) {
         if (ip == null) return null;
         if (ip.endsWith(".i2p")) {
@@ -308,6 +331,9 @@ public class I2PSnarkUtil {
     }
 
     /** hook between snark's logger and an i2p log */
+    void debug(String msg, int snarkDebugLevel) {
+        debug(msg, snarkDebugLevel, null);
+    }
     void debug(String msg, int snarkDebugLevel, Throwable t) {
         if (t instanceof OutOfMemoryError) {
             try { Thread.sleep(100); } catch (InterruptedException ie) {}

@@ -72,7 +72,7 @@ public class PeerID implements Comparable
     bevalue = (BEValue)m.get("ip");
     if (bevalue == null)
       throw new InvalidBEncodingException("ip missing");
-    address = I2PSnarkUtil.instance().getDestination(bevalue.getString());
+    address = I2PSnarkUtil.getDestinationFromBase64(bevalue.getString());
     if (address == null)
         throw new InvalidBEncodingException("Invalid destination [" + bevalue.getString() + "]");
 

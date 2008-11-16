@@ -36,17 +36,16 @@ import net.i2p.util.Log;
  */
 public class ConnectionAcceptor implements Runnable
 {
-  private static final ConnectionAcceptor _instance = new ConnectionAcceptor();
-  public static final ConnectionAcceptor instance() { return _instance; }
   private Log _log = new Log(ConnectionAcceptor.class);
   private I2PServerSocket serverSocket;
   private PeerAcceptor peeracceptor;
   private Thread thread;
+  private I2PSnarkUtil _util;
 
   private boolean stop;
   private boolean socketChanged;
 
-  private ConnectionAcceptor() {}
+  public ConnectionAcceptor(I2PSnarkUtil util) { _util = util; }
   
   public synchronized void startAccepting(PeerCoordinatorSet set, I2PServerSocket socket) {
     if (serverSocket != socket) {
@@ -63,11 +62,12 @@ public class ConnectionAcceptor implements Runnable
     }
   }
   
-  public ConnectionAcceptor(I2PServerSocket serverSocket,
+  public ConnectionAcceptor(I2PSnarkUtil util, I2PServerSocket serverSocket,
                             PeerAcceptor peeracceptor)
   {
     this.serverSocket = serverSocket;
     this.peeracceptor = peeracceptor;
+    _util = util;
     
     socketChanged = false;
     stop = false;
@@ -78,7 +78,7 @@ public class ConnectionAcceptor implements Runnable
 
   public void halt()
   {
-    if (true) throw new RuntimeException("wtf");
+    if (stop) return;
     stop = true;
 
     I2PServerSocket ss = serverSocket;
@@ -95,7 +95,7 @@ public class ConnectionAcceptor implements Runnable
   }
   
   public void restart() {
-      serverSocket = I2PSnarkUtil.instance().getServerSocket();
+      serverSocket = _util.getServerSocket();
       socketChanged = true;
       Thread t = thread;
       if (t != null)
@@ -116,7 +116,7 @@ public class ConnectionAcceptor implements Runnable
             socketChanged = false;
         }
         while ( (serverSocket == null) && (!stop)) {
-            serverSocket = I2PSnarkUtil.instance().getServerSocket();
+            serverSocket = _util.getServerSocket();
             if (serverSocket == null)
                 try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
         }
@@ -129,7 +129,7 @@ public class ConnectionAcceptor implements Runnable
                 if (socketChanged) {
                     continue;
                 } else {
-                    I2PServerSocket ss = I2PSnarkUtil.instance().getServerSocket();
+                    I2PServerSocket ss = _util.getServerSocket();
                     if (ss != serverSocket) {
                         serverSocket = ss;
                         socketChanged = true;
@@ -143,13 +143,13 @@ public class ConnectionAcceptor implements Runnable
         catch (I2PException ioe)
           {
             if (!socketChanged) {
-                Snark.debug("Error while accepting: " + ioe, Snark.ERROR);
+                _util.debug("Error while accepting: " + ioe, Snark.ERROR);
                 stop = true;
             }
           }
         catch (IOException ioe)
           {
-            Snark.debug("Error while accepting: " + ioe, Snark.ERROR);
+            _util.debug("Error while accepting: " + ioe, Snark.ERROR);
             stop = true;
           }
       }
@@ -161,7 +161,6 @@ public class ConnectionAcceptor implements Runnable
       }
     catch (I2PException ignored) { }
     
-    throw new RuntimeException("wtf");
   }
   
   private class Handler implements Runnable {

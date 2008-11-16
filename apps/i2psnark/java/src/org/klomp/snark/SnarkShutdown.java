@@ -51,21 +51,21 @@ public class SnarkShutdown extends I2PThread
 
   public void run()
   {
-    Snark.debug("Shutting down...", Snark.NOTICE);
+    //Snark.debug("Shutting down...", Snark.NOTICE);
 
-    Snark.debug("Halting ConnectionAcceptor...", Snark.INFO);
+    //Snark.debug("Halting ConnectionAcceptor...", Snark.INFO);
     if (acceptor != null)
       acceptor.halt();
 
-    Snark.debug("Halting TrackerClient...", Snark.INFO);
+    //Snark.debug("Halting TrackerClient...", Snark.INFO);
     if (trackerclient != null)
       trackerclient.halt();
 
-    Snark.debug("Halting PeerCoordinator...", Snark.INFO);
+    //Snark.debug("Halting PeerCoordinator...", Snark.INFO);
     if (coordinator != null)
       coordinator.halt();
 
-    Snark.debug("Closing Storage...", Snark.INFO);
+    //Snark.debug("Closing Storage...", Snark.INFO);
     if (storage != null)
       {
         try
@@ -74,7 +74,7 @@ public class SnarkShutdown extends I2PThread
           }
         catch(IOException ioe)
           {
-            I2PSnarkUtil.instance().debug("Couldn't properly close storage", Snark.ERROR, ioe);
+            //I2PSnarkUtil.instance().debug("Couldn't properly close storage", Snark.ERROR, ioe);
             throw new RuntimeException("b0rking");
           }
       }
@@ -82,7 +82,7 @@ public class SnarkShutdown extends I2PThread
     // XXX - Should actually wait till done...
     try
       {
-        Snark.debug("Waiting 5 seconds...", Snark.INFO);
+        //Snark.debug("Waiting 5 seconds...", Snark.INFO);
         Thread.sleep(5*1000);
       }
     catch (InterruptedException ie) { /* ignored */ }

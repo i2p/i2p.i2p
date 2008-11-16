@@ -173,7 +173,7 @@ public class Peer implements Comparable
    * If the given BitField is non-null it is send to the peer as first
    * message.
    */
-  public void runConnection(PeerListener listener, BitField bitfield)
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield)
   {
     if (state != null)
       throw new IllegalStateException("Peer already started");
@@ -184,7 +184,7 @@ public class Peer implements Comparable
         // Do we need to handshake?
         if (din == null)
           {
-            sock = I2PSnarkUtil.instance().connect(peerID);
+            sock = util.connect(peerID);
             _log.debug("Connected to " + peerID + ": " + sock);
             if ((sock == null) || (sock.isClosed())) {
                 throw new IOException("Unable to reach " + peerID);

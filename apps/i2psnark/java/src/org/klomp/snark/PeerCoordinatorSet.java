@@ -12,11 +12,9 @@ import java.util.Set;
  * from it there too)
  */
 public class PeerCoordinatorSet {
-    private static final PeerCoordinatorSet _instance = new PeerCoordinatorSet();
-    public static final PeerCoordinatorSet instance() { return _instance; }
     private Set _coordinators;
     
-    private PeerCoordinatorSet() {
+    public PeerCoordinatorSet() {
         _coordinators = new HashSet();
     }
     

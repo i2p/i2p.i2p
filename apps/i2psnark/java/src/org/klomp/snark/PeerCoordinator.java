@@ -77,13 +77,15 @@ public class PeerCoordinator implements PeerListener
   private boolean halted = false;
 
   private final CoordinatorListener listener;
+  public I2PSnarkUtil _util;
   
   public String trackerProblems = null;
   public int trackerSeenPeers = 0;
 
-  public PeerCoordinator(byte[] id, MetaInfo metainfo, Storage storage,
+  public PeerCoordinator(I2PSnarkUtil util, byte[] id, MetaInfo metainfo, Storage storage,
                          CoordinatorListener listener, Snark torrent)
   {
+    _util = util;
     this.id = id;
     this.metainfo = metainfo;
     this.storage = storage;
@@ -96,7 +98,7 @@ public class PeerCoordinator implements PeerListener
     // Randomize the first start time so multiple tasks are spread out,
     // this will help the behavior with global limits
     Random r = new Random();
-    timer.schedule(new PeerCheckerTask(this), (CHECK_PERIOD / 2) + r.nextInt((int) CHECK_PERIOD), CHECK_PERIOD);
+    timer.schedule(new PeerCheckerTask(_util, this), (CHECK_PERIOD / 2) + r.nextInt((int) CHECK_PERIOD), CHECK_PERIOD);
   }
   
   // only called externally from Storage after the double-check fails
@@ -366,7 +368,7 @@ public class PeerCoordinator implements PeerListener
           {
             public void run()
             {
-              peer.runConnection(listener, bitfield);
+              peer.runConnection(_util, listener, bitfield);
             }
           };
         String threadName = peer.toString();
@@ -846,7 +848,7 @@ public class PeerCoordinator implements PeerListener
    */
   public int allowedUploaders()
   {
-    if (Snark.overUploadLimit(uploaders)) {
+    if (listener != null && listener.overUploadLimit(uploaders)) {
         // if (_log.shouldLog(Log.DEBUG))
         //   _log.debug("Over limit, uploaders was: " + uploaders);
         return uploaders - 1;
@@ -858,12 +860,16 @@ public class PeerCoordinator implements PeerListener
 
   public boolean overUpBWLimit()
   {
-    return Snark.overUpBWLimit();
+    if (listener != null)
+        return listener.overUpBWLimit();
+    return false;
   }
 
   public boolean overUpBWLimit(long total)
   {
-    return Snark.overUpBWLimit(total * 1000 / CHECK_PERIOD);
+    if (listener != null)
+        return listener.overUpBWLimit(total * 1000 / CHECK_PERIOD);
+    return false;
   }
 }
 
