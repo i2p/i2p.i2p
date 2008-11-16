@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -58,7 +58,7 @@ class PeerConnectionOut implements Runnable
   }
   
   public void startup() {
-    thread = new I2PThread(this, "Snark sender " + _id + ": " + peer);
+    thread = new I2PAppThread(this, "Snark sender " + _id + ": " + peer);
     thread.start();
   }
 

@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -40,7 +40,7 @@ import net.i2p.util.Log;
  *
  * @author Mark Wielaard (mark@klomp.org)
  */
-public class TrackerClient extends I2PThread
+public class TrackerClient extends I2PAppThread
 {
   private static final Log _log = new Log(TrackerClient.class);
   private static final String NO_EVENT = "";

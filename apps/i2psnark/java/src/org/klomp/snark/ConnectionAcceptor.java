@@ -28,7 +28,7 @@ import java.io.OutputStream;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -55,7 +55,7 @@ public class ConnectionAcceptor implements Runnable
       stop = false;
       socketChanged = true;
       if (thread == null) {
-          thread = new I2PThread(this, "I2PSnark acceptor");
+          thread = new I2PAppThread(this, "I2PSnark acceptor");
           thread.setDaemon(true);
           thread.start();
       }
@@ -71,7 +71,7 @@ public class ConnectionAcceptor implements Runnable
     
     socketChanged = false;
     stop = false;
-    thread = new I2PThread(this, "I2PSnark acceptor");
+    thread = new I2PAppThread(this, "I2PSnark acceptor");
     thread.setDaemon(true);
     thread.start();
   }
@@ -136,7 +136,7 @@ public class ConnectionAcceptor implements Runnable
                     }
                 }
             } else {
-                Thread t = new I2PThread(new Handler(socket), "Connection-" + socket);
+                Thread t = new I2PAppThread(new Handler(socket), "Connection-" + socket);
                 t.start();
             }
           }

@@ -19,7 +19,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -72,7 +72,7 @@ public class SnarkManager implements Snark.CompleteListener {
         loadConfig("i2psnark.config");
         int minutes = getStartupDelayMinutes();
         _messages.add("Adding torrents in " + minutes + (minutes == 1 ? " minute" : " minutes"));
-        I2PThread monitor = new I2PThread(new DirMonitor(), "Snark DirMonitor");
+        I2PAppThread monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor");
         monitor.setDaemon(true);
         monitor.start();
         if (_context instanceof RouterContext)
@@ -726,7 +726,7 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
 
-    public class SnarkManagerShutdown extends I2PThread {
+    public class SnarkManagerShutdown extends I2PAppThread {
         public void run() {
             Set names = listTorrentFiles();
             for (Iterator iter = names.iterator(); iter.hasNext(); ) {

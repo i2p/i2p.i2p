@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -372,7 +372,7 @@ public class PeerCoordinator implements PeerListener
             }
           };
         String threadName = peer.toString();
-        new I2PThread(r, threadName).start();
+        new I2PAppThread(r, threadName).start();
         return true;
       }
     if (_log.shouldLog(Log.DEBUG)) {

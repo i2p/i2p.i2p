@@ -23,7 +23,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 import org.klomp.snark.I2PSnarkUtil;
@@ -201,7 +201,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 }
             } else if ( (newURL != null) && (newURL.trim().length() > "http://.i2p/".length()) ) {
                 _manager.addMessage("Fetching " + newURL);
-                I2PThread fetch = new I2PThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
+                I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
                 fetch.start();
             } else {
                 // no file or URL specified

@@ -88,7 +88,7 @@ public class I2PThread extends Thread {
         super.finalize();
     }
     
-    private void fireOOM(OutOfMemoryError oom) {
+    protected void fireOOM(OutOfMemoryError oom) {
         for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
             OOMEventListener listener = (OOMEventListener)iter.next();
             listener.outOfMemory(oom);
