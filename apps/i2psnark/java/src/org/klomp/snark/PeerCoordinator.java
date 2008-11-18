@@ -44,7 +44,6 @@ public class PeerCoordinator implements PeerListener
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
-  final static int MAX_CONNECTIONS = 16;
   final static int MAX_UPLOADERS = 6;
 
   // Approximation of the number of current uploaders.
@@ -237,7 +236,7 @@ public class PeerCoordinator implements PeerListener
   {
     synchronized(peers)
       {
-        return !halted && peers.size() < MAX_CONNECTIONS;
+        return !halted && peers.size() < _util.getMaxConnections();
       }
   }
   
@@ -295,7 +294,7 @@ public class PeerCoordinator implements PeerListener
             peer.disconnect(false); // Don't deregister this connection/peer.
           }
         // This is already checked in addPeer() but we could have gone over the limit since then
-        else if (peers.size() >= MAX_CONNECTIONS)
+        else if (peers.size() >= _util.getMaxConnections())
           {
             if (_log.shouldLog(Log.WARN))
               _log.warn("Already at MAX_CONNECTIONS in connected() with peer: " + peer);
@@ -351,7 +350,7 @@ public class PeerCoordinator implements PeerListener
         peersize = peers.size();
         // This isn't a strict limit, as we may have several pending connections;
         // thus there is an additional check in connected()
-        need_more = (!peer.isConnected()) && peersize < MAX_CONNECTIONS;
+        need_more = (!peer.isConnected()) && peersize < _util.getMaxConnections();
         // Check if we already have this peer before we build the connection
         Peer old = peerIDInList(peer.getPeerID(), peers);
         need_more = need_more && ((old == null) || (old.getInactiveTime() > 8*60*1000));
@@ -379,7 +378,7 @@ public class PeerCoordinator implements PeerListener
       if (peer.isConnected())
         _log.info("Add peer already connected: " + peer);
       else
-        _log.info("Connections: " + peersize + "/" + MAX_CONNECTIONS
+        _log.info("Connections: " + peersize + "/" + _util.getMaxConnections()
                   + " not accepting extra peer: " + peer);
     }
     return false;

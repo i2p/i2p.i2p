@@ -32,7 +32,7 @@ public class SnarkManager implements Snark.CompleteListener {
     /** map of (canonical) filename to Snark instance (unsynchronized) */
     private Map _snarks;
     private Object _addSnarkLock;
-    private String _configFile;
+    private String _configFile = "i2psnark.config";
     private Properties _config;
     private I2PAppContext _context;
     private Log _log;
@@ -67,9 +67,15 @@ public class SnarkManager implements Snark.CompleteListener {
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new ArrayList(16);
         _util = new I2PSnarkUtil(_context);
+        loadConfig(null);
+    }
+
+    /** Caller _must_ call loadConfig(file) before this if setting new values
+     *  for i2cp host/port or i2psnark.dir
+     */
+    public void start() {
         _peerCoordinatorSet = new PeerCoordinatorSet();
         _connectionAcceptor = new ConnectionAcceptor(_util);
-        loadConfig("i2psnark.config");
         int minutes = getStartupDelayMinutes();
         _messages.add("Adding torrents in " + minutes + (minutes == 1 ? " minute" : " minutes"));
         I2PAppThread monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor");
@@ -114,17 +120,20 @@ public class SnarkManager implements Snark.CompleteListener {
         return new File(dir); 
     }
     
+    /** null to set initial defaults */
     public void loadConfig(String filename) {
-        _configFile = filename;
         if (_config == null)
             _config = new Properties();
-        File cfg = new File(filename);
-        if (cfg.exists()) {
-            try {
-                DataHelper.loadProps(_config, cfg);
-            } catch (IOException ioe) {
-                _log.error("Error loading I2PSnark config '" + filename + "'", ioe);
-            }
+        if (filename != null) {
+            _configFile = filename;
+            File cfg = new File(filename);
+            if (cfg.exists()) {
+                try {
+                    DataHelper.loadProps(_config, cfg);
+                } catch (IOException ioe) {
+                   _log.error("Error loading I2PSnark config '" + filename + "'", ioe);
+                }
+            } 
         } 
         // now add sane defaults
         if (!_config.containsKey(PROP_I2CP_HOST))

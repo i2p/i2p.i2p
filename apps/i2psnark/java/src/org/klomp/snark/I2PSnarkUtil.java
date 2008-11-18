@@ -47,12 +47,14 @@ public class I2PSnarkUtil {
     private Set _shitlist;
     private int _maxUploaders;
     private int _maxUpBW;
+    private int _maxConnections;
     
     public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
+    public static final int MAX_CONNECTIONS = 16; // per torrent
 
     public I2PSnarkUtil(I2PAppContext ctx) {
         _context = ctx;
@@ -64,6 +66,7 @@ public class I2PSnarkUtil {
         _configured = false;
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = DEFAULT_MAX_UP_BW;
+        _maxConnections = MAX_CONNECTIONS;
     }
     
     /**
@@ -87,8 +90,10 @@ public class I2PSnarkUtil {
     public boolean configured() { return _configured; }
     
     public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {
-        _i2cpHost = i2cpHost;
-        _i2cpPort = i2cpPort;
+        if (i2cpHost != null)
+            _i2cpHost = i2cpHost;
+        if (i2cpPort > 0)
+            _i2cpPort = i2cpPort;
         if (opts != null)
             _opts.putAll(opts);
         _configured = true;
@@ -104,6 +109,11 @@ public class I2PSnarkUtil {
         _configured = true;
     }
     
+    public void setMaxConnections(int limit) {
+        _maxConnections = limit;
+        _configured = true;
+    }
+    
     public String getI2CPHost() { return _i2cpHost; }
     public int getI2CPPort() { return _i2cpPort; }
     public Map getI2CPOptions() { return _opts; }
@@ -112,6 +122,7 @@ public class I2PSnarkUtil {
     public boolean getEepProxySet() { return _shouldProxy; }
     public int getMaxUploaders() { return _maxUploaders; }
     public int getMaxUpBW() { return _maxUpBW; }
+    public int getMaxConnections() { return _maxConnections; }
     
     /**
      * Connect to the router, if we aren't already

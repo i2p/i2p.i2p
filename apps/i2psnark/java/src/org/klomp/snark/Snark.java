@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -35,6 +36,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.i2p.I2PAppContext;
+import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
@@ -235,6 +237,7 @@ public class Snark
       }
   }
 
+  public static final String PROP_MAX_CONNECTIONS = "i2psnark.maxConnections";
   public String torrent;
   public MetaInfo meta;
   public Storage storage;
@@ -254,10 +257,35 @@ public class Snark
     this(util, torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
   }
 
-  /** single torrent */
-  Snark(I2PAppContext ctx, String torrent, String ip, int user_port,
-        StorageListener slistener, CoordinatorListener clistener) { 
-    this(new I2PSnarkUtil(ctx), torrent, ip, user_port, slistener, clistener, null, null, null, true, "."); 
+  /** single torrent - via router */
+  public Snark(I2PAppContext ctx, Properties opts, String torrent,
+               StorageListener slistener, boolean start, String rootDir) { 
+    this(new I2PSnarkUtil(ctx), torrent, null, -1, slistener, null, null, null, null, false, rootDir);
+    String host = opts.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST);
+    int port = 0;
+    String s = opts.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
+    if (s != null) {
+        try {
+             port = Integer.parseInt(s);
+        } catch (NumberFormatException nfe) {}
+    }
+    _util.setI2CPConfig(host, port, opts);
+    s = opts.getProperty(SnarkManager.PROP_UPBW_MAX);
+    if (s != null) {
+        try {
+             int v = Integer.parseInt(s);
+             _util.setMaxUpBW(v);
+        } catch (NumberFormatException nfe) {}
+    }
+    s = opts.getProperty(PROP_MAX_CONNECTIONS);
+    if (s != null) {
+        try {
+             int v = Integer.parseInt(s);
+             _util.setMaxConnections(v);
+        } catch (NumberFormatException nfe) {}
+    }
+    if (start)
+        this.startTorrent();
   }
 
   /** multitorrent */
@@ -523,6 +551,8 @@ public class Snark
     }
     if (pc != null && _peerCoordinatorSet != null)
         _peerCoordinatorSet.remove(pc);
+    if (_peerCoordinatorSet == null)
+        _util.disconnect();
   }
 
   static Snark parseArguments(String[] args)

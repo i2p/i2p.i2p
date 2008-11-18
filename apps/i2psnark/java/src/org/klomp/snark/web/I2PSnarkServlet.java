@@ -55,6 +55,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if ( (configFile == null) || (configFile.trim().length() <= 0) )
             configFile = "i2psnark.config";
         _manager.loadConfig(configFile);
+        _manager.start();
     }
     
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
