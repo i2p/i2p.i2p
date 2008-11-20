@@ -26,7 +26,6 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.router.transport.ntcp.NTCPTransport;
-import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.util.Log;
 
@@ -159,11 +158,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             newCreated = true;
         }
         
-        if (!addresses.containsKey(TCPTransport.STYLE)) {
-            RouterAddress addr = createTCPAddress();
-            if (addr != null)
-                addresses.put(TCPTransport.STYLE, addr);
-        }
         if (!addresses.containsKey(NTCPTransport.STYLE)) {
             RouterAddress addr = createNTCPAddress(_context);
             if (_log.shouldLog(Log.INFO))
@@ -175,35 +169,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses + " isNew? " + newCreated, new Exception("creator"));
         return new HashSet(addresses.values());
-    }
-    
-    private final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";
-    private final static String PROP_I2NP_TCP_PORT = "i2np.tcp.port";
-    private final static String PROP_I2NP_TCP_DISABLED = "i2np.tcp.disable";
-    
-    private RouterAddress createTCPAddress() {
-        if (!TransportManager.ALLOW_TCP) return null;
-        RouterAddress addr = new RouterAddress();
-        addr.setCost(10);
-        addr.setExpiration(null);
-        Properties props = new Properties();
-        String name = _context.router().getConfigSetting(PROP_I2NP_TCP_HOSTNAME);
-        String port = _context.router().getConfigSetting(PROP_I2NP_TCP_PORT);
-        String disabledStr = _context.router().getConfigSetting(PROP_I2NP_TCP_DISABLED);
-        boolean disabled = false;
-        if ( (disabledStr == null) || ("true".equalsIgnoreCase(disabledStr)) )
-            return null;
-        if ( (name == null) || (port == null) ) {
-            //_log.info("TCP Host/Port not specified in config file - skipping TCP transport");
-            return null;
-        } else {
-            _log.info("Creating TCP address on " + name + ":" + port);
-        }
-        props.setProperty("host", name);
-        props.setProperty("port", port);
-        addr.setOptions(props);
-        addr.setTransportStyle(TCPTransport.STYLE);
-        return addr;
     }
     
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";

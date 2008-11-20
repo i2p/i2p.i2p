@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.zip.Deflater;
 
 import net.i2p.util.ByteCache;
 import net.i2p.util.OrderedProperties;
@@ -852,15 +853,21 @@ public class DataHelper {
     }
 
     private static final int MAX_UNCOMPRESSED = 40*1024;
+    public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
+    public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
     /** compress the data and return a new GZIP compressed array */
     public static byte[] compress(byte orig[]) {
         return compress(orig, 0, orig.length);
     }
     public static byte[] compress(byte orig[], int offset, int size) {
+        return compress(orig, offset, size, MAX_COMPRESSION);
+    }
+    public static byte[] compress(byte orig[], int offset, int size, int level) {
         if ((orig == null) || (orig.length <= 0)) return orig;
         if (size >= MAX_UNCOMPRESSED) 
             throw new IllegalArgumentException("tell jrandom size=" + size);
         ReusableGZIPOutputStream out = ReusableGZIPOutputStream.acquire();
+        out.setLevel(level);
         try {
             out.write(orig, offset, size);
             out.finish();

@@ -10,7 +10,10 @@
     <target name="prepare">
         <ant dir="../../jetty/" target="build" />
     </target>
-    <target name="depend">
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
         <depend
             cache="../../../build"
             srcdir="./src" 
@@ -27,6 +30,8 @@
                 <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
             </classpath>
         </depend>
+    </target>
+    <target name="dependVersion">
         <!-- Force the dependency on the RouterVersion as depend doesn't recognize constant changes  -->
         <dependset>
              <srcfilelist dir="." files="../../../router/java/build/obj/net/i2p/router/RouterVersion.class" />
@@ -35,7 +40,7 @@
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
         </dependset>
     </target>
-    <target name="compile" depends="prepare, depend">
+    <target name="compile" depends="prepare, depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 

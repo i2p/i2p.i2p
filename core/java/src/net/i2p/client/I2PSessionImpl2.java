@@ -39,6 +39,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     private final static long SEND_TIMEOUT = 60 * 1000; // 60 seconds to send 
     /** should we gzip each payload prior to sending it? */
     private final static boolean SHOULD_COMPRESS = true;
+    private final static boolean SHOULD_DECOMPRESS = true;
 
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
@@ -64,6 +65,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         _context.statManager().createRateStat("i2cp.receiveStatusTime.4", "How long it took to get status=4 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("i2cp.receiveStatusTime.5", "How long it took to get status=5 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("i2cp.receiveStatusTime", "How long it took to get any status", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.tx.msgCompressed", "compressed size transferred", "i2cp", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2cp.tx.msgExpanded", "size before compression", "i2cp", new long[] { 60*1000, 30*60*1000 });
     }
 
     protected long getTimeout() {
@@ -74,6 +77,27 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     public void destroySession(boolean sendDisconnect) {
         clearStates();
         super.destroySession(sendDisconnect);
+    }
+
+    /** Don't bother if really small.
+     *  Three 66-byte messages will fit in one tunnel message.
+     *  Four messages don't fit no matter how small. So below 66 it isn't worth it.
+     *  See ConnectionOptions.java in the streaming lib for similar calculations.
+     *  Since we still have to pass it through gzip -0 the CPU savings
+     *  is trivial but it's the best we can do for now. See below.
+     *  i2cp.gzip defaults to SHOULD_COMPRESS = true.
+     *  Perhaps the http server (which does its own compression)
+     *  and P2P apps (with generally uncompressible data) should
+     *  set to false.
+     */
+    private static final int DONT_COMPRESS_SIZE = 66;
+    private boolean shouldCompress(int size) {
+         if (size <= DONT_COMPRESS_SIZE)
+             return false;
+         String p = getOptions().getProperty("i2cp.gzip");
+         if (p != null)
+             return Boolean.valueOf(p).booleanValue();
+         return SHOULD_COMPRESS;
     }
     
     @Override
@@ -92,8 +116,30 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
         if (isClosed()) throw new I2PSessionException("Already closed");
-        if (SHOULD_COMPRESS) payload = DataHelper.compress(payload, offset, size);
-        else throw new IllegalStateException("we need to update sendGuaranteed to support partial send");
+
+        // Sadly there is no way to send something completely uncompressed in a backward-compatible way,
+        // so we have to still send it in a gzip format, which adds 23 bytes (2.4% for a 960-byte msg)
+        // (10 byte header + 5 byte block header + 8 byte trailer)
+        // In the future we can add a one-byte magic number != 0x1F to signal an uncompressed msg
+        // (Gzip streams start with 0x1F 0x8B 0x08)
+        // assuming we don't need the CRC-32 that comes with gzip (do we?)
+        // Maybe implement this soon in receiveMessage() below so we are ready
+        // in case we ever make an incompatible network change.
+        // This would save 22 of the 23 bytes and a little CPU.
+        boolean sc = shouldCompress(size);
+        if (sc)
+            payload = DataHelper.compress(payload, offset, size);
+        else
+            payload = DataHelper.compress(payload, offset, size, DataHelper.NO_COMPRESSION);
+        //else throw new IllegalStateException("we need to update sendGuaranteed to support partial send");
+
+        int compressed = payload.length;
+        if (_log.shouldLog(Log.INFO)) {
+            String d = dest.calculateHash().toBase64().substring(0,4);
+            _log.info("sending message to: " + d + " compress? " + sc + " sizeIn=" + size + " sizeOut=" + compressed);
+        }
+        _context.statManager().addRateData("i2cp.tx.msgCompressed", compressed, 0);
+        _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
         return sendBestEffort(dest, payload, keyUsed, tagsSent);
     }
 
@@ -107,7 +153,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _log.error("Error: message " + msgId + " already received!");
             return null;
         }
-        if (SHOULD_COMPRESS) {
+        // future - check magic number to see whether to decompress
+        if (SHOULD_DECOMPRESS) {
             try {
                 return DataHelper.decompress(compressed);
             } catch (IOException ioe) {

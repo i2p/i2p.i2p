@@ -28,7 +28,6 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPTransport;
-import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
 
@@ -70,15 +69,6 @@ public class TransportManager implements TransportEventListener {
     static final boolean ALLOW_TCP = false;
     
     private void configTransports() {
-        String disableTCP = _context.router().getConfigSetting(PROP_DISABLE_TCP);
-        // Unless overridden by constant or explicit config property, start TCP tranport
-        if ( !ALLOW_TCP || ((disableTCP != null) && (Boolean.TRUE.toString().equalsIgnoreCase(disableTCP))) ) {
-            _log.info("Explicitly disabling the TCP transport!");
-        } else {
-            Transport t = new TCPTransport(_context);
-            t.setListener(this);
-            _transports.add(t);
-        }
         String enableUDP = _context.router().getConfigSetting(PROP_ENABLE_UDP);
         if (enableUDP == null)
             enableUDP = DEFAULT_ENABLE_UDP;

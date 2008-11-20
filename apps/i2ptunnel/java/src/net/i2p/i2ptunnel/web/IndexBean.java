@@ -96,6 +96,7 @@ public class IndexBean {
             _curNonce = -1;
         }
     }
+
     public void setPassphrase(String phrase) {
         _passphrase = phrase;
     }
@@ -332,15 +333,15 @@ public class IndexBean {
     
     public String getTunnelName(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getName() != null)
             return tun.getName();
         else
-            return "";
+            return "New Tunnel";
     }
     
     public String getClientPort(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getListenPort() != null)
             return tun.getListenPort();
         else
             return "";
@@ -389,7 +390,7 @@ public class IndexBean {
     
     public String getTunnelDescription(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getDescription() != null)
             return tun.getDescription();
         else
             return "";
@@ -406,7 +407,12 @@ public class IndexBean {
     public String getClientDestination(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
-        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType())) return tun.getTargetDestination();
+        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType())) {
+            if (tun.getTargetDestination() != null)
+                return tun.getTargetDestination();
+            else
+                return "";
+        }
         else return tun.getProxyList();
     }
     

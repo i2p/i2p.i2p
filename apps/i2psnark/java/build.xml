@@ -7,7 +7,10 @@
         <ant dir="../../streaming/java/" target="build" />
 	<!-- streaming will build ministreaming and core -->
     </target>
-    <target name="depend">
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
         <depend
             cache="../../../build"
             srcdir="./src" 

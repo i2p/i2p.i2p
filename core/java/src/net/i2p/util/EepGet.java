@@ -132,6 +132,7 @@ public class EepGet {
         int numRetries = 5;
         int markSize = 1024;
         int lineLen = 40;
+        int inactivityTimeout = 60*1000;
         String etag = null;
         String saveAs = null;
         String url = null;
@@ -144,6 +145,9 @@ public class EepGet {
                     i++;
                 } else if (args[i].equals("-n")) {
                     numRetries = Integer.parseInt(args[i+1]);
+                    i++;
+                } else if (args[i].equals("-t")) {
+                    inactivityTimeout = 1000 * Integer.parseInt(args[i+1]);
                     i++;
                 } else if (args[i].equals("-e")) {
                     etag = "\"" + args[i+1] + "\"";
@@ -174,7 +178,7 @@ public class EepGet {
 
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, proxyHost, proxyPort, numRetries, saveAs, url, true, etag);
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
-        get.fetch();
+        get.fetch(45*1000, -1, inactivityTimeout);
     }
     
     public static String suggestName(String url) {
@@ -208,7 +212,7 @@ public class EepGet {
     }
     
     private static void usage() {
-        System.err.println("EepGet [-p localhost:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] url");
+        System.err.println("EepGet [-p localhost:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] [-t timeout] url");
     }
     
     public static interface StatusListener {
@@ -416,7 +420,7 @@ public class EepGet {
             SocketTimeout timeout = null;
             if (_fetchHeaderTimeout > 0)
                 timeout = new SocketTimeout(_fetchHeaderTimeout);
-            final SocketTimeout stimeout = timeout; // ugly
+            final SocketTimeout stimeout = timeout; // ugly - why not use sotimeout?
             timeout.setTimeoutCommand(new Runnable() {
                 public void run() {
                     if (_log.shouldLog(Log.DEBUG))
@@ -457,7 +461,7 @@ public class EepGet {
             }
 
             _currentAttempt++;
-            if (_currentAttempt > _numRetries) 
+            if (_currentAttempt > _numRetries || !_keepFetching) 
                 break;
             try { 
                 long delay = _context.random().nextInt(60*1000);
@@ -629,8 +633,6 @@ public class EepGet {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("rc: " + responseCode + " for " + _actualURL);
-        if(_transferFailed)
-            _log.error("Already failed for " + _actualURL);
         boolean rcOk = false;
         switch (responseCode) {
             case 200: // full
@@ -661,16 +663,24 @@ public class EepGet {
                 _keepFetching = false;
                 _notModified = true;
                 return; 
+            case 403: // bad req
             case 404: // not found
+            case 409: // bad addr helper
+            case 503: // no outproxy
                 _keepFetching = false;
                 _transferFailed = true;
+                // maybe we should throw instead of return to get the return code back to the user
                 return;
             case 416: // completed (or range out of reach)
                 _bytesRemaining = 0;
                 _keepFetching = false;
                 return;
+            case 504: // gateway timeout
+                // throw out of doFetch() to fetch() and try again
+                throw new IOException("HTTP Proxy timeout");
             default:
                 rcOk = false;
+                _keepFetching = false;
                 _transferFailed = true;
         }
 

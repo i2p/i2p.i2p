@@ -19,7 +19,10 @@
 
 	<target name="distclean" depends="clean" />
 
-        <target name="depend">
+        <condition property="depend.available">
+            <typefound name="depend" />
+        </condition>
+        <target name="depend" if="depend.available">
             <depend
                 cache="../../build"
                 srcdir="${src}"
