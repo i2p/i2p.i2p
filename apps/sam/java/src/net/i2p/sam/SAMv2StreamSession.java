@@ -26,7 +26,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.ByteCache;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -121,7 +121,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 
 			connector = new StreamConnector ( id, d, opts );
 			
-			I2PThread connectThread = new I2PThread ( connector, "StreamConnector" + id ) ;
+			I2PAppThread connectThread = new I2PAppThread ( connector, "StreamConnector" + id ) ;
 
 			connectThread.start() ;
 

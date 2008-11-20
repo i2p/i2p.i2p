@@ -8,7 +8,7 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -29,7 +29,7 @@ public class SAMReader {
     
     public void startReading() {
         _live = true;
-        I2PThread t = new I2PThread(new Runner(), "SAM reader");
+        I2PAppThread t = new I2PAppThread(new Runner(), "SAM reader");
         t.start();
     }
     public void stopReading() { _live = false; }

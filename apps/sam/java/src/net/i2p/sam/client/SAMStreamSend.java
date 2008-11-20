@@ -10,7 +10,7 @@ import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -145,7 +145,7 @@ public class SAMStreamSend {
         Sender sender = new Sender();
         boolean ok = sender.openConnection();
         if (ok) {
-            I2PThread t = new I2PThread(sender, "Sender");
+            I2PAppThread t = new I2PAppThread(sender, "Sender");
             t.start();
         }
     }

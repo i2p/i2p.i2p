@@ -22,7 +22,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.HexDump;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -74,7 +74,7 @@ public abstract class SAMMessageSession {
 
         handler = new SAMMessageSessionHandler(destStream, props);
 
-        Thread t = new I2PThread(handler, "SAMMessageSessionHandler");
+        Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
         t.start();
     }
 

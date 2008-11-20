@@ -14,7 +14,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Properties;
 
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -28,7 +28,7 @@ public abstract class SAMHandler implements Runnable {
 
     private final static Log _log = new Log(SAMHandler.class);
 
-    protected I2PThread thread = null;
+    protected I2PAppThread thread = null;
     protected SAMBridge bridge = null;
 
     private Object socketWLock = new Object(); // Guards writings on socket
@@ -68,7 +68,7 @@ public abstract class SAMHandler implements Runnable {
      *
      */
     public final void startHandling() {
-        thread = new I2PThread(this, "SAMHandler");
+        thread = new I2PAppThread(this, "SAMHandler");
         thread.start();
     }
     

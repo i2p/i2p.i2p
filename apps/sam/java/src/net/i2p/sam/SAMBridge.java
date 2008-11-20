@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -223,9 +223,9 @@ public class SAMBridge implements Runnable {
             opts = parseOptions(args, portIndex+1);
         }
         SAMBridge bridge = new SAMBridge(host, port, opts, keyfile);
-        I2PThread t = new I2PThread(bridge, "SAMListener");
+        I2PAppThread t = new I2PAppThread(bridge, "SAMListener");
         if (Boolean.valueOf(System.getProperty("sam.shutdownOnOOM", "false")).booleanValue()) {
-            I2PThread.addOOMEventListener(new I2PThread.OOMEventListener() {
+            t.addOOMEventThreadListener(new I2PAppThread.OOMEventListener() {
                 public void outOfMemory(OutOfMemoryError err) {
                     err.printStackTrace();
                     System.err.println("OOMed, die die die");

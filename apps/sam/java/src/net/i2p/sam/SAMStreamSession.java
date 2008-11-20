@@ -35,7 +35,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.ByteCache;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -160,7 +160,7 @@ public class SAMStreamSession {
 
         if (canReceive) {
             server = new SAMStreamSessionServer();
-            Thread t = new I2PThread(server, "SAMStreamSessionServer");
+            Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
 
             t.start();
         }
@@ -315,9 +315,9 @@ public class SAMStreamSession {
             sendersMap.put(new Integer(id), sender);
         }
 
-        I2PThread t = new I2PThread(reader, "SAMReader" + id);
+        I2PAppThread t = new I2PAppThread(reader, "SAMReader" + id);
         t.start();
-        t = new I2PThread(sender, "SAMSender" + id);
+        t = new I2PAppThread(sender, "SAMSender" + id);
         t.start();
 
         return id;
