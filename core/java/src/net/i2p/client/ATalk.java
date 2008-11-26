@@ -41,24 +41,34 @@ import net.i2p.util.Log;
 public class ATalk implements I2PSessionListener, Runnable {
     /** logging hook - status messages are piped to this */
     private final static Log _log = new Log(ATalk.class);
+    
     /** platform independent newline */
     private final static String NL = System.getProperty("line.separator");
+    
     /** the current session */
     private I2PSession _session;
+    
     /** who am i */
     private Destination _myDestination;
+    
     /** who are you? */
     private Destination _peerDestination;
+    
     /** location of my secret key file */
     private String _myKeyFile;
+    
     /** location of their public key */
     private String _theirDestinationFile;
+    
     /** where the application reads input from.  currently set to standard input */
     private BufferedReader _in;
+    
     /** where the application sends output to.  currently set to standard output */
     private BufferedWriter _out;
+    
     /** string that messages must begin with to be treated as files */
     private final static String FILE_COMMAND = ".file: ";
+    
     /** the, erm, manual */
     private final static String MANUAL = "ATalk: Anonymous Talk, a demo program for the Invisible Internet Project SDK"
                                          + NL
@@ -84,7 +94,9 @@ public class ATalk implements I2PSessionListener, Runnable {
                                          + NL
                                          + "To end the talk session, enter a period on a line by itself and hit return"
                                          + NL;
+    
     public final static String PROP_CONFIG_LOCATION = "configFile";
+    
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("hh:mm:ss.SSS");
 
     /** Construct the talk engine, but don't connect yet */
@@ -111,11 +123,12 @@ public class ATalk implements I2PSessionListener, Runnable {
             _log.warn("Unable to load up the ATalk config file " + configLocation);
         }
         // Provide any router or client API configuration here.
-        if (!props.containsKey(I2PClient.PROP_TCP_HOST)) props.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        if (!props.containsKey(I2PClient.PROP_TCP_PORT)) props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
+        if (!props.containsKey(I2PClient.PROP_TCP_HOST))
+            props.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        if (!props.containsKey(I2PClient.PROP_TCP_PORT))
+            props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
         if (!props.containsKey(I2PClient.PROP_RELIABILITY))
-                                                           props.setProperty(I2PClient.PROP_RELIABILITY,
-                                                                             I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+            props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
         _session = client.createSession(new FileInputStream(myFile), props);
         _session.setSessionListener(this);
         _session.connect();
@@ -365,3 +378,4 @@ public class ATalk implements I2PSessionListener, Runnable {
         _log.debug("Abuse reported of severity " + severity);
     }
 }
+
