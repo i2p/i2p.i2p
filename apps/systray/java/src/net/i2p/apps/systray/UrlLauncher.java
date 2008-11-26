@@ -74,7 +74,11 @@ public class UrlLauncher {
                     bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("browser.reg"), "UTF-16"));
                     for (String line; (line = bufferedReader.readLine()) != null; ) {
                         if (line.startsWith("@=")) {
-                            browserString = "\"" + line.substring(3, line.toLowerCase().indexOf(".exe") + 4) + "\"";
+                            // we should really use the whole line and replace %1 with the url
+                            browserString = line.substring(3, line.toLowerCase().indexOf(".exe") + 4);
+                            if (browserString.startsWith("\\\""))
+                                browserString = browserString.substring(2);
+                            browserString = "\"" + browserString + "\"";
                         }
                     }
                     try {

@@ -1,3 +1,6 @@
+2008-11-26 zzz
+    * Fix Windows UrlLauncher
+
 2008-11-21 zzz
     * Cache DNS and negative DNS for 5m (was 1m and forever)
     * Delay shitlist cleaner at startup
