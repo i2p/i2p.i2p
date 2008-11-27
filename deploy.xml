@@ -1,0 +1,41 @@
+<? xml version="1.0" encoding="UTF-8" ?>
+<project basedir="." default="help" name="deploy">
+    <property name="deploy.google.script" value="http://ant-googlecode.googlecode.com/files/ant-googlecode-0.0.1.jar" />
+    <property name="dir" value="tmp-deploy" />
+    
+    <property file="deploy.properties" />
+    
+    <target name="help">
+        <echo message="Useful targets: " />
+        <echo message="  fetch:         Fetch the files from the gatekeeper's site" />
+        <echo message="  deploy:        Deploy the files to the remote sites(currently google code only)" />
+    </target>
+    <target name="init">
+        <mkdir dir="${dir}" />
+    </target>
+    <target name="fetch">
+        <!-- TODO: write this(using eepget?) -->
+    </target>
+    <target name="pre-deploy" depends="init">
+        <get src="${deploy.google.script}" dest="${dir}/ant-googlecode.jar" />
+        <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="path/to/ant-googlecode.jar" name="gcupload"/>
+    </target>
+    <target name="validate-deploy">
+        <!-- check deploy.properties -->
+        <fail "Version not set" unless="app.version" />
+        <fail "Google: Username not set" unless="deploy.google.username" />
+        <fail "Google: Password not set" unless="deploy.google.password" />
+
+        <!-- TODO: check for existence of files -->
+
+        <input message="Want to continue?" validargs="y,j,n" addproperty="deploy.continue" />
+        <fail message="Aborted.">
+            <condition>
+                <equals arg1="${deploy.continue}" arg2="n" />
+            </condition>
+        </fail>
+    </target>
+    <target name="deploy" depends="pre-deploy,validate-deploy">
+        <!-- TODO: add all files -->
+    </target>
+</project>
