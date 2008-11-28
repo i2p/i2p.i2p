@@ -46,7 +46,7 @@ public class DoCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-C";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "01",  BEXT = "-D";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -92,6 +92,7 @@ public class DoCMDS implements Runnable {
 	private static final String C_start = "start";
 	private static final String C_status = "status";
 	private static final String C_stop = "stop";
+	private static final String C_verify = "verify";
 
 	/* all the coomands available, plus description */
 	private static final String C_ALL[][] = {
@@ -115,6 +116,7 @@ public class DoCMDS implements Runnable {
 		{C_start, C_start + " * Start the current nickname tunnel."},
 		{C_status, C_status + " nickname * Display status of a nicknamed tunnel."},
 		{C_stop, C_stop + " * Stops the current nicknamed tunnel."},
+		{C_verify, C_verify + " BASE64_key * Verifies BASE64 destination."},
 		{"", "COMMANDS: " + // this is ugly, but...
 		 C_help + " " +
 		 C_clear + " " +
@@ -135,7 +137,8 @@ public class DoCMDS implements Runnable {
 		 C_show + " " +
 		 C_start + " " +
 		 C_status + " " +
-		 C_stop
+		 C_stop + " " +
+		 C_verify
 		},
 		{" ", " "} // end of list
 	};
@@ -346,12 +349,12 @@ public class DoCMDS implements Runnable {
 	 * @return
 	 */
 	private boolean is64ok(String data) {
-		String dest = new String(data);
-		if(dest.replaceAll("[a-zA-Z0-9~-]", "").length() == 0) {
+		try {
+			Destination x = new Destination(data);
 			return true;
+		} catch(Exception e) {
+			return false;
 		}
-
-		return false;
 	}
 
 	/**
@@ -619,6 +622,12 @@ die:                            {
 									}
 								}
 
+							}else if(Command.equals(C_verify)) {
+								if(is64ok(Arg)) {
+									out.println("OK");
+								} else {
+									out.println("ERROR not in BASE64 format");
+								}
 							} else if(Command.equals(C_setkeys)) {
 								// Set the NamedDB to a privatekey in BASE64 format
 								if(ns) {
