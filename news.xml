@@ -19,12 +19,12 @@ and has been optimized to perform better.
 </p><p>
 The BOB (Basic Open Bridge) protocol is introduced,
 for use by client applications which cannot import
-I2CP libraries directly. This depreactes the old
+I2CP libraries directly. This deprecates the old
 SAM protocol which was previously used in such cases.
 For now however, BOB is not started automatically yet
 on new installations, and SAM remains active on old installations.
 </p><p>
-Improved code be better at preventing congestion
+Improved code should be better at preventing congestion
 by probabalistically dropping participating traffic,
 and likewise behave better when congestion occurs.
 The floodfill NetDB should operate more reliably,
