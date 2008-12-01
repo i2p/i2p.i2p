@@ -1,3 +1,38 @@
+2008-12-01 zzz
+    * i2psnark:
+      - Refactor to allow running a single Snark without a SnarkManager again,
+        by moving some things from SnarkManager to I2PSnarkUtil,
+        having Snark call completeListener callbacks,
+        and having Storage call storageListener callbacks.
+        This is in preparation for using Snark for router updates.
+        Step 2 is to allow multiple I2PSnarkUtil instances.
+      - Big rewrite of Storage to open file descriptors on demand, and
+        close them when unused, so we can support large numbers of torrents.
+
+    * i2psnark:
+      - Remove static instances of I2PSnarkUtil, ConnectionAcceptor,
+        and PeerCoordinatorSet
+      - Convert static classes in Snark to listeners
+      - Fix Snark to work in single torrent mode again
+      - Should now work with multiple single Snarks
+
+    * i2psnark:
+      - Use new I2PAppThread that does not call global listeners on OOM,
+        so that OOMing apps will not shutdown the whole router.
+
+    * i2psnark:
+      - Don't create SnarkManager instance until first call,
+        so it doesn't create the i2psnark dir, read the config,
+        etc., for single Snark instances.
+      - Don't read i2psnark.config twice; fix setting
+        i2psnark.dir
+      - More Snark constructor changes for calling from router
+      - Make max connections per torrent configurable
+
+    * SAM:
+      - Use new I2PAppThread that does not call global listeners on OOM,
+        so that OOMing SAM will not shutdown the whole router.
+
 * 2008-12-01  0.6.5 released
 
 2008-12-01 Complication
