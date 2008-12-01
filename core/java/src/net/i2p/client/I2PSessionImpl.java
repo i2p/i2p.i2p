@@ -171,18 +171,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
             String key = (String) iter.next();
             String val = options.getProperty(key);
-            if (key.startsWith("java")) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping java.* property: " + key);
-            } else if (key.startsWith("user")) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping user.* property: " + key);
-            } else if (key.startsWith("os")) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping os.* property: " + key);
-            } else if (key.startsWith("sun")) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping sun.* property: " + key);
-            } else if (key.startsWith("file")) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping file.* property: " + key);
-            } else if (key.startsWith("line")) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping line.* property: " + key);
+            if (key.startsWith("java") ||
+                key.startsWith("user") ||
+                key.startsWith("os") ||
+                key.startsWith("sun") ||
+                key.startsWith("file") ||
+                key.startsWith("line") ||
+                key.startsWith("wrapper")) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping property: " + key);
             } else if ((key.length() > 255) || (val.length() > 255)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getPrefix() + "Not passing on property ["

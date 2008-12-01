@@ -28,11 +28,16 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     /**
      * This tells the flusher in MessageOutputStream whether to flush.
      * It won't flush if this returns true.
-     * It was: return con.getUnackedPacketsSent() > 0;
+     *
+     * It was: return con.getUnackedPacketsSent() > 0 (i.e. Nagle)
      * But then, for data that fills more than one packet, the last part of
      * the data isn't sent until all the previous packets are acked. Which is very slow.
+     * The poor interaction of Nagle and Delayed Acknowledgements is well-documented.
      *
      * So let's send data along unless the outbound window is full.
+     * (i.e. no-Nagle or TCP_NODELAY)
+     *
+     * Probably should have a configuration option for this.
      *
      * @return !flush
      */

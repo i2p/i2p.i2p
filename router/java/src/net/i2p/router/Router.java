@@ -81,12 +81,15 @@ public class Router {
     public final static String PROP_KEYS_FILENAME = "router.keys.location";
     public final static String PROP_KEYS_FILENAME_DEFAULT = "router.keys";
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
+    public final static String DNS_CACHE_TIME = "" + (5*60);
         
     static {
         // grumble about sun's java caching DNS entries *forever* by default
-        // so lets just keep 'em for a minute
-        System.setProperty("sun.net.inetaddr.ttl", "60");
-        System.setProperty("networkaddress.cache.ttl", "60");
+        // so lets just keep 'em for a short time
+        System.setProperty("sun.net.inetaddr.ttl", DNS_CACHE_TIME);
+        System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
+        System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
+        System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
         // until we handle restricted routes and/or all peers support v6, try v4 first
         System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("http.agent", "I2P");

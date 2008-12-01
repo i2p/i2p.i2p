@@ -38,7 +38,7 @@ import net.i2p.util.Log;
  * <li>{@link #FLAG_SIGNATURE_INCLUDED}: {@link net.i2p.data.Signature}</li>
  * <li>{@link #FLAG_SIGNATURE_REQUESTED}: no option data</li>
  * <li>{@link #FLAG_FROM_INCLUDED}: {@link net.i2p.data.Destination}</li>
- * <li>{@link #FLAG_DELAY_REQUESTED}: 1 byte integer</li>
+ * <li>{@link #FLAG_DELAY_REQUESTED}: 2 byte integer</li>
  * <li>{@link #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
  * <li>{@link #FLAG_PROFILE_INTERACTIVE}: no option data</li>
  * </ol>

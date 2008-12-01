@@ -90,14 +90,14 @@ public class ConfigTunnelsHelper {
         renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
         if (now > MAX_LENGTH)
             renderOptions(buf, now, now, now, "", "hop");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".depthOutbound\">\n");
         now = out.getLength();
         renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
         if (now > MAX_LENGTH)
             renderOptions(buf, now, now, now, "", "hop");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
         // tunnel depth variance
@@ -111,7 +111,7 @@ public class ConfigTunnelsHelper {
             renderOptions(buf, now, now, now, "+ 0-", "hop");
         else if (now < MIN_NEG_VARIANCE)
             renderOptions(buf, now, now, now, "+/- 0", "hop");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".varianceOutbound\">\n");
         now = out.getLengthVariance();
@@ -122,7 +122,7 @@ public class ConfigTunnelsHelper {
             renderOptions(buf, now, now, now, "+ 0-", "hop");
         else if (now < MIN_NEG_VARIANCE)
             renderOptions(buf, now, now, now, "+/- 0", "hop");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
 
         // tunnel quantity
         buf.append("<tr><td>Quantity</td>\n");
@@ -131,14 +131,14 @@ public class ConfigTunnelsHelper {
         renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".quantityOutbound\">\n");
         now = out.getQuantity();
         renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
         // tunnel backup quantity
@@ -148,14 +148,14 @@ public class ConfigTunnelsHelper {
         renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".backupOutbound\">\n");
         now = in.getBackupQuantity();
         renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
-        buf.append("</td>\n");
+        buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
         // custom options

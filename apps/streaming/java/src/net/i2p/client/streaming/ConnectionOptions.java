@@ -56,7 +56,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 12;
     static final int DEFAULT_MAX_SENDS = 8;
-    
+    public static final int DEFAULT_INITIAL_RTT = 10*1000;    
     static final int MIN_WINDOW_SIZE = 1;
     
     /**
@@ -208,7 +208,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
         setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, DEFAULT_MAX_MESSAGE_SIZE));
-        setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
+        setRTT(getInt(opts, PROP_INITIAL_RTT, DEFAULT_INITIAL_RTT));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 2000));
@@ -237,7 +237,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_MAX_MESSAGE_SIZE))
             setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
         if (opts.containsKey(PROP_INITIAL_RTT))
-            setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
+            setRTT(getInt(opts, PROP_INITIAL_RTT, DEFAULT_INITIAL_RTT));
         if (opts.containsKey(PROP_INITIAL_RECEIVE_WINDOW))
             setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
@@ -306,6 +306,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     }
     
     /** after how many consecutive messages should we ack?
+     *  This doesn't appear to be used.
      * @return receive window size.
      */
     public int getReceiveWindow() { return _receiveWindow; } 
@@ -420,7 +421,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return Maximum retrys before failing a sent message.
      */
     public int getMaxResends() { return _maxResends; }
-    public void setMaxResends(int numSends) { _maxResends = numSends; }
+    public void setMaxResends(int numSends) { _maxResends = Math.max(numSends, 0); }
     
     /**
      * What period of inactivity qualifies as "too long"?

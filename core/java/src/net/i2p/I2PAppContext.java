@@ -91,7 +91,8 @@ public class I2PAppContext {
     private volatile boolean _routingKeyGeneratorInitialized;
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
-
+    
+    
     /**
      * Pull the default context, creating a new one if necessary, else using 
      * the first one created.
@@ -105,7 +106,7 @@ public class I2PAppContext {
         }
         return _globalAppContext; 
     }
-
+    
     /**
      * Lets root a brand new context
      *
@@ -113,6 +114,7 @@ public class I2PAppContext {
     public I2PAppContext() {
         this(true, null);
     }
+    
     /**
      * Lets root a brand new context
      *
@@ -120,6 +122,7 @@ public class I2PAppContext {
     public I2PAppContext(Properties envProps) {
         this(true, envProps);
     }
+    
     /**
      * @param doInit should this context be used as the global one (if necessary)?
      */
@@ -175,6 +178,7 @@ public class I2PAppContext {
         }
         return System.getProperty(propName, defaultValue);
     }
+
     /**
      * Access the configuration attributes of this context, listing the properties 
      * provided during the context construction, as well as the ones included in
@@ -194,9 +198,11 @@ public class I2PAppContext {
      * over time.
      */
     public StatManager statManager() { 
-        if (!_statManagerInitialized) initializeStatManager();
+        if (!_statManagerInitialized)
+            initializeStatManager();
         return _statManager;
     }
+
     private void initializeStatManager() {
         synchronized (this) {
             if (_statManager == null)
@@ -215,9 +221,11 @@ public class I2PAppContext {
      *
      */
     public SessionKeyManager sessionKeyManager() { 
-        if (!_sessionKeyManagerInitialized) initializeSessionKeyManager();
+        if (!_sessionKeyManagerInitialized)
+            initializeSessionKeyManager();
         return _sessionKeyManager;
     }
+
     private void initializeSessionKeyManager() {
         synchronized (this) {
             if (_sessionKeyManager == null) 
@@ -232,9 +240,11 @@ public class I2PAppContext {
      * specified to customize the naming service exposed.
      */
     public NamingService namingService() { 
-        if (!_namingServiceInitialized) initializeNamingService();
+        if (!_namingServiceInitialized)
+            initializeNamingService();
         return _namingService;
     }
+
     private void initializeNamingService() {
         synchronized (this) {
             if (_namingService == null) {
@@ -245,9 +255,11 @@ public class I2PAppContext {
     }
     
     public PetNameDB petnameDb() {
-        if (!_petnameDbInitialized) initializePetnameDb();
+        if (!_petnameDbInitialized)
+            initializePetnameDb();
         return _petnameDb;
     }
+
     private void initializePetnameDb() {
         synchronized (this) {
             if (_petnameDb == null) {
@@ -266,9 +278,11 @@ public class I2PAppContext {
      * it ;)
      */
     public ElGamalEngine elGamalEngine() {
-        if (!_elGamalEngineInitialized) initializeElGamalEngine();
+        if (!_elGamalEngineInitialized)
+            initializeElGamalEngine();
         return _elGamalEngine;
     }
+
     private void initializeElGamalEngine() {
         synchronized (this) {
             if (_elGamalEngine == null) {
@@ -289,9 +303,11 @@ public class I2PAppContext {
      *
      */
     public ElGamalAESEngine elGamalAESEngine() {
-        if (!_elGamalAESEngineInitialized) initializeElGamalAESEngine();
+        if (!_elGamalAESEngineInitialized)
+            initializeElGamalAESEngine();
         return _elGamalAESEngine;
     }
+
     private void initializeElGamalAESEngine() {
         synchronized (this) {
             if (_elGamalAESEngine == null)
@@ -307,9 +323,11 @@ public class I2PAppContext {
      * disable it.
      */
     public AESEngine aes() {
-        if (!_AESEngineInitialized) initializeAESEngine();
+        if (!_AESEngineInitialized)
+            initializeAESEngine();
         return _AESEngine;
     }
+
     private void initializeAESEngine() {
         synchronized (this) {
             if (_AESEngine == null) {
@@ -329,9 +347,11 @@ public class I2PAppContext {
      * their own log levels, output locations, and rotation configuration.
      */
     public LogManager logManager() { 
-        if (!_logManagerInitialized) initializeLogManager();
+        if (!_logManagerInitialized)
+            initializeLogManager();
         return _logManager;
     }
+
     private void initializeLogManager() {
         synchronized (this) {
             if (_logManager == null)
@@ -339,15 +359,18 @@ public class I2PAppContext {
             _logManagerInitialized = true;
         }
     }
+
     /** 
      * There is absolutely no good reason to make this context specific, 
      * other than for consistency, and perhaps later we'll want to 
      * include some stats.
      */
     public HMACGenerator hmac() { 
-        if (!_hmacInitialized) initializeHMAC();
+        if (!_hmacInitialized)
+            initializeHMAC();
         return _hmac;
     }
+
     private void initializeHMAC() {
         synchronized (this) {
             if (_hmac == null) {
@@ -358,9 +381,11 @@ public class I2PAppContext {
     }
 
     public HMAC256Generator hmac256() {
-        if (!_hmac256Initialized) initializeHMAC256();
+        if (!_hmac256Initialized)
+            initializeHMAC256();
         return _hmac256;
     }
+
     private void initializeHMAC256() {
         synchronized (this) {
             if (_hmac256 == null) {
@@ -375,9 +400,11 @@ public class I2PAppContext {
      *
      */
     public SHA256Generator sha() { 
-        if (!_shaInitialized) initializeSHA();
+        if (!_shaInitialized)
+            initializeSHA();
         return _sha;
     }
+
     private void initializeSHA() {
         synchronized (this) {
             if (_sha == null)
@@ -391,9 +418,11 @@ public class I2PAppContext {
      *
      */
     public DSAEngine dsa() { 
-        if (!_dsaInitialized) initializeDSA();
+        if (!_dsaInitialized)
+            initializeDSA();
         return _dsa;
     }
+
     private void initializeDSA() {
         synchronized (this) {
             if (_dsa == null) {
@@ -411,9 +440,11 @@ public class I2PAppContext {
      * the appContext, see the DSA, HMAC, and SHA comments above.
      */
     public KeyGenerator keyGenerator() {
-        if (!_keyGeneratorInitialized) initializeKeyGenerator();
+        if (!_keyGeneratorInitialized)
+            initializeKeyGenerator();
         return _keyGenerator;
     }
+
     private void initializeKeyGenerator() {
         synchronized (this) {
             if (_keyGenerator == null)
@@ -428,9 +459,11 @@ public class I2PAppContext {
      *
      */
     public Clock clock() { // overridden in RouterContext
-        if (!_clockInitialized) initializeClock();
+        if (!_clockInitialized)
+            initializeClock();
         return _clock;
     }
+
     protected void initializeClock() { // overridden in RouterContext
         synchronized (this) {
             if (_clock == null)
@@ -447,9 +480,11 @@ public class I2PAppContext {
      *
      */
     public RoutingKeyGenerator routingKeyGenerator() {
-        if (!_routingKeyGeneratorInitialized) initializeRoutingKeyGenerator();
+        if (!_routingKeyGeneratorInitialized)
+            initializeRoutingKeyGenerator();
         return _routingKeyGenerator;
     }
+
     private void initializeRoutingKeyGenerator() {
         synchronized (this) {
             if (_routingKeyGenerator == null)
@@ -463,9 +498,11 @@ public class I2PAppContext {
      *
      */
     public RandomSource random() {
-        if (!_randomInitialized) initializeRandom();
+        if (!_randomInitialized)
+            initializeRandom();
         return _random;
     }
+
     private void initializeRandom() {
         synchronized (this) {
             if (_random == null) {

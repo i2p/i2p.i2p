@@ -2,7 +2,7 @@
 ::
 :: postinstall.bat
 :: 2004 The I2P Project
-:: http://www.i2p.net
+:: http://www.i2p2.de/
 :: This code is public domain.
 ::
 :: author: hypercubus

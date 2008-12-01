@@ -1,3 +1,34 @@
+* 2008-12-01  0.6.5 released
+
+2008-12-01 Complication
+    * Update versions, package release, fix typo in comment
+
+2008-11-26 zzz
+    * Fix Windows UrlLauncher
+
+2008-11-21 zzz
+    * Cache DNS and negative DNS for 5m (was 1m and forever)
+    * Delay shitlist cleaner at startup
+    * Strip wrapper properties from client config
+    * Define multiple cert type
+    * Prohibit negative maxSends in streaming
+    * HTML fixup on configtunnels.jsp
+    * Increase wrapper exit timeout from default 15s to 30s
+
+2008-11-20 zzz
+    * I2PTunnel: Handle missing fields in edit pages better
+    * Move DummyNetworkDatabaseFacade to his own file
+      to help the build dependencies
+    * Drop old tcp transport and old tunnel build sources
+    * EepGet:
+      - Better handling of 504 gateway timeout
+        (keep going up to limit of retry count rather
+         than just one more partial fetch)
+      - Add -t cmd line option for timeout
+      - Better handling of 403, 409, 503 errors
+      - Don't keep going after unknown return code
+      - Don't delay before exiting after a failure
+
 2008-11-15 zzz
     * Build files:
       - Don't die if depend not available

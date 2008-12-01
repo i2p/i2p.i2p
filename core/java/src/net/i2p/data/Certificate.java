@@ -39,6 +39,8 @@ public class Certificate extends DataStructureImpl {
     /** Signed with 40-byte Signature and (optional) 32-byte hash */
     public final static int CERTIFICATE_TYPE_SIGNED = 3;
     public final static int CERTIFICATE_LENGTH_SIGNED_WITH_HASH = Signature.SIGNATURE_BYTES + Hash.HASH_LENGTH;
+    /** Contains multiple certs */
+    public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
 
     public Certificate() {
         _type = 0;

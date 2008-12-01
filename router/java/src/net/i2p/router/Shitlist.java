@@ -49,6 +49,7 @@ public class Shitlist {
     public final static long SHITLIST_DURATION_MAX = 60*60*1000;
     public final static long SHITLIST_DURATION_PARTIAL = 20*60*1000;
     public final static long SHITLIST_DURATION_FOREVER = 181l*24*60*60*1000; // will get rounded down to 180d on console
+    public final static long SHITLIST_CLEANER_START_DELAY = SHITLIST_DURATION_PARTIAL;
     
     public Shitlist(RouterContext context) {
         _context = context;
@@ -62,6 +63,7 @@ public class Shitlist {
         public Cleanup(RouterContext ctx) {
             super(ctx);
             _toUnshitlist = new ArrayList(4);
+            getTiming().setStartAfter(_context.clock().now() + SHITLIST_CLEANER_START_DELAY);
         }
         public String getName() { return "Cleanup shitlist"; }
         public void runJob() {
