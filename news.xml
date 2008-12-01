@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2008-10-05 12:00:00 $">
- <i2p.release version="0.6.4" date="2008/10/05" minVersion="0.6"
+<i2p.news date="$Date: 2008-12-01 00:00:00 $">
+ <i2p.release version="0.6.5" date="2008/12/01" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,20 +11,32 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2008-10-05: <b>0.6.4 <a href="http://www.i2p2.i2p/release-0.6.4.html">Released</a></b>
+2008-12-01: <b>0.6.5 <a href="http://www.i2p2.i2p/release-0.6.5.html">Released</a></b>
 </p><p>
-The 0.6.4 release adds performance and stability improvements.
-Floodfill peers which are already connected, are preferred
-for RouterInfo stores, and references to new floodfill peers
-obtained from ordinary peers in case of shortage.
+The 0.6.5 release introduces new components,
+drops some old ones (like the old TCP transport)
+and has been optimized to perform better.
+</p><p>
+The BOB (Basic Open Bridge) protocol is introduced,
+for use by client applications which cannot import
+I2CP libraries directly. This depreactes the old
+SAM protocol which was previously used in such cases.
+For now however, BOB is not started automatically yet
+on new installations, and SAM remains active on old installations.
+</p><p>
+Improved code be better at preventing congestion
+by probabalistically dropping participating traffic,
+and likewise behave better when congestion occurs.
+The floodfill NetDB should operate more reliably,
+the streaming library should choose better message sizes,
+offer a socket timeout function, and work proceeds
+on the "hidden" mode of operation for I2P routers.
+</p><p>
+From this release onward, I2P requires Java 1.5 or higher.
+If you are uncertain about your Java version, you can verify
+by opening a terminal window or command prompt,
+and entering the command "java -version".
+If you have an older Java installed, please update it first!</p>
 
-Preference for already connected peers is generally increased
-by considering them active. Timeouts during tunnel joins
-are now counted against peer profiles.
-
-Improvements to the shutdown handler, tunnel builder,
-router throttling, collection of tunnel pool statistics,
-as well as router console and I2PSnark improvements
-(and texts to explain reachability issues) are also included.
 </p>
 </i2p.news>

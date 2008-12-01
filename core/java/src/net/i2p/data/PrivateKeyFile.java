@@ -164,7 +164,7 @@ public class PrivateKeyFile {
     }
     
     
-    /** Also reads in the file to get the privKay and signingPrivKey, 
+    /** Also reads in the file to get the privKey and signingPrivKey, 
      *  which aren't available from I2PClient.
      */
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
