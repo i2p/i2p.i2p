@@ -59,8 +59,12 @@ public class ConfigRestartBean {
                      + "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=cancelShutdown\">Cancel restart</a> ";
             }
         } else {
-            return "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=restart\" title=\"Graceful restart\">Restart</a> "
-                 + "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=shutdown\" title=\"Graceful shutdown\">Shutdown</a>";
+            String shutdown = "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=shutdown\" title=\"Graceful shutdown\">Shutdown</a>";
+            if (System.getProperty("wrapper.version") != null)
+                return "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=restart\" title=\"Graceful restart\">Restart</a> "
+                       + shutdown;
+            else
+                return shutdown;
         }
     }
     
