@@ -172,8 +172,8 @@ public class Blocklist {
     private void readBlocklistFile(String file) {
         File BLFile = new File(file);
         if (BLFile == null || (!BLFile.exists()) || BLFile.length() <= 0) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Blocklist file not found: " + file);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Blocklist file not found: " + file);
             return;
         }
         long start = _context.clock().now();
