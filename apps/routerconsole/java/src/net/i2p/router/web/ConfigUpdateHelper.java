@@ -107,7 +107,7 @@ public class ConfigUpdateHelper {
         else
             buf.append("<option value=\"download\">Download and verify only</option>");
         
-        if (_context.getProperty("wrapper.version") != null) {
+        if (System.getProperty("wrapper.version") != null) {
             if ("install".equals(policy))
                 buf.append("<option value=\"install\" selected=\"true\">Download, verify, and restart</option>");
             else
