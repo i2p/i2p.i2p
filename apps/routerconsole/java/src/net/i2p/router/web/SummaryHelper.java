@@ -143,6 +143,14 @@ public class SummaryHelper {
                 return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
+                ra = _context.router().getRouterInfo().getTargetAddress("UDP");
+                if (ra == null) {
+                    if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
+                        _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
+                        return "ERR-UDP Disabled and Inbound TCP host/port not set";
+                    else
+                        return "WARN-Firewalled with UDP Disabled";
+                }
                 return "Testing";
         }
     }

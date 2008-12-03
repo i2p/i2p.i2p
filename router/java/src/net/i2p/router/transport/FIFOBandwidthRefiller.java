@@ -6,7 +6,7 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-class FIFOBandwidthRefiller implements Runnable {
+public class FIFOBandwidthRefiller implements Runnable {
     private Log _log;
     private I2PAppContext _context;
     private FIFOBandwidthLimiter _limiter;
@@ -34,9 +34,9 @@ class FIFOBandwidthRefiller implements Runnable {
     //public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
 
     // no longer allow unlimited bandwidth - the user must specify a value, and if they do not, it is 32/16KBps
-    public static final int DEFAULT_INBOUND_BANDWIDTH = 32;
-    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 16;
-    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 48;
+    public static final int DEFAULT_INBOUND_BANDWIDTH = 48;
+    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 24;
+    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 64;
     public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 32;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
@@ -217,10 +217,10 @@ class FIFOBandwidthRefiller implements Runnable {
             // bandwidth was specified *and* changed
             try {
                 int in = Integer.parseInt(inBwStr);
-                if ( (in <= 0) || (in > MIN_INBOUND_BANDWIDTH) ) 
+                if ( (in <= 0) || (in >= _inboundKBytesPerSecond) ) 
                     _inboundBurstKBytesPerSecond = in;
                 else
-                    _inboundBurstKBytesPerSecond = MIN_INBOUND_BANDWIDTH;
+                    _inboundBurstKBytesPerSecond = _inboundKBytesPerSecond;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating inbound burst rate to " + _inboundBurstKBytesPerSecond);
             } catch (NumberFormatException nfe) {
@@ -247,10 +247,10 @@ class FIFOBandwidthRefiller implements Runnable {
             // bandwidth was specified *and* changed
             try {
                 int out = Integer.parseInt(outBwStr);
-                if ( (out <= 0) || (out >= MIN_OUTBOUND_BANDWIDTH) )
+                if ( (out <= 0) || (out >= _outboundKBytesPerSecond) )
                     _outboundBurstKBytesPerSecond = out;
                 else
-                    _outboundBurstKBytesPerSecond = MIN_OUTBOUND_BANDWIDTH;
+                    _outboundBurstKBytesPerSecond = _outboundKBytesPerSecond;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating outbound burst rate to " + _outboundBurstKBytesPerSecond);
             } catch (NumberFormatException nfe) {
@@ -335,4 +335,6 @@ class FIFOBandwidthRefiller implements Runnable {
     
     int getOutboundKBytesPerSecond() { return _outboundKBytesPerSecond; } 
     int getInboundKBytesPerSecond() { return _inboundKBytesPerSecond; } 
+    int getOutboundBurstKBytesPerSecond() { return _outboundBurstKBytesPerSecond; } 
+    int getInboundBurstKBytesPerSecond() { return _inboundBurstKBytesPerSecond; } 
 }

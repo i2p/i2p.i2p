@@ -411,7 +411,10 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     
     public long getMessageDelay() {
-        Rate delayRate = _context.statManager().getRate("transport.sendProcessingTime").getRate(60*1000);
+        RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
+        if (rs == null)
+            return 0;
+        Rate delayRate = rs.getRate(60*1000);
         return (long)delayRate.getAverageValue();
     }
     
@@ -422,6 +425,8 @@ class RouterThrottleImpl implements RouterThrottle {
     
     public double getInboundRateDelta() {
         RateStat receiveRate = _context.statManager().getRate("transport.sendMessageSize");
+        if (receiveRate == null)
+            return 0;
         double nowBps = getBps(receiveRate.getRate(60*1000));
         double fiveMinBps = getBps(receiveRate.getRate(5*60*1000));
         double hourBps = getBps(receiveRate.getRate(60*60*1000));

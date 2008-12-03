@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
+import net.i2p.router.transport.FIFOBandwidthRefiller;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
 import net.i2p.time.Timestamper;
@@ -110,26 +111,6 @@ public class ConfigNetHandler extends FormHandler {
         boolean restartRequired = false;
         
         if (!_ratesOnly) {
-            if ( (_hostname != null) && (_hostname.length() > 0) ) {
-                String oldHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_HOSTNAME);
-                if ( (oldHost == null) || (!oldHost.equalsIgnoreCase(_hostname)) ) {
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_HOSTNAME, _hostname);
-                    addFormNotice("Updating hostname from " + oldHost + " to " + _hostname);
-                    restartRequired = true;
-                }
-            }
-            if ( (_tcpPort != null) && (_tcpPort.length() > 0) ) {
-                String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT);
-                if ( (oldPort == null) && (_tcpPort.equals("8887")) ) {
-                    // still on default.. noop
-                } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_tcpPort)) ) {
-                    // its not the default OR it has changed
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _tcpPort);
-                    addFormNotice("Updating TCP port from " + oldPort + " to " + _tcpPort);
-                    restartRequired = true;
-                }
-            }
-            
             // Normalize some things to make the following code a little easier...
             String oldNHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
             if (oldNHost == null) oldNHost = "";
@@ -181,7 +162,7 @@ public class ConfigNetHandler extends FormHandler {
                     // still on default.. noop
                 } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_udpPort)) ) {
                     // its not the default OR it has changed
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _udpPort);
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT, _udpPort);
                     addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
                     restartRequired = true;
                 }
@@ -193,9 +174,9 @@ public class ConfigNetHandler extends FormHandler {
         
         if (!_ratesOnly) {
             if (_sharePct != null) {
-                String old = _context.router().getConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE);
+                String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
                 if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE, _sharePct);
+                    _context.router().setConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
                     addFormNotice("Updating bandwidth share percentage");
                 }
             }
@@ -263,23 +244,23 @@ public class ConfigNetHandler extends FormHandler {
     private void updateRates() {
         boolean updated = false;
         if ( (_inboundRate != null) && (_inboundRate.length() > 0) ) {
-            _context.router().setConfigSetting(ConfigNetHelper.PROP_INBOUND_KBPS, _inboundRate);
+            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, _inboundRate);
             updated = true;
         }
         if ( (_outboundRate != null) && (_outboundRate.length() > 0) ) {
-            _context.router().setConfigSetting(ConfigNetHelper.PROP_OUTBOUND_KBPS, _outboundRate);
+            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
             updated = true;
         }
         if ( (_inboundBurstRate != null) && (_inboundBurstRate.length() > 0) ) {
-            _context.router().setConfigSetting(ConfigNetHelper.PROP_INBOUND_BURST_KBPS, _inboundBurstRate);
+            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, _inboundBurstRate);
             updated = true;
         }
         if ( (_outboundBurstRate != null) && (_outboundBurstRate.length() > 0) ) {
-            _context.router().setConfigSetting(ConfigNetHelper.PROP_OUTBOUND_BURST_KBPS, _outboundBurstRate);
+            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, _outboundBurstRate);
             updated = true;
         }
         
-        String inBurstRate = _context.router().getConfigSetting(ConfigNetHelper.PROP_INBOUND_BURST_KBPS);
+        String inBurstRate = _context.router().getConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH);
         
         if (_inboundBurst != null) {
             int rateKBps = 0;
@@ -292,12 +273,12 @@ public class ConfigNetHandler extends FormHandler {
             }
             if ( (rateKBps > 0) && (burstSeconds > 0) ) {
                 int kb = rateKBps * burstSeconds;
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_INBOUND_BURST, "" + kb);
+                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
                 updated = true;
             }
         }
         
-        String outBurstRate = _context.router().getConfigSetting(ConfigNetHelper.PROP_OUTBOUND_BURST_KBPS);
+        String outBurstRate = _context.router().getConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH);
         
         if (_outboundBurst != null) {
             int rateKBps = 0;
@@ -310,12 +291,13 @@ public class ConfigNetHandler extends FormHandler {
             }
             if ( (rateKBps > 0) && (burstSeconds > 0) ) {
                 int kb = rateKBps * burstSeconds;
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_OUTBOUND_BURST, "" + kb);
+                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
                 updated = true;
             }
         }
         
         if (updated && !_ratesOnly)
+            _context.bandwidthLimiter().reinitialize();
             addFormNotice("Updated bandwidth limits");
     }
 }
