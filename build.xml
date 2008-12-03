@@ -229,6 +229,7 @@
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
