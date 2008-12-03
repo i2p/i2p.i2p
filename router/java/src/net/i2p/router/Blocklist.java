@@ -85,8 +85,7 @@ public class Blocklist {
     static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
 
     public void startup() {
-        String enabled = _context.getProperty(PROP_BLOCKLIST_ENABLED, "false");
-        if (! "true".equals(enabled))
+        if (! Boolean.valueOf(_context.getProperty(PROP_BLOCKLIST_ENABLED, "true")).booleanValue())
             return;
         String file = _context.getProperty(PROP_BLOCKLIST_FILE, BLOCKLIST_FILE_DEFAULT);
         // Maybe someday we'll read in multiple files and merge them
