@@ -573,6 +573,10 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "I2P-BT";
                 else if ("LUFa".equals(ch))
                     client = "Azureus";
+                else if ("CwsL".equals(ch))
+                    client = "I2PSnarkXL";
+                else if ("AUZV".equals(ch))
+                    client = "Robert";
                 else
                     client = "Unknown";
                 out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
