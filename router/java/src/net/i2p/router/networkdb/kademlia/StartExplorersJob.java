@@ -42,7 +42,8 @@ class StartExplorersJob extends JobImpl {
     public String getName() { return "Start Explorers Job"; }
     public void runJob() {
         Set toExplore = selectKeysToExplore();
-        _log.debug("Keys to explore during this run: " + toExplore);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Keys to explore during this run: " + toExplore);
         _facade.removeFromExploreKeys(toExplore);
         for (Iterator iter = toExplore.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
@@ -83,6 +84,8 @@ class StartExplorersJob extends JobImpl {
      */
     private Set selectKeysToExplore() {
         Set queued = _facade.getExploreKeys();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Keys waiting for exploration: " + queued.size());
         if (queued.size() <= MAX_PER_RUN)
             return queued;
         Set rv = new HashSet(MAX_PER_RUN);

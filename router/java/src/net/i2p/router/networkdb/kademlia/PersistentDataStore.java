@@ -231,6 +231,7 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
+    /** This is only for manual reseeding? Why bother every 60 sec??? */
     private class ReadJob extends JobImpl {
         private boolean _alreadyWarned;
         public ReadJob() {
