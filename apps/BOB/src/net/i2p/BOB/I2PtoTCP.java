@@ -119,27 +119,26 @@ die:            {
 						// nop
 					}
 				}
-				System.out.println("I2PtoTCP: Going away...");
+				// System.out.println("I2PtoTCP: Going away...");
 			} catch(Exception e) {
-				System.out.println("I2PtoTCP: Owch! damn!");
+				// System.out.println("I2PtoTCP: Owch! damn!");
 				break die;
 			}
 		} // die
 		try {
-			//System.out.println("I2PtoTCP: Close I2P");
+			// System.out.println("I2PtoTCP: Close I2P");
 			I2P.close();
 		} catch(Exception e) {
 			tell = false;
 		}
 		//System.out.println("I2PtoTCP: Closed I2P");
 		try {
-			//System.out.println("I2PtoTCP: Close sock");
+			// System.out.println("I2PtoTCP: Close sock");
 			sock.close();
 		} catch(Exception e) {
 			tell = false;
 		}
-		//System.out.println("I2PtoTCP: Closed sock");
-		System.out.println("I2PtoTCP: Done");
+		// System.out.println("I2PtoTCP: Done");
 
 	}
 }

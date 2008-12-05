@@ -152,7 +152,7 @@ public class TCPtoI2P implements Runnable {
 							// nop
 						}
 					}
-					System.out.println("TCPtoI2P: Going away...");
+					// System.out.println("TCPtoI2P: Going away...");
 
 				} catch(I2PException e) {
 					Emsg("ERROR " + e.toString(), out);
@@ -170,19 +170,17 @@ public class TCPtoI2P implements Runnable {
 		} catch(IOException ioe) {
 		}
 		try {
-			System.out.println("TCPtoI2P: Close I2P");
+			// System.out.println("TCPtoI2P: Close I2P");
 			I2P.close();
 		} catch(Exception e) {
 		}
-		//System.out.println("TCPtoI2P: Closed I2P");
 
 		try {
-			System.out.println("TCPtoI2P: Close sock");
+			// System.out.println("TCPtoI2P: Close sock");
 			sock.close();
 		} catch(Exception e) {
 		}
-		//System.out.println("TCPtoI2P: Closed sock");
-		System.out.println("TCPtoI2P: Done.");
+		// System.out.println("TCPtoI2P: Done.");
 
 	}
 }
