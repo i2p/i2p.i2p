@@ -365,7 +365,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Properties getConfig() { return _config; }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    private static final int MAX_FILES_PER_TORRENT = 128;
+    private static final int MAX_FILES_PER_TORRENT = 256;
     
     /** set of filenames that we are dealing with */
     public Set listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
