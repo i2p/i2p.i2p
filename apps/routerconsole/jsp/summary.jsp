@@ -93,7 +93,6 @@
  <b>Message delay:</b> <jsp:getProperty name="helper" property="messageDelay" /><br />
  <b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
  <b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
- <b>PRNG wait/fill:</b> <jsp:getProperty name="helper" property="PRNGStatus" /><br />
  <b><jsp:getProperty name="helper" property="tunnelStatus" /></b><br />
  <hr />
  
