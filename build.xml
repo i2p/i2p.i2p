@@ -442,4 +442,40 @@
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>
+    <target name="findbugs" depends="build2">
+        <echo message="Starting findbugs, this will take a while..." />
+        <exec executable="nice">
+            <arg value="findbugs"/>
+            <arg value="-textui"/>
+            <arg value="-projectName"/>
+            <arg value="i2p"/>
+            <arg value="-sortByClass"/>
+            <arg value="-xml"/>
+            <arg value="-output"/>
+            <arg value="findbugs.xml"/>
+            <arg value="-auxclasspath"/>
+            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:build/xercesImpl.jar"/>
+            <arg value="-sourcepath"/>
+            <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
+            <!-- start of the files to be analyzed -->
+            <arg value="build/BOB.jar"/>
+            <arg value="build/addressbook.war"/>
+            <arg value="build/i2p.jar"/>
+            <arg value="build/i2psnark.jar"/>
+            <arg value="build/i2psnark.war"/>
+            <arg value="build/i2ptunnel.jar"/>
+            <arg value="build/i2ptunnel.war"/>
+            <arg value="build/jbigi.jar"/>
+            <arg value="build/mstreaming.jar"/>
+            <arg value="build/router.jar/"/>
+            <!-- use the class files rather than the jar for routerconsole so we don't analyze jrobin -->
+            <arg value="apps/routerconsole/java/build/obj/"/>
+            <arg value="build/sam.jar"/>
+            <arg value="build/streaming.jar"/>
+            <arg value="build/susidns.war"/>
+            <arg value="build/susimail.war"/>
+            <arg value="build/systray.jar"/>
+        </exec>
+        <echo message="Findbugs output stored in findbugs.xml" />
+    </target>
 </project>
