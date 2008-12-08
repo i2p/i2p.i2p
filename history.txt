@@ -1,3 +1,30 @@
+2008-12-08 zzz
+    * ATalk: Move from core to apps
+    * Blocklists: enable by default, include blocklist file
+      in new installs
+    * Build: Add findbugs target
+    * Cleanup of removed netdb stats
+    * Console:
+      - Don't display restart button if no wrapper
+      - Remove PRNG stats
+    * Eepsite: Disable jetty webapps by default for new installs
+    * i2psnark:
+      - Add default i2psnark.config for new installs
+      - Remove wishlist link
+      - Recognize robert and i2psnarkxl clients
+      - Increase max files to 256
+    * Increase standalone heap size to 128MB
+    * NetDb: Split classes into their own files for mkvore
+    * PeerManager: Fix NPE on early shutdown
+    * SusiDNS: Add textareas
+    * Transport:
+      - Fixes, avoid NPEs, and cleanups when NTCP and/or UDP transports disabled
+      - More TCP removal cleanup
+      - Clean up bandwidth limiting, centralize defaults
+      - Force burst to be >= limit
+      - Increase default bw to 48/24, burst 64/32
+    * Tunnels: Avoid two NPEs on corrupt fragments
+
 2008-12-01 zzz
     * i2psnark:
       - Refactor to allow running a single Snark without a SnarkManager again,
