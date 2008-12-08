@@ -189,6 +189,9 @@ public class FragmentedMessage {
         int size = 0;
         for (int i = 0; i <= _highFragmentNum; i++) {
             ByteArray ba = _fragments[i];
+            // NPE seen here, root cause unknown
+            if (ba == null) 
+                throw new IllegalStateException("wtf, don't get the completed size when we're not complete - null fragment i=" + i + " of " + _highFragmentNum);
             size += ba.getValid();
         }
         return size;

@@ -1,0 +1,35 @@
+# Blocking is now enabled by default.
+# To disable blocking, set router.blocklist.enable=false on configadvanced.jsp and restart.
+#
+# Add additional entries as desired, sorting not required.
+# This file is only read at router startup.
+# To manually block a router after startup, use the form on http://localhost:7657/configpeer.jsp
+# Warning - a large list will increase memory usage.
+# Please do not block too broadly, it will segment and harm the network.
+# For example, http://www.bluetack.co.uk/config/splist.zip is very broad and includes Tor users, it is not recommended.
+# A more reasonable list: http://www.bluetack.co.uk/config/level1.zip
+#
+# You may also wish to add the bogons from http://www.cymru.com/Documents/bogon-list.html ,
+# but you will have top update your blocklist manually as IP ranges are assigned.
+# You must update this list yourself, it is not overwritten by the update process.
+#
+#   * Acceptable formats (IPV4 only):
+#   *   #comment (# must be in column 1)
+#   *   comment:IP-IP
+#   *   comment:morecomments:IP-IP
+#   *   (comments also allowed before any of the following)
+#   *   IP-IP
+#   *   IP/masklength
+#   *   IP
+#   *   hostname (DNS looked up at list readin time, not dynamically, so may not be much use)
+#   *   44-byte Base64 router hash
+#   *
+#   * No whitespace allowed after the last ':'.
+#   *
+#   * For further information and downloads:
+#   *   http://www.bluetack.co.uk/forums/index.php?autocom=faq&CODE=02&qid=17
+#   *   http://blocklist.googlepages.com/
+#   *   http://www.cymru.com/Documents/bogon-list.html
+#
+Chinese Floodfill Flooder:159.226.40.7
+Friend of the Chinese Floodfill Flooder:159.226.40.3

@@ -40,8 +40,7 @@
     <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
   <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
  <i>KBps = kilobytes per second = 1024 bytes per second = 8192 bits per second.<br />
-    A negative inbound rate means a default limit of 32KBytes per second.
-    A negative outbound rate means a default limit of 16KBytes per second.</i><br />
+    A negative rate sets the default.</i><br />
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
  <% int share = nethelper.getShareBandwidth();
@@ -130,6 +129,11 @@
      your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well.
      If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact
      you via TCP, which will hurt the network. Please open your firewall or disable inbound TCP above.
+ <li><b>WARN - Firewalled with UDP Disabled</b> -
+     You have configured inbound TCP, however
+     you have disabled UDP. You appear to be firewalled on TCP, therefore your router cannot
+     accept inbound connections.
+     Please open your firewall or enable UDP.
  <li><b>ERR - Clock Skew</b> - Your system's clock is skewed, which will make it difficult
      to participate in the network. Correct your clock setting if this error persists.
  <li><b>ERR - Private TCP Address</b> - You must never advertise an unroutable IP address such as
@@ -141,6 +145,10 @@
      Check to see if another program is using port 8887. If so, stop that program or configure
      I2P to use a different port. This may be a transient error, if the other program is no longer
      using the port. However, a restart is always required after this error.
+ <li><b>ERR - UDP Disabled and Inbound TCP host/port not set</b> -
+     You have not configured inbound TCP with a hostname and port above, however
+     you have disabled UDP. Therefore your router cannot accept inbound connections.
+     Please configure a TCP host and port above or enable UDP.
  </ul>
  </p>
  <hr />

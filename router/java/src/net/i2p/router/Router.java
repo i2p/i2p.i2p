@@ -1072,11 +1072,13 @@ public class Router {
         return true;
     }
     
-    private static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
+    public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
+    public static final int DEFAULT_SHARE_PERCENTAGE = 80;
     
     /** 
      * What fraction of the bandwidth specified in our bandwidth limits should
      * we allow to be consumed by participating tunnels?
+     * @returns a number less than one, not a percentage!
      *
      */
     public double getSharePercentage() {
@@ -1095,7 +1097,7 @@ public class Router {
                     _log.info("Unable to get the share percentage");
             }
         }
-        return 0.8;
+        return DEFAULT_SHARE_PERCENTAGE / 100.0d;
     }
 
     public int get1sRate() { return get1sRate(false); }

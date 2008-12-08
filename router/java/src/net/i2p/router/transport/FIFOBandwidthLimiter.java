@@ -107,8 +107,11 @@ public class FIFOBandwidthLimiter {
     public float getSendBps15s() { return _sendBps15s; }
     public float getReceiveBps15s() { return _recvBps15s; }
     
+    /** These are the configured maximums, not the current rate */
     public int getOutboundKBytesPerSecond() { return _refiller.getOutboundKBytesPerSecond(); } 
     public int getInboundKBytesPerSecond() { return _refiller.getInboundKBytesPerSecond(); } 
+    public int getOutboundBurstKBytesPerSecond() { return _refiller.getOutboundBurstKBytesPerSecond(); } 
+    public int getInboundBurstKBytesPerSecond() { return _refiller.getInboundBurstKBytesPerSecond(); } 
     
     public void reinitialize() {
         _pendingInboundRequests.clear();
@@ -191,8 +194,8 @@ public class FIFOBandwidthLimiter {
     void setOutboundBurstKBps(int kbytesPerSecond) {
         _maxOutbound = kbytesPerSecond * 1024;
     }
-    int getInboundBurstBytes() { return _maxInboundBurst; }
-    int getOutboundBurstBytes() { return _maxOutboundBurst; }
+    public int getInboundBurstBytes() { return _maxInboundBurst; }
+    public int getOutboundBurstBytes() { return _maxOutboundBurst; }
     void setInboundBurstBytes(int bytes) { _maxInboundBurst = bytes; }
     void setOutboundBurstBytes(int bytes) { _maxOutboundBurst = bytes; }
     

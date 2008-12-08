@@ -58,7 +58,7 @@
   <!-- Add a AJP13 listener on port 8009                               -->
   <!-- This protocol can be used with mod_jk in apache, IIS etc.       -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!--
+  <!-- UNCOMMENT TO ACTIVATE
   <Call name="addListener">
     <Arg>
       <New class="org.mortbay.http.ajp.AJP13Listener">
@@ -87,12 +87,14 @@
   <!-- + Upack the war file                                            -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <Set name="rootWebApp">root</Set>
+  <!-- UNCOMMENT TO ACTIVATE
   <Call name="addWebApplications">
     <Arg></Arg>
     <Arg>./eepsite/webapps/</Arg>
     <Arg></Arg>
     <Arg type="boolean">true</Arg>
   </Call>
+  -->
 
 
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

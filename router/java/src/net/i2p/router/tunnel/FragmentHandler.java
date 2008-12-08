@@ -372,6 +372,8 @@ public class FragmentHandler {
             int fragmentCount = msg.getFragmentCount();
             // toByteArray destroys the contents of the message completely
             byte data[] = msg.toByteArray();
+            if (data == null)
+                throw new I2NPMessageException("null data");   // fragments already released???
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("RECV(" + data.length + "): " + Base64.encode(data)  
                            + " " + _context.sha().calculateHash(data).toBase64());

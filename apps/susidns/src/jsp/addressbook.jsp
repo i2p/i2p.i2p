@@ -136,7 +136,7 @@
 <td class="names"><a href="http://${addr.name}/">${addr.name}</a> -
 <span class="addrhlpr"><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}">(addrhlpr)</a></span>
 </td>
-<td class="destinations"><input type="text" name="dest_${addr.name}" value="${addr.destination}" size="20"></td>
+<td class="destinations"><textarea rows="1" cols="20" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
 </c:forEach>
 </table>
@@ -160,7 +160,7 @@
 <div id="add">
 <p class="add">
 <h3>Add new destination:</h3>
-Hostname: <input type="text" name="hostname" value="" size="20"> Destination: <input type="text" name="destination" value="" size="20"><br/>
+Hostname: <input type="text" name="hostname" value="" size="20"> Destination: <textarea rows="1" cols="20" wrap="off" ></textarea><br/>
 <input type="image" name="action" value="add" src="images/add.png" alt="Add destination" />
 </p>
 </div>

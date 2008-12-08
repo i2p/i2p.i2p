@@ -5,6 +5,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.time.Timestamper;
@@ -27,37 +28,23 @@ public class ConfigNetHelper {
 
     public ConfigNetHelper() {}
     
-    /** copied from various private TCP components */
-    public final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";
-    public final static String PROP_I2NP_TCP_PORT = "i2np.tcp.port";
+    /** copied from various private components */
     public final static String PROP_I2NP_UDP_PORT = "i2np.udp.port";
     public final static String PROP_I2NP_INTERNAL_UDP_PORT = "i2np.udp.internalPort";
-    
-    public String getHostname() {
-        return _context.getProperty(PROP_I2NP_TCP_HOSTNAME);
-    }
-    public String getTcpPort() {
-        int port = 8887;
-        String val = _context.getProperty(PROP_I2NP_TCP_PORT);
-        if (val != null) {
-            try {
-                port = Integer.parseInt(val);
-            } catch (NumberFormatException nfe) {
-                // ignore, use default from above
-            }
-        }
-        return "" + port;
-    }
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoip";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoport";
     public String getNtcphostname() {
+        if (!TransportManager.enableNTCP(_context))
+            return "\" disabled=\"true";
         String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
         if (hostname == null) return "";
         return hostname;
     }
     public String getNtcpport() { 
+        if (!TransportManager.enableNTCP(_context))
+            return "\" disabled=\"true";
         String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
         if (port == null) return "";
         return port;
@@ -116,6 +103,8 @@ public class ConfigNetHelper {
     }
 
     public String getTcpAutoPortChecked() {
+        if (!TransportManager.enableNTCP(_context))
+            return " disabled=\"true\" ";
         String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
         if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
             return " checked ";
@@ -124,6 +113,8 @@ public class ConfigNetHelper {
     }
 
     public String getTcpAutoIPChecked() {
+        if (!TransportManager.enableNTCP(_context))
+            return " disabled=\"true\" ";
         String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
         if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
             return " checked ";
@@ -150,80 +141,33 @@ public class ConfigNetHelper {
         }
     }
     
-    public static final String PROP_INBOUND_KBPS = "i2np.bandwidth.inboundKBytesPerSecond";
-    public static final String PROP_OUTBOUND_KBPS = "i2np.bandwidth.outboundKBytesPerSecond";
-    public static final String PROP_INBOUND_BURST_KBPS = "i2np.bandwidth.inboundBurstKBytesPerSecond";
-    public static final String PROP_OUTBOUND_BURST_KBPS = "i2np.bandwidth.outboundBurstKBytesPerSecond";
-    public static final String PROP_INBOUND_BURST = "i2np.bandwidth.inboundBurstKBytes";
-    public static final String PROP_OUTBOUND_BURST = "i2np.bandwidth.outboundBurstKBytes";
-    public static final String PROP_SHARE_PERCENTAGE = "router.sharePercentage";
-    public static final int DEFAULT_SHARE_PERCENTAGE = 80;
-
     public String getInboundRate() {
-        String rate = _context.getProperty(PROP_INBOUND_KBPS);
-        if (rate != null)
-            return rate;
-        else
-            return "32";
+        return "" + _context.bandwidthLimiter().getInboundKBytesPerSecond();
     }
     public String getOutboundRate() {
-        String rate = _context.getProperty(PROP_OUTBOUND_KBPS);
-        if (rate != null)
-            return rate;
-        else
-            return "16";
+        return "" + _context.bandwidthLimiter().getOutboundKBytesPerSecond();
     }
     public String getInboundBurstRate() {
-        String rate = _context.getProperty(PROP_INBOUND_BURST_KBPS);
-        if (rate != null)
-            return rate;
-        else
-            return "48";
+        return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
     }
     public String getOutboundBurstRate() {
-        String rate = _context.getProperty(PROP_OUTBOUND_BURST_KBPS);
-        if (rate != null)
-            return rate;
-        else
-            return "32";
+        return "" + _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond();
     }
     public String getInboundBurstFactorBox() {
-        String rate = _context.getProperty(PROP_INBOUND_BURST_KBPS);
-        String burst = _context.getProperty(PROP_INBOUND_BURST);
         int numSeconds = 1;
-        if ( (burst != null) && (rate != null) ) {
-            int rateKBps = 0;
-            int burstKB = 0;
-            try {
-                rateKBps = Integer.parseInt(rate);
-                burstKB = Integer.parseInt(burst);
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-            if ( (rateKBps > 0) && (burstKB > 0) ) {
-                numSeconds = burstKB / rateKBps;
-            }
-        }
+        int rateKBps = _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
+        int burstKB = _context.bandwidthLimiter().getInboundBurstBytes() * 1024;
+        if ( (rateKBps > 0) && (burstKB > 0) )
+            numSeconds = burstKB / rateKBps;
         return getBurstFactor(numSeconds, "inboundburstfactor");
     }
     
     public String getOutboundBurstFactorBox() {
-        String rate = _context.getProperty(PROP_OUTBOUND_BURST_KBPS);
-        String burst = _context.getProperty(PROP_OUTBOUND_BURST);
         int numSeconds = 1;
-        if ( (burst != null) && (rate != null) ) {
-            int rateKBps = 0;
-            int burstKB = 0;
-            try {
-                rateKBps = Integer.parseInt(rate);
-                burstKB = Integer.parseInt(burst);
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-            if ( (rateKBps > 0) && (burstKB > 0) ) {
-                numSeconds = burstKB / rateKBps;
-            }
-        }
+        int rateKBps = _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond();
+        int burstKB = _context.bandwidthLimiter().getOutboundBurstBytes() * 1024;
+        if ( (rateKBps > 0) && (burstKB > 0) )
+            numSeconds = burstKB / rateKBps;
         return getBurstFactor(numSeconds, "outboundburstfactor");
     }
     
@@ -254,43 +198,36 @@ public class ConfigNetHelper {
     }
     
     public String getSharePercentageBox() {
-        String pctStr = _context.getProperty(PROP_SHARE_PERCENTAGE);
-        int pct = DEFAULT_SHARE_PERCENTAGE;
-        if (pctStr != null)
-            try { pct = Integer.parseInt(pctStr); } catch (NumberFormatException nfe) {}
+        int pct = (int) (100 * _context.router().getSharePercentage());
         StringBuffer buf = new StringBuffer(256);
         buf.append("<select name=\"sharePercentage\">\n");
         boolean found = false;
-        for (int i = 30; i <= 100; i += 10) {
-            buf.append("<option value=\"").append(i).append("\" ");
-            if (pct == i) {
+        for (int i = 30; i <= 110; i += 10) {
+            int val = i;
+            if (i == 110) {
+                if (found)
+                    break;
+                else
+                    val = pct;
+            }
+            buf.append("<option value=\"").append(val).append("\" ");
+            if (pct == val) {
                 buf.append("selected=\"true\" ");
                 found = true;
-            } else if ( (i == DEFAULT_SHARE_PERCENTAGE) && (!found) ) {
-                buf.append("selected=\"true\" ");
             }
-            buf.append(">Up to ").append(i).append("%</option>\n");
+            buf.append(">Up to ").append(val).append("%</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
     }
 
+    public static final int DEFAULT_SHARE_KBPS = 12;
     public int getShareBandwidth() {
-        String irate = _context.getProperty(PROP_INBOUND_KBPS, "32");
-        String orate = _context.getProperty(PROP_OUTBOUND_KBPS, "16");
-        String pctStr = _context.getProperty(PROP_SHARE_PERCENTAGE, "" + DEFAULT_SHARE_PERCENTAGE);
-        if ( (irate != null) && (orate != null) && (pctStr != null)) {
-            try {
-                int irateKBps = Integer.parseInt(irate);
-                int orateKBps = Integer.parseInt(orate);
-                if (irateKBps < 0 || orateKBps < 0)
-                    return 12;
-                int pct = Integer.parseInt(pctStr);
-                return (int) (((float) pct) * Math.min(irateKBps, orateKBps) / 100);
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-        }
-        return 12;
+        int irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();
+        int orateKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        double pct = _context.router().getSharePercentage();
+        if (irateKBps < 0 || orateKBps < 0)
+            return DEFAULT_SHARE_KBPS;
+        return (int) (pct * Math.min(irateKBps, orateKBps));
     }
 }

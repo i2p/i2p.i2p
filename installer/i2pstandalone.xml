@@ -10,8 +10,8 @@
     <minVersion>1.5.0</minVersion>
     <!--
     <minHeapSize>64</minHeapSize>
-    <maxHeapSize>64</maxHeapSize>
     -->
+    <maxHeapSize>128</maxHeapSize>
     <args>-Djava.library.path=.;lib -DloggerFilenameOverride=logs/log-router-@.txt -Dorg.mortbay.http.Version.paranoid=true -Dorg.mortbay.util.FileResource.checkAliases=false</args>
   </jre>
   <splash>

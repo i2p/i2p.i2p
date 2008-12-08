@@ -36,7 +36,6 @@ public class TransportManager implements TransportEventListener {
     private List _transports;
     private RouterContext _context;
 
-    private final static String PROP_DISABLE_TCP = "i2np.tcp.disable";
     private final static String PROP_ENABLE_UDP = "i2np.udp.enable";
     private final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     private final static String DEFAULT_ENABLE_NTCP = "true";
@@ -66,8 +65,6 @@ public class TransportManager implements TransportEventListener {
         transport.setListener(null);
     }
 
-    static final boolean ALLOW_TCP = false;
-    
     private void configTransports() {
         String enableUDP = _context.router().getConfigSetting(PROP_ENABLE_UDP);
         if (enableUDP == null)
@@ -77,13 +74,16 @@ public class TransportManager implements TransportEventListener {
             udp.setListener(this);
             _transports.add(udp);
         }
-        enableNTCP(_context);
-        NTCPTransport ntcp = new NTCPTransport(_context);
-        ntcp.setListener(this);
-        _transports.add(ntcp);
+        if (enableNTCP(_context)) {
+            NTCPTransport ntcp = new NTCPTransport(_context);
+            ntcp.setListener(this);
+            _transports.add(ntcp);
+        }
+        if (_transports.size() <= 0)
+            _log.log(Log.CRIT, "No transports are enabled");
     }
     
-    static boolean enableNTCP(RouterContext ctx) {
+    public static boolean enableNTCP(RouterContext ctx) {
         String enableNTCP = ctx.router().getConfigSetting(PROP_ENABLE_NTCP);
         if (enableNTCP == null)
             enableNTCP = DEFAULT_ENABLE_NTCP;

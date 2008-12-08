@@ -88,8 +88,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<table border=\"0\" width=\"100%\">\n");
         out.write("<tr><td><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>\n");
         out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
-        out.write("<tr><td><a href=\"http://codevoid.i2p/forums/5\" class=\"snarkRefresh\">Wishlist</a>\n");
-        int count = 1;
+        int count = 0;
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -574,6 +573,10 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "I2P-BT";
                 else if ("LUFa".equals(ch))
                     client = "Azureus";
+                else if ("CwsL".equals(ch))
+                    client = "I2PSnarkXL";
+                else if ("AUZV".equals(ch))
+                    client = "Robert";
                 else
                     client = "Unknown";
                 out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");

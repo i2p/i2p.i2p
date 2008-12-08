@@ -91,8 +91,6 @@ public class StatisticsManager implements Service {
         }
     }
     
-    static final boolean CommentOutIn065 = RouterVersion.VERSION.equals("0.6.4");
-
     /** Retrieve a snapshot of the statistics that should be published */
     public Properties publishStatistics() { 
         Properties stats = new Properties();
@@ -186,8 +184,7 @@ public class StatisticsManager implements Service {
             //includeRate("udp.packetDequeueTime", stats, new long[] { 60*1000 });
             //includeRate("udp.packetVerifyTime", stats, new long[] { 60*1000 });
             
-         if(CommentOutIn065)
-            includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
+            //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
             includeRate("tunnel.buildClientExpire", stats, new long[] { 10*60*1000 });
             includeRate("tunnel.buildClientReject", stats, new long[] { 10*60*1000 });
             includeRate("tunnel.buildClientSuccess", stats, new long[] { 10*60*1000 });
@@ -280,11 +277,13 @@ public class StatisticsManager implements Service {
     private void includeThroughput(Properties stats) {
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
         if (sendRate != null) {
-            if (CommentOutIn065 && _context.router().getUptime() > 5*60*1000) {
+            /****
+            if (_context.router().getUptime() > 5*60*1000) {
                 Rate r = sendRate.getRate(5*60*1000);
                 if (r != null)
                     stats.setProperty("stat_bandwidthSendBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
             }
+            ****/
             if (_context.router().getUptime() > 60*60*1000) { 
                 Rate r = sendRate.getRate(60*60*1000);
                 if (r != null)
@@ -294,11 +293,13 @@ public class StatisticsManager implements Service {
         
         RateStat recvRate = _context.statManager().getRate("bw.recvRate");
         if (recvRate != null) {
-            if (CommentOutIn065 && _context.router().getUptime() > 5*60*1000) {
+            /****
+            if (_context.router().getUptime() > 5*60*1000) {
                 Rate r = recvRate.getRate(5*60*1000);
                 if (r != null)
                     stats.setProperty("stat_bandwidthReceiveBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
             }
+            ****/
             if (_context.router().getUptime() > 60*60*1000) {
                 Rate r = recvRate.getRate(60*60*1000);
                 if (r != null)
