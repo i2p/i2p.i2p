@@ -180,6 +180,25 @@ public class I2PAppContext {
     }
 
     /**
+     * Return an int with an int default
+     */
+    public int getProperty(String propName, int defaultVal) {
+        String val = null;
+        if (_overrideProps != null) {
+            val = _overrideProps.getProperty(propName);
+            if (val == null)
+                val = System.getProperty(propName);
+        }
+        int ival = defaultVal;
+        if (val != null) {
+            try {
+                ival = Integer.parseInt(val);
+            } catch (NumberFormatException nfe) {}
+        }
+        return ival;
+    }
+
+    /**
      * Access the configuration attributes of this context, listing the properties 
      * provided during the context construction, as well as the ones included in
      * System.getProperties.

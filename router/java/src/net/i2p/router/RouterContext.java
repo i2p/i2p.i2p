@@ -330,6 +330,23 @@ public class RouterContext extends I2PAppContext {
     }
 
     /**
+     * Return an int with an int default
+     */
+    public int getProperty(String propName, int defaultVal) {
+        if (_router != null) {
+            String val = _router.getConfigSetting(propName);
+            if (val != null) {
+                int ival = defaultVal;
+                try {
+                    ival = Integer.parseInt(val);
+                } catch (NumberFormatException nfe) {}
+                return ival;
+            }
+        }
+        return super.getProperty(propName, defaultVal);
+    }
+
+    /**
      * The context's synchronized clock, which is kept context specific only to
      * enable simulators to play with clock skew among different instances.
      *
