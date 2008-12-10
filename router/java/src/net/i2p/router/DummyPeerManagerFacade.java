@@ -19,16 +19,14 @@ import net.i2p.data.Hash;
  * includes periodically queueing up outbound messages to the peers to test them.
  *
  */
-public interface PeerManagerFacade extends Service {
-    /**
-     * Select peers from the manager's existing routing tables according to 
-     * the specified criteria.  This call DOES block.
-     *
-     * @return List of Hash objects of the RouterIdentity for matching peers
-     */
-    public List selectPeers(PeerSelectionCriteria criteria);
-    public List getPeersByCapability(char capability);
-    public void setCapabilities(Hash peer, String caps);
-    public void removeCapabilities(Hash peer);
-    public Hash selectRandomByCapability(char capability);
+class DummyPeerManagerFacade implements PeerManagerFacade {
+    public void shutdown() {}    
+    public void startup() {}
+    public void restart() {}
+    public void renderStatusHTML(Writer out) { }    
+    public List selectPeers(PeerSelectionCriteria criteria) { return null; }
+    public List getPeersByCapability(char capability) { return null; }
+    public void setCapabilities(Hash peer, String caps) {}
+    public void removeCapabilities(Hash peer) {}
+    public Hash selectRandomByCapability(char capability) { return null; }
 }

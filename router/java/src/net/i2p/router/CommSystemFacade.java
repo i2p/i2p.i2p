@@ -91,9 +91,11 @@ public abstract class CommSystemFacade implements Service {
     
 }
 
+/** unused
 class DummyCommSystemFacade extends CommSystemFacade {
     public void shutdown() {}
     public void startup() {}
     public void restart() {}
     public void processMessage(OutNetMessage msg) { }    
 }
+**/

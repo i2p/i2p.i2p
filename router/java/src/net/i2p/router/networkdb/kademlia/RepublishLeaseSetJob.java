@@ -81,23 +81,23 @@ public class RepublishLeaseSetJob extends JobImpl {
             _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
         requeue(getContext().random().nextInt(60*1000));
     }
-}
 
-class OnRepublishSuccess extends JobImpl {
-    public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
-    public String getName() { return "Publish leaseSet successful"; }
-    public void runJob() { 
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
+    class OnRepublishSuccess extends JobImpl {
+        public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
+        public String getName() { return "Publish leaseSet successful"; }
+        public void runJob() { 
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
+        }
     }
-}
 
-class OnRepublishFailure extends JobImpl {
-    private RepublishLeaseSetJob _job;
-    public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
-        super(ctx); 
-        _job = job;
+    class OnRepublishFailure extends JobImpl {
+        private RepublishLeaseSetJob _job;
+        public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
+            super(ctx); 
+            _job = job;
+        }
+        public String getName() { return "Publish leaseSet failed"; }
+        public void runJob() {  _job.requeueRepublish(); }
     }
-    public String getName() { return "Publish leaseSet failed"; }
-    public void runJob() {  _job.requeueRepublish(); }
 }

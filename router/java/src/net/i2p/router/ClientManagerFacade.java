@@ -92,29 +92,3 @@ public abstract class ClientManagerFacade implements Service {
     public abstract SessionConfig getClientSessionConfig(Destination dest);
     public void renderStatusHTML(Writer out) throws IOException { }
 }
-
-class DummyClientManagerFacade extends ClientManagerFacade {
-    private RouterContext _context;
-    public DummyClientManagerFacade(RouterContext ctx) {
-        _context = ctx;
-    }
-    public boolean isLocal(Hash destHash) { return true; }
-    public boolean isLocal(Destination dest) { return true; }
-    public void reportAbuse(Destination dest, String reason, int severity) { }
-    public void messageReceived(ClientMessage msg) {}
-    public void requestLeaseSet(Destination dest, LeaseSet set, long timeout, 
-                                Job onCreateJob, Job onFailedJob) { 
-        _context.jobQueue().addJob(onFailedJob);
-    }
-    public void startup() {}    
-    public void stopAcceptingClients() { }
-    public void shutdown() {}
-    public void restart() {}
-    
-    public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {}
-    
-    public SessionConfig getClientSessionConfig(Destination _dest) { return null; }
-    
-    public void requestLeaseSet(Hash dest, LeaseSet set) {}
-    
-}
