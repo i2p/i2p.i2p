@@ -79,7 +79,7 @@ public class ConfigClientsHelper {
         }
         buf.append("/></td><td>&nbsp");
         if (!enabled) {
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" />Start</button>");
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >Start</button>");
         }
         buf.append("&nbsp</td><td>").append(desc).append("</td></tr>\n");
     }

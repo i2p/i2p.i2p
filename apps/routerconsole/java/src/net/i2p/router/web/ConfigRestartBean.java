@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.util.StringTokenizer;
+
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -47,27 +49,35 @@ public class ConfigRestartBean {
                 return "<b>Shutdown imminent</b>";
             } else {
                 return "<b>Shutdown in " + DataHelper.formatDuration(timeRemaining) + "</b><br />"
-                     + "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=shutdownImmediate\">Shutdown immediately</a><br />"
-                     + "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=cancelShutdown\">Cancel shutdown</a> ";
+                     + buttons(urlBase, systemNonce, "shutdownImmediate,Shutdown immediately,cancelShutdown,Cancel shutdown");
             }
         } else if (restarting) {
             if (timeRemaining <= 0) {
                 return "<b>Restart imminent</b>";
             } else {
                 return "<b>Restart in " + DataHelper.formatDuration(timeRemaining) + "</b><br />"
-                     + "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=restartImmediate\">Restart immediately</a><br />"
-                     + "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=cancelShutdown\">Cancel restart</a> ";
+                     + buttons(urlBase, systemNonce, "restartImmediate,Restart immediately,cancelShutdown,Cancel restart");
             }
         } else {
-            String shutdown = "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=shutdown\" title=\"Graceful shutdown\">Shutdown</a>";
             if (System.getProperty("wrapper.version") != null)
-                return "<a href=\"" + urlBase + "?consoleNonce=" + systemNonce + "&amp;action=restart\" title=\"Graceful restart\">Restart</a> "
-                       + shutdown;
+                return buttons(urlBase, systemNonce, "restart,Restart,shutdown,Shutdown");
             else
-                return shutdown;
+                return buttons(urlBase, systemNonce, "shutdown,Shutdown");
         }
     }
     
+    /** @param s value,label,... pairs */
+    private static String buttons(String url, String nonce, String s) {
+        StringBuffer buf = new StringBuffer(128);
+        StringTokenizer tok = new StringTokenizer(s, ",");
+        buf.append("<form action=\"").append(url).append("\" method=\"GET\">\n");
+        buf.append("<input type=\"hidden\" name=\"consoleNonce\" value=\"").append(nonce).append("\" >\n");
+        while (tok.hasMoreTokens())
+            buf.append("<button type=\"submit\" name=\"action\" value=\"").append(tok.nextToken()).append("\" >").append(tok.nextToken()).append("</button>\n");
+        buf.append("</form>\n");
+        return buf.toString();
+    }
+
     private static boolean isShuttingDown(RouterContext ctx) {
         return Router.EXIT_GRACEFUL == ctx.router().scheduledGracefulExitCode();
     }

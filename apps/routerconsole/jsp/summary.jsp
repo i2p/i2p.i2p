@@ -7,6 +7,9 @@
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
 <jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
+<jsp:setProperty name="uhelper" property="*" />
+<jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
 <div class="routersummary">
  <u><b>General</b></u><br />
@@ -25,15 +28,15 @@
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            if (uri.indexOf('?') > 0)
-                uri = uri + "&updateNonce=" + nonce;
-            else
-                uri = uri + "?updateNonce=" + nonce;
-            out.print("<br /><a href=\"" + uri + "\">Update available</a>");
+            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<input type=\"hidden\" name=\"updateNonce\" value=\"" + nonce + "\" >\n");
+            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" ></form></p>\n");
         }
     }
  %>
- <br /><%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
+ <p>
+ <%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
+ </p>
  <hr />
  
  <u><b><a href="peers.jsp">Peers</a></b></u><br />
