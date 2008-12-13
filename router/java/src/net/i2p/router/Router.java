@@ -1078,7 +1078,7 @@ public class Router {
     /** 
      * What fraction of the bandwidth specified in our bandwidth limits should
      * we allow to be consumed by participating tunnels?
-     * @returns a number less than one, not a percentage!
+     * @return a number less than one, not a percentage!
      *
      */
     public double getSharePercentage() {
