@@ -12,6 +12,7 @@ package net.i2p.client;
 import java.util.Set;
 
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
@@ -126,4 +127,10 @@ public interface I2PSession {
      * Retrieve the signing SigningPrivateKey associated with the Destination
      */
     public SigningPrivateKey getPrivateKey();
+
+    /**
+     * Lookup up a Hash
+     *
+     */
+    public Destination lookupDest(Hash h) throws I2PSessionException;
 }

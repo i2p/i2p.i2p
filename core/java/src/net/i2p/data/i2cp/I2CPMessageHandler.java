@@ -81,6 +81,10 @@ public class I2CPMessageHandler {
             return new GetDateMessage();
         case SetDateMessage.MESSAGE_TYPE:
             return new SetDateMessage();
+        case DestLookupMessage.MESSAGE_TYPE:
+            return new DestLookupMessage();
+        case DestReplyMessage.MESSAGE_TYPE:
+            return new DestReplyMessage();
         default:
             throw new I2CPMessageException("The type " + type + " is an unknown I2CP message");
         }

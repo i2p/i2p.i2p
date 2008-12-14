@@ -26,6 +26,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
@@ -48,7 +49,7 @@ import net.i2p.util.SimpleTimer;
  * @author jrandom
  */
 abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
-    private Log _log;
+    protected Log _log;
     /** who we are */
     private Destination _myDestination;
     /** private key for decryption */
@@ -63,15 +64,15 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private LeaseSet _leaseSet;
 
     /** hostname of router */
-    private String _hostname;
+    protected String _hostname;
     /** port num to router */
-    private int _portNum;
+    protected int _portNum;
     /** socket for comm */
-    private Socket _socket;
+    protected Socket _socket;
     /** reader that always searches for messages */
-    private I2CPMessageReader _reader;
+    protected I2CPMessageReader _reader;
     /** where we pipe our messages */
-    private OutputStream _out;
+    protected OutputStream _out;
 
     /** who we send events to */
     private I2PSessionListener _sessionListener;
@@ -90,10 +91,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
-    private boolean _closed;
+    protected boolean _closed;
 
     /** whether the session connection is in the process of being closed */
-    private boolean _closing;
+    protected boolean _closing;
 
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
@@ -106,7 +107,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * reading of other messages (in turn, potentially leading to deadlock)
      *
      */
-    private AvailabilityNotifier _availabilityNotifier;
+    protected AvailabilityNotifier _availabilityNotifier;
 
     void dateUpdated() {
         _dateReceived = true;
@@ -117,6 +118,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     public static final int LISTEN_PORT = 7654;
     
+    /** for extension */
+    public I2PSessionImpl() {}
+
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
@@ -151,7 +155,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Parse the config for anything we know about
      *
      */
-    private void loadConfig(Properties options) {
+    protected void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
         _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
@@ -385,7 +389,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
 
-    private class AvailabilityNotifier implements Runnable {
+    protected class AvailabilityNotifier implements Runnable {
         private List _pendingIds;
         private List _pendingSizes;
         private boolean _alive;
@@ -566,7 +570,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
         _closing = true;   // we use this to prevent a race
-        if (sendDisconnect) {
+        if (sendDisconnect && _producer != null) {    // only null if overridden by I2PSimpleSession
             try {
                 _producer.disconnect(this);
             } catch (I2PSessionException ipe) {
@@ -659,4 +663,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
     
     protected String getPrefix() { return "[" + (_sessionId == null ? -1 : _sessionId.getSessionId()) + "]: "; }
+
+    public Destination lookupDest(Hash h) throws I2PSessionException {
+        return null;
+    }
 }

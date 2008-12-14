@@ -437,6 +437,19 @@ public class IndexBean {
         }
     }
     
+    public String getDestHashBase32(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            String rv = tun.getMyDestHashBase32();
+            if (rv != null)
+                return rv;
+            else
+                return "";
+        } else {
+            return "";
+        }
+    }
+    
     ///
     /// bean props for form submission
     ///

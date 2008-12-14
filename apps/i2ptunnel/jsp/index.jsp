@@ -180,13 +180,23 @@
         </div>
         <div class="targetField rowItem">
             <label>Points at:</label>
-            <span class="text"><%=indexBean.getServerTarget(curServer)%></span>
+            <span class="text">
+        <%
+            if ("httpserver".equals(indexBean.getInternalType(curServer))) {
+          %>
+            <a href="http://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTP server, bypassing I2P"><%=indexBean.getServerTarget(curServer)%></a>
+        <%
+            } else {
+          %><%=indexBean.getServerTarget(curServer)%>
+        <%
+            }
+          %></span>
         </div>
         <div class="previewField rowItem">
             <%
             if ("httpserver".equals(indexBean.getInternalType(curServer)) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label>Preview:</label>    
-            <a class="control" title="Preview this Tunnel" href="http://<%=(new java.util.Random()).nextLong()%>.i2p/?i2paddresshelper=<%=indexBean.getDestinationBase64(curServer)%>" target="_new">Preview</a>     
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.i2p">Preview</a>     
         <%
             } else {
           %><span class="comment">No Preview</span>

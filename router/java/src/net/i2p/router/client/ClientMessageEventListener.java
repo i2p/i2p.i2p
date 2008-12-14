@@ -11,6 +11,7 @@ package net.i2p.router.client;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;
+import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.I2CPMessage;
@@ -78,6 +79,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             case DestroySessionMessage.MESSAGE_TYPE:
                 handleDestroySession(reader, (DestroySessionMessage)message);
                 break;
+            case DestLookupMessage.MESSAGE_TYPE:
+                handleDestLookup(reader, (DestLookupMessage)message);
+                break;
             default:
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Unhandled I2CP type received: " + message.getType());
@@ -85,13 +89,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
 
     /**
-     * Handle notifiation that there was an error
+     * Handle notification that there was an error
      *
      */
     public void readError(I2CPMessageReader reader, Exception error) {
         if (_runner.isDead()) return;
         if (_log.shouldLog(Log.ERROR))
             _log.error("Error occurred", error);
+        // Is this is a little drastic for an unknown message type?
         _runner.stopRunning();
     }
     
@@ -226,6 +231,10 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
         _runner.leaseSetCreated(message.getLeaseSet());
+    }
+
+    private void handleDestLookup(I2CPMessageReader reader, DestLookupMessage message) {
+        _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash()));
     }
 
     // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME

@@ -31,7 +31,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 class I2PSessionImpl2 extends I2PSessionImpl {
-    private Log _log;
 
     /** set of MessageState objects, representing all of the messages in the process of being sent */
     private Set _sendingStates;
@@ -40,6 +39,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     /** should we gzip each payload prior to sending it? */
     private final static boolean SHOULD_COMPRESS = true;
     private final static boolean SHOULD_DECOMPRESS = true;
+
+    /** for extension */
+    public I2PSessionImpl2() {}
 
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
@@ -396,6 +398,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     private void clearStates() {
+        if (_sendingStates == null)    // only null if overridden by I2PSimpleSession
+            return;
         synchronized (_sendingStates) {
             for (Iterator iter = _sendingStates.iterator(); iter.hasNext();) {
                 MessageState state = (MessageState) iter.next();

@@ -16,7 +16,6 @@ import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
-import net.i2p.util.Log;
 
 /**
  * Contains a map of message handlers that a session will want to use
@@ -24,9 +23,11 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 class I2PClientMessageHandlerMap {
-    private final static Log _log = new Log(I2PClientMessageHandlerMap.class);
     /** map of message type id --> I2CPMessageHandler */
-    private I2CPMessageHandler _handlers[];
+    protected I2CPMessageHandler _handlers[];
+
+    /** for extension */
+    public I2PClientMessageHandlerMap() {}
 
     public I2PClientMessageHandlerMap(I2PAppContext context) {
         int highest = DisconnectMessage.MESSAGE_TYPE;

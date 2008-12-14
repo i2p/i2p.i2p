@@ -14,6 +14,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
+import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -356,6 +357,19 @@ public class TunnelController implements Logging {
                 Destination dest = session.getMyDestination();
                 if (dest != null)
                     return dest.toBase64();
+            }
+        }
+        return null;
+    }
+    
+    public String getMyDestHashBase32() {
+        if (_tunnel != null) {
+            List sessions = _tunnel.getSessions();
+            for (int i = 0; i < sessions.size(); i++) {
+                I2PSession session = (I2PSession)sessions.get(i);
+                Destination dest = session.getMyDestination();
+                if (dest != null)
+                    return Base32.encode(dest.calculateHash().getData());
             }
         }
         return null;

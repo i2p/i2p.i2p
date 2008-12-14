@@ -55,6 +55,8 @@ public class HostsTxtNamingService extends NamingService {
         return rv;
     }
     
+    private static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
+
     @Override
     public Destination lookup(String hostname) {
         Destination d = getCache(hostname);
@@ -67,6 +69,15 @@ public class HostsTxtNamingService extends NamingService {
             // What the heck, cache these too
             putCache(hostname, d);
             return d;
+        }
+
+        // Try Base32 decoding
+        if (hostname.length() == BASE32_HASH_LENGTH + 4 && hostname.endsWith(".i2p")) {
+            d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
+            if (d != null) {
+                putCache(hostname, d);
+                return d;
+            }
         }
 
         List filenames = getFilenames();
