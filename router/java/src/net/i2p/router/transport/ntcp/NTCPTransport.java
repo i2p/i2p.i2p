@@ -300,18 +300,13 @@ public class NTCPTransport extends TransportImpl {
         return _slowBid;
     }
     
-    private static final int DEFAULT_MAX_CONNECTIONS = 500;
     public boolean allowConnection() {
-        int max = DEFAULT_MAX_CONNECTIONS;
-        String mc = _context.getProperty("i2np.ntcp.maxConnections");
-        if (mc != null) {
-            try {
-                  max = Integer.parseInt(mc);
-            } catch (NumberFormatException nfe) {}
-        }
-        return countActivePeers() < max;
+        return countActivePeers() < getMaxConnections();
     }
 
+    public boolean haveCapacity() {
+        return countActivePeers() < getMaxConnections() * 4 / 5;
+    }
 
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
     /** async afterSend call, which can take some time w/ jobs, etc */
@@ -581,7 +576,10 @@ public class NTCPTransport extends TransportImpl {
         long totalRecv = 0;
         
         StringBuffer buf = new StringBuffer(512);
-        buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size()).append("</b><br />\n");
+        buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size());
+        buf.append(" limit: ").append(getMaxConnections());
+        buf.append(" timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
+        buf.append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
         buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td>");
         buf.append("     <td><b>dir</b></td>");

@@ -90,6 +90,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** list of RemoteHostId for peers whose packets we want to drop outright */
     private List _dropList;
     
+    private int _expireTimeout;
+
     private static final int DROPLIST_PERIOD = 10*60*1000;
     private static final int MAX_DROPLIST_SIZE = 256;
     
@@ -159,6 +161,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         _flooder = new UDPFlooder(_context, this);
+        _expireTimeout = EXPIRE_TIMEOUT;
         _expireEvent = new ExpirePeerEvent();
         _testEvent = new PeerTestEvent();
         _reachabilityStatus = CommSystemFacade.STATUS_UNKNOWN;
@@ -887,6 +890,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return null;
                 }
             }
+            if (!allowConnection())
+                return null;
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
@@ -922,6 +927,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // in the IntroductionManager a chance to work.
     public static final int EXPIRE_TIMEOUT = 30*60*1000;
     private static final int MAX_IDLE_TIME = EXPIRE_TIMEOUT;
+    private static final int MIN_EXPIRE_TIMEOUT = 10*60*1000;
     
     public String getStyle() { return STYLE; }
     public void send(OutNetMessage msg) { 
@@ -1262,6 +1268,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public boolean isEstablished(Hash dest) {
         return getPeerState(dest) != null;
+    }
+
+    public boolean allowConnection() {
+        synchronized (_peersByIdent) {
+            return _peersByIdent.size() < getMaxConnections();
+        }
+    }
+
+    public boolean haveCapacity() {
+        synchronized (_peersByIdent) {
+            return _peersByIdent.size() < getMaxConnections() * 4 / 5;
+        }
     }
 
     /**
@@ -1622,7 +1640,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int numPeers = 0;
         
         StringBuffer buf = new StringBuffer(512);
-        buf.append("<b id=\"udpcon\">UDP connections: ").append(peers.size()).append("</b><br />\n");
+        buf.append("<b id=\"udpcon\">UDP connections: ").append(peers.size());
+        buf.append(" limit: ").append(getMaxConnections());
+        buf.append(" timeout: ").append(DataHelper.formatDuration(_expireTimeout));
+        buf.append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
         buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b>");
         if (sortFlags == FLAG_ALPHA)
@@ -1951,12 +1972,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _expireBuffer = new ArrayList(128);
         }
         public void timeReached() {
-            long inactivityCutoff = _context.clock().now() - EXPIRE_TIMEOUT;
+            // Increase allowed idle time if we are well under allowed connections, otherwise decrease
+            if (haveCapacity())
+                _expireTimeout = Math.min(_expireTimeout + 15*1000, EXPIRE_TIMEOUT);
+            else
+                _expireTimeout = Math.max(_expireTimeout - 45*1000, MIN_EXPIRE_TIMEOUT);
+            long shortInactivityCutoff = _context.clock().now() - _expireTimeout;
+            long longInactivityCutoff = _context.clock().now() - EXPIRE_TIMEOUT;
+            long pingCutoff = _context.clock().now() - (2 * 60*60*1000);
             _expireBuffer.clear();
             synchronized (_expirePeers) {
                 int sz = _expirePeers.size();
                 for (int i = 0; i < sz; i++) {
                     PeerState peer = (PeerState)_expirePeers.get(i);
+                    long inactivityCutoff;
+                    // if we offered to introduce them, or we used them as introducer in last 2 hours
+                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff)
+                        inactivityCutoff = longInactivityCutoff;
+                    else
+                        inactivityCutoff = shortInactivityCutoff;
                     if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
                         _expireBuffer.add(peer);
                         _expirePeers.remove(i);

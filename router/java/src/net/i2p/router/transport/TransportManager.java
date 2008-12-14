@@ -152,6 +152,19 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
+      * Is at least one transport below its connection limit + some margin
+      * Use for throttling in the router.
+      * Perhaps we should just use SSU?
+      */
+    public boolean haveCapacity() { 
+        for (int i = 0; i < _transports.size(); i++) {
+            if (((Transport)_transports.get(i)).haveCapacity())
+                return true;
+        }
+        return false;
+    }
+    
+    /**
      * Return our peer clock skews on all transports.
      * Vector composed of Long, each element representing a peer skew in seconds.
      * Note: this method returns them in whimsical order.

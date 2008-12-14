@@ -271,6 +271,8 @@ public class EstablishmentManager {
                         _log.warn("Receive session request from blocklisted IP: " + from);
                     return; // drop the packet
                 }
+                if (!_transport.allowConnection())
+                    return; // drop the packet
                 state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
                 isNew = true;

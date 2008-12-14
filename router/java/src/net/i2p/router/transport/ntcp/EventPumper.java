@@ -39,6 +39,7 @@ public class EventPumper implements Runnable {
     private List _wantsRegister;
     private List _wantsConRegister;
     private NTCPTransport _transport;
+    private long _expireIdleWriteTime;
     
     private static final int BUF_SIZE = 8*1024;
     private static final int MAX_CACHE_SIZE = 64;
@@ -50,6 +51,8 @@ public class EventPumper implements Runnable {
      * the time to iterate across them to check a few flags shouldn't be a problem.
      */
     private static final long FAILSAFE_ITERATION_FREQ = 2*1000l;
+    private static final long MIN_EXPIRE_IDLE_TIME = 5*60*1000l;
+    private static final long MAX_EXPIRE_IDLE_TIME = 15*60*1000l;
     
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;
@@ -57,6 +60,7 @@ public class EventPumper implements Runnable {
         _transport = transport;
         _alive = false;
         _bufCache = new ArrayList(MAX_CACHE_SIZE);
+        _expireIdleWriteTime = MAX_EXPIRE_IDLE_TIME;
     }
     
     public void startPumping() {
@@ -135,8 +139,12 @@ public class EventPumper implements Runnable {
                         int failsafeWrites = 0;
                         int failsafeCloses = 0;
                         int failsafeInvalid = 0;
-                                                                // pointless if we do this every 2 seconds?
-                        long expireIdleWriteTime = 10*60*1000l; // + _context.random().nextLong(60*60*1000l);
+
+                        // Increase allowed idle time if we are well under allowed connections, otherwise decrease
+                        if (_transport.haveCapacity())
+                            _expireIdleWriteTime = Math.min(_expireIdleWriteTime + 1000, MAX_EXPIRE_IDLE_TIME);
+                        else
+                            _expireIdleWriteTime = Math.max(_expireIdleWriteTime - 3000, MIN_EXPIRE_IDLE_TIME);
                         for (Iterator iter = all.iterator(); iter.hasNext(); ) {
                             try {
                                 SelectionKey key = (SelectionKey)iter.next();
@@ -181,8 +189,8 @@ public class EventPumper implements Runnable {
                                     failsafeWrites++;
                                 }
                                 
-                                if ( con.getTimeSinceSend() > expireIdleWriteTime &&
-                                     con.getTimeSinceReceive() > expireIdleWriteTime) {
+                                if ( con.getTimeSinceSend() > _expireIdleWriteTime &&
+                                     con.getTimeSinceReceive() > _expireIdleWriteTime) {
                                     // we haven't sent or received anything in a really long time, so lets just close 'er up
                                     con.close();
                                     failsafeCloses++;
@@ -680,4 +688,5 @@ public class EventPumper implements Runnable {
     private void expireTimedOut() {
         _transport.expireTimedOut();
     }
+    public long getIdleTimeout() { return _expireIdleWriteTime; }
 }

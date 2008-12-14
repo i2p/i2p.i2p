@@ -31,7 +31,9 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -78,6 +80,33 @@ public abstract class TransportImpl implements Transport {
      * How many peers are we actively sending messages to (this minute)
      */
     public int countActiveSendPeers() { return 0; }
+
+    /** Default is 500 for floodfills... */
+    public static final int DEFAULT_MAX_CONNECTIONS = 500;
+    /** ...and 60/120/180/240/300 for BW Tiers K/L/M/N/O */
+    public static final int MAX_CONNECTION_FACTOR = 60;
+    /** Per-transport connection limit */
+    public int getMaxConnections() {
+        String style = getStyle();
+        if (style.equals("SSU"))
+            style = "udp";
+        else
+            style = style.toLowerCase();
+        int def = DEFAULT_MAX_CONNECTIONS;
+        RouterInfo ri = _context.router().getRouterInfo();
+        if (ri != null) {
+            char bw = ri.getBandwidthTier().charAt(0);
+            if (bw != 'U' &&
+                ! ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
+                def = MAX_CONNECTION_FACTOR * (1 + bw - Router.CAPABILITY_BW12);
+        }
+        return _context.getProperty("i2np." + style + ".maxConnections", def);
+    }
+
+    /**
+     * Can we initiate or accept a connection to another peer, saving some margin
+     */
+    public boolean haveCapacity() { return true; }
     
     /**
      * Return our peer clock skews on a transport.

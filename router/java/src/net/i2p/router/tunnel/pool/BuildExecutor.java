@@ -214,6 +214,9 @@ class BuildExecutor implements Runnable {
     }
 */
 
+    /** Set 1.5 * LOOP_TIME < BuildRequestor.REQUEST_TIMEOUT/4 - margin */
+    private static final int LOOP_TIME = 1000;
+
     public void run() {
         _isRunning = true;
         List wanted = new ArrayList(8);
@@ -316,7 +319,7 @@ class BuildExecutor implements Runnable {
                                     //if (_log.shouldLog(Log.DEBUG))
                                     //    _log.debug("Nothin' doin (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
                                     //if (allowed <= 0)
-                                        _currentlyBuilding.wait(2000 + _context.random().nextInt(2*1000));
+                                        _currentlyBuilding.wait((LOOP_TIME/2) + _context.random().nextInt(LOOP_TIME));
                                     //else // wanted <= 0
                                     //    _currentlyBuilding.wait(_context.random().nextInt(30*1000));
                                 }

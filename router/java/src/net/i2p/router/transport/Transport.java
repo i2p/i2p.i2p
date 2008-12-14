@@ -40,6 +40,7 @@ public interface Transport {
     
     public int countActivePeers();    
     public int countActiveSendPeers();
+    public boolean haveCapacity();
     public Vector getClockSkews();
     public List getMostRecentErrorMessages();
     
