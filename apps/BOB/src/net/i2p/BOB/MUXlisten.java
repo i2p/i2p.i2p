@@ -32,6 +32,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.util.Log;
+import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
  *
@@ -64,6 +65,7 @@ public class MUXlisten implements Runnable {
 	MUXlisten(NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
 		int port = 0;
 		InetAddress host = null;
+		this.tg = null;
 		this.database = database;
 		this.info = info;
 		this._log = _log;
@@ -207,23 +209,39 @@ die:                            {
 						break die;
 					}
 				} // die
+
 				// wait for child threads and thread groups to die
+				// System.out.println("MUXlisten: waiting for children");
 				while(tg.activeCount() + tg.activeGroupCount() != 0) {
+					tg.interrupt(); // unwedge any blocking threads.
 					try {
-						Thread.sleep(1000); //sleep for 1000 ms (One second)
+						Thread.sleep(100); //sleep for 100 ms (One tenth second)
 					} catch(InterruptedException ex) {
 						// nop
-						}
+					}
 				}
 				tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
 				tg = null;
 			} catch(Exception e) {
+				// System.out.println("MUXlisten: Caught an exception" + e);
 				break quit;
 			}
 		} // quit
-		socketManager.destroySocketManager();
-		// zero out everything, just incase.
+		// This is here to catch when something fucks up REALLY bad.
+		if(tg != null) {
+			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
+			System.out.println("BOB: MUXlisten: Please email the following dump to sponge@mail.i2p");
+			WrapperManager.requestThreadDump();
+			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
+			System.out.println("BOB: MUXlisten: Please email the avove dump to sponge@mail.i2p");
+		}
+			// zero out everything, just incase.
+		try {
+			socketManager.destroySocketManager();
+		} catch(Exception e) {
+			// nop
+		}
 		try {
 			wlock();
 			try {
@@ -236,7 +254,20 @@ die:                            {
 			}
 			wunlock();
 		} catch(Exception e) {
-			return;
+		}
+		// This is here to catch when something fucks up REALLY bad.
+		if(tg != null) {
+			while(tg.activeCount() + tg.activeGroupCount() != 0) {
+					tg.interrupt(); // unwedge any blocking threads.
+					try {
+						Thread.sleep(100); //sleep for 100 ms (One tenth second)
+					} catch(InterruptedException ex) {
+						// nop
+					}
+			}
+			tg.destroy();
+			// Zap reference to the ThreadGroup so the JVM can GC it.
+			tg = null;
 		}
 	}
 }

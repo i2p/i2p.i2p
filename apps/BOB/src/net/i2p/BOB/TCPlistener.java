@@ -76,7 +76,6 @@ public class TCPlistener implements Runnable {
 			tgwatch = 2;
 		}
 		try {
-//			System.out.println("Starting thread count " + Thread.activeCount());
 			Socket server = new Socket();
 			listener.setSoTimeout(1000);
 			info.releaseReadLock();
@@ -87,7 +86,6 @@ public class TCPlistener implements Runnable {
 				spin = info.get("RUNNING").equals(Boolean.TRUE);
 				info.releaseReadLock();
 				database.releaseReadLock();
-//				System.out.println("Thread count " + Thread.activeCount());
 				try {
 					server = listener.accept();
 					g = true;
@@ -102,8 +100,13 @@ public class TCPlistener implements Runnable {
 					g = false;
 				}
 			}
+			//System.out.println("TCPlistener: destroySession");
 			listener.close();
 		} catch(IOException ioe) {
+			try {
+				listener.close();
+			} catch(IOException e) {
+			}
 			// Fatal failure, cause a stop event
 			database.getReadLock();
 			info.getReadLock();
@@ -120,17 +123,6 @@ public class TCPlistener implements Runnable {
 			}
 		}
 
-//System.out.println("STOP!");
-
-		while(Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-//			System.out.println("STOP Thread count " + Thread.activeCount());
-			try {
-				Thread.sleep(1000); //sleep for 1000 ms (One second)
-			} catch(Exception e) {
-				// nop
-				}
-		}
-//		System.out.println("STOP Thread count " + Thread.activeCount());
 		// need to kill off the socket manager too.
 		I2PSession session = socketManager.getSession();
 		if(session != null) {
@@ -139,8 +131,16 @@ public class TCPlistener implements Runnable {
 			} catch(I2PSessionException ex) {
 				// nop
 			}
-//			System.out.println("destroySession Thread count " + Thread.activeCount());
 		}
+		//System.out.println("TCPlistener: Waiting for children");
+		while(Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
+			try {
+				Thread.sleep(100); //sleep for 100 ms (One tenth second)
+			} catch(Exception e) {
+				// nop
+				}
+		}
+		//System.out.println("TCPlistener: Done.");
 	}
 }
 

@@ -120,8 +120,18 @@ public class BOB {
 	 *
 	 * @param arg
 	 */
+	public static void info(String arg) {
+		System.out.println("INFO:" + arg);
+		_log.info(arg);
+	}
+
+	/**
+	 * Log a warning
+	 *
+	 * @param arg
+	 */
 	public static void warn(String arg) {
-		System.out.println(arg);
+		System.out.println("WARNING:" + arg);
 		_log.warn(arg);
 	}
 
@@ -131,7 +141,7 @@ public class BOB {
 	 * @param arg
 	 */
 	public static void error(String arg) {
-		System.out.println(arg);
+		System.out.println("ERROR: " + arg);
 		_log.error(arg);
 	}
 
@@ -202,12 +212,12 @@ public class BOB {
 				props.store(fo, configLocation);
 				fo.close();
 			} catch(IOException ioe) {
-				warn("IOException on BOB config file " + configLocation + ", " + ioe);
+				error("IOException on BOB config file " + configLocation + ", " + ioe);
 			}
 		}
 
 		try {
-			warn("BOB is now running.");
+			info("BOB is now running.");
 			ServerSocket listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
 			Socket server;
 
@@ -220,7 +230,7 @@ public class BOB {
 				t.start();
 			}
 		} catch(IOException ioe) {
-			warn("IOException on socket listen: " + ioe);
+			error("IOException on socket listen: " + ioe);
 			ioe.printStackTrace();
 		}
 	}
