@@ -1,3 +1,31 @@
+2008-12-14 zzz
+    * Contexts: Add int getProperty(String prop, int default)
+    * I2PAppThread: Constructor fix
+    * More split classes into their own files for mkvore
+    * Streaming: Don't build test cases by default
+    * Summary bar: Replace links with buttons
+    * Transport:
+      - Cleanup max connections code
+      - Add i2np.udp.maxConnections
+      - Set max connections based on share bandwidth
+      - Add haveCapacity() that can be used for connection
+        throttling in the router
+      - Reject IBGW/OBEP requests when near connection limit
+      - Reduce idle timeout when near connection limit
+    * Tunnel request handler:
+      - Require tunnel.dropLoad* stats
+      - Speed up request loop
+    * I2CP, HostsTxtNamingService, I2PTunnel:
+      Implement Base32 Hash hostnames, via the naming service.
+      Names are of the form [52-characters].i2p, where
+      the 52 characters are the Base32 representation of our
+      256-byte hash. The client requests a lookup of the hash
+      via a brief I2CP session using new I2CP request/reply
+      messages. The router looks up the leaseset for the hash
+      to convert the hash to a dest. Convert the I2PTunnel
+      'preview' links to use Base32 hostnames as a
+      demonstration.
+
 2008-12-08 zzz
     * ATalk: Move from core to apps
     * Blocklists: enable by default, include blocklist file
