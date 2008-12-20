@@ -144,7 +144,7 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 ra = _context.router().getRouterInfo().getTargetAddress("UDP");
-                if (ra == null) {
+                if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
                         return "ERR-UDP Disabled and Inbound TCP host/port not set";
