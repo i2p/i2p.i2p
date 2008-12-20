@@ -1215,6 +1215,8 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        long max = Runtime.getRuntime().maxMemory() / (1024*1024);
+        ctx.statManager().createRateStat("router.memoryUsed", "(Bytes) Max is " + max + "MB", "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
     public void timeReached() {
@@ -1233,6 +1235,9 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps(), 0);
         getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps(), 0);
         
+        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        getContext().statManager().addRateData("router.memoryUsed", used, 0);
+
         getContext().tunnelDispatcher().updateParticipatingStats();
 
         getContext().statManager().coalesceStats();
