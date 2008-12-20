@@ -211,6 +211,7 @@ public class I2PSnarkUtil {
                 out.delete();
             return null;
         }
+        out.deleteOnExit();
         String fetchURL = url;
         if (rewrite)
             fetchURL = rewriteAnnounce(url);

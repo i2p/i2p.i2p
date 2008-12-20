@@ -346,7 +346,6 @@ public class TrackerClient extends I2PAppThread
     if (fetched == null) {
         throw new IOException("Error fetching " + s);
     }
-    fetched.deleteOnExit();
     
     InputStream in = null;
     try {
