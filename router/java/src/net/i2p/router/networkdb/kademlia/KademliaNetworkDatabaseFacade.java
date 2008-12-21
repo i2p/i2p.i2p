@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -121,6 +122,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * know anyone or just started up) 
      */
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
 
@@ -721,6 +723,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else if ( (_context.router().getUptime() > 60*60*1000) && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
             long age = _context.clock().now() - routerInfo.getPublished();
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
+        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT) && (_context.router().getUptime() > 60*60*1000) ) {
+            if (routerInfo.getAddresses().size() <= 0)
+                return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
+            RouterAddress ra = routerInfo.getTargetAddress("SSU");
+            if (ra != null) {
+                // Introducers change often, introducee will ping introducer for 2 hours
+                Properties props = ra.getOptions();
+                if (props != null && props.getProperty("ihost0") != null)
+                    return "Peer " + key.toBase64() + " published > 90m ago with SSU Introducers";
+            }
         }
         return null;
     }
