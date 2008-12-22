@@ -234,7 +234,7 @@ die:                            {
 			System.out.println("BOB: MUXlisten: Please email the following dump to sponge@mail.i2p");
 			WrapperManager.requestThreadDump();
 			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
-			System.out.println("BOB: MUXlisten: Please email the avove dump to sponge@mail.i2p");
+			System.out.println("BOB: MUXlisten: Please email the above dump to sponge@mail.i2p");
 		}
 			// zero out everything, just incase.
 		try {
