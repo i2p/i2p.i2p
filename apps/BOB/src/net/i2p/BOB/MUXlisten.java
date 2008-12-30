@@ -74,7 +74,10 @@ public class MUXlisten implements Runnable {
 		this.info.getReadLock();
 		N = this.info.get("NICKNAME").toString();
 		prikey = new ByteArrayInputStream((byte[])info.get("KEYS"));
-		Properties Q = (Properties)info.get("PROPERTIES");
+		// Make a new copy so that anything else won't muck with our database.
+		Properties R = (Properties)info.get("PROPERTIES");
+		Properties Q = new Properties();
+		Lifted.copyProperties(R, Q);
 		this.database.releaseReadLock();
 		this.info.releaseReadLock();
 

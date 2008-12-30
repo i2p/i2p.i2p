@@ -114,6 +114,8 @@ public class BOB {
 	public final static String PROP_BOB_HOST = "BOB.host";
 	private static int maxConnections = 0;
 	private static NamedDB database;
+	private static Properties props = new Properties();
+
 
 	/**
 	 * Log a warning
@@ -157,7 +159,6 @@ public class BOB {
 		// Set up all defaults to be passed forward to other threads.
 		// Re-reading the config file in each thread is pretty damn stupid.
 		// I2PClient client = I2PClientFactory.createClient();
-		Properties props = new Properties();
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
 
 		// This is here just to ensure there is no interference with our threadgroups.
@@ -217,6 +218,7 @@ public class BOB {
 		}
 
 		try {
+			info(props.toString());
 			info("BOB is now running.");
 			ServerSocket listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
 			Socket server;
