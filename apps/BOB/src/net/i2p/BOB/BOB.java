@@ -218,7 +218,6 @@ public class BOB {
 		}
 
 		try {
-			info(props.toString());
 			info("BOB is now running.");
 			ServerSocket listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
 			Socket server;
