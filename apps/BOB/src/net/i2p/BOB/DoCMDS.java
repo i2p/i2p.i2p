@@ -46,7 +46,7 @@ public class DoCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "02",  BEXT = "";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "03",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
