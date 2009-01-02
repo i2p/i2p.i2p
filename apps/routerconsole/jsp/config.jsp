@@ -103,6 +103,8 @@
     substantially.  When in doubt, leave the hostname and port number blank.</p>
  <p><b>Note: changing any of these settings will terminate all of your connections and effectively
     restart your router.</b>
+ </p>
+ <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
  <b><a name="help">Reachability Help:</a></b>
  <p>
@@ -171,7 +173,6 @@
  </p>
  <hr />
 -->
- <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  </form>
 </div>
 
