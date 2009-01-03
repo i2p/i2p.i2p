@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -378,7 +379,8 @@ public class I2PSnarkServlet extends HttpServlet {
     
     private List getSortedSnarks(HttpServletRequest req) {
         Set files = _manager.listTorrentFiles();
-        TreeSet fileNames = new TreeSet(files); // sorts it alphabetically
+        TreeSet fileNames = new TreeSet(Collator.getInstance()); // sorts it alphabetically
+        fileNames.addAll(files);
         ArrayList rv = new ArrayList(fileNames.size());
         for (Iterator iter = fileNames.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
