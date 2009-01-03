@@ -114,6 +114,18 @@ public class BOB {
 	public final static String PROP_BOB_HOST = "BOB.host";
 	private static int maxConnections = 0;
 	private static NamedDB database;
+	private static Properties props = new Properties();
+
+
+	/**
+	 * Log a warning
+	 *
+	 * @param arg
+	 */
+	public static void info(String arg) {
+		System.out.println("INFO:" + arg);
+		_log.info(arg);
+	}
 
 	/**
 	 * Log a warning
@@ -121,7 +133,7 @@ public class BOB {
 	 * @param arg
 	 */
 	public static void warn(String arg) {
-		System.out.println(arg);
+		System.out.println("WARNING:" + arg);
 		_log.warn(arg);
 	}
 
@@ -131,7 +143,7 @@ public class BOB {
 	 * @param arg
 	 */
 	public static void error(String arg) {
-		System.out.println(arg);
+		System.out.println("ERROR: " + arg);
 		_log.error(arg);
 	}
 
@@ -147,7 +159,6 @@ public class BOB {
 		// Set up all defaults to be passed forward to other threads.
 		// Re-reading the config file in each thread is pretty damn stupid.
 		// I2PClient client = I2PClientFactory.createClient();
-		Properties props = new Properties();
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
 
 		// This is here just to ensure there is no interference with our threadgroups.
@@ -202,12 +213,12 @@ public class BOB {
 				props.store(fo, configLocation);
 				fo.close();
 			} catch(IOException ioe) {
-				warn("IOException on BOB config file " + configLocation + ", " + ioe);
+				error("IOException on BOB config file " + configLocation + ", " + ioe);
 			}
 		}
 
 		try {
-			warn("BOB is now running.");
+			info("BOB is now running.");
 			ServerSocket listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
 			Socket server;
 
@@ -220,7 +231,7 @@ public class BOB {
 				t.start();
 			}
 		} catch(IOException ioe) {
-			warn("IOException on socket listen: " + ioe);
+			error("IOException on socket listen: " + ioe);
 			ioe.printStackTrace();
 		}
 	}
