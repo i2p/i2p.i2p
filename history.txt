@@ -1,3 +1,24 @@
+2009-01-03 zzz
+    * config.jsp: Move the buttons up
+    * configservice.jsp: Clean up and fix the broken (?)
+      browser launch configuration
+    * i2psnark:
+      - Try again to remove the i2psnarkurl files on shutdown
+      - Sort torrents with a locale-based sort
+    * NetDb:
+      - Expire routers with introducers after 90m.
+        This should improve reachability to firewalled routers
+        by keeping introducer info current.
+      - Expire routers with no addresses after 90m.
+      - Convert to java concurrent
+    * Stats: Add router.memoryUsed, graph by default
+    * Summary bar: Remove spurious UDP warning on startup
+    * UpdateHandler: Make extensible for upcoming
+      torrent updater
+
+2008-12-15 zzz
+    * Remove apps/ bogobot jdom pants q rome stasher syndie
+
 2008-12-14 zzz
     * Contexts: Add int getProperty(String prop, int default)
     * I2PAppThread: Constructor fix
