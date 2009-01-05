@@ -179,6 +179,8 @@ public class AddressBook {
                 // IDN - basic check, not complete validation
                 (host.indexOf("--") < 0 || host.startsWith("xn--") || host.indexOf(".xn--") > 0) &&
                 host.replaceAll("[a-z0-9.-]", "").length() == 0 &&
+                // Base32 spoofing (52chars.i2p)
+                (! (host.length() == 56 && host.substring(0,52).replaceAll("[a-z2-7]", "").length() == 0)) &&
                 // some reserved names that may be used for local configuration someday
                 (! host.equals("proxy.i2p")) &&
                 (! host.equals("router.i2p")) &&
