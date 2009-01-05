@@ -577,7 +577,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Azureus";
                 else if ("CwsL".equals(ch))
                     client = "I2PSnarkXL";
-                else if ("AUZV".equals(ch))
+                else if ("AUZV".equals(ch) || "AkZV".equals(ch))
                     client = "Robert";
                 else
                     client = "Unknown";
