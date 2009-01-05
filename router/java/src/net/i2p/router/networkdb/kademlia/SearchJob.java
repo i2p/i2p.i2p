@@ -124,6 +124,14 @@ class SearchJob extends JobImpl {
     static boolean onlyQueryFloodfillPeers(RouterContext ctx) {
         if (isCongested(ctx))
             return true;
+        // If we are floodfill, we want the FloodfillPeerSelector (in add()) to include
+        // non-ff peers (if required) in DatabaseSearchReplyMessage responses
+        // so that Exploration works.
+        // ExploreJob is disabled if we are floodfill.
+        // The other two places this was called (one below and one in FNDF)
+        // have been commented out.
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(ctx))
+            return false;
         return Boolean.valueOf(ctx.getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY + "")).booleanValue();
     }
     
@@ -136,6 +144,7 @@ class SearchJob extends JobImpl {
     }
     
     static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
+    static final long MIN_TIMEOUT = 2500;
     
     protected int getPerPeerTimeoutMs(Hash peer) {
         int timeout = 0;
@@ -146,7 +155,7 @@ class SearchJob extends JobImpl {
         long now = getContext().clock().now();
         
         if (now + timeout > _expiration)
-            return (int)(_expiration - now);
+            return (int) Math.max(_expiration - now, MIN_TIMEOUT);
         else
             return timeout;
     }
@@ -247,7 +256,8 @@ class SearchJob extends JobImpl {
         int sent = 0;
         Set attempted = _state.getAttempted();
         while (sent <= 0) {
-            boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
+            //boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
+            boolean onlyFloodfill = true;
             if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().size() <= 0) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": no non-floodfill peers left, and no more pending.  Searched: "
@@ -421,7 +431,7 @@ class SearchJob extends JobImpl {
 
 	
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Sending leaseSet search to " + router.getIdentity().getHash().toBase64() 
+            _log.debug(getJobId() + ": Sending search to " + router.getIdentity().getHash().toBase64() 
                        + " for " + msg.getSearchKey().toBase64() + " w/ replies through [" 
                        + msg.getFrom().toBase64() + "] via tunnel [" 
                        + msg.getReplyTunnel() + "]");

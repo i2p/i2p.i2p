@@ -28,7 +28,7 @@ class StartExplorersJob extends JobImpl {
     
     /** don't explore more than 1 bucket at a time */
     private static final int MAX_PER_RUN = 1;
-    /** dont explore the network more often than once every minute */
+    /** dont explore the network more often than this */
     private static final int MIN_RERUN_DELAY_MS = 5*60*1000;
     /** explore the network at least once every thirty minutes */
     private static final int MAX_RERUN_DELAY_MS = 30*60*1000;
@@ -41,14 +41,15 @@ class StartExplorersJob extends JobImpl {
     
     public String getName() { return "Start Explorers Job"; }
     public void runJob() {
-        Set toExplore = selectKeysToExplore();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Keys to explore during this run: " + toExplore);
-        _facade.removeFromExploreKeys(toExplore);
-        for (Iterator iter = toExplore.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            //_log.info("Starting explorer for " + key, new Exception("Exploring!"));
-            getContext().jobQueue().addJob(new ExploreJob(getContext(), _facade, key));
+        if (! ((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled()) {
+            Set toExplore = selectKeysToExplore();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Keys to explore during this run: " + toExplore);
+            _facade.removeFromExploreKeys(toExplore);
+            for (Iterator iter = toExplore.iterator(); iter.hasNext(); ) {
+                Hash key = (Hash)iter.next();
+                getContext().jobQueue().addJob(new ExploreJob(getContext(), _facade, key));
+            }
         }
         long delay = getNextRunDelay();
         if (_log.shouldLog(Log.DEBUG))

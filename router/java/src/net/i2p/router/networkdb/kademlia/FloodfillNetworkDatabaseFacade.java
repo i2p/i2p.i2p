@@ -174,11 +174,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         synchronized (_activeFloodQueries) {
             searchJob = (FloodSearchJob)_activeFloodQueries.get(key);
             if (searchJob == null) {
-                if (SearchJob.onlyQueryFloodfillPeers(_context)) {
+                //if (SearchJob.onlyQueryFloodfillPeers(_context)) {
                     searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
-                } else {
-                    searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
-                }
+                //} else {
+                //    searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                //}
                 _activeFloodQueries.put(key, searchJob);
                 isNew = true;
             }
