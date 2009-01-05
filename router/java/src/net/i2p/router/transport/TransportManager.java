@@ -301,7 +301,10 @@ public class TransportManager implements TransportEventListener {
             // to us via TCP, send via TCP)
             TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
             if (bid != null) {
-                if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
+                if (bid.getLatencyMs() == bid.TRANSIENT_FAIL)
+                    // this keeps GetBids() from shitlisting for "no common transports"
+                    msg.transportFailed(t.getStyle());
+                else if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
                     rv = bid;    
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " bid: " + bid + " currently winning? " + (rv == bid) 

@@ -36,6 +36,7 @@ public class NTCPTransport extends TransportImpl {
     private Log _log;
     private SharedBid _fastBid;
     private SharedBid _slowBid;
+    private SharedBid _transientFail;
     private Object _conLock;
     private Map _conByIdent;
     private NTCPAddress _myAddress;
@@ -131,6 +132,7 @@ public class NTCPTransport extends TransportImpl {
         
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
+        _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
     }
     
     void inboundEstablished(NTCPConnection con) {
@@ -289,7 +291,7 @@ public class NTCPTransport extends TransportImpl {
         if (!allowConnection()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + ", max connection limit reached");
-            return null;
+            return _transientFail;
         }
 
         //if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 

@@ -86,6 +86,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private TransportBid _fastPreferredBid;
     /** shared slow bid for unconnected peers when we want to always prefer UDP */
     private TransportBid _slowPreferredBid;
+    private TransportBid _transientFail;
     
     /** list of RemoteHostId for peers whose packets we want to drop outright */
     private List _dropList;
@@ -157,6 +158,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _fastPreferredBid = new SharedBid(15);
         _slowPreferredBid = new SharedBid(20);
         _slowestBid = new SharedBid(1000);
+        _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
         
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
@@ -891,7 +893,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
             if (!allowConnection())
-                return null;
+                return _transientFail;
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
