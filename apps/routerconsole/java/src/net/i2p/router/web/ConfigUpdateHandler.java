@@ -104,6 +104,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_updateURL != null) && (_updateURL.length() > 0) ) {
+            _updateURL = _updateURL.replaceAll("\r\n", ",").replaceAll("\n", ",");
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_URL, _updateURL);
