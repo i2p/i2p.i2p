@@ -151,7 +151,7 @@ public class ConfigTunnelsHelper {
         buf.append("</select></td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".backupOutbound\">\n");
-        now = in.getBackupQuantity();
+        now = out.getBackupQuantity();
         renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
