@@ -181,6 +181,9 @@ public class AddressBook {
                 host.replaceAll("[a-z0-9.-]", "").length() == 0 &&
                 // Base32 spoofing (52chars.i2p)
                 (! (host.length() == 56 && host.substring(0,52).replaceAll("[a-z2-7]", "").length() == 0)) &&
+                // ... or maybe we do Base32 this way ...
+                (! host.equals("b32.i2p")) &&
+                (! host.endsWith(".b32.i2p")) &&
                 // some reserved names that may be used for local configuration someday
                 (! host.equals("proxy.i2p")) &&
                 (! host.equals("router.i2p")) &&
