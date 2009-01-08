@@ -990,10 +990,10 @@ public class Connection {
     
     /**
      * If we have been explicitly NACKed three times, retransmit the packet even if
-     * there are other packets in flight.
+     * there are other packets in flight. 3 takes forever, let's try 2.
      *
      */
-    static final int FAST_RETRANSMIT_THRESHOLD = 3;
+    static final int FAST_RETRANSMIT_THRESHOLD = 2;
     
     /**
      * Coordinate the resends of a given packet
