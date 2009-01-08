@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -121,20 +122,23 @@ class SearchJob extends JobImpl {
     
     private static final boolean DEFAULT_FLOODFILL_ONLY = true;
     
+    /** this is now misnamed, as it is only used to determine whether to return floodfill peers only */
     static boolean onlyQueryFloodfillPeers(RouterContext ctx) {
-        if (isCongested(ctx))
-            return true;
+        //if (isCongested(ctx))
+        //    return true;
         // If we are floodfill, we want the FloodfillPeerSelector (in add()) to include
         // non-ff peers (if required) in DatabaseSearchReplyMessage responses
         // so that Exploration works.
         // ExploreJob is disabled if we are floodfill.
         // The other two places this was called (one below and one in FNDF)
         // have been commented out.
+        // Returning false essentially enables kademlia as a backup to floodfill for search responses.
         if (FloodfillNetworkDatabaseFacade.floodfillEnabled(ctx))
             return false;
         return Boolean.valueOf(ctx.getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY + "")).booleanValue();
     }
     
+/***
     static boolean isCongested(RouterContext ctx) {
         float availableSend = ctx.bandwidthLimiter().getOutboundKBytesPerSecond()*1024 - ctx.bandwidthLimiter().getSendBps();
         float availableRecv = ctx.bandwidthLimiter().getInboundKBytesPerSecond()*1024 - ctx.bandwidthLimiter().getReceiveBps();
@@ -142,6 +146,7 @@ class SearchJob extends JobImpl {
         // in that range without a problem
         return ( (availableSend < 6*1024) || (availableRecv < 6*1024) );
     }
+***/
     
     static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
     static final long MIN_TIMEOUT = 2500;
@@ -782,6 +787,18 @@ class SearchJob extends JobImpl {
     
     boolean wasAttempted(Hash peer) { return _state.wasAttempted(peer); }
     long timeoutMs() { return _timeoutMs; }
-    boolean add(Hash peer) { return _facade.getKBuckets().add(peer); }
+
+    /** @return true if peer was new */
+    boolean add(Hash peer) {
+        boolean rv = _facade.getKBuckets().add(peer);
+        if (rv) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getJobId() + ": Queueing up for next time: " + peer);
+            Set s = new HashSet(1);
+            s.add(peer);
+            _facade.queueForExploration(s);
+        }
+        return rv;
+    }
     void decrementOutstandingFloodfillSearches() { _floodfillSearchesOutstanding--; }
 }

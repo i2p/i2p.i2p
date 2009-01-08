@@ -78,6 +78,7 @@ class FloodfillPeerSelector extends PeerSelector {
             _wanted = wanted;
         }
         public List getFloodfillParticipants() { return _floodfillMatches; }
+        private static final int EXTRA_MATCHES = 100;
         public void add(Hash entry) {
             //if (_context.profileOrganizer().isFailing(entry))
             //    return;
@@ -98,7 +99,11 @@ class FloodfillPeerSelector extends PeerSelector {
             if (info != null && FloodfillNetworkDatabaseFacade.isFloodfill(info)) {
                 _floodfillMatches.add(entry);
             } else {
-                if ( (!SearchJob.onlyQueryFloodfillPeers(_context)) && (_wanted > _matches) && (_key != null) ) {
+                // This didn't really work because we stopped filling up when _wanted == _matches,
+                // thus we don't add and sort the whole db to find the closest.
+                // So we keep going for a while. This, together with periodically shuffling the
+                // KBucket (see KBucketImpl.add()) makes exploration work well.
+                if ( (!SearchJob.onlyQueryFloodfillPeers(_context)) && (_wanted + EXTRA_MATCHES > _matches) && (_key != null) ) {
                     BigInteger diff = getDistance(_key, entry);
                     _sorted.put(diff, entry);
                 } else {

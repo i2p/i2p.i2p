@@ -20,6 +20,7 @@ import net.i2p.util.Log;
 /**
  * Fire off search jobs for random keys from the explore pool, up to MAX_PER_RUN
  * at a time.
+ * If the explore pool is empty, just search for a random key.
  *
  */
 class StartExplorersJob extends JobImpl {
@@ -82,17 +83,23 @@ class StartExplorersJob extends JobImpl {
     /**
      * Run through the explore pool and pick out some values
      *
+     * Nope, ExploreKeySelectorJob is disabled, so the explore pool
+     * may be empty. In that case, generate random keys.
      */
     private Set selectKeysToExplore() {
         Set queued = _facade.getExploreKeys();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Keys waiting for exploration: " + queued.size());
-        if (queued.size() <= MAX_PER_RUN)
-            return queued;
         Set rv = new HashSet(MAX_PER_RUN);
         for (Iterator iter = queued.iterator(); iter.hasNext(); ) {
             if (rv.size() >= MAX_PER_RUN) break;
             rv.add(iter.next());
+        }
+        for (int i = rv.size(); i < MAX_PER_RUN; i++) {
+            byte hash[] = new byte[Hash.HASH_LENGTH];
+            getContext().random().nextBytes(hash);
+            Hash key = new Hash(hash);
+            rv.add(key);
         }
         return rv;
     }

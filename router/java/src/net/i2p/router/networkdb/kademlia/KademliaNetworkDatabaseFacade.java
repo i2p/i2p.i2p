@@ -298,9 +298,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         
         if (!_quiet) {
             // fill the passive queue periodically
+            // Is this pointless too???
             _context.jobQueue().addJob(new DataRepublishingSelectorJob(_context, this));
             // fill the search queue with random keys in buckets that are too small
-            _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
+            // Disabled since KBucketImpl.generateRandomKey() is b0rked,
+            // and anyway, we want to search for a completely random key,
+            // not a random key for a particular kbucket.
+            // _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
             if (_exploreJob == null)
                 _exploreJob = new StartExplorersJob(_context, this);
             // fire off a group of searches from the explore pool

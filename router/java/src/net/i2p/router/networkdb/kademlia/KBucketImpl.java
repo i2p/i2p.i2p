@@ -10,6 +10,7 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 
@@ -31,12 +33,16 @@ class KBucketImpl implements KBucket {
     private int _begin;
     /** include if no bits higher than this bit (inclusive) are set */
     private int _end;
+    /** when did we last shake things up */
+    private long _lastShuffle;
+    private static final int SHUFFLE_DELAY = 10*60*1000;
     private I2PAppContext _context;
     
     public KBucketImpl(I2PAppContext context, Hash local) {
         _context = context;
         _log = context.logManager().getLog(KBucketImpl.class);
         _entries = new ArrayList(64); //new HashSet();
+        _lastShuffle = context.clock().now();
         setLocal(local);
     }
     
@@ -232,6 +238,13 @@ class KBucketImpl implements KBucket {
         synchronized (_entries) {
             if (!_entries.contains(peer))
                 _entries.add(peer);
+            // Randomize the bucket every once in a while if we are floodfill, so that
+            // exploration will return better results. See FloodfillPeerSelector.add(Hash).
+            if (_lastShuffle + SHUFFLE_DELAY < _context.clock().now() &&
+                !SearchJob.onlyQueryFloodfillPeers((RouterContext)_context)) {
+                Collections.shuffle(_entries, _context.random());
+                _lastShuffle = _context.clock().now();
+            }
             return _entries.size();
         }
     }
@@ -245,6 +258,9 @@ class KBucketImpl implements KBucket {
     /**
      * Generate a random key to go within this bucket
      *
+     * WARNING - Something is seriously broken here. testRand2() fails right away.
+     * ExploreKeySelectorJob is now disabled, ExploreJob just searches for a random
+     * key instead.
      */
     public Hash generateRandomKey() {
         BigInteger variance = new BigInteger((_end-_begin)-1, _context.random());
@@ -336,6 +352,7 @@ class KBucketImpl implements KBucket {
     /**
      * Test harness to make sure its assigning keys to the right buckets
      *
+     * WARNING - Something is seriously broken here. testRand2() fails right away.
      */
     public static void main(String args[]) {
         testRand2();

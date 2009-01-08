@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -32,11 +33,14 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public static final char CAPACITY_FLOODFILL = 'f';
     private Map _activeFloodQueries;
     private boolean _floodfillEnabled;
+    /** for testing, see isFloodfill() below */
+    private static String _alwaysQuery;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
          _floodfillEnabled = false;
+        _alwaysQuery = _context.getProperty("netDb.alwaysQuery");
 
         _context.statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -137,6 +141,19 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     
     public static boolean isFloodfill(RouterInfo peer) {
         if (peer == null) return false;
+        // For testing or local networks... we will
+        // pretend that the specified router is floodfill.
+        // Must be set at startup since it's static.
+        // In that router, set netDb.floodfillOnly=false.
+        // Warning - experts only!
+        if (_alwaysQuery != null) {
+            Hash aq = new Hash();
+            try {
+                aq.fromBase64(_alwaysQuery);
+                if (aq.equals(peer.getIdentity().getHash()))
+                    return true;
+            } catch (DataFormatException dfe) {}
+        }
         String caps = peer.getCapabilities();
         if ( (caps != null) && (caps.indexOf(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL) != -1) )
             return true;
