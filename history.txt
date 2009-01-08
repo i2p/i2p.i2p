@@ -1,3 +1,34 @@
+2009-01-08 zzz
+    * addressbook: Prevent Base32 hostnames
+    * build.xml: Remove readme_xx.html from updater
+    * configtunnels.jsp: Fix display of outbound backup count
+    * configupdate.jsp: Fix corruption of update URLs
+    * i2psnark: Recognize Robert 0.3 and 4
+    * ExploreJob/SearchJob - fix brokenness:
+      - Give each search a minimum of time even at the end
+      - Fix ExploreJob exclude peer list
+      - Always add floodfills to exclude peer list
+      - Don't queue keys for exploration or run ExploreJob
+        if floodfill
+      - Allow floodfills to return non-floodfills in
+        a DSRM msg so exploration works
+    * ExploreJob/SearchJob - more fixes:
+      - Disable ExploreKeySelectorJob completely, just have
+        StartExplorersJob select a random key if queue is empty
+      - Add netDb.alwaysQuery=[B64Hash] for debugging
+      - Queue results of exploration for more exploration
+      - Floodfills periodically shuffle their KBuckets, and
+        FloodfillPeerSelector sorts more keys, so that
+        exploration works well
+    * Shitlist: Reduce max time to 30m (was 60m)
+    * Streaming:
+      - Reduce default initial window size from 12 to 6,
+         to account for the MTU increase in the last release
+         and try to limit initial packet loss
+      - Reduce fast retransmit threshold from 3 to 2
+    * Transport: Don't shitlist a peer if we are at our
+      connection limit
+
 2009-01-03 zzz
     * config.jsp: Move the buttons up
     * configservice.jsp: Clean up and fix the broken (?)
