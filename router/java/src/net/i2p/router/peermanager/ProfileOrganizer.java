@@ -1101,22 +1101,7 @@ public class ProfileOrganizer {
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumFastPeers() {
-        String val = _context.getProperty(PROP_MINIMUM_FAST_PEERS, ""+DEFAULT_MINIMUM_FAST_PEERS);
-        if (val != null) {
-            try {
-                int rv = Integer.parseInt(val);
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("router context said " + PROP_MINIMUM_FAST_PEERS + '=' + val);
-                return rv;
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Minimum fast peers improperly set in the router environment [" + val + "]", nfe);
-            }
-        }
-        
-        if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug("no config for " + PROP_MINIMUM_FAST_PEERS + ", using " + DEFAULT_MINIMUM_FAST_PEERS);
-        return DEFAULT_MINIMUM_FAST_PEERS;
+        return _context.getProperty(PROP_MINIMUM_FAST_PEERS, DEFAULT_MINIMUM_FAST_PEERS);
     }
     
     
@@ -1130,22 +1115,7 @@ public class ProfileOrganizer {
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumHighCapacityPeers() {
-        String val = _context.getProperty(PROP_MINIMUM_HIGH_CAPACITY_PEERS, ""+DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS);
-        if (val != null) {
-            try {
-                int rv = Integer.parseInt(val);
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("router context said " + PROP_MINIMUM_HIGH_CAPACITY_PEERS + '=' + val);
-                return rv;
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Minimum high capacity peers improperly set in the router environment [" + val + "]", nfe);
-            }
-        }
-        
-        if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug("no config for " + PROP_MINIMUM_HIGH_CAPACITY_PEERS + ", using " + DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS);
-        return DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS;
+        return _context.getProperty(PROP_MINIMUM_HIGH_CAPACITY_PEERS, DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS);
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
