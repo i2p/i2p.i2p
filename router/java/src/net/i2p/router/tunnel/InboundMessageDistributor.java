@@ -78,6 +78,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                     _log.info("distributing inbound tunnel message into our inNetMessagePool: " + msg);
                 _context.inNetMessagePool().add(msg, null, null);
             }
+/****** latency measuring attack?
         } else if (_context.routerHash().equals(target)) {
             // the want to send it to a tunnel, except we are also that tunnel's gateway
             // dispatch it directly
@@ -89,6 +90,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             gw.setMessageExpiration(_context.clock().now()+10*1000);
             gw.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             _context.tunnelDispatcher().dispatch(gw);
+******/
         } else {
             // ok, they want us to send it remotely, but that'd bust our anonymity,
             // so we send it out a tunnel first
