@@ -72,7 +72,7 @@ public class HostsTxtNamingService extends NamingService {
         }
 
         // Try Base32 decoding
-        if (hostname.length() == BASE32_HASH_LENGTH + 4 && hostname.endsWith(".i2p")) {
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p")) {
             d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
             if (d != null) {
                 putCache(hostname, d);

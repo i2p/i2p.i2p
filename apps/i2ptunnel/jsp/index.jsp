@@ -196,7 +196,7 @@
             <%
             if ("httpserver".equals(indexBean.getInternalType(curServer)) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label>Preview:</label>    
-            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.i2p">Preview</a>     
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p">Preview</a>     
         <%
             } else {
           %><span class="comment">No Preview</span>
