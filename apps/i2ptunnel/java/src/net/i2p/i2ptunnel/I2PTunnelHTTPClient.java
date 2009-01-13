@@ -470,7 +470,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         if (_log.shouldLog(Log.INFO)) 
                             _log.info(getPrefix(requestId) + "Setting host = " + host);
                     } else if (lowercaseLine.startsWith("user-agent: ") &&
-                               !Boolean.valueOf(getTunnel().getContext().getProperty(PROP_USER_AGENT)).booleanValue()) {
+                               !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue()) {
                         line = null;
                         continue;
                     } else if (lowercaseLine.startsWith("accept")) {
@@ -479,13 +479,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         line = null;
                         continue;
                     } else if (lowercaseLine.startsWith("referer: ") &&
-                               !Boolean.valueOf(getTunnel().getContext().getProperty(PROP_REFERER)).booleanValue()) {
+                               !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_REFERER)).booleanValue()) {
                         // Shouldn't we be more specific, like accepting in-site referers ?
                         //line = "Referer: i2p";
                         line = null;
                         continue; // completely strip the line
                     } else if (lowercaseLine.startsWith("via: ") &&
-                               !Boolean.valueOf(getTunnel().getContext().getProperty(PROP_VIA)).booleanValue()) {
+                               !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_VIA)).booleanValue()) {
                         //line = "Via: i2p";
                         line = null;
                         continue; // completely strip the line
@@ -498,7 +498,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 
                 if (line.length() == 0) {
                     
-                    String ok = getTunnel().getContext().getProperty("i2ptunnel.gzip");
+                    String ok = getTunnel().getClientOptions().getProperty("i2ptunnel.gzip");
                     boolean gzip = DEFAULT_GZIP;
                     if (ok != null)
                         gzip = Boolean.valueOf(ok).booleanValue();
@@ -509,7 +509,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         newRequest.append("Accept-Encoding: \r\n");
                         newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }
-                    if (!Boolean.valueOf(getTunnel().getContext().getProperty(PROP_USER_AGENT)).booleanValue())
+                    if (!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue())
                         newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
                     newRequest.append("Connection: close\r\n\r\n");
                     break;
