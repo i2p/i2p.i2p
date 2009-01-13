@@ -39,6 +39,7 @@ public class HostsTxtNamingService extends NamingService {
      * given file for hostname=destKey values when resolving names
      */
     public final static String PROP_HOSTS_FILE = "i2p.hostsfilelist";
+    public final static String PROP_B32 = "i2p.naming.hostsTxt.useB32";
 
     /** default hosts.txt filename */
     public final static String DEFAULT_HOSTS_FILE = 
@@ -72,7 +73,8 @@ public class HostsTxtNamingService extends NamingService {
         }
 
         // Try Base32 decoding
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p")) {
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p") &&
+            Boolean.valueOf(_context.getProperty(PROP_B32, "true")).booleanValue()) {
             d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
             if (d != null) {
                 putCache(hostname, d);
