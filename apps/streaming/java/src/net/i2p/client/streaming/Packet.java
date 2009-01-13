@@ -530,6 +530,8 @@ public class Packet {
     public boolean verifySignature(I2PAppContext ctx, Destination from, byte buffer[]) {
         if (!isFlagSet(FLAG_SIGNATURE_INCLUDED)) return false;
         if (_optionSignature == null) return false;
+        // prevent receiveNewSyn() ... !active ... sendReset() ... verifySignature ... NPE
+        if (from == null) return false;
         
         int size = writtenSize();
         
