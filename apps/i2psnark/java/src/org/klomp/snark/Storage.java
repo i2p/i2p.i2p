@@ -696,9 +696,6 @@ public class Storage
             listener.setWantedPieces(this);
         _util.debug("WARNING: Not really done, missing " + needed
                     + " pieces", Snark.WARNING);
-      } else {
-        if (listener != null)
-            listener.storageCompleted(this);
       }
     }
 
