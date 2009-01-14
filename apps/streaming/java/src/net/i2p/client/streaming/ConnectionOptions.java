@@ -56,7 +56,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 6;
     static final int DEFAULT_MAX_SENDS = 8;
-    public static final int DEFAULT_INITIAL_RTT = 10*1000;    
+    public static final int DEFAULT_INITIAL_RTT = 8*1000;    
     static final int MIN_WINDOW_SIZE = 1;
     
     /**
