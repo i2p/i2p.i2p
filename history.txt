@@ -1,3 +1,24 @@
+2009-01-14 zzz
+    * config.jsp: Fix burst seconds display
+    * HTTPClient: Fix per-tunnel settings for i2cp.gzip and
+      i2ptunnel.httpclient.send* (thx tino)
+    * i2psnark:
+      - Fix double completion message
+      - Add crstrack
+    * initialNews.xml: Add .de (thx echelon)
+    * Message: Always distribute an inbound msg back out
+      a tunnel to foil a possible latency-measuring attack
+      (welterde)
+    * Naming:
+      - Change base32 names to *.b32.i2p
+      - Add i2p.naming.hostsTxt.useB32 config
+    * profiles.jsp: Remove 1m column
+    * SAM: Don't build tests by default
+    * Streaming:
+      - Prevent a rare NPE
+      - Reduce initial RTT to 8s (was 10s)
+    * tunnels.jsp: Add netdb links
+
 2009-01-08 zzz
     * addressbook: Prevent Base32 hostnames
     * build.xml: Remove readme_xx.html from updater
