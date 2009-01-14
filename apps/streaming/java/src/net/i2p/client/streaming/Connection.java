@@ -121,6 +121,7 @@ public class Connection {
         _resetSentOn = -1;
         _isInbound = false;
         _connectionEvent = new ConEvent();
+	_hardDisconnected = false;
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -148,7 +149,7 @@ public class Connection {
      * @return true if the packet should be sent
      */
     boolean packetSendChoke(long timeoutMs) {
-        if (false) return true;
+        // if (false) return true; // <--- what the fuck??
         long start = _context.clock().now();
         long writeExpire = start + timeoutMs;
         boolean started = false;
@@ -162,9 +163,9 @@ public class Connection {
                 
                 // no need to wait until the other side has ACKed us before sending the first few wsize
                 // packets through
-                //    if (!_connected)
-                //        return false;
-                
+		// Incorrect assumption, the constructor defaults _connected to true --Sponge
+                    if (!_connected)
+                       return false;
                 started = true;
                 if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ||
                      (_lastSendId - _highestAckedThrough > _options.getWindowSize()) ) {
@@ -180,12 +181,12 @@ public class Connection {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "/" 
                                        + _activeResends + "), waiting " + timeLeft);
-                        try { _outboundPackets.wait(timeLeft); } catch (InterruptedException ie) {}
+                        try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) {}
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
                                        + "), waiting indefinitely");
-                        try { _outboundPackets.wait(10*1000); } catch (InterruptedException ie) {}
+                        try { _outboundPackets.wait(250); } catch (InterruptedException ie) {} //10*1000
                     }
                 } else {
                     _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
@@ -487,7 +488,6 @@ public class Connection {
         synchronized (_connectLock) { _connectLock.notifyAll(); }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Disconnecting " + toString(), new Exception("discon"));
-        
         if (!cleanDisconnect) {
             _hardDisconnected = true;
             if (_log.shouldLog(Log.WARN))

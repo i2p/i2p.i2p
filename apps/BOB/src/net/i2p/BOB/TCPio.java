@@ -23,7 +23,6 @@
  */
 package net.i2p.BOB;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -91,12 +90,16 @@ public class TCPio implements Runnable {
 					 * the stream has been reached.
 					 *
 					 */
+					// System.out.println("TCPio: End Of Stream");
 					return;
 				}
 			}
+			// System.out.println("TCPio: RUNNING = false");
 		} catch(Exception e) {
 			// Eject!!! Eject!!!
+			// System.out.println("TCPio: Caught an exception " + e);
 			return;
 		}
+		// System.out.println("TCPio: Leaving.");
 	}
 }
