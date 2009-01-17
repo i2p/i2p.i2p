@@ -432,6 +432,10 @@ public class NTCPTransport extends TransportImpl {
         return bindAddress();
     }
 
+    public boolean isAlive() {
+        return _pumper.isAlive();
+    }
+
     private RouterAddress bindAddress() {
         if (_myAddress != null) {
             try {
@@ -538,6 +542,10 @@ public class NTCPTransport extends TransportImpl {
         }
     }
     
+    /**
+     *  This doesn't (completely) block, caller should check isAlive()
+     *  before calling startListening() or restartListening()
+     */
     public void stopListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Stopping ntcp transport");
         _pumper.stopPumping();
