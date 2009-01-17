@@ -85,6 +85,13 @@ public class EventPumper implements Runnable {
             _selector.wakeup();
     }
     
+    /**
+     *  Selector can take quite a while to close after calling stopPumping()
+     */
+    public boolean isAlive() {
+        return _alive || (_selector != null && _selector.isOpen());
+    }
+
     public void register(ServerSocketChannel chan) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Registering server socket channel");
         synchronized (_wantsRegister) { _wantsRegister.add(chan); }

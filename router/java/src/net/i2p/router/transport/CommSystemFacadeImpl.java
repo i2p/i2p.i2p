@@ -285,9 +285,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _log.warn("Halting NTCP to change address");
         t.stopListening();
         newAddr.setOptions(newProps);
-        // Give NTCP Pumper time to stop so we don't end up with two...
-        // Need better way
-        try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        // Wait for NTCP Pumper to stop so we don't end up with two...
+        while (t.isAlive()) {
+            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        }
         t.restartListening(newAddr);
         _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
         return;     	
