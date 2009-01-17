@@ -75,7 +75,7 @@
     with "SSU introductions" - peers who will relay a request from someone you don't know to your
     router for your router so that you can make an outbound connection to them.  I2P will use these
     introductions automatically if it detects that the port is not forwarded (as shown by
-    the <i>Status: OK (NAT)</i> line), or you can manually require them here.  
+    the <i>Status: Firewalled</i> line), or you can manually require them here.  
     Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
  <hr />
