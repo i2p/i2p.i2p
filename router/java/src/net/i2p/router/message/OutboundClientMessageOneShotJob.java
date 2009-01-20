@@ -69,6 +69,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     public final static String OVERALL_TIMEOUT_MS_PARAM = "clientMessageTimeout";
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
+    private final static long OVERALL_TIMEOUT_MS_MIN = 5*1000;
     
     /** priority of messages, that might get honored some day... */
     private final static int SEND_PRIORITY = 500;
@@ -125,23 +126,34 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _to = msg.getDestination();
         _toString = _to.calculateHash().toBase64().substring(0,4);
         _leaseSetLookupBegin = -1;
-        
-        String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
-        if (param == null)
-            param = ctx.router().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
-        if (param != null) {
-            try {
-                timeoutMs = Long.parseLong(param);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid client message timeout specified [" + param 
-                              + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
-                timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
-            }
-        }
-        
         _start = getContext().clock().now();
-        _overallExpiration = timeoutMs + _start;
+        
+        // use expiration requested by client if available, otherwise session config,
+        // otherwise router config, otherwise default
+        _overallExpiration = msg.getExpiration();
+        if (_overallExpiration > 0) {
+           _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
+           _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
+           if (_log.shouldLog(Log.WARN))
+               _log.warn("Message Expiration (ms): " + (_overallExpiration - _start));
+        } else {
+            String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
+            if (param == null)
+                param = ctx.router().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
+            if (param != null) {
+                try {
+                    timeoutMs = Long.parseLong(param);
+                } catch (NumberFormatException nfe) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid client message timeout specified [" + param 
+                                  + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
+                    timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
+                }
+            }
+            _overallExpiration = timeoutMs + _start;
+           if (_log.shouldLog(Log.WARN))
+               _log.warn("Default Expiration (ms): " + timeoutMs);
+        }
         _finished = false;
     }
     
@@ -445,6 +457,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         boolean wantACK = true;
         int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
+        // what's the point of 5% random? possible improvements or replacements:
+        // - wantACK if we changed their inbound lease
+        // - wantACK if we changed our outbound tunnel (requires moving selectOutboundTunnel() before this)
+        // - wantACK if we haven't in last 1m (requires a new static cache probably)
         if ( (existingTags > 30) && (getContext().random().nextInt(100) >= 5) )
             wantACK = false;
         

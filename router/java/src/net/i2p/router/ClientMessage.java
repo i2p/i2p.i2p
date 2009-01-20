@@ -27,6 +27,7 @@ public class ClientMessage {
     private SessionConfig _senderConfig;
     private Hash _destinationHash;
     private MessageId _messageId;
+    private long _expiration;
     
     public ClientMessage() {
 	setPayload(null);
@@ -36,6 +37,7 @@ public class ClientMessage {
 	setSenderConfig(null);
 	setDestinationHash(null);
 	setMessageId(null);
+        setExpiration(0);
     }
     
     /**
@@ -91,4 +93,12 @@ public class ClientMessage {
      */
     public SessionConfig getSenderConfig() { return _senderConfig; }
     public void setSenderConfig(SessionConfig config) { _senderConfig = config; }
+
+    /**
+     * Expiration requested by the client that sent the message.  This will only be available
+     * for locally originated messages.
+     *
+     */
+    public long getExpiration() { return _expiration; }
+    public void setExpiration(long e) { _expiration = e; }
 }

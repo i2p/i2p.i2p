@@ -29,6 +29,7 @@ import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
+import net.i2p.data.i2cp.SendMessageExpiresMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.Job;
@@ -270,6 +271,9 @@ public class ClientConnectionRunner {
         Destination dest = message.getDestination();
         MessageId id = new MessageId();
         id.setMessageId(getNextMessageId()); 
+        long expiration = 0;
+        if (message instanceof SendMessageExpiresMessage)
+            expiration = ((SendMessageExpiresMessage) message).getExpiration().getTime();
         long beforeLock = _context.clock().now();
         long inLock = 0;
         synchronized (_acceptedPending) {
@@ -291,7 +295,7 @@ public class ClientConnectionRunner {
         // the following blocks as described above
         SessionConfig cfg = _config;
         if (cfg != null)
-            _manager.distributeMessage(cfg.getDestination(), dest, payload, id);
+            _manager.distributeMessage(cfg.getDestination(), dest, payload, id, expiration);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         if (_log.shouldLog(Log.DEBUG))
             _log.warn("Time to distribute in the manager to " 
