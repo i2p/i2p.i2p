@@ -213,6 +213,10 @@ public class ConnectionPacketHandler {
             packet.releasePayload();
         }
         
+        // update the TCB Cache now that we've processed the acks and updated our rtt etc.
+        if (isNew && packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
+            con.updateShareOpts();
+
         //if (choke)
         //    con.fastRetransmit();
     }

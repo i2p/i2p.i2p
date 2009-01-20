@@ -45,6 +45,7 @@ public class Connection {
     private long _congestionWindowEnd;
     private long _highestAckedThrough;
     private boolean _isInbound;
+    private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
     private Map _outboundPackets;
     private PacketQueue _outboundQueue;
@@ -120,6 +121,7 @@ public class Connection {
         _activeResends = 0;
         _resetSentOn = -1;
         _isInbound = false;
+        _updatedShareOpts = false;
         _connectionEvent = new ConEvent();
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -586,6 +588,8 @@ public class Connection {
         if (_remotePeerSet) throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
         _remotePeerSet = true;
         _remotePeer = peer; 
+        // now that we know who the other end is, get the rtt etc. from the cache
+        _connectionManager.updateOptsFromShare(this);
     }
     
     private boolean _sendStreamIdSet = false;
@@ -709,7 +713,13 @@ public class Connection {
     }
     public long getCloseReceivedOn() { return _closeReceivedOn; }
     public void setCloseReceivedOn(long when) { _closeReceivedOn = when; }
-    
+
+    public void updateShareOpts() {
+        if (_closeSentOn > 0 && !_updatedShareOpts) {
+            _connectionManager.updateShareOpts(this);
+            _updatedShareOpts = true;
+        }
+    }
     public void incrementUnackedPacketsReceived() { _unackedPacketsReceived++; }
     public int getUnackedPacketsReceived() { return _unackedPacketsReceived; }
     /** how many packets have we sent but not yet received an ACK for?
@@ -998,7 +1008,7 @@ public class Connection {
     /**
      * Coordinate the resends of a given packet
      */
-    private class ResendPacketEvent implements SimpleTimer.TimedEvent {
+    public class ResendPacketEvent implements SimpleTimer.TimedEvent {
         private PacketLocal _packet;
         private long _nextSendTime;
         public ResendPacketEvent(PacketLocal packet, long sendTime) {
@@ -1104,26 +1114,6 @@ public class Connection {
                     _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
                 }
                 
-                if (numSends - 1 <= _options.getMaxResends()) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Resend packet " + _packet + " time " + numSends + 
-                                  " activeResends: " + _activeResends + 
-                                  " (wsize "
-                                  + newWindowSize + " lifetime " 
-                                  + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
-                    _outboundQueue.enqueue(_packet);
-                    _lastSendTime = _context.clock().now();
-                }
-                
-                // acked during resending (... or somethin')
-                if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {
-                    _activeResends--;
-                    synchronized (_outboundPackets) {
-                        _outboundPackets.notifyAll();
-                    }
-                    return true;
-                }
-                
                 if (numSends - 1 > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Too many resends");
@@ -1137,11 +1127,32 @@ public class Connection {
                     long timeout = rto << (numSends-1);
                     if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
                         timeout = MAX_RESEND_DELAY;
+                    // set this before enqueue() as it passes it on to the router
+                    _nextSendTime = timeout + _context.clock().now();
+
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Resend packet " + _packet + " time " + numSends + 
+                                  " activeResends: " + _activeResends + 
+                                  " (wsize "
+                                  + newWindowSize + " lifetime " 
+                                  + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
+                    _outboundQueue.enqueue(_packet);
+                    _lastSendTime = _context.clock().now();
+
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
                     RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
-                    _nextSendTime = timeout + _context.clock().now();
                 }
+                
+                // acked during resending (... or somethin')
+                if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {
+                    _activeResends--;
+                    synchronized (_outboundPackets) {
+                        _outboundPackets.notifyAll();
+                    }
+                    return true;
+                }
+
                 return true;
             } else {
                 //if (_log.shouldLog(Log.DEBUG))
