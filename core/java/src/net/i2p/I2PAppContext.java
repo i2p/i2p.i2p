@@ -24,6 +24,7 @@ import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.FortunaRandomSource;
+import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
 import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
@@ -75,6 +76,7 @@ public class I2PAppContext {
     private RoutingKeyGenerator _routingKeyGenerator;
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
+    protected KeyRing _keyRing; // overridden in RouterContext
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
@@ -91,6 +93,7 @@ public class I2PAppContext {
     private volatile boolean _routingKeyGeneratorInitialized;
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
+    protected volatile boolean _keyRingInitialized; // used in RouterContext
     
     
     /**
@@ -141,12 +144,14 @@ public class I2PAppContext {
         _elGamalEngine = null;
         _elGamalAESEngine = null;
         _logManager = null;
+        _keyRing = null;
         _statManagerInitialized = false;
         _sessionKeyManagerInitialized = false;
         _namingServiceInitialized = false;
         _elGamalEngineInitialized = false;
         _elGamalAESEngineInitialized = false;
         _logManagerInitialized = false;
+        _keyRingInitialized = false;
     }
     
     /**
@@ -509,6 +514,23 @@ public class I2PAppContext {
             if (_routingKeyGenerator == null)
                 _routingKeyGenerator = new RoutingKeyGenerator(this);
             _routingKeyGeneratorInitialized = true;
+        }
+    }
+    
+    /**
+     * Basic hash map
+     */
+    public KeyRing keyRing() {
+        if (!_keyRingInitialized)
+            initializeKeyRing();
+        return _keyRing;
+    }
+
+    protected void initializeKeyRing() {
+        synchronized (this) {
+            if (_keyRing == null)
+                _keyRing = new KeyRing();
+            _keyRingInitialized = true;
         }
     }
     
