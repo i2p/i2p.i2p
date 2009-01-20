@@ -9,6 +9,7 @@ package net.i2p.data;
  *
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,12 +18,33 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 /**
  * Defines the set of leases a destination currently has.
+ *
+ * Support encryption and decryption with a supplied key.
+ * Only the gateways and tunnel IDs in the individual
+ * leases are encrypted.
+ *
+ * Encrypted leases are not indicated as such.
+ * The only way to tell a lease is encrypted is to
+ * determine that the listed gateways do not exist.
+ * Routers wishing to decrypt a leaseset must have the
+ * desthash and key in their keyring.
+ * This is required for the local router as well, since
+ * the encryption is done on the client side of I2CP, the
+ * router must decrypt it back again for local usage
+ * (but not for transmission to the floodfills)
+ *
+ * Decrypted leases are only available through the getLease()
+ * method, so that storage and network transmission via
+ * writeBytes() will output the original encrypted
+ * leases and the original leaseset signature.
  *
  * @author jrandom
  */
@@ -40,6 +62,9 @@ public class LeaseSet extends DataStructureImpl {
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     private long _lastExpiration;
+    private List _decryptedLeases;
+    private boolean _decrypted;
+    private boolean _checked;
 
     /** This seems like plenty  */
     private final static int MAX_LEASES = 6;
@@ -55,6 +80,8 @@ public class LeaseSet extends DataStructureImpl {
         _receivedAsPublished = false;
         _firstExpiration = Long.MAX_VALUE;
         _lastExpiration = 0;
+        _decrypted = false;
+        _checked = false;
     }
 
     public Destination getDestination() {
@@ -104,11 +131,17 @@ public class LeaseSet extends DataStructureImpl {
     }
 
     public int getLeaseCount() {
-        return _leases.size();
+        if (isEncrypted())
+            return _leases.size() - 1;
+        else
+            return _leases.size();
     }
 
     public Lease getLease(int index) {
-        return (Lease) _leases.get(index);
+        if (isEncrypted())
+            return (Lease) _decryptedLeases.get(index);
+        else
+            return (Lease) _leases.get(index);
     }
 
     public Signature getSignature() {
@@ -334,5 +367,140 @@ public class LeaseSet extends DataStructureImpl {
             buf.append("\n\t\tLease (").append(i).append("): ").append(getLease(i));
         buf.append("]");
         return buf.toString();
+    }
+
+    private static final int DATA_LEN = Hash.HASH_LENGTH + 4;
+    private static final int IV_LEN = 16;
+
+    /**
+     *  Encrypt the gateway and tunnel ID of each lease, leaving the expire dates unchanged.
+     *  This adds an extra dummy lease, because AES data must be padded to 16 bytes.
+     *  The fact that it is encrypted is not stored anywhere.
+     *  Must be called after all the leases are in place, but before sign().
+     */
+    public void encrypt(SessionKey key) {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("encrypting lease: " + _destination.calculateHash());
+        try {
+            encryp(key);
+        } catch (DataFormatException dfe) {
+            _log.error("Error encrypting lease: " + _destination.calculateHash());
+        } catch (IOException ioe) {
+            _log.error("Error encrypting lease: " + _destination.calculateHash());
+        }
+    }
+
+    /**
+     *  - Put the {Gateway Hash, TunnelID} pairs for all the leases in a buffer
+     *  - Pad with random data to a multiple of 16 bytes
+     *  - Use the first part of the dest's public key as an IV
+     *  - Encrypt
+     *  - Pad with random data to a multiple of 36 bytes
+     *  - Add an extra lease
+     *  - Replace the Hash and TunnelID in each Lease
+     */
+    private void encryp(SessionKey key) throws DataFormatException, IOException {
+        int size = _leases.size();
+        if (size < 1 || size > MAX_LEASES-1)
+            throw new IllegalArgumentException("Bad number of leases for encryption");
+        int datalen = ((DATA_LEN * size / 16) + 1) * 16;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
+        for (int i = 0; i < size; i++) {
+            ((Lease)_leases.get(i)).getGateway().writeBytes(baos);
+            ((Lease)_leases.get(i)).getTunnelId().writeBytes(baos);
+        }
+        // pad out to multiple of 16 with random data before encryption
+        int padlen = datalen - (DATA_LEN * size);
+        byte[] pad = new byte[padlen];
+        RandomSource.getInstance().nextBytes(pad);
+        baos.write(pad);
+        byte[] iv = new byte[IV_LEN];
+        System.arraycopy(_destination.getPublicKey().getData(), 0, iv, 0, IV_LEN);
+        byte[] enc = new byte[DATA_LEN * (size + 1)];
+        I2PAppContext.getGlobalContext().aes().encrypt(baos.toByteArray(), 0, enc, 0, key, iv, datalen);
+        // pad out to multiple of 36 with random data after encryption
+        // (even for 4 leases, where 36*4 is a multiple of 16, we add another, just to be consistent)
+        padlen = enc.length - datalen;
+        pad = new byte[padlen];
+        RandomSource.getInstance().nextBytes(pad);
+        System.arraycopy(pad, 0, enc, datalen, padlen);
+        // add the padded lease...
+        Lease padLease = new Lease();
+        padLease.setEndDate(((Lease)_leases.get(0)).getEndDate());
+        _leases.add(padLease);
+        // ...and replace all the gateways and tunnel ids
+        ByteArrayInputStream bais = new ByteArrayInputStream(enc);
+        for (int i = 0; i < size+1; i++) {
+            Hash h = new Hash();
+            h.readBytes(bais);
+            ((Lease)_leases.get(i)).setGateway(h);
+            TunnelId t = new TunnelId();
+            t.readBytes(bais);
+            ((Lease)_leases.get(i)).setTunnelId(t);
+        }
+    }
+
+    /**
+     *  Decrypt the leases, except for the last one which is partially padding.
+     *  Store the new decrypted leases in a backing store,
+     *  and keep the original leases so that verify() still works and the
+     *  encrypted leaseset can be sent on to others (via writeBytes())
+     */
+    private void decrypt(SessionKey key) throws DataFormatException, IOException {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("decrypting lease: " + _destination.calculateHash());
+        int size = _leases.size();
+        if (size < 2)
+            throw new DataFormatException("Bad number of leases for decryption");
+        int datalen = DATA_LEN * size;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
+        for (int i = 0; i < size; i++) {
+            ((Lease)_leases.get(i)).getGateway().writeBytes(baos);
+            ((Lease)_leases.get(i)).getTunnelId().writeBytes(baos);
+        }
+        byte[] iv = new byte[IV_LEN];
+        System.arraycopy(_destination.getPublicKey().getData(), 0, iv, 0, IV_LEN);
+        int enclen = ((DATA_LEN * (size - 1) / 16) + 1) * 16;
+        byte[] enc = new byte[enclen];
+        System.arraycopy(baos.toByteArray(), 0, enc, 0, enclen);
+        byte[] dec = new byte[enclen];
+        I2PAppContext.getGlobalContext().aes().decrypt(enc, 0, dec, 0, key, iv, enclen);
+        ByteArrayInputStream bais = new ByteArrayInputStream(dec);
+        _decryptedLeases = new ArrayList(size - 1);
+        for (int i = 0; i < size-1; i++) {
+            Lease l = new Lease();
+            Hash h = new Hash();
+            h.readBytes(bais);
+            l.setGateway(h);
+            TunnelId t = new TunnelId();
+            t.readBytes(bais);
+            l.setTunnelId(t);
+            l.setEndDate(((Lease)_leases.get(i)).getEndDate());
+            _decryptedLeases.add(l);
+        }
+    }
+
+    /**
+     * @return true if it was encrypted, and we decrypted it successfully.
+     * Decrypts on first call.
+     */
+    private synchronized boolean isEncrypted() {
+        if (_decrypted)
+           return true;
+        if (_checked || _destination == null)
+           return false;
+        SessionKey key = I2PAppContext.getGlobalContext().keyRing().get(_destination.calculateHash());
+        if (key != null) {
+            try {
+                decrypt(key);
+                _decrypted = true;
+            } catch (DataFormatException dfe) {
+                _log.error("Error decrypting lease: " + _destination.calculateHash() + dfe);
+            } catch (IOException ioe) {
+                _log.error("Error decrypting lease: " + _destination.calculateHash() + ioe);
+            }
+        }
+        _checked = true;
+        return _decrypted;
     }
 }
