@@ -12,6 +12,9 @@
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
 <div class="routersummary">
+ <center><b><a href="config.jsp">Configuration</a>&nbsp;&nbsp;<a href="help.jsp">Help</a></b></center>
+ <hr />
+
  <u><b>General</b></u><br />
  <b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=.">view</a>)<br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
@@ -97,6 +100,5 @@
  <b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
  <b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
  <b><jsp:getProperty name="helper" property="tunnelStatus" /></b><br />
- <hr />
  
 </div>
