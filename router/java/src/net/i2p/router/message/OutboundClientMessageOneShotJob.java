@@ -61,6 +61,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private long _leaseSetLookupBegin;
     private TunnelInfo _outTunnel;
     private TunnelInfo _inTunnel;
+    private boolean _wantACK;
     
     /**
      * final timeout (in milliseconds) that the outbound message will fail in.
@@ -279,6 +280,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 long lookupTime = getContext().clock().now() - _leaseSetLookupBegin;
                 getContext().statManager().addRateData("client.leaseSetFoundRemoteTime", lookupTime, lookupTime);
             }
+            _wantACK = false;
             boolean ok = getNextLease();
             if (ok) {
                 send();
@@ -412,6 +414,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Added to cache - lease for " + _toString); 
+        _wantACK = true;
         return true;
     }
 
@@ -455,14 +458,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             dieFatal();
             return;
         }
-        boolean wantACK = true;
+
         int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
+        _outTunnel = selectOutboundTunnel(_to);
         // what's the point of 5% random? possible improvements or replacements:
-        // - wantACK if we changed their inbound lease
-        // - wantACK if we changed our outbound tunnel (requires moving selectOutboundTunnel() before this)
+        // - wantACK if we changed their inbound lease (getNextLease() sets _wantACK)
+        // - wantACK if we changed our outbound tunnel (selectOutboundTunnel() sets _wantACK)
         // - wantACK if we haven't in last 1m (requires a new static cache probably)
-        if ( (existingTags > 30) && (getContext().random().nextInt(100) >= 5) )
-            wantACK = false;
+        boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
@@ -519,7 +522,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                        + _lease.getTunnelId() + " on " 
                        + _lease.getGateway().toBase64());
         
-        _outTunnel = selectOutboundTunnel(_to);
         if (_outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Sending tunnel message out " + _outTunnel.getSendTunnelId(0) + " to " 
@@ -734,6 +736,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                             _log.warn("Switching back to tunnel " + tunnel + " for " + _toString); 
                         _backloggedTunnelCache.remove(hashPair());
                         _tunnelCache.put(hashPair(), tunnel);
+                        _wantACK = true;
                         return tunnel;
                     }  // else still backlogged
                 } else // no longer valid
@@ -756,6 +759,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             tunnel = selectOutboundTunnel();
             if (tunnel != null)
                 _tunnelCache.put(hashPair(), tunnel);
+            _wantACK = true;
         }
         return tunnel;
     }
