@@ -244,7 +244,7 @@ public class SummaryHelper {
      */
     public String getInboundSecondKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         double kbps = _context.bandwidthLimiter().getReceiveBps()/1024d;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -256,7 +256,7 @@ public class SummaryHelper {
      */
     public String getOutboundSecondKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         double kbps = _context.bandwidthLimiter().getSendBps()/1024d;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -269,10 +269,10 @@ public class SummaryHelper {
      */
     public String getInboundFiveMinuteKBps() {
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0.0";
+        if (receiveRate == null) return "0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double kbps = rate.getAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -286,10 +286,10 @@ public class SummaryHelper {
      */
     public String getOutboundFiveMinuteKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.sendRate");
-        if (receiveRate == null) return "0.0";
+        if (receiveRate == null) return "0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double kbps = rate.getAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -303,10 +303,10 @@ public class SummaryHelper {
      */
     public String getInboundLifetimeKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0.0";
+        if (receiveRate == null) return "0";
         double kbps = receiveRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -319,10 +319,10 @@ public class SummaryHelper {
      */
     public String getOutboundLifetimeKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
-        if (sendRate == null) return "0.0";
+        if (sendRate == null) return "0";
         double kbps = sendRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -335,11 +335,11 @@ public class SummaryHelper {
      */
     public String getInboundTransferred() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
 
-        return getTransferred(received);
+        return DataHelper.formatSize(received) + 'B';
     }
     
     /**
@@ -349,40 +349,10 @@ public class SummaryHelper {
      */
     public String getOutboundTransferred() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
-        return getTransferred(sent);
-    }
-    
-    private static String getTransferred(long bytes) {
-        double val = bytes;
-        int scale = 0;
-        if (bytes > 1024*1024*1024) {
-            // gigs transferred
-            scale = 3; 
-            val /= (double)(1024*1024*1024);
-        } else if (bytes > 1024*1024) {
-            // megs transferred
-            scale = 2;
-            val /= (double)(1024*1024);
-        } else if (bytes > 1024) {
-            // kbytes transferred
-            scale = 1;
-            val /= (double)1024;
-        } else {
-            scale = 0;
-        }
-        
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-
-        String str = fmt.format(val);
-        switch (scale) {
-            case 1: return str + "KB";
-            case 2: return str + "MB";
-            case 3: return str + "GB";
-            default: return bytes + "bytes";
-        }
+        return DataHelper.formatSize(sent) + 'B';
     }
     
     /**
