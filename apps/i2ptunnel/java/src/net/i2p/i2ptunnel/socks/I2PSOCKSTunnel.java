@@ -7,6 +7,12 @@
 package net.i2p.i2ptunnel.socks;
 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.Destination;
@@ -20,7 +26,7 @@ import net.i2p.util.Log;
 public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
     private static final Log _log = new Log(I2PSOCKSTunnel.class);
-
+    private HashMap<String, List<String>> proxies = null;  // port# + "" or "default" -> hostname list
     protected Destination outProxyDest = null;
 
     //public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest) {
@@ -36,7 +42,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
         }
 
         setName(getLocalPort() + " -> SOCKSTunnel");
-
+        parseOptions();
         startRunning();
 
         notifyEvent("openSOCKSTunnelResult", "ok");
@@ -53,4 +59,42 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
             closeSocket(s);
         }
     }
+
+    private static final String PROP_PROXY = "i2ptunnel.socks.proxy.";
+    private void parseOptions() {
+        Properties opts = getTunnel().getClientOptions();
+        proxies = new HashMap(0);
+        for (Map.Entry e : opts.entrySet()) {
+           String prop = (String)e.getKey();
+           if ((!prop.startsWith(PROP_PROXY)) || prop.length() <= PROP_PROXY.length())
+              continue;
+           String port = prop.substring(PROP_PROXY.length());
+           List proxyList = new ArrayList(1);
+           StringTokenizer tok = new StringTokenizer((String)e.getValue(), ", \t");
+           while (tok.hasMoreTokens()) {
+               String proxy = tok.nextToken().trim();
+               if (proxy.endsWith(".i2p"))
+                   proxyList.add(proxy);
+               else
+                   _log.error("Non-i2p SOCKS outproxy: " + proxy);
+           }
+           proxies.put(port, proxyList);
+        }
+    }
+
+    public HashMap<String, List<String>> getProxyMap() {
+        return proxies;
+    }
+
+    public List<String> getProxies(int port) {
+        List<String> rv = proxies.get(port + "");
+        if (rv == null)
+            rv = getDefaultProxies();
+        return rv;
+    }
+
+    public List<String> getDefaultProxies() {
+        return proxies.get("default");
+    }
+
 }

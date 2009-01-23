@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
@@ -33,7 +35,6 @@ public class SOCKS5Server extends SOCKSServer {
     private static final int SOCKS_VERSION_5 = 0x05;
 
     private Socket clientSock = null;
-
     private boolean setupCompleted = false;
 
     /**
@@ -274,6 +275,13 @@ public class SOCKS5Server extends SOCKSServer {
             throw new SOCKSException("BUG! See the logs!");
         }
 
+        DataOutputStream out; // for errors
+        try {
+            out = new DataOutputStream(clientSock.getOutputStream());
+        } catch (IOException e) {
+            throw new SOCKSException("Connection error (" + e.getMessage() + ")");
+        }
+
         // FIXME: here we should read our config file, select an
         // outproxy, and instantiate the proper socket class that
         // handles the outproxy itself (SOCKS4a, SOCKS5, HTTP CONNECT...).
@@ -285,24 +293,64 @@ public class SOCKS5Server extends SOCKSServer {
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
-                // TODO get the streaming lib options in there
                 destSock = t.createI2PSocket(I2PTunnel.destFromName(connHostName));
-                confirmConnection();
-                _log.debug("connection confirmed - exchanging data...");
+            } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
+                String err = "No localhost accesses allowed through the Socks Proxy";
+                _log.error(err);
+                try {
+                    sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                } catch (IOException ioe) {}
+                throw new SOCKSException(err);
+            } else if (connPort == 80) {
+                // rewrite GET line to include hostname??? or add Host: line???
+                // or forward to local eepProxy (but that's a Socket not an I2PSocket)
+                // use eepProxy configured outproxies?
+                String err = "No handler for HTTP outproxy implemented";
+                _log.error(err);
+                try {
+                    sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                } catch (IOException ioe) {}
+                throw new SOCKSException(err);
             } else {
-                // if (connPort == 80) ...
-                _log.error("We don't support outproxies (yet)");
-                throw new SOCKSException("Ouproxies not supported (yet)");
+                List<String> proxies = t.getProxies(connPort);
+                if (proxies == null || proxies.size() <= 0) {
+                    String err = "No outproxy configured for port " + connPort + " and no default configured either";
+                    _log.error(err);
+                    try {
+                        sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                    } catch (IOException ioe) {}
+                    throw new SOCKSException(err);
+                }
+                int p = I2PAppContext.getGlobalContext().random().nextInt(proxies.size());
+                String proxy = proxies.get(p);
+                _log.debug("connecting to port " + connPort + " proxy " + proxy + " for " + connHostName + "...");
+                // this isn't going to work, these need to be socks outproxies so we need
+                // to do a socks session to them?
+                destSock = t.createI2PSocket(I2PTunnel.destFromName(proxy));
             }
+            confirmConnection();
+            _log.debug("connection confirmed - exchanging data...");
         } catch (DataFormatException e) {
+            try {
+                sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+            } catch (IOException ioe) {}
             throw new SOCKSException("Error in destination format");
         } catch (SocketException e) {
+            try {
+                sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+            } catch (IOException ioe) {}
             throw new SOCKSException("Error connecting ("
                                      + e.getMessage() + ")");
         } catch (IOException e) {
+            try {
+                sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+            } catch (IOException ioe) {}
             throw new SOCKSException("Error connecting ("
                                      + e.getMessage() + ")");
         } catch (I2PException e) {
+            try {
+                sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+            } catch (IOException ioe) {}
             throw new SOCKSException("Error connecting ("
                                      + e.getMessage() + ")");
         }
