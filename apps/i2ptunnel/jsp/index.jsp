@@ -112,10 +112,12 @@
             }
       %></div>
 
+      <% if (!"sockstunnel".equals(indexBean.getInternalType(curClient))) { %>
         <div class="destinationField rowItem">
             <label>Destination:</label>
             <input class="freetext" size="40" readonly="readonly" value="<%=indexBean.getClientDestination(curClient)%>" />
         </div>
+      <% } %>
 
         <div class="descriptionField rowItem">
             <label>Description:</label>
@@ -140,6 +142,7 @@
                         <option value="client">Standard</option>
                         <option value="httpclient">HTTP</option>
                         <option value="ircclient">IRC</option>
+                        <option value="sockstunnel">SOCKS</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
                 </div>

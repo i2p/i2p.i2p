@@ -39,8 +39,7 @@ public class SOCKSServerFactory {
                 serv = new SOCKS5Server(s);
                 break;
             default:
-                _log.debug("SOCKS protocol version not supported (" + Integer.toHexString(socksVer) + ")");
-                return null;
+                throw new SOCKSException("SOCKS protocol version not supported (" + Integer.toHexString(socksVer) + ")");
             }
         } catch (IOException e) {
             _log.debug("error reading SOCKS protocol version");

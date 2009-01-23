@@ -209,10 +209,7 @@ public class IndexBean {
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
-        if ("true".equalsIgnoreCase(cur.getSharedClient()) &&
-            ("ircclient".equals(cur.getType()) ||
-             "httpclient".equals(cur.getType()) ||
-             "client".equals(cur.getType()))) {
+        if ("true".equalsIgnoreCase(cur.getSharedClient()) && isClient(cur.getType())) {
             // all clients use the same I2CP session, and as such, use the same I2CP options
             List controllers = _group.getControllers();
 
@@ -224,11 +221,7 @@ public class IndexBean {
 
                 // Only modify this non-current tunnel
                 // if it belongs to a shared destination, and is of supported type
-                if ("true".equalsIgnoreCase(c.getSharedClient()) &&
-                    ("httpclient".equals(c.getType()) ||
-                     "ircclient".equals(c.getType()) ||
-                     "client".equals(c.getType()))) {
-
+                if ("true".equalsIgnoreCase(c.getSharedClient()) && isClient(c.getType())) {
                     Properties cOpt = c.getConfig("");
                     if (_tunnelQuantity != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelQuantity);
@@ -326,9 +319,14 @@ public class IndexBean {
     public boolean isClient(int tunnelNum) {
         TunnelController cur = getController(tunnelNum);
         if (cur == null) return false;
-        return ( ("client".equals(cur.getType())) || 
-        		("httpclient".equals(cur.getType())) ||
-        		("ircclient".equals(cur.getType())));
+        return isClient(cur.getType());
+    }
+
+    public static boolean isClient(String type) {
+        return ( ("client".equals(type)) || 
+        		("httpclient".equals(type)) ||
+        		("sockstunnel".equals(type)) ||
+        		("ircclient".equals(type)));
     }
     
     public String getTunnelName(int tunnel) {
@@ -361,6 +359,7 @@ public class IndexBean {
         else if ("ircclient".equals(internalType)) return "IRC client";
         else if ("server".equals(internalType)) return "Standard server";
         else if ("httpserver".equals(internalType)) return "HTTP server";
+        else if ("sockstunnel".equals(internalType)) return "SOCKS proxy";
         else return internalType;
     }
     
@@ -579,77 +578,40 @@ public class IndexBean {
         Properties config = new Properties();
         updateConfigGeneric(config);
         
-        if ("httpclient".equals(_type)) {
+        if (isClient(_type)) {
+            // generic client stuff
             if (_port != null)
                 config.setProperty("listenPort", _port);
             if (_reachableByOther != null)
                 config.setProperty("interface", _reachableByOther);
             else
                 config.setProperty("interface", _reachableBy);
-            if (_proxyList != null)
-                config.setProperty("proxyList", _proxyList);
-
-        	config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-        	config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
+            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
             if (_name != null && !_sharedClient) {
                  config.setProperty("option.inbound.nickname", _name);
                  config.setProperty("option.outbound.nickname", _name);
             }
-
             config.setProperty("sharedClient", _sharedClient + "");
-        }else if ("ircclient".equals(_type)) {
-                if (_port != null)
-                    config.setProperty("listenPort", _port);
-                if (_reachableByOther != null)
-                    config.setProperty("interface", _reachableByOther);
-                else
-                    config.setProperty("interface", _reachableBy);
-                if (_targetDestination != null)
-                    config.setProperty("targetDestination", _targetDestination);
+        } else {
+            // generic server stuff
+            if (_targetHost != null)
+                config.setProperty("targetHost", _targetHost);
+            if (_targetPort != null)
+                config.setProperty("targetPort", _targetPort);
+            if (_privKeyFile != null)
+                config.setProperty("privKeyFile", _privKeyFile);
+        }
 
-            	config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-            	config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-                if (_name != null && !_sharedClient) {
-                     config.setProperty("option.inbound.nickname", _name);
-                     config.setProperty("option.outbound.nickname", _name);
-                }
-
-                config.setProperty("sharedClient", _sharedClient + "");
-        } else if ("client".equals(_type)) {
-            if (_port != null)
-                config.setProperty("listenPort", _port);
-            if (_reachableByOther != null)
-                config.setProperty("interface", _reachableByOther);
-            else
-                config.setProperty("interface", _reachableBy);
+        if ("httpclient".equals(_type)) {
+            if (_proxyList != null)
+                config.setProperty("proxyList", _proxyList);
+        } else if ("ircclient".equals(_type) || "client".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
-            
-            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            if (_name != null && !_sharedClient) {
-                config.setProperty("option.inbound.nickname", _name);
-                config.setProperty("option.outbound.nickname", _name);
-           }
-            config.setProperty("sharedClient", _sharedClient + "");
-        } else if ("server".equals(_type)) {
-            if (_targetHost != null)
-                config.setProperty("targetHost", _targetHost);
-            if (_targetPort != null)
-                config.setProperty("targetPort", _targetPort);
-            if (_privKeyFile != null)
-                config.setProperty("privKeyFile", _privKeyFile);
         } else if ("httpserver".equals(_type)) {
-            if (_targetHost != null)
-                config.setProperty("targetHost", _targetHost);
-            if (_targetPort != null)
-                config.setProperty("targetPort", _targetPort);
-            if (_privKeyFile != null)
-                config.setProperty("privKeyFile", _privKeyFile);
             if (_spoofedHost != null)
                 config.setProperty("spoofedHost", _spoofedHost);
-        } else {
-            return null;
         }
 
         return config;

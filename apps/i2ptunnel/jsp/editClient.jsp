@@ -116,14 +116,14 @@
                 <hr />
             </div>
            
-            <% if ("httpclient".equals(editBean.getInternalType(curTunnel))) {
+            <% if ("httpclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
                     Outpro<span class="accessKey">x</span>ies:
                 </label>
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
             </div>
-            <% } else {
+            <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
                     <span class="accessKey">T</span>unnel Destination:
@@ -205,7 +205,7 @@
                     <span class="accessKey">V</span>ariance:
                 </label>
                 <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Depth" class="selectbox">
-                    <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, -1);
+                    <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
                   %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>>0 hop variance (no randomisation, consistant performance)</option>
                     <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>>+ 0-1 hop variance (medium additive randomisation, subtractive performance)</option>
                     <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>>+ 0-2 hop variance (high additive randomisation, subtractive performance)</option>

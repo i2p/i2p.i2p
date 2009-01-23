@@ -662,7 +662,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      * "openSOCKSTunnelResult" = "ok" or "error" after the client tunnel has
      * started.
      *
-     * @param args {portNumber}
+     * @param args {portNumber [, sharedClient]}
      * @param l logger to receive events and output
      */
     public void runSOCKSTunnel(String args[], Logging l) {
@@ -677,6 +677,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
 
+            boolean isShared = false;
+            if (args.length > 1)
+                isShared = "true".equalsIgnoreCase(args[1].trim());
+
+            ownDest = !isShared;
             I2PTunnelTask task;
             task = new I2PSOCKSTunnel(port, l, ownDest, (EventDispatcher) this, this);
             addtask(task);
