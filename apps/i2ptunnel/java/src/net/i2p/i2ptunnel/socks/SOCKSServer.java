@@ -59,7 +59,7 @@ public abstract class SOCKSServer {
      *
      * @return an I2PSocket connected with the destination
      */
-    public I2PSocket getDestinationI2PSocket() throws SOCKSException {
+    public I2PSocket getDestinationI2PSocket(I2PSOCKSTunnel t) throws SOCKSException {
         setupServer();
 
         if (connHostName == null) {
@@ -79,8 +79,11 @@ public abstract class SOCKSServer {
         try {
             if (connHostName.toLowerCase().endsWith(".i2p")) {
                 _log.debug("connecting to " + connHostName + "...");
-                I2PSocketManager sm = I2PSocketManagerFactory.createManager();
-                destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
+                // Let's not due a new Dest for every request, huh?
+                //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
+                //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
+                // TODO get the streaming lib options in there
+                destSock = t.createI2PSocket(I2PTunnel.destFromName(connHostName));
                 confirmConnection();
                 _log.debug("connection confirmed - exchanging data...");
             } else {

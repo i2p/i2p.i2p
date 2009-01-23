@@ -46,7 +46,7 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
         try {
             SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(s);
             Socket clientSock = serv.getClientSocket();
-            I2PSocket destSock = serv.getDestinationI2PSocket();
+            I2PSocket destSock = serv.getDestinationI2PSocket(this);
             new I2PTunnelRunner(clientSock, destSock, sockLock, null, mySockets);
         } catch (SOCKSException e) {
             _log.error("Error from SOCKS connection: " + e.getMessage());
