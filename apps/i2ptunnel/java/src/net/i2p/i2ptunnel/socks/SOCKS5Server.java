@@ -12,7 +12,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
+import net.i2p.I2PException;
+import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.DataFormatException;
+import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
@@ -126,6 +131,7 @@ public class SOCKS5Server extends SOCKSServer {
             throw new SOCKSException("UDP ASSOCIATE command not supported");
         default:
             _log.debug("unknown command in request (" + Integer.toHexString(command) + ")");
+            sendRequestReply(Reply.COMMAND_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("Invalid command in request");
         }
 
@@ -166,12 +172,14 @@ public class SOCKS5Server extends SOCKSServer {
             throw new SOCKSException("IPV6 addresses not supported");
         default:
             _log.debug("unknown address type in request (" + Integer.toHexString(command) + ")");
+            sendRequestReply(Reply.ADDRESS_TYPE_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("Invalid addresses type in request");
         }
 
         connPort = in.readUnsignedShort();
         if (connPort == 0) {
             _log.debug("trying to connect to TCP port 0?  Dropping!");
+            sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("Invalid port number in request");
         }
     }
@@ -246,6 +254,60 @@ public class SOCKS5Server extends SOCKSServer {
         }
 
         out.write(reply);
+    }
+
+    /**
+     * Get an I2PSocket that can be used to send/receive 8-bit clean data
+     * to/from the destination of the SOCKS connection.
+     *
+     * @return an I2PSocket connected with the destination
+     */
+    public I2PSocket getDestinationI2PSocket(I2PSOCKSTunnel t) throws SOCKSException {
+        setupServer();
+
+        if (connHostName == null) {
+            _log.error("BUG: destination host name has not been initialized!");
+            throw new SOCKSException("BUG! See the logs!");
+        }
+        if (connPort == 0) {
+            _log.error("BUG: destination port has not been initialized!");
+            throw new SOCKSException("BUG! See the logs!");
+        }
+
+        // FIXME: here we should read our config file, select an
+        // outproxy, and instantiate the proper socket class that
+        // handles the outproxy itself (SOCKS4a, SOCKS5, HTTP CONNECT...).
+        I2PSocket destSock;
+
+        try {
+            if (connHostName.toLowerCase().endsWith(".i2p")) {
+                _log.debug("connecting to " + connHostName + "...");
+                // Let's not due a new Dest for every request, huh?
+                //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
+                //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
+                // TODO get the streaming lib options in there
+                destSock = t.createI2PSocket(I2PTunnel.destFromName(connHostName));
+                confirmConnection();
+                _log.debug("connection confirmed - exchanging data...");
+            } else {
+                // if (connPort == 80) ...
+                _log.error("We don't support outproxies (yet)");
+                throw new SOCKSException("Ouproxies not supported (yet)");
+            }
+        } catch (DataFormatException e) {
+            throw new SOCKSException("Error in destination format");
+        } catch (SocketException e) {
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
+        } catch (IOException e) {
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
+        } catch (I2PException e) {
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
+        }
+
+        return destSock;
     }
 
     /*
