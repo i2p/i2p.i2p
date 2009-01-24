@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2008-12-01 00:00:00 $">
- <i2p.release version="0.6.5" date="2008/12/01" minVersion="0.6"
+<i2p.news date="$Date: 2009-01-24 00:00:00 $">
+ <i2p.release version="0.7" date="2009/01/24" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,28 +11,27 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2008-12-01: <b>0.6.5 <a href="http://www.i2p2.i2p/release-0.6.5.html">Released</a></b>
+2009-01-24: <b>0.7 <a href="http://www.i2p2.i2p/release-0.7.html">Released</a></b>
 </p><p>
-The 0.6.5 release introduces new components,
-drops some old ones (like the old TCP transport)
-and has been optimized to perform better.
+The 0.7 release adds stability and flexibility to I2PSnark,
+which can hopefully be used to distribute I2P updates in future.
 </p><p>
-The BOB (Basic Open Bridge) protocol is introduced,
-for use by client applications which cannot import
-I2CP libraries directly. This deprecates the old
-SAM protocol which was previously used in such cases.
-For now however, BOB is not started automatically yet
-on new installations, and SAM remains active on old installations.
+The I2P router gets fixes and optimizations to various
+transport-level and streaming issues, network exploration,
+NetDB performance and the UDP introducer system.
+Among other features, the new release offers
+better connection limiting, higher tolerance to "out of memory" exceptions
+in helper applications, and an experimental new address system
+using Base32 hashes of destination keys (".b32.i2p" URLs).
 </p><p>
-Improved code should be better at preventing congestion
-by probabalistically dropping participating traffic,
-and likewise behave better when congestion occurs.
-The floodfill NetDB should operate more reliably,
-the streaming library should choose better message sizes,
-offer a socket timeout function, and work proceeds
-on the "hidden" mode of operation for I2P routers.
+Both the BOB and SAM protocols are improved upon,
+more old components dropped, Router Console features added
+and a possible latency measurement attack mitigated.
+From this release onwards, block lists for misbehaving peers
+are activated by default.
 </p><p>
-From this release onward, I2P requires Java 1.5 or higher.
+It seems worthwhile to remind that already since
+the last release, I2P requires Java 1.5 or higher.
 If you are uncertain about your Java version, you can verify
 by opening a terminal window or command prompt,
 and entering the command "java -version".
