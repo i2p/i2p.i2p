@@ -34,9 +34,8 @@ licenses and dependencies.  This webpage is being served as part of the I2P rout
 client application, which is built off a trimmed down <a href="http://jetty.mortbay.com/jetty/index.html">Jetty</a>
 instance (trimmed down, as in, we do not include the demo apps or other add-ons, and we simplify configuration), 
 allowing you to deploy standard JSP/Servlet web applications into your router.  Jetty in turn makes use of 
-Apache's javax.servlet (javax.servlet.jar) implementation, as well as their xerces-j XML parser (xerces.jar).
-Their XML parser requires the Sun XML APIs (JAXP) which is included in binary form (xml-apis.jar) as required 
-by their binary code license.  This product includes software developed by the Apache Software Foundation 
+Apache's javax.servlet (javax.servlet.jar) implementation.
+This product includes software developed by the Apache Software Foundation 
 (http://www.apache.org/). </p>
 
 <p>Another application you can see on this webpage is <a href="http://www.i2p2.i2p/i2ptunnel">I2PTunnel</a>
