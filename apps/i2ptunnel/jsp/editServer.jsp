@@ -110,7 +110,8 @@
                 <label for="spoofedHost" accesskey="W">
                     <span class="accessKey">W</span>ebsite name:
                 </label>
-                <input type="text" size="20" id="spoofedHost" name="spoofedHost" title="Website Host Name" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />                
+                <input type="text" size="20" id="targetHost" name="spoofedHost" title="Website Host Name" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />                
+                <span class="comment">(leave blank for outproxies)</span>
             </div>
             <% }
           %><div id="privKeyField" class="rowItem">

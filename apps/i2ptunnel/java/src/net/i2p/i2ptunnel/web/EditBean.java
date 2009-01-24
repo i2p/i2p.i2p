@@ -39,7 +39,7 @@ public class EditBean extends IndexBean {
     
     public String getTargetHost(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getTargetHost() != null)
             return tun.getTargetHost();
         else
             return "127.0.0.1";
@@ -53,7 +53,7 @@ public class EditBean extends IndexBean {
     }
     public String getSpoofedHost(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getSpoofedHost() != null)
             return tun.getSpoofedHost();
         else
             return "";
