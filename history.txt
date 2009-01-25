@@ -1,4 +1,47 @@
-* 2008-01-24  0.7 released
+2009-01-25 zzz
+    * Build files:
+      - Don't bundle unneeded XML parser xercesImpl.jar (1MB)
+      - Don't include unneeded stuff in Copy, Delete, Exec.jar (300KB)
+    * I2CP:
+      Implement new I2CP message ReconfigureSessionMessage.
+      Will be used for tunnel reduction.
+    * I2PTunnel Edit Pages:
+      - Change default length to 2+0
+      - Cleanup helper code
+      - Prevent null spoofhost
+      - Stub out the following new options (C=client, S=server):
+        + Access list (S)
+        + Certificate type (S)
+        + Encrypted LeaseSet (S)
+        + New dest on idle restart (C)
+        + Tunnel closure on idle (C)
+        + Tunnel reduction on idle (C,S)
+    * I2PTunnel Socks:
+      - Add support for SOCKS to GUI
+      - Don't NPE on SOCKS 4, just close
+      - Don't have SOCKS build a new dest for every request
+      - Beginnings of SOCKS configuration by port
+      - HTML error msg for attempted HTTP access
+    * LeaseSet: Add encrypt/decrypt methods
+    * netdb.jsp: Don't show stats by default
+    * OCMOSJ: Bundle a reply when we switch tunnel or lease,
+      to detect failure sooner
+    * PublishLocalRouterInfoJob:
+      - Delay for 5m at startup
+      - Run every 20m (was 7.5m)
+    * RebuildRouterInfoJob: Don't run it
+    * Router: Add a keyring for decrypting leases
+    * Routerconsole: Add configkeyring.jsp
+    * SummaryHelper.getTransferred() move to DataHelper,
+      rename to formatSize(), use on tunnels.jsp
+    * Streaming, I2CP, Client Message sending:
+      Pass message timeout through new I2CP message
+      SendMessageExpiresMessage, so that the router
+      uses the same expiration as the streaming lib.
+      Should help reliability.
+    * Streaming: TCB control block sharing
+
+* 2009-01-24  0.7 released
 
 2009-01-24 Complication
     * Update versions, package release
