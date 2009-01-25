@@ -18,7 +18,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
- * Handle messages from the server for the client
+ * Handle messages from the server for the client or vice versa
  *
  */
 public class I2CPMessageHandler {
@@ -75,6 +75,8 @@ public class I2CPMessageHandler {
             return new RequestLeaseSetMessage();
         case SendMessageMessage.MESSAGE_TYPE:
             return new SendMessageMessage();
+        case SendMessageExpiresMessage.MESSAGE_TYPE:
+            return new SendMessageExpiresMessage();
         case SessionStatusMessage.MESSAGE_TYPE:
             return new SessionStatusMessage();
         case GetDateMessage.MESSAGE_TYPE:

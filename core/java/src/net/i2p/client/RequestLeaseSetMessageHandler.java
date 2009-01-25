@@ -21,6 +21,7 @@ import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
+import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.I2CPMessage;
@@ -78,6 +79,17 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
 
         leaseSet.setEncryptionKey(li.getPublicKey());
         leaseSet.setSigningKey(li.getSigningPublicKey());
+        String sk = session.getOptions().getProperty("i2cp.sessionKey");
+        if (sk != null) {
+            SessionKey key = new SessionKey();
+            try {
+                key.fromBase64(sk);
+                leaseSet.encrypt(key);
+                _context.keyRing().put(session.getMyDestination().calculateHash(), key);
+            } catch (DataFormatException dfe) {
+                _log.error("Bad session key: " + sk);
+            }
+        }
         try {
             leaseSet.sign(session.getPrivateKey());
             session.getProducer().createLeaseSet(session, leaseSet, li.getSigningPrivateKey(), li.getPrivateKey());

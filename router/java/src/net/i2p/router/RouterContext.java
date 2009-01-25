@@ -26,6 +26,7 @@ import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
 import net.i2p.util.Clock;
+import net.i2p.util.KeyRing;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to
@@ -366,4 +367,21 @@ public class RouterContext extends I2PAppContext {
         }
     }
 
+    /** override to support storage in router.config */
+    @Override
+    public KeyRing keyRing() {
+        if (!_keyRingInitialized)
+            initializeKeyRing();
+        return _keyRing;
+    }
+
+    @Override
+    protected void initializeKeyRing() {
+        synchronized (this) {
+            if (_keyRing == null)
+                _keyRing = new PersistentKeyRing(this);
+            _keyRingInitialized = true;
+        }
+    }
+    
 }

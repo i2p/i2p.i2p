@@ -140,7 +140,7 @@ public class ClientManager {
         }
     }
     
-    void distributeMessage(Destination fromDest, Destination toDest, Payload payload, MessageId msgId) { 
+    void distributeMessage(Destination fromDest, Destination toDest, Payload payload, MessageId msgId, long expiration) { 
         // check if there is a runner for it
         ClientConnectionRunner runner = getRunner(toDest);
         if (runner != null) {
@@ -168,6 +168,7 @@ public class ClientManager {
             msg.setSenderConfig(runner.getConfig());
             msg.setFromDestination(runner.getConfig().getDestination());
             msg.setMessageId(msgId);
+            msg.setExpiration(expiration);
             _ctx.clientMessagePool().add(msg, true);
         }
     }

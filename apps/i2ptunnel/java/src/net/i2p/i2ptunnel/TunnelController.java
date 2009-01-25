@@ -135,8 +135,10 @@ public class TunnelController implements Logging {
         }
         if ("httpclient".equals(type)) {
             startHttpClient();
-        }else if("ircclient".equals(type)) {
+        } else if("ircclient".equals(type)) {
             startIrcClient();
+        } else if("sockstunnel".equals(type)) {
+            startSocksClient();
         } else if ("client".equals(type)) {
             startClient();
         } else if ("server".equals(type)) {
@@ -172,6 +174,17 @@ public class TunnelController implements Logging {
         String dest = getTargetDestination();
         String sharedClient = getSharedClient();
         _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient }, this);
+        acquire();
+        _running = true;
+    }
+    
+    private void startSocksClient() {
+        setI2CPOptions();
+        setSessionOptions();
+        setListenOn();
+        String listenPort = getListenPort();
+        String sharedClient = getSharedClient();
+        _tunnel.runSOCKSTunnel(new String[] { listenPort, sharedClient }, this);
         acquire();
         _running = true;
     }

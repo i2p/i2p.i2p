@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -235,7 +236,7 @@ public class DataHelper {
                 int split = line.indexOf('=');
                 if (split <= 0) continue;
                 String key = line.substring(0, split);
-                String val = line.substring(split+1);
+                String val = line.substring(split+1);   //.trim() ??????????????
                 // Unescape line breaks after loading.
                 // Remember: "\" needs escaping both for regex and string.
                 val = val.replaceAll("\\\\r","\r");
@@ -839,6 +840,29 @@ public class DataHelper {
             return "n/a";
         } else {
             return (ms / (24 * 60 * 60 * 1000)) + "d";
+        }
+    }
+    
+    /**
+     * Caller should append 'B' or 'b' as appropriate
+     */
+    public static String formatSize(long bytes) {
+        double val = bytes;
+        int scale = 0;
+        while (val >= 1024) {
+            scale++; 
+            val /= 1024;
+        }
+        
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+
+        String str = fmt.format(val);
+        switch (scale) {
+            case 1: return str + "K";
+            case 2: return str + "M";
+            case 3: return str + "G";
+            case 4: return str + "T";
+            default: return bytes + "";
         }
     }
     

@@ -61,6 +61,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private long _leaseSetLookupBegin;
     private TunnelInfo _outTunnel;
     private TunnelInfo _inTunnel;
+    private boolean _wantACK;
     
     /**
      * final timeout (in milliseconds) that the outbound message will fail in.
@@ -69,6 +70,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     public final static String OVERALL_TIMEOUT_MS_PARAM = "clientMessageTimeout";
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
+    private final static long OVERALL_TIMEOUT_MS_MIN = 5*1000;
     
     /** priority of messages, that might get honored some day... */
     private final static int SEND_PRIORITY = 500;
@@ -125,23 +127,34 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _to = msg.getDestination();
         _toString = _to.calculateHash().toBase64().substring(0,4);
         _leaseSetLookupBegin = -1;
-        
-        String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
-        if (param == null)
-            param = ctx.router().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
-        if (param != null) {
-            try {
-                timeoutMs = Long.parseLong(param);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid client message timeout specified [" + param 
-                              + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
-                timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
-            }
-        }
-        
         _start = getContext().clock().now();
-        _overallExpiration = timeoutMs + _start;
+        
+        // use expiration requested by client if available, otherwise session config,
+        // otherwise router config, otherwise default
+        _overallExpiration = msg.getExpiration();
+        if (_overallExpiration > 0) {
+           _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
+           _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
+           if (_log.shouldLog(Log.WARN))
+               _log.warn("Message Expiration (ms): " + (_overallExpiration - _start));
+        } else {
+            String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
+            if (param == null)
+                param = ctx.router().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
+            if (param != null) {
+                try {
+                    timeoutMs = Long.parseLong(param);
+                } catch (NumberFormatException nfe) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid client message timeout specified [" + param 
+                                  + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
+                    timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
+                }
+            }
+            _overallExpiration = timeoutMs + _start;
+           if (_log.shouldLog(Log.WARN))
+               _log.warn("Default Expiration (ms): " + timeoutMs);
+        }
         _finished = false;
     }
     
@@ -267,6 +280,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 long lookupTime = getContext().clock().now() - _leaseSetLookupBegin;
                 getContext().statManager().addRateData("client.leaseSetFoundRemoteTime", lookupTime, lookupTime);
             }
+            _wantACK = false;
             boolean ok = getNextLease();
             if (ok) {
                 send();
@@ -400,6 +414,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Added to cache - lease for " + _toString); 
+        _wantACK = true;
         return true;
     }
 
@@ -443,10 +458,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             dieFatal();
             return;
         }
-        boolean wantACK = true;
+
         int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
-        if ( (existingTags > 30) && (getContext().random().nextInt(100) >= 5) )
-            wantACK = false;
+        _outTunnel = selectOutboundTunnel(_to);
+        // what's the point of 5% random? possible improvements or replacements:
+        // - wantACK if we changed their inbound lease (getNextLease() sets _wantACK)
+        // - wantACK if we changed our outbound tunnel (selectOutboundTunnel() sets _wantACK)
+        // - wantACK if we haven't in last 1m (requires a new static cache probably)
+        boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
@@ -503,7 +522,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                        + _lease.getTunnelId() + " on " 
                        + _lease.getGateway().toBase64());
         
-        _outTunnel = selectOutboundTunnel(_to);
         if (_outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Sending tunnel message out " + _outTunnel.getSendTunnelId(0) + " to " 
@@ -718,6 +736,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                             _log.warn("Switching back to tunnel " + tunnel + " for " + _toString); 
                         _backloggedTunnelCache.remove(hashPair());
                         _tunnelCache.put(hashPair(), tunnel);
+                        _wantACK = true;
                         return tunnel;
                     }  // else still backlogged
                 } else // no longer valid
@@ -740,6 +759,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             tunnel = selectOutboundTunnel();
             if (tunnel != null)
                 _tunnelCache.put(hashPair(), tunnel);
+            _wantACK = true;
         }
         return tunnel;
     }

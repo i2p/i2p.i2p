@@ -60,7 +60,6 @@
         <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/xercesImpl.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
     <target name="buildexe">
@@ -87,7 +86,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/xercesImpl.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
@@ -219,7 +218,6 @@
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
         <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
-        <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -371,17 +369,16 @@
         <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
         <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
-        <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
     </target>
     <target name="installer" depends="preppkg">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
-        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Delete" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
         </jar>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
@@ -452,7 +449,7 @@
             <arg value="-output"/>
             <arg value="findbugs.xml"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:build/xercesImpl.jar"/>
+            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->

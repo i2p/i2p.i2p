@@ -21,7 +21,9 @@ import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.ReceiveMessageBeginMessage;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
+import net.i2p.data.i2cp.ReconfigureSessionMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
+import net.i2p.data.i2cp.SendMessageExpiresMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
@@ -66,6 +68,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 break;
             case SendMessageMessage.MESSAGE_TYPE:
                 handleSendMessage(reader, (SendMessageMessage)message);
+                break;
+            case SendMessageExpiresMessage.MESSAGE_TYPE:
+                handleSendMessage(reader, (SendMessageExpiresMessage)message);
                 break;
             case ReceiveMessageBeginMessage.MESSAGE_TYPE:
                 handleReceiveBegin(reader, (ReceiveMessageBeginMessage)message);
@@ -237,6 +242,17 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash()));
     }
 
+    /**
+     * Message's Session ID ignored. This doesn't support removing previously set options.
+     * Nor do we bother with message.getSessionConfig().verifySignature() ... should we?
+     *
+     */
+    private void handleReconfigureSession(I2CPMessageReader reader, ReconfigureSessionMessage message) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Updating options - session " + _runner.getSessionId());
+        _runner.getConfig().getOptions().putAll(message.getSessionConfig().getOptions());
+    }
+    
     // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME
     private final static int MAX_SESSION_ID = 32767;
 

@@ -550,10 +550,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Pass off the error to the listener
      */
     void propogateError(String msg, Throwable error) {
-        if (_log.shouldLog(Log.WARN)) 
-            _log.warn(getPrefix() + "Error occurred: " + msg + " - " + error.getMessage());
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(getPrefix() + " cause", error);
+        if (_log.shouldLog(Log.ERROR)) 
+            _log.error(getPrefix() + "Error occurred: " + msg + " - " + error.getMessage());
+        if (_log.shouldLog(Log.ERROR))
+            _log.error(getPrefix() + " cause", error);
         
         if (_sessionListener != null) _sessionListener.errorOccurred(this, msg, error);
     }

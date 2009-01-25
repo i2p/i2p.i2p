@@ -78,7 +78,6 @@
                 <include name="jasper-runtime.jar" />
                 <include name="javax.servlet.jar" />
                 <include name="org.mortbay.jetty.jar" />
-                <include name="xercesImpl.jar" />
             </fileset>
         </copy>
         <delete dir="jetty-5.1.12" />

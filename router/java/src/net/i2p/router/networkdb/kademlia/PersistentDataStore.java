@@ -65,10 +65,6 @@ class PersistentDataStore extends TransientDataStore {
         return super.remove(key);
     }
     
-    public DataStructure removeLease(Hash key) {
-        return super.removeLease(key);
-    }
-    
     public void put(Hash key, DataStructure data) {
         if ( (data == null) || (key == null) ) return;
         super.put(key, data);
@@ -76,26 +72,6 @@ class PersistentDataStore extends TransientDataStore {
         if (data instanceof RouterInfo)
             _writer.queue(key, data);
     }
-    
-/*
- *  We don't store leasesets here anymore, use the TransientDataStore count
- *
-    public int countLeaseSets() {
-        File dbDir = null;
-        try {
-            dbDir = getDbDir();
-        } catch (IOException ioe) { 
-            return 0;
-        }
-        if (dbDir == null)
-            return 0;
-        File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
-        if (leaseSetFiles == null) 
-            return 0;
-        else
-            return leaseSetFiles.length;
-    }
-*/
     
     private void accept(LeaseSet ls) {
         super.put(ls.getDestination().calculateHash(), ls);
@@ -249,18 +225,6 @@ class PersistentDataStore extends TransientDataStore {
             int routerCount = 0;
             try {
                 File dbDir = getDbDir();
-/****
-                if (getContext().router().getUptime() < 10*60*1000) {
-                    File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
-                    if (leaseSetFiles != null) {
-                        for (int i = 0; i < leaseSetFiles.length; i++) {
-                            Hash key = getLeaseSetHash(leaseSetFiles[i].getName());
-                            if ( (key != null) && (!isKnown(key)) )
-                                PersistentDataStore.this._context.jobQueue().addJob(new ReadLeaseJob(leaseSetFiles[i], key));
-                        }
-                    }
-                }
-****/
                 File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
                 if (routerInfoFiles != null) {
                     routerCount += routerInfoFiles.length;
@@ -282,63 +246,6 @@ class PersistentDataStore extends TransientDataStore {
             }
         }
     }
-    
-/****
-    private class ReadLeaseJob extends JobImpl {
-        private File _leaseFile;
-        private Hash _key;
-        public ReadLeaseJob(File leaseFile, Hash key) {
-            super(PersistentDataStore.this._context);
-            _leaseFile = leaseFile;
-            _key = key;
-        }
-        public String getName() { return "Read LeaseSet"; }
-        private boolean shouldRead() {
-            DataStructure data = get(_key);
-            if (data == null) return true;
-            if (data instanceof LeaseSet) {
-                long knownDate = ((LeaseSet)data).getEarliestLeaseDate();
-                long fileDate = _leaseFile.lastModified();
-                if (fileDate > knownDate)
-                    return true;
-                else
-                    return false;
-            } else {
-                // wtf
-                return true;
-            }
-        }
-        public void runJob() {
-            if (!shouldRead()) return;
-            try {
-                FileInputStream fis = null;
-                boolean corrupt = false;
-                try {
-                    fis = new FileInputStream(_leaseFile);
-                    LeaseSet ls = new LeaseSet();
-                    ls.readBytes(fis);
-                    try {
-                        _facade.store(ls.getDestination().calculateHash(), ls);
-                    } catch (IllegalArgumentException iae) {
-                        _log.info("Refused locally loaded leaseSet - deleting");
-                        corrupt = true;
-                    }
-                } catch (DataFormatException dfe) {
-                    _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), dfe);
-                    corrupt = true;
-                } catch (FileNotFoundException fnfe) {
-                    _log.debug("Deleted prior to read.. a race during expiration / load");
-                    corrupt = false;
-                } finally {
-                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-                }
-                if (corrupt) _leaseFile.delete();
-            } catch (IOException ioe) {
-                _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), ioe);
-            }
-        }
-    }
-****/
     
     private class ReadRouterJob extends JobImpl {
         private File _routerFile;
@@ -464,31 +371,8 @@ class PersistentDataStore extends TransientDataStore {
                 _log.info("Removed router info at " + f.getAbsolutePath());
             return;
         }
-/***
-        String lsName = getLeaseSetName(key);
-        File f = new File(dir, lsName);
-        if (f.exists()) {
-            boolean removed = f.delete();
-            if (!removed)
-                _log.warn("Unable to remove lease set at " + f.getAbsolutePath());
-            else
-                _log.info("Removed lease set at " + f.getAbsolutePath());
-            return;
-        }
-***/
     }
     
-/***
-    private final static class LeaseSetFilter implements FilenameFilter {
-        private static final FilenameFilter _instance = new LeaseSetFilter();
-        public static final FilenameFilter getInstance() { return _instance; }
-        public boolean accept(File dir, String name) {
-            if (name == null) return false;
-            name = name.toUpperCase();
-            return (name.startsWith(LEASESET_PREFIX.toUpperCase()) && name.endsWith(LEASESET_SUFFIX.toUpperCase()));
-        }
-    }
-***/
     private final static class RouterInfoFilter implements FilenameFilter {
         private static final FilenameFilter _instance = new RouterInfoFilter();
         public static final FilenameFilter getInstance() { return _instance; }

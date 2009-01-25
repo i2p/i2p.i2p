@@ -507,7 +507,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         out.write("</table>\n");
         out.write("Inactive participating tunnels: " + inactive + "<br />\n");
-        out.write("Lifetime bandwidth usage: " + processed + "KB<br />\n");
+        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B<br />\n");
     }
     
     class TunnelComparator implements Comparator {
@@ -577,7 +577,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         if (live <= 0)
             out.write("<b>No tunnels, waiting for the grace period to end</b><br />\n");
-        out.write("Lifetime bandwidth usage: " + processedIn + "KB in, " + processedOut + "KB out<br />");
+        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "B in, " +
+                  DataHelper.formatSize(processedOut*1024) + "B out<br />");
     }
     
     private String getCapacity(Hash peer) {

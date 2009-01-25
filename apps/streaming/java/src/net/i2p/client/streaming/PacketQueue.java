@@ -82,7 +82,16 @@ class PacketQueue {
             
             // this should not block!
             begin = _context.clock().now();
-            sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);
+            long expires = 0;
+            Connection.ResendPacketEvent rpe = (Connection.ResendPacketEvent) packet.getResendEvent();
+            if (rpe != null)
+                // we want the router to expire it a little before we do,
+                // so if we retransmit it will use a new tunnel/lease combo
+                expires = rpe.getNextSendTime() - 500;
+            if (expires > 0)
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
+            else
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);
             end = _context.clock().now();
             
             if ( (end-begin > 1000) && (_log.shouldLog(Log.WARN)) ) 

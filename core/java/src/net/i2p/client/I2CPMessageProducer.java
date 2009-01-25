@@ -9,6 +9,7 @@ package net.i2p.client;
  *
  */
 
+import java.util.Date;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -28,6 +29,7 @@ import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
+import net.i2p.data.i2cp.SendMessageExpiresMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.util.Log;
 
@@ -91,8 +93,13 @@ class I2CPMessageProducer {
      *
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag,
-                            SessionKey key, Set tags, SessionKey newKey) throws I2PSessionException {
-        SendMessageMessage msg = new SendMessageMessage();
+                            SessionKey key, Set tags, SessionKey newKey, long expires) throws I2PSessionException {
+        SendMessageMessage msg;
+        if (expires > 0) {
+            msg = new SendMessageExpiresMessage();
+            ((SendMessageExpiresMessage)msg).setExpiration(new Date(expires));
+        } else
+            msg = new SendMessageMessage();
         msg.setDestination(dest);
         msg.setSessionId(session.getSessionId());
         msg.setNonce(nonce);

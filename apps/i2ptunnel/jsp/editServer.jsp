@@ -110,7 +110,8 @@
                 <label for="spoofedHost" accesskey="W">
                     <span class="accessKey">W</span>ebsite name:
                 </label>
-                <input type="text" size="20" id="spoofedHost" name="spoofedHost" title="Website Host Name" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />                
+                <input type="text" size="20" id="targetHost" name="spoofedHost" title="Website Host Name" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />                
+                <span class="comment">(leave blank for outproxies)</span>
             </div>
             <% }
           %><div id="privKeyField" class="rowItem">
@@ -177,12 +178,12 @@
                     <span class="accessKey">V</span>ariance:
                 </label>
                 <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Depth" class="selectbox">
-                    <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, -1);
+                    <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
                   %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>>0 hop variance          (no randomisation, consistant performance)</option>
-                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>>+/- 0-1 hop variance    (standard randomisation, standard performance)</option>
-                    <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>>+/- 0-2 hop variance    (high randomisation, variable performance)</option>
                     <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>>+ 0-1 hop variance      (medium additive randomisation, subtractive performance)</option>
                     <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>>+ 0-2 hop variance      (high additive randomisation, subtractive performance)</option>
+                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>>+/- 0-1 hop variance    (standard randomisation, standard performance)</option>
+                    <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>>+/- 0-2 hop variance    (not recommended)</option>
                 <% if (tunnelVariance > 2 || tunnelVariance < -2) {
                 %>    <option value="<%=tunnelVariance%>" selected="selected"><%= (tunnelVariance > 2 ? "+ " : "+/- ") %>0-<%=tunnelVariance%> hop variance</option>
                 <% }
@@ -242,6 +243,130 @@
                 <hr />
             </div>
            
+            <div id="optionsField" class="rowItem">
+                <label for="encrypt" accesskey="e">
+                    <span class="accessKey">E</span>ncrypt Leaseset:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="encrypt" accesskey="e">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="Encrypt LeaseSet"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="hostField" class="rowItem">
+                <label for="encrypt" accesskey="e">
+                    Leaseset Encryption Key:
+                </label>
+                <input type="text" id="hostField" name="encryptKey" size="60" title="Encrypt Key" value="<%=editBean.getEncryptKey(curTunnel)%>" class="freetext" />                
+                <span class="comment">(Users will require this key)</span>
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+           
+            <div id="optionsField" class="rowItem">
+                <label for="access" accesskey="s">
+                    Restricted Acce<span class="accessKey">s</span>s List:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="s">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="access" title="Enable Access List"<%=(editBean.getAccess(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="hostField" class="rowItem">
+                <label for="accessList" accesskey="s">
+                    Access List:
+                </label>
+                <textarea rows="2" cols="60" id="hostField" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <span class="comment">(Restrict to these clients only)</span>
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+           
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="d">
+                    Re<span class="accessKey">d</span>uce tunnel quantity when idle:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="d">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="reduce" title="Reduce Tunnels"<%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceCount" accesskey="d">
+                    Reduced tunnel count:
+                </label>
+                <input type="text" id="port" name="reduceCount" size="1" maxlength="1" title="Reduced Tunnel Count" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceTime" accesskey="d">
+                    Reduce when idle (minutes):
+                </label>
+                <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
+            </div>
+
+            <div class="subdivider">
+                <hr />
+            </div>
+           
+            <div id="tunnelOptionsField" class="rowItem">
+                <label for="cert" accesskey="c">
+                    <span class="accessKey">C</span>ertificate type:
+                </label>
+            </div>
+            <div id="hostField" class="rowItem">
+              <div id="portField" class="rowItem">
+                <label>None</label>
+                <input value="0" type="radio" id="startOnLoad" name="cert" title="No Certificate"<%=(editBean.getCert(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <span class="comment"></span>
+              </div>
+              <div id="portField" class="rowItem">
+                <label>Hashcash (effort)</label>
+                <input value="1" type="radio" id="startOnLoad" name="cert" title="Hashcash Certificate"<%=(editBean.getCert(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input type="text" id="port" name="effort" size="2" title="Hashcash Effort" value="<%=editBean.getEffort(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="force" accesskey="c">
+                    Estimate Hashcash Calc Time:
+                </label>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Estimate Calculation Time" title="Estimate Calculation Time">Estimate</button>
+            </div>
+            <div id="hostField" class="rowItem">
+              <div id="portField" class="rowItem">
+                <label>Hidden</label>
+                <input value="2" type="radio" id="startOnLoad" name="cert" title="Hidden Certificate"<%=(editBean.getCert(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <span class="comment"></span>
+              </div>
+              <div id="portField" class="rowItem">
+                <label for="signer" accesskey="c">
+                    Signed (signed by):
+                </label>
+                <input value="3" type="radio" id="startOnLoad" name="cert" title="Signed Certificate"<%=(editBean.getCert(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input type="text" id="port" name="signer" size="50" title="Cert Signer" value="<%=editBean.getSigner(curTunnel)%>" class="freetext" />                
+                <span class="comment"></span>
+              </div>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="force" accesskey="c">
+                    Modify Certificate:
+                </label>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Modify Cert Now" title="Force New Cert Now">Modify</button>
+                <span class="comment">(Tunnel must be stopped first)</span>
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+                 
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">
                     C<span class="accessKey">u</span>stom options:
@@ -256,8 +381,10 @@
             <div class="header"></div>
             <div class="footer">
                 <div class="toolbox">
+                    <span class="comment">NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted</span>
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button><button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
+                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button>
+                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
                 </div>
             </div> 
         </div>

@@ -116,14 +116,14 @@
                 <hr />
             </div>
            
-            <% if ("httpclient".equals(editBean.getInternalType(curTunnel))) {
+            <% if ("httpclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
                     Outpro<span class="accessKey">x</span>ies:
                 </label>
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
             </div>
-            <% } else {
+            <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
                     <span class="accessKey">T</span>unnel Destination:
@@ -205,12 +205,12 @@
                     <span class="accessKey">V</span>ariance:
                 </label>
                 <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Depth" class="selectbox">
-                    <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, -1);
+                    <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
                   %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>>0 hop variance (no randomisation, consistant performance)</option>
-                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>>+/- 0-1 hop variance (standard randomisation, standard performance)</option>
-                    <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>>+/- 0-2 hop variance (high randomisation, variable performance)</option>
                     <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>>+ 0-1 hop variance (medium additive randomisation, subtractive performance)</option>
                     <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>>+ 0-2 hop variance (high additive randomisation, subtractive performance)</option>
+                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>>+/- 0-1 hop variance (standard randomisation, standard performance)</option>
+                    <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>>+/- 0-2 hop variance (not recommended)</option>
                 <% if (tunnelVariance > 2 || tunnelVariance < -2) {
                 %>    <option value="<%=tunnelVariance%>" selected="selected"><%= (tunnelVariance > 2 ? "+ " : "+/- ") %>0-<%=tunnelVariance%> hop variance</option>
                 <% }
@@ -265,6 +265,62 @@
                 </label>
                 <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
             </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+           
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="c">
+                    <span class="accessKey">C</span>lose tunnels when idle:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="close" title="Close Tunnels"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Generate New Destination Keys On Reopen:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="newDest" title="New Destination"<%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceTime" accesskey="c">
+                    Reduce when idle (minutes):
+                </label>
+                <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+           
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="d">
+                    Re<span class="accessKey">d</span>uce tunnel quantity when idle:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="d">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="reduce" title="Reduce Tunnels"<%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceCount" accesskey="d">
+                    Reduced tunnel count:
+                </label>
+                <input type="text" id="port" name="reduceCount" size="1" maxlength="1" title="Reduced Tunnel Count" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceTime" accesskey="d">
+                    Reduce when idle (minutes):
+                </label>
+                <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
+            </div>
             
             <div class="subdivider">
                 <hr />
@@ -284,8 +340,10 @@
             <div class="header"></div>
             <div class="footer">
                 <div class="toolbox">
+                    <span class="comment">NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted</span>
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button><button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
+                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button>
+                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
                 </div>
             </div> 
         </div>

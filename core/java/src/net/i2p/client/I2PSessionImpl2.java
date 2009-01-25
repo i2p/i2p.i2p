@@ -107,14 +107,18 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         return sendMessage(dest, payload, 0, payload.length);
     }
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
-        return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64));
+        return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64), 0);
     }
     
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException {
-        return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent);
+        return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent, 0);
     }
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
+                   throws I2PSessionException {
+        return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0);
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expires)
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
         if (isClosed()) throw new I2PSessionException("Already closed");
@@ -142,7 +146,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         _context.statManager().addRateData("i2cp.tx.msgCompressed", compressed, 0);
         _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
-        return sendBestEffort(dest, payload, keyUsed, tagsSent);
+        return sendBestEffort(dest, payload, keyUsed, tagsSent, expires);
     }
 
     /**
@@ -168,7 +172,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     
     private static final int NUM_TAGS = 50;
 
-    private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
+    private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent, long expires)
                     throws I2PSessionException {
         SessionKey key = null;
         SessionKey newKey = null;
@@ -176,6 +180,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         Set sentTags = null;
         int oldTags = 0;
         long begin = _context.clock().now();
+        /***********
         if (I2CPMessageProducer.END_TO_END_CRYPTO) {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("begin sendBestEffort");
             key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
@@ -220,6 +225,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         } else {
             // not using end to end crypto, so don't ever bundle any tags
         }
+        **********/
         
         if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
         
@@ -233,14 +239,14 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Setting key = " + key);
 
         if (keyUsed != null) {
-            if (I2CPMessageProducer.END_TO_END_CRYPTO) {
-                if (newKey != null)
-                    keyUsed.setData(newKey.getData());
-                else
-                    keyUsed.setData(key.getData());
-            } else {
+            //if (I2CPMessageProducer.END_TO_END_CRYPTO) {
+            //    if (newKey != null)
+            //        keyUsed.setData(newKey.getData());
+            //    else
+            //        keyUsed.setData(key.getData());
+            //} else {
                 keyUsed.setData(SessionKey.INVALID_KEY.getData());
-            }
+            //}
         }
         if (tagsSent != null) {
             if (sentTags != null) {
@@ -261,7 +267,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                        + state.getNonce() + " for best effort "
                        + " sync took " + (inSendingSync-beforeSendingSync) 
                        + " add took " + (afterSendingSync-inSendingSync));
-        _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
+        _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey, expires);
         
         // since this is 'best effort', all we're waiting for is a status update 
         // saying that the router received it - in theory, that should come back

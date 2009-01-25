@@ -28,7 +28,8 @@ public class StartAcceptingClientsJob extends JobImpl {
         getContext().clientManager().startup();
 
         getContext().jobQueue().addJob(new ReadConfigJob(getContext()));
-        getContext().jobQueue().addJob(new RebuildRouterInfoJob(getContext()));
+        // pointless
+        //getContext().jobQueue().addJob(new RebuildRouterInfoJob(getContext()));
         getContext().jobQueue().allowParallelOperation();
     }
 }
