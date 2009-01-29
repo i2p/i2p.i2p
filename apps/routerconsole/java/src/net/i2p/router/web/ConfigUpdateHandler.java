@@ -51,7 +51,7 @@ public class ConfigUpdateHandler extends FormHandler {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice("Update available, attempting to download now");
                 else
-                    addFormNotice("Update available, click link on left to download");
+                    addFormNotice("Update available, click button on left to download");
             } else
                 addFormNotice("No update available");
         }

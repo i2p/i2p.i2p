@@ -11,12 +11,10 @@ import net.i2p.router.RouterContext;
  * uuuugly.  dump the peer profile data if given a peer.
  *
  */
-public class StatHelper {
+public class StatHelper extends HelperBase {
     private String _peer;
-    private Writer _writer;
     
     public void setPeer(String peer) { _peer = peer; }
-    public void setWriter(Writer writer) { _writer = writer; }
     
     public String getProfile() { 
         RouterContext ctx = (RouterContext)net.i2p.router.RouterContext.listContexts().get(0);
@@ -25,10 +23,10 @@ public class StatHelper {
             Hash peer = (Hash)iter.next();
             if (peer.toBase64().startsWith(_peer)) {
                 try {
-                    WriterOutputStream wos = new WriterOutputStream(_writer);
+                    WriterOutputStream wos = new WriterOutputStream(_out);
                     ctx.profileOrganizer().exportProfile(peer, wos);
                     wos.flush();
-                    _writer.flush();
+                    _out.flush();
                     return "";
                 } catch (Exception e) {
                     e.printStackTrace();

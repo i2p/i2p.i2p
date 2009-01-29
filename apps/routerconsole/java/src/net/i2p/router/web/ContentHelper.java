@@ -6,25 +6,11 @@ import java.util.Locale;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 
-public class ContentHelper {
+public class ContentHelper extends HelperBase {
     private String _page;
     private int _maxLines;
     private boolean _startAtBeginning;
     private String _lang;
-    private RouterContext _context;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
     
     public ContentHelper() {}
     
