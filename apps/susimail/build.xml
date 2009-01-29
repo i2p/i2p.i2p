@@ -19,7 +19,7 @@
     <target name="jar" depends="compile, war" />
     <target name="war" depends="compile">
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
-             basedir="src/" excludes="WEB-INF/web.xml">
+             basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
         </war>
     </target>
     <target name="javadoc">
