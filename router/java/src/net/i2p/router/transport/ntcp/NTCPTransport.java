@@ -27,7 +27,6 @@ import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 
 /**
  *
@@ -50,7 +49,7 @@ public class NTCPTransport extends TransportImpl {
     private List _establishing;
 
     private List _sent;
-    private SendFinisher _finisher;
+    private NTCPSendFinisher _finisher;
     
     public NTCPTransport(RouterContext ctx) {
         super(ctx);
@@ -124,7 +123,7 @@ public class NTCPTransport extends TransportImpl {
         _conByIdent = new HashMap(64);
         
         _sent = new ArrayList(4);
-        _finisher = new SendFinisher();
+        _finisher = new NTCPSendFinisher(ctx, this);
         
         _pumper = new EventPumper(ctx, this);
         _reader = new Reader(ctx);
@@ -310,27 +309,8 @@ public class NTCPTransport extends TransportImpl {
         return countActivePeers() < getMaxConnections() * 4 / 5;
     }
 
+    /** queue up afterSend call, which can take some time w/ jobs, etc */
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
-    /** async afterSend call, which can take some time w/ jobs, etc */
-    private class SendFinisher implements SimpleTimer.TimedEvent {
-        public void add(OutNetMessage msg) {
-            synchronized (_sent) { _sent.add(msg); }
-            SimpleTimer.getInstance().addEvent(SendFinisher.this, 0);
-        }
-        public void timeReached() {
-            int pending = 0;
-            OutNetMessage msg = null;
-            synchronized (_sent) {
-                pending = _sent.size()-1;
-                if (pending >= 0)
-                    msg = (OutNetMessage)_sent.remove(0);
-            }
-            if (msg != null)
-                afterSend(msg, true, false, msg.getSendTime());
-            if (pending > 0)
-                SimpleTimer.getInstance().addEvent(SendFinisher.this, 0);
-        }
-    }
 
     private boolean isEstablished(RouterIdentity peer) {
         return isEstablished(peer.calculateHash());
@@ -412,6 +392,7 @@ public class NTCPTransport extends TransportImpl {
     
     public RouterAddress startListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Starting ntcp transport listening");
+        _finisher.start();
         _pumper.startPumping();
         
         _reader.startReading(NUM_CONCURRENT_READERS);
@@ -423,6 +404,7 @@ public class NTCPTransport extends TransportImpl {
 
     public RouterAddress restartListening(RouterAddress addr) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Restarting ntcp transport listening");
+        _finisher.start();
         _pumper.startPumping();
         
         _reader.startReading(NUM_CONCURRENT_READERS);
@@ -551,6 +533,7 @@ public class NTCPTransport extends TransportImpl {
         _pumper.stopPumping();
         _writer.stopWriting();
         _reader.stopReading();
+        _finisher.stop();
         Map cons = null;
         synchronized (_conLock) {
             cons = new HashMap(_conByIdent);
