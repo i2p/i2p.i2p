@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+build:
+	ant preppkg && \
+	(cd pkg-temp; chmod +x postinstall.sh) && \
+	mkdir -p debian/tmp/var/lib && \
+	mkdir -p debian/tmp/etc/init.d && \
+	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p && \
+	cp -a pkg-temp debian/tmp/var/lib/i2p && \
+	touch debian/build
+binary: build
+	mkdir -p debian/tmp/DEBIAN && \
+	dpkg-gencontrol && \
+	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/tmp/DEBIAN && \
+	dpkg-deb -b debian/tmp ..
+clean:
+	rm -f debian/build
+	ant clean
+	rm -Rf pkg-temp
+	@exit 0
