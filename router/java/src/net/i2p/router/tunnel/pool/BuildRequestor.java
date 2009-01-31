@@ -12,6 +12,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
+import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -136,6 +137,7 @@ class BuildRequestor {
                 return;
             }
             outMsg.setTarget(peer);
+            outMsg.setOnFailedSendJob(new TunnelBuildFirstHopFailJob(ctx, pool, cfg, exec));
             ctx.outNetMessagePool().add(outMsg);
         }
         if (log.shouldLog(Log.DEBUG))
@@ -212,5 +214,34 @@ class BuildRequestor {
         cfg.setExpireJob(expireJob);
         ctx.jobQueue().addJob(expireJob);
         // can it get much easier?
+    }
+
+    /**
+     *  Do two important things if we can't get the build msg to the
+     *  first hop on an outbound tunnel -
+     *  - Call buildComplete() so we can get started on the next build
+     *    without waiting for the full expire time
+     *  - Blame the first hop in the profile
+     *  Most likely to happen on an exploratory tunnel, obviously.
+     *  Can't do this for inbound tunnels since the msg goes out an expl. tunnel.
+     */
+    private static class TunnelBuildFirstHopFailJob extends JobImpl {
+        TunnelPool _pool;
+        PooledTunnelCreatorConfig _cfg;
+        BuildExecutor _exec;
+        private TunnelBuildFirstHopFailJob(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
+            super(ctx);
+            _cfg = cfg;
+            _exec = exec;
+            _pool = pool;
+        }
+        public String getName() { return "Timeout contacting first peer for OB tunnel"; }
+        public void runJob() {
+            _exec.buildComplete(_cfg, _pool);
+            getContext().profileManager().tunnelTimedOut(_cfg.getPeer(1));
+            getContext().statManager().addRateData("tunnel.buildFailFirstHop", 1, 0);
+            // static, no _log
+            //System.err.println("Cant contact first hop for " + _cfg);
+        }
     }
 }
