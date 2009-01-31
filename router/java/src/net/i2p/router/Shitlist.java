@@ -36,7 +36,7 @@ public class Shitlist {
     private RouterContext _context;
     private Map _entries;
     
-    private class Entry {
+    private static class Entry {
         /** when it should expire, per the i2p clock */
         long expireOn;
         /** why they were shitlisted */

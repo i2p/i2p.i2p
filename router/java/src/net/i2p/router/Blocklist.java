@@ -256,7 +256,7 @@ public class Blocklist {
         }
     }
 
-    private class Entry {
+    private static class Entry {
         String comment;
         byte ip1[];
         byte ip2[];
