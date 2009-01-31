@@ -55,7 +55,7 @@ public final class ByteCache {
         _maxCached = maxCachedEntries;
         _entrySize = entrySize;
         _lastOverflow = -1;
-        SimpleTimer.getInstance().addEvent(new Cleanup(), CLEANUP_FREQUENCY);
+        SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY);
         _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
     }
     
@@ -120,7 +120,6 @@ public final class ByteCache {
                         _log.debug("Removing " + toRemove + " cached entries of size " + _entrySize);
                 }
             }
-            SimpleTimer.getInstance().addEvent(Cleanup.this, CLEANUP_FREQUENCY);
         }
     }
 }

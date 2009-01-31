@@ -28,6 +28,7 @@ import java.util.List;
 
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
@@ -215,7 +216,7 @@ class PeerConnectionOut implements Runnable
   private void addMessage(Message m)
   {
     if (m.type == Message.PIECE)
-      SimpleTimer.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
+      SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     synchronized(sendQueue)
       {
         sendQueue.add(m);

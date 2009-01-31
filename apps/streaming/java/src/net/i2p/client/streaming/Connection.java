@@ -12,6 +12,7 @@ import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -246,7 +247,7 @@ public class Connection {
     void sendReset() {
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         long now = _context.clock().now();
         if (_resetSentOn + 10*1000 > now) return; // don't send resets too fast
@@ -460,7 +461,7 @@ public class Connection {
     void resetReceived() {
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         _resetReceived = true;
         MessageOutputStream mos = _outputStream;
@@ -509,7 +510,7 @@ public class Connection {
         if (removeFromConMgr) {
             if (_disconnectScheduledOn < 0) {
                 _disconnectScheduledOn = _context.clock().now();
-                SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+                SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
             }
         }
         _connected = false;
@@ -708,7 +709,7 @@ public class Connection {
         _closeSentOn = when;
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
     }
     public long getCloseReceivedOn() { return _closeReceivedOn; }

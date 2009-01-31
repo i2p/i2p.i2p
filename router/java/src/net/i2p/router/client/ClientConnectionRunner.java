@@ -38,6 +38,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -419,7 +420,7 @@ public class ClientConnectionRunner {
                     // theirs is newer
                 } else {
                     // ours is newer, so wait a few secs and retry
-                    SimpleTimer.getInstance().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
+                    SimpleScheduler.getInstance().addEvent(new Rerequest(set, expirationTime, onCreateJob, onFailedJob), 3*1000);
                 }
                 // fire onCreated?
                 return; // already requesting

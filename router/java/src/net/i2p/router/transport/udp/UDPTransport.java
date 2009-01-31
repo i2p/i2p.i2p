@@ -33,6 +33,7 @@ import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -631,7 +632,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                     if (added) {
                         _context.statManager().addRateData("udp.dropPeerDroplist", droplistSize, 0);
-                        SimpleTimer.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                        SimpleScheduler.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                     }
                 }
                 markUnreachable(peerHash);

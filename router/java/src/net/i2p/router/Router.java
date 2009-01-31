@@ -43,6 +43,7 @@ import net.i2p.stat.StatManager;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -257,7 +258,7 @@ public class Router {
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        SimpleTimer.getInstance().addEvent(new CoalesceStatsEvent(_context), 0);
+        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), 20*1000);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
@@ -346,7 +347,7 @@ public class Router {
             if (blockingRebuild)
                 r.timeReached();
             else
-                SimpleTimer.getInstance().addEvent(r, 0);
+                SimpleScheduler.getInstance().addEvent(r, 0);
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
@@ -1261,8 +1262,6 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
                 getContext().statManager().addRateData("bw.sendBps", (long)KBps, 60*1000);
             }
         }
-        
-        SimpleTimer.getInstance().addEvent(this, 20*1000);
     }
 }
 

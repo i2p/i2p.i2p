@@ -40,6 +40,7 @@ import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -369,7 +370,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Notified availability for session " + _sessionId + ", message " + id);
         }
-        SimpleTimer.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
+        SimpleScheduler.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
     private class VerifyUsage implements SimpleTimer.TimedEvent {
         private Long _msgId;
