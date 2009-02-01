@@ -60,7 +60,7 @@ class PeerState
   // If we have te resend outstanding requests (true after we got choked).
   private boolean resend = false;
 
-  private final static int MAX_PIPELINE = 2;               // this is for outbound requests
+  private final static int MAX_PIPELINE = 3;               // this is for outbound requests
   private final static int MAX_PIPELINE_BYTES = 128*1024;  // this is for inbound requests
   public final static int PARTSIZE = 32*1024; // Snark was 16K, i2p-bt uses 64KB
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this

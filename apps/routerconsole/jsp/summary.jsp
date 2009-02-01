@@ -63,11 +63,9 @@
             if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            if (uri.indexOf('?') > 0)
-                uri = uri + "&reseedNonce=" + nonce;
-            else
-                uri = uri + "?reseedNonce=" + nonce;
-            out.print(" <a href=\"" + uri + "\">reseed</a><br />");
+            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<input type=\"hidden\" name=\"reseedNonce\" value=\"" + nonce + "\" >\n");
+            out.print("<button type=\"submit\" >Reseed</button></form></p>\n");
         }
     }
     // If a new reseed ain't running, and the last reseed had errors, show error message

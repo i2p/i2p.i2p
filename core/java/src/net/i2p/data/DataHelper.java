@@ -344,8 +344,9 @@ public class DataHelper {
 
         long rv = 0;
         for (int i = 0; i < numBytes; i++) {
-            long cur = rawStream.read() & 0xFF;
+            long cur = rawStream.read();
             if (cur == -1) throw new DataFormatException("Not enough bytes for the field");
+            cur &= 0xFF;
             // we loop until we find a nonzero byte (or we reach the end)
             if (cur != 0) {
                 // ok, data found, now iterate through it to fill the rv
@@ -355,9 +356,10 @@ public class DataHelper {
                     cur = cur << shiftAmount;
                     rv += cur;
                     if (j + 1 < remaining) {
-                        cur = rawStream.read() & 0xFF;
+                        cur = rawStream.read();
                         if (cur == -1)
                             throw new DataFormatException("Not enough bytes for the field");
+                        cur &= 0xFF;
                     }
                 }
                 break;

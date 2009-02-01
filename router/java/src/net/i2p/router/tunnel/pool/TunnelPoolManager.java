@@ -376,7 +376,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _context.jobQueue().addJob(new BootstrapPool(_context, _outboundExploratory));
     }
     
-    private class BootstrapPool extends JobImpl {
+    private static class BootstrapPool extends JobImpl {
         private TunnelPool _pool;
         public BootstrapPool(RouterContext ctx, TunnelPool pool) {
             super(ctx);

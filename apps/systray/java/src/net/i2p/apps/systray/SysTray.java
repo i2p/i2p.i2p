@@ -11,6 +11,7 @@ package net.i2p.apps.systray;
 
 import java.awt.Frame;
 
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
@@ -60,14 +61,13 @@ public class SysTray implements SysTrayMenuListener {
     private SysTray() {
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
-        SimpleTimer.getInstance().addEvent(new RefreshDisplayEvent(), REFRESH_DISPLAY_FREQUENCY);
+        SimpleScheduler.getInstance().addPeriodicEvent(new RefreshDisplayEvent(), REFRESH_DISPLAY_FREQUENCY);
     }
     
     private static final long REFRESH_DISPLAY_FREQUENCY = 30*1000;
     private class RefreshDisplayEvent implements SimpleTimer.TimedEvent {
         public void timeReached() {
             refreshDisplay();
-            SimpleTimer.getInstance().addEvent(RefreshDisplayEvent.this, REFRESH_DISPLAY_FREQUENCY);
         }
     }
 

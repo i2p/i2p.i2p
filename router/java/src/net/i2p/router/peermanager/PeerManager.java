@@ -24,6 +24,7 @@ import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -50,7 +51,7 @@ class PeerManager {
             _peersByCapability[i] = new ArrayList(64);
         loadProfiles();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        SimpleTimer.getInstance().addEvent(new Reorg(), 0);
+        SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 30*1000);
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
     
@@ -60,8 +61,6 @@ class PeerManager {
                 _organizer.reorganize(true);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error evaluating profiles", t);
-            } finally {
-                SimpleTimer.getInstance().addEvent(Reorg.this, 30*1000);
             }
         }
     }

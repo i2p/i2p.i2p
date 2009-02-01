@@ -24,6 +24,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.util.EepGet;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -183,7 +184,7 @@ public class I2PSnarkUtil {
             synchronized (_shitlist) {
                 _shitlist.add(dest);
             }
-            SimpleTimer.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
+            SimpleScheduler.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
     }

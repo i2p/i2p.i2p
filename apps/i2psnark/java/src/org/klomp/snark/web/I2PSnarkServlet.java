@@ -580,7 +580,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 else if ("AUZV".equals(ch) || "AkZV".equals(ch) || "A0ZV".equals(ch))
                     client = "Robert";
                 else
-                    client = "Unknown";
+                    client = "Unknown (" + ch + ')';
                 out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");

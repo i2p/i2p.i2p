@@ -10,22 +10,7 @@ import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.time.Timestamper;
 
-public class ConfigNetHelper {
-    private RouterContext _context;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
+public class ConfigNetHelper extends HelperBase {
     public ConfigNetHelper() {}
     
     /** copied from various private components */

@@ -27,6 +27,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runnable {
@@ -401,7 +402,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
         
         if (_maxWaitTime > 0)
-            SimpleTimer.getInstance().addEvent(new CloseEvent(s), _maxWaitTime);
+            SimpleScheduler.getInstance().addEvent(new CloseEvent(s), _maxWaitTime);
 
         synchronized (_waitingSockets) {
             _waitingSockets.add(s);

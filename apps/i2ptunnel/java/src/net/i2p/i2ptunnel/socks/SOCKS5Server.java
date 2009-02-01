@@ -361,24 +361,24 @@ public class SOCKS5Server extends SOCKSServer {
     /*
      * Some namespaces to enclose SOCKS protocol codes
      */
-    private class Method {
+    private static class Method {
         private static final int NO_AUTH_REQUIRED = 0x00;
         private static final int NO_ACCEPTABLE_METHODS = 0xff;
     }
 
-    private class AddressType {
+    private static class AddressType {
         private static final int IPV4 = 0x01;
         private static final int DOMAINNAME = 0x03;
         private static final int IPV6 = 0x04;
     }
 
-    private class Command {
+    private static class Command {
         private static final int CONNECT = 0x01;
         private static final int BIND = 0x02;
         private static final int UDP_ASSOCIATE = 0x03;
     }
 
-    private class Reply {
+    private static class Reply {
         private static final int SUCCEEDED = 0x00;
         private static final int GENERAL_SOCKS_SERVER_FAILURE = 0x01;
         private static final int CONNECTION_NOT_ALLOWED_BY_RULESET = 0x02;

@@ -156,7 +156,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         return buf.toString();
     }
 
-    private class TunnelEndpoint {
+    private static class TunnelEndpoint {
         private Hash _router;
         private TunnelId _tunnelId;
 

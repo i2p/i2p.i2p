@@ -15,6 +15,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -79,7 +80,7 @@ class PeerTestManager {
         
         sendTestToBob();
         
-        SimpleTimer.getInstance().addEvent(new ContinueTest(), RESEND_TIMEOUT);
+        SimpleScheduler.getInstance().addEvent(new ContinueTest(), RESEND_TIMEOUT);
     }
     
     private class ContinueTest implements SimpleTimer.TimedEvent {
@@ -103,7 +104,7 @@ class PeerTestManager {
                     // second message from Charlie yet
                     sendTestToCharlie();
                 }
-                SimpleTimer.getInstance().addEvent(ContinueTest.this, RESEND_TIMEOUT);
+                SimpleScheduler.getInstance().addEvent(ContinueTest.this, RESEND_TIMEOUT);
             }
         }
     }
@@ -430,7 +431,7 @@ class PeerTestManager {
                 synchronized (_activeTests) {
                     _activeTests.put(new Long(nonce), state);
                 }
-                SimpleTimer.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
             UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort, aliceIntroKey, nonce, state.getBobCipherKey(), state.getBobMACKey());
@@ -511,7 +512,7 @@ class PeerTestManager {
                 synchronized (_activeTests) {
                     _activeTests.put(new Long(nonce), state);
                 }
-                SimpleTimer.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
             UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 

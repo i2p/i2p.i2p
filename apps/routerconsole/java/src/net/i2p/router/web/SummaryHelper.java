@@ -25,22 +25,7 @@ import net.i2p.stat.RateStat;
  * Simple helper to query the appropriate router for data necessary to render
  * the summary sections on the router console.  
  */
-public class SummaryHelper {
-    private RouterContext _context;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    
+public class SummaryHelper extends HelperBase {
     /**
      * Retrieve the shortened 4 character ident for the router located within
      * the current JVM at the given context.

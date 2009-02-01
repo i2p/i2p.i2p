@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -54,7 +55,7 @@ class ConnectionHandler {
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
-        RetransmissionTimer.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+        SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
         synchronized (_synQueue) {
             _synQueue.add(packet);
             _synQueue.notifyAll();
