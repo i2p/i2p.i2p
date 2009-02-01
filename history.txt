@@ -1,3 +1,7 @@
+2009-01-31 sponge
+    * One line BOB discarded interger fix 
+      (not that it mattered at this point)
+
 2009-01-25 zzz
     * Build files:
       - Don't bundle unneeded XML parser xercesImpl.jar (1MB)
