@@ -1,0 +1,21 @@
+You will need atleast monotone > = 0.41 to get the most recent build source
+and connect it to an already running i2p router.
+
+OR:
+
+You may download the actual source from 
+http://mirror.i2p2.de/i2psource_0.7.tar.bz2 for the "stable" releases.
+
+
+You will need to follwing tools to build the i2p and i2p-base packages:
+
+bash >= 3.1.017
+jre >= 6u11
+jdk >= 6u11
+
+apache-ant >= 1.7.1
+perl >= 5.10.0
+python >= 2.5.2
+
+Reccomended:
+monotone >= 0.41 (from pkgs.dr.ea.ms)

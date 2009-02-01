@@ -1,3 +1,6 @@
+2009-02-01 sponge
+    * Slackbuild files... if we can have them for Debian, why not :-)
+
 2009-02-01 zzz
     * Convert some inner classes to static (findbugs)
     * DataHelper.readLong(): Was returning -1 on EOF instead
