@@ -1,3 +1,25 @@
+2009-02-01 zzz
+    * Convert some inner classes to static (findbugs)
+    * DataHelper.readLong(): Was returning -1 on EOF instead
+      of throwing exception
+    * i2psnark: Increase tunnels and pipeline to 3
+    * NTCP: Use a java.util.concurrent execution queue instead of
+      SimpleTimer for afterSend() to reduce lock contention
+    * Remove source from susimail.war, susidns.war, i2ptunnel.war (85KB)
+    * Routerconsole:
+      - Move common methods to new HelperBase class
+      - Make reseed link a button
+    * SimpleScheduler: New replacement for SimpleTimer when events
+      will not be rescheduled or cancelled, to reduce SimpleTimer
+      lock contention
+    * Tunnel Pool:
+      - Remove tunnel from participating if can't contact next hop
+      - Fail outbound build faster if can't contact first hop
+    * Wrapper: Remove dup timeout
+
+2009-01-31 dream
+    * Debian files
+
 2009-01-31 sponge
     * One line BOB discarded interger fix 
       (not that it mattered at this point)
