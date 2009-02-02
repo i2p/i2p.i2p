@@ -110,6 +110,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     protected AvailabilityNotifier _availabilityNotifier;
 
+    private long _lastActivity;
+    private boolean _isReduced;
+
     void dateUpdated() {
         _dateReceived = true;
         synchronized (_dateReceivedLock) {
@@ -290,6 +293,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                  _log.info(getPrefix() + "Lease set created with inbound tunnels after "
                            + (connected - startConnect)
                            + "ms - ready to participate in the network!");
+            startIdleMonitor();
         } catch (UnknownHostException uhe) {
             _closed = true;
             throw new I2PSessionException(getPrefix() + "Invalid session configuration", uhe);
@@ -316,6 +320,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _log.error("Receive message " + msgId + " had no matches, remaining=" + remaining);
             return null;
         }
+        updateActivity();
         return msg.getPayload().getUnencryptedData();
     }
 
@@ -667,5 +672,35 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     public Destination lookupDest(Hash h) throws I2PSessionException {
         return null;
+    }
+
+    protected void updateActivity() {
+        _lastActivity = _context.clock().now();
+        if (_isReduced) {
+            _isReduced = false;
+            try {
+                _producer.updateTunnels(this, 0);
+            } catch (I2PSessionException ise) {
+                _log.error(getPrefix() + "bork restore from reduced");
+            }
+        }
+    }
+
+    public long lastActivity() {
+        return _lastActivity;
+    }
+
+    public void setReduced() {
+        _isReduced = true;
+    }
+
+    private void startIdleMonitor() {
+        _isReduced = false;
+        boolean reduce = Boolean.valueOf(_options.getProperty("i2cp.reduceOnIdle")).booleanValue();
+        boolean close = Boolean.valueOf(_options.getProperty("i2cp.closeOnIdle")).booleanValue();
+        if (reduce || close) {
+            updateActivity();
+            SimpleScheduler.getInstance().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
+        }
     }
 }

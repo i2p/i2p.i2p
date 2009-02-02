@@ -122,6 +122,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
         if (isClosed()) throw new I2PSessionException("Already closed");
+        updateActivity();
 
         // Sadly there is no way to send something completely uncompressed in a backward-compatible way,
         // so we have to still send it in a gzip format, which adds 23 bytes (2.4% for a 960-byte msg)

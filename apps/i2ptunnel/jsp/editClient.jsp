@@ -289,9 +289,9 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="reduceTime" accesskey="c">
-                    Reduce when idle (minutes):
+                    Close when idle (minutes):
                 </label>
-                <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
+                <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
             </div>
                  
             <div class="subdivider">

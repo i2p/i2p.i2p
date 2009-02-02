@@ -150,6 +150,10 @@ public class EditBean extends IndexBean {
         return false;
     }
     
+    public int getCloseTime(int tunnel) {
+        return getProperty(tunnel, "closeIdleTime", 30);
+    }
+    
     public boolean getNewDest(int tunnel) {
         return false;
     }

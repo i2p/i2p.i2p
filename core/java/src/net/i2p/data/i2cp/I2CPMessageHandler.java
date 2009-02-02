@@ -69,6 +69,8 @@ public class I2CPMessageHandler {
             return new ReceiveMessageBeginMessage();
         case ReceiveMessageEndMessage.MESSAGE_TYPE:
             return new ReceiveMessageEndMessage();
+        case ReconfigureSessionMessage.MESSAGE_TYPE:
+            return new ReconfigureSessionMessage();
         case ReportAbuseMessage.MESSAGE_TYPE:
             return new ReportAbuseMessage();
         case RequestLeaseSetMessage.MESSAGE_TYPE:
