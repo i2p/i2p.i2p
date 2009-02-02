@@ -1,3 +1,7 @@
+2009-02-02 sponge
+    * Final? cleanups to Slackbuilds.
+    * ant target for Slackbuilds.
+
 2009-02-01 sponge
     * Slackbuild files... if we can have them for Debian, why not :-)
 

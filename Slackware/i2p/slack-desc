@@ -14,8 +14,6 @@ i2p: data is wrapped with several layers of encryption, and the network is
 i2p: both distributed and dynamic, with no trusted parties.
 i2p: Many applications are available that interface with I2P, including 
 i2p: mail, peer-peer file sharing, IRC chat, and others.
-i2p:
+i2p: WARNING: To upgrade installpkg FIRST _THEN_ removepkg.
 i2p: For more information, see:  http://www.i2p2.de/
-i2p:
-i2p: This package requires i2p-base.
 i2p:

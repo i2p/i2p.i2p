@@ -76,8 +76,11 @@ mkdir -p $PKG/$INSTALL_DIR/
 cp -a ../i2p $PKG/$INSTALL_DIR/
 
 mkdir -p $PKG/install
-mv $PKG/$INSTALL_DIR/i2p/blocklist.txt $PKG/$INSTALL_DIR/i2p/blocklist.txt.new
 mv $PKG/$INSTALL_DIR/i2p/*.config $PKG/install
+mv $PKG/$INSTALL_DIR/i2p/blocklist.txt $PKG/$INSTALL_DIR/i2p/blocklist.txt.new
+mv $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml.new
+mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html.new
+mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico.new
 sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
 cat $CWD/slack-desc > $PKG/install/slack-desc
 cd $PKG

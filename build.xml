@@ -15,6 +15,7 @@
         <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
+        <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
@@ -436,6 +437,11 @@
     <target name="i2psnark">
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
+    </target>
+    <target name="slackpkg">
+        <echo message="Building Slackware package." />
+        <ant dir="Slackware/i2p/" target="slackpkg" />
+        <ant dir="Slackware/i2p-base/" target="slackpkg" />
     </target>
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />
