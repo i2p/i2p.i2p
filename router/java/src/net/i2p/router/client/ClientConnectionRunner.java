@@ -11,6 +11,7 @@ package net.i2p.router.client;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,7 +60,7 @@ public class ClientConnectionRunner {
     /** user's config */
     private SessionConfig _config;
     /** static mapping of MessageId to Payload, storing messages for retrieval */
-    private Map _messages; 
+    private Map<MessageId, Payload> _messages; 
     /** lease set request state, or null if there is no request pending on at the moment */
     private LeaseRequestState _leaseRequest;
     /** currently allocated leaseSet, or null if none is allocated */
@@ -88,7 +89,7 @@ public class ClientConnectionRunner {
         _manager = manager;
         _socket = socket;
         _config = null;
-        _messages = new HashMap();
+        _messages = new ConcurrentHashMap();
         _alreadyProcessed = new ArrayList();
         _acceptedPending = new HashSet();
         _dead = false;
@@ -106,7 +107,7 @@ public class ClientConnectionRunner {
             _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this));
             _writer = new ClientWriterRunner(_context, this);
             I2PThread t = new I2PThread(_writer);
-            t.setName("Writer " + ++__id);
+            t.setName("I2CP Writer " + ++__id);
             t.setDaemon(true);
             t.setPriority(I2PThread.MAX_PRIORITY);
             t.start();
@@ -128,9 +129,7 @@ public class ClientConnectionRunner {
         if (_reader != null) _reader.stopReading();
         if (_writer != null) _writer.stopWriting();
         if (_socket != null) try { _socket.close(); } catch (IOException ioe) { }
-        synchronized (_messages) {
-            _messages.clear();
-        }
+        _messages.clear();
         if (_manager != null)
             _manager.unregisterConnection(this);
         if (_currentLeaseSet != null)
@@ -164,50 +163,18 @@ public class ClientConnectionRunner {
     }
     /** already closed? */
     boolean isDead() { return _dead; }
+
     /** message body */
     Payload getPayload(MessageId id) { 
-        Payload rv = null;
-        long beforeLock = _context.clock().now();
-        long inLock = 0;
-        synchronized (_messages) { 
-            inLock = _context.clock().now();
-            rv = (Payload)_messages.get(id); 
-        } 
-        long afterLock = _context.clock().now();
-        
-        if (afterLock - beforeLock > 50) {
-            _log.warn("alreadyAccepted.locking took too long: " + (afterLock-beforeLock)
-                      + " overall, synchronized took " + (inLock - beforeLock));
-        }
-        return rv;
+        return _messages.get(id); 
     }
+
     void setPayload(MessageId id, Payload payload) { 
-        long beforeLock = _context.clock().now();
-        long inLock = 0;
-        synchronized (_messages) { 
-            inLock = _context.clock().now();
-            _messages.put(id, payload); 
-        } 
-        long afterLock = _context.clock().now();
-        
-        if (afterLock - beforeLock > 50) {
-            _log.warn("setPayload.locking took too long: " + (afterLock-beforeLock)
-                      + " overall, synchronized took " + (inLock - beforeLock));
-        }
+        _messages.put(id, payload); 
     }
+
     void removePayload(MessageId id) { 
-        long beforeLock = _context.clock().now();
-        long inLock = 0;
-        synchronized (_messages) { 
-            inLock = _context.clock().now();
-            _messages.remove(id); 
-        } 
-        long afterLock = _context.clock().now();
-        
-        if (afterLock - beforeLock > 50) {
-            _log.warn("removePayload.locking took too long: " + (afterLock-beforeLock)
-                      + " overall, synchronized took " + (inLock - beforeLock));
-        }
+        _messages.remove(id); 
     }
     
     void sessionEstablished(SessionConfig config) {

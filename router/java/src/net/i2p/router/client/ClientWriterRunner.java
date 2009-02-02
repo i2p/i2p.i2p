@@ -1,9 +1,13 @@
 package net.i2p.router.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.i2cp.I2CPMessage;
+import net.i2p.data.i2cp.I2CPMessageImpl;
+import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -13,26 +17,18 @@ import net.i2p.util.Log;
  * the client reads from their i2cp socket, causing all sorts of bad shit to
  * happen)
  *
+ * @author zzz modded to use concurrent
  */
 class ClientWriterRunner implements Runnable {
-    private List _messagesToWrite;
-    private List _messagesToWriteTimes;
+    private BlockingQueue<I2CPMessage> _messagesToWrite;
     private ClientConnectionRunner _runner;
-    private RouterContext _context;
     private Log _log;
     private long _id;
     private static long __id = 0;
     
-    private static final long MAX_WAIT = 5*1000;
-    
-    /** lock on this when updating the class level data structs */
-    private Object _dataLock = new Object();
-    
     public ClientWriterRunner(RouterContext context, ClientConnectionRunner runner) {
-        _context = context;
         _log = context.logManager().getLog(ClientWriterRunner.class);
-        _messagesToWrite = new ArrayList(4);
-        _messagesToWriteTimes = new ArrayList(4);
+        _messagesToWrite = new LinkedBlockingQueue();
         _runner = runner;
         _id = ++__id;
     }
@@ -42,11 +38,9 @@ class ClientWriterRunner implements Runnable {
      *
      */
     public void addMessage(I2CPMessage msg) {
-        synchronized (_dataLock) {
-            _messagesToWrite.add(msg);
-            _messagesToWriteTimes.add(new Long(_context.clock().now()));
-            _dataLock.notifyAll();
-        }
+        try {
+            _messagesToWrite.put(msg);
+        } catch (InterruptedException ie) {}
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("["+_id+"] addMessage completed for " + msg.getClass().getName());
     }
@@ -56,47 +50,37 @@ class ClientWriterRunner implements Runnable {
      *
      */
     public void stopWriting() {
-        synchronized (_dataLock) {
-            _dataLock.notifyAll();
+        _messagesToWrite.clear();
+        try {
+            _messagesToWrite.put(new PoisonMessage());
+        } catch (InterruptedException ie) {}
+    }
+
+    public void run() {
+        I2CPMessage msg;
+        while (!_runner.getIsDead()) {
+            try {
+                msg = _messagesToWrite.take();
+            } catch (InterruptedException ie) {
+                continue;
+            }
+            if (msg.getType() == PoisonMessage.MESSAGE_TYPE)
+                break;
+            _runner.writeMessage(msg);
         }
     }
-    public void run() {
-        List messages = new ArrayList(64); 
-        List messageTimes = new ArrayList(64);
-        List switchList = null;
-        
-        while (!_runner.getIsDead()) {
-            synchronized (_dataLock) {
-                if (_messagesToWrite.size() <= 0) 
-                    try { _dataLock.wait(); } catch (InterruptedException ie) {}
-                
-                if (_messagesToWrite.size() > 0) {
-                    switchList = _messagesToWrite;
-                    _messagesToWrite = messages;
-                    messages = switchList;
-                    
-                    switchList = _messagesToWriteTimes;
-                    _messagesToWriteTimes = messageTimes;
-                    messageTimes = switchList;
-                } 
-            }
-            
-            if (messages.size() > 0) {
-                for (int i = 0; i < messages.size(); i++) {
-                    I2CPMessage msg = (I2CPMessage)messages.get(i);
-                    Long when = (Long)messageTimes.get(i);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("["+_id+"] writeMessage before writing " 
-                                   + msg.getClass().getName());
-                    _runner.writeMessage(msg);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("["+_id+"] writeMessage time since addMessage(): " 
-                                   + (_context.clock().now()-when.longValue()) + " for " 
-                                   + msg.getClass().getName());
-                }
-            }
-            messages.clear();
-            messageTimes.clear();
+
+    /**
+     * End-of-stream msg used to stop the concurrent queue
+     * See http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/BlockingQueue.html
+     *
+     */
+    private static class PoisonMessage extends I2CPMessageImpl {
+        public static final int MESSAGE_TYPE = 999999;
+        public int getType() {
+            return MESSAGE_TYPE;
         }
+        public void doReadMessage(InputStream buf, int size) throws I2CPMessageException, IOException {}
+        public byte[] doWriteMessage() throws I2CPMessageException, IOException { return null; }
     }
 }
