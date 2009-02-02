@@ -760,7 +760,7 @@ class SearchJob extends JobImpl {
         }
     }
     
-    private class Search {
+    private static class Search {
         private Job _onFind;
         private Job _onFail;
         private long _expiration;
