@@ -28,7 +28,7 @@ public class Clock implements Timestamper.UpdateListener {
         _context = context;
         _offset = 0;
         _alreadyChanged = false;
-        _listeners = new HashSet(64);
+        _listeners = new HashSet(1);
         _timestamper = new Timestamper(context, this);
         _startedOn = System.currentTimeMillis();
         _statCreated = false;
