@@ -50,4 +50,11 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
     public Iterator<E> iterator() {
         return _map.keySet().iterator();
     }
+
+    public boolean addAll(Collection<? extends E> c) {
+        boolean rv = false;
+        for (E e : c)
+            rv |= _map.put(e, DUMMY) == null;
+        return rv;
+    }
 }

@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.TreeMap;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -34,7 +36,7 @@ import net.i2p.util.Log;
 public class Shitlist {
     private Log _log;
     private RouterContext _context;
-    private Map _entries;
+    private Map<Hash, Entry> _entries;
     
     private static class Entry {
         /** when it should expire, per the i2p clock */
@@ -42,7 +44,7 @@ public class Shitlist {
         /** why they were shitlisted */
         String cause;
         /** what transports they were shitlisted for (String), or null for all transports */
-        Set transports;
+        Set<String> transports;
     }
     
     public final static long SHITLIST_DURATION_MS = 20*60*1000;
@@ -54,39 +56,30 @@ public class Shitlist {
     public Shitlist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Shitlist.class);
-        _entries = new HashMap(32);
+        _entries = new ConcurrentHashMap(8);
         _context.jobQueue().addJob(new Cleanup(_context));
     }
     
     private class Cleanup extends JobImpl {
-        private List _toUnshitlist;
         public Cleanup(RouterContext ctx) {
             super(ctx);
-            _toUnshitlist = new ArrayList(4);
-            getTiming().setStartAfter(_context.clock().now() + SHITLIST_CLEANER_START_DELAY);
+            getTiming().setStartAfter(ctx.clock().now() + SHITLIST_CLEANER_START_DELAY);
         }
         public String getName() { return "Cleanup shitlist"; }
         public void runJob() {
-            _toUnshitlist.clear();
             long now = getContext().clock().now();
-            synchronized (_entries) {
-                for (Iterator iter = _entries.keySet().iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
-                    Entry entry = (Entry)_entries.get(peer);
-                    if (entry.expireOn <= now) {
-                        iter.remove();
-                        _toUnshitlist.add(peer);
-                    }
+            for (Iterator iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry<Hash, Entry> e = (Map.Entry) iter.next();
+                if (e.getValue().expireOn <= now) {
+                    iter.remove();
+                    Hash peer = e.getKey();
+                    PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+                    if (prof != null)
+                        prof.unshitlist();
+                    _context.messageHistory().unshitlist(peer);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Unshitlisting router (expired) " + peer.toBase64());
                 }
-            }
-            for (int i = 0; i < _toUnshitlist.size(); i++) {
-                Hash peer = (Hash)_toUnshitlist.get(i);
-                PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-                if (prof != null)
-                    prof.unshitlist();
-                _context.messageHistory().unshitlist(peer);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Unshitlisting router (expired) " + peer.toBase64());
             }
             
             requeue(30*1000);
@@ -94,9 +87,7 @@ public class Shitlist {
     }
     
     public int getRouterCount() {
-        synchronized (_entries) {
-            return _entries.size();
-        }
+        return _entries.size();
     }
     
     public boolean shitlistRouter(Hash peer) {
@@ -143,12 +134,11 @@ public class Shitlist {
         e.cause = reason;
         e.transports = null;
         if (transport != null) {
-            e.transports = new HashSet(1);
+            e.transports = new ConcurrentHashSet(1);
             e.transports.add(transport);
         }
         
-        synchronized (_entries) {
-            Entry old = (Entry)_entries.get(peer);
+            Entry old = _entries.get(peer);
             if (old != null) {
                 wasAlready = true;
                 // take the oldest expiration and cause, combine transports
@@ -166,7 +156,6 @@ public class Shitlist {
                 }
             }
             _entries.put(peer, e);
-        }
         
         if (transport == null) {
             // we hate the peer on *any* transport
@@ -190,20 +179,19 @@ public class Shitlist {
             _log.debug("Calling unshitlistRouter " + peer.toBase64()
                       + (transport != null ? "/" + transport : ""));
         boolean fully = false;
-        Entry e;
-        synchronized (_entries) {
-            e = (Entry)_entries.remove(peer);
-            if ( (e == null) || (e.transports == null) || (transport == null) || (e.transports.size() <= 1) ) {
-                // fully unshitlisted
+
+        Entry e = _entries.remove(peer);
+        if ( (e == null) || (e.transports == null) || (transport == null) || (e.transports.size() <= 1) ) {
+            // fully unshitlisted
+            fully = true;
+        } else {
+            e.transports.remove(transport);
+            if (e.transports.size() <= 0)
                 fully = true;
-            } else {
-                e.transports.remove(transport);
-                if (e.transports.size() <= 0)
-                    fully = true;
-                else
-                    _entries.put(peer, e);
-            }
+            else
+                _entries.put(peer, e);
         }
+
         if (fully) {
             if (realUnshitlist) {
                 PeerProfile prof = _context.profileOrganizer().getProfile(peer);
@@ -221,25 +209,18 @@ public class Shitlist {
     public boolean isShitlisted(Hash peer, String transport) {
         boolean rv = false;
         boolean unshitlist = false;
-        synchronized (_entries) {
-            Entry entry = (Entry)_entries.get(peer);
-            if (entry == null) {
-                rv = false;
-            } else {
-                if (entry.expireOn <= _context.clock().now()) {
-                    _entries.remove(peer);
-                    unshitlist = true;
-                    rv = false;
-                } else {
-                    if (entry.transports == null) {
-                        rv = true;
-                    } else if (entry.transports.contains(transport)) {
-                        rv = true;
-                    } else {
-                        rv = false;
-                    }
-                }
-            }
+
+        Entry entry = _entries.get(peer);
+        if (entry == null) {
+            rv = false;
+        } else if (entry.expireOn <= _context.clock().now()) {
+            _entries.remove(peer);
+            unshitlist = true;
+            rv = false;
+        } else if (entry.transports == null) {
+            rv = true;
+        } else {
+            rv = entry.transports.contains(transport);
         }
         
         if (unshitlist) {
@@ -255,10 +236,7 @@ public class Shitlist {
     }
     
     public boolean isShitlistedForever(Hash peer) {
-        Entry entry;
-        synchronized (_entries) {
-            entry = (Entry)_entries.get(peer);
-        }
+        Entry entry = _entries.get(peer);
         return entry != null && entry.expireOn > _context.clock().now() + SHITLIST_DURATION_MAX;
     }
 
@@ -271,17 +249,15 @@ public class Shitlist {
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<h2>Shitlist</h2>");
-        Map entries = new TreeMap(new HashComparator());
+        Map<Hash, Entry> entries = new TreeMap(new HashComparator());
         
-        synchronized (_entries) {
-            entries.putAll(_entries);
-        }
+        entries.putAll(_entries);
+
         buf.append("<ul>");
         
-        for (Iterator iter = entries.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry mentry = (Map.Entry)iter.next();
-            Hash key = (Hash)mentry.getKey();
-            Entry entry = (Entry)mentry.getValue();
+        for (Map.Entry<Hash, Entry> e : entries.entrySet()) {
+            Hash key = e.getKey();
+            Entry entry = e.getValue();
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
             buf.append(" (<a href=\"netdb.jsp?r=").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
             buf.append(" expiring in ");
