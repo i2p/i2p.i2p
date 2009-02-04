@@ -61,25 +61,32 @@ public class Shitlist {
     }
     
     private class Cleanup extends JobImpl {
+        private List<Hash> _toUnshitlist;
         public Cleanup(RouterContext ctx) {
             super(ctx);
+            _toUnshitlist = new ArrayList(4);
             getTiming().setStartAfter(ctx.clock().now() + SHITLIST_CLEANER_START_DELAY);
         }
         public String getName() { return "Cleanup shitlist"; }
         public void runJob() {
+            _toUnshitlist.clear();
             long now = getContext().clock().now();
-            for (Iterator iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry<Hash, Entry> e = (Map.Entry) iter.next();
-                if (e.getValue().expireOn <= now) {
-                    iter.remove();
-                    Hash peer = e.getKey();
-                    PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-                    if (prof != null)
-                        prof.unshitlist();
-                    _context.messageHistory().unshitlist(peer);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Unshitlisting router (expired) " + peer.toBase64());
+            try {
+                for (Iterator iter = _entries.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<Hash, Entry> e = (Map.Entry) iter.next();
+                    if (e.getValue().expireOn <= now) {
+                        iter.remove();
+                        _toUnshitlist.add(e.getKey());
+                    }
                 }
+            } catch (IllegalStateException ise) {} // next time...
+            for (Hash peer : _toUnshitlist) {
+                PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+                if (prof != null)
+                    prof.unshitlist();
+                _context.messageHistory().unshitlist(peer);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Unshitlisting router (expired) " + peer.toBase64());
             }
             
             requeue(30*1000);
