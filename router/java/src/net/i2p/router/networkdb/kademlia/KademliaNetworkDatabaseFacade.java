@@ -53,10 +53,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private Set _explicitSendKeys; // set of Hash objects that should be published ASAP
-    private Set _passiveSendKeys; // set of Hash objects that should be published when there's time
     private Set _exploreKeys; // set of Hash objects that we should search on (to fill up a bucket, not to get data)
-    private Map _lastSent; // Hash to Long (date last sent, or <= 0 for never)
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -153,53 +150,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _exploreJob.updateExploreSchedule();
     }
     
-    public Set getExplicitSendKeys() {
-        if (!_initialized) return null;
-        synchronized (_explicitSendKeys) {
-            return new HashSet(_explicitSendKeys);
-        }
-    }
-    public Set getPassivelySendKeys() {
-        if (!_initialized) return null;
-        synchronized (_passiveSendKeys) {
-            return new HashSet(_passiveSendKeys);
-        }
-    }
-    public void removeFromExplicitSend(Set toRemove) {
-        if (!_initialized) return;
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.removeAll(toRemove);
-        }
-    }
-    public void removeFromPassiveSend(Set toRemove) {
-        if (!_initialized) return;
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.removeAll(toRemove);
-        }
-    }
-    public void queueForPublishing(Set toSend) {
-        if (!_initialized) return;
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.addAll(toSend);
-        }
-    }
-    
-    public Long getLastSent(Hash key) {
-        if (!_initialized) return null;
-        synchronized (_lastSent) {
-            if (!_lastSent.containsKey(key))
-                _lastSent.put(key, new Long(0));
-            return (Long)_lastSent.get(key);
-        }
-    }
-    
-    public void noteKeySent(Hash key) {
-        if (!_initialized) return;
-        synchronized (_lastSent) {
-            _lastSent.put(key, new Long(_context.clock().now()));
-        }
-    }
-    
     public Set getExploreKeys() {
         if (!_initialized) return null;
         synchronized (_exploreKeys) {
@@ -226,10 +176,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _initialized = false;
         _kb = null;
         _ds = null;
-        _explicitSendKeys = null;
-        _passiveSendKeys = null;
         _exploreKeys = null;
-        _lastSent = null;
     }
     
     public void restart() {
@@ -244,9 +191,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
-        synchronized (_explicitSendKeys) { _explicitSendKeys.clear(); }
         synchronized (_exploreKeys) { _exploreKeys.clear(); }
-        synchronized (_passiveSendKeys) { _passiveSendKeys.clear(); }
 
         _initialized = true;
         
@@ -273,10 +218,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
         _ds = new PersistentDataStore(_context, dbDir, this);
         //_ds = new TransientDataStore();
-        _explicitSendKeys = new HashSet(64);
-        _passiveSendKeys = new HashSet(64);
         _exploreKeys = new HashSet(64);
-        _lastSent = new HashMap(1024);
         _dbDir = dbDir;
         
         createHandlers();
@@ -284,9 +226,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _initialized = true;
         _started = System.currentTimeMillis();
         
-        // read the queues and publish appropriately
-        if (false)
-            _context.jobQueue().addJob(new DataPublisherJob(_context, this));
         // expire old leases
         _context.jobQueue().addJob(new ExpireLeasesJob(_context, this));
         
@@ -298,9 +237,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         ////_context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
         
         if (!_quiet) {
-            // fill the passive queue periodically
-            // Is this pointless too???
-            _context.jobQueue().addJob(new DataRepublishingSelectorJob(_context, this));
             // fill the search queue with random keys in buckets that are too small
             // Disabled since KBucketImpl.generateRandomKey() is b0rked,
             // and anyway, we want to search for a completely random key,
@@ -532,9 +468,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
         
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.add(h);
-        }
         RepublishLeaseSetJob j = null;
         synchronized (_publishingLeaseSets) {
             j = (RepublishLeaseSetJob)_publishingLeaseSets.get(h);
@@ -563,9 +496,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (_context.router().isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.add(h);
-        }
     }
 
     /**
@@ -658,10 +588,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             throw new IllegalArgumentException("Invalid store attempt - " + err);
         
         _ds.put(key, leaseSet);
-        synchronized (_lastSent) {
-            if (!_lastSent.containsKey(key))
-                _lastSent.put(key, new Long(0));
-        }
         
         // Iterate through the old failure / success count, copying over the old
         // values (if any tunnels overlap between leaseSets).  no need to be
@@ -770,10 +696,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
         _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
         _ds.put(key, routerInfo);
-        synchronized (_lastSent) {
-            if (!_lastSent.containsKey(key))
-                _lastSent.put(key, new Long(0));
-        }
         if (rv == null)
             _kb.add(key);
         return rv;
@@ -808,15 +730,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _ds.remove(dbEntry);
         else
             _ds.removeLease(dbEntry);
-        synchronized (_lastSent) {
-            _lastSent.remove(dbEntry);
-        }
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.remove(dbEntry);
-        }
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.remove(dbEntry);
-        }
     }
     
     /** don't use directly - see F.N.D.F. override */
@@ -833,30 +746,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         _ds.remove(peer);
-        synchronized (_lastSent) {
-            _lastSent.remove(peer);
-        }
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.remove(peer);
-        }
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.remove(peer);
-        }
     }
     
     public void unpublish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
         DataStructure data = _ds.remove(h);
-        synchronized (_lastSent) {
-            _lastSent.remove(h);
-        }
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.remove(h);
-        }
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.remove(h);
-        }
         
         if (data == null) {
             if (_log.shouldLog(Log.WARN))
