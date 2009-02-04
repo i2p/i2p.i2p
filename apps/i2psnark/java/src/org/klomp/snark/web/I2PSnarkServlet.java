@@ -63,7 +63,7 @@ public class I2PSnarkServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
-        long stats[] = {0,0,0,0};
+        long stats[] = {0,0,0,0,0};
         
         String nonce = req.getParameter("nonce");
         if ( (nonce != null) && (nonce.equals(String.valueOf(_nonce))) )
@@ -143,8 +143,10 @@ public class I2PSnarkServlet extends HttpServlet {
         if (snarks.size() <= 0) {
             out.write(TABLE_EMPTY);
         } else if (snarks.size() > 1) {
-            out.write(TABLE_TOTAL);
-            out.write("    <th align=\"right\" valign=\"top\">" + formatSize(stats[0]) + "</th>\n" +
+            out.write("<tfoot><tr>\n" +
+                      "    <th align=\"left\" valign=\"top\" colspan=\"2\">Totals (" + snarks.size() + " torrents, " + stats[4] + " connected peers)</th>\n" +
+                      "    <th>&nbsp;</th>\n" +
+                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th align=\"right\" valign=\"top\">" + formatSize(stats[1]) + "</th>\n" +
                       "    <th align=\"right\" valign=\"top\">" + formatSize(stats[2]) + "ps</th>\n" +
                       "    <th align=\"right\" valign=\"top\">" + formatSize(stats[3]) + "ps</th>\n" +
@@ -439,6 +441,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if (snark.coordinator != null) {
             err = snark.coordinator.trackerProblems;
             curPeers = snark.coordinator.getPeerCount();
+            stats[4] += curPeers;
             knownPeers = snark.coordinator.trackerSeenPeers;
         }
         
@@ -577,7 +580,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Azureus";
                 else if ("CwsL".equals(ch))
                     client = "I2PSnarkXL";
-                else if ("AUZV".equals(ch) || "AkZV".equals(ch) || "A0ZV".equals(ch))
+                else if ("ZV".equals(ch.substring(2,4)))
                     client = "Robert";
                 else
                     client = "Unknown (" + ch + ')';
@@ -857,11 +860,6 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"right\" valign=\"top\">Uploaded</th>\n" +
                                                "    <th align=\"right\" valign=\"top\">Down Rate</th>\n" +
                                                "    <th align=\"right\" valign=\"top\">Up Rate</th>\n";
-    
-    private static final String TABLE_TOTAL =  "<tfoot>\n" +
-                                               "<tr><th align=\"left\" valign=\"top\">Totals</th>\n" +
-                                               "    <th>&nbsp;</th>\n" +
-                                               "    <th>&nbsp;</th>\n";
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
                                               "<td class=\"snarkTorrentEven\" align=\"left\"" +
