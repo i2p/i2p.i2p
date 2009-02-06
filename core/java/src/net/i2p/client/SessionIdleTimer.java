@@ -56,7 +56,7 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
                 } catch (NumberFormatException nfe) {}
             }
             _reduceTime = DEFAULT_REDUCE_TIME;
-            p = props.getProperty("i2cp.reduceTime");
+            p = props.getProperty("i2cp.reduceIdleTime");
             if (p != null) {
                 try {
                     _reduceTime = Math.max(Long.parseLong(p), MINIMUM_TIME);
@@ -66,7 +66,7 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
         }
         if (shutdown) {
             _shutdownTime = DEFAULT_CLOSE_TIME;
-            String p = props.getProperty("i2cp.closeTime");
+            String p = props.getProperty("i2cp.closeIdleTime");
             if (p != null) {
                 try {
                     _shutdownTime = Math.max(Long.parseLong(p), MINIMUM_TIME);
