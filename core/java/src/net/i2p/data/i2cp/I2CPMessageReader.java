@@ -134,9 +134,11 @@ public class I2CPMessageReader {
         public void cancelRunner() {
             _doRun = false;
             _stayAlive = false;
-            if (_stream != null) {
+            // prevent race NPE
+            InputStream in = _stream;
+            if (in != null) {
                 try {
-                    _stream.close();
+                    in.close();
                 } catch (IOException ioe) {
                     _log.error("Error closing the stream", ioe);
                 }
@@ -164,6 +166,7 @@ public class I2CPMessageReader {
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();
                     } catch (OutOfMemoryError oom) {
+                        // ooms seen here... maybe log and keep going?
                         throw oom;
                     } catch (Exception e) {
                         _log.log(Log.CRIT, "Unhandled error reading I2CP stream", e);
