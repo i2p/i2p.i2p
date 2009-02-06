@@ -560,7 +560,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             
             Destination dest = I2PTunnel.destFromName(destination);
             if (dest == null) {
-                l.log("Could not resolve " + destination + ".");
+                //l.log("Could not resolve " + destination + ".");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
                 String str;
@@ -570,6 +570,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
                 else if(ahelper != 0)
                     str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
+                else if (destination.length() == 60 && destination.endsWith(".b32.i2p"))
+                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
                 else {
                     str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
                     showAddrHelper = true;
