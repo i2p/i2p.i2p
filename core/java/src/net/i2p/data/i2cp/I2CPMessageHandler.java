@@ -34,8 +34,13 @@ public class I2CPMessageHandler {
      *          message - if it is an unknown type or has improper formatting, etc.
      */
     public static I2CPMessage readMessage(InputStream in) throws IOException, I2CPMessageException {
+        int length = -1;
         try {
-            int length = (int) DataHelper.readLong(in, 4);
+            length = (int) DataHelper.readLong(in, 4);
+        } catch (DataFormatException dfe) {
+            throw new IOException("Connection closed");
+        }
+        try {
             if (length < 0) throw new I2CPMessageException("Invalid message length specified");
             int type = (int) DataHelper.readLong(in, 1);
             I2CPMessage msg = createMessage(in, length, type);

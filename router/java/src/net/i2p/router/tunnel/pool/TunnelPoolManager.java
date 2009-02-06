@@ -237,22 +237,20 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return null;
     }
     public void setInboundSettings(Hash client, TunnelPoolSettings settings) {
-        
-        TunnelPool pool = null;
-        synchronized (_clientInboundPools) { 
-            pool = (TunnelPool)_clientInboundPools.get(client); 
-        }
-        if (pool != null)
-            pool.setSettings(settings);
+        setSettings(_clientInboundPools, client, settings);
     }
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {
-        
+        setSettings(_clientOutboundPools, client, settings);
+    }
+    private void setSettings(Map pools, Hash client, TunnelPoolSettings settings) {
         TunnelPool pool = null;
-        synchronized (_clientOutboundPools) { 
-            pool = (TunnelPool)_clientOutboundPools.get(client); 
+        synchronized (pools) { 
+            pool = (TunnelPool)pools.get(client); 
         }
-        if (pool != null)
+        if (pool != null) {
+            settings.setDestination(client); // prevent spoofing or unset dest
             pool.setSettings(settings);
+        }
     }
     
     public void restart() { 

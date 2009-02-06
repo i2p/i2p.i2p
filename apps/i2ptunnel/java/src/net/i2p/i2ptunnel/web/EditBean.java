@@ -8,12 +8,10 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.i2ptunnel.TunnelController;
@@ -107,15 +105,15 @@ public class EditBean extends IndexBean {
     }
     
     public boolean getReduce(int tunnel) {
-        return false;
+        return getBooleanProperty(tunnel, "i2cp.reduceOnIdle");
     }
     
     public int getReduceCount(int tunnel) {
-        return getProperty(tunnel, "inbound.reduceQuantity", 1);
+        return getProperty(tunnel, "i2cp.reduceQuantity", 1);
     }
     
     public int getReduceTime(int tunnel) {
-        return getProperty(tunnel, "reduceIdleTime", 20);
+        return getProperty(tunnel, "i2cp.reduceIdleTime", 20*60*1000) / (60*1000);
     }
     
     public int getCert(int tunnel) {
@@ -131,31 +129,31 @@ public class EditBean extends IndexBean {
     }
     
     public boolean getEncrypt(int tunnel) {
-        return false;
+        return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
     }
     
     public String getEncryptKey(int tunnel) {
-        return getProperty(tunnel, "encryptKey", "");
+        return getProperty(tunnel, "i2cp.leaseSetKey", "");
     }
     
     public boolean getAccess(int tunnel) {
-        return false;
+        return getBooleanProperty(tunnel, "i2cp.enableAccessList");
     }
     
     public String getAccessList(int tunnel) {
-        return getProperty(tunnel, "accessList", "");
+        return getProperty(tunnel, "i2cp.accessList", "").replaceAll(",", "\n");
     }
     
     public boolean getClose(int tunnel) {
-        return false;
+        return getBooleanProperty(tunnel, "i2cp.closeOnIdle");
     }
     
     public int getCloseTime(int tunnel) {
-        return getProperty(tunnel, "closeIdleTime", 30);
+        return getProperty(tunnel, "i2cp.closeIdleTime", 30*60*1000) / (60*1000);
     }
     
     public boolean getNewDest(int tunnel) {
-        return false;
+        return getBooleanProperty(tunnel, "i2cp.newDestOnResume");
     }
     
     private int getProperty(int tunnel, String prop, int def) {
@@ -183,6 +181,17 @@ public class EditBean extends IndexBean {
         return def;
     }
     
+    /** default is false */
+    private boolean getBooleanProperty(int tunnel, String prop) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = getOptions(tun);
+            if (opts != null)
+                return Boolean.valueOf(opts.getProperty(prop)).booleanValue();
+        }
+        return false;
+    }
+    
     public String getI2CPHost(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null)
@@ -199,14 +208,6 @@ public class EditBean extends IndexBean {
             return "7654";
     }
 
-    private static final String noShowProps[] = {
-        "inbound.length", "outbound.length", "inbound.lengthVariance", "outbound.lengthVariance",
-        "inbound.backupQuantity", "outbound.backupQuantity", "inbound.quantity", "outbound.quantity",
-        "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
-        };
-    private static final Set noShowSet = new HashSet(noShowProps.length);
-    static { noShowSet.addAll(Arrays.asList(noShowProps)); }
-
     public String getCustomOptions(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
@@ -216,7 +217,7 @@ public class EditBean extends IndexBean {
             int i = 0;
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
-                if (noShowSet.contains(key))
+                if (_noShowSet.contains(key))
                     continue;
                 String val = opts.getProperty(key);
                 if (i != 0) buf.append(' ');

@@ -31,6 +31,7 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
     private boolean _shutdownEnabled;
     private long _shutdownTime;
     private long _minimumTime;
+    private long _lastActive;
 
     /**
      *  reduce, shutdown, or both must be true
@@ -44,6 +45,7 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
             throw new IllegalArgumentException("At least one must be enabled");
         Properties props = session.getOptions();
         _minimumTime = Long.MAX_VALUE;
+        _lastActive = 0;
         if (reduce) {
             _reduceQuantity = 1;
             String p = props.getProperty("i2cp.reduceQuantity");
@@ -83,10 +85,16 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
         long lastActivity = _session.lastActivity();
         if (_log.shouldLog(Log.INFO))
             _log.info("Fire idle timer, last activity: " + DataHelper.formatDuration(now - lastActivity) + " ago ");
+        long nextDelay = 0;
         if (_shutdownEnabled && now - lastActivity >= _shutdownTime) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Closing on idle " + _session);
             _session.destroySession();
+            return;
+        } else if (lastActivity <= _lastActive && !_shutdownEnabled) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Still idle, sleeping again " + _session);
+            nextDelay = _reduceTime;
         } else if (_reduceEnabled && now - lastActivity >= _reduceTime) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Reducing quantity on idle " + _session);
@@ -96,11 +104,14 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
                 _log.error("bork idle reduction " + ise);
             }
             _session.setReduced();
+            _lastActive = lastActivity;
             if (_shutdownEnabled)
-                SimpleScheduler.getInstance().addEvent(this, _shutdownTime - (now - lastActivity));
-            // else sessionimpl must reschedule??
+                nextDelay =  _shutdownTime - (now - lastActivity);
+            else
+                nextDelay =  _reduceTime;
         } else {
-            SimpleScheduler.getInstance().addEvent(this, _minimumTime - (now - lastActivity));
+            nextDelay = _minimumTime - (now - lastActivity);
         }
+        SimpleScheduler.getInstance().addEvent(this, nextDelay);
     }
 }

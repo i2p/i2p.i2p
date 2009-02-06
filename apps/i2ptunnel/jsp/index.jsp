@@ -114,7 +114,13 @@
 
       <% if (!"sockstunnel".equals(indexBean.getInternalType(curClient))) { %>
         <div class="destinationField rowItem">
-            <label>Destination:</label>
+            <label>
+            <% if ("httpclient".equals(indexBean.getInternalType(curClient)) || "connectclient".equals(indexBean.getInternalType(curClient))) { %>
+                Outproxy:
+            <% } else { %>
+                Destination:
+            <% } %>
+            </label>
             <input class="freetext" size="40" readonly="readonly" value="<%=indexBean.getClientDestination(curClient)%>" />
         </div>
       <% } %>
@@ -143,6 +149,7 @@
                         <option value="httpclient">HTTP</option>
                         <option value="ircclient">IRC</option>
                         <option value="sockstunnel">SOCKS</option>
+                        <option value="connectclient">CONNECT</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
                 </div>
@@ -162,10 +169,10 @@
         <div class="nameHeaderField rowItem">
             <label>Name:</label>
         </div>
-        <div class="targetHeaderField rowItem">
+        <div class="previewHeaderField rowItem">
             <label>Points at:</label>
         </div>
-        <div class="previewHeaderField rowItem">
+        <div class="targetHeaderField rowItem">
             <label>Preview:</label>
         </div>
         <div class="statusHeaderField rowItem">
@@ -181,7 +188,7 @@
             <label>Name:</label>
             <span class="text"><a href="edit.jsp?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
         </div>
-        <div class="targetField rowItem">
+        <div class="previewField rowItem">
             <label>Points at:</label>
             <span class="text">
         <%
@@ -195,11 +202,14 @@
             }
           %></span>
         </div>
-        <div class="previewField rowItem">
+        <div class="targetField rowItem">
             <%
             if ("httpserver".equals(indexBean.getInternalType(curServer)) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label>Preview:</label>    
             <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p">Preview</a>     
+            <%
+            } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
+          %><span class="text">Base32 Address:<br><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
         <%
             } else {
           %><span class="comment">No Preview</span>

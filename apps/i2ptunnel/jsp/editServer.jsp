@@ -281,7 +281,7 @@
                 <label for="accessList" accesskey="s">
                     Access List:
                 </label>
-                <textarea rows="2" cols="60" id="hostField" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <textarea rows="2" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
                 <span class="comment">(Restrict to these clients only)</span>
             </div>
                  
@@ -385,6 +385,7 @@
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button>
                     <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
+                    <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel">Cancel</button>
                 </div>
             </div> 
         </div>

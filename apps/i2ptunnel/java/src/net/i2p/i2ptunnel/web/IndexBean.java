@@ -8,13 +8,19 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -57,6 +63,8 @@ public class IndexBean {
     private boolean _sharedClient;
     private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
+    private Set<String> _booleanOptions;
+    private Map<String, String> _otherOptions;
     
     public static final int RUNNING = 1;
     public static final int STARTING = 2;
@@ -85,6 +93,8 @@ public class IndexBean {
         } catch (NumberFormatException nfe) {}
         _nextNonce = _context.random().nextLong();
         System.setProperty(PROP_NONCE, Long.toString(_nextNonce));
+        _booleanOptions = new ConcurrentHashSet(4);
+        _otherOptions = new ConcurrentHashMap(4);
     }
     
     public long getNextNonce() { return _nextNonce; }
@@ -326,6 +336,7 @@ public class IndexBean {
         return ( ("client".equals(type)) || 
         		("httpclient".equals(type)) ||
         		("sockstunnel".equals(type)) ||
+        		("connectclient".equals(type)) ||
         		("ircclient".equals(type)));
     }
     
@@ -360,6 +371,7 @@ public class IndexBean {
         else if ("server".equals(internalType)) return "Standard server";
         else if ("httpserver".equals(internalType)) return "HTTP server";
         else if ("sockstunnel".equals(internalType)) return "SOCKS proxy";
+        else if ("connectclient".equals(internalType)) return "CONNECT/SSL/HTTPS proxy";
         else return internalType;
     }
     
@@ -406,13 +418,12 @@ public class IndexBean {
     public String getClientDestination(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
-        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType())) {
-            if (tun.getTargetDestination() != null)
-                return tun.getTargetDestination();
-            else
-                return "";
-        }
-        else return tun.getProxyList();
+        String rv;
+        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType()))
+            rv = tun.getTargetDestination();
+        else
+            rv = tun.getProxyList();
+        return rv != null ? rv : "";
     }
     
     public String getServerTarget(int tunnel) {
@@ -429,11 +440,8 @@ public class IndexBean {
             String rv = tun.getMyDestination();
             if (rv != null)
                 return rv;
-            else
-                return "";
-        } else {
-            return "";
         }
+        return "";
     }
     
     public String getDestHashBase32(int tunnel) {
@@ -442,11 +450,8 @@ public class IndexBean {
             String rv = tun.getMyDestHashBase32();
             if (rv != null)
                 return rv;
-            else
-                return "";
-        } else {
-            return "";
         }
+        return "";
     }
     
     ///
@@ -568,6 +573,49 @@ public class IndexBean {
         _profile = profile; 
     }
 
+    public void setReduce(String moo) {
+        _booleanOptions.add("i2cp.reduceOnIdle");
+    }
+    public void setClose(String moo) {
+        _booleanOptions.add("i2cp.closeOnIdle");
+    }
+    public void setEncrypt(String moo) {
+        _booleanOptions.add("i2cp.encryptLeaseSet");
+    }
+    public void setAccess(String moo) {
+        _booleanOptions.add("i2cp.enableAccessList");
+    }
+    public void setNewDest(String moo) {
+        _booleanOptions.add("i2cp.newDestOnResume");
+    }
+
+    public void setReduceTime(String val) {
+        if (val != null) {
+            try {
+                _otherOptions.put("i2cp.reduceIdleTime", "" + (Integer.parseInt(val.trim()) * 60*1000));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+    public void setReduceCount(String val) {
+        if (val != null)
+            _otherOptions.put("i2cp.reduceQuantity", val.trim());
+    }
+    public void setEncryptKey(String val) {
+        if (val != null)
+            _otherOptions.put("i2cp.leaseSetKey", val.trim());
+    }
+    public void setAccessList(String val) {
+        if (val != null)
+            _otherOptions.put("i2cp.accessList", val.trim().replaceAll("\r\n", ",").replaceAll("\n", ",").replaceAll(" ", ","));
+    }
+    public void setCloseTime(String val) {
+        if (val != null) {
+            try {
+                _otherOptions.put("i2cp.closeIdleTime", "" + (Integer.parseInt(val.trim()) * 60*1000));
+            } catch (NumberFormatException nfe) {}
+        }
+    }
+
     /**
      * Based on all provided data, create a set of configuration parameters 
      * suitable for use in a TunnelController.  This will replace (not add to)
@@ -593,6 +641,11 @@ public class IndexBean {
                  config.setProperty("option.outbound.nickname", _name);
             }
             config.setProperty("sharedClient", _sharedClient + "");
+            for (String p : _booleanClientOpts)
+                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
+            for (String p : _otherClientOpts)
+                if (_otherOptions.containsKey(p))
+                    config.setProperty("option." + p, _otherOptions.get(p));
         } else {
             // generic server stuff
             if (_targetHost != null)
@@ -601,9 +654,14 @@ public class IndexBean {
                 config.setProperty("targetPort", _targetPort);
             if (_privKeyFile != null)
                 config.setProperty("privKeyFile", _privKeyFile);
+            for (String p : _booleanServerOpts)
+                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
+            for (String p : _otherServerOpts)
+                if (_otherOptions.containsKey(p))
+                    config.setProperty("option." + p, _otherOptions.get(p));
         }
 
-        if ("httpclient".equals(_type)) {
+        if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
         } else if ("ircclient".equals(_type) || "client".equals(_type)) {
@@ -617,6 +675,32 @@ public class IndexBean {
         return config;
     }
     
+    private static final String _noShowOpts[] = {
+        "inbound.length", "outbound.length", "inbound.lengthVariance", "outbound.lengthVariance",
+        "inbound.backupQuantity", "outbound.backupQuantity", "inbound.quantity", "outbound.quantity",
+        "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
+        };
+    private static final String _booleanClientOpts[] = {
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume"
+        };
+    private static final String _booleanServerOpts[] = {
+        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
+        };
+    private static final String _otherClientOpts[] = {
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime"
+        };
+    private static final String _otherServerOpts[] = {
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList"
+        };
+    protected static final Set _noShowSet = new HashSet();
+    static {
+        _noShowSet.addAll(Arrays.asList(_noShowOpts));
+        _noShowSet.addAll(Arrays.asList(_booleanClientOpts));
+        _noShowSet.addAll(Arrays.asList(_booleanServerOpts));
+        _noShowSet.addAll(Arrays.asList(_otherClientOpts));
+        _noShowSet.addAll(Arrays.asList(_otherServerOpts));
+    }
+
     private void updateConfigGeneric(Properties config) {
         config.setProperty("type", _type);
         if (_name != null)
@@ -639,19 +723,9 @@ public class IndexBean {
                 if ( (eq <= 0) || (eq >= pair.length()) )
                     continue;
                 String key = pair.substring(0, eq);
+                if (_noShowSet.contains(key))
+                    continue;
                 String val = pair.substring(eq+1);
-                if ("inbound.length".equals(key)) continue;
-                if ("outbound.length".equals(key)) continue;
-                if ("inbound.quantity".equals(key)) continue;
-                if ("outbound.quantity".equals(key)) continue;
-                if ("inbound.lengthVariance".equals(key)) continue;
-                if ("outbound.lengthVariance".equals(key)) continue;
-                if ("inbound.backupQuantity".equals(key)) continue;
-                if ("outbound.backupQuantity".equals(key)) continue;
-                if ("inbound.nickname".equals(key)) continue;
-                if ("outbound.nickname".equals(key)) continue;
-                if ("i2p.streaming.connectDelay".equals(key)) continue;
-                if ("i2p.streaming.maxWindowSize".equals(key)) continue;
                 config.setProperty("option." + key, val);
             }
         }
@@ -679,14 +753,14 @@ public class IndexBean {
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
         if (_name != null) {
-            if ( ((!"client".equals(_type)) && (!"httpclient".equals(_type))&& (!"ircclient".equals(_type))) || (!_sharedClient) ) {
+            if ( (!isClient(_type)) || (!_sharedClient) ) {
                 config.setProperty("option.inbound.nickname", _name);
                 config.setProperty("option.outbound.nickname", _name);
             } else {
                 config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
                 config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
             }
-        } 
+        }
         if ("interactive".equals(_profile))
             // This was 1 which doesn't make much sense
             // The real way to make it interactive is to make the streaming lib

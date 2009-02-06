@@ -116,7 +116,7 @@
                 <hr />
             </div>
            
-            <% if ("httpclient".equals(tunnelType)) {
+            <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
                     Outpro<span class="accessKey">x</span>ies:
@@ -344,6 +344,7 @@
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button>
                     <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
+                    <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel">Cancel</button>
                 </div>
             </div> 
         </div>

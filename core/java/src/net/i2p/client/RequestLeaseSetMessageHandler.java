@@ -79,15 +79,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
 
         leaseSet.setEncryptionKey(li.getPublicKey());
         leaseSet.setSigningKey(li.getSigningPublicKey());
-        String sk = session.getOptions().getProperty("i2cp.sessionKey");
-        if (sk != null) {
+        boolean encrypt = Boolean.valueOf(session.getOptions().getProperty("i2cp.encryptLeaseset")).booleanValue();
+        String sk = session.getOptions().getProperty("i2cp.leaseSetKey");
+        if (encrypt && sk != null) {
             SessionKey key = new SessionKey();
             try {
                 key.fromBase64(sk);
                 leaseSet.encrypt(key);
                 _context.keyRing().put(session.getMyDestination().calculateHash(), key);
             } catch (DataFormatException dfe) {
-                _log.error("Bad session key: " + sk);
+                _log.error("Bad leaseset key: " + sk);
             }
         }
         try {
