@@ -1,0 +1,88 @@
+#!/bin/sh
+# Heavily based on the Slackware 12.1 SlackBuild
+# Slackware build script for i2p
+
+# PLEASE READ THIS:
+# Probably you will never have to update i2p packages with upgradepkg,
+# just because i2p have an auto-update function.
+# How to start i2p:
+# After installpkg command, doinst.sh will execute a postinstallation script
+# needed by i2p. After that you have to chmod +x /etc/rc.d/rc.i2p and start
+# i2p service with /etc/rc.d/rc.i2p start.
+# Now tell your browser to user this proxy: localhost on port 4444 and open
+# this page: http://localhost:7657/index.jsp
+# Here you can configure i2p, watch network status and navigate anonimously.
+# It's suggested to subscribe to various dns host, like i2host.i2p
+# For any additional information, visit i2host.i2p and forum.i2p
+
+BUILD=1sim
+
+# put here installation dir, without first and last /
+# es: usr/local
+INSTALL_DIR=opt
+NAME=i2p
+ARCH=noarch
+
+
+#
+# This mess is here due to the totally moronic way i2p does versioning.
+# We correct it here.
+#
+ROUTER=$(echo -ne "_")$(cat ../../router/java/src/net/i2p/router/RouterVersion.java | grep -e "public final static long BUILD" | cut -f2 -d"=" | cut -f1 -d";" | sed -re "s/ //g")
+if [ "$ROUTER" == "_" ] ;  then
+	ROUTER="_0"
+fi
+
+#
+# That was the easy one, now for the tough one.
+#
+
+CORE=$(cat ../../core/java/src/net/i2p/CoreVersion.java | grep -e "public final static String VERSION" | cut -f2 -d'"' | sed -re "s/ //g")
+CORE1=$(echo -n $CORE.x.x | sed -re "s/(.*)\.(.*)\.(.*)\.(.*)/\1/")
+CORE2=$(echo -n $CORE.x | sed -re "s/(.*)\.(.*)\.(.*)\.(.*)/\1/")
+
+if [ "$CORE.x.x" == "$CORE1" ] ; then
+	CORE=$(echo -ne $CORE".0.0")
+fi
+if [ "$CORE.x" == "$CORE2" ] ; then
+	CORE=$(echo -ne $CORE".0")
+fi
+
+VERSION=$(echo $CORE$ROUTER)
+#
+# Whew!
+# OK, let's build i2p
+#
+
+CWD=$(pwd)
+TMP=/tmp
+
+PKG=$TMP/package-i2p
+rm -rf $PKG
+mkdir -p $PKG
+
+cd $CWD/../../
+
+ant distclean
+ant dist
+
+
+tar xjvf i2p.tar.bz2 -C $TMP
+
+cd $TMP/i2p
+chown -R root:root .
+
+mkdir -p $PKG/$INSTALL_DIR/
+cp -a ../i2p $PKG/$INSTALL_DIR/
+
+mkdir -p $PKG/install
+mv $PKG/$INSTALL_DIR/i2p/*.config $PKG/install
+mv $PKG/$INSTALL_DIR/i2p/blocklist.txt $PKG/$INSTALL_DIR/i2p/blocklist.txt.new
+mv $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml.new
+mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html.new
+mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico.new
+sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cd $PKG
+requiredbuilder -v -y -s $CWD $PKG
+makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.tgz

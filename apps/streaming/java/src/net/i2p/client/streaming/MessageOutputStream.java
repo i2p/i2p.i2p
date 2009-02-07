@@ -97,6 +97,7 @@ public class MessageOutputStream extends OutputStream {
         long begin = _context.clock().now();
         while (remaining > 0) {
             WriteStatus ws = null;
+            if (_closed) throw new IOException("closed underneath us");
             // we do any waiting outside the synchronized() block because we
             // want to allow other threads to flushAvailable() whenever they want.  
             // this is the only method that *adds* to the _buf, and all 

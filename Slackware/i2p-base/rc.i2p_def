@@ -1,0 +1,27 @@
+#!/bin/sh
+# Start/stop i2p service.
+
+i2p_start() {
+ /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory start )"
+}
+
+i2p_stop() {
+ /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory stop )"
+}
+
+case "$1" in
+'start')
+  i2p_start
+  ;;
+'stop')
+  i2p_stop
+  ;;
+'restart')
+  i2p_stop
+  i2p_start
+  ;;
+*)
+  echo "usage $0 start|stop|restart"
+  ;;
+esac
+

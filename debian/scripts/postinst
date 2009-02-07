@@ -1,0 +1,9 @@
+#!/bin/sh
+TOP=/var/lib/i2p
+useradd -b $TOP -r i2p 2>/dev/null
+chown i2p $TOP -R
+
+update-rc.d
+
+cd $TOP
+exec su i2p -c ./postinstall.sh
