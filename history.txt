@@ -1,3 +1,25 @@
+2009-02-07 zzz
+    * ClientConnectionRunner, Shitlist, TunnelDispatcher:
+      Update using concurrent
+    * Streaming ConnectionHandler: Bound SYN queue and
+      use concurrent to prevent blowup
+    * HTTP Proxy: Fix error msg for b32 addresses
+    * I2CP: Implement optional reduce tunnels on idle - not hooked
+      in to i2ptunnel GUI yet - still needs tweaks
+    * I2CP MessageReader: Prevent rare NPE
+    * I2CP Writer: Rewrite using concurrent
+    * i2psnark: Add torrent and connection count
+    * I2PTunnel & I2CP:
+      - Fix tunnel reduction/restore, hook in the GUI
+      - Hook leaseset encryption into the GUI
+      - Implement saves for all the new stuff
+      - Add cancel button
+      - Add b32 display for non-http servers
+      - Prep for CONNECT
+      - Fix error msg when connection goes away
+    * NetDb: Remove all DataPublisher stuff
+    * Wrapper: Remove dup timeout
+
 2009-02-02 sponge
     * Final? cleanups to Slackbuilds.
     * ant target for Slackbuilds.
