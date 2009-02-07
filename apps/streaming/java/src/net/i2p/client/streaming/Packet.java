@@ -144,7 +144,7 @@ public class Packet {
     public static final int FLAG_NO_ACK = (1 << 10);
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
-    private static final int MAX_DELAY_REQUEST = 65535;
+    protected static final int MAX_DELAY_REQUEST = 65535;
 
     public Packet() { }
     
