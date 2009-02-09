@@ -456,6 +456,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    private static final long PUBLISH_DELAY = 3*1000;
     public void publish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
@@ -476,7 +477,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _publishingLeaseSets.put(h, j);
             }
         }
-        j.getTiming().setStartAfter(_context.clock().now());
+        // Don't spam the floodfills. In addition, always delay a few seconds since there may
+        // be another leaseset change coming along momentarily.
+        long nextTime = Math.max(j.lastPublished() + j.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
+        j.getTiming().setStartAfter(nextTime);
         _context.jobQueue().addJob(j);
     }
     
