@@ -855,10 +855,12 @@ public class Connection {
                 return;
             }
             // if one of us can't talk...
-            if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are closing");
-                return;
-            }
+            // No - not true - data and acks are still going back and forth.
+            // Prevent zombie connections by keeping the inactivity timer.
+            //if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) {
+            //    if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are closing");
+            //    return;
+            //}
             
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, with action=" + _options.getInactivityAction());
             
@@ -959,9 +961,9 @@ public class Connection {
         }
         
         if (getResetSent())
-            buf.append(" reset sent");
+            buf.append(" reset sent ").append(DataHelper.formatDuration(_context.clock().now() - getResetSentOn())).append(" ago");
         if (getResetReceived())
-            buf.append(" reset received");
+            buf.append(" reset received ").append(DataHelper.formatDuration(_context.clock().now() - getDisconnectScheduledOn())).append(" ago");
         if (getCloseSentOn() > 0) {
             buf.append(" close sent ");
             long timeSinceClose = _context.clock().now() - getCloseSentOn();
@@ -969,7 +971,7 @@ public class Connection {
             buf.append(" ago");
         }
         if (getCloseReceivedOn() > 0)
-            buf.append(" close received");
+            buf.append(" close received ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
         buf.append(" sent: ").append(1 + _lastSendId);
         if (_inputStream != null)
             buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
