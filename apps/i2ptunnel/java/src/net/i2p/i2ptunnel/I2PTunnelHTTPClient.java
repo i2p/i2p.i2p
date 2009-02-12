@@ -5,6 +5,7 @@ package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -21,6 +22,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.FileUtil;
@@ -131,16 +133,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
     
-    private final static int MAX_POSTBYTES = 20*1024*1024; // arbitrary but huge -  all in memory, no temp file
-    private final static byte[] ERR_MAXPOST =
-        ("HTTP/1.1 503 Bad POST\r\n"+
-         "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
-         "\r\n"+
-         "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
-         "The maximum POST size is " + MAX_POSTBYTES + " bytes.<BR>")
-        .getBytes();
-    
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
@@ -232,6 +224,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     
     private static long __requestId = 0;
     protected void clientConnectionRun(Socket s) {
+        InputStream in = null;
         OutputStream out = null;
         String targetRequest = null;
         boolean usingWWWProxy = false;
@@ -239,11 +232,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         long requestId = ++__requestId;
         try {
             out = s.getOutputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream(), "ISO-8859-1"));
+            InputReader reader = new InputReader(s.getInputStream());
             String line, method = null, protocol = null, host = null, destination = null;
             StringBuffer newRequest = new StringBuffer();
             int ahelper = 0;
-            while ((line = br.readLine()) != null) {
+            while ((line = reader.readLine(method)) != null) {
+                line = line.trim();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix(requestId) + "Line=[" + line + "]");
                 
@@ -257,7 +251,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug(getPrefix(requestId) + "Method is null for [" + line + "]");
                     
-                    line = line.trim();
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
                     method = line.substring(0, pos);
@@ -514,30 +507,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     newRequest.append("Connection: close\r\n\r\n");
                     break;
                 } else {
-                    newRequest.append(line.trim()).append("\r\n"); // HTTP spec
+                    newRequest.append(line).append("\r\n"); // HTTP spec
                 }
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
-            
-            int postbytes = 0;
-            while (br.ready()) { // empty the buffer (POST requests)
-                int i = br.read();
-                if (i != -1) {
-                    newRequest.append((char) i);
-                    if (++postbytes > MAX_POSTBYTES) {
-                        if (out != null) {
-                            out.write(ERR_MAXPOST);
-                            out.write("<p /><i>Generated on: ".getBytes());
-                            out.write(new Date().toString().getBytes());
-                            out.write("</i></body></html>\n".getBytes());
-                            out.flush();
-                        }
-                        s.close();
-                        return;
-                    }
-                }
-            }
 
             if (method == null || destination == null) {
                 l.log("No HTTP method found in the request.");
@@ -610,12 +584,35 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
-        } catch (OutOfMemoryError oom) {  // mainly for huge POSTs
-            IOException ex = new IOException("OOM (in POST?)");
+        } catch (OutOfMemoryError oom) {
+            IOException ex = new IOException("OOM");
             _log.info("getPrefix(requestId) + Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
+        }
+    }
+
+    /**
+     *  Read the first line unbuffered.
+     *  After that, switch to a BufferedReader, unless the method is "POST".
+     *  We can't use BufferedReader for POST because we can't have readahead,
+     *  since we are passing the stream on to I2PTunnelRunner for the POST data.
+     *
+     */
+    private static class InputReader {
+        BufferedReader _br;
+        InputStream _s;
+        public InputReader(InputStream s) {
+            _br = null;
+            _s = s;
+        }
+        String readLine(String method) throws IOException {
+             if (method == null || "POST".equals(method))
+                 return DataHelper.readLine(_s);
+             if (_br == null)
+                 _br = new BufferedReader(new InputStreamReader(_s, "ISO-8859-1"));
+             return _br.readLine();
         }
     }
 
@@ -630,7 +627,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
 
-    private class OnTimeout implements Runnable {
+    private static class OnTimeout implements Runnable {
         private Socket _socket;
         private OutputStream _out;
         private String _target;
@@ -708,11 +705,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
 
-    private void handleHTTPClientException(Exception ex, OutputStream out, String targetRequest,
+    private static void handleHTTPClientException(Exception ex, OutputStream out, String targetRequest,
                                                   boolean usingWWWProxy, String wwwProxy, long requestId) {
                                                       
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(getPrefix(requestId) + "Error sending to " + wwwProxy + " (proxy? " + usingWWWProxy + ", request: " + targetRequest, ex);
+        // static
+        //if (_log.shouldLog(Log.WARN))
+        //    _log.warn(getPrefix(requestId) + "Error sending to " + wwwProxy + " (proxy? " + usingWWWProxy + ", request: " + targetRequest, ex);
         if (out != null) {
             try {
                 String str;
@@ -727,16 +725,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     header = ERR_DESTINATION_UNKNOWN;
                 writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, false);
             } catch (IOException ioe) {
-                _log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);
+                // static
+                //_log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);
             }
         } else {
-            _log.warn(getPrefix(requestId) + "Client disconnected before we could say that destination " + "was unknown", ex);
+            // static
+            //_log.warn(getPrefix(requestId) + "Client disconnected before we could say that destination " + "was unknown", ex);
         }
     }
 
     private final static String SUPPORTED_HOSTS[] = { "i2p", "www.i2p.com", "i2p."};
 
-    private boolean isSupportedAddress(String host, String protocol) {
+    private static boolean isSupportedAddress(String host, String protocol) {
         if ((host == null) || (protocol == null)) return false;
         boolean found = false;
         String lcHost = host.toLowerCase();
