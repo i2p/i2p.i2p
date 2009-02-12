@@ -249,6 +249,8 @@ class BuildHandler {
                 int record = order.indexOf(Integer.valueOf(i));
                 if (record < 0) {
                     _log.error("Bad status index " + i);
+                    // don't leak
+                    _exec.buildComplete(cfg, cfg.getTunnelPool());
                     return;
                 }
                 int howBad = statuses[record];
@@ -294,9 +296,9 @@ class BuildHandler {
                     _context.messageHistory().tunnelParticipantRejected(peer, "peer rejected after " + rtt + " with " + howBad + ": " + cfg.toString());
                 }
             }
+            _exec.buildComplete(cfg, cfg.getTunnelPool());
             if (allAgree) {
                 // wikked, completely build
-                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 if (cfg.isInbound())
                     _context.tunnelDispatcher().joinInbound(cfg);
                 else
@@ -313,7 +315,6 @@ class BuildHandler {
                     _context.statManager().addRateData("tunnel.buildClientSuccess", rtt, rtt);
             } else {
                 // someone is no fun
-                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 if (cfg.getDestination() == null)
                     _context.statManager().addRateData("tunnel.buildExploratoryReject", rtt, rtt);
                 else
@@ -322,6 +323,8 @@ class BuildHandler {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
+            // don't leak
+            _exec.buildComplete(cfg, cfg.getTunnelPool());
         }
     }
     
