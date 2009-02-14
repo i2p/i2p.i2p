@@ -303,13 +303,11 @@
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
-        <!--
-	<mkdir dir="pkg-temp/syndie" />
-	<mkdir dir="pkg-temp/syndie/archive" />
-	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
-	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
-	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
-        -->
+        <copy file="LICENSE.txt" todir="pkg-temp/" />
+        <mkdir dir="pkg-temp/licenses/" />
+        <copy todir="pkg-temp/licenses/" >
+          <fileset dir="licenses/" />
+        </copy>
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -345,6 +343,11 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
+        <copy file="LICENSE.txt" todir="pkg-temp/" />
+        <mkdir dir="pkg-temp/licenses/" />
+        <copy todir="pkg-temp/licenses/" >
+          <fileset dir="licenses/" />
+        </copy>
     </target>
     <target name="prepupdateSmall" depends="buildSmall">
         <delete dir="pkg-temp" />
