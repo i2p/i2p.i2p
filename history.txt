@@ -1,3 +1,27 @@
+2009-02-15 zzz
+    * Add licenses to all packages
+    * I2PSession: Concurrent _messagesReceived
+    * i2psnark: tmp file removal try #3
+    * I2PTunnel:
+      - Don't buffer POST data in HTTPClient
+      - Display destination even when stopped
+      - Enable key generation, dest modification, and
+        hashcash estimation in the GUI
+      - Add new CONNECT client
+    * NetDb: Enforce 60s minimum leaseset publish interval
+    * Streaming lib:
+      - Plug connection leak
+      - Move ConEvent from SimpleTimer to SimpleScheduler
+      - Move RetransmissionTimer (ResendPacketEvent)
+        from SimpleTimer to new SimpleTimer2
+      - Move ActivityTimer and Flusher from SimpleTimer to RetransmissionTimer
+      - SimpleTimer2 allows specifying "fuzz" to reduce
+        timer queue churn further
+    * Susidns: Fix save of new dest broken in 0.7
+    * TunnelPool:
+      - Allow leasesets with reduced leases for robustness and startup speed
+      - Plug in-progress build leak
+
 2009-02-07 zzz
     * ClientConnectionRunner, Shitlist, TunnelDispatcher:
       Update using concurrent
