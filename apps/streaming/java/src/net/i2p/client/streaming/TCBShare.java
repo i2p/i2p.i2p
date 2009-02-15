@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  *  Share important TCP Control Block parameters across Connections
@@ -38,11 +38,11 @@ public class TCBShare {
         _log = ctx.logManager().getLog(TCBShare.class);
         _cache = new ConcurrentHashMap(4);
         _cleaner = new CleanEvent();
-        SimpleTimer.getInstance().addEvent(_cleaner, CLEAN_TIME);
+        _cleaner.schedule(CLEAN_TIME);
     }
 
     public void stop() {
-        SimpleTimer.getInstance().removeEvent(_cleaner);
+        _cleaner.cancel();
     }
 
     public void updateOptsFromShare(Connection con) {
@@ -124,14 +124,16 @@ public class TCBShare {
         }
     }
 
-    private class CleanEvent implements SimpleTimer.TimedEvent {
-        public CleanEvent() {}
+    private class CleanEvent extends SimpleTimer2.TimedEvent {
+        public CleanEvent() {
+            super(RetransmissionTimer.getInstance());
+        }
         public void timeReached() {
             for (Iterator iter = _cache.keySet().iterator(); iter.hasNext(); ) {
                 if (_cache.get(iter.next()).isExpired())
                     iter.remove();
             }
-            SimpleTimer.getInstance().addEvent(CleanEvent.this, CLEAN_TIME);
+            schedule(CLEAN_TIME);
         }
     }
 }

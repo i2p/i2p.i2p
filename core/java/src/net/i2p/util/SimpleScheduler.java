@@ -13,8 +13,8 @@ import net.i2p.I2PAppContext;
  * appropriate time.  The method that is fired however should NOT block (otherwise
  * they b0rk the timer).
  *
- * This is like SimpleScheduler but addEvent() for an existing event adds a second
- * job. Events cannot be cancelled or rescheduled.
+ * This is like SimpleTimer but addEvent() for an existing event adds a second
+ * job. Unlike SimpleTimer, events cannot be cancelled or rescheduled.
  *
  * For events that cannot or will not be cancelled or rescheduled -
  * for example, a call such as:

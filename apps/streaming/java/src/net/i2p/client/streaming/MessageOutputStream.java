@@ -8,7 +8,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * A stream that we can shove data into that fires off those bytes
@@ -200,13 +200,20 @@ public class MessageOutputStream extends OutputStream {
      * Flush data that has been enqued but not flushed after a certain 
      * period of inactivity
      */
-    private class Flusher implements SimpleTimer.TimedEvent {
+    private class Flusher extends SimpleTimer2.TimedEvent {
         private boolean _enqueued;
+        public Flusher() { 
+            super(RetransmissionTimer.getInstance());
+        }
         public void enqueue() {
             // no need to be overly worried about duplicates - it would just 
             // push it further out
             if (!_enqueued) {
-                RetransmissionTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
+                // Maybe we could just use schedule() here - or even SimpleScheduler - not sure...
+                // To be safe, use forceReschedule() so we don't get lots of duplicates
+                // We've seen the queue blow up before, maybe it was this before the rewrite...
+                // So perhaps it IS wise to be "overly worried" ...
+                forceReschedule(_passiveFlushDelay);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Enqueueing the flusher for " + _passiveFlushDelay + "ms out");
             } else {

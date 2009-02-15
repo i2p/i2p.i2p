@@ -14,6 +14,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Maintain the state controlling a streaming connection between two 
@@ -69,6 +70,7 @@ public class Connection {
     /** how many messages have been resent and not yet ACKed? */
     private int _activeResends;
     private ConEvent _connectionEvent;
+    private int _randomWait;
     
     private long _lifetimeBytesSent;
     private long _lifetimeBytesReceived;
@@ -124,6 +126,7 @@ public class Connection {
         _isInbound = false;
         _updatedShareOpts = false;
         _connectionEvent = new ConEvent();
+        _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -325,7 +328,8 @@ public class Connection {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Resend in " + timeout + " for " + packet, new Exception("Sent by"));
 
-            RetransmissionTimer.getInstance().addEvent(new ResendPacketEvent(packet, timeout + _context.clock().now()), timeout);
+            // schedules itself
+            ResendPacketEvent rpe = new ResendPacketEvent(packet, timeout);
         }
 
         _context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
@@ -526,7 +530,7 @@ public class Connection {
         if (_receiver != null)
             _receiver.destroy();
         if (_activityTimer != null)
-            SimpleTimer.getInstance().removeEvent(_activityTimer);
+            _activityTimer.cancel();
         //_activityTimer = null;
         if (_inputStream != null)
             _inputStream.streamErrorOccurred(new IOException("disconnected!"));
@@ -822,15 +826,18 @@ public class Connection {
             return;
         }
         long howLong = _options.getInactivityTimeout();
-        howLong += _context.random().nextInt(30*1000); // randomize it a bit, so both sides don't do it at once
+        howLong += _randomWait; // randomize it a bit, so both sides don't do it at once
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Resetting the inactivity timer to " + howLong, new Exception(toString()));
         // this will get rescheduled, and rescheduled, and rescheduled...
-        RetransmissionTimer.getInstance().removeEvent(_activityTimer);
-        RetransmissionTimer.getInstance().addEvent(_activityTimer, howLong);
+        _activityTimer.reschedule(howLong, false); // use the later of current and previous timeout
     }
     
-    private class ActivityTimer implements SimpleTimer.TimedEvent {
+    private class ActivityTimer extends SimpleTimer2.TimedEvent {
+        public ActivityTimer() { 
+            super(RetransmissionTimer.getInstance());
+            setFuzz(5*1000); // sloppy timer, don't reschedule unless at least 5s later
+        }
         public void timeReached() {
             // uh, nothing more to do...
             if (!_connected) {
@@ -841,7 +848,7 @@ public class Connection {
             long left = getTimeLeft();
             if (left > 0) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is time left (" + left + ")");
-                RetransmissionTimer.getInstance().addEvent(ActivityTimer.this, left);
+                schedule(left);
                 return;
             }
             // these are either going to time out or cause further rescheduling
@@ -1010,20 +1017,27 @@ public class Connection {
     
     /**
      * Coordinate the resends of a given packet
+     *
      */
-    public class ResendPacketEvent implements SimpleTimer.TimedEvent {
+    public class ResendPacketEvent extends SimpleTimer2.TimedEvent {
         private PacketLocal _packet;
         private long _nextSendTime;
-        public ResendPacketEvent(PacketLocal packet, long sendTime) {
+        public ResendPacketEvent(PacketLocal packet, long delay) {
+            super(RetransmissionTimer.getInstance());
             _packet = packet;
-            _nextSendTime = sendTime;
+            _nextSendTime = delay + _context.clock().now();
             packet.setResendPacketEvent(ResendPacketEvent.this);
+            schedule(delay);
         }
         
         public long getNextSendTime() { return _nextSendTime; }
         public void timeReached() { retransmit(true); }
         /**
          * Retransmit the packet if we need to.  
+         *
+         * ackImmediately() above calls directly in here, so
+         * we have to use forceReschedule() instead of schedule() below,
+         * to prevent duplicates in the timer queue.
          *
          * @param penalize true if this retransmission is caused by a timeout, false if we
          *                 are just sending this packet instead of an ACK
@@ -1057,7 +1071,7 @@ public class Connection {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Delaying resend of " + _packet + " as there are " 
                                   + _activeResends + " active resends already in play");
-                    RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
+                    forceReschedule(1000);
                     _nextSendTime = 1000 + _context.clock().now();
                     return false;
                 }
@@ -1144,7 +1158,7 @@ public class Connection {
 
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
-                    RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
+                    forceReschedule(timeout);
                 }
                 
                 // acked during resending (... or somethin')
