@@ -254,12 +254,18 @@
                 </label>
                 <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="Encrypt LeaseSet"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
-            <div id="hostField" class="rowItem">
+            <div id="portField" class="rowItem">
                 <label for="encrypt" accesskey="e">
                     Leaseset Encryption Key:
                 </label>
-                <input type="text" id="hostField" name="encryptKey" size="60" title="Encrypt Key" value="<%=editBean.getEncryptKey(curTunnel)%>" class="freetext" />                
-                <span class="comment">(Users will require this key)</span>
+                <textarea rows="1" cols="44" id="portField" name="encryptKey" title="Encrypt Key" wrap="off"><%=editBean.getEncryptKey(curTunnel)%></textarea>               
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="force" accesskey="c">
+                    Generate Key:
+                </label>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now">Generate New Key</button>
+                <span class="comment">(Tunnel must be stopped first)</span>
             </div>
                  
             <div class="subdivider">
@@ -319,7 +325,7 @@
            
             <div id="tunnelOptionsField" class="rowItem">
                 <label for="cert" accesskey="c">
-                    <span class="accessKey">C</span>ertificate type:
+                    New <span class="accessKey">C</span>ertificate type:
                 </label>
             </div>
             <div id="hostField" class="rowItem">
@@ -331,14 +337,14 @@
               <div id="portField" class="rowItem">
                 <label>Hashcash (effort)</label>
                 <input value="1" type="radio" id="startOnLoad" name="cert" title="Hashcash Certificate"<%=(editBean.getCert(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <input type="text" id="port" name="effort" size="2" title="Hashcash Effort" value="<%=editBean.getEffort(curTunnel)%>" class="freetext" />                
+                <input type="text" id="port" name="effort" size="2" maxlength="2" title="Hashcash Effort" value="<%=editBean.getEffort(curTunnel)%>" class="freetext" />                
               </div>
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
                     Estimate Hashcash Calc Time:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Estimate Calculation Time" title="Estimate Calculation Time">Estimate</button>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Estimate" title="Estimate Calculation Time">Estimate</button>
             </div>
             <div id="hostField" class="rowItem">
               <div id="portField" class="rowItem">
@@ -359,7 +365,7 @@
                 <label for="force" accesskey="c">
                     Modify Certificate:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Modify Cert Now" title="Force New Cert Now">Modify</button>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Modify" title="Force New Cert Now">Modify</button>
                 <span class="comment">(Tunnel must be stopped first)</span>
             </div>
                  

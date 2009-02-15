@@ -244,6 +244,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             runIrcClient(args, l);
         } else if ("sockstunnel".equals(cmdname)) {
             runSOCKSTunnel(args, l);
+        } else if ("connectclient".equals(cmdname)) {
+            runConnectClient(args, l);
         } else if ("config".equals(cmdname)) {
             runConfig(args, l);
         } else if ("listen_on".equals(cmdname)) {
@@ -296,6 +298,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
         l.log("ircclient <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
         l.log("httpclient <port> [<sharedClient>] [<proxy>]");
+        l.log("connectclient <port> [<sharedClient>] [<proxy>]");
         l.log("lookup <name>");
         l.log("quit");
         l.log("close [forced] <jobnumber>|all");
@@ -555,7 +558,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
             
-            String proxy = "squid.i2p";
+            String proxy = "";
             boolean isShared = true;
             if (args.length > 1) {
                 if ("true".equalsIgnoreCase(args[1].trim())) {
@@ -595,8 +598,63 @@ public class I2PTunnel implements Logging, EventDispatcher {
             l.log("  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)");
             l.log("  <proxy> (optional) indicates a proxy server to be used");
             l.log("  when trying to access an address out of the .i2p domain");
-            l.log("  (the default proxy is squid.i2p).");
             notifyEvent("httpclientTaskId", Integer.valueOf(-1));
+        }
+    }
+
+    /**
+     * Run a CONNECT client on the given port number 
+     *
+     * @param args {portNumber[, sharedClient][, proxy to be used for the WWW]}
+     * @param l logger to receive events and output
+     */
+    public void runConnectClient(String args[], Logging l) {
+        if (args.length >= 1 && args.length <= 3) {
+            int port = -1;
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException nfe) {
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
+                return;
+            }
+            
+            String proxy = "";
+            boolean isShared = true;
+            if (args.length > 1) {
+                if ("true".equalsIgnoreCase(args[1].trim())) {
+                    isShared = true;
+                    if (args.length == 3)
+                        proxy = args[2];
+                } else if ("false".equalsIgnoreCase(args[1].trim())) {
+                    _log.warn("args[1] == [" + args[1] + "] and rejected explicitly");
+                    isShared = false;
+                    if (args.length == 3)
+                        proxy = args[2];
+                } else if (args.length == 3) {
+                    isShared = false; // not "true"
+                    proxy = args[2];
+                    _log.warn("args[1] == [" + args[1] + "] but rejected");
+                } else {
+                    // isShared not specified, default to true
+                    isShared = true;
+                    proxy = args[1];
+                }
+            }
+
+            I2PTunnelTask task;
+            ownDest = !isShared;
+            try {
+                task = new I2PTunnelConnectClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
+                addtask(task);
+            } catch (IllegalArgumentException iae) {
+                _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ port + "]", iae);
+            }
+        } else {
+            l.log("connectclient <port> [<sharedClient>] [<proxy>]");
+            l.log("  creates a client that for SSL/HTTPS requests.");
+            l.log("  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)");
+            l.log("  <proxy> (optional) indicates a proxy server to be used");
+            l.log("  when trying to access an address out of the .i2p domain");
         }
     }
 

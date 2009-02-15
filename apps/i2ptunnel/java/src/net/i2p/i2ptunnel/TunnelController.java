@@ -73,7 +73,7 @@ public class TunnelController implements Logging {
         
         File keyFile = new File(getPrivKeyFile());
         if (keyFile.exists()) {
-            log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
+            //log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
             return;
         } else {
             File parent = keyFile.getParentFile();
@@ -87,6 +87,7 @@ public class TunnelController implements Logging {
             String destStr = dest.toBase64();
             log("Private key created and saved in " + keyFile.getAbsolutePath());
             log("New destination: " + destStr);
+            log("Base32: " + Base32.encode(dest.calculateHash().getData()) + ".b32.i2p");
         } catch (I2PException ie) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error creating new destination", ie);
@@ -139,6 +140,8 @@ public class TunnelController implements Logging {
             startIrcClient();
         } else if("sockstunnel".equals(type)) {
             startSocksClient();
+        } else if("connectclient".equals(type)) {
+            startConnectClient();
         } else if ("client".equals(type)) {
             startClient();
         } else if ("server".equals(type)) {
@@ -162,6 +165,21 @@ public class TunnelController implements Logging {
             _tunnel.runHttpClient(new String[] { listenPort, sharedClient }, this);
         else
             _tunnel.runHttpClient(new String[] { listenPort, sharedClient, proxyList }, this);
+        acquire();
+        _running = true;
+    }
+    
+    private void startConnectClient() {
+        setI2CPOptions();
+        setSessionOptions();
+        setListenOn();
+        String listenPort = getListenPort();
+        String proxyList = getProxyList();
+        String sharedClient = getSharedClient();
+        if (proxyList == null)
+            _tunnel.runConnectClient(new String[] { listenPort, sharedClient }, this);
+        else
+            _tunnel.runConnectClient(new String[] { listenPort, sharedClient, proxyList }, this);
         acquire();
         _running = true;
     }

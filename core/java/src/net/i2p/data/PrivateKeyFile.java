@@ -77,74 +77,25 @@ public class PrivateKeyFile {
             verifySignature(d);
             if (args.length == 1)
                 return;
-            Certificate c = new Certificate();
             if (args[0].equals("-n")) {
                 // Cert constructor generates a null cert
+                pkf.setCertType(Certificate.CERTIFICATE_TYPE_NULL);
             } else if (args[0].equals("-u")) {
-                c.setCertificateType(99);
+                pkf.setCertType(99);
             } else if (args[0].equals("-x")) {
-                c.setCertificateType(Certificate.CERTIFICATE_TYPE_HIDDEN);
+                pkf.setCertType(Certificate.CERTIFICATE_TYPE_HIDDEN);
             } else if (args[0].equals("-h")) {
                 int hashEffort = HASH_EFFORT;
                 if (args.length == 3)
                     hashEffort = Integer.parseInt(args[1]);
                 System.out.println("Estimating hashcash generation time, stand by...");
-                // takes a lot longer than the estimate usually...
-                // maybe because the resource string is much longer than used in the estimate?
-                long low = HashCash.estimateTime(hashEffort);
-                System.out.println("It is estimated this will take " + DataHelper.formatDuration(low) +
-                                   " to " + DataHelper.formatDuration(4*low));
-
-                long begin = System.currentTimeMillis();
-                System.out.println("Starting hashcash generation now...");
-                String resource = d.getPublicKey().toBase64() + d.getSigningPublicKey().toBase64();
-                HashCash hc = HashCash.mintCash(resource, hashEffort);
-                System.out.println("Generation took: " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
-                System.out.println("Full Hashcash is: " + hc);
-                // Take the resource out of the stamp
-                String hcs = hc.toString();
-                int end1 = 0;
-                for (int i = 0; i < 3; i++) {
-                    end1 = 1 + hcs.indexOf(':', end1);
-                    if (end1 < 0) {
-                        System.out.println("Bad hashcash");
-                        return;
-                    }
-                }
-                int start2 = hcs.indexOf(':', end1);
-                if (start2 < 0) {
-                    System.out.println("Bad hashcash");
-                    return;
-                }
-                hcs = hcs.substring(0, end1) + hcs.substring(start2);
-                System.out.println("Short Hashcash is: " + hcs);
-
-                c.setCertificateType(Certificate.CERTIFICATE_TYPE_HASHCASH);
-                c.setPayload(hcs.getBytes());
+                System.out.println(estimateHashCashTime(hashEffort));
+                pkf.setHashCashCert(hashEffort);
             } else if (args.length == 3 && args[0].equals("-s")) {
                 // Sign dest1 with dest2's Signing Private Key
-                File f2 = new File(args[2]);
-                I2PClient client2 = I2PClientFactory.createClient();
-                PrivateKeyFile pkf2 = new PrivateKeyFile(f2, client2);
-                Destination d2 = pkf2.getDestination();
-                SigningPrivateKey spk2 = pkf2.getSigningPrivKey();
-                System.out.println("Signing With Dest:");
-                System.out.println(pkf2.toString());
-
-                int len = PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES; // no cert 
-                byte[] data = new byte[len];
-                System.arraycopy(d.getPublicKey().getData(), 0, data, 0, PublicKey.KEYSIZE_BYTES);
-                System.arraycopy(d.getSigningPublicKey().getData(), 0, data, PublicKey.KEYSIZE_BYTES, SigningPublicKey.KEYSIZE_BYTES);
-                byte[] payload = new byte[Hash.HASH_LENGTH + Signature.SIGNATURE_BYTES];
-                byte[] sig = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2).getData();
-                System.arraycopy(sig, 0, payload, 0, Signature.SIGNATURE_BYTES);
-                // Add dest2's Hash for reference
-                byte[] h2 = d2.calculateHash().getData();
-                System.arraycopy(h2, 0, payload, Signature.SIGNATURE_BYTES, Hash.HASH_LENGTH);
-                c.setCertificateType(Certificate.CERTIFICATE_TYPE_SIGNED);
-                c.setPayload(payload);
+                PrivateKeyFile pkf2 = new PrivateKeyFile(args[2]);
+                pkf.setSignedCert(pkf2);
             }
-            d.setCertificate(c);  // do this rather than just change the existing cert so the hash is recalculated
             System.out.println("New signed destination is:");
             System.out.println(pkf);
             pkf.write();
@@ -154,7 +105,10 @@ public class PrivateKeyFile {
         }
     }
     
-    
+    public PrivateKeyFile(String file) {
+        this(new File(file), I2PClientFactory.createClient());
+    }
+
     public PrivateKeyFile(File file, I2PClient client) {
         this.file = file;
         this.client = client;
@@ -176,7 +130,7 @@ public class PrivateKeyFile {
         return getDestination();
     }
     
-    /** Also sets the local privKay and signingPrivKey */
+    /** Also sets the local privKey and signingPrivKey */
     public Destination getDestination() throws I2PSessionException, IOException, DataFormatException {
         if (dest == null) {
             I2PSession s = open();
@@ -187,6 +141,86 @@ public class PrivateKeyFile {
             }
         }
         return this.dest;
+    }
+
+    public void setDestination(Destination d) {
+        this.dest = d;
+    }
+    
+    /** change cert type - caller must also call write() */
+    public Certificate setCertType(int t) {
+        if (this.dest == null)
+            throw new IllegalArgumentException("Dest is null");
+        Certificate c = new Certificate();
+        c.setCertificateType(t);
+        this.dest.setCertificate(c);
+        return c;
+    }
+    
+    /** change to hashcash cert - caller must also call write() */
+    public Certificate setHashCashCert(int effort) {
+        Certificate c = setCertType(Certificate.CERTIFICATE_TYPE_HASHCASH);
+        long begin = System.currentTimeMillis();
+        System.out.println("Starting hashcash generation now...");
+        String resource = this.dest.getPublicKey().toBase64() + this.dest.getSigningPublicKey().toBase64();
+        HashCash hc;
+        try {
+            hc = HashCash.mintCash(resource, effort);
+        } catch (Exception e) {
+            return null;
+        }
+        System.out.println("Generation took: " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
+        System.out.println("Full Hashcash is: " + hc);
+        // Take the resource out of the stamp
+        String hcs = hc.toString();
+        int end1 = 0;
+        for (int i = 0; i < 3; i++) {
+            end1 = 1 + hcs.indexOf(':', end1);
+            if (end1 < 0) {
+                System.out.println("Bad hashcash");
+                return null;
+            }
+        }
+        int start2 = hcs.indexOf(':', end1);
+        if (start2 < 0) {
+            System.out.println("Bad hashcash");
+            return null;
+        }
+        hcs = hcs.substring(0, end1) + hcs.substring(start2);
+        System.out.println("Short Hashcash is: " + hcs);
+
+        c.setPayload(hcs.getBytes());
+        return c;
+    }
+    
+    /** sign this dest by dest found in pkf2 - caller must also call write() */
+    public Certificate setSignedCert(PrivateKeyFile pkf2) {
+        Certificate c = setCertType(Certificate.CERTIFICATE_TYPE_SIGNED);
+        Destination d2;
+        try {
+            d2 = pkf2.getDestination();
+        } catch (Exception e) {
+            return null;
+        }
+        if (d2 == null)
+            return null;
+        SigningPrivateKey spk2 = pkf2.getSigningPrivKey();
+        System.out.println("Signing With Dest:");
+        System.out.println(pkf2.toString());
+
+        int len = PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES; // no cert 
+        byte[] data = new byte[len];
+        System.arraycopy(this.dest.getPublicKey().getData(), 0, data, 0, PublicKey.KEYSIZE_BYTES);
+        System.arraycopy(this.dest.getSigningPublicKey().getData(), 0, data, PublicKey.KEYSIZE_BYTES, SigningPublicKey.KEYSIZE_BYTES);
+        byte[] payload = new byte[Hash.HASH_LENGTH + Signature.SIGNATURE_BYTES];
+        byte[] sig = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2).getData();
+        System.arraycopy(sig, 0, payload, 0, Signature.SIGNATURE_BYTES);
+        // Add dest2's Hash for reference
+        byte[] h2 = d2.calculateHash().getData();
+        System.arraycopy(h2, 0, payload, Signature.SIGNATURE_BYTES, Hash.HASH_LENGTH);
+        c.setCertificateType(Certificate.CERTIFICATE_TYPE_SIGNED);
+        c.setPayload(payload);
+        return c;
     }
     
     public PrivateKey getPrivKey() {
@@ -238,7 +272,25 @@ public class PrivateKeyFile {
         return s.toString();
     }
     
-    
+    public static String estimateHashCashTime(int hashEffort) {
+        if (hashEffort <= 0 || hashEffort > 160)
+            return "Bad HashCash value: " + hashEffort;
+        long low = Long.MAX_VALUE;
+        try {
+            low = HashCash.estimateTime(hashEffort);
+        } catch (Exception e) {}
+        // takes a lot longer than the estimate usually...
+        // maybe because the resource string is much longer than used in the estimate?
+        return "It is estimated that generating a HashCash Certificate with value " + hashEffort +
+               " for the Destination will take " +
+               ((low < 1000l * 24l * 60l * 60l * 1000l)
+                 ?
+                   "approximately " + DataHelper.formatDuration(low) +
+                   " to " + DataHelper.formatDuration(4*low)
+                 :
+                   "longer than three years!"
+               );
+    }    
     
     /**
      *  Sample code to verify a 3rd party signature.
