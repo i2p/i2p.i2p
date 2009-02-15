@@ -41,7 +41,7 @@ class KBucketImpl implements KBucket {
     public KBucketImpl(I2PAppContext context, Hash local) {
         _context = context;
         _log = context.logManager().getLog(KBucketImpl.class);
-        _entries = new ArrayList(64); //new HashSet();
+        _entries = new ArrayList(0); //all but the last 1 or 2 buckets will be empty
         _lastShuffle = context.clock().now();
         setLocal(local);
     }
