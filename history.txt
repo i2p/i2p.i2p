@@ -1,3 +1,237 @@
+2009-02-07 zzz
+    * ClientConnectionRunner, Shitlist, TunnelDispatcher:
+      Update using concurrent
+    * Streaming ConnectionHandler: Bound SYN queue and
+      use concurrent to prevent blowup
+    * HTTP Proxy: Fix error msg for b32 addresses
+    * I2CP: Implement optional reduce tunnels on idle - not hooked
+      in to i2ptunnel GUI yet - still needs tweaks
+    * I2CP MessageReader: Prevent rare NPE
+    * I2CP Writer: Rewrite using concurrent
+    * i2psnark: Add torrent and connection count
+    * I2PTunnel & I2CP:
+      - Fix tunnel reduction/restore, hook in the GUI
+      - Hook leaseset encryption into the GUI
+      - Implement saves for all the new stuff
+      - Add cancel button
+      - Add b32 display for non-http servers
+      - Prep for CONNECT
+      - Fix error msg when connection goes away
+    * NetDb: Remove all DataPublisher stuff
+    * Wrapper: Remove dup timeout
+
+2009-02-02 sponge
+    * Final? cleanups to Slackbuilds.
+    * ant target for Slackbuilds.
+
+2009-02-01 sponge
+    * Slackbuild files... if we can have them for Debian, why not :-)
+
+2009-02-01 zzz
+    * Convert some inner classes to static (findbugs)
+    * DataHelper.readLong(): Was returning -1 on EOF instead
+      of throwing exception
+    * i2psnark: Increase tunnels and pipeline to 3
+    * NTCP: Use a java.util.concurrent execution queue instead of
+      SimpleTimer for afterSend() to reduce lock contention
+    * Remove source from susimail.war, susidns.war, i2ptunnel.war (85KB)
+    * Routerconsole:
+      - Move common methods to new HelperBase class
+      - Make reseed link a button
+    * SimpleScheduler: New replacement for SimpleTimer when events
+      will not be rescheduled or cancelled, to reduce SimpleTimer
+      lock contention
+    * Tunnel Pool:
+      - Remove tunnel from participating if can't contact next hop
+      - Fail outbound build faster if can't contact first hop
+    * Wrapper: Remove dup timeout
+
+2009-01-31 dream
+    * Debian files
+
+2009-01-31 sponge
+    * One line BOB discarded interger fix 
+      (not that it mattered at this point)
+
+2009-01-25 zzz
+    * Build files:
+      - Don't bundle unneeded XML parser xercesImpl.jar (1MB)
+      - Don't include unneeded stuff in Copy, Delete, Exec.jar (300KB)
+    * I2CP:
+      Implement new I2CP message ReconfigureSessionMessage.
+      Will be used for tunnel reduction.
+    * I2PTunnel Edit Pages:
+      - Change default length to 2+0
+      - Cleanup helper code
+      - Prevent null spoofhost
+      - Stub out the following new options (C=client, S=server):
+        + Access list (S)
+        + Certificate type (S)
+        + Encrypted LeaseSet (S)
+        + New dest on idle restart (C)
+        + Tunnel closure on idle (C)
+        + Tunnel reduction on idle (C,S)
+    * I2PTunnel Socks:
+      - Add support for SOCKS to GUI
+      - Don't NPE on SOCKS 4, just close
+      - Don't have SOCKS build a new dest for every request
+      - Beginnings of SOCKS configuration by port
+      - HTML error msg for attempted HTTP access
+    * LeaseSet: Add encrypt/decrypt methods
+    * netdb.jsp: Don't show stats by default
+    * OCMOSJ: Bundle a reply when we switch tunnel or lease,
+      to detect failure sooner
+    * PublishLocalRouterInfoJob:
+      - Delay for 5m at startup
+      - Run every 20m (was 7.5m)
+    * RebuildRouterInfoJob: Don't run it
+    * Router: Add a keyring for decrypting leases
+    * Routerconsole: Add configkeyring.jsp
+    * SummaryHelper.getTransferred() move to DataHelper,
+      rename to formatSize(), use on tunnels.jsp
+    * Streaming, I2CP, Client Message sending:
+      Pass message timeout through new I2CP message
+      SendMessageExpiresMessage, so that the router
+      uses the same expiration as the streaming lib.
+      Should help reliability.
+    * Streaming: TCB control block sharing
+
+* 2009-01-24  0.7 released
+
+2009-01-24 Complication
+    * Update versions, package release
+
+2009-01-17 zzz
+    * NTCP: Prevent two NTCP Pumpers
+
+2009-01-14 zzz
+    * config.jsp: Fix burst seconds display
+    * HTTPClient: Fix per-tunnel settings for i2cp.gzip and
+      i2ptunnel.httpclient.send* (thx tino)
+    * i2psnark:
+      - Fix double completion message
+      - Add crstrack
+    * initialNews.xml: Add .de (thx echelon)
+    * Message: Always distribute an inbound msg back out
+      a tunnel to foil a possible latency-measuring attack
+      (welterde)
+    * Naming:
+      - Change base32 names to *.b32.i2p
+      - Add i2p.naming.hostsTxt.useB32 config
+    * profiles.jsp: Remove 1m column
+    * SAM: Don't build tests by default
+    * Streaming:
+      - Prevent a rare NPE
+      - Reduce initial RTT to 8s (was 10s)
+    * tunnels.jsp: Add netdb links
+
+2009-01-08 zzz
+    * addressbook: Prevent Base32 hostnames
+    * build.xml: Remove readme_xx.html from updater
+    * configtunnels.jsp: Fix display of outbound backup count
+    * configupdate.jsp: Fix corruption of update URLs
+    * i2psnark: Recognize Robert 0.3 and 4
+    * ExploreJob/SearchJob - fix brokenness:
+      - Give each search a minimum of time even at the end
+      - Fix ExploreJob exclude peer list
+      - Always add floodfills to exclude peer list
+      - Don't queue keys for exploration or run ExploreJob
+        if floodfill
+      - Allow floodfills to return non-floodfills in
+        a DSRM msg so exploration works
+    * ExploreJob/SearchJob - more fixes:
+      - Disable ExploreKeySelectorJob completely, just have
+        StartExplorersJob select a random key if queue is empty
+      - Add netDb.alwaysQuery=[B64Hash] for debugging
+      - Queue results of exploration for more exploration
+      - Floodfills periodically shuffle their KBuckets, and
+        FloodfillPeerSelector sorts more keys, so that
+        exploration works well
+    * Shitlist: Reduce max time to 30m (was 60m)
+    * Streaming:
+      - Reduce default initial window size from 12 to 6,
+         to account for the MTU increase in the last release
+         and try to limit initial packet loss
+      - Reduce fast retransmit threshold from 3 to 2
+    * Transport: Don't shitlist a peer if we are at our
+      connection limit
+
+2009-01-03 zzz
+    * config.jsp: Move the buttons up
+    * configservice.jsp: Clean up and fix the broken (?)
+      browser launch configuration
+    * i2psnark:
+      - Try again to remove the i2psnarkurl files on shutdown
+      - Sort torrents with a locale-based sort
+    * NetDb:
+      - Expire routers with introducers after 90m.
+        This should improve reachability to firewalled routers
+        by keeping introducer info current.
+      - Expire routers with no addresses after 90m.
+      - Convert to java concurrent
+    * Stats: Add router.memoryUsed, graph by default
+    * Summary bar: Remove spurious UDP warning on startup
+    * UpdateHandler: Make extensible for upcoming
+      torrent updater
+
+2008-12-15 zzz
+    * Remove apps/ bogobot jdom pants q rome stasher syndie
+
+2008-12-14 zzz
+    * Contexts: Add int getProperty(String prop, int default)
+    * I2PAppThread: Constructor fix
+    * More split classes into their own files for mkvore
+    * Streaming: Don't build test cases by default
+    * Summary bar: Replace links with buttons
+    * Transport:
+      - Cleanup max connections code
+      - Add i2np.udp.maxConnections
+      - Set max connections based on share bandwidth
+      - Add haveCapacity() that can be used for connection
+        throttling in the router
+      - Reject IBGW/OBEP requests when near connection limit
+      - Reduce idle timeout when near connection limit
+    * Tunnel request handler:
+      - Require tunnel.dropLoad* stats
+      - Speed up request loop
+    * I2CP, HostsTxtNamingService, I2PTunnel:
+      Implement Base32 Hash hostnames, via the naming service.
+      Names are of the form [52-characters].i2p, where
+      the 52 characters are the Base32 representation of our
+      256-byte hash. The client requests a lookup of the hash
+      via a brief I2CP session using new I2CP request/reply
+      messages. The router looks up the leaseset for the hash
+      to convert the hash to a dest. Convert the I2PTunnel
+      'preview' links to use Base32 hostnames as a
+      demonstration.
+
+2008-12-08 zzz
+    * ATalk: Move from core to apps
+    * Blocklists: enable by default, include blocklist file
+      in new installs
+    * Build: Add findbugs target
+    * Cleanup of removed netdb stats
+    * Console:
+      - Don't display restart button if no wrapper
+      - Remove PRNG stats
+    * Eepsite: Disable jetty webapps by default for new installs
+    * i2psnark:
+      - Add default i2psnark.config for new installs
+      - Remove wishlist link
+      - Recognize robert and i2psnarkxl clients
+      - Increase max files to 256
+    * Increase standalone heap size to 128MB
+    * NetDb: Split classes into their own files for mkvore
+    * PeerManager: Fix NPE on early shutdown
+    * SusiDNS: Add textareas
+    * Transport:
+      - Fixes, avoid NPEs, and cleanups when NTCP and/or UDP transports disabled
+      - More TCP removal cleanup
+      - Clean up bandwidth limiting, centralize defaults
+      - Force burst to be >= limit
+      - Increase default bw to 48/24, burst 64/32
+    * Tunnels: Avoid two NPEs on corrupt fragments
+
 2008-12-01 zzz
     * i2psnark:
       - Refactor to allow running a single Snark without a SnarkManager again,

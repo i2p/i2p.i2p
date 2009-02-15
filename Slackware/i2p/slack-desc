@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+   |-----handy-ruler----------------------------------------------------------|
+i2p: i2p (an anonymizing network)
+i2p:
+i2p: I2P is an anonymizing network, offering a simple layer that
+i2p: identity-sensitive applications can use to securely communicate. All
+i2p: data is wrapped with several layers of encryption, and the network is
+i2p: both distributed and dynamic, with no trusted parties.
+i2p: Many applications are available that interface with I2P, including 
+i2p: mail, peer-peer file sharing, IRC chat, and others.
+i2p: WARNING: To upgrade installpkg FIRST _THEN_ removepkg.
+i2p: For more information, see:  http://www.i2p2.de/
+i2p:

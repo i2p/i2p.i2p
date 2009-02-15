@@ -12,7 +12,6 @@
 
 <div class="logo">
  <a href="index.jsp"><img src="i2plogo.png" alt="Router Console" width="187" height="35" /></a><br />
- [<a href="config.jsp">configuration</a> | <a href="help.jsp">help</a>]
 </div>
 <div class="toolbar">
  <% if (new File("docs/toolbar.html").exists()) { %>

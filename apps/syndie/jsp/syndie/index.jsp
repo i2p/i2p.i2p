@@ -1,1 +1,0 @@
-<%response.sendRedirect("../index.jsp");%>

@@ -70,7 +70,7 @@ public class I2Plistener implements Runnable {
 		boolean g = false;
 		I2PSocket sessSocket = null;
 
-		serverSocket.setSoTimeout(1000);
+		serverSocket.setSoTimeout(100);
 		database.getReadLock();
 		info.getReadLock();
 		if(info.exists("INPORT")) {
@@ -107,32 +107,31 @@ public class I2Plistener implements Runnable {
 				//	System.out.println("Exception " + e);
 			}
 		}
-
+		// System.out.println("I2Plistener: Close");
 		try {
 			serverSocket.close();
 		} catch(I2PException e) {
 			// nop
 		}
-
-		while(Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-//			System.out.println("STOP Thread count " + Thread.activeCount());
-			try {
-				Thread.sleep(1000); //sleep for 1000 ms (One second)
-			} catch(Exception e) {
-				// nop
-				}
-		}
-
-		//		System.out.println("STOP Thread count " + Thread.activeCount());
 		// need to kill off the socket manager too.
 		I2PSession session = socketManager.getSession();
 		if(session != null) {
+			// System.out.println("I2Plistener: destroySession");
 			try {
 				session.destroySession();
 			} catch(I2PSessionException ex) {
 				// nop
 			}
-//			System.out.println("destroySession Thread count " + Thread.activeCount());
 		}
+		// System.out.println("I2Plistener: Waiting for children");
+		while(Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
+			try {
+				Thread.sleep(100); //sleep for 100 ms (One tenth second)
+			} catch(Exception e) {
+				// nop
+			}
+		}
+
+		// System.out.println("I2Plistener: Done.");
 	}
 }
