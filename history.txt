@@ -1,3 +1,7 @@
+2009-02-16 zzz
+    * Streaming lib: Plug timer leak, don't send keepalives
+      after close, don't disconnect hard after close
+
 2009-02-15 zzz
     * Add licenses to all packages
     * I2PSession: Concurrent _messagesReceived
