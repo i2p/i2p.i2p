@@ -839,6 +839,8 @@ public class Connection {
             setFuzz(5*1000); // sloppy timer, don't reschedule unless at least 5s later
         }
         public void timeReached() {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Fire inactivity timer on " + Connection.this.toString());
             // uh, nothing more to do...
             if (!_connected) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are already closed");
@@ -864,6 +866,9 @@ public class Connection {
             // if one of us can't talk...
             // No - not true - data and acks are still going back and forth.
             // Prevent zombie connections by keeping the inactivity timer.
+            // Not sure why... receiving a close but never sending one?
+            // If so we can probably re-enable this for _closeSentOn.
+            // For further investigation...
             //if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) {
             //    if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are closing");
             //    return;
@@ -873,15 +878,17 @@ public class Connection {
             
             // bugger it, might as well do the hard work now
             switch (_options.getInactivityAction()) {
-                case ConnectionOptions.INACTIVITY_ACTION_SEND:
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Sending some data due to inactivity");
-                    _receiver.send(null, 0, 0, true);
-                    break;
                 case ConnectionOptions.INACTIVITY_ACTION_NOOP:
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Inactivity timer expired, but we aint doin' shit");
                     break;
+                case ConnectionOptions.INACTIVITY_ACTION_SEND:
+                    if (_closeSentOn <= 0 && _closeReceivedOn <= 0) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Sending some data due to inactivity");
+                        _receiver.send(null, 0, 0, true);
+                        break;
+                    } // else fall through
                 case ConnectionOptions.INACTIVITY_ACTION_DISCONNECT:
                     // fall through
                 default:
@@ -897,7 +904,9 @@ public class Connection {
                     
                     _inputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
                     _outputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
-                    disconnect(false);
+                    // Clean disconnect if we have already scheduled one
+                    // (generally because we already sent a close)
+                    disconnect(_disconnectScheduledOn >= 0);
                     break;
             }
         }
@@ -1046,7 +1055,9 @@ public class Connection {
             if (_packet.getAckTime() > 0) 
                 return false;
             
-            if (_resetSent || _resetReceived) {
+            if (_resetSent || _resetReceived || !_connected) {
+                if(_log.shouldLog(Log.WARN) && (!_resetSent) && (!_resetReceived))
+                     _log.warn("??? no resets but not connected: " + _packet); // don't think this is possible
                 _packet.cancelled();
                 return false;
             }

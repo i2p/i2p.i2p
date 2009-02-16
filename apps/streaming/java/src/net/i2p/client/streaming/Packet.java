@@ -41,6 +41,8 @@ import net.i2p.util.Log;
  * <li>{@link #FLAG_DELAY_REQUESTED}: 2 byte integer</li>
  * <li>{@link #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
  * <li>{@link #FLAG_PROFILE_INTERACTIVE}: no option data</li>
+ * <li>{@link #FLAG_ECHO}: no option data</li>
+ * <li>{@link #FLAG_NO_ACK}: no option data</li>
  * </ol>
  *
  * <p>If the signature is included, it uses the Destination's DSA key 

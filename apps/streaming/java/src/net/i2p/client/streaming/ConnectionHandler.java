@@ -71,7 +71,8 @@ class ConnectionHandler {
         if (!_active) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as we're not listening");
-            sendReset(packet);
+            if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+                sendReset(packet);
             return;
         }
         if (_log.shouldLog(Log.DEBUG))
