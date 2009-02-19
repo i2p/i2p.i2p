@@ -543,6 +543,8 @@ public class NTCPTransport extends TransportImpl {
             NTCPConnection con = (NTCPConnection)iter.next();
             con.close();
         }
+        // will this work?
+        replaceAddress(null);
     }
     public static final String STYLE = "NTCP";
     

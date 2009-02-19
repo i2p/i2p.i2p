@@ -14,4 +14,5 @@ import net.i2p.data.i2np.I2NPMessage;
 
 public interface TransportEventListener {
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash);
+    public void transportAddressChanged();
 }
