@@ -261,7 +261,7 @@ public class PrivateKeyFile {
     public String toString() {
         StringBuffer s = new StringBuffer(128);
         s.append("Dest: ");
-        s.append(this.dest.toBase64());
+        s.append(this.dest != null ? this.dest.toBase64() : "null");
         s.append("\nContains: ");
         s.append(this.dest);
         s.append("\nPrivate Key: ");
