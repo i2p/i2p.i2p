@@ -45,15 +45,18 @@ public class UPnPManager {
     }
     
     public synchronized void start() {
-        _log.error("UPnP Start");
-        Debug.on();  // UPnP stuff -> wrapper log
+        if (_log.shouldLog(Log.DEBUG)) {
+            _log.debug("UPnP Start");
+            Debug.on();  // UPnP stuff -> wrapper log
+        }
         if (!_isRunning)
             _upnp.runPlugin();
         _isRunning = true;
     }
 
     public synchronized void stop() {
-        _log.error("UPnP Stop");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("UPnP Stop");
         if (_isRunning)
             _upnp.terminate();
         _isRunning = false;
@@ -61,7 +64,8 @@ public class UPnPManager {
     
     /** call when the ports might have changed */
     public void update(Map<String, RouterAddress> addresses) {
-        _log.error("UPnP Update:");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("UPnP Update:");
         if (!_isRunning)
             return;
         Set<ForwardPort> forwards = new HashSet(addresses.size());
@@ -86,7 +90,8 @@ public class UPnPManager {
                 protocol = ForwardPort.PROTOCOL_TCP_IPV4;
             else
                 continue;
-            _log.error("Adding: " + style + " " + port);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Adding: " + style + " " + port);
             ForwardPort fp = new ForwardPort(style, false, protocol, port);
             forwards.add(fp);
         }
@@ -98,18 +103,32 @@ public class UPnPManager {
 	
         /** Called to indicate status on one or more forwarded ports. */
         public void portForwardStatus(Map<ForwardPort,ForwardPortStatus> statuses) {
-             _log.error("UPnP Callback:");
+            if (_log.shouldLog(Log.DEBUG))
+                 _log.debug("UPnP Callback:");
 
-             DetectedIP[] ips = _upnp.getAddress();
-             for (DetectedIP ip : ips) {
-                 _log.error("External address: " + ip.publicAddress + " type: " + ip.natType);
-             }
+            DetectedIP[] ips = _upnp.getAddress();
+            if (ips != null) {
+                for (DetectedIP ip : ips) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("External address: " + ip.publicAddress + " type: " + ip.natType);
+                }
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("No external address returned");
+            }
 
-             for (ForwardPort fp : statuses.keySet()) {
-                 ForwardPortStatus fps = statuses.get(fp);
-                 _log.error(fp.name + " " + fp.protocol + " " + fp.portNumber +
-                            " status: " + fps.status + " reason: " + fps.reasonString + " ext port: " + fps.externalPort);
-             }
-         }
+            for (ForwardPort fp : statuses.keySet()) {
+                ForwardPortStatus fps = statuses.get(fp);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(fp.name + " " + fp.protocol + " " + fp.portNumber +
+                               " status: " + fps.status + " reason: " + fps.reasonString + " ext port: " + fps.externalPort);
+            }
+        }
+    }
+
+    public String renderStatusHTML() {
+        if (!_isRunning)
+            return "<b>UPnP is not enabled</b>\n";
+        return _upnp.renderStatusHTML();
     }
 }

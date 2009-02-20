@@ -369,7 +369,7 @@ public class TransportManager implements TransportEventListener {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         StringBuffer buf = new StringBuffer(4*1024);
-        buf.append("Listening on: <br /><pre>\n");
+        buf.append("<p><b>Router Transport Addresses:</b><br /><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             if (t.getCurrentAddress() != null)
@@ -379,6 +379,8 @@ public class TransportManager implements TransportEventListener {
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
+        out.write(_upnpManager.renderStatusHTML());
+        buf.append("</p>\n");
         out.flush();
     }
 }
