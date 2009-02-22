@@ -1,3 +1,7 @@
+2009-02-22 sponge
+    * BOB: Orphan tunnel issue fix, bump BOB version
+    * bump to Build 6
+
 2009-02-16 zzz
     * Streaming lib: Plug timer leak, don't send keepalives
       after close, don't disconnect hard after close
