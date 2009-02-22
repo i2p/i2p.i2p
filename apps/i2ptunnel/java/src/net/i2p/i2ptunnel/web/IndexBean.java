@@ -384,7 +384,7 @@ public class IndexBean {
         else if ("ircclient".equals(internalType)) return "IRC client";
         else if ("server".equals(internalType)) return "Standard server";
         else if ("httpserver".equals(internalType)) return "HTTP server";
-        else if ("sockstunnel".equals(internalType)) return "SOCKS 5 proxy";
+        else if ("sockstunnel".equals(internalType)) return "SOCKS 4/4a/5 proxy";
         else if ("connectclient".equals(internalType)) return "CONNECT/SSL/HTTPS proxy";
         else if ("ircserver".equals(internalType)) return "IRC server";
         else return internalType;

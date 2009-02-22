@@ -148,7 +148,7 @@
                         <option value="client">Standard</option>
                         <option value="httpclient">HTTP</option>
                         <option value="ircclient">IRC</option>
-                        <option value="sockstunnel">SOCKS 5</option>
+                        <option value="sockstunnel">SOCKS 4/4a/5</option>
                         <option value="connectclient">CONNECT</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
