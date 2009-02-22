@@ -234,6 +234,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             runServer(args, l);
         } else if ("httpserver".equals(cmdname)) {
             runHttpServer(args, l);
+        } else if ("ircserver".equals(cmdname)) {
+            runIrcServer(args, l);
         } else if ("textserver".equals(cmdname)) {
             runTextServer(args, l);
         } else if ("client".equals(cmdname)) {
@@ -371,6 +373,53 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
             I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this, this);
+            serv.setReadTimeout(readTimeout);
+            serv.startRunning();
+            addtask(serv);
+            notifyEvent("serverTaskId", Integer.valueOf(serv.getId()));
+            return;
+        } else {
+            l.log("server <host> <port> <privkeyfile>");
+            l.log("  creates a server that sends all incoming data\n" + "  of its destination to host:port.");
+            notifyEvent("serverTaskId", Integer.valueOf(-1));
+        }
+    }
+
+    /**
+     * Same args as runServer
+     * (we should stop duplicating all this code...)
+     */
+    public void runIrcServer(String args[], Logging l) {
+        if (args.length == 3) {
+            InetAddress serverHost = null;
+            int portNum = -1;
+            File privKeyFile = null;
+            try {
+                serverHost = InetAddress.getByName(args[0]);
+            } catch (UnknownHostException uhe) {
+                l.log("unknown host");
+                _log.error(getPrefix() + "Error resolving " + args[0], uhe);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            try {
+                portNum = Integer.parseInt(args[1]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            privKeyFile = new File(args[2]);
+            if (!privKeyFile.canRead()) {
+                l.log("private key file does not exist");
+                _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+            I2PTunnelServer serv = new I2PTunnelIRCServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
             serv.startRunning();
             addtask(serv);

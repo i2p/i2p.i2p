@@ -58,7 +58,7 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
-        if (createKey && ("server".equals(getType()) || "httpserver".equals(getType())) )
+        if (createKey && getType().endsWith("server"))
             createPrivateKey();
         _starting = getStartOnLoad();
     }
@@ -148,6 +148,8 @@ public class TunnelController implements Logging {
             startServer();
         } else if ("httpserver".equals(type)) {
             startHttpServer();
+        } else if ("ircserver".equals(type)) {
+            startIrcServer();
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot start tunnel - unknown type [" + type + "]");
@@ -270,6 +272,17 @@ public class TunnelController implements Logging {
         String spoofedHost = getSpoofedHost(); 
         String privKeyFile = getPrivKeyFile(); 
         _tunnel.runHttpServer(new String[] { targetHost, targetPort, spoofedHost, privKeyFile }, this);
+        acquire();
+        _running = true;
+    }
+    
+    private void startIrcServer() {
+        setI2CPOptions();
+        setSessionOptions();
+        String targetHost = getTargetHost(); 
+        String targetPort = getTargetPort(); 
+        String privKeyFile = getPrivKeyFile(); 
+        _tunnel.runIrcServer(new String[] { targetHost, targetPort, privKeyFile }, this);
         acquire();
         _running = true;
     }

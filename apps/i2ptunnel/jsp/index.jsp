@@ -260,6 +260,7 @@
                     <select name="type">
                         <option value="server">Standard</option>
                         <option value="httpserver">HTTP</option>
+                        <option value="ircserver">IRC</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
                 </div>
