@@ -62,6 +62,8 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
+import net.i2p.i2ptunnel.streamr.StreamrConsumer;
+import net.i2p.i2ptunnel.streamr.StreamrProducer;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;
@@ -248,6 +250,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             runSOCKSTunnel(args, l);
         } else if ("connectclient".equals(cmdname)) {
             runConnectClient(args, l);
+        } else if ("streamrclient".equals(cmdname)) {
+            runStreamrClient(args, l);
+        } else if ("streamrserver".equals(cmdname)) {
+            runStreamrServer(args, l);
         } else if ("config".equals(cmdname)) {
             runConfig(args, l);
         } else if ("listen_on".equals(cmdname)) {
@@ -797,6 +803,82 @@ public class I2PTunnel implements Logging, EventDispatcher {
             l.log("sockstunnel <port>");
             l.log("  creates a tunnel that distributes SOCKS requests.");
             notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
+        }
+    }
+
+    /**
+     * Streamr client
+     *
+     * @param args {targethost, targetport, destinationString}
+     * @param l logger to receive events and output
+     */
+    public void runStreamrClient(String args[], Logging l) {
+        if (args.length == 3) {
+            InetAddress host;
+            try {
+                host = InetAddress.getByName(args[0]);
+            } catch (UnknownHostException uhe) {
+                l.log("unknown host");
+                _log.error(getPrefix() + "Error resolving " + args[0], uhe);
+                notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            int port = -1;
+            try {
+                port = Integer.parseInt(args[1]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
+                notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            StreamrConsumer task = new StreamrConsumer(host, port, args[2], l, (EventDispatcher) this, this);
+            task.startRunning();
+            addtask(task);
+            notifyEvent("streamrtunnelTaskId", Integer.valueOf(task.getId()));
+        } else {
+            l.log("streamrclient <host> <port> <destination>");
+            l.log("  creates a tunnel that receives streaming data.");
+            notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
+        }
+    }
+
+    /**
+     * Streamr server
+     *
+     * @param args {port, privkeyfile}
+     * @param l logger to receive events and output
+     */
+    public void runStreamrServer(String args[], Logging l) {
+        if (args.length == 2) {
+            int port = -1;
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
+                notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            File privKeyFile = new File(args[1]);
+            if (!privKeyFile.canRead()) {
+                l.log("private key file does not exist");
+                _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[3]);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            StreamrProducer task = new StreamrProducer(port, privKeyFile, args[1], l, (EventDispatcher) this, this);
+            task.startRunning();
+            addtask(task);
+            notifyEvent("streamrtunnelTaskId", Integer.valueOf(task.getId()));
+        } else {
+            l.log("streamrserver <port> <privkeyfile>");
+            l.log("  creates a tunnel that sends streaming data.");
+            notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
         }
     }
 

@@ -82,14 +82,20 @@
             </div>
                  
             <div id="targetField" class="rowItem">
+         <% if ("streamrserver".equals(tunnelType)) { %>
+                <label>Access Point:</label>
+         <% } else { %>
                 <label>Target:</label>
+         <% } %>
             </div>
+         <% if (!"streamrserver".equals(tunnelType)) { %>
             <div id="hostField" class="rowItem">
                 <label for="targetHost" accesskey="H">
                     <span class="accessKey">H</span>ost:
                 </label>
                 <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=editBean.getTargetHost(curTunnel)%>" class="freetext" />                
             </div>
+         <% } // !streamrserver %>
             <div id="portField" class="rowItem">
                 <label for="targetPort" accesskey="P">
                     <span class="accessKey">P</span>ort:
@@ -124,6 +130,7 @@
                 </label>
                 <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
             </div>
+         <% if (!"streamrserver".equals(tunnelType)) { %>
             <div id="profileField" class="rowItem">
                 <label for="profile" accesskey="f">
                     Pro<span class="accessKey">f</span>ile:
@@ -134,6 +141,7 @@
                     <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk">bulk connection (downloads/websites/BT) </option>
                 </select>                
             </div> 
+         <% } // !streamrserver %>
             <div id="destinationField" class="rowItem">
                 <label for="localDestination" accesskey="L">
                     <span class="accessKey">L</span>ocal destination:

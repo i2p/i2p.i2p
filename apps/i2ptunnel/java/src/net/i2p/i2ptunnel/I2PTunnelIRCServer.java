@@ -61,18 +61,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
      */
-    public I2PTunnelIRCServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(host, port, privData, l, notifyThis, tunnel);
-        initCloak(tunnel);
-    }
 
     public I2PTunnelIRCServer(InetAddress host, int port, File privkey, String privkeyname, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privkey, privkeyname, l, notifyThis, tunnel);
-        initCloak(tunnel);
-    }
-
-    public I2PTunnelIRCServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(host, port, privData, privkeyname, l, notifyThis, tunnel);
         initCloak(tunnel);
     }
 

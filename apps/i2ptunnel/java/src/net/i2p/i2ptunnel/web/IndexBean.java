@@ -351,6 +351,7 @@ public class IndexBean {
         		("httpclient".equals(type)) ||
         		("sockstunnel".equals(type)) ||
         		("connectclient".equals(type)) ||
+        		("streamrclient".equals(type)) ||
         		("ircclient".equals(type)));
     }
     
@@ -387,6 +388,8 @@ public class IndexBean {
         else if ("sockstunnel".equals(internalType)) return "SOCKS 4/4a/5 proxy";
         else if ("connectclient".equals(internalType)) return "CONNECT/SSL/HTTPS proxy";
         else if ("ircserver".equals(internalType)) return "IRC server";
+        else if ("streamrclient".equals(internalType)) return "Streamr client";
+        else if ("streamrserver".equals(internalType)) return "Streamr server";
         else return internalType;
     }
     
@@ -434,7 +437,8 @@ public class IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
         String rv;
-        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType()))
+        if ("client".equals(tun.getType()) || "ircclient".equals(tun.getType()) ||
+            "streamrclient".equals(tun.getType()))
             rv = tun.getTargetDestination();
         else
             rv = tun.getProxyList();
@@ -798,7 +802,7 @@ public class IndexBean {
         if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
-        } else if ("ircclient".equals(_type) || "client".equals(_type)) {
+        } else if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
         } else if ("httpserver".equals(_type)) {

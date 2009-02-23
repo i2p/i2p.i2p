@@ -150,6 +150,7 @@
                         <option value="ircclient">IRC</option>
                         <option value="sockstunnel">SOCKS 4/4a/5</option>
                         <option value="connectclient">CONNECT</option>
+                        <option value="streamrclient">Streamr</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
                 </div>
@@ -261,6 +262,7 @@
                         <option value="server">Standard</option>
                         <option value="httpserver">HTTP</option>
                         <option value="ircserver">IRC</option>
+                        <option value="streamrserver">Streamr</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
                 </div>

@@ -75,7 +75,11 @@
             </div>
                  
             <div id="accessField" class="rowItem">
+         <% if ("streamrclient".equals(tunnelType)) { %>
+                <label>Target:</label>
+         <% } else { %>
                 <label>Access Point:</label>
+         <% } %>
             </div>
             <div id="portField" class="rowItem">
                 <label for="port" accesskey="P">
@@ -87,14 +91,17 @@
                 </label>
                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />               
             </div>
+         <% String otherInterface = "";
+            String clientInterface = editBean.getClientInterface(curTunnel);
+            if ("streamrclient".equals(tunnelType)) {   
+                otherInterface = clientInterface;
+            } else { %>
             <div id="reachField" class="rowItem">
                 <label for="reachableBy" accesskey="r">
                     <span class="accessKey">R</span>eachable by:
                 </label>
                 <select id="reachableBy" name="reachableBy" title="Valid IP for Client Access" class="selectbox">
-                    <% String clientInterface = editBean.getClientInterface(curTunnel);
-                       String otherInterface = "";
-                       if (!("127.0.0.1".equals(clientInterface)) &&
+                  <%   if (!("127.0.0.1".equals(clientInterface)) &&
                            !("0.0.0.0".equals(clientInterface)) &&
                             (clientInterface != null) &&
                             (clientInterface.trim().length() > 0)) {
@@ -105,9 +112,18 @@
                     <option value="other"<%=(!("".equals(otherInterface))    ? " selected=\"selected\"" : "")%>>LAN Hosts (Please specify your LAN address)</option>
                 </select>                
             </div> 
+         <% } // streamrclient %>
             <div id="otherField" class="rowItem">
                 <label for="reachableByOther" accesskey="O">
+         <% if ("streamrclient".equals(tunnelType)) { %>
+                    Host:
+                    <% String vvv = otherInterface;
+                       if (vvv == null || "".equals(vvv.trim()))
+                           out.write(" <font color=\"red\">(required)</font>");
+                     %>
+         <% } else { %>
                     <span class="accessKey">O</span>ther:
+         <% } %>
                 </label>
                 <input type="text" size="20" id="reachableByOther" name="reachableByOther" title="Alternative IP for Client Access" value="<%=otherInterface%>" class="freetext" />                
             </div>
@@ -123,7 +139,7 @@
                 </label>
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
             </div>
-            <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
+            <% } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
                     <span class="accessKey">T</span>unnel Destination:
@@ -135,8 +151,9 @@
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
                 <span class="comment">(name or destination)</span>
             </div>
-            <% }
-          %><div id="profileField" class="rowItem">
+         <% } %>
+         <% if (!"streamrclient".equals(tunnelType)) { %>
+            <div id="profileField" class="rowItem">
                 <label for="profile" accesskey="f">
                     Pro<span class="accessKey">f</span>ile:
                 </label>
@@ -160,6 +177,7 @@
                 <input value="true" type="checkbox" id="shared" name="shared" title="Share tunnels with other clients"<%=(editBean.isSharedClient(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
                 <span class="comment">(Share tunnels with other clients and irc/httpclients? Change requires restart of client proxy)</span>
             </div>
+         <% } // !streamrclient %>
             <div id="startupField" class="rowItem">
                 <label for="startOnLoad" accesskey="a">
                     <span class="accessKey">A</span>uto Start:
