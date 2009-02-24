@@ -47,6 +47,7 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
     public boolean close(boolean forced) {
         // send unsubscribe-message
         this.pinger.stop();
+        this.sink.stop();
         return super.close(forced);
     }
 
@@ -59,6 +60,6 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
 
     
     
-    private Sink sink;
+    private UDPSink sink;
     private Pinger pinger;
 }

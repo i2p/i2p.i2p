@@ -28,6 +28,13 @@ public class UDPSource implements Source, Runnable {
         // create thread
         this.thread = new Thread(this);
     }
+
+    /** use socket from UDPSink */
+    public UDPSource(DatagramSocket sock) {
+        this.sink = null;
+        this.sock = sock;
+        this.thread = new Thread(this);
+    }
     
     public void setSink(Sink sink) {
         this.sink = sink;
@@ -57,13 +64,14 @@ public class UDPSource implements Source, Runnable {
                 //System.out.print("i");
             } catch(Exception e) {
                 e.printStackTrace();
+                break;
             }
         }
     }
     
-    
-    
-    
+    public void stop() {    
+        this.sock.close();    
+    }    
     
     
     

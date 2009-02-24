@@ -34,6 +34,8 @@ public class UDPSink implements Sink {
     }
     
     public void send(Destination src, byte[] data) {
+        // if data.length > this.sock.getSendBufferSize() ...
+
         // create packet
         DatagramPacket packet = new DatagramPacket(data, data.length, this.remoteHost, this.remotePort);
         
@@ -46,17 +48,18 @@ public class UDPSink implements Sink {
         }
     }
     
+    public int getPort() {    
+        return this.sock.getLocalPort();    
+    }    
     
+    /** to pass to UDPSource constructor */
+    public DatagramSocket getSocket() {    
+        return this.sock;    
+    }    
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    public void stop() {    
+        this.sock.close();    
+    }    
     
     
     

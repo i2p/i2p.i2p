@@ -51,7 +51,8 @@ public class StreamrProducer extends I2PTunnelUDPServerBase {
     }
     
     public boolean close(boolean forced) {
-        // need some stop() methods in UDPSource and MultiSource
+        this.server.stop();
+        this.multi.stop();
         return super.close(forced);
     }
 
@@ -65,6 +66,6 @@ public class StreamrProducer extends I2PTunnelUDPServerBase {
     
     
     private MultiSource multi;
-    private Source server;
+    private UDPSource server;
     private Sink subscriber;
 }
