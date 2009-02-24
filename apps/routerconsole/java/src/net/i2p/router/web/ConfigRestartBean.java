@@ -26,12 +26,14 @@ public class ConfigRestartBean {
         if ( (nonce != null) && (systemNonce.equals(nonce)) && (action != null) ) {
             if ("shutdownImmediate".equals(action)) {
                 ctx.router().addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
-                ctx.router().shutdown(Router.EXIT_HARD); // never returns
+                //ctx.router().shutdown(Router.EXIT_HARD); // never returns
+                ctx.router().shutdownGracefully(Router.EXIT_HARD); // give the UI time to respond
             } else if ("cancelShutdown".equals(action)) {
                 ctx.router().cancelGracefulShutdown();
             } else if ("restartImmediate".equals(action)) {
                 ctx.router().addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
-                ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
+                //ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
+                ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART); // give the UI time to respond
             } else if ("restart".equals(action)) {
                 ctx.router().addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
                 ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
@@ -79,9 +81,18 @@ public class ConfigRestartBean {
     }
 
     private static boolean isShuttingDown(RouterContext ctx) {
-        return Router.EXIT_GRACEFUL == ctx.router().scheduledGracefulExitCode();
+        return Router.EXIT_GRACEFUL == ctx.router().scheduledGracefulExitCode() ||
+               Router.EXIT_HARD == ctx.router().scheduledGracefulExitCode();
     }
     private static boolean isRestarting(RouterContext ctx) {
-        return Router.EXIT_GRACEFUL_RESTART == ctx.router().scheduledGracefulExitCode();
+        return Router.EXIT_GRACEFUL_RESTART == ctx.router().scheduledGracefulExitCode() ||
+               Router.EXIT_HARD_RESTART == ctx.router().scheduledGracefulExitCode();
+    }
+    /** this is for summaryframe.jsp */
+    public static long getRestartTimeRemaining() {
+        RouterContext ctx = ContextHelper.getContext(null);
+        if (ctx.router().gracefulShutdownInProgress())
+            return ctx.router().getShutdownTimeRemaining();
+        return Long.MAX_VALUE/2;  // summaryframe.jsp adds a safety factor so we don't want to overflow...
     }
 }

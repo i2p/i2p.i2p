@@ -446,13 +446,14 @@ public class Router {
      */
     private static final String _rebuildFiles[] = new String[] { "router.info", 
                                                                  "router.keys",
-                                                                 "netDb/my.info",
-                                                                 "connectionTag.keys",
+                                                                 "netDb/my.info",      // no longer used
+                                                                 "connectionTag.keys", // never used?
                                                                  "keyBackup/privateEncryption.key",
                                                                  "keyBackup/privateSigning.key",
                                                                  "keyBackup/publicEncryption.key",
                                                                  "keyBackup/publicSigning.key",
-                                                                 "sessionKeys.dat" };
+                                                                 "sessionKeys.dat"     // no longer used
+                                                               };
 
     static final String IDENTLOG = "identlog.txt";
     public static void killKeys() {
@@ -859,6 +860,10 @@ public class Router {
     public void shutdownGracefully() {
         shutdownGracefully(EXIT_GRACEFUL);
     }
+    /**
+     * Call this with EXIT_HARD or EXIT_HARD_RESTART for a non-blocking,
+     * hard, non-graceful shutdown with a brief delay to allow a UI response
+     */
     public void shutdownGracefully(int exitCode) {
         _gracefulExitCode = exitCode;
         _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
@@ -887,7 +892,9 @@ public class Router {
     }
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
-        if (_gracefulExitCode <= 0) return -1;
+        if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
+        if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART)
+            return 0;
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
             return -1;
@@ -906,9 +913,20 @@ public class Router {
             while (true) {
                 boolean shutdown = (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
                 if (shutdown) {
-                    if (_context.tunnelManager().getParticipatingCount() <= 0) {
-                        if (_log.shouldLog(Log.CRIT))
+                    if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART ||
+                        _context.tunnelManager().getParticipatingCount() <= 0) {
+                        if (_gracefulExitCode == EXIT_HARD)
+                            _log.log(Log.CRIT, "Shutting down after a brief delay");
+                        else if (_gracefulExitCode == EXIT_HARD_RESTART)
+                            _log.log(Log.CRIT, "Restarting after a brief delay");
+                        else
                             _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
+                        // Allow time for a UI reponse
+                        try {
+                            synchronized (Thread.currentThread()) {
+                                Thread.currentThread().wait(2*1000);
+                            }
+                        } catch (InterruptedException ie) {}
                         shutdown(_gracefulExitCode);
                         return;
                     } else {
