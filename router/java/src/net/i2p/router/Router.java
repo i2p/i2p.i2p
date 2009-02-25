@@ -65,7 +65,6 @@ public class Router {
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
     private I2PThread _gracefulShutdownDetector;
-    private Set _shutdownTasks;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -171,7 +170,6 @@ public class Router {
         watchdog.setDaemon(true);
         watchdog.start();
         
-        _shutdownTasks = new HashSet(0);
     }
     
     /**
@@ -491,13 +489,12 @@ public class Router {
      */
     public void rebuildNewIdentity() {
         killKeys();
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
+        for (Runnable task : _context.getShutdownTasks()) {
+            try {
                 task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
         // hard and ugly
         finalShutdown(EXIT_HARD_RESTART);
@@ -782,12 +779,6 @@ public class Router {
         buf.setLength(0);
     }
     
-    public void addShutdownTask(Runnable task) {
-        synchronized (_shutdownTasks) {
-            _shutdownTasks.add(task);
-        }
-    }
-    
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
@@ -800,13 +791,12 @@ public class Router {
         I2PThread.removeOOMEventListener(_oomListener);
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
+        for (Runnable task : _context.getShutdownTasks()) {
+            try {
                 task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }

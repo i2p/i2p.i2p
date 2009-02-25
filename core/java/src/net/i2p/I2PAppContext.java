@@ -23,6 +23,7 @@ import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
@@ -94,6 +95,7 @@ public class I2PAppContext {
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
     protected volatile boolean _keyRingInitialized; // used in RouterContext
+    private Set<Runnable> _shutdownTasks;
     
     
     /**
@@ -152,6 +154,7 @@ public class I2PAppContext {
         _elGamalAESEngineInitialized = false;
         _logManagerInitialized = false;
         _keyRingInitialized = false;
+        _shutdownTasks = new ConcurrentHashSet(0);
     }
     
     /**
@@ -557,4 +560,13 @@ public class I2PAppContext {
             _randomInitialized = true;
         }
     }
+
+    public void addShutdownTask(Runnable task) {
+        _shutdownTasks.add(task);
+    }
+    
+    public Set<Runnable> getShutdownTasks() {
+        return new HashSet(_shutdownTasks);
+    }
+    
 }
