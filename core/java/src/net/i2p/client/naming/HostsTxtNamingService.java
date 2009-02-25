@@ -16,8 +16,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 /**
@@ -127,6 +129,36 @@ public class HostsTxtNamingService extends NamingService {
                         String key = hosts.getProperty(host);
                         if (destkey.equals(key))
                             return host;
+                    }
+                }
+            } catch (Exception ioe) {
+                _log.error("Error loading hosts file " + hostsfile, ioe);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String reverseLookup(Hash h) {
+        List filenames = getFilenames();
+        for (int i = 0; i < filenames.size(); i++) { 
+            String hostsfile = (String)filenames.get(i);
+            Properties hosts = new Properties();
+            try {
+                File f = new File(hostsfile);
+                if ( (f.exists()) && (f.canRead()) ) {
+                    DataHelper.loadProps(hosts, f, true);
+                    Set keyset = hosts.keySet();
+                    Iterator iter = keyset.iterator();
+                    while (iter.hasNext()) {
+                        String host = (String)iter.next();
+                        String key = hosts.getProperty(host);
+                        try {
+                            Destination destkey = new Destination();
+                            destkey.fromBase64(key);
+                            if (h.equals(destkey.calculateHash()))
+                                return host;
+                        } catch (DataFormatException dfe) {}
                     }
                 }
             } catch (Exception ioe) {
