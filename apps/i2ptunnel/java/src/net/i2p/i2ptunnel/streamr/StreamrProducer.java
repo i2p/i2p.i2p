@@ -48,6 +48,7 @@ public class StreamrProducer extends I2PTunnelUDPServerBase {
     public final void startRunning() {
         super.startRunning();
         this.server.start();
+        l.log("Streamr server ready");
     }
     
     public boolean close(boolean forced) {

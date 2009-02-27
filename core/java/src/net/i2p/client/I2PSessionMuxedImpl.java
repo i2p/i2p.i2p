@@ -118,12 +118,13 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
 
     @Override
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
-        return sendMessage(dest, payload, 0, 0, null, null, 0, PROTO_UNSPECIFIED, PORT_UNSPECIFIED, PORT_UNSPECIFIED);
+        return sendMessage(dest, payload, 0, payload.length, null, null,
+                           0, PROTO_UNSPECIFIED, PORT_UNSPECIFIED, PORT_UNSPECIFIED);
     }
 
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int proto, int fromport, int toport) throws I2PSessionException {
-        return sendMessage(dest, payload, 0, 0, null, null, 0, proto, fromport, toport);
+        return sendMessage(dest, payload, 0, payload.length, null, null, 0, proto, fromport, toport);
     }
 
     @Override

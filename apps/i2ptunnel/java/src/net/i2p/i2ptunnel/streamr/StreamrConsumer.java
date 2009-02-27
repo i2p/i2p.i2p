@@ -42,6 +42,7 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
         super.startRunning();
         // send subscribe-message
         this.pinger.start();
+        l.log("Streamr client ready");
     }
     
     public boolean close(boolean forced) {

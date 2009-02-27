@@ -88,14 +88,16 @@
                 <label>Target:</label>
          <% } %>
             </div>
-         <% if (!"streamrserver".equals(tunnelType)) { %>
             <div id="hostField" class="rowItem">
                 <label for="targetHost" accesskey="H">
+         <% if ("streamrserver".equals(tunnelType)) { %>
+                    <span class="accessKey">R</span>eachable by:
+         <% } else { %>
                     <span class="accessKey">H</span>ost:
+         <% } %>
                 </label>
                 <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=editBean.getTargetHost(curTunnel)%>" class="freetext" />                
             </div>
-         <% } // !streamrserver %>
             <div id="portField" class="rowItem">
                 <label for="targetPort" accesskey="P">
                     <span class="accessKey">P</span>ort:

@@ -41,7 +41,7 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
 
     private static volatile long __serverId = 0;
 
-    private Logging l;
+    protected Logging l;
 
     private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
     /** default timeout to 3 minutes - override if desired */
@@ -137,7 +137,6 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
             start();
         //}
 
-        l.log("Ready!");
         notifyEvent("openServerResult", "ok");
         open = true;
     }

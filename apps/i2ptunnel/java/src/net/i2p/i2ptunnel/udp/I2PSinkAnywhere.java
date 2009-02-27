@@ -27,7 +27,8 @@ public class I2PSinkAnywhere implements Sink {
         this.raw = raw;
         
         // create maker
-        this.maker = new I2PDatagramMaker(this.sess);
+        if (!raw)
+            this.maker = new I2PDatagramMaker(this.sess);
     }
     
     /** @param to - where it's going */

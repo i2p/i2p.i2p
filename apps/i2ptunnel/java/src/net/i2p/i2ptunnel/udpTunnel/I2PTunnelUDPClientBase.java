@@ -141,9 +141,6 @@ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements So
         } else {
             _i2pSink = new I2PSinkAnywhere(_session, false);
         }   
-
-        //configurePool(tunnel);
-        
     }
     
     /**
@@ -165,13 +162,7 @@ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements So
             startRunning = true;
             startLock.notify();
         }
-
-        if (open && listenerReady) {
-            notifyEvent("openBaseClientResult", "ok");
-        } else {
-            l.log("Error listening - please see the logs!");
-            notifyEvent("openBaseClientResult", "error");
-        }
+        open = true;
     }
 
     /**
@@ -187,6 +178,7 @@ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements So
             } catch (I2PSessionException ise) {}
         }
         l.log("Closing client " + toString());
+        open = false;
         return true;
     }
 
