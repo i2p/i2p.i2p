@@ -81,8 +81,7 @@ public class SnarkManager implements Snark.CompleteListener {
         I2PAppThread monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor");
         monitor.setDaemon(true);
         monitor.start();
-        if (_context instanceof RouterContext)
-            ((RouterContext)_context).router().addShutdownTask(new SnarkManagerShutdown());
+        _context.addShutdownTask(new SnarkManagerShutdown());
     }
     
     /** hook to I2PSnarkUtil for the servlet */
@@ -539,7 +538,7 @@ public class SnarkManager implements Snark.CompleteListener {
         String announce = info.getAnnounce();
         // basic validation of url
         if ((!announce.startsWith("http://")) ||
-            (announce.indexOf(".i2p/") < 0))
+            (announce.indexOf(".i2p/") < 0)) // need to do better than this
             return "Non-i2p tracker in " + info.getName() + ", deleting it";
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {

@@ -77,12 +77,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected OutputStream _out;
 
     /** who we send events to */
-    private I2PSessionListener _sessionListener;
+    protected I2PSessionListener _sessionListener;
 
     /** class that generates new messages */
     protected I2CPMessageProducer _producer;
     /** map of Long --> MessagePayloadMessage */
-    private Map<Long, MessagePayloadMessage> _availableMessages;
+    protected Map<Long, MessagePayloadMessage> _availableMessages;
     
     protected I2PClientMessageHandlerMap _handlerMap;
     
@@ -366,14 +366,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
         SimpleScheduler.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
-    private class VerifyUsage implements SimpleTimer.TimedEvent {
+    protected class VerifyUsage implements SimpleTimer.TimedEvent {
         private Long _msgId;
         public VerifyUsage(Long id) { _msgId = id; }
         
         public void timeReached() {
             MessagePayloadMessage removed = _availableMessages.remove(_msgId);
             if (removed != null && !isClosed())
-                _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed);
+                _log.error("Message NOT removed!  id=" + _msgId + ": " + removed);
         }
     }
 

@@ -113,6 +113,10 @@ Applications:
    See licenses/LICENSE-I2PTunnel.txt
    See licenses/LICENSE-GPLv2.txt
 
+   I2PTunnel UDP and Streamr:
+   By welterde.
+   See licenses/LICENSE-GPLv2.txt
+
    Jetty 5.1.12:
    Copyright 2000-2004 Mort Bay Consulting Pty. Ltd.
    See licenses/LICENSE-Apache1.1.txt

@@ -93,7 +93,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      *  set to false.
      */
     private static final int DONT_COMPRESS_SIZE = 66;
-    private boolean shouldCompress(int size) {
+    protected boolean shouldCompress(int size) {
          if (size <= DONT_COMPRESS_SIZE)
              return false;
          String p = getOptions().getProperty("i2cp.gzip");
@@ -102,12 +102,35 @@ class I2PSessionImpl2 extends I2PSessionImpl {
          return SHOULD_COMPRESS;
     }
     
+    public void addSessionListener(I2PSessionListener lsnr, int proto, int port) {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public void addMuxedSessionListener(I2PSessionMuxedListener l, int proto, int port) {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public void removeListener(int proto, int port) {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int proto, int fromport, int toport) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
+                               int proto, int fromport, int toport) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+                               int proto, int fromport, int toport) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+
     @Override
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length);
     }
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
-        return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64), 0);
+        // we don't do end-to-end crypto any more
+        //return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64), 0);
+        return sendMessage(dest, payload, offset, size, null, null, 0);
     }
     
     @Override
@@ -173,7 +196,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     
     private static final int NUM_TAGS = 50;
 
-    private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent, long expires)
+    protected boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent, long expires)
                     throws I2PSessionException {
         SessionKey key = null;
         SessionKey newKey = null;

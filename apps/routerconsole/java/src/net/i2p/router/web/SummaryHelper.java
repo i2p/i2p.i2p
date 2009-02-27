@@ -1,11 +1,15 @@
 package net.i2p.router.web;
 
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -346,20 +350,16 @@ public class SummaryHelper extends HelperBase {
      * @return html section summary
      */
     public String getDestinations() {
-        Set clients = _context.clientManager().listClients();
+        // covert the set to a list so we can sort by name and not lose duplicates
+        List clients = new ArrayList(_context.clientManager().listClients());
+        Collections.sort(clients, new AlphaComparator());
         
         StringBuffer buf = new StringBuffer(512);
         buf.append("<u><b>Local destinations</b></u><br />");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
-            TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(client.calculateHash());
-            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(client.calculateHash());
-            String name = (in != null ? in.getDestinationNickname() : null);
-            if (name == null)
-                name = (out != null ? out.getDestinationNickname() : null);
-            if (name == null)
-                name = client.calculateHash().toBase64().substring(0,6);
+            String name = getName(client);
             
             buf.append("<b>*</b> ").append(name).append("<br />\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
@@ -373,14 +373,38 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<i>No leases</i><br />\n");
             }
             buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
-            buf.append("\">Details</a> ");
+            buf.append("\" target=\"_top\">Details</a> ");
             buf.append("<a href=\"configtunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
-            buf.append("\">Config</a><br />\n");
+            buf.append("\" target=\"_top\">Config</a><br />\n");
         }
         buf.append("<hr />\n");
         return buf.toString();
     }
     
+    private class AlphaComparator implements Comparator {
+        public int compare(Object lhs, Object rhs) {
+            String lname = getName((Destination)lhs);
+            String rname = getName((Destination)rhs);
+            if (lname.equals("shared clients"))
+                return -1;
+            if (rname.equals("shared clients"))
+                return 1;
+            return Collator.getInstance().compare(lname, rname);
+        }
+    }
+
+    private String getName(Destination d) {
+        TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(d.calculateHash());
+        String name = (in != null ? in.getDestinationNickname() : null);
+        if (name == null) {
+            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(d.calculateHash());
+            name = (out != null ? out.getDestinationNickname() : null);
+            if (name == null)
+                name = d.calculateHash().toBase64().substring(0,6);
+        }
+        return name;
+    }
+
     /**
      * How many free inbound tunnels we have.
      *
@@ -511,4 +535,5 @@ public class SummaryHelper extends HelperBase {
     public boolean updateAvailable() { 
         return NewsFetcher.getInstance(_context).updateAvailable();
     }
+
 }

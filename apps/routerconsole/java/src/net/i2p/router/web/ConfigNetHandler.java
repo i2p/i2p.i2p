@@ -237,7 +237,7 @@ public class ConfigNetHandler extends FormHandler {
 
     private void hiddenSwitch() {
         // Full restart required to generate new keys
-        _context.router().addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+        _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
     

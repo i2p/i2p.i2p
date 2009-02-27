@@ -83,9 +83,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             i2ps = createI2PSocket(dest);
             i2ps.setReadTimeout(readTimeout);
             StringBuffer expectedPong = new StringBuffer();
-            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong));
+            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in");
             in.start();
-            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps, expectedPong));
+            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " out");
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))

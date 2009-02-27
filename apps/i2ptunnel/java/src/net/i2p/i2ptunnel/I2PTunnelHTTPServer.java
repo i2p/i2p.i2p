@@ -124,8 +124,17 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.error("Error while closing the received i2p con", ex);
             }
         } catch (IOException ex) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {}
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error while receiving the new HTTP request", ex);
+        } catch (OutOfMemoryError oom) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {}
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("OOM in HTTP server", oom);
         }
 
         long afterHandle = getTunnel().getContext().clock().now();
