@@ -173,6 +173,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 // USER zzz1 abcd1234.i2p localhost :zzz
                 // this whole class is for these two lines...
                 buf.append("USER ").append(field[idx]).append(' ').append(newHostname);
+                buf.append(' ');
                 buf.append(field[idx+2]).append(' ').append(field[idx+3]).append("\r\n");
                 break;
             }
