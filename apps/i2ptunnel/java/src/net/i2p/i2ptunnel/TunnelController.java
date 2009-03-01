@@ -192,7 +192,12 @@ public class TunnelController implements Logging {
         String listenPort = getListenPort();
         String dest = getTargetDestination();
         String sharedClient = getSharedClient();
-        _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient }, this);
+        if (getPersistentClientKey()) {
+            String privKeyFile = getPrivKeyFile(); 
+            _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient, privKeyFile }, this);
+        } else {
+            _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient }, this);
+        }
     }
     
     private void startSocksClient() {
@@ -264,7 +269,12 @@ public class TunnelController implements Logging {
         String listenPort = getListenPort(); 
         String dest = getTargetDestination();
         String sharedClient = getSharedClient();
-        _tunnel.runClient(new String[] { listenPort, dest, sharedClient }, this);
+        if (getPersistentClientKey()) {
+            String privKeyFile = getPrivKeyFile(); 
+            _tunnel.runClient(new String[] { listenPort, dest, sharedClient, privKeyFile }, this);
+        } else {
+            _tunnel.runClient(new String[] { listenPort, dest, sharedClient }, this);
+        }
     }
 
     private void startServer() {
@@ -395,7 +405,7 @@ public class TunnelController implements Logging {
     public String getProxyList() { return _config.getProperty("proxyList"); }
     public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
-    public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("persistentClientKey")).booleanValue(); }
+    public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
     public String getMyDestination() {
         if (_tunnel != null) {
             List sessions = _tunnel.getSessions();

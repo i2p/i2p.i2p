@@ -351,6 +351,7 @@
                 <hr />
             </div>
 
+         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) { %>
             <div id="optionsField" class="rowItem">
                 <label for="privKeyFile" accesskey="k">
                     Persistent private <span class="accessKey">k</span>ey:
@@ -365,10 +366,18 @@
                 <label>File:</label>
                 <input type="text" size="30" id="clientHost" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
             </div>
+            <div id="destinationField" class="rowItem">
+                <label for="localDestination" accesskey="L">
+                    <span class="accessKey">L</span>ocal destination:
+                </label>
+                <textarea rows="1" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
+                <span class="comment">(if known)</span>
+            </div>
 
             <div class="subdivider">
                 <hr />
             </div>
+         <% } %>
            
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">

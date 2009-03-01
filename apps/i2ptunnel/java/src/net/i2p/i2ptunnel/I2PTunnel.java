@@ -552,14 +552,14 @@ public class I2PTunnel implements Logging, EventDispatcher {
      * Integer port number if the client is listening
      * sharedClient parameter is a String "true" or "false"
      *
-     * @param args {portNumber, destinationBase64 or "file:filename"[, sharedClient]}
+     * @param args {portNumber, destinationBase64 or "file:filename"[, sharedClient [, privKeyFile]]}
      * @param l logger to receive events and output
      */
     public void runClient(String args[], Logging l) {
         boolean isShared = true;
-        if (args.length == 3)
+        if (args.length >= 3)
             isShared = Boolean.valueOf(args[2].trim()).booleanValue();
-        if ( (args.length == 2) || (args.length == 3) ) {
+        if (args.length >= 2) {
             int portNum = -1;
             try {
                 portNum = Integer.parseInt(args[0]);
@@ -572,7 +572,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelClient(portNum, args[1], l, ownDest, (EventDispatcher) this, this);
+                String privateKeyFile = null;
+                if (args.length >= 4)
+                    privateKeyFile = args[3];
+                task = new I2PTunnelClient(portNum, args[1], l, ownDest, (EventDispatcher) this, this, privateKeyFile);
                 addtask(task);
                 notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -581,7 +584,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("clientTaskId", Integer.valueOf(-1));
             }
         } else {
-            l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>[ <sharedClient>]");
+            l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>[ <sharedClient>] [<privKeyFile>]");
             l.log("  creates a client that forwards port to the pubkey.\n"
                   + "  use 0 as port to get a free port assigned.  If you specify\n"
                   + "  a comma delimited list of pubkeys, it will rotate among them\n"
@@ -720,11 +723,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
      * Also sets "ircclientStatus" = "ok" or "error" after the client tunnel has started.
      * parameter sharedClient is a String, either "true" or "false"
      *
-     * @param args {portNumber,destinationBase64 or "file:filename" [, sharedClient]}
+     * @param args {portNumber,destinationBase64 or "file:filename" [, sharedClient [, privKeyFile]]}
      * @param l logger to receive events and output
      */
     public void runIrcClient(String args[], Logging l) {
-        if (args.length >= 2 && args.length <= 3) {
+        if (args.length >= 2) {
             int port = -1;
             try {
                 port = Integer.parseInt(args[0]);
@@ -751,7 +754,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelIRCClient(port, args[1],l, ownDest, (EventDispatcher) this, this);
+                String privateKeyFile = null;
+                if (args.length >= 4)
+                    privateKeyFile = args[3];
+                task = new I2PTunnelIRCClient(port, args[1], l, ownDest, (EventDispatcher) this, this, privateKeyFile);
                 addtask(task);
                 notifyEvent("ircclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -760,7 +766,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("ircclientTaskId", Integer.valueOf(-1));
             }
         } else {
-            l.log("ircclient <port> [<sharedClient>]");
+            l.log("ircclient <port> [<sharedClient> [<privKeyFile>]]");
             l.log("  creates a client that filter IRC protocol.");
             l.log("  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)");
             notifyEvent("ircclientTaskId", Integer.valueOf(-1));

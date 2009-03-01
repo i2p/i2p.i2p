@@ -39,12 +39,12 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                               Logging l, 
                               boolean ownDest,
                               EventDispatcher notifyThis,
-                              I2PTunnel tunnel) throws IllegalArgumentException {
+                              I2PTunnel tunnel, String pkf) throws IllegalArgumentException {
         super(localPort, 
               ownDest, 
               l, 
               notifyThis, 
-              "IRCHandler " + (++__clientId), tunnel);
+              "IRCHandler " + (++__clientId), tunnel, pkf);
         
         StringTokenizer tok = new StringTokenizer(destinations, ",");
         dests = new ArrayList(1);

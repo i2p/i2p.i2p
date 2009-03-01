@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
@@ -59,6 +60,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private byte[] pubkey;
 
     private String handlerName;
+    private String privKeyFile;
 
     private Object conLock = new Object();
     
@@ -91,18 +93,28 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     //    I2PTunnelClientBase(localPort, ownDest, l, (EventDispatcher)null);
     //}
 
+    public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, 
+                               EventDispatcher notifyThis, String handlerName, 
+                               I2PTunnel tunnel) throws IllegalArgumentException {
+        this(localPort, ownDest, l, notifyThis, handlerName, tunnel, null);
+    }
+
     /**
+     * @param privKeyFile null to generate a transient key
+     *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */
     public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, 
                                EventDispatcher notifyThis, String handlerName, 
-                               I2PTunnel tunnel) throws IllegalArgumentException{
+                               I2PTunnel tunnel, String pkf) throws IllegalArgumentException{
         super(localPort + " (uninitialized)", notifyThis, tunnel);
         _clientId = ++__clientId;
         this.localPort = localPort;
         this.l = l;
         this.handlerName = handlerName + _clientId;
+        this.privKeyFile = pkf;
+
 
         _context = tunnel.getContext();
         _context.statManager().createRateStat("i2ptunnel.client.closeBacklog", "How many pending sockets remain when we close one due to backlog?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -195,28 +207,34 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private static I2PSocketManager socketManager;
 
     protected synchronized I2PSocketManager getSocketManager() {
-        return getSocketManager(getTunnel());
+        return getSocketManager(getTunnel(), this.privKeyFile);
     }
     protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel) {
+        return getSocketManager(tunnel, null);
+    }
+    protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel, String pkf) {
         if (socketManager != null) {
             I2PSession s = socketManager.getSession();
             if ( (s == null) || (s.isClosed()) ) {
                 _log.info("Building a new socket manager since the old one closed [s=" + s + "]");
-                socketManager = buildSocketManager(tunnel);
+                socketManager = buildSocketManager(tunnel, pkf);
             } else {
                 _log.info("Not building a new socket manager since the old one is open [s=" + s + "]");
             }
         } else {
             _log.info("Building a new socket manager since there is no other one");
-            socketManager = buildSocketManager(tunnel);
+            socketManager = buildSocketManager(tunnel, pkf);
         }
         return socketManager;
     }
 
     protected I2PSocketManager buildSocketManager() {
-        return buildSocketManager(getTunnel());
+        return buildSocketManager(getTunnel(), this.privKeyFile);
     }
     protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel) {
+        return buildSocketManager(tunnel, null);
+    }
+    protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel, String pkf) {
         Properties props = new Properties();
         props.putAll(tunnel.getClientOptions());
         int portNum = 7654;
@@ -230,10 +248,22 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         
         I2PSocketManager sockManager = null;
         while (sockManager == null) {
-            // if persistent dest
-            //      sockManager = I2PSocketManagerFactory.createManager(privData, tunnel.host, portNum, props);
-            // else
-            sockManager = I2PSocketManagerFactory.createManager(tunnel.host, portNum, props);
+            if (pkf != null) {
+                // Persistent client dest
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(pkf);
+                    sockManager = I2PSocketManagerFactory.createManager(fis, tunnel.host, portNum, props);
+                } catch (IOException ioe) {
+                    _log.error("Error opening key file", ioe);
+                    // this is going to loop but if we break we'll get a NPE
+                } finally {
+                    if (fis != null)
+                        try { fis.close(); } catch (IOException ioe) {}
+                }
+            } else {
+                sockManager = I2PSocketManagerFactory.createManager(tunnel.host, portNum, props);
+            }
             
             if (sockManager == null) {
                 _log.log(Log.CRIT, "Unable to create socket manager");
