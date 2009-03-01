@@ -60,8 +60,9 @@ public class EditBean extends IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
-        else
-            return "";
+        if (tunnel < 0)
+            tunnel = _group.getControllers().size();
+        return "i2ptunnel" + tunnel + "-privKeys.dat";
     }
     
     public boolean startAutomatically(int tunnel) {
