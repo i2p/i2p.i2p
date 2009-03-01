@@ -58,7 +58,7 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
-        if (createKey && getType().endsWith("server"))
+        if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
             createPrivateKey();
         _starting = getStartOnLoad();
     }
@@ -395,6 +395,7 @@ public class TunnelController implements Logging {
     public String getProxyList() { return _config.getProperty("proxyList"); }
     public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
+    public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("persistentClientKey")).booleanValue(); }
     public String getMyDestination() {
         if (_tunnel != null) {
             List sessions = _tunnel.getSessions();

@@ -614,8 +614,11 @@ public class IndexBean {
     public void setAccess(String moo) {
         _booleanOptions.add("i2cp.enableAccessList");
     }
-    public void setNewDest(String moo) {
-        _booleanOptions.add("i2cp.newDestOnResume");
+    public void setNewDest(String val) {
+        if ("1".equals(val))
+            _booleanOptions.add("i2cp.newDestOnResume");
+        else if ("2".equals(val))
+            _booleanOptions.add("persistentClientKey");
     }
 
     public void setReduceTime(String val) {
@@ -790,8 +793,6 @@ public class IndexBean {
                 config.setProperty("targetHost", _targetHost);
             if (_targetPort != null)
                 config.setProperty("targetPort", _targetPort);
-            if (_privKeyFile != null)
-                config.setProperty("privKeyFile", _privKeyFile);
             for (String p : _booleanServerOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
             for (String p : _otherServerOpts)
@@ -819,7 +820,7 @@ public class IndexBean {
         "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
         };
     private static final String _booleanClientOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume"
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey"
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
@@ -852,6 +853,8 @@ public class IndexBean {
         } else {
             config.setProperty("i2cpPort", "7654");
         }
+        if (_privKeyFile != null)
+            config.setProperty("privKeyFile", _privKeyFile);
         
         if (_customOptions != null) {
             StringTokenizer tok = new StringTokenizer(_customOptions);

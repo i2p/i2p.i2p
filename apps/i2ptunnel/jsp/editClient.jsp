@@ -289,34 +289,6 @@
             </div>
            
             <div id="optionsField" class="rowItem">
-                <label for="reduce" accesskey="c">
-                    <span class="accessKey">C</span>lose tunnels when idle:
-                </label>
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="access" accesskey="c">
-                    Enable:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="close" title="Close Tunnels"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="access" accesskey="c">
-                    Generate New Destination Keys On Reopen:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="newDest" title="New Destination"<%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-            </div>
-            <div id="portField" class="rowItem">
-                <label for="reduceTime" accesskey="c">
-                    Close when idle (minutes):
-                </label>
-                <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
-            </div>
-                 
-            <div class="subdivider">
-                <hr />
-            </div>
-           
-            <div id="optionsField" class="rowItem">
                 <label for="reduce" accesskey="d">
                     Re<span class="accessKey">d</span>uce tunnel quantity when idle:
                 </label>
@@ -340,6 +312,60 @@
                 <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
             </div>
             
+            <div class="subdivider">
+                <hr />
+            </div>
+           
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="c">
+                    <span class="accessKey">C</span>lose tunnels when idle:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="close" title="Close Tunnels"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Generate New Destination Keys On Reopen:
+                </label>
+                <table border="0"><tr><!-- I give up -->
+                <td><input value="1" type="radio" id="startOnLoad" name="newDest" title="New Destination"
+                     <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <td valign="center">Enable
+                <td><input value="0" type="radio" id="startOnLoad" name="newDest" title="New Destination"
+                     <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />                
+                <td valign="center">Disable
+                </table>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="reduceTime" accesskey="c">
+                    Close when idle (minutes):
+                </label>
+                <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+
+            <div id="optionsField" class="rowItem">
+                <label for="privKeyFile" accesskey="k">
+                    Persistent private <span class="accessKey">k</span>ey:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label>Enable:</label>
+                <input value="2" type="radio" id="startOnLoad" name="newDest" title="New Destination"
+                     <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="reachField" class="rowItem">
+                <label>File:</label>
+                <input type="text" size="30" id="clientHost" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
+            </div>
+
             <div class="subdivider">
                 <hr />
             </div>

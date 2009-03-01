@@ -42,7 +42,8 @@ public class I2PSinkAnywhere implements Sink {
         
         // send message
         try {
-            this.sess.sendMessage(to, payload);
+            this.sess.sendMessage(to, payload, I2PSession.PROTO_DATAGRAM,
+                                  I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
         } catch(I2PSessionException exc) {
             // TODO: handle better
             exc.printStackTrace();

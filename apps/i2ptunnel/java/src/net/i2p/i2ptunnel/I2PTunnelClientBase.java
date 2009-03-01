@@ -230,6 +230,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         
         I2PSocketManager sockManager = null;
         while (sockManager == null) {
+            // if persistent dest
+            //      sockManager = I2PSocketManagerFactory.createManager(privData, tunnel.host, portNum, props);
+            // else
             sockManager = I2PSocketManagerFactory.createManager(tunnel.host, portNum, props);
             
             if (sockManager == null) {

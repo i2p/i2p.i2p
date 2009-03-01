@@ -272,9 +272,9 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
-                    Generate Key:
+                    Generate New Key:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now">Generate New Key</button>
+                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now">Generate</button>
                 <span class="comment">(Tunnel must be stopped first)</span>
             </div>
                  

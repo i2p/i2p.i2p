@@ -156,6 +156,10 @@ public class EditBean extends IndexBean {
         return getBooleanProperty(tunnel, "i2cp.newDestOnResume");
     }
     
+    public boolean getPersistentClientKey(int tunnel) {
+        return getBooleanProperty(tunnel, "persistentClientKey");
+    }
+    
     private int getProperty(int tunnel, String prop, int def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
