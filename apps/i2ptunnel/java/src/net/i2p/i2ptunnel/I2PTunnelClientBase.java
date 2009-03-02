@@ -355,6 +355,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     public I2PSocket createI2PSocket(Destination dest, I2PSocketOptions opt) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
         I2PSocket i2ps;
 
+        if (Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.newDestOnResume")).booleanValue()) {
+            synchronized(sockMgr) {
+                I2PSocketManager oldSockMgr = sockMgr;
+                // This will build a new socket manager and a new dest if the session is closed.
+                sockMgr = getSocketManager();
+                if (oldSockMgr != sockMgr) {
+                    _log.error("Built a new destination on resume");
+                }
+            }
+        }  // else the old socket manager will reconnect the old session if necessary
         i2ps = sockMgr.connect(dest, opt);
         synchronized (sockLock) {
             mySockets.add(i2ps);
