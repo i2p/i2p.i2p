@@ -74,6 +74,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             startup();
     }
     
+    public boolean isAlive() { return _manager != null && _manager.isAlive(); }
+
     private static final long MAX_TIME_TO_REBUILD = 10*60*1000;
     public boolean verifyClientLiveliness() {
         if (_manager == null) return true;

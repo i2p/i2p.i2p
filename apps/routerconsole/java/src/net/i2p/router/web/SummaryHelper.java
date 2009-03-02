@@ -106,6 +106,9 @@ public class SummaryHelper extends HelperBase {
     public int getAllPeers() { return _context.netDb().getKnownRouters(); }
     
     public String getReachability() {
+        if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
+            !_context.clientManager().isAlive())
+            return "ERR-Client Manager I2CP Error - check logs";  // not a router problem but the user should know
         if (!_context.clock().getUpdatedSuccessfully())
             return "ERR-ClockSkew";
         if (_context.router().isHidden())

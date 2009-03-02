@@ -108,6 +108,8 @@ public class ClientManager {
         }
     }
     
+    public boolean isAlive() { return _listener.isListening(); }
+
     public void registerConnection(ClientConnectionRunner runner) {
         synchronized (_pendingRunners) {
             _pendingRunners.add(runner);

@@ -72,6 +72,7 @@ public abstract class ClientManagerFacade implements Service {
     public abstract void messageReceived(ClientMessage msg);
     
     public boolean verifyClientLiveliness() { return true; }
+    public boolean isAlive() { return true; }
     /**
      * Does the client specified want their leaseSet published?
      */
