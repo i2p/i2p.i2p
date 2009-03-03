@@ -149,7 +149,9 @@
                     <span class="accessKey">L</span>ocal destination:
                 </label>
                 <textarea rows="1" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
-                <span class="comment">(if known)</span>
+         <% if (!"".equals(editBean.getDestinationBase64(curTunnel))) { %>    
+            <a href="/susidns/addressbook.jsp?book=private&hostname=<%=editBean.getTunnelName(curTunnel)%>&destination=<%=editBean.getDestinationBase64(curTunnel)%>#add">Add to local addressbook</a>    
+         <% } %>
             </div>
             
             <div class="footer">
