@@ -8,6 +8,21 @@ import net.i2p.router.RouterContext;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
+/**
+ * Copied from http://www.i2p2.i2p/how_peerselection.html
+ *
+ * See also main() below for additional commentary by zzz.
+ *
+ * Currently, there is no 'ejection' strategy to get rid of the profiles for peers that
+ * are no longer active (or when the network consists of thousands of peers, to get rid
+ * of peers that are performing poorly). However, the size of each profile is fairly small,
+ * and is unrelated to how much data is collected about the peer, so that a router can
+ * keep a few thousand active peer profiles before the overhead becomes a serious concern.
+ * Once it becomes necessary, we can simply compact the poorly performing profiles
+ * (keeping only the most basic data) and maintain hundreds of thousands of profiles
+ * in memory. Beyond that size, we can simply eject the peers (e.g. keeping the best 100,000).
+ */
+
 public class PeerProfile {
     private Log _log;
     private RouterContext _context;
@@ -315,6 +330,11 @@ public class PeerProfile {
             }
         }
     }
+    /**
+     * @return the average of the three fastest one-minute data transfers, on a per-tunnel basis,
+     *         through this peer. Ever. Except that the peak values are cut in half
+     *         once a day by coalesceThroughput(). This seems way too seldom.
+     */
     public double getPeakTunnel1mThroughputKBps() { 
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
@@ -504,12 +524,36 @@ public class PeerProfile {
     public String toString() { return "Profile: " + getPeer().toBase64(); }
     
     /**
+     * New measurement is 12KB per expanded profile. (2009-03 zzz)
+     * And nowhere in the code is shrinkProfile() called so
+     * the size of compact profiles doesn't matter right now.
+     * This is far bigger than the NetDB entry, which is only about 1.5KB
+     * now that most of the stats have been removed.
+     *
+     * The biggest user in the profile is the Rates. (144 bytes per according to jhat).
+     * PeerProfile:     9 RateStats, 3-5 Rates each - 35 total
+     * DBHistory:       2 RateStats, 3 each -          6 total
+     * TunnelHistory:   4 RateStats, 5 each -         20 total
+     *                ---                            ---------
+     *                 15                             61 total  
+     *                *60 bytes                     *144 bytes
+     *                ---                            ---------
+     *                900 bytes                     8784 bytes
+     *
+     * The RateStat itself is 32 bytes and the Rate[] is 28 so that adds
+     * about 1KB.
+     *
+     * So two obvious things to do are cut out some of the Rates,
+     * and call shrinkProfile().
+     *
+     * Obsolete calculation follows:
+     *
      * Calculate the memory consumption of profiles.  Measured to be ~3739 bytes
      * for an expanded profile, and ~212 bytes for a compacted one.
      *
      */
-    public static void main2(String args[]) {
-        RouterContext ctx = new RouterContext(null);
+    public static void main(String args[]) {
+        RouterContext ctx = new RouterContext(new net.i2p.router.Router());
         testProfileSize(ctx, 100, 0); // 560KB
         testProfileSize(ctx, 1000, 0); // 3.9MB
         testProfileSize(ctx, 10000, 0); // 37MB
@@ -524,7 +568,7 @@ public class PeerProfile {
      *  PeerProfile [filename]*
      * </pre>
      */
-    public static void main(String args[]) {
+    public static void main2(String args[]) {
         RouterContext ctx = new RouterContext(new net.i2p.router.Router());
         DecimalFormat fmt = new DecimalFormat("0,000.0");
         fmt.setPositivePrefix("+");
