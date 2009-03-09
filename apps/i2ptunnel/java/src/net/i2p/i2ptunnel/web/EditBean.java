@@ -161,6 +161,10 @@ public class EditBean extends IndexBean {
         return getBooleanProperty(tunnel, "persistentClientKey");
     }
     
+    public boolean getDelayOpen(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.delayOpen");
+    }
+    
     private int getProperty(int tunnel, String prop, int def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {

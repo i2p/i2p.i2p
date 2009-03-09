@@ -614,6 +614,9 @@ public class IndexBean {
     public void setAccess(String moo) {
         _booleanOptions.add("i2cp.enableAccessList");
     }
+    public void setDelayOpen(String moo) {
+        _booleanOptions.add("i2cp.delayOpen");
+    }
     public void setNewDest(String val) {
         if ("1".equals(val))
             _booleanOptions.add("i2cp.newDestOnResume");
@@ -820,7 +823,7 @@ public class IndexBean {
         "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
         };
     private static final String _booleanClientOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey"
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"

@@ -351,6 +351,22 @@
                 <hr />
             </div>
 
+            <div id="optionsField" class="rowItem">
+                <label for="reduce" accesskey="c">
+                    <span class="accessKey">D</span>elay tunnel open until required:
+                </label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label for="access" accesskey="c">
+                    Enable:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="delayOpen" title="Delay Tunnel Open"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+                 
+            <div class="subdivider">
+                <hr />
+            </div>
+
          <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) { %>
             <div id="optionsField" class="rowItem">
                 <label for="privKeyFile" accesskey="k">
