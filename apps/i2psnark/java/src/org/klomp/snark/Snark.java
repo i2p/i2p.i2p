@@ -232,7 +232,7 @@ public class Snark
           }
         
         // Explicit shutdown.
-        Runtime.getRuntime().removeShutdownHook(snarkhook);
+        //Runtime.getRuntime().removeShutdownHook(snarkhook);
         snarkhook.start();
       }
   }
