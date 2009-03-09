@@ -1,3 +1,27 @@
+2009-02-26 zzz
+    * I2CP Client: Add support for muxing
+    * I2PTunnel:
+      - Add new IRCServer tunnel type
+      - Add SOCKS 4/4a support
+      - Catch OOMs in HTTPServer
+      - Name the IRCClient filter threads
+      - Port Streamr to I2PTunnel
+      - The beginnings of SOCKS UDP support
+    * Naming: Add reverse lookup by hash
+    * OCMOSJ: Clean up the cache cleaning
+    * Router: Move addShutdownTask from Router to I2PAppContext
+      so that apps can register more easily
+    * Routerconsole:
+      - Thread hard shutdown and restart requests from the routerconsole,
+        and add a delay even if no tunnels, to allow time for a UI response
+      - Sort the summary bar destinations
+      - Move dest-to-hash converter to new helper class so we can
+        use it in i2ptunnel
+
+2009-02-22 sponge
+    * BOB: Orphan tunnel issue fix, bump BOB version
+    * bump to Build 6
+
 2009-02-16 zzz
     * Streaming lib: Plug timer leak, don't send keepalives
       after close, don't disconnect hard after close

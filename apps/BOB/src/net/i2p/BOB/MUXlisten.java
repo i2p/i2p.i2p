@@ -173,7 +173,7 @@ die:                            {
 					boolean spin = true;
 					while(spin) {
 						try {
-							Thread.sleep(1000); //sleep for 1000 ms (One second)
+							Thread.sleep(200); //sleep for 200 ms (Two thenths second)
 						} catch(InterruptedException e) {
 							// nop
 						}
@@ -213,14 +213,21 @@ die:                            {
 					}
 				} // die
 
+				try {
+					Thread.sleep(500); //sleep for 500 ms (One half second)
+				} catch(InterruptedException ex) {
+					// nop
+				}
 				// wait for child threads and thread groups to die
 				// System.out.println("MUXlisten: waiting for children");
-				while(tg.activeCount() + tg.activeGroupCount() != 0) {
+				if(tg.activeCount() + tg.activeGroupCount() != 0) {
 					tg.interrupt(); // unwedge any blocking threads.
-					try {
-						Thread.sleep(100); //sleep for 100 ms (One tenth second)
-					} catch(InterruptedException ex) {
-						// nop
+					while(tg.activeCount() + tg.activeGroupCount() != 0) {
+						try {
+							Thread.sleep(100); //sleep for 100 ms (One tenth second)
+						} catch(InterruptedException ex) {
+							// nop
+						}
 					}
 				}
 				tg.destroy();
@@ -260,17 +267,33 @@ die:                            {
 		}
 		// This is here to catch when something fucks up REALLY bad.
 		if(tg != null) {
-			while(tg.activeCount() + tg.activeGroupCount() != 0) {
+			if(tg.activeCount() + tg.activeGroupCount() != 0) {
 					tg.interrupt(); // unwedge any blocking threads.
+				while(tg.activeCount() + tg.activeGroupCount() != 0) {
 					try {
 						Thread.sleep(100); //sleep for 100 ms (One tenth second)
 					} catch(InterruptedException ex) {
 						// nop
 					}
+				}
 			}
 			tg.destroy();
 			// Zap reference to the ThreadGroup so the JVM can GC it.
 			tg = null;
 		}
+
+		// Lastly try to close things again.
+		if(this.come_in) {
+			try {
+				listener.close();
+			} catch(IOException e) {
+			}
+		}
+		try {
+			socketManager.destroySocketManager();
+		} catch(Exception e) {
+			// nop
+		}
+
 	}
 }
