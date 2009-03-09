@@ -1,3 +1,22 @@
+2009-03-09 zzz
+    * Client:
+      - Clean up retry code
+      - Bring I2CP listen error to the summary bar
+        http://forum.i2p/viewtopic.php?t=3133
+    * I2PSnark: Remove the http from the add torrent box
+    * I2PTunnel:
+      - Add persistent key option for standard and IRC clients
+      - Add delay-open option for clients
+      - Get regenerate-dest-on-reconnect working
+      - Add default key file name
+      - Add link to addressbook
+      - I2PSink: Send protocol byte
+    * OCMOSJ:
+      - Change from 5% reply requests to at least
+        once per minute, in hopes of reducing IRC drops
+      - More clean up of the cache cleaning
+    * Routerconsole: Don't OOM configpeer.jsp on huge blocklists
+
 2009-02-26 zzz
     * I2CP Client: Add support for muxing
     * I2PTunnel:
