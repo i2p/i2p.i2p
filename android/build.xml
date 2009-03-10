@@ -26,10 +26,10 @@
         <os family="windows"/>
     </condition>
 
-    <property name="external-libs" value="lib" />
+    <property name="external-libs" value="libs" />
     <condition property="external-libs-ospath"
-            value="..\pkg-temp\${external-libs}"
-            else="../pkg-temp/${external-libs}" >
+            value="${basedir}\${external-libs}"
+            else="${basedir}/${external-libs}" >
         <os family="windows"/>
     </condition>
 
@@ -105,6 +105,8 @@
 
     <target name="clean">
         <delete dir="${outdir}" />
+        <delete dir="${external-libs}" />
+        <delete dir="tmp/" />
         <delete file="${outdir-r}/net/i2p/router/R.java" />
     </target>
 
@@ -144,13 +146,19 @@
                 destdir="${outdir-classes}"
                 bootclasspath="${android-jar}">
             <classpath>
-                <fileset dir="${external-libs-ospath}" includes="*.jar"/>
+                <fileset dir="${external-libs}" includes="*.jar"/>
             </classpath>
          </javac>
     </target>
 
     <target name="buildrouter">
-         <ant dir=".." target="prepupdateRouter" />
+        <ant dir=".." target="buildrouter" />
+        <copy file="../build/router.jar" todir="${external-libs}" />
+        <mkdir dir="tmp" />
+        <unjar src="../build/i2p.jar" dest="tmp/" />
+        <delete file="tmp/net/i2p/util/LogWriter.class" />
+        <!-- lots of unneeded stuff, like Log* -->
+        <jar destfile="${external-libs}/i2p.jar" basedir="tmp/" />
     </target>
 
     <!-- Convert this project's .class files into .dex files. -->
@@ -162,7 +170,7 @@
             <arg value="--dex" />
             <arg value="--output=${intermediate-dex-ospath}" />
             <arg path="${outdir-classes-ospath}" />
-            <fileset dir="${external-libs-ospath}" includes="*.jar"/>
+            <fileset dir="${external-libs}" includes="*.jar"/>
         </apply>
     </target>
 

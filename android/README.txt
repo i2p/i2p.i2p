@@ -12,7 +12,7 @@ ant
 ant install
 
 #then run the debugger
-$A/ddms &
+../../android-sdk-linux_x86-1.1_r1/tools/ddms &
 
 #to rebuild and reinstall to emulator:
 ant reinstall
