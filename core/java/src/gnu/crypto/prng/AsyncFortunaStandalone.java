@@ -12,10 +12,11 @@ import net.i2p.util.Log;
  * has been eaten)
  */
 public class AsyncFortunaStandalone extends FortunaStandalone implements Runnable {
-    private static final int BUFFERS = 16;
+    private static final int DEFAULT_BUFFERS = 16;
     private static final int BUFSIZE = 256*1024;
-    private final byte asyncBuffers[][] = new byte[BUFFERS][BUFSIZE];
-    private final int status[] = new int[BUFFERS];
+    private int _bufferCount;
+    private final byte asyncBuffers[][];
+    private final int status[];
     private int nextBuf = 0;
     private I2PAppContext _context;
     private Log _log;
@@ -27,7 +28,10 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     
     public AsyncFortunaStandalone(I2PAppContext context) {
         super();
-        for (int i = 0; i < BUFFERS; i++)
+        _bufferCount = context.getProperty("router.prng.buffers", DEFAULT_BUFFERS);
+        asyncBuffers = new byte[_bufferCount][BUFSIZE];
+        status = new int[_bufferCount];
+        for (int i = 0; i < _bufferCount; i++)
             status[i] = STATUS_NEED_FILL;
         _context = context;
         context.statManager().createRateStat("prng.bufferWaitTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
@@ -80,11 +84,11 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
             status[nextBuf] = STATUS_LIVE;
             int prev=nextBuf-1;
             if (prev<0)
-                prev = BUFFERS-1;
+                prev = _bufferCount-1;
             if (status[prev] == STATUS_LIVE)
                 status[prev] = STATUS_NEED_FILL;
             nextBuf++;
-            if (nextBuf >= BUFFERS)
+            if (nextBuf >= _bufferCount)
                 nextBuf = 0;
             asyncBuffers.notify();
         }
@@ -95,7 +99,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
             int toFill = -1;
             try {
                 synchronized (asyncBuffers) {
-                    for (int i = 0; i < BUFFERS; i++) {
+                    for (int i = 0; i < _bufferCount; i++) {
                         if (status[i] == STATUS_NEED_FILL) {
                             status[i] = STATUS_FILLING;
                             toFill = i;
