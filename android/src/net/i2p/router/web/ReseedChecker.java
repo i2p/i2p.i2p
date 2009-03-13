@@ -30,6 +30,8 @@ public class ReseedChecker {
                 System.err.println("Yes, reseeding now");
                 ReseedHandler reseedHandler = new ReseedHandler();
                 reseedHandler.requestReseed();
+            } else {
+                System.err.println("No, we have " + names.length + " routers in the netDb");
             }
         }
     }

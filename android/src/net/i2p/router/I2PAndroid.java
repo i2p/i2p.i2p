@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 import net.i2p.router.Router;
+import net.i2p.router.web.ContextHelper;
 import net.i2p.router.web.ReseedChecker;
 import net.i2p.util.I2PFile;
 
@@ -29,17 +30,22 @@ public class I2PAndroid extends Activity
         _context = this;  // Activity extends Context
         debugStuff();
         initialize();
-
-        Router.main(null);
-        System.err.println("Router.main finished");
-
-        ReseedChecker.checkReseed();
     }
 
     public void onRestart()
     {
         System.err.println("onRestart called");
         super.onRestart();
+    }
+
+    public void onStart()
+    {
+        System.err.println("onStart called");
+        super.onStart();
+        Router.main(null);
+        System.err.println("Router.main finished");
+
+        ReseedChecker.checkReseed();
     }
 
     public void onResume()
@@ -58,6 +64,9 @@ public class I2PAndroid extends Activity
     {
         System.err.println("onStop called");
         super.onStop();
+        // shutdown() doesn't return so use shutdownGracefully()
+        ContextHelper.getContext(null).router().shutdownGracefully(Router.EXIT_HARD);
+        System.err.println("shutdown complete");
     }
 
     public void onDestroy()

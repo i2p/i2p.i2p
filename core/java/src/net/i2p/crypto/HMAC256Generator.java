@@ -20,10 +20,10 @@ public class HMAC256Generator extends HMACGenerator {
     public HMAC256Generator(I2PAppContext context) { super(context); }
     
     @Override
-    protected Mac acquire() {
+    protected I2PHMac acquire() {
         synchronized (_available) {
             if (_available.size() > 0)
-                return (Mac)_available.remove(0);
+                return (I2PHMac)_available.remove(0);
         }
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards

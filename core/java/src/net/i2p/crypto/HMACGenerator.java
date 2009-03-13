@@ -50,7 +50,7 @@ public class HMACGenerator {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        Mac mac = acquire();
+        I2PHMac mac = acquire();
         mac.init(key.getData());
         mac.update(data, offset, length);
         //byte rv[] = new byte[Hash.HASH_LENGTH];
@@ -87,10 +87,10 @@ public class HMACGenerator {
         return eq;
     }
     
-    protected Mac acquire() {
+    protected I2PHMac acquire() {
         synchronized (_available) {
             if (_available.size() > 0)
-                return (Mac)_available.remove(0);
+                return (I2PHMac)_available.remove(0);
         }
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
