@@ -25,6 +25,8 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileStreamFactory;
+import net.i2p.util.I2PFile;
 import net.i2p.util.Log;
 
 /**
@@ -93,7 +95,7 @@ public class RebuildRouterInfoJob extends JobImpl {
         String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
         if (keyFilename == null)
             keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-        File keyFile = new File(keyFilename);
+        File keyFile = new I2PFile(keyFilename);
         
         if (keyFile.exists()) {
             // ok, no need to rebuild a brand new identity, just update what we can
@@ -102,7 +104,7 @@ public class RebuildRouterInfoJob extends JobImpl {
                 info = new RouterInfo();
                 FileInputStream fis = null;
                 try {
-                    fis = new FileInputStream(keyFile);
+                    fis = FileStreamFactory.getFileInputStream(keyFile);
                     PrivateKey privkey = new PrivateKey();
                     privkey.readBytes(fis);
                     SigningPrivateKey signingPrivKey = new SigningPrivateKey();
@@ -146,7 +148,7 @@ public class RebuildRouterInfoJob extends JobImpl {
             
             FileOutputStream fos = null;
             try {
-                fos = new FileOutputStream(infoFilename);
+                fos = FileStreamFactory.getFileOutputStream(infoFilename);
                 info.writeBytes(fos);
             } catch (DataFormatException dfe) {
                 _log.error("Error rebuilding the router information", dfe);

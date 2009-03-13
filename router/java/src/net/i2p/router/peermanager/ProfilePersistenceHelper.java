@@ -18,6 +18,8 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileStreamFactory;
+import net.i2p.util.I2PFile;
 import net.i2p.util.Log;
 
 class ProfilePersistenceHelper {
@@ -61,7 +63,7 @@ class ProfilePersistenceHelper {
         long before = _context.clock().now();
         OutputStream fos = null;
         try {
-            fos = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(f)));
+            fos = new BufferedOutputStream(new GZIPOutputStream(FileStreamFactory.getFileOutputStream(f)));
             writeProfile(profile, fos);
         } catch (IOException ioe) {
             _log.error("Error writing profile to " + f);
@@ -264,10 +266,10 @@ class ProfilePersistenceHelper {
     
     private void loadProps(Properties props, File file) {
         try {
-            FileInputStream fin = new FileInputStream(file);
+            FileInputStream fin = FileStreamFactory.getFileInputStream(file);
             int c = fin.read(); 
             fin.close();
-            fin = new FileInputStream(file); // ghetto mark+reset
+            fin = FileStreamFactory.getFileInputStream(file); // ghetto mark+reset
             if (c == '#') {
                 // uncompressed
                 if (_log.shouldLog(Log.INFO))
@@ -299,7 +301,7 @@ class ProfilePersistenceHelper {
     }
     
     private File pickFile(PeerProfile profile) {
-        return new File(getProfileDir(), "profile-" + profile.getPeer().toBase64() + ".dat");
+        return new I2PFile(getProfileDir(), "profile-" + profile.getPeer().toBase64() + ".dat");
     }
     
     private File getProfileDir() {
@@ -315,7 +317,7 @@ class ProfilePersistenceHelper {
                     dir = DEFAULT_PEER_PROFILE_DIR;
                 }
             }
-            _profileDir = new File(dir);
+            _profileDir = new I2PFile(dir);
         }
         return _profileDir;
     }

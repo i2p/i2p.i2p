@@ -87,36 +87,44 @@ class LogWriter implements Runnable {
 
     private void writeRecord(LogRecord rec) {
         if (rec.getThrowable() == null)
-            log(rec.getPriority(), rec.getSourceName(), null, rec.getThreadName(), rec.getMessage());
+            log(rec.getPriority(), rec.getSource(), rec.getSourceName(), rec.getThreadName(), rec.getMessage());
         else
-            log(rec.getPriority(), rec.getSourceName(), null, rec.getThreadName(), rec.getMessage(), rec.getThrowable());
+            log(rec.getPriority(), rec.getSource(), rec.getSourceName(), rec.getThreadName(), rec.getMessage(), rec.getThrowable());
     }
 
-    public void log(int priority, String className, String name, String threadName, String msg) {
-            if (className != null)
+    public void log(int priority, Class src, String name, String threadName, String msg) {
+            if (src != null) {
+                String tag = src.getName();
+                int dot = tag.lastIndexOf(".");
+                if (dot >= 0)
+                    tag = tag.substring(dot + 1);
                 android.util.Log.println(toAndroidLevel(priority),
-                                         className,
-                                         threadName + ' ' + msg);
-            else if (name != null)
+                                         tag,
+                                         '[' + threadName + "] " + msg);
+            } else if (name != null)
                 android.util.Log.println(toAndroidLevel(priority),
                                          name,
-                                         threadName + ' ' + msg);
+                                         '[' + threadName + "] " + msg);
             else
                 android.util.Log.println(toAndroidLevel(priority),
                                          threadName, msg);
     }
 
-    public void log(int priority, String className, String name, String threadName, String msg, Throwable t) {
-            if (className != null)
+    public void log(int priority, Class src, String name, String threadName, String msg, Throwable t) {
+            if (src != null) {
+                String tag = src.getName();
+                int dot = tag.lastIndexOf(".");
+                if (dot >= 0)
+                    tag = tag.substring(dot + 1);
                 android.util.Log.println(toAndroidLevel(priority),
-                                         className,
-                                         threadName + ' ' + msg +
-                                         msg + ' ' + t.toString() + ' ' + android.util.Log.getStackTraceString(t));
-            else if (name != null)
+                                         tag,
+                                         '[' + threadName + "] " + msg +
+                                         ' ' + t.toString() + ' ' + android.util.Log.getStackTraceString(t));
+            } else if (name != null)
                 android.util.Log.println(toAndroidLevel(priority),
                                          name,
-                                         threadName + ' ' + msg +
-                                         msg + ' ' + t.toString() + ' ' + android.util.Log.getStackTraceString(t));
+                                         '[' + threadName + "] " + msg +
+                                         ' ' + t.toString() + ' ' + android.util.Log.getStackTraceString(t));
             else
                 android.util.Log.println(toAndroidLevel(priority),
                                          threadName,

@@ -101,12 +101,15 @@
         <echo>Creating output directories if needed...</echo>
         <mkdir dir="${outdir}" />
         <mkdir dir="${outdir-classes}" />
+        <mkdir dir="${external-libs}" />
     </target>
 
     <target name="clean">
         <delete dir="${outdir}" />
         <delete dir="${external-libs}" />
         <delete dir="tmp/" />
+        <delete dir="res/drawable/" />
+        <delete file="res/raw/blocklist_txt" />
         <delete file="${outdir-r}/net/i2p/router/R.java" />
     </target>
 
@@ -140,7 +143,7 @@
     </target>
 
     <!-- Compile this project's .java files into .class files. -->
-    <target name="compile" depends="dirs, resource-src, aidl, buildrouter">
+    <target name="compile" depends="buildrouter, dirs, resource-src, aidl">
         <javac encoding="ascii" target="1.5" debug="true" extdirs=""
                 srcdir="."
                 destdir="${outdir-classes}"
@@ -151,18 +154,68 @@
          </javac>
     </target>
 
-    <target name="buildrouter">
+    <target name="buildrouter" depends="dirs" >
+        <!-- for now, we just need the ReseedHandler from routerconsole -->
+        <ant dir="../apps/routerconsole/java" target="compile" />
+        <jar destfile="${external-libs}/routerconsole.jar" >
+            <fileset dir="../apps/routerconsole/java/build/obj/" >
+                <include name="net/i2p/router/web/ContextHelper.class" />
+                <include name="net/i2p/router/web/ReseedHandler.class" />
+                <include name="net/i2p/router/web/ReseedHandler$ReseedRunner.class" />
+            </fileset>
+        </jar>
+
+        <!-- build router and core (actually the routerconsole builds these anyway) -->
         <ant dir=".." target="buildrouter" />
+
+        <!-- router -->
         <copy file="../build/router.jar" todir="${external-libs}" />
+
+        <!-- core -->
         <mkdir dir="tmp" />
         <unjar src="../build/i2p.jar" dest="tmp/" />
         <delete file="tmp/net/i2p/util/LogWriter.class" />
-        <!-- lots of unneeded stuff, like Log* -->
+        <delete file="tmp/net/i2p/util/FileStreamFactory.class" />
+        <delete file="tmp/net/i2p/util/I2PFile.class" />
+        <!-- org.bouncycastle.crypto already in android
+             but we need a little trickery because our HMac is incompatible...
+             and the libs aren't in the SDK to compile against??? -->
+        <jar destfile="${external-libs}/crypto.jar" >
+            <fileset dir="tmp/" >
+                <include name="org/bouncycastle/crypto/Digest.class" />
+                <include name="org/bouncycastle/crypto/Mac.class" />
+                <include name="org/bouncycastle/crypto/digests/GeneralDigest.class" />
+                <include name="org/bouncycastle/crypto/digests/MD5Digest.class" />
+            </fileset>
+        </jar>
+        <delete>
+            <fileset dir="tmp/" >
+                <include name="org/bouncycastle/crypto/Digest.class" />
+                <include name="org/bouncycastle/crypto/Mac.class" />
+                <include name="org/bouncycastle/crypto/digests/GeneralDigest.class" />
+                <include name="org/bouncycastle/crypto/digests/MD5Digest.class" />
+            </fileset>
+        </delete>
+<!--
+        <delete dir="tmp/org/bouncycastle/" />
+        <delete file="tmp/net/i2p/crypto/HMACGenerator.class" />
+-->
+        <delete file="tmp/org/bouncycastle/" />
+        <!-- lots of unneeded stuff could be deleted here -->
         <jar destfile="${external-libs}/i2p.jar" basedir="tmp/" />
+
+        <!-- some resources -->
+        <mkdir dir="res/drawable/" />
+        <copy file="../apps/routerconsole/jsp/i2plogo.png" todir="res/drawable/" />
+        <copy file="../installer/resources/blocklist.txt" tofile="res/raw/blocklist_txt" />
+    </target>
+
+    <target name="hackcleanup">
+        <delete file="${external-libs}/crypto.jar" />
     </target>
 
     <!-- Convert this project's .class files into .dex files. -->
-    <target name="dex" depends="compile">
+    <target name="dex" depends="compile, hackcleanup">
         <echo>Converting compiled files and external libraries into ${outdir}/${dex-file}...</echo>
         <apply executable="${dx}" failonerror="true" parallel="true">
             <!-- this is a bad sign that we need this -->

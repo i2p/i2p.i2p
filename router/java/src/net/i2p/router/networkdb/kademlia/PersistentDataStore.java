@@ -26,6 +26,8 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileStreamFactory;
+import net.i2p.util.I2PFile;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -171,11 +173,11 @@ class PersistentDataStore extends TransientDataStore {
             else
                 throw new IOException("We don't know how to write objects of type " + data.getClass().getName());
 
-            dbFile = new File(dbDir, filename);
+            dbFile = new I2PFile(dbDir, filename);
             long dataPublishDate = getPublishDate(data);
             if (dbFile.lastModified() < dataPublishDate) {
                 // our filesystem is out of date, lets replace it
-                fos = new FileOutputStream(dbFile);
+                fos = FileStreamFactory.getFileOutputStream(dbFile);
                 try {
                     data.writeBytes(fos);
                     fos.close();
@@ -278,7 +280,7 @@ class PersistentDataStore extends TransientDataStore {
                 FileInputStream fis = null;
                 boolean corrupt = false;
                 try {
-                    fis = new FileInputStream(_routerFile);
+                    fis = FileStreamFactory.getFileInputStream(_routerFile);
                     RouterInfo ri = new RouterInfo();
                     ri.readBytes(fis);
                     if (ri.getNetworkId() != Router.NETWORK_ID) {
@@ -312,7 +314,7 @@ class PersistentDataStore extends TransientDataStore {
     
     
     private File getDbDir() throws IOException {
-        File f = new File(_dbDir);
+        File f = new I2PFile(_dbDir);
         if (!f.exists()) {
             boolean created = f.mkdirs();
             if (!created)
@@ -362,7 +364,7 @@ class PersistentDataStore extends TransientDataStore {
     
     private void removeFile(Hash key, File dir) throws IOException {
         String riName = getRouterInfoName(key);
-        File f = new File(dir, riName);
+        File f = new I2PFile(dir, riName);
         if (f.exists()) {
             boolean removed = f.delete();
             if (!removed)

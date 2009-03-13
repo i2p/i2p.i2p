@@ -81,7 +81,7 @@ public class EventPumper implements Runnable {
     
     public void stopPumping() {
         _alive = false;
-        if (_selector.isOpen())
+        if (_selector != null &&_selector.isOpen())
             _selector.wakeup();
     }
     

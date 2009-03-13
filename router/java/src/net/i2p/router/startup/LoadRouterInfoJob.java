@@ -21,6 +21,8 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileStreamFactory;
+import net.i2p.util.I2PFile;
 import net.i2p.util.Log;
 
 public class LoadRouterInfoJob extends JobImpl {
@@ -62,10 +64,10 @@ public class LoadRouterInfoJob extends JobImpl {
         if (keyFilename == null)
             keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
         
-        File rif = new File(routerInfoFile);
+        File rif = new I2PFile(routerInfoFile);
         if (rif.exists())
             _infoExists = true;
-        File rkf = new File(keyFilename);
+        File rkf = new I2PFile(keyFilename);
         if (rkf.exists())
             _keysExist = true;
         
@@ -73,14 +75,14 @@ public class LoadRouterInfoJob extends JobImpl {
         FileInputStream fis2 = null;
         try {
             if (_infoExists) {
-                fis1 = new FileInputStream(rif);
+                fis1 = FileStreamFactory.getFileInputStream(rif);
                 info = new RouterInfo();
                 info.readBytes(fis1);
                 _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
             }
             
             if (_keysExist) {
-                fis2 = new FileInputStream(rkf);
+                fis2 = FileStreamFactory.getFileInputStream(rkf);
                 PrivateKey privkey = new PrivateKey();
                 privkey.readBytes(fis2);
                 SigningPrivateKey signingPrivKey = new SigningPrivateKey();

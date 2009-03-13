@@ -240,7 +240,7 @@ public class LogManager {
     //
 
     private void loadConfig() {
-        File cfgFile = new File(_location);
+        File cfgFile = new I2PFile(_location);
         if (!cfgFile.exists()) {
             if (!_alreadyNoticedMissingConfig) {
                 if (_log.shouldLog(Log.WARN))
@@ -268,11 +268,11 @@ public class LogManager {
         Properties p = new Properties();
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(cfgFile);
+            fis = FileStreamFactory.getFileInputStream(cfgFile);
             p.load(fis);
             _configLastRead = _context.clock().now();
         } catch (IOException ioe) {
-            System.err.println("Error loading logger config from " + new File(_location).getAbsolutePath());
+            System.err.println("Error loading logger config from " + new I2PFile(_location).getAbsolutePath());
         } finally {
             if (fis != null) try {
                 fis.close();
@@ -540,7 +540,7 @@ public class LogManager {
         String config = createConfig();
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_location);
+            fos = FileStreamFactory.getFileOutputStream(_location);
             fos.write(config.getBytes());
             return true;
         } catch (IOException ioe) {

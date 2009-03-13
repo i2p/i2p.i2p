@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.zip.Deflater;
 
 import net.i2p.util.ByteCache;
+import net.i2p.util.FileStreamFactory;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.ReusableGZIPOutputStream;
@@ -217,7 +218,7 @@ public class DataHelper {
         loadProps(props, file, false);
     }
     public static void loadProps(Properties props, File file, boolean forceLowerCase) throws IOException {
-        loadProps(props, new FileInputStream(file), forceLowerCase);
+        loadProps(props, FileStreamFactory.getFileInputStream(file), forceLowerCase);
     }
     public static void loadProps(Properties props, InputStream inStr) throws IOException {
         loadProps(props, inStr, false);

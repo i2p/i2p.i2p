@@ -40,7 +40,9 @@ import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
+import net.i2p.util.FileStreamFactory;
 import net.i2p.util.FileUtil;
+import net.i2p.util.I2PFile;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -292,7 +294,7 @@ public class Router {
         }
         Properties props = new Properties();
         try {
-            File f = new File(filename);
+            File f = new I2PFile(filename);
             if (f.canRead()) {
                 DataHelper.loadProps(props, f);
                 // dont be a wanker
@@ -945,7 +947,7 @@ public class Router {
     public boolean saveConfig() {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_configFilename);
+            fos = FileStreamFactory.getFileOutputStream(_configFilename);
             StringBuffer buf = new StringBuffer(8*1024);
             synchronized (_config) {
                 TreeSet ordered = new TreeSet(_config.keySet());
@@ -1331,7 +1333,7 @@ class MarkLiveliness implements Runnable {
     private void ping() {
         FileOutputStream fos = null;
         try { 
-            fos = new FileOutputStream(_pingFile);
+            fos = FileStreamFactory.getFileOutputStream(_pingFile);
             fos.write(("" + System.currentTimeMillis()).getBytes());
         } catch (IOException ioe) {
             System.err.println("Error writing to ping file");
@@ -1378,7 +1380,7 @@ class PersistRouterInfoJob extends JobImpl {
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(infoFilename);
+            fos = FileStreamFactory.getFileOutputStream(infoFilename);
             info.writeBytes(fos);
         } catch (DataFormatException dfe) {
             _log.error("Error rebuilding the router information", dfe);

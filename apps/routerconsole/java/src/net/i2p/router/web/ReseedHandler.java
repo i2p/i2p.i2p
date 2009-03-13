@@ -15,6 +15,8 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
+import net.i2p.util.FileStreamFactory;
+import net.i2p.util.I2PFile;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -250,11 +252,11 @@ public class ReseedHandler {
     
         private void writeSeed(String name, byte data[]) throws Exception {
             String dirName = "netDb"; // _context.getProperty("router.networkDatabase.dbDir", "netDb");
-            File netDbDir = new File(dirName);
+            File netDbDir = new I2PFile(dirName);
             if (!netDbDir.exists()) {
                 boolean ok = netDbDir.mkdirs();
             }
-            FileOutputStream fos = new FileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
+            FileOutputStream fos = FileStreamFactory.getFileOutputStream(new I2PFile(netDbDir, "routerInfo-" + name + ".dat"));
             fos.write(data);
             fos.close();
         }
