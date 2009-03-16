@@ -1,3 +1,11 @@
+2009-03-16 zzz
+    * help.jsp: Add some
+    * I2PTunnel: Cleanup
+    * I2PTunnelHTTPClient: Fix NPE on delayed open
+    * I2PTunnelHTTPServer: Maybe catch an NPE
+    * SOCKS: Allow .onion addresses for onioncat testing
+    * Tunnel: Catch a rare AIOOB
+
 2009-03-09 zzz
     * Client:
       - Clean up retry code
