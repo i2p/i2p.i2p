@@ -74,6 +74,12 @@ public class FragmentHandler {
         int padding = 0;
         while (preprocessed[offset] != (byte)0x00) {
             offset++; // skip the padding
+            // AIOOBE http://forum.i2p/viewtopic.php?t=3187
+            if (offset >= TrivialPreprocessor.PREPROCESSED_SIZE) {
+                _cache.release(new ByteArray(preprocessed));
+                _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
+                return;
+            }
             padding++;
         }
         offset++; // skip the final 0x00, terminating the padding

@@ -198,7 +198,8 @@ public class SOCKS4aServer extends SOCKSServer {
         I2PSocket destSock;
 
         try {
-            if (connHostName.toLowerCase().endsWith(".i2p")) {
+            if (connHostName.toLowerCase().endsWith(".i2p") ||
+                connHostName.toLowerCase().endsWith(".onion")) {
                 _log.debug("connecting to " + connHostName + "...");
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
@@ -224,7 +225,7 @@ public class SOCKS4aServer extends SOCKSServer {
             } else {
                 List<String> proxies = t.getProxies(connPort);
                 if (proxies == null || proxies.size() <= 0) {
-                    String err = "No outproxy configured for port " + connPort + " and no default configured either";
+                    String err = "No outproxy configured for port " + connPort + " and no default configured either - host: " + connHostName;
                     _log.error(err);
                     try {
                         sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);

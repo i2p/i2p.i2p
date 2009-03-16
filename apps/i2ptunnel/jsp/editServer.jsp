@@ -326,7 +326,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="reduceTime" accesskey="d">
-                    Reduce when idle (minutes):
+                    Idle minutes:
                 </label>
                 <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
             </div>
@@ -354,7 +354,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
-                    Estimate Hashcash Calc Time:
+                    Hashcash Calc Time:
                 </label>
                 <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Estimate" title="Estimate Calculation Time">Estimate</button>
             </div>

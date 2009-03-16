@@ -307,7 +307,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="reduceTime" accesskey="d">
-                    Reduce when idle (minutes):
+                    Idle minutes:
                 </label>
                 <input type="text" id="port" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext" />                
             </div>
@@ -329,7 +329,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="access" accesskey="c">
-                    Generate New Destination Keys On Reopen:
+                    New Keys on Reopen:
                 </label>
                 <table border="0"><tr><!-- I give up -->
                 <td><input value="1" type="radio" id="startOnLoad" name="newDest" title="New Destination"
@@ -342,7 +342,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="reduceTime" accesskey="c">
-                    Close when idle (minutes):
+                    Idle minutes:
                 </label>
                 <input type="text" id="port" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext" />                
             </div>
