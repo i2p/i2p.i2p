@@ -1,3 +1,13 @@
+2009-03-24 zzz
+    * I2PTunnel:
+      - Add some warnings about new features
+      - Fix encrypted leasesets broken in about -4
+      - Suppress log error on manual stop
+      - Fix NPE on close of a tunnel not open yet
+    * Transport:
+      - Increase default bw to 64/32, burst 80/40
+    * Tunnels: Change some fragmentation errors to warns
+
 2009-03-16 zzz
     * help.jsp: Add some
     * I2PTunnel: Cleanup
