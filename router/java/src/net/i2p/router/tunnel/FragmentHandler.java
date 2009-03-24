@@ -393,8 +393,8 @@ public class FragmentHandler {
                 _log.error("Error receiving fragmented message (corrupt?): " + stringified, ioe);
         } catch (I2NPMessageException ime) {
             if (stringified == null) stringified = msg.toString();
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error receiving fragmented message (corrupt?): " + stringified, ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error receiving fragmented message (corrupt?): " + stringified, ime);
         }
     }
 
