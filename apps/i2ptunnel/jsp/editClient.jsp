@@ -318,7 +318,7 @@
            
             <div id="optionsField" class="rowItem">
                 <label for="reduce" accesskey="c">
-                    <span class="accessKey">C</span>lose tunnels when idle:
+                    <span class="accessKey">C</span>lose tunnels when idle: <i>Experimental</i>
                 </label>
             </div>
             <div id="portField" class="rowItem">
@@ -353,7 +353,7 @@
 
             <div id="optionsField" class="rowItem">
                 <label for="reduce" accesskey="c">
-                    <span class="accessKey">D</span>elay tunnel open until required:
+                    <span class="accessKey">D</span>elay tunnel open until required: <i>Experimental</i>
                 </label>
             </div>
             <div id="portField" class="rowItem">

@@ -286,7 +286,7 @@
            
             <div id="optionsField" class="rowItem">
                 <label for="access" accesskey="s">
-                    Restricted Acce<span class="accessKey">s</span>s List:
+                    Restricted Acce<span class="accessKey">s</span>s List: <i>Unimplemented</i>
                 </label>
             </div>
             <div id="portField" class="rowItem">
