@@ -22,6 +22,10 @@ or IRC.
 <br />
 
 <h2>Summary Bar Information</h2>
+Many of the stats on the summary bar may be
+<a href="configstats.jsp">configured</a> to be
+<a href="graphs.jsp">graphed</a> for further analysis.
+
 <h3>General</h3>
 <ul>
 <li><b>Ident:</b>
@@ -47,13 +51,16 @@ This may range from 8-10 to several hundred, depending on your total bandwidth,
 shared bandwidth, and locally-generated traffic.
 The second number is the number of peers seen in the last hour or so.
 Do not be concerned if these numbers vary widely.
+<a href="configstats.jsp#router.activePeers">Enable graphing</a>
 <li><b>Fast:</b>
 This is the number of peers you use for building client tunnels. It is generally in the
 range 8-15. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
+<a href="configstats.jsp#router.fastPeers">Enable graphing</a>
 <li><b>High Capacity:</b>
 This is the number of peers you use for building some of your exploratory tunnels. It is generally in the
 range 8-25. The fast peers are included in the high capacity tier.
 Your high capacity peers are shown on the <a href="profiles.jsp">profiles page</a>.
+<a href="configstats.jsp#router.highCapacityPeers">Enable graphing</a>
 <li><b>Well Integrated:</b>
 This is the number of peers you use for network database inquiries.
 These are usually the "floodfill" peers.
@@ -71,6 +78,7 @@ I2P does not require a router to know every other router.
 <h3>Bandwidth in/out</h3>
 Should be self-explanatory. All values are in bytes per second, not bits per second.
 Change your bandwidth limits on the <a href="config.jsp#help">configuration page</a>.
+Bandwidth is <a href="graphs.jsp">graphed</a> by default.
 
 <h3>Local destinations</h3>
 The local applications connecting through your router.
@@ -93,10 +101,12 @@ The recommended method for limiting participating tunnels is
 to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
 You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
 the <a href="configadvanced.jsp">advanced configuration page</a>.
+<a href="configstats.jsp#tunnel.participatingTunnels">Enable graphing</a>
 </ul>
 
 <h3>Congestion</h3>
 Some basic indications of router overload.
+<ul>
 <li><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
 Unfortunately, there are several other job queues in the router that may be congested,
@@ -104,18 +114,21 @@ and their status is not available in the router console.
 The job lag should generally be zero.
 If it is consistently higher than 500ms, your computer is very slow, or the
 router has serious problems.
+<a href="configstats.jsp#jobQueue.jobLag">Enable graphing</a>
 <li><b>Message delay:</b>
 How long an outbound message waits in the queue.
 This should generally be a few hundred milliseconds or less.
 If it is consistently higher than 1000ms, your computer is very slow,
 or you should adjust your bandwidth limits, or your (bittorrent?) clients
 may be sending too much data and should have their transmit bandwidth limit reduced.
+<a href="configstats.jsp#transport.sendProcessingTime">Enable graphing</a> (transport.sendProcessingTime)
 <li><b>Tunnel lag:</b>
 This is the round trip time for a tunnel test, which sends a single message
 out a client tunnel and in an exploratory tunnel, or vice versa.
 It should usually be less than 5 seconds.
 If it is consistently higher than that, your computer is very slow,
 or you should adjust your bandwidth limits, or there are network problems.
+<a href="configstats.jsp#tunnel.testSuccessTime">Enable graphing</a> (tunnel.testSuccessTime)
 <li><b>Handle backlog:</b>
 This is the number of pending requests from other routers to build a
 participating tunnel through your router.
