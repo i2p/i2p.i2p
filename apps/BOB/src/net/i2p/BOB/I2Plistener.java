@@ -70,7 +70,7 @@ public class I2Plistener implements Runnable {
 		boolean g = false;
 		I2PSocket sessSocket = null;
 
-		serverSocket.setSoTimeout(100);
+		serverSocket.setSoTimeout(50);
 		database.getReadLock();
 		info.getReadLock();
 		if(info.exists("INPORT")) {

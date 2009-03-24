@@ -16,6 +16,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.Base32;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -36,26 +37,27 @@ import net.i2p.util.Log;
  * "custom options" section of i2ptunnel.
  *   - ircserver.cloakKey unset:          Cloak with a random value that is persistent for
  *                                        the life of this tunnel. This is the default.
- *   - ircserver.cloakKey=none:           Don't cloak. Users may be correlated with their
- *                                        (probably) shared clients destination.
- *                                        Of course if the ircd does cloaking than this is ok.
  *   - ircserver.cloakKey=somepassphrase: Cloak with the hash of the passphrase. Use this to
  *                                        have consistent mangling across restarts, or to
  *                                        have multiple IRC servers cloak consistently to
  *                                        be able to track users even when they switch servers.
  *                                        Note: don't quote or put spaces in the passphrase,
  *                                        the i2ptunnel gui can't handle it.
+ *   - ircserver.fakeHostname=%f.b32.i2p: Set the fake hostname sent by I2PTunnel,
+ *                                        %f is the full B32 destination hash
+ *                                        %c is the cloaked hash.
  *
  * There is no outbound filtering.
  *
  * @author zzz
  */
 public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
-
+    public static final String PROP_CLOAK="ircserver.cloakKey";
+    public static final String PROP_HOSTNAME="ircserver.fakeHostname";
+    public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
+    
     private static final Log _log = new Log(I2PTunnelIRCServer.class);
-    private static final String PROP_CLOAK="ircserver.cloakKey";
-    private boolean _cloak;
-    private byte[] _cloakKey; // 32 bytes of stuff to scramble the dest with
+    
     
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -71,15 +73,14 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     private void initCloak(I2PTunnel tunnel) {
         Properties opts = tunnel.getClientOptions();
         String passphrase = opts.getProperty(PROP_CLOAK);
-        _cloak = passphrase == null || !"none".equals(passphrase);
-        if (_cloak) {
-            if (passphrase == null) {
-                _cloakKey = new byte[Hash.HASH_LENGTH];
-                tunnel.getContext().random().nextBytes(_cloakKey);
-            } else {
-                _cloakKey = SHA256Generator.getInstance().calculateHash(passphrase.trim().getBytes()).getData();
-            }
+        if (passphrase == null) {
+            this.cloakKey = new byte[Hash.HASH_LENGTH];
+            tunnel.getContext().random().nextBytes(this.cloakKey);
+        } else {
+            this.cloakKey = SHA256Generator.getInstance().calculateHash(passphrase.trim().getBytes()).getData();
         }
+        
+        this.hostname = opts.getProperty(PROP_HOSTNAME, PROP_HOSTNAME_DEFAULT);
     }
     
     protected void blockingHandle(I2PSocket socket) {
@@ -122,16 +123,17 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
      *
      */
     String cloakDest(Destination d) {
-        Hash h;
-        if (_cloak) {
-            byte[] b = new byte[d.size() + _cloakKey.length];
-            System.arraycopy(b, 0, d.toByteArray(), 0, d.size());
-            System.arraycopy(b, d.size(), _cloakKey, 0, _cloakKey.length);
-            h = SHA256Generator.getInstance().calculateHash(b);
-        } else {
-            h = d.calculateHash();
-        }
-        return h.toBase64().substring(0, 8) + ".i2p";
+        String hf;
+        String hc;
+        
+        byte[] b = new byte[d.size() + this.cloakKey.length];
+        System.arraycopy(b, 0, d.toByteArray(), 0, d.size());
+        System.arraycopy(b, d.size(), this.cloakKey, 0, this.cloakKey.length);
+        hc = Base32.encode(SHA256Generator.getInstance().calculateHash(b).getData());
+        
+        hf = Base32.encode(d.calculateHash().getData());
+        
+        return this.hostname.replace("%f", hf).replace("%c", hc);
     }
 
     /** keep reading until we see USER or SERVER */
@@ -156,9 +158,10 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             if(field[0].charAt(0)==':')
                 idx++;
 
-            try { command = field[idx++]; }
-             catch (IndexOutOfBoundsException ioobe) // wtf, server sent borked command?
-            {
+            try {
+                command = field[idx++];
+            } catch (IndexOutOfBoundsException ioobe) {
+                // wtf, server sent borked command?
                throw new IOException("Dropping defective message: index out of bounds while extracting command.");
             }
 
@@ -169,7 +172,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 //  =>
                 // USER zzz1 abcd1234.i2p localhost :zzz
                 // this whole class is for these two lines...
-                buf.append("USER ").append(field[idx]).append(' ').append(newHostname).append(".i2p ");
+                buf.append("USER ").append(field[idx]).append(' ').append(newHostname);
+                buf.append(' ');
                 buf.append(field[idx+2]).append(' ').append(field[idx+3]).append("\r\n");
                 break;
             }
@@ -181,4 +185,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             _log.debug("All done, sending: " + buf.toString());
         return buf.toString();
     }
+    
+    private byte[] cloakKey; // 32 bytes of stuff to scramble the dest with
+    private String hostname;
 }
