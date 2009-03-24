@@ -375,7 +375,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 // This will build a new socket manager and a new dest if the session is closed.
                 sockMgr = getSocketManager();
                 if (oldSockMgr != sockMgr) {
-                    _log.error("Built a new destination on resume");
+                    _log.warn("Built a new destination on resume");
                 }
             }
         }  // else the old socket manager will reconnect the old session if necessary
@@ -431,8 +431,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 _context.statManager().addRateData("i2ptunnel.client.manageTime", total, total);
             }
         } catch (IOException ex) {
-            _log.error("Error listening for connections on " + localPort, ex);
-            notifyEvent("openBaseClientResult", "error");
+            if (open) {
+                _log.error("Error listening for connections on " + localPort, ex);
+                notifyEvent("openBaseClientResult", "error");
+            }
             synchronized (sockLock) {
                 mySockets.clear();
             }
@@ -513,20 +515,23 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         // might risk to create an orphan socket. Would be better
         // to return with an error in that situation quickly.
         synchronized (sockLock) {
-            mySockets.retainAll(sockMgr.listSockets());
-            if (!forced && mySockets.size() != 0) {
-                l.log("There are still active connections!");
-                _log.debug("can't close: there are still active connections!");
-                for (Iterator it = mySockets.iterator(); it.hasNext();) {
-                    l.log("->" + it.next());
+            if (sockMgr != null) {
+                mySockets.retainAll(sockMgr.listSockets());
+                if (!forced && mySockets.size() != 0) {
+                    l.log("There are still active connections!");
+                    _log.debug("can't close: there are still active connections!");
+                    for (Iterator it = mySockets.iterator(); it.hasNext();) {
+                        l.log("->" + it.next());
+                    }
+                    return false;
                 }
-                return false;
-            }
-            I2PSession session = sockMgr.getSession();
-            if (session != null) {
-                getTunnel().removeSession(session);
+                I2PSession session = sockMgr.getSession();
+                if (session != null) {
+                    getTunnel().removeSession(session);
+                }
             }
             l.log("Closing client " + toString());
+            open = false;
             try {
                 if (ss != null) ss.close();
             } catch (IOException ex) {
@@ -534,7 +539,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 return false;
             }
             l.log("Client closed.");
-            open = false;
         }
         
         synchronized (_waitingSockets) { _waitingSockets.notifyAll(); }
