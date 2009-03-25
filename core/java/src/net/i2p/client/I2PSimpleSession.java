@@ -130,7 +130,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
             return null;
         _bwReceivedLock = new Object();
         sendMessage(new GetBandwidthLimitsMessage());
-        for (int i = 0; i < 5 && !_destReceived; i++) {
+        for (int i = 0; i < 5 && !_bwReceived; i++) {
             try {
                 synchronized (_bwReceivedLock) {
                     _bwReceivedLock.wait(1000);

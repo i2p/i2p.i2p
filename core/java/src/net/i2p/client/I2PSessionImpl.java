@@ -656,6 +656,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         return null;
     }
 
+    public int[] bandwidthLimits() throws I2PSessionException {
+        return null;
+    }
+
     protected void updateActivity() {
         _lastActivity = _context.clock().now();
         if (_isReduced) {

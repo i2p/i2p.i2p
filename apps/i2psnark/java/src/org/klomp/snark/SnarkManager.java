@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
-import net.i2p.router.RouterContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -147,21 +146,20 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_EEP_PORT, "4444");
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
-        if (!_config.containsKey(PROP_UPBW_MAX)) {
-            try {
-                if (_context instanceof RouterContext)
-                    _config.setProperty(PROP_UPBW_MAX, "" + (((RouterContext)_context).bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
-                else
-                    _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
-            } catch (NoClassDefFoundError ncdfe) {
-                _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
-            }
-        }
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
         updateConfig();
+    }
+
+    /** call from DirMonitor since loadConfig() is called before router I2CP is up */
+    private void getBWLimit() {
+        if (!_config.containsKey(PROP_UPBW_MAX)) {
+            int[] limits = BWLimits.getBWLimits(_util.getI2CPHost(), _util.getI2CPPort());
+            if (limits != null && limits[1] > 0)
+                _util.setMaxUpBW(limits[1]);
+        }
     }
     
     private void updateConfig() {
@@ -619,6 +617,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     _messages.remove(0);
             }
 
+            // here because we need to delay until I2CP is up
+            // although the user will see the default until then
+            getBWLimit();
             while (true) {
                 File dir = getDataDir();
                 _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());

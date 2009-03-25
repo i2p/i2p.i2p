@@ -280,15 +280,15 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
 
     /**
-     * Divide router limit by 2 for overhead.
+     * Divide router limit by 1.75 for overhead.
      * This could someday give a different answer to each client.
      * But it's not enforced anywhere.
      */
     private void handleGetBWLimits(I2CPMessageReader reader, GetBandwidthLimitsMessage message) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Got BW Limits request");
-        int in = _context.bandwidthLimiter().getInboundKBytesPerSecond() / 2;
-        int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond() / 2;
+        int in = _context.bandwidthLimiter().getInboundKBytesPerSecond() * 4 / 7;
+        int out = _context.bandwidthLimiter().getOutboundKBytesPerSecond() * 4 / 7;
         BandwidthLimitsMessage msg = new BandwidthLimitsMessage(in, out);
         try {
             _runner.doSend(msg);
