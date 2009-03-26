@@ -276,6 +276,7 @@
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
         <copy file="readme_de.html" todir="pkg-temp/docs/" />
+        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
         <copy file="readme_nl.html" todir="pkg-temp/docs/" />
         <copy file="readme_sv.html" todir="pkg-temp/docs/" />
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
@@ -362,7 +363,7 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
         <mkdir dir="pkg-temp/docs" />
-        <copy file="readme_sv.html" todir="pkg-temp/docs/" />
+        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter">
         <delete dir="pkg-temp" />
