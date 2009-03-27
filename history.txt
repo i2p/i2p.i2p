@@ -1,3 +1,8 @@
+2009-03-27 zzz
+    * Add readme_fr.html
+    * License splash update
+    * Catch rare TunnelGatewayMessage AIOOB, root cause unknown
+
 2009-03-24 zzz
     * I2PTunnel:
       - Add some warnings about new features
