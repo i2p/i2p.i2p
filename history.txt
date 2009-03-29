@@ -1,3 +1,8 @@
+* 2009-03-29  0.7.1 released
+
+2009-03-29 Complication
+    * Update versions, package release
+
 2009-03-27 zzz
     * Add readme_fr.html
     * License splash update
