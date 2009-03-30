@@ -18,7 +18,6 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
-                <pathelement location="../../../router/java/build/obj" />
                 <pathelement location="../../ministreaming/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
@@ -32,7 +31,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../../router/java/build/router.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
     </target>
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/*Servlet.class">

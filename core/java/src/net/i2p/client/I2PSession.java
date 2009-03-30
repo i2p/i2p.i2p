@@ -143,6 +143,11 @@ public interface I2PSession {
      */
     public Destination lookupDest(Hash h) throws I2PSessionException;
 
+    /**
+     * Get the current bandwidth limits
+     */
+    public int[] bandwidthLimits() throws I2PSessionException;
+
     /** See I2PSessionMuxedImpl for details */
     public void addSessionListener(I2PSessionListener lsnr, int proto, int port);
     /** See I2PSessionMuxedImpl for details */

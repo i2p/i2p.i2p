@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Set;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -62,6 +63,9 @@ public interface TunnelManagerFacade extends Service {
     /** count how many inbound tunnel requests we have received but not yet processed */
     public int getInboundBuildQueueSize();
     
+    /** @return Set of peers that should not be allowed to be in another tunnel */
+    public Set<Hash> selectPeersInTooManyTunnels();
+
     /** 
      * the client connected (or updated their settings), so make sure we have
      * the tunnels for them, and whenever necessary, ask them to authorize 

@@ -176,6 +176,7 @@ public abstract class TunnelPeerSelector {
 
         Set peers = new HashSet(1);
         peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
+        peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
         if (filterUnreachable(ctx, isInbound, isExploratory)) {
             List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
