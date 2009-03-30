@@ -1,8 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 # When executed in Mingw: Produces an jbigi.dll
 # When executed in Linux/FreeBSD: Produces an libjbigi.so
-# Darwin produces libjbigi.jnilib, right?
-
+# What does Darwin produce? libjbigi.jnilib?
 CC="gcc"
 
 case `uname -sr` in
@@ -31,20 +30,18 @@ Darwin*)
 	LIBFILE="libjbigi.so";;
 esac
 
-#To link dynamically to GMP (use libgmp.so or gmp.lib), uncomment the first line below
-#To link statically to GMP, uncomment the second line below
-# Bug!!! Quote *BOTH* or neither! --Sponge
-if test "$1" = "dynamic"
-then
-	echo "Building jbigi lib that is dynamically linked to GMP" 
+if [ "$1" = "dynamic" ] ; then
+	echo "Building a jbigi lib that is dynamically linked to GMP" 
 	LIBPATH="-L.libs"
 	INCLUDELIBS="-lgmp"
 else
-	echo "Building jbigi lib that is statically linked to GMP"
+	echo "Building a jbigi lib that is statically linked to GMP"
 	STATICLIBS=".libs/libgmp.a"
 fi
 
 echo "Compiling C code..."
 rm -f jbigi.o $LIBFILE
-$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c
-$CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS
+$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
+$CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS || exit 1
+
+exit 0

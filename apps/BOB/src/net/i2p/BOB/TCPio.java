@@ -76,6 +76,9 @@ public class TCPio implements Runnable {
 		 *
 		 * --Sponge
 		 *
+		 * Tested with 128 bytes, and there was no performance gain.
+		 *
+		 * --Sponge
 		 */
 
 		int b;
