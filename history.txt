@@ -1,3 +1,13 @@
+2009-03-30 zzz
+    * I2CP:
+      - Implement BandwidthLimitsMessage
+      - Have i2psnark use new message, remove
+        build dependency on router
+    * Peer Selection:
+      - Limit peers to a max % of all tunnels with
+        router.maxTunnelPercentage=nn, default 33
+      - Add chart to tunnels.jsp to see results
+
 * 2009-03-29  0.7.1 released
 
 2009-03-29 Complication
