@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -506,6 +509,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.write("</table>\n");
         out.write("Inactive participating tunnels: " + inactive + "<br />\n");
         out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B<br />\n");
+        renderPeers(out);
     }
     
     class TunnelComparator implements Comparator {
@@ -579,6 +583,135 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                   DataHelper.formatSize(processedOut*1024) + "B out<br />");
     }
     
+    private void renderPeers(Writer out) throws IOException {
+        // count up the peers in the local pools
+        HashCounter lc = new HashCounter();
+        int tunnelCount = countTunnelsPerPeer(lc);
+
+        // count up the peers in the participating tunnels
+        HashCounter pc = new HashCounter();
+        int partCount = countParticipatingPerPeer(pc);
+
+        Set<Hash> peers = new HashSet(lc.hashes());
+        peers.addAll(pc.hashes());
+        List<Hash> peerList = new ArrayList(peers);
+        Collections.sort(peerList, new HashComparator());
+
+        out.write("<h2><a name=\"peers\">Tunnel Counts By Peer</a>:</h2>\n");
+        out.write("<table border=\"1\"><tr><td><b>Peer</b></td><td><b>Expl. + Client</b></td><td><b>% of total</b></td><td><b>Part. from + to</b></td><td><b>% of total</b></td></tr>\n");
+        for (Hash h : peerList) {
+             out.write("<tr><td>");
+             out.write(netDbLink(h));
+             out.write("<td align=\"right\">" + lc.count(h));
+             out.write("<td align=\"right\">");
+             if (tunnelCount > 0)
+                 out.write("" + (lc.count(h) * 100 / tunnelCount));
+             else
+                 out.write('0');
+             out.write("<td align=\"right\">" + pc.count(h));
+             out.write("<td align=\"right\">");
+             if (partCount > 0)
+                 out.write("" + (pc.count(h) * 100 / partCount));
+             else
+                 out.write('0');
+             out.write('\n');
+        }
+        out.write("<tr><td>Tunnels<td align=\"right\">" + tunnelCount);
+        out.write("<td>&nbsp;<td align=\"right\">" + partCount);
+        out.write("<td>&nbsp;</table>\n");
+    }
+
+    /** @return total number of non-fallback expl. + client tunnels */
+    private int countTunnelsPerPeer(HashCounter lc) {
+        List<TunnelPool> pools = new ArrayList();
+        listPools(pools);
+        int tunnelCount = 0;
+        for (TunnelPool tp : pools) {
+            for (TunnelInfo info : tp.listTunnels()) {
+                if (info.getLength() > 1) {
+                    tunnelCount++;
+                    for (int j = 0; j < info.getLength(); j++) {
+                        Hash peer = info.getPeer(j);
+                        if (!_context.routerHash().equals(peer))
+                            lc.increment(peer);
+                    }
+                }
+            }
+        }
+        return tunnelCount;
+    }
+
+    private static final int DEFAULT_MAX_PCT_TUNNELS = 33;
+    /**
+     *  For reliability reasons, don't allow a peer in more than x% of
+     *  client and exploratory tunnels.
+     *
+     *  This also will prevent a single huge-capacity (or malicious) peer from
+     *  taking all the tunnels in the network (although it would be nice to limit
+     *  the % of total network tunnels to 10% or so, but that appears to be
+     *  too low to set as a default here... much lower than 33% will push client
+     *  tunnels out of the fast tier into high cap or beyond...)
+     *
+     *  Possible improvement - restrict based on count per IP, or IP block,
+     *  to slightly increase costs of collusion
+     *
+     *  @return Set of peers that should not be allowed in another tunnel
+     */
+    public Set<Hash> selectPeersInTooManyTunnels() {
+        HashCounter lc = new HashCounter();
+        int tunnelCount = countTunnelsPerPeer(lc);
+        Set<Hash> rv = new HashSet();
+        if (tunnelCount >= 4 && _context.router().getUptime() > 10*60*1000) {
+            int max = _context.getProperty("router.maxTunnelPercentage", DEFAULT_MAX_PCT_TUNNELS);
+            for (Hash h : lc.hashes()) {
+                 if (lc.count(h) > 0 && (lc.count(h) + 1) * 100 / (tunnelCount + 1) > max)
+                     rv.add(h);
+            }
+        }
+        return rv;
+    }
+
+    /** @return total number of part. tunnels */
+    private int countParticipatingPerPeer(HashCounter pc) {
+        List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
+        for (HopConfig cfg : participating) {
+            Hash from = cfg.getReceiveFrom();
+            if (from != null)
+                pc.increment(from);
+            Hash to = cfg.getSendTo();
+            if (to != null)
+                pc.increment(to);
+        }
+        return participating.size();
+    }
+
+    class HashComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
+        }
+    }
+
+    private static class HashCounter {
+        private ConcurrentHashMap<Hash, Integer> _map;
+        public HashCounter() {
+            _map = new ConcurrentHashMap();
+        }
+        public void increment(Hash h) {
+            Integer i = _map.putIfAbsent(h, Integer.valueOf(1));
+            if (i != null)
+                _map.put(h, Integer.valueOf(i.intValue() + 1));
+        }
+        public int count(Hash h) {
+            Integer i = _map.get(h);
+            if (i != null)
+                return i.intValue();
+            return 0;
+        }
+        public Set<Hash> hashes() {
+            return _map.keySet();
+        }
+    }
+
     private String getCapacity(Hash peer) {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (info != null) {

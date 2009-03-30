@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Set;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -44,6 +45,7 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public void setInboundSettings(Hash client, TunnelPoolSettings settings) {}
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {}
     public int getInboundBuildQueueSize() { return 0; }
+    public Set<Hash> selectPeersInTooManyTunnels() { return null; }
     
     public void renderStatusHTML(Writer out) throws IOException {}
     public void restart() {}
