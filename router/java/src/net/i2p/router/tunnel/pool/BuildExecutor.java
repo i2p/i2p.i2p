@@ -37,12 +37,12 @@ class BuildExecutor implements Runnable {
         _currentlyBuilding = new ArrayList(10);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientExpire", "How often a client tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientSuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientExpire", "How often a client tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "Response time for success", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientSuccess", "Response time for success", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "Response time for rejection", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientReject", "Response time for rejection", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestTime", "How long it takes to build a tunnel request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
