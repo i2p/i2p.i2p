@@ -1,3 +1,7 @@
+2009-04-01 zzz
+    * I2PTunnel: Fix tunnel close
+      http://forum.i2p/viewtopic.php?t=3231
+
 2009-03-30 zzz
     * I2CP:
       - Implement BandwidthLimitsMessage
