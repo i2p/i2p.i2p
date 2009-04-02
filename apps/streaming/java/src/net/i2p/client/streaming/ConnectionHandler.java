@@ -64,35 +64,7 @@ class ConnectionHandler {
     }
     
     public boolean waitSyn( long ms ) throws InterruptedException {
-    	boolean incoming = false ;
-    	boolean isTimed = (ms>=0);
-
-    	Clock clock = I2PAppContext.getGlobalContext().clock();
-    	long now = clock.now();
-    	long end = now + ms;
-    	while (!incoming && (!isTimed || now<=end) ) {
-    		synchronized (_synQueue) {
-
-    			for (Packet p : _synQueue)
-    			{
-    				if (p.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
-    					incoming = true ;
-    					break;
-    				}
-    			}
-    			if (!incoming) {
-    				if (!isTimed) {
-    					_synQueue.wait();
-    				} else {
-    					now = clock.now();
-    					if (now < end) {
-    						_synQueue.wait(end-now);
-    					}
-    				}
-    			}
-    		}
-    	}
-    	return incoming ;
+    	throw new InterruptedException();
     }
     
     /**
