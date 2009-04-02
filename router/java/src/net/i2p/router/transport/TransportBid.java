@@ -23,6 +23,8 @@ public class TransportBid {
     private long _bidExpiration;
     private Transport _transport;
     
+    public static final int TRANSIENT_FAIL = 999999;
+
     public TransportBid() {
         setLatencyMs(-1);
         setBandwidthBytes(-1);

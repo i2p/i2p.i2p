@@ -82,7 +82,24 @@ class PacketQueue {
             
             // this should not block!
             begin = _context.clock().now();
-            sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);
+            long expires = 0;
+            Connection.ResendPacketEvent rpe = (Connection.ResendPacketEvent) packet.getResendEvent();
+            if (rpe != null)
+                // we want the router to expire it a little before we do,
+                // so if we retransmit it will use a new tunnel/lease combo
+                expires = rpe.getNextSendTime() - 500;
+            if (expires > 0)
+                // I2PSessionImpl2
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
+                // I2PSessionMuxedImpl
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires,
+                                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+            else
+                // I2PSessionImpl2
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, 0);
+                // I2PSessionMuxedImpl
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent,
+                                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
             end = _context.clock().now();
             
             if ( (end-begin > 1000) && (_log.shouldLog(Log.WARN)) ) 

@@ -25,7 +25,14 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
-            srcdir="./src:./test" 
+            srcdir="./src" 
+            debug="true" deprecation="on" source="1.5" target="1.5" 
+            destdir="./build/obj" 
+            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
+    </target>
+    <target name="compileTest" depends="compile">
+        <javac 
+            srcdir="./test" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
@@ -37,6 +44,9 @@
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
             </manifest>
         </jar>
+    </target>
+    <target name="jarTest" depends="jar, compileTest">
+        <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*Test*.class" update="true" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />

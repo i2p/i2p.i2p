@@ -33,11 +33,11 @@ public class FIFOBandwidthRefiller implements Runnable {
     public static final String PROP_OUTBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.outboundBurstKBytes";
     //public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
 
-    // no longer allow unlimited bandwidth - the user must specify a value, and if they do not, it is 32/16KBps
-    public static final int DEFAULT_INBOUND_BANDWIDTH = 48;
-    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 24;
-    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 64;
-    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 32;
+    // no longer allow unlimited bandwidth - the user must specify a value, else use defaults below (KBps)
+    public static final int DEFAULT_INBOUND_BANDWIDTH = 64;
+    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 32;
+    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 80;
+    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 40;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
     
@@ -154,55 +154,30 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
     
     private void updateInboundRate() {
-        String inBwStr = _context.getProperty(PROP_INBOUND_BANDWIDTH);
-        if ( (inBwStr != null) && 
-             (inBwStr.trim().length() > 0) && 
-             (!(inBwStr.equals(String.valueOf(_inboundKBytesPerSecond)))) ) {
+        int in = _context.getProperty(PROP_INBOUND_BANDWIDTH, DEFAULT_INBOUND_BANDWIDTH);
+        if (in != _inboundKBytesPerSecond) {
             // bandwidth was specified *and* changed
-            try {
-                int in = Integer.parseInt(inBwStr);
                 if ( (in <= 0) || (in > MIN_INBOUND_BANDWIDTH) ) 
                     _inboundKBytesPerSecond = in;
                 else
                     _inboundKBytesPerSecond = MIN_INBOUND_BANDWIDTH;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating inbound rate to " + _inboundKBytesPerSecond);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid inbound bandwidth limit [" + inBwStr 
-                              + "], keeping as " + _inboundKBytesPerSecond);
-            }
-        } else {
-            if ( (inBwStr == null) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("Inbound bandwidth limits not specified in the config via " + PROP_INBOUND_BANDWIDTH);
         }
         
         if (_inboundKBytesPerSecond <= 0)
             _inboundKBytesPerSecond = DEFAULT_INBOUND_BANDWIDTH;
     }
     private void updateOutboundRate() {
-        String outBwStr = _context.getProperty(PROP_OUTBOUND_BANDWIDTH);
-        
-        if ( (outBwStr != null) && 
-             (outBwStr.trim().length() > 0) && 
-             (!(outBwStr.equals(String.valueOf(_outboundKBytesPerSecond)))) ) {
+        int out = _context.getProperty(PROP_OUTBOUND_BANDWIDTH, DEFAULT_OUTBOUND_BANDWIDTH);
+        if (out != _outboundKBytesPerSecond) {
             // bandwidth was specified *and* changed
-            try {
-                int out = Integer.parseInt(outBwStr);
                 if ( (out <= 0) || (out >= MIN_OUTBOUND_BANDWIDTH) )
                     _outboundKBytesPerSecond = out;
                 else
                     _outboundKBytesPerSecond = MIN_OUTBOUND_BANDWIDTH;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating outbound rate to " + _outboundKBytesPerSecond);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid outbound bandwidth limit [" + outBwStr 
-                              + "], keeping as " + _outboundKBytesPerSecond);
-            }
-        } else {
-            if ( (outBwStr == null) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("Outbound bandwidth limits not specified in the config via " + PROP_OUTBOUND_BANDWIDTH);
         }
         
         if (_outboundKBytesPerSecond <= 0)
@@ -210,27 +185,15 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
     
     private void updateInboundBurstRate() {
-        String inBwStr = _context.getProperty(PROP_INBOUND_BURST_BANDWIDTH);
-        if ( (inBwStr != null) && 
-             (inBwStr.trim().length() > 0) && 
-             (!(inBwStr.equals(String.valueOf(_inboundBurstKBytesPerSecond)))) ) {
+        int in = _context.getProperty(PROP_INBOUND_BURST_BANDWIDTH, DEFAULT_INBOUND_BURST_BANDWIDTH);
+        if (in != _inboundBurstKBytesPerSecond) {
             // bandwidth was specified *and* changed
-            try {
-                int in = Integer.parseInt(inBwStr);
                 if ( (in <= 0) || (in >= _inboundKBytesPerSecond) ) 
                     _inboundBurstKBytesPerSecond = in;
                 else
                     _inboundBurstKBytesPerSecond = _inboundKBytesPerSecond;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating inbound burst rate to " + _inboundBurstKBytesPerSecond);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid inbound bandwidth burst limit [" + inBwStr 
-                              + "], keeping as " + _inboundBurstKBytesPerSecond);
-            }
-        } else {
-            if ( (inBwStr == null) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("Inbound bandwidth burst limits not specified in the config via " + PROP_INBOUND_BURST_BANDWIDTH);
         }
         
         if (_inboundBurstKBytesPerSecond <= 0)
@@ -239,28 +202,15 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
     
     private void updateOutboundBurstRate() {
-        String outBwStr = _context.getProperty(PROP_OUTBOUND_BURST_BANDWIDTH);
-        
-        if ( (outBwStr != null) && 
-             (outBwStr.trim().length() > 0) && 
-             (!(outBwStr.equals(String.valueOf(_outboundBurstKBytesPerSecond)))) ) {
+        int out = _context.getProperty(PROP_OUTBOUND_BURST_BANDWIDTH, DEFAULT_OUTBOUND_BURST_BANDWIDTH);
+        if (out != _outboundBurstKBytesPerSecond) {
             // bandwidth was specified *and* changed
-            try {
-                int out = Integer.parseInt(outBwStr);
                 if ( (out <= 0) || (out >= _outboundKBytesPerSecond) )
                     _outboundBurstKBytesPerSecond = out;
                 else
                     _outboundBurstKBytesPerSecond = _outboundKBytesPerSecond;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating outbound burst rate to " + _outboundBurstKBytesPerSecond);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid outbound bandwidth burst limit [" + outBwStr 
-                              + "], keeping as " + _outboundBurstKBytesPerSecond);
-            }
-        } else {
-            if ( (outBwStr == null) && (_log.shouldLog(Log.DEBUG)) )
-                _log.debug("Outbound bandwidth burst limits not specified in the config via " + PROP_OUTBOUND_BURST_BANDWIDTH);
         }
         
         if (_outboundBurstKBytesPerSecond <= 0)
@@ -269,13 +219,10 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
     
     private void updateInboundPeak() {
-        String inBwStr = _context.getProperty(PROP_INBOUND_BANDWIDTH_PEAK);
-        if ( (inBwStr != null) && 
-             (inBwStr.trim().length() > 0) && 
-             (!(inBwStr.equals(String.valueOf(_limiter.getInboundBurstBytes())))) ) {
+        int in = _context.getProperty(PROP_INBOUND_BANDWIDTH_PEAK,
+                                      DEFAULT_BURST_SECONDS * _inboundBurstKBytesPerSecond);
+        if (in != _limiter.getInboundBurstBytes()) {
             // peak bw was specified *and* changed
-            try {
-                int in = Integer.parseInt(inBwStr);
                 if (in >= MIN_INBOUND_BANDWIDTH_PEAK) {
                     if (in < _inboundBurstKBytesPerSecond)
                         _limiter.setInboundBurstBytes(_inboundBurstKBytesPerSecond * 1024);
@@ -287,27 +234,13 @@ public class FIFOBandwidthRefiller implements Runnable {
                     else
                         _limiter.setInboundBurstBytes(MIN_INBOUND_BANDWIDTH_PEAK * 1024);
                 }
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid inbound bandwidth burst limit [" + inBwStr 
-                              + "]");
-                _limiter.setInboundBurstBytes(DEFAULT_BURST_SECONDS * _inboundBurstKBytesPerSecond * 1024);
-            }
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Inbound bandwidth burst limits not specified in the config via " 
-                           + PROP_INBOUND_BANDWIDTH_PEAK);
-            _limiter.setInboundBurstBytes(DEFAULT_BURST_SECONDS * _inboundBurstKBytesPerSecond * 1024);
         }
     }
     private void updateOutboundPeak() {
-        String inBwStr = _context.getProperty(PROP_OUTBOUND_BANDWIDTH_PEAK);
-        if ( (inBwStr != null) && 
-             (inBwStr.trim().length() > 0) && 
-             (!(inBwStr.equals(String.valueOf(_limiter.getOutboundBurstBytes())))) ) {
+        int in = _context.getProperty(PROP_OUTBOUND_BANDWIDTH_PEAK,
+                                      DEFAULT_BURST_SECONDS * _outboundBurstKBytesPerSecond);
+        if (in != _limiter.getOutboundBurstBytes()) {
             // peak bw was specified *and* changed
-            try {
-                int in = Integer.parseInt(inBwStr);
                 if (in >= MIN_OUTBOUND_BANDWIDTH_PEAK) {
                     if (in < _outboundBurstKBytesPerSecond)
                         _limiter.setOutboundBurstBytes(_outboundBurstKBytesPerSecond * 1024);
@@ -319,17 +252,6 @@ public class FIFOBandwidthRefiller implements Runnable {
                     else
                         _limiter.setOutboundBurstBytes(MIN_OUTBOUND_BANDWIDTH_PEAK * 1024);
                 }
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid outbound bandwidth burst limit [" + inBwStr 
-                              + "]");
-                _limiter.setOutboundBurstBytes(DEFAULT_BURST_SECONDS * _outboundBurstKBytesPerSecond * 1024);
-            }
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Outbound bandwidth burst limits not specified in the config via " 
-                           + PROP_OUTBOUND_BANDWIDTH_PEAK);
-            _limiter.setOutboundBurstBytes(DEFAULT_BURST_SECONDS * _outboundBurstKBytesPerSecond * 1024);
         }
     }
     

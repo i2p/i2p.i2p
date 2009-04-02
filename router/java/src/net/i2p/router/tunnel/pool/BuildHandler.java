@@ -61,6 +61,7 @@ class BuildHandler {
 
         _context.statManager().createRateStat("tunnel.decryptRequestTime", "How long it takes to decrypt a new tunnel build request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.rejectTimeout", "How often we reject a tunnel because we can't find the next hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectTimeout2", "How often we fail a tunnel because we can't contact the next hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
         _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.acceptLoad", "Delay before processing the accepted request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -248,6 +249,8 @@ class BuildHandler {
                 int record = order.indexOf(Integer.valueOf(i));
                 if (record < 0) {
                     _log.error("Bad status index " + i);
+                    // don't leak
+                    _exec.buildComplete(cfg, cfg.getTunnelPool());
                     return;
                 }
                 int howBad = statuses[record];
@@ -293,9 +296,9 @@ class BuildHandler {
                     _context.messageHistory().tunnelParticipantRejected(peer, "peer rejected after " + rtt + " with " + howBad + ": " + cfg.toString());
                 }
             }
+            _exec.buildComplete(cfg, cfg.getTunnelPool());
             if (allAgree) {
                 // wikked, completely build
-                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 if (cfg.isInbound())
                     _context.tunnelDispatcher().joinInbound(cfg);
                 else
@@ -312,7 +315,6 @@ class BuildHandler {
                     _context.statManager().addRateData("tunnel.buildClientSuccess", rtt, rtt);
             } else {
                 // someone is no fun
-                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 if (cfg.getDestination() == null)
                     _context.statManager().addRateData("tunnel.buildExploratoryReject", rtt, rtt);
                 else
@@ -321,6 +323,8 @@ class BuildHandler {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
+            // don't leak
+            _exec.buildComplete(cfg, cfg.getTunnelPool());
         }
     }
     
@@ -413,7 +417,7 @@ class BuildHandler {
         }
     }
 
-    private class TimeoutReq extends JobImpl {
+    private static class TimeoutReq extends JobImpl {
         private BuildMessageState _state;
         private BuildRequestRecord _req;
         private Hash _nextPeer;
@@ -425,10 +429,12 @@ class BuildHandler {
         }
         public String getName() { return "Timeout looking for next peer for tunnel join"; }
         public void runJob() {
-            getContext().statManager().addRateData("tunnel.rejectTimeout", 1, 1);
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Request " + _state.msg.getUniqueId() 
-                          + " could no be satisfied, as the next peer could not be found: " + _nextPeer.toBase64());
+            getContext().statManager().addRateData("tunnel.rejectTimeout", 1, 0);
+            // logging commented out so class can be static
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Request " + _state.msg.getUniqueId() 
+            //              + " could no be satisfied, as the next peer could not be found: " + _nextPeer.toBase64());
+
             // ???  should we blame the peer here?   getContext().profileManager().tunnelTimedOut(_nextPeer);
             getContext().messageHistory().tunnelRejected(_state.fromHash, new TunnelId(_req.readReceiveTunnelId()), _nextPeer, 
                                                          "rejected because we couldn't find " + _nextPeer.toBase64() + ": " +
@@ -498,8 +504,15 @@ class BuildHandler {
             }
         }
         
+        /*
+         * Being a IBGW or OBEP generally leads to more connections, so if we are
+         * approaching our connection limit (i.e. !haveCapacity()),
+         * reject this request.
+         */
         if (response == 0 && (isInGW || isOutEnd) &&
-            Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT)).booleanValue()) {
+            (Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT)).booleanValue() ||
+             ! _context.commSystem().haveCapacity())) {
+                _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
@@ -509,8 +522,9 @@ class BuildHandler {
                        + " from " + (state.fromHash != null ? state.fromHash.toBase64() : 
                                      state.from != null ? state.from.calculateHash().toBase64() : "tunnel"));
 
+        HopConfig cfg = null;
         if (response == 0) {
-            HopConfig cfg = new HopConfig();
+            cfg = new HopConfig();
             cfg.setCreation(_context.clock().now());
             cfg.setExpiration(_context.clock().now() + 10*60*1000);
             cfg.setIVKey(req.readIVKey());
@@ -586,6 +600,8 @@ class BuildHandler {
             msg.setExpiration(state.msg.getMessageExpiration());
             msg.setPriority(300);
             msg.setTarget(nextPeerInfo);
+            if (response == 0)
+                msg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
             _context.outNetMessagePool().add(msg);
         } else {
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
@@ -612,6 +628,8 @@ class BuildHandler {
                 outMsg.setMessage(m);
                 outMsg.setPriority(300);
                 outMsg.setTarget(nextPeerInfo);
+                if (response == 0)
+                    outMsg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
                 _context.outNetMessagePool().add(outMsg);
             }
         }
@@ -755,7 +773,7 @@ class BuildHandler {
     }
     
     /** normal inbound requests from other people */
-    private class BuildMessageState {
+    private static class BuildMessageState {
         TunnelBuildMessage msg;
         RouterIdentity from;
         Hash fromHash;
@@ -768,7 +786,7 @@ class BuildHandler {
         }
     }
     /** replies for outbound tunnels that we have created */
-    private class BuildReplyMessageState {
+    private static class BuildReplyMessageState {
         TunnelBuildReplyMessage msg;
         long recvTime;
         public BuildReplyMessageState(I2NPMessage m) {
@@ -777,7 +795,7 @@ class BuildHandler {
         }
     }
     /** replies for inbound tunnels we have created */
-    private class BuildEndMessageState {
+    private static class BuildEndMessageState {
         TunnelBuildMessage msg;
         PooledTunnelCreatorConfig cfg;
         long recvTime;
@@ -789,15 +807,35 @@ class BuildHandler {
     }
 
     // noop
-    private class TunnelBuildMessageHandlerJob extends JobImpl {
+    private static class TunnelBuildMessageHandlerJob extends JobImpl {
         private TunnelBuildMessageHandlerJob(RouterContext ctx) { super(ctx); }
         public void runJob() {}
         public String getName() { return "Receive tunnel build message"; }
     }
     // noop
-    private class TunnelBuildReplyMessageHandlerJob extends JobImpl {
+    private static class TunnelBuildReplyMessageHandlerJob extends JobImpl {
         private TunnelBuildReplyMessageHandlerJob(RouterContext ctx) { super(ctx); }
         public void runJob() {}
         public String getName() { return "Receive tunnel build reply message"; }
+    }
+
+    /**
+     *  Remove the participating tunnel if we can't contact the next hop
+     *  Not strictly necessary, as the entry doesn't use that much space,
+     *  but it affects capacity calculations
+     */
+    private static class TunnelBuildNextHopFailJob extends JobImpl {
+        HopConfig _cfg;
+        private TunnelBuildNextHopFailJob(RouterContext ctx, HopConfig cfg) {
+            super(ctx);
+            _cfg = cfg;
+        }
+        public String getName() { return "Timeout contacting next peer for tunnel join"; }
+        public void runJob() {
+            getContext().tunnelDispatcher().remove(_cfg);
+            getContext().statManager().addRateData("tunnel.rejectTimeout2", 1, 0);
+            // static, no _log
+            //_log.error("Cant contact next hop for " + _cfg);
+        }
     }
 }

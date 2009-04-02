@@ -40,7 +40,7 @@ public class I2PAppThread extends I2PThread {
         super(r, name);
     }
     public I2PAppThread(Runnable r, String name, boolean isDaemon) {
-        super(r, name);
+        super(r, name, isDaemon);
     }
     
     protected void fireOOM(OutOfMemoryError oom) {

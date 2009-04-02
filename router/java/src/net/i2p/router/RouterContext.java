@@ -26,6 +26,7 @@ import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
 import net.i2p.util.Clock;
+import net.i2p.util.KeyRing;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to
@@ -330,6 +331,23 @@ public class RouterContext extends I2PAppContext {
     }
 
     /**
+     * Return an int with an int default
+     */
+    public int getProperty(String propName, int defaultVal) {
+        if (_router != null) {
+            String val = _router.getConfigSetting(propName);
+            if (val != null) {
+                int ival = defaultVal;
+                try {
+                    ival = Integer.parseInt(val);
+                } catch (NumberFormatException nfe) {}
+                return ival;
+            }
+        }
+        return super.getProperty(propName, defaultVal);
+    }
+
+    /**
      * The context's synchronized clock, which is kept context specific only to
      * enable simulators to play with clock skew among different instances.
      *
@@ -349,4 +367,21 @@ public class RouterContext extends I2PAppContext {
         }
     }
 
+    /** override to support storage in router.config */
+    @Override
+    public KeyRing keyRing() {
+        if (!_keyRingInitialized)
+            initializeKeyRing();
+        return _keyRing;
+    }
+
+    @Override
+    protected void initializeKeyRing() {
+        synchronized (this) {
+            if (_keyRing == null)
+                _keyRing = new PersistentKeyRing(this);
+            _keyRingInitialized = true;
+        }
+    }
+    
 }

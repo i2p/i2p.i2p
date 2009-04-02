@@ -184,7 +184,7 @@ class SummaryRenderer {
             def.setTimePeriod(start/1000, 0);
             String name = _listener.getRate().getRateStat().getName();
             // heuristic to set K=1024
-            if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0)
+            if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0 || name.indexOf("memory") >= 0)
                 && !showEvents)
                 def.setBaseValue(1024);
             String title = name;

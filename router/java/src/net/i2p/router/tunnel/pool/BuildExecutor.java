@@ -39,13 +39,14 @@ class BuildExecutor implements Runnable {
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildClientExpire", "How often a client tunnel times out during creation", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "How often an exploratory tunnel is fully built", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientSuccess", "How often a client tunnel is fully built", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "How often an exploratory tunnel is rejected", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.buildClientReject", "How often a client tunnel is rejected", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratorySuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientSuccess", "Response time for success", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildExploratoryReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildClientReject", "Response time for rejection", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestTime", "How long it takes to build a tunnel request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
@@ -71,10 +72,7 @@ class BuildExecutor implements Runnable {
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
         if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
         if (allowed > 10) allowed = 10; // Never go beyond 10, that is uncharted territory (old limit was 5)
-
-        String prop = _context.getProperty("router.tunnelConcurrentBuilds");
-        if (prop != null)
-            try { allowed = Integer.valueOf(prop).intValue(); } catch (NumberFormatException nfe) {}
+        allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
         List expired = null;
         int concurrent = 0;
@@ -214,6 +212,9 @@ class BuildExecutor implements Runnable {
     }
 */
 
+    /** Set 1.5 * LOOP_TIME < BuildRequestor.REQUEST_TIMEOUT/4 - margin */
+    private static final int LOOP_TIME = 1000;
+
     public void run() {
         _isRunning = true;
         List wanted = new ArrayList(8);
@@ -316,7 +317,7 @@ class BuildExecutor implements Runnable {
                                     //if (_log.shouldLog(Log.DEBUG))
                                     //    _log.debug("Nothin' doin (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
                                     //if (allowed <= 0)
-                                        _currentlyBuilding.wait(2000 + _context.random().nextInt(2*1000));
+                                        _currentlyBuilding.wait((LOOP_TIME/2) + _context.random().nextInt(LOOP_TIME));
                                     //else // wanted <= 0
                                     //    _currentlyBuilding.wait(_context.random().nextInt(30*1000));
                                 }

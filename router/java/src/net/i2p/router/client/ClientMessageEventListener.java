@@ -8,9 +8,12 @@ package net.i2p.router.client;
  *
  */
 
+import java.util.Properties;
+
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;
+import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.I2CPMessage;
@@ -20,10 +23,13 @@ import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.ReceiveMessageBeginMessage;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
+import net.i2p.data.i2cp.ReconfigureSessionMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
+import net.i2p.data.i2cp.SendMessageExpiresMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
+import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
@@ -66,6 +72,9 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             case SendMessageMessage.MESSAGE_TYPE:
                 handleSendMessage(reader, (SendMessageMessage)message);
                 break;
+            case SendMessageExpiresMessage.MESSAGE_TYPE:
+                handleSendMessage(reader, (SendMessageExpiresMessage)message);
+                break;
             case ReceiveMessageBeginMessage.MESSAGE_TYPE:
                 handleReceiveBegin(reader, (ReceiveMessageBeginMessage)message);
                 break;
@@ -78,6 +87,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             case DestroySessionMessage.MESSAGE_TYPE:
                 handleDestroySession(reader, (DestroySessionMessage)message);
                 break;
+            case DestLookupMessage.MESSAGE_TYPE:
+                handleDestLookup(reader, (DestLookupMessage)message);
+                break;
+            case ReconfigureSessionMessage.MESSAGE_TYPE:
+                handleReconfigureSession(reader, (ReconfigureSessionMessage)message);
+                break;
             default:
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Unhandled I2CP type received: " + message.getType());
@@ -85,13 +100,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
 
     /**
-     * Handle notifiation that there was an error
+     * Handle notification that there was an error
      *
      */
     public void readError(I2CPMessageReader reader, Exception error) {
         if (_runner.isDead()) return;
         if (_log.shouldLog(Log.ERROR))
             _log.error("Error occurred", error);
+        // Is this is a little drastic for an unknown message type?
         _runner.stopRunning();
     }
     
@@ -128,24 +144,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             return;
         }
 	
-        SessionStatusMessage msg = new SessionStatusMessage();
         SessionId sessionId = new SessionId();
         sessionId.setSessionId(getNextSessionId()); 
         _runner.setSessionId(sessionId);
-        msg.setSessionId(sessionId);
-        msg.setStatus(SessionStatusMessage.STATUS_CREATED);
-        try {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("before sending sessionStatusMessage for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
-            _runner.doSend(msg);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("after sending sessionStatusMessage for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
-            _runner.sessionEstablished(message.getSessionConfig());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
-        } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the session status message", ime);
-        }
+        sendStatusMessage(SessionStatusMessage.STATUS_CREATED);
+        _runner.sessionEstablished(message.getSessionConfig());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
 
         _context.jobQueue().addJob(new CreateSessionJob(_context, _runner));
     }
@@ -226,6 +231,47 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 
         // leaseSetCreated takes care of all the LeaseRequestState stuff (including firing any jobs)
         _runner.leaseSetCreated(message.getLeaseSet());
+    }
+
+    private void handleDestLookup(I2CPMessageReader reader, DestLookupMessage message) {
+        _context.jobQueue().addJob(new LookupDestJob(_context, _runner, message.getHash()));
+    }
+
+    /**
+     * Message's Session ID ignored. This doesn't support removing previously set options.
+     * Nor do we bother with message.getSessionConfig().verifySignature() ... should we?
+     *
+     */
+    private void handleReconfigureSession(I2CPMessageReader reader, ReconfigureSessionMessage message) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Updating options - old: " + _runner.getConfig() + " new: " + message.getSessionConfig());
+        if (!message.getSessionConfig().getDestination().equals(_runner.getConfig().getDestination())) {
+            _log.error("Dest mismatch");
+            sendStatusMessage(SessionStatusMessage.STATUS_INVALID);
+            _runner.stopRunning();
+            return;
+        }
+        _runner.getConfig().getOptions().putAll(message.getSessionConfig().getOptions());
+        ClientTunnelSettings settings = new ClientTunnelSettings();
+        Properties props = new Properties();
+        props.putAll(_runner.getConfig().getOptions());
+        settings.readFromProperties(props);
+        _context.tunnelManager().setInboundSettings(_runner.getConfig().getDestination().calculateHash(),
+                                                    settings.getInboundSettings());
+        _context.tunnelManager().setOutboundSettings(_runner.getConfig().getDestination().calculateHash(),
+                                                     settings.getOutboundSettings());
+        sendStatusMessage(SessionStatusMessage.STATUS_UPDATED);
+    }
+    
+    private void sendStatusMessage(int status) {
+        SessionStatusMessage msg = new SessionStatusMessage();
+        msg.setSessionId(_runner.getSessionId());
+        msg.setStatus(status);
+        try {
+            _runner.doSend(msg);
+        } catch (I2CPMessageException ime) {
+            _log.error("Error writing out the session status message", ime);
+        }
     }
 
     // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME

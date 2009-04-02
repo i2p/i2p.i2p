@@ -7,29 +7,14 @@ import java.io.Writer;
 
 import net.i2p.router.RouterContext;
 
-public class NetDbHelper {
-    private RouterContext _context;
-    private Writer _out;
+public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
-
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
+    private boolean _full = false;
     
     public NetDbHelper() {}
     
-    public void setWriter(Writer writer) { _out = writer; }
     public void setRouter(String r) { _routerPrefix = r; }
+    public void setFull(String f) { _full = "1".equals(f); };
     
     public String getNetDbSummary() {
         try {
@@ -37,14 +22,14 @@ public class NetDbHelper {
                 if (_routerPrefix != null)
                     _context.netDb().renderRouterInfoHTML(_out, _routerPrefix);
                 else
-                    _context.netDb().renderStatusHTML(_out);
+                    _context.netDb().renderStatusHTML(_out, _full);
                 return "";
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
                 if (_routerPrefix != null)
                     _context.netDb().renderRouterInfoHTML(new OutputStreamWriter(baos), _routerPrefix);
                 else
-                    _context.netDb().renderStatusHTML(new OutputStreamWriter(baos));
+                    _context.netDb().renderStatusHTML(new OutputStreamWriter(baos), _full);
                 return new String(baos.toByteArray());
             }
         } catch (IOException ioe) {

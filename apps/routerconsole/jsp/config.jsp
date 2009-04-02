@@ -75,7 +75,7 @@
     with "SSU introductions" - peers who will relay a request from someone you don't know to your
     router for your router so that you can make an outbound connection to them.  I2P will use these
     introductions automatically if it detects that the port is not forwarded (as shown by
-    the <i>Status: OK (NAT)</i> line), or you can manually require them here.  
+    the <i>Status: Firewalled</i> line), or you can manually require them here.  
     Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
  <hr />
@@ -103,6 +103,8 @@
     substantially.  When in doubt, leave the hostname and port number blank.</p>
  <p><b>Note: changing any of these settings will terminate all of your connections and effectively
     restart your router.</b>
+ </p>
+ <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
  <b><a name="help">Reachability Help:</a></b>
  <p>
@@ -110,6 +112,7 @@
  if you open up your port (generally 8887) to both UDP and TCP, and enable inbound TCP above.
  If you think you have opened up your firewall and I2P still thinks you are firewalled, remember
  that you may have multiple firewalls, for example both software packages and external hardware routers.
+ If there is an error, the <a href="logs.jsp">logs</a> may also help diagnose the problem.
  <ul>
  <li><b>OK</b> - Your UDP port does not appear to be firewalled.
  <li><b>Firewalled</b> - Your UDP port appears to be firewalled.
@@ -149,6 +152,9 @@
      You have not configured inbound TCP with a hostname and port above, however
      you have disabled UDP. Therefore your router cannot accept inbound connections.
      Please configure a TCP host and port above or enable UDP.
+ <li><b>ERR - Client Manager I2CP Error - check logs</b> -
+     This is usually due to a port 7654 conflict. Check the logs to verify. Do you have another I2P instance running?
+     Stop the conflicting program and restart I2P.
  </ul>
  </p>
  <hr />
@@ -171,7 +177,6 @@
  </p>
  <hr />
 -->
- <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  </form>
 </div>
 

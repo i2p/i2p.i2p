@@ -152,6 +152,7 @@ public class ConnectionAcceptor implements Runnable
             _util.debug("Error while accepting: " + ioe, Snark.ERROR);
             stop = true;
           }
+        // catch oom?
       }
 
     try

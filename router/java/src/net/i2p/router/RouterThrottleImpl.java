@@ -190,14 +190,7 @@ class RouterThrottleImpl implements RouterThrottle {
             }
         }
         
-        int max = DEFAULT_MAX_TUNNELS;
-        String maxTunnels = _context.getProperty(PROP_MAX_TUNNELS);
-        if (maxTunnels != null) {
-            try {
-                max = Integer.parseInt(maxTunnels);
-            } catch (NumberFormatException nfe) {
-            }
-        }
+        int max = _context.getProperty(PROP_MAX_TUNNELS, DEFAULT_MAX_TUNNELS);
         if (numTunnels >= max) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are already participating in " 
@@ -387,11 +380,7 @@ class RouterThrottleImpl implements RouterThrottle {
     
     /** dont ever probabalistically throttle tunnels if we have less than this many */
     private int getMinThrottleTunnels() { 
-        try {
-            return Integer.parseInt(_context.getProperty("router.minThrottleTunnels", "1000"));
-        } catch (NumberFormatException nfe) {
-            return 1000;
-        }
+        return _context.getProperty("router.minThrottleTunnels", 1000);
     }
     
     private double getTunnelGrowthFactor() {

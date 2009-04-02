@@ -18,7 +18,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
- * Handle messages from the server for the client
+ * Handle messages from the server for the client or vice versa
  *
  */
 public class I2CPMessageHandler {
@@ -34,8 +34,13 @@ public class I2CPMessageHandler {
      *          message - if it is an unknown type or has improper formatting, etc.
      */
     public static I2CPMessage readMessage(InputStream in) throws IOException, I2CPMessageException {
+        int length = -1;
         try {
-            int length = (int) DataHelper.readLong(in, 4);
+            length = (int) DataHelper.readLong(in, 4);
+        } catch (DataFormatException dfe) {
+            throw new IOException("Connection closed");
+        }
+        try {
             if (length < 0) throw new I2CPMessageException("Invalid message length specified");
             int type = (int) DataHelper.readLong(in, 1);
             I2CPMessage msg = createMessage(in, length, type);
@@ -69,18 +74,26 @@ public class I2CPMessageHandler {
             return new ReceiveMessageBeginMessage();
         case ReceiveMessageEndMessage.MESSAGE_TYPE:
             return new ReceiveMessageEndMessage();
+        case ReconfigureSessionMessage.MESSAGE_TYPE:
+            return new ReconfigureSessionMessage();
         case ReportAbuseMessage.MESSAGE_TYPE:
             return new ReportAbuseMessage();
         case RequestLeaseSetMessage.MESSAGE_TYPE:
             return new RequestLeaseSetMessage();
         case SendMessageMessage.MESSAGE_TYPE:
             return new SendMessageMessage();
+        case SendMessageExpiresMessage.MESSAGE_TYPE:
+            return new SendMessageExpiresMessage();
         case SessionStatusMessage.MESSAGE_TYPE:
             return new SessionStatusMessage();
         case GetDateMessage.MESSAGE_TYPE:
             return new GetDateMessage();
         case SetDateMessage.MESSAGE_TYPE:
             return new SetDateMessage();
+        case DestLookupMessage.MESSAGE_TYPE:
+            return new DestLookupMessage();
+        case DestReplyMessage.MESSAGE_TYPE:
+            return new DestReplyMessage();
         default:
             throw new I2CPMessageException("The type " + type + " is an unknown I2CP message");
         }

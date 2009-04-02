@@ -9,6 +9,8 @@ package net.i2p.client;
  *
  */
 
+import java.util.Date;
+import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -26,8 +28,10 @@ import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;
 import net.i2p.data.i2cp.DestroySessionMessage;
 import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.ReconfigureSessionMessage;
 import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
+import net.i2p.data.i2cp.SendMessageExpiresMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.util.Log;
 
@@ -91,8 +95,13 @@ class I2CPMessageProducer {
      *
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag,
-                            SessionKey key, Set tags, SessionKey newKey) throws I2PSessionException {
-        SendMessageMessage msg = new SendMessageMessage();
+                            SessionKey key, Set tags, SessionKey newKey, long expires) throws I2PSessionException {
+        SendMessageMessage msg;
+        if (expires > 0) {
+            msg = new SendMessageExpiresMessage();
+            ((SendMessageExpiresMessage)msg).setExpiration(new Date(expires));
+        } else
+            msg = new SendMessageMessage();
         msg.setDestination(dest);
         msg.setSessionId(session.getSessionId());
         msg.setNonce(nonce);
@@ -178,6 +187,35 @@ class I2CPMessageProducer {
         msg.setLeaseSet(leaseSet);
         msg.setPrivateKey(priv);
         msg.setSigningPrivateKey(signingPriv);
+        msg.setSessionId(session.getSessionId());
+        session.sendMessage(msg);
+    }
+
+    /**
+     * Update number of tunnels
+     * 
+     * @param tunnels 0 for original configured number
+     */
+    public void updateTunnels(I2PSessionImpl session, int tunnels) throws I2PSessionException {
+        ReconfigureSessionMessage msg = new ReconfigureSessionMessage();
+        SessionConfig cfg = new SessionConfig(session.getMyDestination());
+        Properties props = session.getOptions();
+        if (tunnels > 0) {
+            Properties newprops = new Properties();
+            newprops.putAll(props);
+            props = newprops;
+            props.setProperty("inbound.quantity", "" + tunnels);
+            props.setProperty("outbound.quantity", "" + tunnels);
+            props.setProperty("inbound.backupQuantity", "0");
+            props.setProperty("outbound.backupQuantity", "0");
+        }
+        cfg.setOptions(props);
+        try {
+            cfg.signSessionConfig(session.getPrivateKey());
+        } catch (DataFormatException dfe) {
+            throw new I2PSessionException("Unable to sign the session config", dfe);
+        }
+        msg.setSessionConfig(cfg);
         msg.setSessionId(session.getSessionId());
         session.sendMessage(msg);
     }

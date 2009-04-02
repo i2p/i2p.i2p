@@ -22,11 +22,12 @@ div.logo {
 	top: 1em;
 	margin: 0em;
 	padding: .5em;
-	text-align: left;
+	text-align: center;
 }
 
 div.toolbar {
-    font-weight: bold
+	margin: 0em 0em 2em 0em;
+	font-weight: bold;
 }
 
 div.routersummary {
@@ -70,7 +71,7 @@ div.news {
 	margin: 0em 1em 1em 224px;
 	padding: .5em 1em;
 	background-color: #ffffc0;
-	border: medium solid #ffffd0;
+	border: medium solid #ffffa0;
 	text-align: left;
 	color: inherit;
 }

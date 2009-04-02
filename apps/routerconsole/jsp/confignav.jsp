@@ -10,6 +10,8 @@
  %>Clients | <% } else { %><a href="configclients.jsp">Clients</a> | <% }
  if (request.getRequestURI().indexOf("configpeer.jsp") != -1) {
  %>Peers | <% } else { %><a href="configpeer.jsp">Peers</a> | <% }
+ if (request.getRequestURI().indexOf("configkeyring.jsp") != -1) {
+ %>Keyring | <% } else { %><a href="configkeyring.jsp">Keyring</a> | <% }
  if (request.getRequestURI().indexOf("configlogging.jsp") != -1) {
  %>Logging | <% } else { %><a href="configlogging.jsp">Logging</a> | <% }
  if (request.getRequestURI().indexOf("configstats.jsp") != -1) {

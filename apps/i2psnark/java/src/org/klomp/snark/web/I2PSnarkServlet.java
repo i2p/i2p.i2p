@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -62,7 +63,7 @@ public class I2PSnarkServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
-        long stats[] = {0,0,0,0};
+        long stats[] = {0,0,0,0,0};
         
         String nonce = req.getParameter("nonce");
         if ( (nonce != null) && (nonce.equals(String.valueOf(_nonce))) )
@@ -142,8 +143,10 @@ public class I2PSnarkServlet extends HttpServlet {
         if (snarks.size() <= 0) {
             out.write(TABLE_EMPTY);
         } else if (snarks.size() > 1) {
-            out.write(TABLE_TOTAL);
-            out.write("    <th align=\"right\" valign=\"top\">" + formatSize(stats[0]) + "</th>\n" +
+            out.write("<tfoot><tr>\n" +
+                      "    <th align=\"left\" valign=\"top\" colspan=\"2\">Totals (" + snarks.size() + " torrents, " + stats[4] + " connected peers)</th>\n" +
+                      "    <th>&nbsp;</th>\n" +
+                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th align=\"right\" valign=\"top\">" + formatSize(stats[1]) + "</th>\n" +
                       "    <th align=\"right\" valign=\"top\">" + formatSize(stats[2]) + "ps</th>\n" +
                       "    <th align=\"right\" valign=\"top\">" + formatSize(stats[3]) + "ps</th>\n" +
@@ -199,10 +202,14 @@ public class I2PSnarkServlet extends HttpServlet {
                 } catch (IOException ioe) {
                     _log.warn("hrm: " + local, ioe);
                 }
-            } else if ( (newURL != null) && (newURL.trim().length() > "http://.i2p/".length()) ) {
-                _manager.addMessage("Fetching " + newURL);
-                I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
-                fetch.start();
+            } else if (newURL != null) {
+                if (newURL.startsWith("http://")) {
+                    _manager.addMessage("Fetching " + newURL);
+                    I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
+                    fetch.start();
+                } else {
+                    _manager.addMessage("Invalid URL - must start with http://");
+                }
             } else {
                 // no file or URL specified
             }
@@ -378,7 +385,8 @@ public class I2PSnarkServlet extends HttpServlet {
     
     private List getSortedSnarks(HttpServletRequest req) {
         Set files = _manager.listTorrentFiles();
-        TreeSet fileNames = new TreeSet(files); // sorts it alphabetically
+        TreeSet fileNames = new TreeSet(Collator.getInstance()); // sorts it alphabetically
+        fileNames.addAll(files);
         ArrayList rv = new ArrayList(fileNames.size());
         for (Iterator iter = fileNames.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -437,6 +445,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if (snark.coordinator != null) {
             err = snark.coordinator.trackerProblems;
             curPeers = snark.coordinator.getPeerCount();
+            stats[4] += curPeers;
             knownPeers = snark.coordinator.trackerSeenPeers;
         }
         
@@ -575,10 +584,10 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Azureus";
                 else if ("CwsL".equals(ch))
                     client = "I2PSnarkXL";
-                else if ("AUZV".equals(ch))
+                else if ("ZV".equals(ch.substring(2,4)))
                     client = "Robert";
                 else
-                    client = "Unknown";
+                    client = "Unknown (" + ch + ')';
                 out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
@@ -639,7 +648,7 @@ public class I2PSnarkServlet extends HttpServlet {
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String uri = req.getRequestURI();
         String newURL = req.getParameter("newURL");
-        if ( (newURL == null) || (newURL.trim().length() <= 0) ) newURL = "http://";
+        if ( (newURL == null) || (newURL.trim().length() <= 0) ) newURL = "";
         String newFile = req.getParameter("newFile");
         if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
         
@@ -767,7 +776,7 @@ public class I2PSnarkServlet extends HttpServlet {
             return bytes + "B";
         else if (bytes < 5*1024*1024)
             return ((bytes + 512)/1024) + "KB";
-        else if (bytes < 5*1024*1024*1024l)
+        else if (bytes < 10*1024*1024*1024l)
             return ((bytes + 512*1024)/(1024*1024)) + "MB";
         else
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "GB";
@@ -855,11 +864,6 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"right\" valign=\"top\">Uploaded</th>\n" +
                                                "    <th align=\"right\" valign=\"top\">Down Rate</th>\n" +
                                                "    <th align=\"right\" valign=\"top\">Up Rate</th>\n";
-    
-    private static final String TABLE_TOTAL =  "<tfoot>\n" +
-                                               "<tr><th align=\"left\" valign=\"top\">Totals</th>\n" +
-                                               "    <th>&nbsp;</th>\n" +
-                                               "    <th>&nbsp;</th>\n";
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
                                               "<td class=\"snarkTorrentEven\" align=\"left\"" +

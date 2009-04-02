@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
@@ -39,6 +41,7 @@ import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -48,7 +51,7 @@ import net.i2p.util.SimpleTimer;
  * @author jrandom
  */
 abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
-    private Log _log;
+    protected Log _log;
     /** who we are */
     private Destination _myDestination;
     /** private key for decryption */
@@ -63,23 +66,23 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private LeaseSet _leaseSet;
 
     /** hostname of router */
-    private String _hostname;
+    protected String _hostname;
     /** port num to router */
-    private int _portNum;
+    protected int _portNum;
     /** socket for comm */
-    private Socket _socket;
+    protected Socket _socket;
     /** reader that always searches for messages */
-    private I2CPMessageReader _reader;
+    protected I2CPMessageReader _reader;
     /** where we pipe our messages */
-    private OutputStream _out;
+    protected OutputStream _out;
 
     /** who we send events to */
-    private I2PSessionListener _sessionListener;
+    protected I2PSessionListener _sessionListener;
 
     /** class that generates new messages */
     protected I2CPMessageProducer _producer;
     /** map of Long --> MessagePayloadMessage */
-    private Map _availableMessages;
+    protected Map<Long, MessagePayloadMessage> _availableMessages;
     
     protected I2PClientMessageHandlerMap _handlerMap;
     
@@ -90,10 +93,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
-    private boolean _closed;
+    protected boolean _closed;
 
     /** whether the session connection is in the process of being closed */
-    private boolean _closing;
+    protected boolean _closing;
 
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
@@ -106,7 +109,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * reading of other messages (in turn, potentially leading to deadlock)
      *
      */
-    private AvailabilityNotifier _availabilityNotifier;
+    protected AvailabilityNotifier _availabilityNotifier;
+
+    private long _lastActivity;
+    private boolean _isReduced;
 
     void dateUpdated() {
         _dateReceived = true;
@@ -117,6 +123,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     public static final int LISTEN_PORT = 7654;
     
+    /** for extension */
+    public I2PSessionImpl() {}
+
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
@@ -131,7 +140,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _closing = false;
         _producer = new I2CPMessageProducer(context);
         _availabilityNotifier = new AvailabilityNotifier();
-        _availableMessages = new HashMap();
+        _availableMessages = new ConcurrentHashMap();
         try {
             readDestination(destKeyStream);
         } catch (DataFormatException dfe) {
@@ -144,14 +153,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         loadConfig(options);
         _sessionId = null;
         _leaseSet = null;
-        _context.statManager().createRateStat("client.availableMessages", "How many messages are available for the current client", "ClientMessages", new long[] { 60*1000, 10*60*1000 });
     }
 
     /**
      * Parse the config for anything we know about
      *
      */
-    private void loadConfig(Properties options) {
+    protected void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
         _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
@@ -285,6 +293,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                  _log.info(getPrefix() + "Lease set created with inbound tunnels after "
                            + (connected - startConnect)
                            + "ms - ready to participate in the network!");
+            startIdleMonitor();
         } catch (UnknownHostException uhe) {
             _closed = true;
             throw new I2PSessionException(getPrefix() + "Invalid session configuration", uhe);
@@ -300,17 +309,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
-        int remaining = 0;
-        MessagePayloadMessage msg = null;
-        synchronized (_availableMessages) {
-            msg = (MessagePayloadMessage) _availableMessages.remove(new Long(msgId));
-            remaining = _availableMessages.size();
-        }
-        _context.statManager().addRateData("client.availableMessages", remaining, 0);
+        MessagePayloadMessage msg = _availableMessages.remove(new Long(msgId));
         if (msg == null) {
-            _log.error("Receive message " + msgId + " had no matches, remaining=" + remaining);
+            _log.error("Receive message " + msgId + " had no matches");
             return null;
         }
+        updateActivity();
         return msg.getPayload().getUnencryptedData();
     }
 
@@ -347,12 +351,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     public void addNewMessage(MessagePayloadMessage msg) {
         Long mid = new Long(msg.getMessageId());
-        int avail = 0;
-        synchronized (_availableMessages) {
-            _availableMessages.put(mid, msg);
-            avail = _availableMessages.size();
-        }
-        _context.statManager().addRateData("client.availableMessages", avail, 0);
+        _availableMessages.put(mid, msg);
         long id = msg.getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {
@@ -365,27 +364,20 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Notified availability for session " + _sessionId + ", message " + id);
         }
-        SimpleTimer.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
+        SimpleScheduler.getInstance().addEvent(new VerifyUsage(mid), 30*1000);
     }
-    private class VerifyUsage implements SimpleTimer.TimedEvent {
+    protected class VerifyUsage implements SimpleTimer.TimedEvent {
         private Long _msgId;
         public VerifyUsage(Long id) { _msgId = id; }
         
         public void timeReached() {
-            MessagePayloadMessage removed = null;
-            int remaining = 0;
-            synchronized (_availableMessages) {
-                removed = (MessagePayloadMessage)_availableMessages.remove(_msgId);
-                remaining = _availableMessages.size();
-            }
-            if (removed != null) {
-                _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed + ": remaining: " + remaining);
-                _context.statManager().addRateData("client.availableMessages", remaining, 0);
-            }
+            MessagePayloadMessage removed = _availableMessages.remove(_msgId);
+            if (removed != null && !isClosed())
+                _log.error("Message NOT removed!  id=" + _msgId + ": " + removed);
         }
     }
 
-    private class AvailabilityNotifier implements Runnable {
+    protected class AvailabilityNotifier implements Runnable {
         private List _pendingIds;
         private List _pendingSizes;
         private boolean _alive;
@@ -432,8 +424,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                             long before = System.currentTimeMillis();
                             _sessionListener.messageAvailable(I2PSessionImpl.this, msgId.intValue(), size.intValue());
                             long duration = System.currentTimeMillis() - before;
-                            if ((duration > 100) && _log.shouldLog(Log.WARN)) 
-                                _log.warn("Message availability notification for " + msgId.intValue() + " took " 
+                            if ((duration > 100) && _log.shouldLog(Log.INFO)) 
+                                _log.info("Message availability notification for " + msgId.intValue() + " took " 
                                            + duration + " to " + _sessionListener);
                         } catch (Exception e) {
                             _log.log(Log.CRIT, "Error notifying app of message availability", e);
@@ -546,10 +538,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Pass off the error to the listener
      */
     void propogateError(String msg, Throwable error) {
-        if (_log.shouldLog(Log.WARN)) 
-            _log.warn(getPrefix() + "Error occurred: " + msg + " - " + error.getMessage());
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(getPrefix() + " cause", error);
+        if (_log.shouldLog(Log.ERROR)) 
+            _log.error(getPrefix() + "Error occurred: " + msg + " - " + error.getMessage());
+        if (_log.shouldLog(Log.ERROR))
+            _log.error(getPrefix() + " cause", error);
         
         if (_sessionListener != null) _sessionListener.errorOccurred(this, msg, error);
     }
@@ -566,7 +558,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
         _closing = true;   // we use this to prevent a race
-        if (sendDisconnect) {
+        if (sendDisconnect && _producer != null) {    // only null if overridden by I2PSimpleSession
             try {
                 _producer.disconnect(this);
             } catch (I2PSessionException ipe) {
@@ -659,4 +651,40 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
     
     protected String getPrefix() { return "[" + (_sessionId == null ? -1 : _sessionId.getSessionId()) + "]: "; }
+
+    public Destination lookupDest(Hash h) throws I2PSessionException {
+        return null;
+    }
+
+    protected void updateActivity() {
+        _lastActivity = _context.clock().now();
+        if (_isReduced) {
+            _isReduced = false;
+            if (_log.shouldLog(Log.WARN)) 
+                _log.warn(getPrefix() + "Restoring original tunnel quantity");
+            try {
+                _producer.updateTunnels(this, 0);
+            } catch (I2PSessionException ise) {
+                _log.error(getPrefix() + "bork restore from reduced");
+            }
+        }
+    }
+
+    public long lastActivity() {
+        return _lastActivity;
+    }
+
+    public void setReduced() {
+        _isReduced = true;
+    }
+
+    private void startIdleMonitor() {
+        _isReduced = false;
+        boolean reduce = Boolean.valueOf(_options.getProperty("i2cp.reduceOnIdle")).booleanValue();
+        boolean close = Boolean.valueOf(_options.getProperty("i2cp.closeOnIdle")).booleanValue();
+        if (reduce || close) {
+            updateActivity();
+            SimpleScheduler.getInstance().addEvent(new SessionIdleTimer(_context, this, reduce, close), SessionIdleTimer.MINIMUM_TIME);
+        }
+    }
 }

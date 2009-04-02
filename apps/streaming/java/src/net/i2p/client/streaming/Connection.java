@@ -12,7 +12,9 @@ import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Maintain the state controlling a streaming connection between two 
@@ -45,6 +47,7 @@ public class Connection {
     private long _congestionWindowEnd;
     private long _highestAckedThrough;
     private boolean _isInbound;
+    private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
     private Map _outboundPackets;
     private PacketQueue _outboundQueue;
@@ -67,6 +70,7 @@ public class Connection {
     /** how many messages have been resent and not yet ACKed? */
     private int _activeResends;
     private ConEvent _connectionEvent;
+    private int _randomWait;
     
     private long _lifetimeBytesSent;
     private long _lifetimeBytesReceived;
@@ -120,8 +124,10 @@ public class Connection {
         _activeResends = 0;
         _resetSentOn = -1;
         _isInbound = false;
+        _updatedShareOpts = false;
         _connectionEvent = new ConEvent();
 	_hardDisconnected = false;
+        _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -245,7 +251,7 @@ public class Connection {
     void sendReset() {
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         long now = _context.clock().now();
         if (_resetSentOn + 10*1000 > now) return; // don't send resets too fast
@@ -323,7 +329,8 @@ public class Connection {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Resend in " + timeout + " for " + packet, new Exception("Sent by"));
 
-            RetransmissionTimer.getInstance().addEvent(new ResendPacketEvent(packet, timeout + _context.clock().now()), timeout);
+            // schedules itself
+            ResendPacketEvent rpe = new ResendPacketEvent(packet, timeout);
         }
 
         _context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
@@ -459,7 +466,7 @@ public class Connection {
     void resetReceived() {
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
         _resetReceived = true;
         MessageOutputStream mos = _outputStream;
@@ -507,7 +514,7 @@ public class Connection {
         if (removeFromConMgr) {
             if (_disconnectScheduledOn < 0) {
                 _disconnectScheduledOn = _context.clock().now();
-                SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+                SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
             }
         }
         _connected = false;
@@ -523,7 +530,7 @@ public class Connection {
         if (_receiver != null)
             _receiver.destroy();
         if (_activityTimer != null)
-            SimpleTimer.getInstance().removeEvent(_activityTimer);
+            _activityTimer.cancel();
         //_activityTimer = null;
         if (_inputStream != null)
             _inputStream.streamErrorOccurred(new IOException("disconnected!"));
@@ -586,6 +593,8 @@ public class Connection {
         if (_remotePeerSet) throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
         _remotePeerSet = true;
         _remotePeer = peer; 
+        // now that we know who the other end is, get the rtt etc. from the cache
+        _connectionManager.updateOptsFromShare(this);
     }
     
     private boolean _sendStreamIdSet = false;
@@ -704,12 +713,18 @@ public class Connection {
         _closeSentOn = when;
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
-            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+            SimpleScheduler.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         }
     }
     public long getCloseReceivedOn() { return _closeReceivedOn; }
     public void setCloseReceivedOn(long when) { _closeReceivedOn = when; }
-    
+
+    public void updateShareOpts() {
+        if (_closeSentOn > 0 && !_updatedShareOpts) {
+            _connectionManager.updateShareOpts(this);
+            _updatedShareOpts = true;
+        }
+    }
     public void incrementUnackedPacketsReceived() { _unackedPacketsReceived++; }
     public int getUnackedPacketsReceived() { return _unackedPacketsReceived; }
     /** how many packets have we sent but not yet received an ACK for?
@@ -811,16 +826,21 @@ public class Connection {
             return;
         }
         long howLong = _options.getInactivityTimeout();
-        howLong += _context.random().nextInt(30*1000); // randomize it a bit, so both sides don't do it at once
+        howLong += _randomWait; // randomize it a bit, so both sides don't do it at once
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Resetting the inactivity timer to " + howLong, new Exception(toString()));
         // this will get rescheduled, and rescheduled, and rescheduled...
-        RetransmissionTimer.getInstance().removeEvent(_activityTimer);
-        RetransmissionTimer.getInstance().addEvent(_activityTimer, howLong);
+        _activityTimer.reschedule(howLong, false); // use the later of current and previous timeout
     }
     
-    private class ActivityTimer implements SimpleTimer.TimedEvent {
+    private class ActivityTimer extends SimpleTimer2.TimedEvent {
+        public ActivityTimer() { 
+            super(RetransmissionTimer.getInstance());
+            setFuzz(5*1000); // sloppy timer, don't reschedule unless at least 5s later
+        }
         public void timeReached() {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Fire inactivity timer on " + Connection.this.toString());
             // uh, nothing more to do...
             if (!_connected) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are already closed");
@@ -830,7 +850,7 @@ public class Connection {
             long left = getTimeLeft();
             if (left > 0) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is time left (" + left + ")");
-                RetransmissionTimer.getInstance().addEvent(ActivityTimer.this, left);
+                schedule(left);
                 return;
             }
             // these are either going to time out or cause further rescheduling
@@ -844,24 +864,31 @@ public class Connection {
                 return;
             }
             // if one of us can't talk...
-            if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are closing");
-                return;
-            }
+            // No - not true - data and acks are still going back and forth.
+            // Prevent zombie connections by keeping the inactivity timer.
+            // Not sure why... receiving a close but never sending one?
+            // If so we can probably re-enable this for _closeSentOn.
+            // For further investigation...
+            //if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) {
+            //    if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are closing");
+            //    return;
+            //}
             
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, with action=" + _options.getInactivityAction());
             
             // bugger it, might as well do the hard work now
             switch (_options.getInactivityAction()) {
-                case ConnectionOptions.INACTIVITY_ACTION_SEND:
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Sending some data due to inactivity");
-                    _receiver.send(null, 0, 0, true);
-                    break;
                 case ConnectionOptions.INACTIVITY_ACTION_NOOP:
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Inactivity timer expired, but we aint doin' shit");
                     break;
+                case ConnectionOptions.INACTIVITY_ACTION_SEND:
+                    if (_closeSentOn <= 0 && _closeReceivedOn <= 0) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Sending some data due to inactivity");
+                        _receiver.send(null, 0, 0, true);
+                        break;
+                    } // else fall through
                 case ConnectionOptions.INACTIVITY_ACTION_DISCONNECT:
                     // fall through
                 default:
@@ -877,7 +904,9 @@ public class Connection {
                     
                     _inputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
                     _outputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
-                    disconnect(false);
+                    // Clean disconnect if we have already scheduled one
+                    // (generally because we already sent a close)
+                    disconnect(_disconnectScheduledOn >= 0);
                     break;
             }
         }
@@ -948,9 +977,9 @@ public class Connection {
         }
         
         if (getResetSent())
-            buf.append(" reset sent");
+            buf.append(" reset sent ").append(DataHelper.formatDuration(_context.clock().now() - getResetSentOn())).append(" ago");
         if (getResetReceived())
-            buf.append(" reset received");
+            buf.append(" reset received ").append(DataHelper.formatDuration(_context.clock().now() - getDisconnectScheduledOn())).append(" ago");
         if (getCloseSentOn() > 0) {
             buf.append(" close sent ");
             long timeSinceClose = _context.clock().now() - getCloseSentOn();
@@ -958,7 +987,7 @@ public class Connection {
             buf.append(" ago");
         }
         if (getCloseReceivedOn() > 0)
-            buf.append(" close received");
+            buf.append(" close received ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
         buf.append(" sent: ").append(1 + _lastSendId);
         if (_inputStream != null)
             buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
@@ -990,27 +1019,33 @@ public class Connection {
     
     /**
      * If we have been explicitly NACKed three times, retransmit the packet even if
-     * there are other packets in flight.
+     * there are other packets in flight. 3 takes forever, let's try 2.
      *
      */
-    static final int FAST_RETRANSMIT_THRESHOLD = 3;
+    static final int FAST_RETRANSMIT_THRESHOLD = 2;
     
     /**
      * Coordinate the resends of a given packet
      */
-    private class ResendPacketEvent implements SimpleTimer.TimedEvent {
+    public class ResendPacketEvent extends SimpleTimer2.TimedEvent {
         private PacketLocal _packet;
         private long _nextSendTime;
-        public ResendPacketEvent(PacketLocal packet, long sendTime) {
+        public ResendPacketEvent(PacketLocal packet, long delay) {
+            super(RetransmissionTimer.getInstance());
             _packet = packet;
-            _nextSendTime = sendTime;
+            _nextSendTime = delay + _context.clock().now();
             packet.setResendPacketEvent(ResendPacketEvent.this);
+            schedule(delay);
         }
         
         public long getNextSendTime() { return _nextSendTime; }
         public void timeReached() { retransmit(true); }
         /**
          * Retransmit the packet if we need to.  
+         *
+         * ackImmediately() above calls directly in here, so
+         * we have to use forceReschedule() instead of schedule() below,
+         * to prevent duplicates in the timer queue.
          *
          * @param penalize true if this retransmission is caused by a timeout, false if we
          *                 are just sending this packet instead of an ACK
@@ -1020,7 +1055,9 @@ public class Connection {
             if (_packet.getAckTime() > 0) 
                 return false;
             
-            if (_resetSent || _resetReceived) {
+            if (_resetSent || _resetReceived || !_connected) {
+                if(_log.shouldLog(Log.WARN) && (!_resetSent) && (!_resetReceived))
+                     _log.warn("??? no resets but not connected: " + _packet); // don't think this is possible
                 _packet.cancelled();
                 return false;
             }
@@ -1044,7 +1081,7 @@ public class Connection {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Delaying resend of " + _packet + " as there are " 
                                   + _activeResends + " active resends already in play");
-                    RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
+                    forceReschedule(1000);
                     _nextSendTime = 1000 + _context.clock().now();
                     return false;
                 }
@@ -1104,26 +1141,6 @@ public class Connection {
                     _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
                 }
                 
-                if (numSends - 1 <= _options.getMaxResends()) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Resend packet " + _packet + " time " + numSends + 
-                                  " activeResends: " + _activeResends + 
-                                  " (wsize "
-                                  + newWindowSize + " lifetime " 
-                                  + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
-                    _outboundQueue.enqueue(_packet);
-                    _lastSendTime = _context.clock().now();
-                }
-                
-                // acked during resending (... or somethin')
-                if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {
-                    _activeResends--;
-                    synchronized (_outboundPackets) {
-                        _outboundPackets.notifyAll();
-                    }
-                    return true;
-                }
-                
                 if (numSends - 1 > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Too many resends");
@@ -1137,11 +1154,32 @@ public class Connection {
                     long timeout = rto << (numSends-1);
                     if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
                         timeout = MAX_RESEND_DELAY;
+                    // set this before enqueue() as it passes it on to the router
+                    _nextSendTime = timeout + _context.clock().now();
+
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Resend packet " + _packet + " time " + numSends + 
+                                  " activeResends: " + _activeResends + 
+                                  " (wsize "
+                                  + newWindowSize + " lifetime " 
+                                  + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
+                    _outboundQueue.enqueue(_packet);
+                    _lastSendTime = _context.clock().now();
+
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
-                    RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
-                    _nextSendTime = timeout + _context.clock().now();
+                    forceReschedule(timeout);
                 }
+                
+                // acked during resending (... or somethin')
+                if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {
+                    _activeResends--;
+                    synchronized (_outboundPackets) {
+                        _outboundPackets.notifyAll();
+                    }
+                    return true;
+                }
+
                 return true;
             } else {
                 //if (_log.shouldLog(Log.DEBUG))

@@ -1,0 +1,42 @@
+#!/bin/sh
+# Heavily based on the Slackware 12.1 SlackBuild
+# Slackware build script for i2p
+
+# PLEASE READ THIS:
+# Probably you will never have to update i2p packages with upgradepkg,
+# just because i2p have an auto-update function.
+# How to start i2p:
+# After installpkg command, doinst.sh will execute a postinstallation script
+# needed by i2p. After that you have to chmod +x /etc/rc.d/rc.i2p and start
+# i2p service with /etc/rc.d/rc.i2p start.
+# Now tell your browser to user this proxy: localhost on port 4444 and open
+# this page: http://localhost:7657/index.jsp
+# Here you can configure i2p, watch network status and navigate anonimously.
+# It's suggested to subscribe to various dns host, like i2host.i2p
+# For any additional information, visit i2host.i2p and forum.i2p
+
+CWD=$(pwd)
+TMP=/tmp
+PKG=/$TMP/package-base-i2p
+rm -rf $PKG
+mkdir -p $PKG
+# put here installation dir, without first and last /
+# es: usr/local
+NAME=i2p-base
+VERSION=0.0.1
+BUILD=1sim
+ARCH=noarch
+INSTALL_DIR=opt
+cd $PKG
+chown -R root:root .
+
+mkdir -p $PKG/etc/rc.d
+mkdir -p $PKG/install
+sed "s|directory|/$INSTALL_DIR/i2p/i2prouter|g" $CWD/rc.i2p_def > $PKG/etc/rc.d/rc.i2p.new
+chmod 644 $PKG/etc/rc.d/rc.i2p.new
+sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+requiredbuilder -v -y -s $CWD $PKG
+makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.tgz

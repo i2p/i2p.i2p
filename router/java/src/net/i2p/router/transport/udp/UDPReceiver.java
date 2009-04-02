@@ -9,6 +9,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -115,7 +116,7 @@ public class UDPReceiver {
             long delay = ARTIFICIAL_DELAY_BASE + _context.random().nextInt(ARTIFICIAL_DELAY);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Delay packet " + packet + " for " + delay);
-            SimpleTimer.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
+            SimpleScheduler.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
             return -1;
         }
         

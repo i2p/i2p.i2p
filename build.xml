@@ -15,6 +15,11 @@
         <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
+        <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
+        <echo message="  debianhowto: instructions on building Debian packages" />
+    </target>
+    <target name="debianhowto">
+        <echo message="To build debian packages, you must run dpkg-buildpackage as root in the source directory. It will then run ant for you. dpkg-buildpackage is found in the 'dpkg-dev' package. Also it should work fine to use the 'fakeroot' package with dpkg-buildpackage, if you don't want to run as root. Please read 'man dpkg-buildpackage' before building any packages yourself." />
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
@@ -60,7 +65,6 @@
         <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/xercesImpl.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
     <target name="buildexe">
@@ -87,7 +91,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/xercesImpl.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
@@ -219,7 +223,6 @@
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
         <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
-        <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -273,6 +276,7 @@
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
         <copy file="readme_de.html" todir="pkg-temp/docs/" />
+        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
         <copy file="readme_nl.html" todir="pkg-temp/docs/" />
         <copy file="readme_sv.html" todir="pkg-temp/docs/" />
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
@@ -300,13 +304,11 @@
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
-        <!--
-	<mkdir dir="pkg-temp/syndie" />
-	<mkdir dir="pkg-temp/syndie/archive" />
-	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
-	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
-	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
-        -->
+        <copy file="LICENSE.txt" todir="pkg-temp/" />
+        <mkdir dir="pkg-temp/licenses/" />
+        <copy todir="pkg-temp/licenses/" >
+          <fileset dir="licenses/" />
+        </copy>
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -342,6 +344,11 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
+        <copy file="LICENSE.txt" todir="pkg-temp/" />
+        <mkdir dir="pkg-temp/licenses/" />
+        <copy todir="pkg-temp/licenses/" >
+          <fileset dir="licenses/" />
+        </copy>
     </target>
     <target name="prepupdateSmall" depends="buildSmall">
         <delete dir="pkg-temp" />
@@ -354,11 +361,9 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
-        <!-- New readme_*.html files - For one release only, remove after 0.6.5 is out -->
+        <!-- New readme_*.html files - For one release only -->
         <mkdir dir="pkg-temp/docs" />
-        <copy file="readme_de.html" todir="pkg-temp/docs/" />
-        <copy file="readme_nl.html" todir="pkg-temp/docs/" />
-        <copy file="readme_sv.html" todir="pkg-temp/docs/" />
+        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter">
         <delete dir="pkg-temp" />
@@ -373,17 +378,16 @@
         <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
         <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
-        <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
     </target>
     <target name="installer" depends="preppkg">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
-        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Delete" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
         </jar>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
@@ -442,6 +446,11 @@
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>
+    <target name="slackpkg">
+        <echo message="Building Slackware package." />
+        <ant dir="Slackware/i2p/" target="slackpkg" />
+        <ant dir="Slackware/i2p-base/" target="slackpkg" />
+    </target>
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />
         <exec executable="nice">
@@ -454,7 +463,7 @@
             <arg value="-output"/>
             <arg value="findbugs.xml"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:build/xercesImpl.jar"/>
+            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->

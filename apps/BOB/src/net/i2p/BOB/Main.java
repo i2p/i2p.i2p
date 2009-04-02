@@ -24,7 +24,6 @@
 package net.i2p.BOB;
 
 import net.i2p.client.streaming.RetransmissionTimer;
-import net.i2p.util.SimpleTimer;
 
 /**
  * Start from command line
@@ -39,8 +38,8 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// THINK THINK THINK THINK THINK THINK
-		SimpleTimer Y = RetransmissionTimer.getInstance();
+		RetransmissionTimer Y = RetransmissionTimer.getInstance();
 		BOB.main(args);
-		Y.removeSimpleTimer();
+		Y.stop();
 	}
 }

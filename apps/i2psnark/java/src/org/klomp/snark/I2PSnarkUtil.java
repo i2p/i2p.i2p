@@ -23,7 +23,9 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.util.EepGet;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -48,6 +50,7 @@ public class I2PSnarkUtil {
     private int _maxUploaders;
     private int _maxUpBW;
     private int _maxConnections;
+    private File _tmpDir;
     
     public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
@@ -67,6 +70,12 @@ public class I2PSnarkUtil {
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
+        // This is used for both announce replies and .torrent file downloads,
+        // so it must be available even if not connected to I2CP.
+        // so much for multiple instances
+        _tmpDir = new File("tmp", "i2psnark");
+        FileUtil.rmdir(_tmpDir, false);
+        _tmpDir.mkdirs();
     }
     
     /**
@@ -94,6 +103,7 @@ public class I2PSnarkUtil {
             _i2cpHost = i2cpHost;
         if (i2cpPort > 0)
             _i2cpPort = i2cpPort;
+        // can't remove any options this way...
         if (opts != null)
             _opts.putAll(opts);
         _configured = true;
@@ -166,6 +176,10 @@ public class I2PSnarkUtil {
         _manager = null;
         _shitlist.clear();
         mgr.destroySocketManager();
+        // this will delete a .torrent file d/l in progress so don't do that...
+        FileUtil.rmdir(_tmpDir, false);
+        // in case the user will d/l a .torrent file next...
+        _tmpDir.mkdirs();
     }
     
     /** connect to the given destination */
@@ -183,7 +197,7 @@ public class I2PSnarkUtil {
             synchronized (_shitlist) {
                 _shitlist.add(dest);
             }
-            SimpleTimer.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
+            SimpleScheduler.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
     }
@@ -204,13 +218,15 @@ public class I2PSnarkUtil {
         _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
-            out = File.createTempFile("i2psnark", "url", new File("."));
+            // we could use the system tmp dir but deleteOnExit() doesn't seem to work on all platforms...
+            out = File.createTempFile("i2psnark", null, _tmpDir);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             if (out != null)
                 out.delete();
             return null;
         }
+        out.deleteOnExit();
         String fetchURL = url;
         if (rewrite)
             fetchURL = rewriteAnnounce(url);

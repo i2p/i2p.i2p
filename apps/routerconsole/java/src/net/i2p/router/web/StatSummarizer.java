@@ -54,6 +54,7 @@ public class StatSummarizer implements Runnable {
 //                                                  ",udp.receivePacketSkew.60000" +
 //                                                  ",udp.sendConfirmTime.60000" +
 //                                                  ",udp.sendPacketSize.60000" +
+                                                    ",router.memoryUsed.60000" +
                                                     ",router.activePeers.60000";
 //                                                  ",router.activeSendPeers.60000" +
 //                                                  ",tunnel.acceptLoad.60000" +

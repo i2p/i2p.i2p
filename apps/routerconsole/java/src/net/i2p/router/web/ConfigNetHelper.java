@@ -10,22 +10,7 @@ import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.time.Timestamper;
 
-public class ConfigNetHelper {
-    private RouterContext _context;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
+public class ConfigNetHelper extends HelperBase {
     public ConfigNetHelper() {}
     
     /** copied from various private components */
@@ -156,7 +141,7 @@ public class ConfigNetHelper {
     public String getInboundBurstFactorBox() {
         int numSeconds = 1;
         int rateKBps = _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
-        int burstKB = _context.bandwidthLimiter().getInboundBurstBytes() * 1024;
+        int burstKB = _context.bandwidthLimiter().getInboundBurstBytes() / 1024;
         if ( (rateKBps > 0) && (burstKB > 0) )
             numSeconds = burstKB / rateKBps;
         return getBurstFactor(numSeconds, "inboundburstfactor");
@@ -165,7 +150,7 @@ public class ConfigNetHelper {
     public String getOutboundBurstFactorBox() {
         int numSeconds = 1;
         int rateKBps = _context.bandwidthLimiter().getOutboundBurstKBytesPerSecond();
-        int burstKB = _context.bandwidthLimiter().getOutboundBurstBytes() * 1024;
+        int burstKB = _context.bandwidthLimiter().getOutboundBurstBytes() / 1024;
         if ( (rateKBps > 0) && (burstKB > 0) )
             numSeconds = burstKB / rateKBps;
         return getBurstFactor(numSeconds, "outboundburstfactor");
@@ -175,16 +160,21 @@ public class ConfigNetHelper {
         StringBuffer buf = new StringBuffer(256);
         buf.append("<select name=\"").append(name).append("\">\n");
         boolean found = false;
-        for (int i = 10; i <= 60; i += 10) {
-            buf.append("<option value=\"").append(i).append("\" ");
-            if (i == numSeconds) {
+        for (int i = 10; i <= 70; i += 10) {
+            int val = i;
+            if (i == 70) {
+                if (found)
+                    break;
+                else
+                    val = numSeconds;
+            }
+            buf.append("<option value=\"").append(val).append("\" ");
+            if (val == numSeconds) {
                 buf.append("selected ");
                 found = true;
-            } else if ( (i == 60) && (!found) ) {
-                buf.append("selected ");
             }
             buf.append(">");
-            buf.append(i).append(" seconds</option>\n");
+            buf.append(val).append(" seconds</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();

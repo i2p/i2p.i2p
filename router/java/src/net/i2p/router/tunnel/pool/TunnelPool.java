@@ -468,7 +468,9 @@ public class TunnelPool {
         if (_tunnels.size() < wanted) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": Not enough tunnels (" + _tunnels.size() + ", wanted " + wanted + ")");
-            return null;
+            // see comment below
+            if (_tunnels.size() <= 0)
+                return null;
         }
 
         long expireAfter = _context.clock().now(); // + _settings.getRebuildPeriod();
@@ -492,15 +494,26 @@ public class TunnelPool {
             leases.add(lease);
         }
         
+        // Go ahead and use less leases for now, hopefully a new tunnel will be built soon
+        // and we will get called again to generate a full leaseset.
+        // For clients with high tunnel count or length,
+        // this will make startup considerably faster, and reduce loss of leaseset
+        // when one tunnel is lost, thus making us much more robust.
+        // This also helps when returning to full lease count after reduce-on-idle
+        // or close-on-idle.
+        // So we will generate a succession of leases at startup. That's OK.
+        // Do we want a config option for this, or are there times when we shouldn't do this?
         if (leases.size() < wanted) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": Not enough leases (" + leases.size() + ", wanted " + wanted + ")");
-            return null;
+            if (leases.size() <= 0)
+                return null;
         }
 
         LeaseSet ls = new LeaseSet();
         Iterator iter = leases.iterator();
-        for (int i = 0; i < wanted; i++)
+        int count = Math.min(leases.size(), wanted);
+        for (int i = 0; i < count; i++)
              ls.addLease((Lease) iter.next());
         if (_log.shouldLog(Log.INFO))
             _log.info(toString() + ": built new leaseSet: " + ls);

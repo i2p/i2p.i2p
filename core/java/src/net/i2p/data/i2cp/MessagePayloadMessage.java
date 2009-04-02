@@ -19,8 +19,7 @@ import net.i2p.data.Payload;
 import net.i2p.util.Log;
 
 /**
- * Defines the message a client sends to a router to ask it to deliver
- * a new message
+ * Defines the payload message a router sends to the client
  *
  * @author jrandom
  */

@@ -34,7 +34,6 @@ import java.util.Properties;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.RetransmissionTimer;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 /**
  * <span style="font-size:8px;font-family:courier;color:#EEEEEE;background-color:#000000">
  * ################################################################################<br>
@@ -114,6 +113,8 @@ public class BOB {
 	public final static String PROP_BOB_HOST = "BOB.host";
 	private static int maxConnections = 0;
 	private static NamedDB database;
+	private static Properties props = new Properties();
+
 
 	/**
 	 * Log a warning
@@ -157,11 +158,10 @@ public class BOB {
 		// Set up all defaults to be passed forward to other threads.
 		// Re-reading the config file in each thread is pretty damn stupid.
 		// I2PClient client = I2PClientFactory.createClient();
-		Properties props = new Properties();
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
 
 		// This is here just to ensure there is no interference with our threadgroups.
-		SimpleTimer Y = RetransmissionTimer.getInstance();
+		RetransmissionTimer Y = RetransmissionTimer.getInstance();
 		i = Y.hashCode();
 		{
 			try {
@@ -216,6 +216,7 @@ public class BOB {
 			}
 		}
 
+		i = 0;
 		try {
 			info("BOB is now running.");
 			ServerSocket listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));

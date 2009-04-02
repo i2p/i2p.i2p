@@ -66,7 +66,8 @@ public class GetBidsJob extends JobImpl {
             int failedCount = msg.getFailedTransports().size();
             if (failedCount == 0) {
                 context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime(), 0);
-                context.shitlist().shitlistRouter(to, "We share no common transports with them");
+                // This used to be "no common transports" but it is almost always no transports at all
+                context.shitlist().shitlistRouter(to, "No transports (hidden or starting up?)");
             } else if (failedCount >= facade.getTransportCount()) {
                 context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime(), 0);
                 // fail after all transports were unsuccessful

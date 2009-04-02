@@ -20,12 +20,12 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Publish the local router's RouterInfo every 5 to 10 minutes
+ * Publish the local router's RouterInfo periodically
  *
  */
 public class PublishLocalRouterInfoJob extends JobImpl {
     private Log _log;
-    final static long PUBLISH_DELAY = 5*60*1000; // every 5 to 10 minutes (since we randomize)
+    final static long PUBLISH_DELAY = 20*60*1000;
     
     public PublishLocalRouterInfoJob(RouterContext ctx) {
         super(ctx);
@@ -67,6 +67,6 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         } catch (DataFormatException dfe) {
             _log.error("Error signing the updated local router info!", dfe);
         }
-        requeue(PUBLISH_DELAY + getContext().random().nextInt((int)PUBLISH_DELAY));
+        requeue((PUBLISH_DELAY/2) + getContext().random().nextInt((int)PUBLISH_DELAY));
     }
 }

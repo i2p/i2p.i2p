@@ -60,6 +60,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     public int countActivePeers() { return (_manager == null ? 0 : _manager.countActivePeers()); }
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
+    public boolean haveCapacity() { return (_manager == null ? false : _manager.haveCapacity()); } 
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
@@ -284,9 +285,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _log.warn("Halting NTCP to change address");
         t.stopListening();
         newAddr.setOptions(newProps);
-        // Give NTCP Pumper time to stop so we don't end up with two...
-        // Need better way
-        try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        // Wait for NTCP Pumper to stop so we don't end up with two...
+        while (t.isAlive()) {
+            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        }
         t.restartListening(newAddr);
         _log.warn("Changed NTCP Address and started up, address is now " + newAddr);
         return;     	

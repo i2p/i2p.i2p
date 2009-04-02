@@ -22,6 +22,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -184,7 +185,7 @@ public class EstablishmentManager {
                                                        msg.getTarget().getIdentity(), 
                                                        new SessionKey(addr.getIntroKey()), addr);
                     _outboundStates.put(to, state);
-                    SimpleTimer.getInstance().addEvent(new Expire(to, state), 10*1000);
+                    SimpleScheduler.getInstance().addEvent(new Expire(to, state), 10*1000);
                 }
             }
             if (state != null) {
@@ -271,6 +272,8 @@ public class EstablishmentManager {
                         _log.warn("Receive session request from blocklisted IP: " + from);
                     return; // drop the packet
                 }
+                if (!_transport.allowConnection())
+                    return; // drop the packet
                 state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
                 isNew = true;
@@ -392,7 +395,7 @@ public class EstablishmentManager {
                                                msg.getTarget().getIdentity(), 
                                                new SessionKey(addr.getIntroKey()), addr);
             _outboundStates.put(to, qstate);
-            SimpleTimer.getInstance().addEvent(new Expire(to, qstate), 10*1000);
+            SimpleScheduler.getInstance().addEvent(new Expire(to, qstate), 10*1000);
 
             for (int i = 0; i < queued.size(); i++) {
                 OutNetMessage m = (OutNetMessage)queued.get(i);
@@ -475,7 +478,7 @@ public class EstablishmentManager {
         dsm.setMessageExpiration(_context.clock().now()+10*1000);
         dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         _transport.send(dsm, peer);
-        SimpleTimer.getInstance().addEvent(new PublishToNewInbound(peer), 0);
+        SimpleScheduler.getInstance().addEvent(new PublishToNewInbound(peer), 0);
     }
     private class PublishToNewInbound implements SimpleTimer.TimedEvent {
         private PeerState _peer;
@@ -627,7 +630,7 @@ public class EstablishmentManager {
                 }
             }
         }
-        SimpleTimer.getInstance().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
+        SimpleScheduler.getInstance().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
         state.setIntroNonce(nonce);
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
         UDPPacket requests[] = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());

@@ -15,8 +15,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
 
-public class ConfigStatsHelper {
-    private RouterContext _context;
+public class ConfigStatsHelper extends HelperBase {
     private Log _log;
     private String _filter;
     private Set _filters;

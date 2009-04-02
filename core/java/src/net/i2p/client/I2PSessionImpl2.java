@@ -31,7 +31,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 class I2PSessionImpl2 extends I2PSessionImpl {
-    private Log _log;
 
     /** set of MessageState objects, representing all of the messages in the process of being sent */
     private Set _sendingStates;
@@ -40,6 +39,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     /** should we gzip each payload prior to sending it? */
     private final static boolean SHOULD_COMPRESS = true;
     private final static boolean SHOULD_DECOMPRESS = true;
+
+    /** for extension */
+    public I2PSessionImpl2() {}
 
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
@@ -91,7 +93,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      *  set to false.
      */
     private static final int DONT_COMPRESS_SIZE = 66;
-    private boolean shouldCompress(int size) {
+    protected boolean shouldCompress(int size) {
          if (size <= DONT_COMPRESS_SIZE)
              return false;
          String p = getOptions().getProperty("i2cp.gzip");
@@ -100,22 +102,50 @@ class I2PSessionImpl2 extends I2PSessionImpl {
          return SHOULD_COMPRESS;
     }
     
+    public void addSessionListener(I2PSessionListener lsnr, int proto, int port) {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public void addMuxedSessionListener(I2PSessionMuxedListener l, int proto, int port) {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public void removeListener(int proto, int port) {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int proto, int fromport, int toport) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
+                               int proto, int fromport, int toport) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+                               int proto, int fromport, int toport) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
+
     @Override
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length);
     }
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
-        return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64));
+        // we don't do end-to-end crypto any more
+        //return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64), 0);
+        return sendMessage(dest, payload, offset, size, null, null, 0);
     }
     
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException {
-        return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent);
+        return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent, 0);
     }
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
                    throws I2PSessionException {
+        return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0);
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expires)
+                   throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
         if (isClosed()) throw new I2PSessionException("Already closed");
+        updateActivity();
 
         // Sadly there is no way to send something completely uncompressed in a backward-compatible way,
         // so we have to still send it in a gzip format, which adds 23 bytes (2.4% for a 960-byte msg)
@@ -140,7 +170,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         _context.statManager().addRateData("i2cp.tx.msgCompressed", compressed, 0);
         _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
-        return sendBestEffort(dest, payload, keyUsed, tagsSent);
+        return sendBestEffort(dest, payload, keyUsed, tagsSent, expires);
     }
 
     /**
@@ -166,7 +196,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     
     private static final int NUM_TAGS = 50;
 
-    private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
+    protected boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent, long expires)
                     throws I2PSessionException {
         SessionKey key = null;
         SessionKey newKey = null;
@@ -174,6 +204,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         Set sentTags = null;
         int oldTags = 0;
         long begin = _context.clock().now();
+        /***********
         if (I2CPMessageProducer.END_TO_END_CRYPTO) {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("begin sendBestEffort");
             key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
@@ -218,6 +249,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         } else {
             // not using end to end crypto, so don't ever bundle any tags
         }
+        **********/
         
         if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
         
@@ -231,14 +263,14 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Setting key = " + key);
 
         if (keyUsed != null) {
-            if (I2CPMessageProducer.END_TO_END_CRYPTO) {
-                if (newKey != null)
-                    keyUsed.setData(newKey.getData());
-                else
-                    keyUsed.setData(key.getData());
-            } else {
+            //if (I2CPMessageProducer.END_TO_END_CRYPTO) {
+            //    if (newKey != null)
+            //        keyUsed.setData(newKey.getData());
+            //    else
+            //        keyUsed.setData(key.getData());
+            //} else {
                 keyUsed.setData(SessionKey.INVALID_KEY.getData());
-            }
+            //}
         }
         if (tagsSent != null) {
             if (sentTags != null) {
@@ -259,7 +291,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                        + state.getNonce() + " for best effort "
                        + " sync took " + (inSendingSync-beforeSendingSync) 
                        + " add took " + (afterSendingSync-inSendingSync));
-        _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
+        _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey, expires);
         
         // since this is 'best effort', all we're waiting for is a status update 
         // saying that the router received it - in theory, that should come back
@@ -396,6 +428,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     private void clearStates() {
+        if (_sendingStates == null)    // only null if overridden by I2PSimpleSession
+            return;
         synchronized (_sendingStates) {
             for (Iterator iter = _sendingStates.iterator(); iter.hasNext();) {
                 MessageState state = (MessageState) iter.next();

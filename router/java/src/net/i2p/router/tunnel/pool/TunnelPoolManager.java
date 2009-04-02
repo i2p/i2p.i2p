@@ -237,22 +237,20 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return null;
     }
     public void setInboundSettings(Hash client, TunnelPoolSettings settings) {
-        
-        TunnelPool pool = null;
-        synchronized (_clientInboundPools) { 
-            pool = (TunnelPool)_clientInboundPools.get(client); 
-        }
-        if (pool != null)
-            pool.setSettings(settings);
+        setSettings(_clientInboundPools, client, settings);
     }
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {
-        
+        setSettings(_clientOutboundPools, client, settings);
+    }
+    private void setSettings(Map pools, Hash client, TunnelPoolSettings settings) {
         TunnelPool pool = null;
-        synchronized (_clientOutboundPools) { 
-            pool = (TunnelPool)_clientOutboundPools.get(client); 
+        synchronized (pools) { 
+            pool = (TunnelPool)pools.get(client); 
         }
-        if (pool != null)
+        if (pool != null) {
+            settings.setDestination(client); // prevent spoofing or unset dest
             pool.setSettings(settings);
+        }
     }
     
     public void restart() { 
@@ -376,7 +374,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _context.jobQueue().addJob(new BootstrapPool(_context, _outboundExploratory));
     }
     
-    private class BootstrapPool extends JobImpl {
+    private static class BootstrapPool extends JobImpl {
         private TunnelPool _pool;
         public BootstrapPool(RouterContext ctx, TunnelPool pool) {
             super(ctx);
@@ -472,7 +470,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             else
                 out.write("<td>n/a</td>");
             if (cfg.getReceiveFrom() != null)
-                out.write("<td>" + cfg.getReceiveFrom().toBase64().substring(0,4) +"</td>");
+                out.write("<td>" + netDbLink(cfg.getReceiveFrom()) +"</td>");
             else
                 out.write("<td>&nbsp;</td>");
             if (cfg.getSendTunnel() != null)
@@ -480,7 +478,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             else
                 out.write("<td>&nbsp;</td>");
             if (cfg.getSendTo() != null)
-                out.write("<td>" + cfg.getSendTo().toBase64().substring(0,4) +"</td>");
+                out.write("<td>" + netDbLink(cfg.getSendTo()) +"</td>");
             else
                 out.write("<td>&nbsp;</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
@@ -507,7 +505,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         out.write("</table>\n");
         out.write("Inactive participating tunnels: " + inactive + "<br />\n");
-        out.write("Lifetime bandwidth usage: " + processed + "KB<br />\n");
+        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B<br />\n");
     }
     
     class TunnelComparator implements Comparator {
@@ -549,7 +547,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 if (_context.routerHash().equals(peer))
                     out.write("<td>" + (id == null ? "" : "" + id) + "</td>");
                 else
-                    out.write("<td>" + peer.toBase64().substring(0,4) + (id == null ? "" : ":" + id) + cap + "</td>");                
+                    out.write("<td>" + netDbLink(peer) + (id == null ? "" : ":" + id) + cap + "</td>");                
             }
             out.write("</tr>\n");
             
@@ -577,7 +575,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         if (live <= 0)
             out.write("<b>No tunnels, waiting for the grace period to end</b><br />\n");
-        out.write("Lifetime bandwidth usage: " + processedIn + "KB in, " + processedOut + "KB out<br />");
+        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "B in, " +
+                  DataHelper.formatSize(processedOut*1024) + "B out<br />");
     }
     
     private String getCapacity(Hash peer) {
@@ -600,5 +599,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         } else {
             return "[unkn]";
         }
+    }
+
+    private static String netDbLink(Hash peer) {
+        String h = peer.toBase64().substring(0, 4);
+        return "<a href=\"netdb.jsp?r=" + h + "\">" + h + "</a>";
     }
 }

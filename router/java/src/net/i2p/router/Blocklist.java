@@ -256,7 +256,7 @@ public class Blocklist {
         }
     }
 
-    private class Entry {
+    private static class Entry {
         String comment;
         byte ip1[];
         byte ip2[];
@@ -754,37 +754,36 @@ public class Blocklist {
         // We already shitlisted in shitlist(peer), that's good enough
     }
 
+    /** write directly to the stream so we don't OOM on a huge list */
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("<h2>IP Blocklist</h2>");
+        out.write("<h2>IP Blocklist</h2>");
         Set singles = new TreeSet();
         synchronized(_singleIPBlocklist) {
             singles.addAll(_singleIPBlocklist);
         }
         if (singles.size() > 0) {
-            buf.append("<table><tr><td><b>Transient IPs</b></td></tr>");
+            out.write("<table><tr><td><b>Transient IPs</b></td></tr>");
             for (Iterator iter = singles.iterator(); iter.hasNext(); ) {
                  int ip = ((Integer) iter.next()).intValue();
-                 buf.append("<tr><td align=right>").append(toStr(ip)).append("</td></tr>\n");
+                 out.write("<tr><td align=right>"); out.write(toStr(ip)); out.write("</td></tr>\n");
             }
-            buf.append("</table>");
+            out.write("</table>");
         }
         if (_blocklistSize > 0) {
-            buf.append("<table><tr><td align=center colspan=2><b>IPs from Blocklist File</b></td></tr><tr><td align=center><b>From</b></td><td align=center><b>To</b></td></tr>");
+            out.write("<table><tr><td align=center colspan=2><b>IPs from Blocklist File</b></td></tr><tr><td align=center><b>From</b></td><td align=center><b>To</b></td></tr>");
             for (int i = 0; i < _blocklistSize; i++) {
                  int from = getFrom(_blocklist[i]);
-                 buf.append("<tr><td align=right>").append(toStr(from)).append("</td><td align=right>");
+                 out.write("<tr><td align=right>"); out.write(toStr(from)); out.write("</td><td align=right>");
                  int to = getTo(_blocklist[i]);
-                 if (to != from)
-                     buf.append(toStr(to)).append("</td></tr>\n");
-                 else
-                     buf.append("&nbsp</td></tr>\n");
+                 if (to != from) {
+                     out.write(toStr(to)); out.write("</td></tr>\n");
+                 } else
+                     out.write("&nbsp</td></tr>\n");
             }
-            buf.append("</table>");
+            out.write("</table>");
         } else {
-            buf.append("<br>No blocklist file entries");
+            out.write("<br>No blocklist file entries");
         }
-        out.write(buf.toString());
         out.flush();
     }
 

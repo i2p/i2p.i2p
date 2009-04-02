@@ -7,8 +7,14 @@
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
 <jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
+<jsp:setProperty name="uhelper" property="*" />
+<jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
 <div class="routersummary">
+ <center><b><a href="config.jsp">Configuration</a>&nbsp;&nbsp;<a href="help.jsp">Help</a></b></center>
+ <hr />
+
  <u><b>General</b></u><br />
  <b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=.">view</a>)<br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
@@ -25,15 +31,15 @@
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            if (uri.indexOf('?') > 0)
-                uri = uri + "&updateNonce=" + nonce;
-            else
-                uri = uri + "?updateNonce=" + nonce;
-            out.print("<br /><a href=\"" + uri + "\">Update available</a>");
+            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<input type=\"hidden\" name=\"updateNonce\" value=\"" + nonce + "\" >\n");
+            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" ></form></p>\n");
         }
     }
  %>
- <br /><%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
+ <p>
+ <%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
+ </p>
  <hr />
  
  <u><b><a href="peers.jsp">Peers</a></b></u><br />
@@ -57,11 +63,9 @@
             if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            if (uri.indexOf('?') > 0)
-                uri = uri + "&reseedNonce=" + nonce;
-            else
-                uri = uri + "?reseedNonce=" + nonce;
-            out.print(" <a href=\"" + uri + "\">reseed</a><br />");
+            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<input type=\"hidden\" name=\"reseedNonce\" value=\"" + nonce + "\" >\n");
+            out.print("<button type=\"submit\" >Reseed</button></form></p>\n");
         }
     }
     // If a new reseed ain't running, and the last reseed had errors, show error message
@@ -94,6 +98,5 @@
  <b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
  <b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
  <b><jsp:getProperty name="helper" property="tunnelStatus" /></b><br />
- <hr />
  
 </div>

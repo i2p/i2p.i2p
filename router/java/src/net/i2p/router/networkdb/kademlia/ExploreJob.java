@@ -28,15 +28,25 @@ class ExploreJob extends SearchJob {
     private Log _log;
     private PeerSelector _peerSelector;
     
-    /** how long each exploration should run for (currently a trivial 10 seconds) */
-    private static final long MAX_EXPLORE_TIME = 10*1000;
+    /** how long each exploration should run for
+     *  The exploration won't "succeed" so we make it long so we query several peers */
+    private static final long MAX_EXPLORE_TIME = 15*1000;
     
     /** how many of the peers closest to the key being explored do we want to explicitly say "dont send me this"? */
     private static final int NUM_CLOSEST_TO_IGNORE = 3;
     
     /** how many peers to explore through concurrently */
     private static final int EXPLORE_BREDTH = 1;
+
+    /** only send the closest "dont tell me about" refs...
+     *  Override to make this bigger because we want to include both the
+     *  floodfills and the previously-queried peers */
+    static final int MAX_CLOSEST = 20;
     
+    /** Override to make this shorter, since we don't sort out the
+     *  unresponsive ff peers like we do in FloodOnlySearchJob */
+    static final int PER_FLOODFILL_PEER_TIMEOUT = 5*1000;
+
     /**
      * Create a new search for the routingKey specified
      *
@@ -60,19 +70,31 @@ class ExploreJob extends SearchJob {
      * massive (aka sending the entire routing table as 'dont tell me about these
      * guys').  but maybe we do.  dunno.  lots of implications.
      *
+     * FloodfillPeerSelector would add only the floodfill peers,
+     * and PeerSelector doesn't include the floodfill peers,
+     * so we add the ff peers ourselves and then use the regular PeerSelector.
+     *
      * @param replyTunnelId tunnel to receive replies through
      * @param replyGateway gateway for the reply tunnel
      * @param expiration when the search should stop
      */
-    protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
+    protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
-        msg.setFrom(replyGateway.getIdentity().getHash());
+        msg.setFrom(replyGateway);
         msg.setDontIncludePeers(getState().getClosestAttempted(MAX_CLOSEST));
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         
         int available = MAX_CLOSEST - msg.getDontIncludePeers().size();
+        if (available > 0) {
+            List peers = ((FloodfillNetworkDatabaseFacade)_facade).getFloodfillPeers();
+            int len = peers.size();
+            if (len > 0)
+                msg.getDontIncludePeers().addAll(peers.subList(0, Math.min(available, len)));
+        }
+        
+        available = MAX_CLOSEST - msg.getDontIncludePeers().size();
         if (available > 0) {
             List peers = _peerSelector.selectNearestExplicit(getState().getTarget(), available, msg.getDontIncludePeers(), getFacade().getKBuckets());
             msg.getDontIncludePeers().addAll(peers);
@@ -91,7 +113,7 @@ class ExploreJob extends SearchJob {
      *
      */
     protected DatabaseLookupMessage buildMessage(long expiration) {
-        return buildMessage(null, getContext().router().getRouterInfo(), expiration);
+        return buildMessage(null, getContext().router().getRouterInfo().getIdentity().getHash(), expiration);
     }
     
     /** max # of concurrent searches */

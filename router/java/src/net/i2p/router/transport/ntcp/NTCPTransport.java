@@ -27,7 +27,6 @@ import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 
 /**
  *
@@ -36,6 +35,7 @@ public class NTCPTransport extends TransportImpl {
     private Log _log;
     private SharedBid _fastBid;
     private SharedBid _slowBid;
+    private SharedBid _transientFail;
     private Object _conLock;
     private Map _conByIdent;
     private NTCPAddress _myAddress;
@@ -49,7 +49,7 @@ public class NTCPTransport extends TransportImpl {
     private List _establishing;
 
     private List _sent;
-    private SendFinisher _finisher;
+    private NTCPSendFinisher _finisher;
     
     public NTCPTransport(RouterContext ctx) {
         super(ctx);
@@ -123,7 +123,7 @@ public class NTCPTransport extends TransportImpl {
         _conByIdent = new HashMap(64);
         
         _sent = new ArrayList(4);
-        _finisher = new SendFinisher();
+        _finisher = new NTCPSendFinisher(ctx, this);
         
         _pumper = new EventPumper(ctx, this);
         _reader = new Reader(ctx);
@@ -131,6 +131,7 @@ public class NTCPTransport extends TransportImpl {
         
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
+        _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
     }
     
     void inboundEstablished(NTCPConnection con) {
@@ -289,7 +290,7 @@ public class NTCPTransport extends TransportImpl {
         if (!allowConnection()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + ", max connection limit reached");
-            return null;
+            return _transientFail;
         }
 
         //if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
@@ -300,40 +301,16 @@ public class NTCPTransport extends TransportImpl {
         return _slowBid;
     }
     
-    private static final int DEFAULT_MAX_CONNECTIONS = 500;
     public boolean allowConnection() {
-        int max = DEFAULT_MAX_CONNECTIONS;
-        String mc = _context.getProperty("i2np.ntcp.maxConnections");
-        if (mc != null) {
-            try {
-                  max = Integer.parseInt(mc);
-            } catch (NumberFormatException nfe) {}
-        }
-        return countActivePeers() < max;
+        return countActivePeers() < getMaxConnections();
     }
 
+    public boolean haveCapacity() {
+        return countActivePeers() < getMaxConnections() * 4 / 5;
+    }
 
+    /** queue up afterSend call, which can take some time w/ jobs, etc */
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
-    /** async afterSend call, which can take some time w/ jobs, etc */
-    private class SendFinisher implements SimpleTimer.TimedEvent {
-        public void add(OutNetMessage msg) {
-            synchronized (_sent) { _sent.add(msg); }
-            SimpleTimer.getInstance().addEvent(SendFinisher.this, 0);
-        }
-        public void timeReached() {
-            int pending = 0;
-            OutNetMessage msg = null;
-            synchronized (_sent) {
-                pending = _sent.size()-1;
-                if (pending >= 0)
-                    msg = (OutNetMessage)_sent.remove(0);
-            }
-            if (msg != null)
-                afterSend(msg, true, false, msg.getSendTime());
-            if (pending > 0)
-                SimpleTimer.getInstance().addEvent(SendFinisher.this, 0);
-        }
-    }
 
     private boolean isEstablished(RouterIdentity peer) {
         return isEstablished(peer.calculateHash());
@@ -415,6 +392,7 @@ public class NTCPTransport extends TransportImpl {
     
     public RouterAddress startListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Starting ntcp transport listening");
+        _finisher.start();
         _pumper.startPumping();
         
         _reader.startReading(NUM_CONCURRENT_READERS);
@@ -426,6 +404,7 @@ public class NTCPTransport extends TransportImpl {
 
     public RouterAddress restartListening(RouterAddress addr) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Restarting ntcp transport listening");
+        _finisher.start();
         _pumper.startPumping();
         
         _reader.startReading(NUM_CONCURRENT_READERS);
@@ -433,6 +412,10 @@ public class NTCPTransport extends TransportImpl {
         
         _myAddress = new NTCPAddress(addr);
         return bindAddress();
+    }
+
+    public boolean isAlive() {
+        return _pumper.isAlive();
     }
 
     private RouterAddress bindAddress() {
@@ -541,11 +524,16 @@ public class NTCPTransport extends TransportImpl {
         }
     }
     
+    /**
+     *  This doesn't (completely) block, caller should check isAlive()
+     *  before calling startListening() or restartListening()
+     */
     public void stopListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Stopping ntcp transport");
         _pumper.stopPumping();
         _writer.stopWriting();
         _reader.stopReading();
+        _finisher.stop();
         Map cons = null;
         synchronized (_conLock) {
             cons = new HashMap(_conByIdent);
@@ -581,7 +569,10 @@ public class NTCPTransport extends TransportImpl {
         long totalRecv = 0;
         
         StringBuffer buf = new StringBuffer(512);
-        buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size()).append("</b><br />\n");
+        buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size());
+        buf.append(" limit: ").append(getMaxConnections());
+        buf.append(" timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
+        buf.append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
         buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td>");
         buf.append("     <td><b>dir</b></td>");

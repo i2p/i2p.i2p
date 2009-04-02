@@ -11,27 +11,12 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 
-public class GraphHelper {
-    private RouterContext _context;
-    private Writer _out;
+public class GraphHelper extends HelperBase {
     private int _periodCount;
     private boolean _showEvents;
     private int _width;
     private int _height;
     private int _refreshDelaySeconds;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
     
     public GraphHelper() {
         _periodCount = 60; // SummaryListener.PERIODS;
@@ -41,7 +26,6 @@ public class GraphHelper {
         _refreshDelaySeconds = 60;
     }
     
-    public void setOut(Writer out) { _out = out; }
     public void setPeriodCount(String str) { 
         try { _periodCount = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
     }

@@ -16,8 +16,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 /**
@@ -39,6 +41,7 @@ public class HostsTxtNamingService extends NamingService {
      * given file for hostname=destKey values when resolving names
      */
     public final static String PROP_HOSTS_FILE = "i2p.hostsfilelist";
+    public final static String PROP_B32 = "i2p.naming.hostsTxt.useB32";
 
     /** default hosts.txt filename */
     public final static String DEFAULT_HOSTS_FILE = 
@@ -55,6 +58,8 @@ public class HostsTxtNamingService extends NamingService {
         return rv;
     }
     
+    private static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
+
     @Override
     public Destination lookup(String hostname) {
         Destination d = getCache(hostname);
@@ -67,6 +72,16 @@ public class HostsTxtNamingService extends NamingService {
             // What the heck, cache these too
             putCache(hostname, d);
             return d;
+        }
+
+        // Try Base32 decoding
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p") &&
+            Boolean.valueOf(_context.getProperty(PROP_B32, "true")).booleanValue()) {
+            d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
+            if (d != null) {
+                putCache(hostname, d);
+                return d;
+            }
         }
 
         List filenames = getFilenames();
@@ -114,6 +129,36 @@ public class HostsTxtNamingService extends NamingService {
                         String key = hosts.getProperty(host);
                         if (destkey.equals(key))
                             return host;
+                    }
+                }
+            } catch (Exception ioe) {
+                _log.error("Error loading hosts file " + hostsfile, ioe);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String reverseLookup(Hash h) {
+        List filenames = getFilenames();
+        for (int i = 0; i < filenames.size(); i++) { 
+            String hostsfile = (String)filenames.get(i);
+            Properties hosts = new Properties();
+            try {
+                File f = new File(hostsfile);
+                if ( (f.exists()) && (f.canRead()) ) {
+                    DataHelper.loadProps(hosts, f, true);
+                    Set keyset = hosts.keySet();
+                    Iterator iter = keyset.iterator();
+                    while (iter.hasNext()) {
+                        String host = (String)iter.next();
+                        String key = hosts.getProperty(host);
+                        try {
+                            Destination destkey = new Destination();
+                            destkey.fromBase64(key);
+                            if (h.equals(destkey.calculateHash()))
+                                return host;
+                        } catch (DataFormatException dfe) {}
                     }
                 }
             } catch (Exception ioe) {

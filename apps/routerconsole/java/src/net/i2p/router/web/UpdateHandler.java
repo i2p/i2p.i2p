@@ -27,13 +27,13 @@ import net.i2p.util.Log;
  * </p>
  */
 public class UpdateHandler {
-    private static UpdateRunner _updateRunner;
-    private RouterContext _context;
-    private Log _log;
-    private DecimalFormat _pct = new DecimalFormat("00.0%");
+    protected static UpdateRunner _updateRunner;
+    protected RouterContext _context;
+    protected Log _log;
+    protected DecimalFormat _pct = new DecimalFormat("00.0%");
     
-    private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
-    private static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
+    protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
+    protected static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
 
     public UpdateHandler() {
         this(ContextHelper.getContext(null));
@@ -93,9 +93,8 @@ public class UpdateHandler {
     }
     
     public class UpdateRunner implements Runnable, EepGet.StatusListener {
-        private boolean _isRunning;
-        private String _status;
-        private long _startedOn;
+        protected boolean _isRunning;
+        protected String _status;
         public UpdateRunner() { 
             _isRunning = false; 
             _status = "<b>Updating</b>";
@@ -108,8 +107,7 @@ public class UpdateHandler {
             System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             _isRunning = false;
         }
-        private void update() {
-            _startedOn = -1;
+        protected void update() {
             _status = "<b>Updating</b>";
             String updateURL = selectUpdateURL();
             if (_log.shouldLog(Log.DEBUG))
@@ -130,7 +128,6 @@ public class UpdateHandler {
                 else
                     get = new EepGet(_context, 1, SIGNED_UPDATE_FILE, updateURL, false);
                 get.addStatusListener(UpdateRunner.this);
-                _startedOn = _context.clock().now();
                 get.fetch();
             } catch (Throwable t) {
                 _context.logManager().getLog(UpdateHandler.class).error("Error updating", t);
@@ -188,7 +185,7 @@ public class UpdateHandler {
     }
     
     private void restart() {
-        _context.router().addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+        _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
 

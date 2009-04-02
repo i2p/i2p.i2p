@@ -34,6 +34,7 @@ public abstract class CommSystemFacade implements Service {
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }
+    public boolean haveCapacity() { return true; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
     /**
@@ -91,9 +92,11 @@ public abstract class CommSystemFacade implements Service {
     
 }
 
+/** unused
 class DummyCommSystemFacade extends CommSystemFacade {
     public void shutdown() {}
     public void startup() {}
     public void restart() {}
     public void processMessage(OutNetMessage msg) { }    
 }
+**/

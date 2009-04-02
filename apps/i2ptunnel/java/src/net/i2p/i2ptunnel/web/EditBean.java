@@ -8,6 +8,7 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -28,9 +29,7 @@ public class EditBean extends IndexBean {
         if (controllers.size() > tunnel) {
             TunnelController cur = (TunnelController)controllers.get(tunnel);
             if (cur == null) return false;
-            return ( ("client".equals(cur.getType())) || 
-            		 ("httpclient".equals(cur.getType()))||
-            		 ("ircclient".equals(cur.getType())));
+            return isClient(cur.getType());
         } else {
             return false;
         }
@@ -38,7 +37,7 @@ public class EditBean extends IndexBean {
     
     public String getTargetHost(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getTargetHost() != null)
             return tun.getTargetHost();
         else
             return "127.0.0.1";
@@ -52,7 +51,7 @@ public class EditBean extends IndexBean {
     }
     public String getSpoofedHost(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
+        if (tun != null && tun.getSpoofedHost() != null)
             return tun.getSpoofedHost();
         else
             return "";
@@ -61,8 +60,9 @@ public class EditBean extends IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
-        else
-            return "";
+        if (tunnel < 0)
+            tunnel = _group.getControllers().size();
+        return "i2ptunnel" + tunnel + "-privKeys.dat";
     }
     
     public boolean startAutomatically(int tunnel) {
@@ -82,119 +82,123 @@ public class EditBean extends IndexBean {
     }
     
     public boolean shouldDelay(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null) {
-                String delay = opts.getProperty("i2p.streaming.connectDelay");
-                if ( (delay == null) || ("0".equals(delay)) )
-                    return false;
-                else
-                    return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+        return getProperty(tunnel, "i2p.streaming.connectDelay", 0) > 0;
     }
     
     public boolean isInteractive(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null) {
-                String wsiz = opts.getProperty("i2p.streaming.maxWindowSize");
-                if ( (wsiz == null) || (!"1".equals(wsiz)) )
-                    return false;
-                else
-                    return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+        return getProperty(tunnel, "i2p.streaming.maxWindowSize", 128) == 12;
     }
     
     public int getTunnelDepth(int tunnel, int defaultLength) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null) {
-                String len = opts.getProperty("inbound.length");
-                if (len == null) return defaultLength;
-                try {
-                    return Integer.parseInt(len);
-                } catch (NumberFormatException nfe) {
-                    return defaultLength;
-                }
-            } else {
-                return defaultLength;
-            }
-        } else {
-            return defaultLength;
-        }
+        return getProperty(tunnel, "inbound.length", defaultLength);
     }
     
     public int getTunnelQuantity(int tunnel, int defaultQuantity) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null) {
-                String len = opts.getProperty("inbound.quantity");
-                if (len == null) return defaultQuantity;
-                try {
-                    return Integer.parseInt(len);
-                } catch (NumberFormatException nfe) {
-                    return defaultQuantity;
-                }
-            } else {
-                return defaultQuantity;
-            }
-        } else {
-            return defaultQuantity;
-        }
+        return getProperty(tunnel, "inbound.quantity", defaultQuantity);
     }
    
     public int getTunnelBackupQuantity(int tunnel, int defaultBackupQuantity) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null) {
-                String len = opts.getProperty("inbound.backupQuantity");
-                if (len == null) return defaultBackupQuantity;
-                try {
-                    return Integer.parseInt(len);
-                } catch (NumberFormatException nfe) {
-                    return defaultBackupQuantity;
-                }
-            } else {
-                return defaultBackupQuantity;
-            }
-        } else {
-            return defaultBackupQuantity;
-        }
+        return getProperty(tunnel, "inbound.backupQuantity", defaultBackupQuantity);
     }
   
     public int getTunnelVariance(int tunnel, int defaultVariance) {
+        return getProperty(tunnel, "inbound.lengthVariance", defaultVariance);
+    }
+    
+    public boolean getReduce(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.reduceOnIdle");
+    }
+    
+    public int getReduceCount(int tunnel) {
+        return getProperty(tunnel, "i2cp.reduceQuantity", 1);
+    }
+    
+    public int getReduceTime(int tunnel) {
+        return getProperty(tunnel, "i2cp.reduceIdleTime", 20*60*1000) / (60*1000);
+    }
+    
+    public int getCert(int tunnel) {
+        return 0;
+    }
+    
+    public int getEffort(int tunnel) {
+        return 23;
+    }
+    
+    public String getSigner(int tunnel) {
+        return "";
+    }
+    
+    public boolean getEncrypt(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
+    }
+    
+    public String getEncryptKey(int tunnel) {
+        return getProperty(tunnel, "i2cp.leaseSetKey", "");
+    }
+    
+    public boolean getAccess(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.enableAccessList");
+    }
+    
+    public String getAccessList(int tunnel) {
+        return getProperty(tunnel, "i2cp.accessList", "").replaceAll(",", "\n");
+    }
+    
+    public boolean getClose(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.closeOnIdle");
+    }
+    
+    public int getCloseTime(int tunnel) {
+        return getProperty(tunnel, "i2cp.closeIdleTime", 30*60*1000) / (60*1000);
+    }
+    
+    public boolean getNewDest(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.newDestOnResume");
+    }
+    
+    public boolean getPersistentClientKey(int tunnel) {
+        return getBooleanProperty(tunnel, "persistentClientKey");
+    }
+    
+    public boolean getDelayOpen(int tunnel) {
+        return getBooleanProperty(tunnel, "i2cp.delayOpen");
+    }
+    
+    private int getProperty(int tunnel, String prop, int def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts != null) {
-                String len = opts.getProperty("inbound.lengthVariance");
-                if (len == null) return defaultVariance;
+                String s = opts.getProperty(prop);
+                if (s == null) return def;
                 try {
-                    return Integer.parseInt(len);
-                } catch (NumberFormatException nfe) {
-                    return defaultVariance;
-                }
-            } else {
-                return defaultVariance;
+                    return Integer.parseInt(s);
+                } catch (NumberFormatException nfe) {}
             }
-        } else {
-            return defaultVariance;
         }
+        return def;
+    }
+    
+    private String getProperty(int tunnel, String prop, String def) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = getOptions(tun);
+            if (opts != null)
+                return opts.getProperty(prop, def);
+        }
+        return def;
+    }
+    
+    /** default is false */
+    private boolean getBooleanProperty(int tunnel, String prop) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = getOptions(tun);
+            if (opts != null)
+                return Boolean.valueOf(opts.getProperty(prop)).booleanValue();
+        }
+        return false;
     }
     
     public String getI2CPHost(int tunnel) {
@@ -222,19 +226,9 @@ public class EditBean extends IndexBean {
             int i = 0;
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
+                if (_noShowSet.contains(key))
+                    continue;
                 String val = opts.getProperty(key);
-                if ("inbound.length".equals(key)) continue;
-                if ("outbound.length".equals(key)) continue;
-                if ("inbound.lengthVariance".equals(key)) continue;
-                if ("outbound.lengthVariance".equals(key)) continue;
-                if ("inbound.backupQuantity".equals(key)) continue;
-                if ("outbound.backupQuantity".equals(key)) continue;
-                if ("inbound.quantity".equals(key)) continue;
-                if ("outbound.quantity".equals(key)) continue;
-                if ("inbound.nickname".equals(key)) continue;
-                if ("outbound.nickname".equals(key)) continue;
-                if ("i2p.streaming.connectDelay".equals(key)) continue;
-                if ("i2p.streaming.maxWindowSize".equals(key)) continue;
                 if (i != 0) buf.append(' ');
                 buf.append(key).append('=').append(val);
                 i++;

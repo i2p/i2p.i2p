@@ -187,7 +187,6 @@ class ProfileOrganizerRenderer {
         buf.append("<td><b>Failed Lookups</b></td>");
         buf.append("<td><b>New Stores</b></td>");
         buf.append("<td><b>Old Stores</b></td>");
-        buf.append("<td><b>1m Fail Rate</b></td>");
         buf.append("<td><b>1h Fail Rate</b></td>");
         buf.append("<td><b>1d Fail Rate</b></td>");
         buf.append("</tr>");
@@ -231,7 +230,6 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\">").append(dbh.getFailedLookups()).append("</td>");
                 buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreNew()).append("</td>");
                 buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreOld()).append("</td>");
-                buf.append("<td align=\"right\">").append(davg(dbh, 60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
             }

@@ -41,6 +41,8 @@ import net.i2p.util.Log;
  * <li>{@link #FLAG_DELAY_REQUESTED}: 2 byte integer</li>
  * <li>{@link #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
  * <li>{@link #FLAG_PROFILE_INTERACTIVE}: no option data</li>
+ * <li>{@link #FLAG_ECHO}: no option data</li>
+ * <li>{@link #FLAG_NO_ACK}: no option data</li>
  * </ol>
  *
  * <p>If the signature is included, it uses the Destination's DSA key 
@@ -144,7 +146,7 @@ public class Packet {
     public static final int FLAG_NO_ACK = (1 << 10);
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
-    private static final int MAX_DELAY_REQUEST = 65535;
+    protected static final int MAX_DELAY_REQUEST = 65535;
 
     public Packet() { }
     
@@ -530,6 +532,8 @@ public class Packet {
     public boolean verifySignature(I2PAppContext ctx, Destination from, byte buffer[]) {
         if (!isFlagSet(FLAG_SIGNATURE_INCLUDED)) return false;
         if (_optionSignature == null) return false;
+        // prevent receiveNewSyn() ... !active ... sendReset() ... verifySignature ... NPE
+        if (from == null) return false;
         
         int size = writtenSize();
         

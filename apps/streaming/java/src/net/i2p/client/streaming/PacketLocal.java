@@ -6,7 +6,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * coordinate local attributes about a packet - send time, ack time, number of
@@ -27,7 +27,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private long _cancelledOn;
     private volatile int _nackCount;
     private volatile boolean _retransmitted;
-    private SimpleTimer.TimedEvent _resendEvent;
+    private SimpleTimer2.TimedEvent _resendEvent;
     
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
@@ -93,7 +93,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
             releasePayload();
             notifyAll();
         }
-        SimpleTimer.getInstance().removeEvent(_resendEvent);
+        _resendEvent.cancel();
     }
     public void cancelled() { 
         synchronized (this) {
@@ -101,11 +101,11 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
             releasePayload();
             notifyAll();
         }
-        SimpleTimer.getInstance().removeEvent(_resendEvent);
+        _resendEvent.cancel();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }
-    public SimpleTimer.TimedEvent getResendEvent() { return _resendEvent; }
+    public SimpleTimer2.TimedEvent getResendEvent() { return _resendEvent; }
     
     /** how long after packet creation was it acked?
      * @return how long after packet creation the packet was ACKed in ms
@@ -122,15 +122,15 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
 
     public void incrementNACKs() { 
         int cnt = ++_nackCount;
-        SimpleTimer.TimedEvent evt = _resendEvent;
+        SimpleTimer2.TimedEvent evt = _resendEvent;
         if ( (cnt >= Connection.FAST_RETRANSMIT_THRESHOLD) && (evt != null) && (!_retransmitted)) {
             _retransmitted = true;
-            RetransmissionTimer.getInstance().addEvent(evt, 0);
+            evt.reschedule(0);
         }
     }
     public int getNACKs() { return _nackCount; }
     
-    public void setResendPacketEvent(SimpleTimer.TimedEvent evt) { _resendEvent = evt; }
+    public void setResendPacketEvent(SimpleTimer2.TimedEvent evt) { _resendEvent = evt; }
     
 	@Override
     public StringBuffer formatAsString() {

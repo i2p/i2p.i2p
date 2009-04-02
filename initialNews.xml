@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2008-12-01 00:00:00 $">
- <i2p.release version="0.6.5" date="2008/12/01" minVersion="0.6"
+<i2p.news date="$Date: 2009-03-29 00:00:00 $">
+ <i2p.release version="0.7.1" date="2009/03/29" minVersion="0.6"
             />
 <center><h2>Congratulations on getting I2P installed!</h2></center>
 <ul>
@@ -18,10 +18,33 @@ If you can, open up <b>port 8887</b> on your firewall, then <b>enable inbound TC
 <li>
 Once you have a "shared clients" destination listed on the left,
 please <b>check out</b> our
-<a href="http://www.i2p2.i2p/faq.html">FAQ<a>.
+<a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
 </li>
 <li>
 Point your IRC client to <b>localhost:6668</b> and say hi to us on #i2p.
+</li>
+</ul>
+
+
+
+<center><h2>Gratulation zur erfolgreichen Installation von I2P!</h2></center>
+<ul>
+<li>
+<b>Willkommen bei I2P!</b>
+Bitte noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router  findet.
+</li>
+<li>
+Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
+<a href="config.jsp">Einstellungsseite</a> an.
+</li>
+<li>
+Bitte &ouml;ffne sobald m&ouml;glich  den <b>Port 8887</b> in deiner Firewall, aktiviere danach den <b>eingehenden TCP Verkehr</b> auf der <a href="config.jsp">Einstellungsseite</a>.
+</li>
+<li>
+Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
+</li>
+<li>
+Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal #i2p.
 </li>
 </ul>
 

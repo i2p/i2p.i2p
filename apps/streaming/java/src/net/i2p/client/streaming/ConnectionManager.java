@@ -30,6 +30,7 @@ public class ConnectionManager {
     private PacketQueue _outboundQueue;
     private SchedulerChooser _schedulerChooser;
     private ConnectionPacketHandler _conPacketHandler;
+    private TCBShare _tcbShare;
     /** Inbound stream ID (Long) to Connection map */
     private Map _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
@@ -52,6 +53,7 @@ public class ConnectionManager {
         _connectionHandler = new ConnectionHandler(context, this);
         _schedulerChooser = new SchedulerChooser(context);
         _conPacketHandler = new ConnectionPacketHandler(context);
+        _tcbShare = new TCBShare(context);
         _session = session;
         session.setSessionListener(_messageHandler);
         _outboundQueue = new PacketQueue(context, session, this);
@@ -127,6 +129,7 @@ public class ConnectionManager {
      */
     public Connection receiveConnection(Packet synPacket) {
         Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, new ConnectionOptions(_defaultOptions));
+        _tcbShare.updateOptsFromShare(con);
         con.setInbound();
         long receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
         boolean reject = false;
@@ -277,6 +280,8 @@ public class ConnectionManager {
     public ConnectionHandler getConnectionHandler() { return _connectionHandler; }
     public I2PSession getSession() { return _session; }
     public PacketQueue getPacketQueue() { return _outboundQueue; }
+    public void updateOptsFromShare(Connection con) { _tcbShare.updateOptsFromShare(con); }
+    public void updateShareOpts(Connection con) { _tcbShare.updateShareOpts(con); }
     
     /**
      * Something b0rked hard, so kill all of our connections without mercy.
@@ -292,6 +297,7 @@ public class ConnectionManager {
             _connectionByInboundId.clear();
             _connectionLock.notifyAll();
         }
+        _tcbShare.stop();
     }
     
     /**

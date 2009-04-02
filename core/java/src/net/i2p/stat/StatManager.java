@@ -1,5 +1,6 @@
 package net.i2p.stat;
 
+import java.text.Collator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,12 +46,12 @@ public class StatManager {
     public static final String DEFAULT_STAT_REQUIRED =
         "bw.recvRate,bw.sendBps,bw.sendRate,client.sendAckTime,clock.skew,crypto.elGamal.encrypt," +
         "jobQueue.jobLag,netDb.successTime,router.fastPeers," +
-        "prng.bufferFillTime,prng.bufferWaitTime," +
+        "prng.bufferFillTime,prng.bufferWaitTime,router.memoryUsed," +
         "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
         "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout" +
         "tunnel.buildClientExpire,tunnel.buildClientReject,tunnel.buildClientSuccess," +
         "tunnel.buildExploratoryExpire,tunnel.buildExploratoryReject,tunnel.buildExploratorySuccess," +
-        "tunnel.buildRatio.*,tunnel.corruptMessage," +
+        "tunnel.buildRatio.*,tunnel.corruptMessage,tunnel.dropLoad*," +
         "tunnel.decryptRequestTime,tunnel.fragmentedDropped,tunnel.participatingMessageCount,"+
         "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime," +
         "tunnel.participatingBandwidth,udp.sendPacketSize,udp.packetsRetransmitted" ;
@@ -178,7 +179,7 @@ public class StatManager {
 
     /** Group name (String) to a Set of stat names, ordered alphabetically */
     public Map getStatsByGroup() {
-        Map groups = new TreeMap();
+        Map groups = new TreeMap(Collator.getInstance());
         for (Iterator iter = _frequencyStats.values().iterator(); iter.hasNext();) {
             FrequencyStat stat = (FrequencyStat) iter.next();
             if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());

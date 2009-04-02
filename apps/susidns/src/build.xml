@@ -63,12 +63,10 @@
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
         		<include name="WEB-INF/lib/*.jar"/>
-        		<include name="${src}/**/*.java"/>
         		<include name="jsp/*.jsp"/>
         		<include name="images/*.png"/>
         		<include name="css.css"/>
         		<include name="index.html"/>
-        		<include name="build.xml"/>
         		<include name="WEB-INF/web-template.xml"/>
         		<include name="WEB-INF/web-out.xml"/>
         		<include name="WEB-INF/classes/${project}.properties"/>

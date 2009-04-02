@@ -8,22 +8,7 @@ import net.i2p.data.Destination;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 
-public class ConfigTunnelsHelper {
-    private RouterContext _context;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
+public class ConfigTunnelsHelper extends HelperBase {
     public ConfigTunnelsHelper() {}
     
     
@@ -64,7 +49,9 @@ public class ConfigTunnelsHelper {
 
     private static final int WARN_LENGTH = 4;
     private static final int MAX_LENGTH = 4;
-    private static final int MAX_QUANTITY = 3;
+    private static final int WARN_QUANTITY = 5;
+    private static final int MAX_QUANTITY = 6;
+    private static final int MAX_BACKUP_QUANTITY = 3;
     private static final int MAX_VARIANCE = 2;
     private static final int MIN_NEG_VARIANCE = -1;
     private void renderForm(StringBuffer buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
@@ -79,6 +66,9 @@ public class ConfigTunnelsHelper {
         if (in.getLength() + Math.abs(in.getLengthVariance()) >= WARN_LENGTH ||
             out.getLength() + Math.abs(out.getLengthVariance()) >= WARN_LENGTH)
             buf.append("<tr><td colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include very long tunnels</font></td></tr>");
+        if (in.getQuantity() + in.getBackupQuantity() >= WARN_QUANTITY ||
+            out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
+            buf.append("<tr><td colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include high tunnel quantities</font></td></tr>");
 
 
         buf.append("<tr><td></td><td><b>Inbound</b></td><td><b>Outbound</b></td></tr>\n");
@@ -145,15 +135,15 @@ public class ConfigTunnelsHelper {
         buf.append("<tr><td>Backup quantity</td>\n");
         buf.append("<td><select name=\"").append(index).append(".backupInbound\">\n");
         now = in.getBackupQuantity();
-        renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
-        if (now > MAX_QUANTITY)
+        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", "tunnel");
+        if (now > MAX_BACKUP_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</select></td>\n");
 
         buf.append("<td><select name=\"").append(index).append(".backupOutbound\">\n");
-        now = in.getBackupQuantity();
-        renderOptions(buf, 0, MAX_QUANTITY, now, "", "tunnel");
-        if (now > MAX_QUANTITY)
+        now = out.getBackupQuantity();
+        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", "tunnel");
+        if (now > MAX_BACKUP_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</select></td>\n");
         buf.append("</tr>\n");

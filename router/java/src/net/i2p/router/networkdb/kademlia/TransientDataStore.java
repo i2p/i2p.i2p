@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,49 +26,38 @@ import net.i2p.util.Log;
 
 class TransientDataStore implements DataStore {
     private Log _log;
-    private Map _data; // hash --> DataStructure
+    private Map<Hash, DataStructure> _data;
     protected RouterContext _context;
     
     public TransientDataStore(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(TransientDataStore.class);
-        _data = new HashMap(1024);
+        _data = new ConcurrentHashMap(1024);
         if (_log.shouldLog(Log.INFO))
             _log.info("Data Store initialized");
     }
     
     public void restart() {
-        synchronized (_data) {
-            _data.clear();
-        }
+        _data.clear();
     }
     
     public Set getKeys() {
-        synchronized (_data) {
-            return new HashSet(_data.keySet());
-        }
+        return new HashSet(_data.keySet());
     }
     
     public DataStructure get(Hash key) {
-        synchronized (_data) {
-            return (DataStructure)_data.get(key);
-        }
+        return _data.get(key);
     }
     
     public boolean isKnown(Hash key) {
-        synchronized (_data) {
-            return _data.containsKey(key);
-        }
+        return _data.containsKey(key);
     }
 
     public int countLeaseSets() {
         int count = 0;
-        synchronized (_data) {
-            for (Iterator iter = _data.values().iterator(); iter.hasNext();) {
-                DataStructure data = (DataStructure)iter.next();
-                if (data instanceof LeaseSet)
-                    count++;
-            }
+        for (DataStructure d : _data.values()) {
+            if (d instanceof LeaseSet)
+                count++;
         }
         return count;
     }
@@ -81,10 +71,8 @@ class TransientDataStore implements DataStore {
         if (data == null) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Storing key " + key);
-        Object old = null;
-        synchronized (_data) {
-            old = _data.put(key, data);
-        }
+        DataStructure old = null;
+        old = _data.put(key, data);
         if (data instanceof RouterInfo) {
             _context.profileManager().heardAbout(key);
             RouterInfo ri = (RouterInfo)data;
@@ -95,17 +83,13 @@ class TransientDataStore implements DataStore {
                         _log.info("Almost clobbered an old router! " + key + ": [old published on " + new Date(ori.getPublished()) + " new on " + new Date(ri.getPublished()) + "]");
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Number of router options for " + key + ": " + ri.getOptions().size() + " (old one had: " + ori.getOptions().size() + ")", new Exception("Updated routerInfo"));
-                    synchronized (_data) {
-                        _data.put(key, old);
-                    }
+                    _data.put(key, old);
                 } else if (ri.getPublished() > _context.clock().now() + MAX_FUTURE_PUBLISH_DATE) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Hmm, someone tried to give us something with the publication date really far in the future (" + new Date(ri.getPublished()) + "), dropping it");
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Number of router options for " + key + ": " + ri.getOptions().size() + " (old one had: " + ori.getOptions().size() + ")", new Exception("Updated routerInfo"));
-                    synchronized (_data) {
-                        _data.put(key, old);
-                    }
+                    _data.put(key, old);
                 } else {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Updated the old router for " + key + ": [old published on " + new Date(ori.getPublished()) + " new on " + new Date(ri.getPublished()) + "]");
@@ -125,15 +109,11 @@ class TransientDataStore implements DataStore {
                 if (ls.getEarliestLeaseDate() < ols.getEarliestLeaseDate()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Almost clobbered an old leaseSet! " + key + ": [old published on " + new Date(ols.getEarliestLeaseDate()) + " new on " + new Date(ls.getEarliestLeaseDate()) + "]");
-                    synchronized (_data) {
-                        _data.put(key, old);
-                    }
+                    _data.put(key, old);
                 } else if (ls.getEarliestLeaseDate() > _context.clock().now() + MAX_FUTURE_EXPIRATION_DATE) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Hmm, someone tried to give us something with the expiration date really far in the future (" + new Date(ls.getEarliestLeaseDate()) + "), dropping it");
-                    synchronized (_data) {
-                        _data.put(key, old);
-                    }
+                    _data.put(key, old);
                 }
             }
         }
@@ -150,13 +130,9 @@ class TransientDataStore implements DataStore {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("Transient DataStore: ").append(_data.size()).append("\nKeys: ");
-        Map data = new HashMap();
-        synchronized (_data) {
-            data.putAll(_data);
-        }
-        for (Iterator iter = data.keySet().iterator(); iter.hasNext();) {
-            Hash key = (Hash)iter.next();
-            DataStructure dp = (DataStructure)data.get(key);
+        for (Map.Entry<Hash, DataStructure> e : _data.entrySet()) {
+            Hash key = e.getKey();
+            DataStructure dp = e.getValue();
             buf.append("\n\t*Key:   ").append(key.toString()).append("\n\tContent: ").append(dp.toString());
         }
         buf.append("\n");
@@ -168,10 +144,8 @@ class TransientDataStore implements DataStore {
     }
 
     public DataStructure remove(Hash key) {
-        synchronized (_data) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Removing key " + key.toBase64());
-            return (DataStructure)_data.remove(key);
-        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Removing key " + key.toBase64());
+        return _data.remove(key);
     }
 }

@@ -56,9 +56,28 @@ public class TCPio implements Runnable {
 	 * Copy from source to destination...
 	 * and yes, we are totally OK to block here on writes,
 	 * The OS has buffers, and I intend to use them.
+	 * We send an interrupt signal to the threadgroup to
+	 * unwedge any pending writes.
 	 *
 	 */
 	public void run() {
+		/*
+		 * NOTE:
+		 * The write method of OutputStream calls the write method of
+		 * one argument on each of the bytes to be written out.
+		 * Subclasses are encouraged to override this method and provide
+		 * a more efficient implementation.
+		 *
+		 * So, is this really a performance problem?
+		 * Should we expand to several bytes?
+		 * I don't believe there would be any gain, since read method
+		 * has the same reccomendations. If anyone has a better way to
+		 * do this, I'm interested in performance improvements.
+		 *
+		 * --Sponge
+		 *
+		 */
+
 		int b;
 		byte a[] = new byte[1];
 		boolean spin = true;

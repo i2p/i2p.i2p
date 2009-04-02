@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -52,10 +53,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private Set _explicitSendKeys; // set of Hash objects that should be published ASAP
-    private Set _passiveSendKeys; // set of Hash objects that should be published when there's time
     private Set _exploreKeys; // set of Hash objects that we should search on (to fill up a bucket, not to get data)
-    private Map _lastSent; // Hash to Long (date last sent, or <= 0 for never)
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -121,8 +119,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * know anyone or just started up) 
      */
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
+    private final static long PUBLISH_JOB_DELAY = 5*60*1000l;
 
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -148,53 +148,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _lastExploreNew = when; 
         if (_exploreJob != null)
             _exploreJob.updateExploreSchedule();
-    }
-    
-    public Set getExplicitSendKeys() {
-        if (!_initialized) return null;
-        synchronized (_explicitSendKeys) {
-            return new HashSet(_explicitSendKeys);
-        }
-    }
-    public Set getPassivelySendKeys() {
-        if (!_initialized) return null;
-        synchronized (_passiveSendKeys) {
-            return new HashSet(_passiveSendKeys);
-        }
-    }
-    public void removeFromExplicitSend(Set toRemove) {
-        if (!_initialized) return;
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.removeAll(toRemove);
-        }
-    }
-    public void removeFromPassiveSend(Set toRemove) {
-        if (!_initialized) return;
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.removeAll(toRemove);
-        }
-    }
-    public void queueForPublishing(Set toSend) {
-        if (!_initialized) return;
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.addAll(toSend);
-        }
-    }
-    
-    public Long getLastSent(Hash key) {
-        if (!_initialized) return null;
-        synchronized (_lastSent) {
-            if (!_lastSent.containsKey(key))
-                _lastSent.put(key, new Long(0));
-            return (Long)_lastSent.get(key);
-        }
-    }
-    
-    public void noteKeySent(Hash key) {
-        if (!_initialized) return;
-        synchronized (_lastSent) {
-            _lastSent.put(key, new Long(_context.clock().now()));
-        }
     }
     
     public Set getExploreKeys() {
@@ -223,10 +176,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _initialized = false;
         _kb = null;
         _ds = null;
-        _explicitSendKeys = null;
-        _passiveSendKeys = null;
         _exploreKeys = null;
-        _lastSent = null;
     }
     
     public void restart() {
@@ -241,9 +191,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
-        synchronized (_explicitSendKeys) { _explicitSendKeys.clear(); }
         synchronized (_exploreKeys) { _exploreKeys.clear(); }
-        synchronized (_passiveSendKeys) { _passiveSendKeys.clear(); }
 
         _initialized = true;
         
@@ -270,10 +218,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
         _ds = new PersistentDataStore(_context, dbDir, this);
         //_ds = new TransientDataStore();
-        _explicitSendKeys = new HashSet(64);
-        _passiveSendKeys = new HashSet(64);
         _exploreKeys = new HashSet(64);
-        _lastSent = new HashMap(1024);
         _dbDir = dbDir;
         
         createHandlers();
@@ -281,9 +226,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _initialized = true;
         _started = System.currentTimeMillis();
         
-        // read the queues and publish appropriately
-        if (false)
-            _context.jobQueue().addJob(new DataPublisherJob(_context, this));
         // expire old leases
         _context.jobQueue().addJob(new ExpireLeasesJob(_context, this));
         
@@ -295,10 +237,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         ////_context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
         
         if (!_quiet) {
-            // fill the passive queue periodically
-            _context.jobQueue().addJob(new DataRepublishingSelectorJob(_context, this));
             // fill the search queue with random keys in buckets that are too small
-            _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
+            // Disabled since KBucketImpl.generateRandomKey() is b0rked,
+            // and anyway, we want to search for a completely random key,
+            // not a random key for a particular kbucket.
+            // _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
             if (_exploreJob == null)
                 _exploreJob = new StartExplorersJob(_context, this);
             // fire off a group of searches from the explore pool
@@ -320,7 +263,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         // periodically update and resign the router's 'published date', which basically
         // serves as a version
-        _context.jobQueue().addJob(new PublishLocalRouterInfoJob(_context));
+        Job plrij = new PublishLocalRouterInfoJob(_context);
+        plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
+        _context.jobQueue().addJob(plrij);
         try {
             publish(ri);
         } catch (IllegalArgumentException iae) {
@@ -511,6 +456,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    private static final long PUBLISH_DELAY = 3*1000;
     public void publish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
@@ -523,9 +469,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
         
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.add(h);
-        }
         RepublishLeaseSetJob j = null;
         synchronized (_publishingLeaseSets) {
             j = (RepublishLeaseSetJob)_publishingLeaseSets.get(h);
@@ -534,7 +477,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _publishingLeaseSets.put(h, j);
             }
         }
-        j.getTiming().setStartAfter(_context.clock().now());
+        // Don't spam the floodfills. In addition, always delay a few seconds since there may
+        // be another leaseset change coming along momentarily.
+        long nextTime = Math.max(j.lastPublished() + j.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
+        j.getTiming().setStartAfter(nextTime);
         _context.jobQueue().addJob(j);
     }
     
@@ -554,9 +500,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (_context.router().isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.add(h);
-        }
     }
 
     /**
@@ -649,10 +592,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             throw new IllegalArgumentException("Invalid store attempt - " + err);
         
         _ds.put(key, leaseSet);
-        synchronized (_lastSent) {
-            if (!_lastSent.containsKey(key))
-                _lastSent.put(key, new Long(0));
-        }
         
         // Iterate through the old failure / success count, copying over the old
         // values (if any tunnels overlap between leaseSets).  no need to be
@@ -721,6 +660,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else if ( (_context.router().getUptime() > 60*60*1000) && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
             long age = _context.clock().now() - routerInfo.getPublished();
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
+        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT) && (_context.router().getUptime() > 60*60*1000) ) {
+            if (routerInfo.getAddresses().size() <= 0)
+                return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
+            RouterAddress ra = routerInfo.getTargetAddress("SSU");
+            if (ra != null) {
+                // Introducers change often, introducee will ping introducer for 2 hours
+                Properties props = ra.getOptions();
+                if (props != null && props.getProperty("ihost0") != null)
+                    return "Peer " + key.toBase64() + " published > 90m ago with SSU Introducers";
+            }
         }
         return null;
     }
@@ -751,10 +700,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
         _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
         _ds.put(key, routerInfo);
-        synchronized (_lastSent) {
-            if (!_lastSent.containsKey(key))
-                _lastSent.put(key, new Long(0));
-        }
         if (rv == null)
             _kb.add(key);
         return rv;
@@ -789,15 +734,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _ds.remove(dbEntry);
         else
             _ds.removeLease(dbEntry);
-        synchronized (_lastSent) {
-            _lastSent.remove(dbEntry);
-        }
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.remove(dbEntry);
-        }
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.remove(dbEntry);
-        }
     }
     
     /** don't use directly - see F.N.D.F. override */
@@ -814,30 +750,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         _ds.remove(peer);
-        synchronized (_lastSent) {
-            _lastSent.remove(peer);
-        }
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.remove(peer);
-        }
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.remove(peer);
-        }
     }
     
     public void unpublish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
         DataStructure data = _ds.remove(h);
-        synchronized (_lastSent) {
-            _lastSent.remove(h);
-        }
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.remove(h);
-        }
-        synchronized (_passiveSendKeys) {
-            _passiveSendKeys.remove(h);
-        }
         
         if (data == null) {
             if (_log.shouldLog(Log.WARN))
@@ -954,7 +872,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         StringBuffer buf = new StringBuffer(4*1024);
         buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
         if (".".equals(routerPrefix)) {
-            renderRouterInfo(buf, _context.router().getRouterInfo(), true);
+            renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
             boolean notFound = true;
             Set routers = getRouters();
@@ -962,7 +880,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 RouterInfo ri = (RouterInfo)iter.next();
                 Hash key = ri.getIdentity().getHash();
                 if (key.toBase64().startsWith(routerPrefix)) {
-                    renderRouterInfo(buf, ri, false);
+                    renderRouterInfo(buf, ri, false, true);
                     notFound = false;
                 }
             }
@@ -974,7 +892,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(getKnownRouters() * 2048);
+        renderStatusHTML(out, true);
+    }
+
+    public void renderStatusHTML(Writer out, boolean full) throws IOException {
+        int size = getKnownRouters() * 512;
+        if (full)
+            size *= 4;
+        StringBuffer buf = new StringBuffer(size);
         buf.append("<h2>Network Database Contents</h2>\n");
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
@@ -1028,10 +953,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         Hash us = _context.routerHash();
-        out.write("<h3>Routers</h3>\n");
+        out.write("<a name=\"routers\" /><h3>Routers (<a href=\"netdb.jsp");
+        if (full)
+            out.write("#routers\" >view without");
+        else
+            out.write("?f=1#routers\" >view with");
+        out.write(" stats</a>)</h3>\n");
         
         RouterInfo ourInfo = _context.router().getRouterInfo();
-        renderRouterInfo(buf, ourInfo, true);
+        renderRouterInfo(buf, ourInfo, true, true);
         out.write(buf.toString());
         buf.setLength(0);
         
@@ -1045,7 +975,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             Hash key = ri.getIdentity().getHash();
             boolean isUs = key.equals(us);
             if (!isUs) {
-                renderRouterInfo(buf, ri, false);
+                renderRouterInfo(buf, ri, false, full);
                 out.write(buf.toString());
                 buf.setLength(0);
                 String coreVersion = ri.getOption("coreVersion");
@@ -1086,7 +1016,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         out.flush();
     }
     
-    private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {
+    private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
         if (isUs) {
@@ -1113,13 +1043,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
         }
         buf.append("</i><br />\n");
-        buf.append("Stats: <br /><i><code>\n");
-        for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = info.getOption(key);
-            buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br />\n");
+        if (full) {
+            buf.append("Stats: <br /><i><code>\n");
+            for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
+                String key = (String)iter.next();
+                String val = info.getOption(key);
+                buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br />\n");
+            }
+            buf.append("</code></i>\n");
+        } else {
+            buf.append("<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>\n");
         }
-        buf.append("</code></i><hr />\n");
+        buf.append("<hr />\n");
     }
     
 }

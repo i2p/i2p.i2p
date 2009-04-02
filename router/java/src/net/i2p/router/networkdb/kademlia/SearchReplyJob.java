@@ -57,6 +57,8 @@ class SearchReplyJob extends JobImpl {
     public String getName() { return "Process Reply for Kademlia Search"; }
     public void runJob() {
         if (_curIndex >= _msg.getNumReplies()) {
+            if (_log.shouldLog(Log.DEBUG) && _msg.getNumReplies() == 0)
+                _log.debug(getJobId() + ": dbSearchReply received with no routers referenced");
             if (_repliesPendingVerification > 0) {
                 // we received new references from the peer, but still 
                 // haven't verified all of them, so lets give it more time
@@ -106,7 +108,8 @@ class SearchReplyJob extends JobImpl {
                 _duplicatePeers++;
             } 
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": dbSearchReply received on search referencing router " + peer);
+                _log.debug(getJobId() + ": dbSearchReply received on search referencing router " + peer +
+                           " already known? " + (info != null));
             if (shouldAdd) {
                 if (_searchJob.add(peer))
                     _newPeers++;

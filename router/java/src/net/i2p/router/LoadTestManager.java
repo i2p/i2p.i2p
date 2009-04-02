@@ -117,12 +117,7 @@ public class LoadTestManager {
     private int getConcurrency() {
         if (!isEnabled(_context)) return 0;
         
-        int rv = CONCURRENT_PEERS;
-        try {
-            rv = Integer.parseInt(_context.getProperty("router.loadTestConcurrency", CONCURRENT_PEERS+""));
-        } catch (NumberFormatException nfe) {
-            rv = CONCURRENT_PEERS;
-        }
+        int rv = _context.getProperty("router.loadTestConcurrency", CONCURRENT_PEERS);
         if (rv < 0) 
             rv = 0;
         if (rv > 50)
@@ -131,15 +126,7 @@ public class LoadTestManager {
     }
     
     private int getPeerMessages() {
-        String msgsPerPeer = _context.getProperty("router.loadTestMessagesPerPeer");
-        int rv = CONCURRENT_MESSAGES;
-        if (msgsPerPeer != null) {
-            try { 
-                rv = Integer.parseInt(msgsPerPeer); 
-            } catch (NumberFormatException nfe) {
-                rv = CONCURRENT_MESSAGES;
-            }
-        }
+        int rv = _context.getProperty("router.loadTestMessagesPerPeer", CONCURRENT_MESSAGES);
         if (rv < 1) 
             rv = 1;
         if (rv > 50)

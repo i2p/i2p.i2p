@@ -23,7 +23,9 @@ import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FortunaRandomSource;
+import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
 import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
@@ -75,6 +77,7 @@ public class I2PAppContext {
     private RoutingKeyGenerator _routingKeyGenerator;
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
+    protected KeyRing _keyRing; // overridden in RouterContext
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
@@ -91,6 +94,8 @@ public class I2PAppContext {
     private volatile boolean _routingKeyGeneratorInitialized;
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
+    protected volatile boolean _keyRingInitialized; // used in RouterContext
+    private Set<Runnable> _shutdownTasks;
     
     
     /**
@@ -141,12 +146,15 @@ public class I2PAppContext {
         _elGamalEngine = null;
         _elGamalAESEngine = null;
         _logManager = null;
+        _keyRing = null;
         _statManagerInitialized = false;
         _sessionKeyManagerInitialized = false;
         _namingServiceInitialized = false;
         _elGamalEngineInitialized = false;
         _elGamalAESEngineInitialized = false;
         _logManagerInitialized = false;
+        _keyRingInitialized = false;
+        _shutdownTasks = new ConcurrentHashSet(0);
     }
     
     /**
@@ -177,6 +185,25 @@ public class I2PAppContext {
                 return _overrideProps.getProperty(propName, defaultValue);
         }
         return System.getProperty(propName, defaultValue);
+    }
+
+    /**
+     * Return an int with an int default
+     */
+    public int getProperty(String propName, int defaultVal) {
+        String val = null;
+        if (_overrideProps != null) {
+            val = _overrideProps.getProperty(propName);
+            if (val == null)
+                val = System.getProperty(propName);
+        }
+        int ival = defaultVal;
+        if (val != null) {
+            try {
+                ival = Integer.parseInt(val);
+            } catch (NumberFormatException nfe) {}
+        }
+        return ival;
     }
 
     /**
@@ -494,6 +521,23 @@ public class I2PAppContext {
     }
     
     /**
+     * Basic hash map
+     */
+    public KeyRing keyRing() {
+        if (!_keyRingInitialized)
+            initializeKeyRing();
+        return _keyRing;
+    }
+
+    protected void initializeKeyRing() {
+        synchronized (this) {
+            if (_keyRing == null)
+                _keyRing = new KeyRing();
+            _keyRingInitialized = true;
+        }
+    }
+    
+    /**
      * [insert snarky comment here]
      *
      */
@@ -516,4 +560,13 @@ public class I2PAppContext {
             _randomInitialized = true;
         }
     }
+
+    public void addShutdownTask(Runnable task) {
+        _shutdownTasks.add(task);
+    }
+    
+    public Set<Runnable> getShutdownTasks() {
+        return new HashSet(_shutdownTasks);
+    }
+    
 }

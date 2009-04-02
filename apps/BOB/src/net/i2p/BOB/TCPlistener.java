@@ -77,7 +77,7 @@ public class TCPlistener implements Runnable {
 		}
 		try {
 			Socket server = new Socket();
-			listener.setSoTimeout(1000);
+			listener.setSoTimeout(50); // Half of the expected time from MUXlisten
 			info.releaseReadLock();
 			database.releaseReadLock();
 			while(spin) {

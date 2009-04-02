@@ -1,11 +1,15 @@
 package net.i2p.router.web;
 
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -25,22 +29,7 @@ import net.i2p.stat.RateStat;
  * Simple helper to query the appropriate router for data necessary to render
  * the summary sections on the router console.  
  */
-public class SummaryHelper {
-    private RouterContext _context;
-    /**
-     * Configure this bean to query a particular router context
-     *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
-     */
-    public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    
+public class SummaryHelper extends HelperBase {
     /**
      * Retrieve the shortened 4 character ident for the router located within
      * the current JVM at the given context.
@@ -117,6 +106,9 @@ public class SummaryHelper {
     public int getAllPeers() { return _context.netDb().getKnownRouters(); }
     
     public String getReachability() {
+        if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
+            !_context.clientManager().isAlive())
+            return "ERR-Client Manager I2CP Error - check logs";  // not a router problem but the user should know
         if (!_context.clock().getUpdatedSuccessfully())
             return "ERR-ClockSkew";
         if (_context.router().isHidden())
@@ -144,7 +136,7 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 ra = _context.router().getRouterInfo().getTargetAddress("UDP");
-                if (ra == null) {
+                if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
                         return "ERR-UDP Disabled and Inbound TCP host/port not set";
@@ -244,7 +236,7 @@ public class SummaryHelper {
      */
     public String getInboundSecondKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         double kbps = _context.bandwidthLimiter().getReceiveBps()/1024d;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -256,7 +248,7 @@ public class SummaryHelper {
      */
     public String getOutboundSecondKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         double kbps = _context.bandwidthLimiter().getSendBps()/1024d;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -269,10 +261,10 @@ public class SummaryHelper {
      */
     public String getInboundFiveMinuteKBps() {
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0.0";
+        if (receiveRate == null) return "0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double kbps = rate.getAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -286,10 +278,10 @@ public class SummaryHelper {
      */
     public String getOutboundFiveMinuteKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.sendRate");
-        if (receiveRate == null) return "0.0";
+        if (receiveRate == null) return "0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double kbps = rate.getAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -303,10 +295,10 @@ public class SummaryHelper {
      */
     public String getInboundLifetimeKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0.0";
+        if (receiveRate == null) return "0";
         double kbps = receiveRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -319,10 +311,10 @@ public class SummaryHelper {
      */
     public String getOutboundLifetimeKBps() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
-        if (sendRate == null) return "0.0";
+        if (sendRate == null) return "0";
         double kbps = sendRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
@@ -335,11 +327,11 @@ public class SummaryHelper {
      */
     public String getInboundTransferred() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
 
-        return getTransferred(received);
+        return DataHelper.formatSize(received) + 'B';
     }
     
     /**
@@ -349,40 +341,10 @@ public class SummaryHelper {
      */
     public String getOutboundTransferred() { 
         if (_context == null) 
-            return "0.0";
+            return "0";
         
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
-        return getTransferred(sent);
-    }
-    
-    private static String getTransferred(long bytes) {
-        double val = bytes;
-        int scale = 0;
-        if (bytes > 1024*1024*1024) {
-            // gigs transferred
-            scale = 3; 
-            val /= (double)(1024*1024*1024);
-        } else if (bytes > 1024*1024) {
-            // megs transferred
-            scale = 2;
-            val /= (double)(1024*1024);
-        } else if (bytes > 1024) {
-            // kbytes transferred
-            scale = 1;
-            val /= (double)1024;
-        } else {
-            scale = 0;
-        }
-        
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-
-        String str = fmt.format(val);
-        switch (scale) {
-            case 1: return str + "KB";
-            case 2: return str + "MB";
-            case 3: return str + "GB";
-            default: return bytes + "bytes";
-        }
+        return DataHelper.formatSize(sent) + 'B';
     }
     
     /**
@@ -391,20 +353,16 @@ public class SummaryHelper {
      * @return html section summary
      */
     public String getDestinations() {
-        Set clients = _context.clientManager().listClients();
+        // covert the set to a list so we can sort by name and not lose duplicates
+        List clients = new ArrayList(_context.clientManager().listClients());
+        Collections.sort(clients, new AlphaComparator());
         
         StringBuffer buf = new StringBuffer(512);
         buf.append("<u><b>Local destinations</b></u><br />");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
-            TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(client.calculateHash());
-            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(client.calculateHash());
-            String name = (in != null ? in.getDestinationNickname() : null);
-            if (name == null)
-                name = (out != null ? out.getDestinationNickname() : null);
-            if (name == null)
-                name = client.calculateHash().toBase64().substring(0,6);
+            String name = getName(client);
             
             buf.append("<b>*</b> ").append(name).append("<br />\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
@@ -418,14 +376,38 @@ public class SummaryHelper {
                 buf.append("<i>No leases</i><br />\n");
             }
             buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
-            buf.append("\">Details</a> ");
+            buf.append("\" target=\"_top\">Details</a> ");
             buf.append("<a href=\"configtunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
-            buf.append("\">Config</a><br />\n");
+            buf.append("\" target=\"_top\">Config</a><br />\n");
         }
         buf.append("<hr />\n");
         return buf.toString();
     }
     
+    private class AlphaComparator implements Comparator {
+        public int compare(Object lhs, Object rhs) {
+            String lname = getName((Destination)lhs);
+            String rname = getName((Destination)rhs);
+            if (lname.equals("shared clients"))
+                return -1;
+            if (rname.equals("shared clients"))
+                return 1;
+            return Collator.getInstance().compare(lname, rname);
+        }
+    }
+
+    private String getName(Destination d) {
+        TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(d.calculateHash());
+        String name = (in != null ? in.getDestinationNickname() : null);
+        if (name == null) {
+            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(d.calculateHash());
+            name = (out != null ? out.getDestinationNickname() : null);
+            if (name == null)
+                name = d.calculateHash().toBase64().substring(0,6);
+        }
+        return name;
+    }
+
     /**
      * How many free inbound tunnels we have.
      *
@@ -556,4 +538,5 @@ public class SummaryHelper {
     public boolean updateAvailable() { 
         return NewsFetcher.getInstance(_context).updateAvailable();
     }
+
 }

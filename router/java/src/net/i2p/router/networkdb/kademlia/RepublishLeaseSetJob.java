@@ -23,15 +23,18 @@ import net.i2p.util.Log;
 public class RepublishLeaseSetJob extends JobImpl {
     private Log _log;
     private final static long REPUBLISH_LEASESET_DELAY = 5*60*1000;
-    private final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
+    public final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
     private Hash _dest;
     private KademliaNetworkDatabaseFacade _facade;
+    /** this is actually last attempted publish */
+    private long _lastPublished;
     
     public RepublishLeaseSetJob(RouterContext ctx, KademliaNetworkDatabaseFacade facade, Hash destHash) {
         super(ctx);
         _log = ctx.logManager().getLog(RepublishLeaseSetJob.class);
         _facade = facade;
         _dest = destHash;
+        _lastPublished = 0;
         //getTiming().setStartAfter(ctx.clock().now()+REPUBLISH_LEASESET_DELAY);
         getContext().statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
@@ -52,6 +55,7 @@ public class RepublishLeaseSetJob extends JobImpl {
                     } else {
                         getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1, 0);
                         _facade.sendStore(_dest, ls, new OnRepublishSuccess(getContext()), new OnRepublishFailure(getContext(), this), REPUBLISH_LEASESET_TIMEOUT, null);
+                        _lastPublished = getContext().clock().now();
                         //getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
                     }
                 } else {
@@ -81,23 +85,27 @@ public class RepublishLeaseSetJob extends JobImpl {
             _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
         requeue(getContext().random().nextInt(60*1000));
     }
-}
 
-class OnRepublishSuccess extends JobImpl {
-    public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
-    public String getName() { return "Publish leaseSet successful"; }
-    public void runJob() { 
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
+    public long lastPublished() {
+        return _lastPublished;
     }
-}
 
-class OnRepublishFailure extends JobImpl {
-    private RepublishLeaseSetJob _job;
-    public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
-        super(ctx); 
-        _job = job;
+    class OnRepublishSuccess extends JobImpl {
+        public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
+        public String getName() { return "Publish leaseSet successful"; }
+        public void runJob() { 
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
+        }
     }
-    public String getName() { return "Publish leaseSet failed"; }
-    public void runJob() {  _job.requeueRepublish(); }
+
+    class OnRepublishFailure extends JobImpl {
+        private RepublishLeaseSetJob _job;
+        public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
+            super(ctx); 
+            _job = job;
+        }
+        public String getName() { return "Publish leaseSet failed"; }
+        public void runJob() {  _job.requeueRepublish(); }
+    }
 }

@@ -2,7 +2,7 @@ package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleScheduler;
 
 /**
  * Base scheduler
@@ -17,6 +17,6 @@ abstract class SchedulerImpl implements TaskScheduler {
     }
     
     protected void reschedule(long msToWait, Connection con) {
-        SimpleTimer.getInstance().addEvent(con.getConnectionEvent(), msToWait);
+        SimpleScheduler.getInstance().addEvent(con.getConnectionEvent(), msToWait);
     }
 }

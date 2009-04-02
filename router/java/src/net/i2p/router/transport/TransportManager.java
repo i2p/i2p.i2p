@@ -152,6 +152,19 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
+      * Is at least one transport below its connection limit + some margin
+      * Use for throttling in the router.
+      * Perhaps we should just use SSU?
+      */
+    public boolean haveCapacity() { 
+        for (int i = 0; i < _transports.size(); i++) {
+            if (((Transport)_transports.get(i)).haveCapacity())
+                return true;
+        }
+        return false;
+    }
+    
+    /**
      * Return our peer clock skews on all transports.
      * Vector composed of Long, each element representing a peer skew in seconds.
      * Note: this method returns them in whimsical order.
@@ -288,7 +301,10 @@ public class TransportManager implements TransportEventListener {
             // to us via TCP, send via TCP)
             TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
             if (bid != null) {
-                if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
+                if (bid.getLatencyMs() == bid.TRANSIENT_FAIL)
+                    // this keeps GetBids() from shitlisting for "no common transports"
+                    msg.transportFailed(t.getStyle());
+                else if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
                     rv = bid;    
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " bid: " + bid + " currently winning? " + (rv == bid) 

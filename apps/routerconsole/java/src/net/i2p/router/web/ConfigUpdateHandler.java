@@ -51,7 +51,7 @@ public class ConfigUpdateHandler extends FormHandler {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice("Update available, attempting to download now");
                 else
-                    addFormNotice("Update available, click link on left to download");
+                    addFormNotice("Update available, click button on left to download");
             } else
                 addFormNotice("No update available");
         }
@@ -104,6 +104,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_updateURL != null) && (_updateURL.length() > 0) ) {
+            _updateURL = _updateURL.replaceAll("\r\n", ",").replaceAll("\n", ",");
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_URL, _updateURL);

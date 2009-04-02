@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -121,12 +122,23 @@ class SearchJob extends JobImpl {
     
     private static final boolean DEFAULT_FLOODFILL_ONLY = true;
     
+    /** this is now misnamed, as it is only used to determine whether to return floodfill peers only */
     static boolean onlyQueryFloodfillPeers(RouterContext ctx) {
-        if (isCongested(ctx))
-            return true;
+        //if (isCongested(ctx))
+        //    return true;
+        // If we are floodfill, we want the FloodfillPeerSelector (in add()) to include
+        // non-ff peers (if required) in DatabaseSearchReplyMessage responses
+        // so that Exploration works.
+        // ExploreJob is disabled if we are floodfill.
+        // The other two places this was called (one below and one in FNDF)
+        // have been commented out.
+        // Returning false essentially enables kademlia as a backup to floodfill for search responses.
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(ctx))
+            return false;
         return Boolean.valueOf(ctx.getProperty("netDb.floodfillOnly", DEFAULT_FLOODFILL_ONLY + "")).booleanValue();
     }
     
+/***
     static boolean isCongested(RouterContext ctx) {
         float availableSend = ctx.bandwidthLimiter().getOutboundKBytesPerSecond()*1024 - ctx.bandwidthLimiter().getSendBps();
         float availableRecv = ctx.bandwidthLimiter().getInboundKBytesPerSecond()*1024 - ctx.bandwidthLimiter().getReceiveBps();
@@ -134,8 +146,10 @@ class SearchJob extends JobImpl {
         // in that range without a problem
         return ( (availableSend < 6*1024) || (availableRecv < 6*1024) );
     }
+***/
     
     static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
+    static final long MIN_TIMEOUT = 2500;
     
     protected int getPerPeerTimeoutMs(Hash peer) {
         int timeout = 0;
@@ -146,7 +160,7 @@ class SearchJob extends JobImpl {
         long now = getContext().clock().now();
         
         if (now + timeout > _expiration)
-            return (int)(_expiration - now);
+            return (int) Math.max(_expiration - now, MIN_TIMEOUT);
         else
             return timeout;
     }
@@ -247,7 +261,8 @@ class SearchJob extends JobImpl {
         int sent = 0;
         Set attempted = _state.getAttempted();
         while (sent <= 0) {
-            boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
+            //boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
+            boolean onlyFloodfill = true;
             if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().size() <= 0) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": no non-floodfill peers left, and no more pending.  Searched: "
@@ -421,7 +436,7 @@ class SearchJob extends JobImpl {
 
 	
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Sending leaseSet search to " + router.getIdentity().getHash().toBase64() 
+            _log.debug(getJobId() + ": Sending search to " + router.getIdentity().getHash().toBase64() 
                        + " for " + msg.getSearchKey().toBase64() + " w/ replies through [" 
                        + msg.getFrom().toBase64() + "] via tunnel [" 
                        + msg.getReplyTunnel() + "]");
@@ -745,7 +760,7 @@ class SearchJob extends JobImpl {
         }
     }
     
-    private class Search {
+    private static class Search {
         private Job _onFind;
         private Job _onFail;
         private long _expiration;
@@ -772,6 +787,18 @@ class SearchJob extends JobImpl {
     
     boolean wasAttempted(Hash peer) { return _state.wasAttempted(peer); }
     long timeoutMs() { return _timeoutMs; }
-    boolean add(Hash peer) { return _facade.getKBuckets().add(peer); }
+
+    /** @return true if peer was new */
+    boolean add(Hash peer) {
+        boolean rv = _facade.getKBuckets().add(peer);
+        if (rv) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getJobId() + ": Queueing up for next time: " + peer);
+            Set s = new HashSet(1);
+            s.add(peer);
+            _facade.queueForExploration(s);
+        }
+        return rv;
+    }
     void decrementOutstandingFloodfillSearches() { _floodfillSearchesOutstanding--; }
 }

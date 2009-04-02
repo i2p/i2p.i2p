@@ -437,7 +437,6 @@ class StoreJob extends JobImpl {
             _log.debug(getJobId() + ": State of successful send: " + _state);
         if (_onSuccess != null)
             getContext().jobQueue().addJob(_onSuccess);
-        _facade.noteKeySent(_state.getTarget());
         _state.complete(true);
         getContext().statManager().addRateData("netDb.storePeers", _state.getAttempted().size(), _state.getWhenCompleted()-_state.getWhenStarted());
     }

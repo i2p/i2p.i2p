@@ -7,6 +7,7 @@ import net.i2p.I2PException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -168,7 +169,7 @@ public class ConnectionPacketHandler {
                 // take note of congestion
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("congestion.. dup " + packet);
-                RetransmissionTimer.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
+                SimpleScheduler.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
                 //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
                 //fastAck = true;
             } else {
@@ -213,6 +214,10 @@ public class ConnectionPacketHandler {
             packet.releasePayload();
         }
         
+        // update the TCB Cache now that we've processed the acks and updated our rtt etc.
+        if (isNew && packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
+            con.updateShareOpts();
+
         //if (choke)
         //    con.fastRetransmit();
     }

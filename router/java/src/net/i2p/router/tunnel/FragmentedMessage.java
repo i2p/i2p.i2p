@@ -78,13 +78,13 @@ public class FragmentedMessage {
             return false;
         }
         if (length <= 0) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Length is impossible (" + length + ") for messageId " + messageId);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Length is impossible (" + length + ") for messageId " + messageId);
             return false;
         }
         if (offset + length > payload.length) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
             return false;
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -131,13 +131,13 @@ public class FragmentedMessage {
             return false;
         }
         if (length <= 0) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Length is impossible (" + length + ") for messageId " + messageId);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Length is impossible (" + length + ") for messageId " + messageId);
             return false;
         }
         if (offset + length > payload.length) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
             return false;
         }
         if (_log.shouldLog(Log.DEBUG))
