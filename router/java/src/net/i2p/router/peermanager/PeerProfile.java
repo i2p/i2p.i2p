@@ -442,7 +442,7 @@ public class PeerProfile {
     private double calculateSpeed() { return _context.speedCalculator().calc(this); }
     private double calculateCapacity() { return _context.capacityCalculator().calc(this); }
     private double calculateIntegration() { return _context.integrationCalculator().calc(this); }
-    private boolean calculateIsFailing() { return _context.isFailingCalculator().calcBoolean(this); }
+    private boolean calculateIsFailing() { return false; }
     void setIsFailing(boolean val) { _isFailing = val; }
     
     public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
