@@ -1762,6 +1762,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 buf.append(" [shitlisted]");
                 appended = true;
             }
+            //byte[] ip = getIP(peer.getRemotePeer());
+            //if (ip != null)
+            //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</code></td>");
             
             long idleIn = (now-peer.getLastReceiveTime())/1000;

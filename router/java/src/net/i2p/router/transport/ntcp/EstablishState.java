@@ -472,6 +472,8 @@ public class EstablishState {
                         byte nextReadIV[] = new byte[16];
                         System.arraycopy(_e_bobSig, _e_bobSig.length-16, nextReadIV, 0, nextReadIV.length);
                         _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, nextReadIV); // skew in seconds
+                       _transport.setIP(_con.getRemotePeer().calculateHash(),
+                                        _con.getChannel().socket().getInetAddress().getAddress());
                         return;
                     }
                 }
@@ -546,15 +548,17 @@ public class EstablishState {
             Signature sig = new Signature(s);
             _verified = _context.dsa().verifySignature(sig, toVerify, alice.getSigningPublicKey());
             if (_verified) {
+                byte[] ip = _con.getChannel().socket().getInetAddress().getAddress();
                 if (_context.shitlist().isShitlistedForever(alice.calculateHash())) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping inbound connection from permanently shitlisted peer: " + alice.calculateHash().toBase64());
                     // So next time we will not accept the con from this IP,
                     // rather than doing the whole handshake
-                    _context.blocklist().add(_con.getChannel().socket().getInetAddress().getAddress());
+                    _context.blocklist().add(ip);
                     fail("Peer is shitlisted forever: " + alice.calculateHash().toBase64());
                     return;
                 }
+                _transport.setIP(alice.calculateHash(), ip);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix() + "verification successful for " + _con);
                                 

@@ -450,6 +450,7 @@ public class EstablishmentManager {
         _transport.addRemotePeerState(peer);
         
         _transport.inboundConnectionReceived();
+        _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
         sendInboundComplete(peer);
@@ -531,6 +532,7 @@ public class EstablishmentManager {
         
         
         _transport.addRemotePeerState(peer);
+        _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
         sendOurInfo(peer, false);

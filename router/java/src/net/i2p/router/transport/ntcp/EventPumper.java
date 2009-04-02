@@ -66,22 +66,25 @@ public class EventPumper implements Runnable {
     public void startPumping() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting pumper");
-        _alive = true;
         _wantsRead = new ArrayList(16);
         _wantsWrite = new ArrayList(4);
         _wantsRegister = new ArrayList(1);
         _wantsConRegister = new ArrayList(4);
         try {
             _selector = Selector.open();
+            _alive = true;
+            new I2PThread(this, "NTCP Pumper", true).start();
         } catch (IOException ioe) {
-            _log.error("Error opening the selector", ioe);
+            _log.log(Log.CRIT, "Error opening the NTCP selector", ioe);
+        } catch (java.lang.InternalError jlie) {
+            // "unable to get address of epoll functions, pre-2.6 kernel?"
+            _log.log(Log.CRIT, "Error opening the NTCP selector", jlie);
         }
-        new I2PThread(this, "NTCP Pumper", true).start();
     }
     
     public void stopPumping() {
         _alive = false;
-        if (_selector.isOpen())
+        if (_selector != null && _selector.isOpen())
             _selector.wakeup();
     }
     

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -34,6 +35,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -47,8 +49,10 @@ public abstract class TransportImpl implements Transport {
     private List _sendPool;
     protected RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
-    private Map _unreachableEntries;
-    private Set _wasUnreachableEntries;
+    private Map<Hash, Long>  _unreachableEntries;
+    private Set<Hash> _wasUnreachableEntries;
+    /** global router ident -> IP */
+    private static Map<Hash, byte[]> _IPMap = new ConcurrentHashMap(128);
 
     /**
      * Initialize the new transport
@@ -67,7 +71,7 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
         _unreachableEntries = new HashMap(16);
-        _wasUnreachableEntries = new HashSet(16);
+        _wasUnreachableEntries = new ConcurrentHashSet(16);
         _currentAddress = null;
     }
     
@@ -483,10 +487,8 @@ public abstract class TransportImpl implements Transport {
      * This is NOT reset if the peer contacts us and it is never expired.
      */
     public boolean wasUnreachable(Hash peer) {
-        synchronized (_wasUnreachableEntries) {
-            if (_wasUnreachableEntries.contains(peer))
-                return true;
-        }
+        if (_wasUnreachableEntries.contains(peer))
+            return true;
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return false;
@@ -496,14 +498,20 @@ public abstract class TransportImpl implements Transport {
      * Maintain the WasUnreachable list
      */
     public void markWasUnreachable(Hash peer, boolean yes) {
-        synchronized (_wasUnreachableEntries) {
-            if (yes)
-                _wasUnreachableEntries.add(peer);
-            else
-                _wasUnreachableEntries.remove(peer);
-        }
+        if (yes)
+            _wasUnreachableEntries.add(peer);
+        else
+            _wasUnreachableEntries.remove(peer);
         if (_log.shouldLog(Log.WARN))
             _log.warn(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
+    }
+
+    public static void setIP(Hash peer, byte[] ip) {
+        _IPMap.put(peer, ip);
+    }
+
+    public static byte[] getIP(Hash peer) {
+        return _IPMap.get(peer);
     }
 
     public static boolean isPubliclyRoutable(byte addr[]) {

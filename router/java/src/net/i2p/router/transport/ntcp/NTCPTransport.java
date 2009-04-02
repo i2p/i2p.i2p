@@ -241,6 +241,8 @@ public class NTCPTransport extends TransportImpl {
         super.afterSend(msg, sendSuccessful, allowRequeue, msToSend);
     }
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
+        if (!isAlive())
+            return null;
         Hash peer = toAddress.getIdentity().calculateHash();
         if (_context.shitlist().isShitlisted(peer, STYLE)) {
             // we aren't shitlisted in general (since we are trying to get a bid), but we have
@@ -591,7 +593,10 @@ public class NTCPTransport extends TransportImpl {
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
             String name = con.getRemotePeer().calculateHash().toBase64().substring(0,6);
-            buf.append("<tr><td><code><a href=\"netdb.jsp?r=").append(name).append("\">").append(name);
+            buf.append("<tr><td><code><a href=\"netdb.jsp?r=").append(name).append("\">").append(name).append("</a>");
+            //byte[] ip = getIP(con.getRemotePeer().calculateHash());
+            //if (ip != null)
+            //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</code></td><td align=\"center\"><code>");
             if (con.isInbound())
                 buf.append("in");
