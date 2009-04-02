@@ -268,7 +268,7 @@
             </div>
             <div id="portField" class="rowItem">
                 <label for="encrypt" accesskey="e">
-                    Leaseset Encryption Key:
+                    Encryption Key:
                 </label>
                 <textarea rows="1" cols="44" id="portField" name="encryptKey" title="Encrypt Key" wrap="off"><%=editBean.getEncryptKey(curTunnel)%></textarea>               
             </div>
