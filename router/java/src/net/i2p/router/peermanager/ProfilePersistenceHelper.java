@@ -95,7 +95,6 @@ class ProfilePersistenceHelper {
         if (_us != null)
             buf.append("# as calculated by ").append(_us.toBase64()).append(NL);
         buf.append("#").append(NL);
-        buf.append("# reliability: ").append(profile.getReliabilityValue()).append(NL);
         buf.append("# capacity: ").append(profile.getCapacityValue()).append(NL);
         buf.append("# integration: ").append(profile.getIntegrationValue()).append(NL);
         buf.append("# speedValue: ").append(profile.getSpeedValue()).append(NL);
@@ -134,15 +133,12 @@ class ProfilePersistenceHelper {
         
         if (profile.getIsExpanded()) {
             // only write out expanded data if, uh, we've got it
-            profile.getCommError().store(out, "commError");
             profile.getDbIntroduction().store(out, "dbIntroduction");
             profile.getDbResponseTime().store(out, "dbResponseTime");
             profile.getReceiveSize().store(out, "receiveSize");
-            profile.getSendFailureSize().store(out, "sendFailureSize");
             profile.getSendSuccessSize().store(out, "sendSuccessSize");
             profile.getTunnelCreateResponseTime().store(out, "tunnelCreateResponseTime");
             profile.getTunnelTestResponseTime().store(out, "tunnelTestResponseTime");
-            profile.getTunnelTestResponseTimeSlow().store(out, "tunnelTestResponseTimeSlow");
         }
     }
     
@@ -217,15 +213,12 @@ class ProfilePersistenceHelper {
             profile.getTunnelHistory().load(props);
             profile.getDBHistory().load(props);
             
-            profile.getCommError().load(props, "commError", true);
             profile.getDbIntroduction().load(props, "dbIntroduction", true);
             profile.getDbResponseTime().load(props, "dbResponseTime", true);
             profile.getReceiveSize().load(props, "receiveSize", true);
-            profile.getSendFailureSize().load(props, "sendFailureSize", true);
             profile.getSendSuccessSize().load(props, "sendSuccessSize", true);
             profile.getTunnelCreateResponseTime().load(props, "tunnelCreateResponseTime", true);
             profile.getTunnelTestResponseTime().load(props, "tunnelTestResponseTime", true);
-            profile.getTunnelTestResponseTimeSlow().load(props, "tunnelTestResponseTimeSlow", true);
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());
