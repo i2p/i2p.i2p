@@ -1,9 +1,11 @@
 package net.i2p.client.streaming;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -14,7 +16,7 @@ class ConnectionHandler {
     private I2PAppContext _context;
     private Log _log;
     private ConnectionManager _manager;
-    private List _synQueue;
+    private List<Packet> _synQueue;
     private boolean _active;
     private int _acceptTimeout;
     
@@ -61,13 +63,45 @@ class ConnectionHandler {
         }
     }
     
+    public boolean waitSyn( long ms ) throws InterruptedException {
+    	boolean incoming = false ;
+    	boolean isTimed = (ms>=0);
+
+    	Clock clock = I2PAppContext.getGlobalContext().clock();
+    	long now = clock.now();
+    	long end = now + ms;
+    	while (!incoming && (!isTimed || now<=end) ) {
+    		synchronized (_synQueue) {
+
+    			for (Packet p : _synQueue)
+    			{
+    				if (p.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+    					incoming = true ;
+    					break;
+    				}
+    			}
+    			if (!incoming) {
+    				if (!isTimed) {
+    					_synQueue.wait();
+    				} else {
+    					now = clock.now();
+    					if (now < end) {
+    						_synQueue.wait(end-now);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return incoming ;
+    }
+    
     /**
      * Receive an incoming connection (built from a received SYN)
      * Non-SYN packets with a zero SendStreamID may also be queued here so 
      * that they don't get thrown away while the SYN packet before it is queued.
      *
-     * @param timeoutMs max amount of time to wait for a connection (if less 
-     *                  than 1ms, wait indefinitely)
+     * @param timeoutMs max amount of time to wait for a connection (if negative, 
+     *                  wait indefinitely)
      * @return connection received, or null if there was a timeout or the 
      *                    handler was shut down
      */
@@ -77,8 +111,6 @@ class ConnectionHandler {
 
         long expiration = timeoutMs + _context.clock().now();
         while (true) {
-            if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
-                return null;
             if (!_active) {
                 // fail all the ones we had queued up
                 synchronized (_synQueue) {
@@ -97,7 +129,7 @@ class ConnectionHandler {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Accept("+ timeoutMs+"): active=" + _active + " queue: " 
                                    + _synQueue.size());
-                    if (timeoutMs <= 0) {
+                    if (timeoutMs < 0) {
                         try { _synQueue.wait(); } catch (InterruptedException ie) {}
                     } else {
                         long remaining = expiration - _context.clock().now();
@@ -129,6 +161,8 @@ class ConnectionHandler {
                 }
             }
             // keep looping...
+            if ( (timeoutMs >= 0) && (expiration < _context.clock().now()) )
+                return null;
         }
     }
 

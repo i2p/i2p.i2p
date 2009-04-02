@@ -102,6 +102,24 @@ public class SAMUtils {
     }
     
     /**
+     * Resolve the destination from a key or a hostname
+     *
+     * @param s Hostname or key to be resolved
+     *
+     * @return the Destination for the specified hostname, or null if not found
+     */
+    public static Destination getDest(String s)
+    {
+  	  Destination d = new Destination() ;
+  	  try {
+  		  d.fromBase64(s);
+  		  return d ;
+  	  } catch (DataFormatException e) {
+  		  return  lookupHost(s, null);
+  	  }
+    }
+
+    /**
      * Parse SAM parameters, and put them into a Propetries object
      *
      * @param tok A StringTokenizer pointing to the SAM parameters

@@ -14,9 +14,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,7 +35,7 @@ import net.i2p.util.Log;
  */
 public class SAMBridge implements Runnable {
     private final static Log _log = new Log(SAMBridge.class);
-    private ServerSocket serverSocket;
+    private ServerSocketChannel serverSocket;
     private Properties i2cpProps;
     /** 
      * filename in which the name to private key mapping should 
@@ -45,12 +46,17 @@ public class SAMBridge implements Runnable {
      * app designated destination name to the base64 of the I2P formatted 
      * destination keys (Destination+PrivateKey+SigningPrivateKey)
      */
-    private Map nameToPrivKeys;
+    private Map<String,String> nameToPrivKeys;
 
     private boolean acceptConnections = true;
 
     private static final int SAM_LISTENPORT = 7656;
     public static final String DEFAULT_SAM_KEYFILE = "sam.keys";
+    public static final String PROP_DATAGRAM_HOST = "sam.datagram.host";
+    public static final String PROP_DATAGRAM_PORT = "sam.datagram.port";
+    public static final String DEFAULT_DATAGRAM_HOST = "0.0.0.0";
+    public static final String DEFAULT_DATAGRAM_PORT = "7655";
+
     
     private SAMBridge() {}
     
@@ -64,16 +70,18 @@ public class SAMBridge implements Runnable {
      */
     public SAMBridge(String listenHost, int listenPort, Properties i2cpProps, String persistFile) {
         persistFilename = persistFile;
-        nameToPrivKeys = new HashMap(8);
+        nameToPrivKeys = new HashMap<String,String>(8);
         loadKeys();
         try {
             if ( (listenHost != null) && !("0.0.0.0".equals(listenHost)) ) {
-                serverSocket = new ServerSocket(listenPort, 0, InetAddress.getByName(listenHost));
+                serverSocket = ServerSocketChannel.open();
+                serverSocket.socket().bind(new InetSocketAddress(listenHost, listenPort));
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("SAM bridge listening on "
                                + listenHost + ":" + listenPort);
             } else {
-                serverSocket = new ServerSocket(listenPort);
+                serverSocket = ServerSocketChannel.open();
+                serverSocket.socket().bind(new InetSocketAddress(listenPort));
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("SAM bridge listening on 0.0.0.0:" + listenPort);
             }
@@ -193,12 +201,12 @@ public class SAMBridge implements Runnable {
     
     /**
      * Usage:
-     *  <pre>SAMBridge [[listenHost ]listenPort[ name=val]*]</pre>
+     *  <pre>SAMBridge [ keyfile [listenHost ] listenPort [ name=val ]* ]</pre>
      * 
      * name=val options are passed to the I2CP code to build a session, 
      * allowing the bridge to specify an alternate I2CP host and port, tunnel
      * depth, etc.
-     * @param args [[listenHost ]listenPort[ name=val]*]
+     * @param args [ keyfile [ listenHost ] listenPort [ name=val ]* ]
      */
     public static void main(String args[]) {
         String keyfile = DEFAULT_SAM_KEYFILE;
@@ -266,11 +274,11 @@ public class SAMBridge implements Runnable {
         if (serverSocket == null) return;
         try {
             while (acceptConnections) {
-                Socket s = serverSocket.accept();
+                SocketChannel s = serverSocket.accept();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("New connection from "
-                               + s.getInetAddress().toString() + ":"
-                               + s.getPort());
+                               + s.socket().getInetAddress().toString() + ":"
+                               + s.socket().getPort());
 
                 try {
                     SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps);
@@ -289,7 +297,7 @@ public class SAMBridge implements Runnable {
                         _log.error("SAM error: " + e.getMessage(), e);
                     try {
                         String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
-                        s.getOutputStream().write(reply.getBytes("ISO-8859-1"));
+                        s.write(ByteBuffer.wrap(reply.getBytes("ISO-8859-1")));
                     } catch (IOException ioe) {
                         if (_log.shouldLog(Log.ERROR))
                             _log.error("SAM Error sending error reply", ioe);

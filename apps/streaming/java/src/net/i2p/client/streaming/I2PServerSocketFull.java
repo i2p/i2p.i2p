@@ -1,7 +1,12 @@
 package net.i2p.client.streaming;
 
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Bridge to allow accepting new connections
@@ -45,4 +50,43 @@ public class I2PServerSocketFull implements I2PServerSocket {
     public I2PSocketManager getManager() {
         return _socketManager;
     }
+
+    /**
+     * accept(true) has the same behaviour as accept().
+     * accept(false) does not wait for a socket connecting. If a socket is
+     * available in the queue, it is accepted. Else, null is returned. 
+     *
+     * @param true if the call should block until a socket is available
+     *
+     * @return a connected I2PSocket, or null
+     *
+     * @throws I2PException if there is a problem with reading a new socket
+     *         from the data available (aka the I2PSession closed, etc)
+     * @throws SocketTimeoutException if the timeout has been reached
+     */
+
+	public I2PSocket accept(boolean blocking)  throws I2PException, SocketTimeoutException {
+		long timeout = this.getSoTimeout();
+
+		try {
+			if (blocking)
+			{
+				this.setSoTimeout(-1);
+			} else {
+				this.setSoTimeout(0);
+			}
+			try {
+				return this.accept();
+			} catch (SocketTimeoutException e) {
+				if (blocking) throw e;
+				else return null ;
+			}
+		} finally {
+			this.setSoTimeout(timeout);
+		}
+	}
+
+	public boolean waitIncoming(long timeoutMs) throws InterruptedException {
+        return this._socketManager.getConnectionManager().getConnectionHandler().waitSyn(timeoutMs);
+	}
 }
