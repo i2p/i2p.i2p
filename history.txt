@@ -1,6 +1,16 @@
+2009-04-03 zzz
+    * Console:
+      - Fix bug with IE buttons not working,
+        because it sends the label instead of the value
+      - Display version of downloaded update
+    * Update:
+      - Change default to "Download and verify"
+      - Change news fetch default to 24h (was 12h)
+
 2009-04-03 sponge
     * Fix broken dependencies for BOB.jar
     * Router build version incremented to 5.
+
 2009-04-02 zzz
     * Profiles:
       - Remove unused calculators and RateStats:
