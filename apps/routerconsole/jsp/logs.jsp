@@ -21,6 +21,12 @@
  <hr />
  <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
+ <hr />
+ <h4>Java Version:</h4><a name="version"> </a>
+ <pre>
+<%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%>
+<%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%>
+ </pre>
 </div>
 
 </body>
