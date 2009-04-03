@@ -142,7 +142,7 @@ public class IndexBean {
     }
     
     private String processAction() {
-        if ( (_action == null) || (_action.trim().length() <= 0) )
+        if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
         if ( (_prevNonce != _curNonce) && (!validPassphrase(_passphrase)) )
             return "Invalid nonce, are you being spoofed?";

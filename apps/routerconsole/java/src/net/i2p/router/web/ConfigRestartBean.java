@@ -24,20 +24,21 @@ public class ConfigRestartBean {
         RouterContext ctx = ContextHelper.getContext(null);
         String systemNonce = getNonce();
         if ( (nonce != null) && (systemNonce.equals(nonce)) && (action != null) ) {
-            if ("shutdownImmediate".equals(action)) {
+            // Normal browsers send value, IE sends button label
+            if ("shutdownImmediate".equals(action) || "Shutdown immediately".equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
                 //ctx.router().shutdown(Router.EXIT_HARD); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD); // give the UI time to respond
-            } else if ("cancelShutdown".equals(action)) {
+            } else if ("cancelShutdown".equals(action) || "Cancel shutdown".equals(action)) {
                 ctx.router().cancelGracefulShutdown();
-            } else if ("restartImmediate".equals(action)) {
+            } else if ("restartImmediate".equals(action) || "Restart immediately".equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
                 //ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART); // give the UI time to respond
-            } else if ("restart".equals(action)) {
+            } else if ("restart".equalsIgnoreCase(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
                 ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            } else if ("shutdown".equals(action)) {
+            } else if ("shutdown".equalsIgnoreCase(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
                 ctx.router().shutdownGracefully();
             }

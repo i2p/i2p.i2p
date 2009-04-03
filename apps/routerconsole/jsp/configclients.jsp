@@ -5,6 +5,11 @@
 <html><head>
 <title>I2P Router Console - config clients</title>
 <link rel="stylesheet" href="default.css" type="text/css" />
+<style type='text/css'>
+button span.hide{
+    display:none;
+}
+</style>
 </head><body>
 
 <%@include file="nav.jsp" %>
