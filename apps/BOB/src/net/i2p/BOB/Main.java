@@ -24,7 +24,7 @@
 package net.i2p.BOB;
 
 import net.i2p.client.streaming.RetransmissionTimer;
-
+import net.i2p.util.SimpleScheduler;
 /**
  * Start from command line
  *
@@ -39,6 +39,9 @@ public class Main {
 	public static void main(String[] args) {
 		// THINK THINK THINK THINK THINK THINK
 		RetransmissionTimer Y = RetransmissionTimer.getInstance();
+		// needs SimpleScheduler
+		// no way to stop the scheduler?!?
+		SimpleScheduler.getInstance();
 		BOB.main(args);
 		Y.stop();
 	}

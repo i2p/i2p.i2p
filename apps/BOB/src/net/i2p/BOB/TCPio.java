@@ -35,7 +35,7 @@ public class TCPio implements Runnable {
 
 	private InputStream Ain;
 	private OutputStream Aout;
-	private NamedDB info,  database;
+	// private NamedDB info,  database;
 
 	/**
 	 * Constructor
@@ -43,13 +43,14 @@ public class TCPio implements Runnable {
 	 * @param Ain
 	 * @param Aout
 	 * @param info
-	 * @param database
+	 *
+	 * param database
 	 */
-	TCPio(InputStream Ain, OutputStream Aout, NamedDB info, NamedDB database) {
+	TCPio(InputStream Ain, OutputStream Aout /*, NamedDB info , NamedDB database */) {
 		this.Ain = Ain;
 		this.Aout = Aout;
-		this.info = info;
-		this.database = database;
+		// this.info = info;
+		// this.database = database;
 	}
 
 	/**
@@ -86,11 +87,11 @@ public class TCPio implements Runnable {
 		boolean spin = true;
 		try {
 			while(spin) {
-				database.getReadLock();
-				info.getReadLock();
-				spin = info.get("RUNNING").equals(Boolean.TRUE);
-				info.releaseReadLock();
-				database.releaseReadLock();
+				// database.getReadLock();
+				// info.getReadLock();
+				// spin = info.get("RUNNING").equals(Boolean.TRUE);
+				// info.releaseReadLock();
+				// database.releaseReadLock();
 				b = Ain.read(a, 0, 1);
 				// System.out.println(info.get("NICKNAME").toString() + " " + b);
 				if(b > 0) {

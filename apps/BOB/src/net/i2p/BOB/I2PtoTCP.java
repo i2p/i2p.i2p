@@ -105,8 +105,8 @@ die:            {
 					out.flush(); // not really needed, but...
 				}
 				// setup to cross the streams
-				TCPio conn_c = new TCPio(in, Iout, info, database); // app -> I2P
-				TCPio conn_a = new TCPio(Iin, out, info, database); // I2P -> app
+				TCPio conn_c = new TCPio(in, Iout /*, info, database */ ); // app -> I2P
+				TCPio conn_a = new TCPio(Iin, out /* , info, database */); // I2P -> app
 				Thread t = new Thread(conn_c, "TCPioA");
 				Thread q = new Thread(conn_a, "TCPioB");
 				// Fire!

@@ -45,7 +45,7 @@ import net.i2p.i2ptunnel.I2PTunnel;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	private NamedDB info,  database;
+	// private NamedDB info,  database;
 	private Socket sock;
 	private I2PSocketManager socketManager;
 
@@ -84,13 +84,13 @@ public class TCPtoI2P implements Runnable {
 	 * Constructor
 	 * @param i2p
 	 * @param socket
-	 * @param info
-	 * @param database
+	 * param info
+	 * param database
 	 */
-	TCPtoI2P(I2PSocketManager i2p, Socket socket, NamedDB info, NamedDB database) {
+	TCPtoI2P(I2PSocketManager i2p, Socket socket /*, NamedDB info, NamedDB database */) {
 		this.sock = socket;
-		this.info = info;
-		this.database = database;
+		// this.info = info;
+		// this.database = database;
 		this.socketManager = i2p;
 	}
 
@@ -110,6 +110,7 @@ public class TCPtoI2P implements Runnable {
 
 	/**
 	 * TCP stream to I2P stream thread starter
+	 *
 	 */
 	public void run() {
 		String line, input;
@@ -138,8 +139,8 @@ public class TCPtoI2P implements Runnable {
 					InputStream Iin = I2P.getInputStream();
 					OutputStream Iout = I2P.getOutputStream();
 					// setup to cross the streams
-					TCPio conn_c = new TCPio(in, Iout, info, database); // app -> I2P
-					TCPio conn_a = new TCPio(Iin, out, info, database); // I2P -> app
+					TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
+					TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
 					Thread t = new Thread(conn_c, "TCPioA");
 					Thread q = new Thread(conn_a, "TCPioB");
 					// Fire!
@@ -167,7 +168,8 @@ public class TCPtoI2P implements Runnable {
 			} catch(Exception e) {
 				Emsg("ERROR " + e.toString(), out);
 			}
-		} catch(IOException ioe) {
+		} catch(Exception e) {
+			// bail on anything else
 		}
 		try {
 			// System.out.println("TCPtoI2P: Close I2P");
@@ -181,6 +183,5 @@ public class TCPtoI2P implements Runnable {
 		} catch(Exception e) {
 		}
 		// System.out.println("TCPtoI2P: Done.");
-
 	}
 }

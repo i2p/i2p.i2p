@@ -100,7 +100,7 @@ public class MUXlisten implements Runnable {
 		// Everything is OK as far as we can tell.
 		this.database.getWriteLock();
 		this.info.getWriteLock();
-		this.info.add("STARTING", Boolean.TRUE);
+		this.info.add("STARTING", new Boolean(true));
 		this.info.releaseWriteLock();
 		this.database.releaseWriteLock();
 	}
@@ -134,8 +134,8 @@ public class MUXlisten implements Runnable {
 		try {
 			wlock();
 			try {
-				info.add("RUNNING", Boolean.TRUE);
-				info.add("STARTING", Boolean.FALSE);
+				info.add("RUNNING", new Boolean(true));
+				info.add("STARTING", new Boolean(false));
 			} catch(Exception e) {
 				wunlock();
 				return;
@@ -198,7 +198,7 @@ die:                            {
 					try {
 						wlock();
 						try {
-							info.add("RUNNING", Boolean.FALSE);
+							info.add("RUNNING", new Boolean(false));
 						} catch(Exception e) {
 							wunlock();
 							break die;
@@ -255,9 +255,9 @@ die:                            {
 		try {
 			wlock();
 			try {
-				info.add("STARTING", Boolean.FALSE);
-				info.add("STOPPING", Boolean.FALSE);
-				info.add("RUNNING", Boolean.FALSE);
+				info.add("STARTING", new Boolean(false));
+				info.add("STOPPING", new Boolean(false));
+				info.add("RUNNING", new Boolean(false));
 			} catch(Exception e) {
 				wunlock();
 				return;
