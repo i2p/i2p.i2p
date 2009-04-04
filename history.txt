@@ -1,3 +1,42 @@
+2009-04-03 zzz
+    * Console:
+      - Fix bug with IE buttons not working,
+        because it sends the label instead of the value
+      - Display version of downloaded update
+    * Update:
+      - Change default to "Download and verify"
+      - Change news fetch default to 24h (was 12h)
+
+2009-04-03 sponge
+    * Fix broken dependencies for BOB.jar
+    * Router build version incremented to 5.
+
+2009-04-02 zzz
+    * Profiles:
+      - Remove unused calculators and RateStats:
+        CapacityCalculator, StrictSpeedCalculator, IsFailingCalculator;
+        sendFailureSize, processSuccessRate, processfailureRate, commErrorRate,
+        tunnelTestResponseTimeSlow
+      - Reduced number of Rates in these RateStats:
+        sendSuccessSize, receiveSize, rejectRate, failRate
+      - ~5KB/profile savings total
+      - Deflate speed calculation once an hour instead of once a day,
+        to improve fast tier selection
+      - Remove dup comment in persisted files
+    * StatisticsManager - effective in 0.7.2:
+      - Spoof uptime to 90m for all
+      - Change tunnel stats from 10m to 60m
+    * Transport:
+      - Maintain a router hash -> IP map in transport,
+        to support additional IP checks (unused for now)
+      - Catch error on pre-2.6 kernels
+      - Some concurrent conversion
+      - Fix an HTML error on peers.jsp
+
+2009-04-01 zzz
+    * I2PTunnel: Fix tunnel close
+      http://forum.i2p/viewtopic.php?t=3231
+
 2009-03-30 zzz
     * I2CP:
       - Implement BandwidthLimitsMessage
