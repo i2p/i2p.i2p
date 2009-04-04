@@ -105,6 +105,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.outboundEstablishFailed", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.outboundFailedIOEImmediate", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.invalidOutboundSkew", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("ntcp.noBidTooLargeI2NP", "send size", "ntcp", new long[] { 60*60*1000 });
         _context.statManager().createRateStat("ntcp.prepBufCache", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.queuedRecv", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("ntcp.read", "", "ntcp", new long[] { 60*1000, 10*60*1000 });
@@ -243,6 +244,11 @@ public class NTCPTransport extends TransportImpl {
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
         if (!isAlive())
             return null;
+        if (dataSize > NTCPConnection.MAX_MSG_SIZE) {
+            // let SSU deal with it
+            _context.statManager().addRateData("ntcp.noBidTooLargeI2NP", dataSize, 0);
+            return null;
+        }
         Hash peer = toAddress.getIdentity().calculateHash();
         if (_context.shitlist().isShitlisted(peer, STYLE)) {
             // we aren't shitlisted in general (since we are trying to get a bid), but we have
