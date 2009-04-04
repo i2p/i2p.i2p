@@ -16,7 +16,7 @@ else :
 if len(sys.argv)==3 :
 	name = sys.argv[2]
 else :
-	name = "essaiSamForward"
+	name = "datagramSamForward"
 
 sess = socket.socket(
     socket.AF_INET, socket.SOCK_STREAM)

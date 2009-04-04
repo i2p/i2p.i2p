@@ -60,28 +60,24 @@ class I2PServerSocketImpl implements I2PServerSocket {
      * 
      * @param timeoutMs timeout in ms. A negative value waits forever.
      *
-     * @return true if a socket is available, false if not
-     *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
      * @throws ConnectException if the I2PServerSocket is closed
      */
-    public boolean waitIncoming(long timeoutMs) throws I2PException, ConnectException {
+    public void waitIncoming(long timeoutMs) throws I2PException, ConnectException, InterruptedException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("waitIncoming() called, pending: " + pendingSockets.size());
         
-        boolean isTimed = (timeoutMs>=0);
+        boolean isTimed = (timeoutMs>0);
         if (isTimed) {
             Clock clock = I2PAppContext.getGlobalContext().clock();
             long now = clock.now();
             long end = now + timeoutMs;
             while (pendingSockets.size() <= 0 && now<end) {
                 if (closing) throw new ConnectException("I2PServerSocket closed");
-                try {
-                    synchronized(socketAddedLock) {
-                        socketAddedLock.wait(end - now);
-                    }
-                } catch (InterruptedException ie) {}
+                synchronized(socketAddedLock) {
+                    socketAddedLock.wait(end - now);
+                }
                 now = clock.now();
             }
         } else {
@@ -94,7 +90,6 @@ class I2PServerSocketImpl implements I2PServerSocket {
                 } catch (InterruptedException ie) {}
             }
         }
-		return (pendingSockets.size()>0);
 	}
 
     
@@ -112,16 +107,20 @@ class I2PServerSocketImpl implements I2PServerSocket {
      * @throws ConnectException if the I2PServerSocket is closed
      */
 
-	public I2PSocket accept(boolean blocking) throws I2PException, ConnectException {
+	public I2PSocket accept(long timeout) throws I2PException, ConnectException, InterruptedException {
         I2PSocket ret = null;
         
-        if (blocking) {
+        if (timeout<=0) {
         	ret = accept();
         } else {
+        	long now  = I2PAppContext.getGlobalContext().clock().now();
+            long expiration = timeout + now ;
         	synchronized (pendingSockets) {
-                if (pendingSockets.size() > 0) {
-                    ret = (I2PSocket)pendingSockets.remove(0);
+                while (pendingSockets.size() == 0 && expiration>now) {
+                	pendingSockets.wait(expiration-now);
+                	now  = I2PAppContext.getGlobalContext().clock().now();
                 }
+                ret = (I2PSocket)pendingSockets.remove(0);
             } 
             if (ret != null) {
                 synchronized (socketAcceptedLock) {
@@ -151,10 +150,12 @@ class I2PServerSocketImpl implements I2PServerSocket {
         I2PSocket ret = null;
         
         while ( (ret == null) && (!closing) ){
-        	
-        	this.waitIncoming(-1);
-
-        	ret = accept(false);
+        	try {
+        		this.waitIncoming(0);
+        		ret = accept(1);
+        	} catch (InterruptedException e) {
+        		throw new I2PException("Thread interrupted") ;
+        	}
         }
         
         if (_log.shouldLog(Log.DEBUG))

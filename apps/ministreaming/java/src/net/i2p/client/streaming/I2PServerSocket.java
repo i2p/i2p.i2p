@@ -44,7 +44,7 @@ public interface I2PServerSocket {
      * @throws ConnectException if the I2PServerSocket is closed
      * @throws SocketTimeoutException 
      */
-    public I2PSocket accept(boolean blocking) throws I2PException, ConnectException, SocketTimeoutException;
+    public I2PSocket accept(long timeout) throws I2PException, ConnectException, SocketTimeoutException, InterruptedException;
 
     /**
      * Waits until there is a socket waiting for acception or the timeout is
@@ -58,7 +58,7 @@ public interface I2PServerSocket {
      *         from the data available (aka the I2PSession closed, etc)
      * @throws ConnectException if the I2PServerSocket is closed
      */
-    public boolean waitIncoming(long timeoutMs) throws I2PException, ConnectException, InterruptedException;
+    public void waitIncoming(long timeoutMs) throws I2PException, ConnectException, InterruptedException;
 
     /**
      * Set Sock Option accept timeout

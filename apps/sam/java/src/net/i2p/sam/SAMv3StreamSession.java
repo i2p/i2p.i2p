@@ -269,10 +269,9 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	{
 	    		while (session.socketServer!=null) {
 	    			
-	    	    	boolean available = false ;
 	    			I2PSocket i2ps = null ;
 	    			try {
-	    				available = session.socketServer.waitIncoming(-1);
+	    				session.socketServer.waitIncoming(0);
 	    			} catch (ConnectException e) {
 	    				_log.debug("ConnectException");
 	    				break ;
@@ -283,7 +282,6 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    				_log.debug("InterruptedException");
 	    				break ;
 	    			}
-	    			if ( !available ) continue ;
 	    			
 	    			java.net.InetSocketAddress addr = new java.net.InetSocketAddress(host,port);
 	    			
@@ -296,7 +294,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    			}
 	    			
 	    			try {
-	    				i2ps = session.socketServer.accept(false);
+	    				i2ps = session.socketServer.accept(1);
 	    			} catch (Exception e) {}
 	    			
 	    			if (i2ps==null) {

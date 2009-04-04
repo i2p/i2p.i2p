@@ -23,6 +23,7 @@ class ConnectionHandler {
     private Log _log;
     private ConnectionManager _manager;
     private LinkedBlockingQueue<Packet> _synQueue;
+    private Object _synSignal;
     private boolean _active;
     private int _acceptTimeout;
     
@@ -81,7 +82,13 @@ class ConnectionHandler {
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
             SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
-        } else {
+            if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+            	synchronized (this._synSignal) 
+            	{
+            		this._synSignal.notifyAll();
+            	}
+
+       } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
@@ -89,8 +96,17 @@ class ConnectionHandler {
         }
     }
     
-    public boolean waitSyn( long ms ) throws InterruptedException {
-    	throw new InterruptedException();
+    /**
+     * Wait until some SYN packet is available
+     * @param ms max amount of time to wait for a connection (if negative or null,
+     *                wait indefinitely)
+     * @throws InterruptedException
+     */
+    public void waitSyn( long ms ) throws InterruptedException {
+    	synchronized (this._synSignal) 
+    	{
+    		this._synSignal.wait(ms);
+    	}
     }
     
     /**
@@ -120,6 +136,9 @@ class ConnectionHandler {
                 return null;
             }
             
+            if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
+                return null;
+
             Packet syn = null;
             while ( _active && syn == null) {
                 if (_log.shouldLog(Log.DEBUG))
@@ -162,8 +181,6 @@ class ConnectionHandler {
                 }
             }
             // keep looping...
-            if ( (timeoutMs >= 0) && (expiration < _context.clock().now()) )
-                return null;
         }
     }
 

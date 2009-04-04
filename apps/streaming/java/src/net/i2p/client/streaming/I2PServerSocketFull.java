@@ -65,28 +65,20 @@ public class I2PServerSocketFull implements I2PServerSocket {
      * @throws SocketTimeoutException if the timeout has been reached
      */
 
-	public I2PSocket accept(boolean blocking)  throws I2PException, SocketTimeoutException {
-		long timeout = this.getSoTimeout();
+	public I2PSocket accept(long timeout)  throws I2PException {
+		long reset_timeout = this.getSoTimeout();
 
 		try {
-			if (blocking)
-			{
-				this.setSoTimeout(-1);
-			} else {
-				this.setSoTimeout(0);
-			}
-			try {
-				return this.accept();
-			} catch (SocketTimeoutException e) {
-				if (blocking) throw e;
-				else return null ;
-			}
-		} finally {
 			this.setSoTimeout(timeout);
+			return this.accept();
+		} catch (SocketTimeoutException e) {
+			return null ;
+		} finally {
+			this.setSoTimeout(reset_timeout);
 		}
 	}
 
-	public boolean waitIncoming(long timeoutMs) throws InterruptedException {
-        return this._socketManager.getConnectionManager().getConnectionHandler().waitSyn(timeoutMs);
+	public void waitIncoming(long timeoutMs) throws InterruptedException {
+        this._socketManager.getConnectionManager().getConnectionHandler().waitSyn(timeoutMs);
 	}
 }
