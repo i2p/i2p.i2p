@@ -31,32 +31,33 @@ public interface I2PServerSocket {
     public I2PSocket accept() throws I2PException, ConnectException, SocketTimeoutException;
 
     /**
-     * accept(true) has the same behaviour as accept().
-     * accept(false) does not wait for a socket connecting. If a socket is
-     * available in the queue, it is accepted. Else, null is returned. 
+     * accept(timeout) waits timeout ms for a socket connecting. If a socket is
+     * not available during the timeout, return null. accept(0) behaves like accept() 
      *
-     * @param true if the call should block until a socket is available
+     * @param timeout in ms
      *
      * @return a connected I2PSocket, or null
      *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
      * @throws ConnectException if the I2PServerSocket is closed
-     * @throws SocketTimeoutException 
+     * @throws InterruptedException if thread is interrupted while waiting
      */
-    public I2PSocket accept(long timeout) throws I2PException, ConnectException, SocketTimeoutException, InterruptedException;
+    public I2PSocket accept(long timeout) throws I2PException, ConnectException, InterruptedException;
 
     /**
-     * Waits until there is a socket waiting for acception or the timeout is
+     * Wait until there is a socket waiting for acception or the timeout is
      * reached.
      * 
-     * @param timeoutMs timeout in ms. A negative value waits forever.
+     * @param timeoutMs timeout in ms. If ms is 0, wait forever.
      *
      * @return true if a socket is available, false if not
      *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
      * @throws ConnectException if the I2PServerSocket is closed
+     * @throws InterruptedException if the thread is interrupted before
+     *         completion
      */
     public void waitIncoming(long timeoutMs) throws I2PException, ConnectException, InterruptedException;
 

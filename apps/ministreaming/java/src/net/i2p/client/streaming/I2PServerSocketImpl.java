@@ -1,6 +1,7 @@
 package net.i2p.client.streaming;
 
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,11 +50,6 @@ class I2PServerSocketImpl implements I2PServerSocket {
         this.mgr = mgr;
     }
     
- 
-    
-    
-    
-    
     /**
      * Waits until there is a socket waiting for acception or the timeout is
      * reached.
@@ -63,6 +59,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
      * @throws ConnectException if the I2PServerSocket is closed
+     * @throws InterruptedException if thread is interrupted while waiting
      */
     public void waitIncoming(long timeoutMs) throws I2PException, ConnectException, InterruptedException {
         if (_log.shouldLog(Log.DEBUG))
@@ -92,21 +89,19 @@ class I2PServerSocketImpl implements I2PServerSocket {
         }
 	}
 
-    
     /**
-     * accept(true) has the same behaviour as accept().
-     * accept(false) does not wait for a socket connecting. If a socket is
-     * available in the queue, it is accepted. Else, null is returned. 
+     * accept(timeout) waits timeout ms for a socket connecting. If a socket is
+     * not available during the timeout, return null. accept(0) behaves like accept() 
      *
-     * @param true if the call should block until a socket is available
+     * @param timeout in ms
      *
      * @return a connected I2PSocket, or null
      *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
      * @throws ConnectException if the I2PServerSocket is closed
+     * @throws InterruptedException if thread is interrupted while waiting
      */
-
 	public I2PSocket accept(long timeout) throws I2PException, ConnectException, InterruptedException {
         I2PSocket ret = null;
         

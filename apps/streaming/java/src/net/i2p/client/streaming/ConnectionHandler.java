@@ -2,8 +2,6 @@ package net.i2p.client.streaming;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -42,7 +40,8 @@ class ConnectionHandler {
         _context = context;
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
-        _synQueue = new LinkedBlockingQueue(MAX_QUEUE_SIZE);
+        _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
+        _synSignal= new Object();
         _active = false;
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
@@ -83,12 +82,8 @@ class ConnectionHandler {
         if (success) {
             SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
-            	synchronized (this._synSignal) 
-            	{
-            		this._synSignal.notifyAll();
-            	}
-
-       } else {
+            	synchronized (this._synSignal) {this._synSignal.notifyAll();}
+        } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
@@ -103,9 +98,24 @@ class ConnectionHandler {
      * @throws InterruptedException
      */
     public void waitSyn( long ms ) throws InterruptedException {
-    	synchronized (this._synSignal) 
+    	synchronized (this._synSignal)
     	{
-    		this._synSignal.wait(ms);
+    		long now = this._context.clock().now() ;
+    		long expiration = now + ms ;
+    		while ( expiration > now || ms<=0 ) {
+    			// check we have not missed a SYN packet before entering
+    			// the lock
+    			for ( Packet p : this._synQueue ) {
+    				if ( p.isFlagSet(Packet.FLAG_SYNCHRONIZE) ) return ;
+    			}
+    			// wait until a SYN is signaled
+    			if ( ms == 0) {
+    				this._synSignal.wait();
+    			} else {
+    				this._synSignal.wait(expiration-now);
+    				now = this._context.clock().now();
+    			}
+    		}
     	}
     }
     
@@ -114,8 +124,8 @@ class ConnectionHandler {
      * Non-SYN packets with a zero SendStreamID may also be queued here so 
      * that they don't get thrown away while the SYN packet before it is queued.
      *
-     * @param timeoutMs max amount of time to wait for a connection (if negative, 
-     *                  wait indefinitely)
+     * @param timeoutMs max amount of time to wait for a connection (if less 
+     *                  than 1ms, wait indefinitely)
      * @return connection received, or null if there was a timeout or the 
      *                    handler was shut down
      */
@@ -125,6 +135,8 @@ class ConnectionHandler {
 
         long expiration = timeoutMs + _context.clock().now();
         while (true) {
+            if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
+                return null;
             if (!_active) {
                 // fail all the ones we had queued up
                 while(true) {
@@ -136,9 +148,6 @@ class ConnectionHandler {
                 return null;
             }
             
-            if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
-                return null;
-
             Packet syn = null;
             while ( _active && syn == null) {
                 if (_log.shouldLog(Log.DEBUG))

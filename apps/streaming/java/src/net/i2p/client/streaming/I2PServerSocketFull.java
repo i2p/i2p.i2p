@@ -1,12 +1,9 @@
 package net.i2p.client.streaming;
 
-import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 
 /**
  * Bridge to allow accepting new connections
@@ -52,17 +49,15 @@ public class I2PServerSocketFull implements I2PServerSocket {
     }
 
     /**
-     * accept(true) has the same behaviour as accept().
-     * accept(false) does not wait for a socket connecting. If a socket is
-     * available in the queue, it is accepted. Else, null is returned. 
+     * accept(timeout) waits timeout ms for a socket connecting. If a socket is
+     * not available during the timeout, return null. accept(0) behaves like accept() 
      *
-     * @param true if the call should block until a socket is available
+     * @param timeout in ms
      *
      * @return a connected I2PSocket, or null
      *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
-     * @throws SocketTimeoutException if the timeout has been reached
      */
 
 	public I2PSocket accept(long timeout)  throws I2PException {
@@ -78,7 +73,17 @@ public class I2PServerSocketFull implements I2PServerSocket {
 		}
 	}
 
-	public void waitIncoming(long timeoutMs) throws InterruptedException {
+	/**
+	 * block until a SYN packet is detected or the timeout is reached. If timeout is 0,
+	 * block until a SYN packet is detected.
+	 * 
+	 * @param timeoutMs
+	 * @throws InterruptedException
+	 * @throws I2PException
+	 */
+	public void waitIncoming(long timeoutMs) throws I2PException, InterruptedException {
+		if (this._socketManager.getConnectionManager().getSession().isClosed())
+			throw new I2PException("Session is closed");
         this._socketManager.getConnectionManager().getConnectionHandler().waitSyn(timeoutMs);
 	}
 }
