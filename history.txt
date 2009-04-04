@@ -1,3 +1,7 @@
+2009-04-04 sponge
+    * Hopeful fixups to the infamous orpahned tunnel problem.
+    * BOB now 0.0.5
+
 2009-04-04 zzz
     * NTCP: Don't bid on messages too big to handle
 
