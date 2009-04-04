@@ -1,3 +1,6 @@
+2009-04-04 zzz
+    * NTCP: Don't bid on messages too big to handle
+
 2009-04-03 zzz
     * Console:
       - Fix bug with IE buttons not working,
