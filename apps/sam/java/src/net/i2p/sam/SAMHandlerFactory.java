@@ -84,11 +84,13 @@ public class SAMHandlerFactory {
         }
 
         String ver = chooseBestVersion(minVer, maxVer);
-        if (ver == null)
-            throw new SAMException("No version specified");
 
-        // Let's answer positively
         try {
+            if (ver == null) {
+            	s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=NOVERSION\n").getBytes("ISO-8859-1")));
+            	return null ;
+            }
+            // Let's answer positively
             s.write(ByteBuffer.wrap(("HELLO REPLY RESULT=OK VERSION="
                        + ver + "\n").getBytes("ISO-8859-1")));
         } catch (UnsupportedEncodingException e) {

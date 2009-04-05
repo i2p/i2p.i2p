@@ -327,7 +327,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 return false;
             }
 
-            Destination dest;
+            Destination dest = null ;
             if (name.equals("ME")) {
                 if (getRawSession() != null) {
                     dest = getRawSession().getDestination();
@@ -340,7 +340,10 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     return false;
                 }
             } else {
-                dest = SAMUtils.getDest(name);
+            	try {
+            		dest = SAMUtils.getDest(name);
+            	} catch (DataFormatException e) {
+            	}
             }
             
             if (dest == null) {

@@ -44,16 +44,18 @@ def accept() :
 	sock.send("HELLO VERSION MIN=3.0 MAX=3.0\n")
 	sys.stdout.write(sock.recv(1000))
 	sock.send("STREAM ACCEPT ID=" + name + silent+"\n")
-	print "STREAM ACCEPT ID="+name+silent+"\n"
+	print "STREAM ACCEPT ID="+name+silent
+	if (silent==" SILENT=false") :
+		sys.stdout.write( sock.recv(100) )
 	return sock
 
 def echo( sock, lines ) :
 	l = 0
 	while lines==-1 or l<lines :
 	    chunk = sock.recv(1000)
-	    sys.stdout.write(chunk)
 	    if lines!=-1 : l = l + 1
 	    if not chunk : break
+	    print chunk
 	    sock.send(chunk)
 	print
 

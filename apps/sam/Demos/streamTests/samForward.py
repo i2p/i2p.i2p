@@ -55,4 +55,10 @@ while 1 :
     chunk = sock.recv(100)
     sys.stdout.write(chunk)
     if not chunk : break
+print "Forward socket closed"
+l=0
+while 1 :
+    chunk = sess.recv(100)
+    sys.stdout.write(chunk)
+    if not chunk : break
 

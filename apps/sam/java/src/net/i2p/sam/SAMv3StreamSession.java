@@ -77,7 +77,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    }
 
 	    private void initSAMStreamSession(String login)
-	    	throws IOException, DataFormatException, SAMException{
+	    	throws IOException, DataFormatException, SAMException {
 
 	        SAMv3Handler.SessionRecord rec = getDB().get(login);
 	        String dest = rec.getDest() ;
@@ -131,8 +131,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    public void connect ( SAMv3Handler handler, String dest, Properties props ) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedIOException, IOException {
 
 	    	boolean verbose = (props.getProperty("SILENT", "false").equals("false"));
-	        Destination d = new Destination();
-	        d = SAMUtils.getDest(dest);
+	        Destination d = SAMUtils.getDest(dest);
 
 	        I2PSocketOptions opts = socketMgr.buildOptions(props);
 	        if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
@@ -148,7 +147,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	        
 	        if ( rec==null ) throw new InterruptedIOException() ;
 	        
-	        if (verbose) handler.notifyStreamOutgoingConnection("OK") ;
+	        handler.notifyStreamResult(verbose, "OK", null) ;
 
 	        handler.stealSocket() ;
 	        

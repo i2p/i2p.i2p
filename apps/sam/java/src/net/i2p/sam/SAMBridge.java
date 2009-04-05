@@ -280,33 +280,43 @@ public class SAMBridge implements Runnable {
                                + s.socket().getInetAddress().toString() + ":"
                                + s.socket().getPort());
 
-                try {
-                    SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps);
-                    if (handler == null) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("SAM handler has not been instantiated");
+                class HelloHandler implements Runnable {
+                	SocketChannel s ;
+                	SAMBridge parent ;
+                	HelloHandler(SocketChannel s, SAMBridge parent) { 
+                		this.s = s ; 
+                	}
+                	public void run() {
                         try {
-                            s.close();
-                        } catch (IOException e) {}
-                        continue;
-                    }
-                    handler.setBridge(this);
-                    handler.startHandling();
-                } catch (SAMException e) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("SAM error: " + e.getMessage(), e);
-                    try {
-                        String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
-                        s.write(ByteBuffer.wrap(reply.getBytes("ISO-8859-1")));
-                    } catch (IOException ioe) {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("SAM Error sending error reply", ioe);
-                    }
-                    try { s.close(); } catch (IOException ioe) {}
-                } catch (Exception ee) {
-                    try { s.close(); } catch (IOException ioe) {}
-                    _log.log(Log.CRIT, "Unexpected error handling SAM connection", ee);
-                } 
+                            SAMHandler handler = SAMHandlerFactory.createSAMHandler(s, i2cpProps);
+                            if (handler == null) {
+                                if (_log.shouldLog(Log.DEBUG))
+                                    _log.debug("SAM handler has not been instantiated");
+                                try {
+                                    s.close();
+                                } catch (IOException e) {}
+                                return;
+                            }
+                            handler.setBridge(parent);
+                            handler.startHandling();
+                        } catch (SAMException e) {
+                            if (_log.shouldLog(Log.ERROR))
+                                _log.error("SAM error: " + e.getMessage(), e);
+                            try {
+                                String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
+                                s.write(ByteBuffer.wrap(reply.getBytes("ISO-8859-1")));
+                            } catch (IOException ioe) {
+                                if (_log.shouldLog(Log.ERROR))
+                                    _log.error("SAM Error sending error reply", ioe);
+                            }
+                            try { s.close(); } catch (IOException ioe) {}
+                        } catch (Exception ee) {
+                            try { s.close(); } catch (IOException ioe) {}
+                            _log.log(Log.CRIT, "Unexpected error handling SAM connection", ee);
+                        }                		
+                	}
+                }
+                new I2PAppThread(new HelloHandler(s,this), "HelloHandler").start();
             }
         } catch (Exception e) {
             if (_log.shouldLog(Log.ERROR))
