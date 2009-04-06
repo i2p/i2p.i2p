@@ -81,6 +81,8 @@ class ConnectionHandler {
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
             SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+            // advertise the new syn packet to threads that could be waiting
+            // (by calling waitSyn(long)
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
             	synchronized (this._synSignal) {this._synSignal.notifyAll();}
         } else {
@@ -103,8 +105,7 @@ class ConnectionHandler {
     		long now = this._context.clock().now() ;
     		long expiration = now + ms ;
     		while ( expiration > now || ms<=0 ) {
-    			// check we have not missed a SYN packet before entering
-    			// the lock
+    			// check if there is a SYN packet in the queue
     			for ( Packet p : this._synQueue ) {
     				if ( p.isFlagSet(Packet.FLAG_SYNCHRONIZE) ) return ;
     			}
