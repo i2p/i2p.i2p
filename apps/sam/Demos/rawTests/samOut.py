@@ -13,7 +13,7 @@ import time
 if len(sys.argv)>=2 :
 	name = sys.argv[1]
 else :
-	name = "datagramSamForward"
+	name = "rawSamForward"
 
 if len(sys.argv)>2 :
 	message = ''.join([s+' ' for s in sys.argv[2:]]).strip()
