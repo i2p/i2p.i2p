@@ -37,9 +37,11 @@ public class I2PSink implements Sink {
         //System.out.print("w");
         // create payload
         byte[] payload;
-        if(!this.raw)
-            payload = this.maker.makeI2PDatagram(data);
-        else
+        if(!this.raw) {
+            synchronized(this.maker) {
+                payload = this.maker.makeI2PDatagram(data);
+            }
+        } else
             payload = data;
         
         // send message
