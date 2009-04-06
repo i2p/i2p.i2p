@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
-import java.util.Map;
 
 import net.i2p.I2PAppContext;
 
@@ -56,6 +55,7 @@ public class SimpleTimer2 {
              super(threads, factory);
         }
 
+        @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
             if (t != null) // shoudn't happen, caught in RunnableEvent.run()
@@ -67,6 +67,10 @@ public class SimpleTimer2 {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
             rv.setName(_name + ' ' + (++_count) + '/' + THREADS);
+            String name = rv.getThreadGroup().getName();
+            if(!(name.isEmpty() || name.equals("Main") || name.equals("main"))) {
+                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
+            }
             rv.setDaemon(true);
             return rv;
         }
@@ -232,6 +236,7 @@ public class SimpleTimer2 {
         public abstract void timeReached();
     }
 
+    @Override
     public String toString() {
         return _name;
     }

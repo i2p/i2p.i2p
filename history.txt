@@ -1,3 +1,7 @@
+2009-04-06 sponge
+    * Debugging to make SimpleTimer2 and SimpleScheduler easier to debug.
+    * Fix for the config files in the GUI from mathiasdm
+
 2009-04-04 sponge
     * Hopeful fixups to the infamous orpahned tunnel problem.
     * BOB now 0.0.5
