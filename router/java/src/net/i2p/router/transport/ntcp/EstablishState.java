@@ -462,7 +462,6 @@ public class EstablishState {
                     if (!_verified) {
                         _context.statManager().addRateData("ntcp.invalidSignature", 1, 0);
                         fail("Signature was invalid - attempt to spoof " + _con.getRemotePeer().calculateHash().toBase64() + "?");
-                        return;
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(prefix() + "signature verified from Bob.  done!");
@@ -472,10 +471,12 @@ public class EstablishState {
                         byte nextReadIV[] = new byte[16];
                         System.arraycopy(_e_bobSig, _e_bobSig.length-16, nextReadIV, 0, nextReadIV.length);
                         _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, nextReadIV); // skew in seconds
-                       _transport.setIP(_con.getRemotePeer().calculateHash(),
-                                        _con.getChannel().socket().getInetAddress().getAddress());
-                        return;
+                        // if socket gets closed this will be null - prevent NPE
+                        InetAddress ia = _con.getChannel().socket().getInetAddress();
+                        if (ia != null)
+                            _transport.setIP(_con.getRemotePeer().calculateHash(), ia.getAddress());
                     }
+                    return;
                 }
             }
         }
