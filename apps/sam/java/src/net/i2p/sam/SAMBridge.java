@@ -51,11 +51,17 @@ public class SAMBridge implements Runnable {
     private boolean acceptConnections = true;
 
     private static final int SAM_LISTENPORT = 7656;
+    
     public static final String DEFAULT_SAM_KEYFILE = "sam.keys";
-    public static final String PROP_DATAGRAM_HOST = "sam.datagram.host";
-    public static final String PROP_DATAGRAM_PORT = "sam.datagram.port";
-    public static final String DEFAULT_DATAGRAM_HOST = "0.0.0.0";
-    public static final String DEFAULT_DATAGRAM_PORT = "7655";
+    public static final String PROP_TCP_HOST = "sam.tcp.host";
+    public static final String PROP_TCP_PORT = "sam.tcp.port";
+    protected static final String DEFAULT_TCP_HOST = "0.0.0.0";
+    protected static final String DEFAULT_TCP_PORT = "7656";
+    
+    public static final String PROP_DATAGRAM_HOST = "sam.udp.host";
+    public static final String PROP_DATAGRAM_PORT = "sam.udp.port";
+    protected static final String DEFAULT_DATAGRAM_HOST = "0.0.0.0";
+    protected static final String DEFAULT_DATAGRAM_PORT = "7655";
 
     
     private SAMBridge() {}
@@ -199,10 +205,14 @@ public class SAMBridge implements Runnable {
         }
     }
     
+    static class HelpRequested extends Exception {static final long serialVersionUID=0x1;}
+    
     /**
      * Usage:
      *  <pre>SAMBridge [ keyfile [listenHost ] listenPort [ name=val ]* ]</pre>
-     * 
+     * or:
+     *  <pre>SAMBridge [ name=val ]* </pre>
+     *  
      * name=val options are passed to the I2CP code to build a session, 
      * allowing the bridge to specify an alternate I2CP host and port, tunnel
      * depth, etc.
@@ -211,24 +221,34 @@ public class SAMBridge implements Runnable {
     public static void main(String args[]) {
         String keyfile = DEFAULT_SAM_KEYFILE;
         int port = SAM_LISTENPORT;
-        String host = "0.0.0.0";
+        String host = DEFAULT_TCP_HOST;
         Properties opts = null;
         if (args.length > 0) {
-            keyfile = args[0];
-            int portIndex = 1;
-            try {
-                port = Integer.parseInt(args[portIndex]);
-            } catch (NumberFormatException nfe) {
-                host = args[1];
-                portIndex++;
-                try {
-                    port = Integer.parseInt(args[portIndex]);
-                } catch (NumberFormatException nfe1) {
-                    usage();
-                    return;
-                }
-            }
-            opts = parseOptions(args, portIndex+1);
+        	try {
+        		opts = parseOptions(args, 0);
+        		keyfile = args[0];
+        		int portIndex = 1;
+        		try {
+        			if (args.length>portIndex) port = Integer.parseInt(args[portIndex]);
+        		} catch (NumberFormatException nfe) {
+        			host = args[portIndex];
+        			portIndex++;
+        			try {
+        				if (args.length>portIndex) port = Integer.parseInt(args[portIndex]);
+        			} catch (NumberFormatException nfe1) {
+        				try {
+        					port = Integer.parseInt(opts.getProperty(SAMBridge.PROP_TCP_PORT, SAMBridge.DEFAULT_TCP_PORT));
+        					host = opts.getProperty(SAMBridge.PROP_TCP_HOST, SAMBridge.DEFAULT_TCP_HOST);
+        				} catch (NumberFormatException e) {
+        					usage();
+        					return;
+        				}
+        			}
+        		}
+        	} catch (HelpRequested e) {
+        		usage();
+        		return;
+        	}
         }
         SAMBridge bridge = new SAMBridge(host, port, opts, keyfile);
         I2PAppThread t = new I2PAppThread(bridge, "SAMListener");
@@ -244,10 +264,11 @@ public class SAMBridge implements Runnable {
         t.start();
     }
 
-    private static Properties parseOptions(String args[], int startArgs) {
+    private static Properties parseOptions(String args[], int startArgs) throws HelpRequested {
         Properties props = new Properties();
         // skip over first few options
         for (int i = startArgs; i < args.length; i++) {
+        	if (args[i].equals("-h")) throw new HelpRequested();
             int eq = args[i].indexOf('=');
             if (eq <= 0) continue;
             if (eq >= args[i].length()-1) continue;
@@ -263,11 +284,26 @@ public class SAMBridge implements Runnable {
     
     private static void usage() {
         System.err.println("Usage: SAMBridge [keyfile [listenHost] listenPortNum[ name=val]*]");
+        System.err.println("or:");
+        System.err.println("       SAMBridge [ name=val ]*");
         System.err.println(" keyfile: location to persist private keys (default sam.keys)");
         System.err.println(" listenHost: interface to listen on (0.0.0.0 for all interfaces)");
         System.err.println(" listenPort: port to listen for SAM connections on (default 7656)");
         System.err.println(" name=val: options to pass when connecting via I2CP, such as ");
         System.err.println("           i2cp.host=localhost and i2cp.port=7654");
+        System.err.println("");
+        System.err.println("Host and ports of the SAM bridge can be specified with the alternate");
+        System.err.println("form by specifying options "+SAMBridge.PROP_TCP_HOST+" and/or "+
+        		SAMBridge.PROP_TCP_PORT);
+        System.err.println("");
+        System.err.println("Options "+SAMBridge.PROP_DATAGRAM_HOST+" and "+SAMBridge.PROP_DATAGRAM_PORT+
+        		" specify the listening ip");
+        System.err.println("range and the port of SAM datagram server. This server is");
+        System.err.println("only launched after a client creates the first SAM datagram");
+        System.err.println("or raw session, after a handshake with SAM version >= 3.0.");
+        System.err.println("");
+        System.err.println("The option loglevel=[DEBUG|WARN|ERROR|CRIT] can be used");
+        System.err.println("for tuning the log verbosity.\n");
     }
     
     public void run() {
