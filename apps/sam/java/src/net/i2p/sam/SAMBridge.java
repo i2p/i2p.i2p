@@ -320,7 +320,8 @@ public class SAMBridge implements Runnable {
                 	SocketChannel s ;
                 	SAMBridge parent ;
                 	HelloHandler(SocketChannel s, SAMBridge parent) { 
-                		this.s = s ; 
+                		this.s = s ;
+                		this.parent = parent ;
                 	}
                 	public void run() {
                         try {
