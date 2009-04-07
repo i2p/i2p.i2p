@@ -1,3 +1,62 @@
+2009-04-07 sponge
+    * SimpleTimer2, SimpleScheduler fixed so that the threads all run from
+      The main threadgroup, not in the current possible child threadgroup.
+      So long as any SimpleTimer2/SimpleScheduler is started *BEFORE* any
+      child threadgroups, the constructors are threadgroup safe. What would
+      be super cool is if they were to be all jailed within thier very own
+      threadgroup too, but, I2P isn't up to the task of this yet.
+    * Fixes to BOB to ensure the above is true.
+
+2009-04-06 sponge
+    * Debugging to make SimpleTimer2 and SimpleScheduler easier to debug.
+    * Fix for the config files in the GUI from mathiasdm
+
+2009-04-04 sponge
+    * Hopeful fixups to the infamous orpahned tunnel problem.
+    * BOB now 0.0.5
+
+2009-04-04 zzz
+    * NTCP: Don't bid on messages too big to handle
+
+2009-04-03 zzz
+    * Console:
+      - Fix bug with IE buttons not working,
+        because it sends the label instead of the value
+      - Display version of downloaded update
+    * Update:
+      - Change default to "Download and verify"
+      - Change news fetch default to 24h (was 12h)
+
+2009-04-03 sponge
+    * Fix broken dependencies for BOB.jar
+    * Router build version incremented to 5.
+
+2009-04-02 zzz
+    * Profiles:
+      - Remove unused calculators and RateStats:
+        CapacityCalculator, StrictSpeedCalculator, IsFailingCalculator;
+        sendFailureSize, processSuccessRate, processfailureRate, commErrorRate,
+        tunnelTestResponseTimeSlow
+      - Reduced number of Rates in these RateStats:
+        sendSuccessSize, receiveSize, rejectRate, failRate
+      - ~5KB/profile savings total
+      - Deflate speed calculation once an hour instead of once a day,
+        to improve fast tier selection
+      - Remove dup comment in persisted files
+    * StatisticsManager - effective in 0.7.2:
+      - Spoof uptime to 90m for all
+      - Change tunnel stats from 10m to 60m
+    * Transport:
+      - Maintain a router hash -> IP map in transport,
+        to support additional IP checks (unused for now)
+      - Catch error on pre-2.6 kernels
+      - Some concurrent conversion
+      - Fix an HTML error on peers.jsp
+
+2009-04-01 zzz
+    * I2PTunnel: Fix tunnel close
+      http://forum.i2p/viewtopic.php?t=3231
+
 2009-03-30 zzz
     * I2CP:
       - Implement BandwidthLimitsMessage

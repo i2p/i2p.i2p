@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.6" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
+    <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="uploadLabel" min="-2" max="-2" attributes="0"/>
+                                  <Component id="uploadBurstLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="uploadUsageLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="uploadBurstField" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="uploadField" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="uploadMonth" alignment="0" max="32767" attributes="1"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="downloadLabel" min="-2" max="-2" attributes="0"/>
+                                  <Component id="downloadBurstLabel" min="-2" max="-2" attributes="0"/>
+                                  <Component id="downloadUsageLabel" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="downloadField" max="32767" attributes="1"/>
+                                  <Component id="downloadMonth" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="downloadBurstField" alignment="0" max="32767" attributes="1"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="previousButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="finishButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace min="-2" pref="400" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="-2" pref="81" max="-2" attributes="0"/>
+              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="uploadLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="downloadLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uploadField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="downloadField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="uploadBurstLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="downloadBurstLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="downloadBurstField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uploadBurstField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="uploadUsageLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="downloadUsageLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uploadMonth" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="downloadMonth" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="48" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="previousButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="finishButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JButton" name="finishButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="finishButton.text"/>
+        <Property name="name" type="java.lang.String" value="finishButton" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="finishButtonMouseClicked"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="previousButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="previousButton.text"/>
+        <Property name="name" type="java.lang.String" value="previousButton" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="previousButtonMouseClicked"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
+        <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uploadLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="uploadLabel.text"/>
+        <Property name="name" type="java.lang.String" value="uploadLabel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="downloadLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="downloadLabel.text"/>
+        <Property name="name" type="java.lang.String" value="downloadLabel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uploadBurstLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="uploadBurstLabel.text"/>
+        <Property name="name" type="java.lang.String" value="uploadBurstLabel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="downloadBurstLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="downloadBurstLabel.text"/>
+        <Property name="name" type="java.lang.String" value="downloadBurstLabel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uploadUsageLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="uploadUsageLabel.text"/>
+        <Property name="name" type="java.lang.String" value="uploadUsageLabel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="downloadUsageLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="downloadUsageLabel.text"/>
+        <Property name="name" type="java.lang.String" value="downloadUsageLabel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="uploadField">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="uploadField.text"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[77, 27]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="uploadField" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="speedFieldKeyReleased"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="uploadBurstField">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="uploadBurstField.text"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[77, 27]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="uploadBurstField" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="downloadField">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="downloadField.text"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[77, 27]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="downloadField" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="speedFieldKeyReleased"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="downloadBurstField">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="downloadBurstField.text"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[77, 27]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="downloadBurstField" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uploadMonth">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="uploadMonth.text"/>
+        <Property name="name" type="java.lang.String" value="uploadMonth" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="downloadMonth">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="downloadMonth.text"/>
+        <Property name="name" type="java.lang.String" value="downloadMonth" noResource="true"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
