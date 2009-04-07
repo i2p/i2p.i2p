@@ -34,6 +34,8 @@ import java.util.Properties;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.RetransmissionTimer;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * <span style="font-size:8px;font-family:courier;color:#EEEEEE;background-color:#000000">
@@ -159,9 +161,10 @@ public class BOB {
 		// Set up all defaults to be passed forward to other threads.
 		// Re-reading the config file in each thread is pretty damn stupid.
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
-
 		// This is here just to ensure there is no interference with our threadgroups.
 		RetransmissionTimer Y = RetransmissionTimer.getInstance();
+		SimpleScheduler Y1 = SimpleScheduler.getInstance();
+		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
 		i = Y.hashCode();
 
 		{

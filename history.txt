@@ -1,3 +1,12 @@
+2009-04-07 sponge
+    * SimpleTimer2, SimpleScheduler fixed so that the threads all run from
+      The main threadgroup, not in the current possible child threadgroup.
+      So long as any SimpleTimer2/SimpleScheduler is started *BEFORE* any
+      child threadgroups, the constructors are threadgroup safe. What would
+      be super cool is if they were to be all jailed within thier very own
+      threadgroup too, but, I2P isn't up to the task of this yet.
+    * Fixes to BOB to ensure the above is true.
+
 2009-04-06 sponge
     * Debugging to make SimpleTimer2 and SimpleScheduler easier to debug.
     * Fix for the config files in the GUI from mathiasdm

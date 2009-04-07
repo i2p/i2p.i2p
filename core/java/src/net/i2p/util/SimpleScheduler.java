@@ -42,6 +42,7 @@ public class SimpleScheduler {
         _name = name;
         _count = 0;
         _executor = new ScheduledThreadPoolExecutor(THREADS, new CustomThreadFactory());
+        _executor.prestartAllCoreThreads();
     }
     
     /**
@@ -90,10 +91,11 @@ public class SimpleScheduler {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
             rv.setName(_name +  ' ' + (++_count) + '/' + THREADS);
-            String name = rv.getThreadGroup().getName();
-            if(!(name.isEmpty() || name.equals("Main") || name.equals("main"))) {
-                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
-            }
+// Uncomment this to test threadgrouping, but we should be all safe now that the constructor preallocates!
+//            String name = rv.getThreadGroup().getName();
+//            if(!name.equals("main")) {
+//                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
+//            }
             rv.setDaemon(true);
             return rv;
         }
