@@ -166,6 +166,8 @@ public class BOB {
 		SimpleScheduler Y1 = SimpleScheduler.getInstance();
 		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
 		i = Y.hashCode();
+		i = Y1.hashCode();
+		i = Y2.hashCode();
 
 		{
 			try {

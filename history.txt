@@ -1,3 +1,6 @@
+2009-04-07 sponge
+    * BOB prevent jvac from optimizing out thread-group code from -10
+
 2009-04-07 zzz
     * NTCP: Prevent occasional NPE introduced in -4
     * streamr: Synchronize DatagramMaker
