@@ -1,3 +1,7 @@
+2009-04-07 zzz
+    * NTCP: Prevent occasional NPE introduced in -4
+    * streamr: Synchronize DatagramMaker
+
 2009-04-07 sponge
     * SimpleTimer2, SimpleScheduler fixed so that the threads all run from
       The main threadgroup, not in the current possible child threadgroup.
