@@ -23,6 +23,6 @@ public class SpeedHelper {
     }
     
     public static int calculateMonthlyUsage(int kbytes) {
-        return (kbytes*3600*24*31)/1000000;
+        return (int) ((((long)kbytes)*3600*24*31)/1000000);
     }
 }
