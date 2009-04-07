@@ -37,7 +37,6 @@
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
         <ant dir="apps/i2psnark/java/" target="war" />
-        <ant dir="apps/desktopgui/" target="jar" />
     </target>
     <target name="builddepSmall">
         <ant dir="core/java/" target="jar" />
@@ -105,7 +104,6 @@
     <target name="compile" />
     <target name="jar" depends="jarSmall" >
         <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
@@ -216,13 +214,6 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
-        <mkdir dir="pkg-temp/desktopgui/resources/" />
-        <copy todir="pkg-temp/desktopgui/resources/" >
-          <fileset dir="apps/desktopgui/desktopgui/resources/" />
-        </copy>
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
         <!-- <copy file="build/sucker.jar" todir="pkg-temp/lib" /> -->
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
