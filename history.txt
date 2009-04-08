@@ -1,3 +1,15 @@
+2009-04-08 zzz
+    * IPV6/localhost:
+      - Enable IPv6 stack in the JVM, hopefully won't break anything
+      - Patch Jetty to support binding to IPv6 addresses
+      - Allow multiple bind addresses for the router console
+        in the clients.config file; for new installs the
+        default is now "127.0.0.1,::1"
+      - Change most instances of "localhost" to "127.0.0.1"
+        throughout the code
+    * Router:
+      - Move some classes to private static inner
+
 2009-04-07 sponge
     * BOB prevent jvac from optimizing out thread-group code from -10
 
