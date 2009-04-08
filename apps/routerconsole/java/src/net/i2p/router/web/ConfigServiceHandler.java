@@ -155,7 +155,7 @@ public class ConfigServiceHandler extends FormHandler {
         }
         // releases <= 0.6.5 deleted the entry completely
         if (shouldLaunchBrowser && !found) {
-            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser", "http://localhost:7657", 5, false);
+            ClientAppConfig ca = new ClientAppConfig(UrlLauncher.class.getName(), "consoleBrowser", "http://127.0.0.1:7657", 5, false);
             clients.add(ca);
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);

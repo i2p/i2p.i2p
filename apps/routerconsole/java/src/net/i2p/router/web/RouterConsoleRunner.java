@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.SysTray;
@@ -36,6 +37,14 @@ public class RouterConsoleRunner {
         System.setProperty("java.awt.headless", "true");
     }
     
+    /**
+     *  @param args second arg may be a comma-separated list of bind addresses,
+     *              for example ::1,127.0.0.1
+     *              On XP, the other order (127.0.0.1,::1) fails the IPV6 bind,
+     *              because 127.0.0.1 will bind ::1 also. But even though it's bound
+     *              to both, we can't connect to [::1]:7657 for some reason.
+     *              So the wise choice is ::1,127.0.0.1
+     */
     public RouterConsoleRunner(String args[]) {
         if (args.length == 3) {
             _listenPort = args[0].trim();
@@ -66,7 +75,24 @@ public class RouterConsoleRunner {
             rewrite = true;
         }
         try {
-            _server.addListener(_listenHost + ':' + _listenPort);
+            StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
+            int boundAddresses = 0;
+            while (tok.hasMoreTokens()) {
+                String host = tok.nextToken().trim();
+                try {
+                    if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
+                        _server.addListener('[' + host + "]:" + _listenPort);
+                    else
+                        _server.addListener(host + ':' + _listenPort);
+                    boundAddresses++;
+                } catch (IOException ioe) { // this doesn't seem to work, exceptions don't happen until start() below
+                    System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
+                }
+            }
+            if (boundAddresses <= 0) {
+                System.err.println("Unable to bind routerconsole to any address on port " + _listenPort);
+                return;
+            }
             _server.setRootWebApp(ROUTERCONSOLE);
             WebApplicationContext wac = _server.addWebApplication("/", _webAppsDir + ROUTERCONSOLE + ".war");
             initialize(wac);
@@ -100,7 +126,12 @@ public class RouterConsoleRunner {
         try {
             _server.start();
         } catch (Exception me) {
-            me.printStackTrace();
+            System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
+                               "If your console is still accessible at http://127.0.0.1:7657/,\n" +
+                               "this may be a problem only with binding to the IPV6 address ::1.\n" +
+                               "If so, you may ignore this error, or remove the\n" +
+                               "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.\n" +
+                               "Exception: " + me);
         }
         try {
             SysTray tray = SysTray.getInstance();

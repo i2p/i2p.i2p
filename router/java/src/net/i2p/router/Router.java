@@ -90,8 +90,6 @@ public class Router {
         System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
-        // until we handle restricted routes and/or all peers support v6, try v4 first
-        System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("http.agent", "I2P");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
@@ -135,7 +133,9 @@ public class Router {
                 envProps.setProperty(k, v);
             }
         }
-            
+        // This doesn't work, guess it has to be in the static block above?
+        // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
+        //    System.setProperty("java.net.preferIPv4Stack", "true");
 
         _context = new RouterContext(this, envProps);
         _routerInfo = null;
@@ -1206,13 +1206,13 @@ public class Router {
         return Math.max(send, recv);
     }
     
-}
+/* following classes are now private static inner classes, didn't bother to reindent */
 
 /**
  * coalesce the stats framework every minute
  *
  */
-class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
+private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
     private RouterContext _ctx;
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
@@ -1278,7 +1278,7 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
  * This is done here because we want to make sure the key is updated before anyone
  * uses it.
  */
-class UpdateRoutingKeyModifierJob extends JobImpl {
+private static class UpdateRoutingKeyModifierJob extends JobImpl {
     private Log _log;
     private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
     public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
@@ -1310,7 +1310,7 @@ class UpdateRoutingKeyModifierJob extends JobImpl {
     }
 }
 
-class MarkLiveliness implements Runnable {
+private static class MarkLiveliness implements Runnable {
     private RouterContext _context;
     private Router _router;
     private File _pingFile;
@@ -1342,7 +1342,7 @@ class MarkLiveliness implements Runnable {
     }
 }
 
-class ShutdownHook extends Thread {
+private static class ShutdownHook extends Thread {
     private RouterContext _context;
     private static int __id = 0;
     private int _id;
@@ -1359,7 +1359,7 @@ class ShutdownHook extends Thread {
 }
 
 /** update the router.info file whenever its, er, updated */
-class PersistRouterInfoJob extends JobImpl {
+private static class PersistRouterInfoJob extends JobImpl {
     private Log _log;
     public PersistRouterInfoJob(RouterContext ctx) { 
         super(ctx); 
@@ -1388,4 +1388,6 @@ class PersistRouterInfoJob extends JobImpl {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
+}
+
 }

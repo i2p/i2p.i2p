@@ -206,7 +206,7 @@ public class EditBean extends IndexBean {
         if (tun != null)
             return tun.getI2CPHost();
         else
-            return "localhost";
+            return "127.0.0.1";
     }
     
     public String getI2CPPort(int tunnel) {
