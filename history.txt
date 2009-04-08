@@ -1,3 +1,6 @@
+2009-04-08 sponge
+    * More hopeful fixups to the infamous orpahned tunnel problem. *Sigh*
+
 2009-04-08 zzz
     * IPV6/localhost:
       - Enable IPv6 stack in the JVM, hopefully won't break anything
