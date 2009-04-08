@@ -6,7 +6,7 @@ Proxy-Connection: close
 
 <html><head>
 <title>Outproxy Not Found</title>
-<link rel="shortcut icon" href="http://localhost:7657/favicon.ico" />
+<link rel="shortcut icon" href="http://127.0.0.1:7657/favicon.ico" />
 <style type='text/css'>
 div.warning {
 	margin: 0em 1em 1em 224px;
@@ -33,8 +33,8 @@ div.logo {
 </head>
 <body>
 <div class=logo>
- <a href="http://localhost:7657/index.jsp" title="Router Console"><img src="http://localhost:7657/i2plogo.png" alt="Router Console" width="187" height="35" border="0"/></a><br />
- [<a href="http://localhost:7657/config.jsp">configuration</a> | <a href="http://localhost:7657/help.jsp">help</a>]
+ <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://127.0.0.1:7657/i2plogo.png" alt="Router Console" width="187" height="35" border="0"/></a><br />
+ [<a href="http://127.0.0.1:7657/config.jsp">configuration</a> | <a href="http://127.0.0.1:7657/help.jsp">help</a>]
 </div>
 <div class=warning id=warning>
 The WWW Outproxy was not found. 
@@ -43,8 +43,8 @@ or your router is not yet well-integrated with peers.
 You may want to 
 <a href="javascript: parent.window.location.reload()">retry</a> 
 as this will randomly reselect an outproxy from the pool you have defined 
-<a href="http://localhost:7657/i2ptunnel/index.jsp">here</a> 
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">here</a> 
 (if you have more than one configured). 
 If you continue to have trouble you may want to edit your outproxy list 
-<a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=0">here</a>. 
+<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">here</a>. 
 <BR><BR>Could not find the following destination:<BR><BR>

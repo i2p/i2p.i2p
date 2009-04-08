@@ -162,7 +162,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
-        _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
         String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
         try {
             _portNum = Integer.parseInt(portNum);

@@ -25,7 +25,7 @@
  <a href="susidns/index.jsp">SusiDNS</a> |
  <!-- <a href="syndie/">Syndie</a> | -->
  <a href="i2psnark/">I2PSnark</a> |
- <a href="http://localhost:7658/">My Eepsite</a> <br>
+ <a href="http://127.0.0.1:7658/">My Eepsite</a> <br>
  <a href="i2ptunnel/index.jsp">I2PTunnel</a> |
  <a href="tunnels.jsp">Tunnels</a> |
  <a href="profiles.jsp">Profiles</a> |

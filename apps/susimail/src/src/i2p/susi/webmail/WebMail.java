@@ -76,7 +76,7 @@ public class WebMail extends HttpServlet
 
 	private static final int BUFSIZE = 4096;
 
-	private static final String DEFAULT_HOST = "localhost";
+	private static final String DEFAULT_HOST = "127.0.0.1";
 	private static final int DEFAULT_POP3PORT = 7660;
 	private static final int DEFAULT_SMTPPORT = 7659;
 	

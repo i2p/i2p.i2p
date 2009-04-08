@@ -132,7 +132,7 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+        openRouterConsole("http://127.0.0.1:" + _portString + "/index.jsp");
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -153,7 +153,7 @@ public class SysTray implements SysTrayMenuListener {
             if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
                 setBrowser(browser);
         } else if (e.getActionCommand().equals("openconsole")) {
-            openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+            openRouterConsole("http://127.0.0.1:" + _portString + "/index.jsp");
         }
     }
 
