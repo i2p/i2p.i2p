@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
@@ -51,15 +53,15 @@ public class SAMStreamSession {
 
     protected SAMStreamReceiver recv = null;
 
-    private SAMStreamSessionServer server = null;
+    protected SAMStreamSessionServer server = null;
 
     protected I2PSocketManager socketMgr = null;
 
     private Object handlersMapLock = new Object();
     /** stream id (Long) to SAMStreamSessionSocketReader */
-    private HashMap handlersMap = new HashMap();
+    private HashMap<Integer,SAMStreamSessionSocketReader> handlersMap = new HashMap<Integer,SAMStreamSessionSocketReader>();
     /** stream id (Long) to StreamSender */
-    private HashMap sendersMap = new HashMap();
+    private HashMap<Integer,StreamSender> sendersMap = new HashMap<Integer,StreamSender>();
 
     private Object idLock = new Object();
     private int lastNegativeId = 0;
@@ -75,6 +77,10 @@ public class SAMStreamSession {
 
     public static String PROP_FORCE_FLUSH = "sam.forceFlush";
     public static String DEFAULT_FORCE_FLUSH = "false";
+    
+    public SAMStreamSession() {
+    	
+    }
     
     /**
      * Create a new SAM STREAM session.
@@ -166,7 +172,7 @@ public class SAMStreamSession {
         }
     }
     
-    private class DisconnectListener implements I2PSocketManager.DisconnectListener {
+    protected class DisconnectListener implements I2PSocketManager.DisconnectListener {
         public void sessionDisconnected() {
             close();
         }
@@ -572,19 +578,20 @@ public class SAMStreamSession {
             _log.debug("run() called for socket reader " + id);
 
             int read = -1;
-            byte[] data = new byte[SOCKET_HANDLER_BUF_SIZE];
+            ByteBuffer data = ByteBuffer.allocateDirect(SOCKET_HANDLER_BUF_SIZE);
 
             try {
                 InputStream in = i2pSocket.getInputStream();
 
                 while (stillRunning) {
-                    read = in.read(data);
+                	data.clear();
+                    read = Channels.newChannel(in).read(data);
                     if (read == -1) {
                         _log.debug("Handler " + id + ": connection closed");
                         break;
                     }
-                    
-                    recv.receiveStreamBytes(id, data, read);
+                    data.flip();
+                    recv.receiveStreamBytes(id, data);
                 }
             } catch (IOException e) {
                 _log.debug("Caught IOException", e);
@@ -650,7 +657,7 @@ public class SAMStreamSession {
 
     protected class v1StreamSender extends StreamSender
       {
-        private List _data;
+        private List<ByteArray> _data;
         private int _id;
         private ByteCache _cache;
         private OutputStream _out = null;
@@ -660,7 +667,7 @@ public class SAMStreamSession {
         
 	public v1StreamSender ( I2PSocket s, int id ) throws IOException {
 	    super ( s, id );
-            _data = new ArrayList(1);
+            _data = new ArrayList<ByteArray>(1);
             _id = id;
             _cache = ByteCache.getInstance(4, 32*1024);
             _out = s.getOutputStream();
