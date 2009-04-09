@@ -48,17 +48,18 @@ public class I2Plistener implements Runnable {
 
 	/**
 	 * Constructor
+	 * @param SS
 	 * @param S
 	 * @param info
 	 * @param database
 	 * @param _log
 	 */
-	I2Plistener(I2PSocketManager S, NamedDB info, NamedDB database, Log _log) {
+	I2Plistener(I2PServerSocket SS, I2PSocketManager S, NamedDB info, NamedDB database, Log _log) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
-		serverSocket = this.socketManager.getServerSocket();
+		serverSocket = SS;
 		tgwatch = 1;
 	}
 
@@ -70,16 +71,6 @@ public class I2Plistener implements Runnable {
 	private void runlock() throws Exception {
 		database.releaseReadLock();
 		info.releaseReadLock();
-	}
-
-	private void wlock() throws Exception {
-		database.getWriteLock();
-		info.getWriteLock();
-	}
-
-	private void wunlock() throws Exception {
-		info.releaseWriteLock();
-		database.releaseWriteLock();
 	}
 
 	/**

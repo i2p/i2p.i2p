@@ -510,6 +510,8 @@
         </copy>
     </target>
     <target name="updaterWithDesktopgui" depends="prepupdateWithDesktopgui,updater" />
+    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, tarball" />
+    <target name="distWithDesktopgui" depends="pkgWithDesktopgui, javadoc" />
     <target name="distcleanWithDesktopgui" depends="distclean">
         <ant dir="apps/desktopgui" target="clean" />
     </target>
