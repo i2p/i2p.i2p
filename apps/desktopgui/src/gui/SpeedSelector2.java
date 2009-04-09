@@ -21,13 +21,13 @@ public class SpeedSelector2 extends javax.swing.JFrame {
     Properties props;
 
     /** Creates new form ProfileSelector2 */
-    public SpeedSelector2(Point point, Dimension dimension) {
+    public SpeedSelector2(Point point) {
         this.props = PropertyManager.getProps();
         initComponents();
         this.setLocation(point);
-        this.setSize(dimension);
         loadButtonSelection();
         this.setVisible(true);
+        this.requestFocus();
     }
 
     /** This method is called from within the constructor to
@@ -45,11 +45,15 @@ public class SpeedSelector2 extends javax.swing.JFrame {
         questionLabel = new javax.swing.JLabel();
         browseButton = new javax.swing.JRadioButton();
         downloadButton = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(desktopgui.Main.class).getContext().getResourceMap(SpeedSelector2.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setMinimumSize(new java.awt.Dimension(610, 330));
         setName("Form"); // NOI18N
+        setResizable(false);
+        getContentPane().setLayout(null);
 
         nextButton.setText(resourceMap.getString("nextButton.text")); // NOI18N
         nextButton.setName("nextButton"); // NOI18N
@@ -58,6 +62,8 @@ public class SpeedSelector2 extends javax.swing.JFrame {
                 nextButtonMouseClicked(evt);
             }
         });
+        getContentPane().add(nextButton);
+        nextButton.setBounds(440, 250, 90, 29);
 
         returnButton.setText(resourceMap.getString("returnButton.text")); // NOI18N
         returnButton.setName("returnButton"); // NOI18N
@@ -66,54 +72,32 @@ public class SpeedSelector2 extends javax.swing.JFrame {
                 returnButtonMouseClicked(evt);
             }
         });
+        getContentPane().add(returnButton);
+        returnButton.setBounds(336, 250, 90, 29);
 
         questionLabel.setText(resourceMap.getString("questionLabel.text")); // NOI18N
         questionLabel.setName("questionLabel"); // NOI18N
+        getContentPane().add(questionLabel);
+        questionLabel.setBounds(30, 40, 265, 17);
 
         buttonGroup1.add(browseButton);
         browseButton.setText(resourceMap.getString("browseButton.text")); // NOI18N
+        browseButton.setActionCommand(resourceMap.getString("browseButton.actionCommand")); // NOI18N
         browseButton.setName("browseButton"); // NOI18N
+        getContentPane().add(browseButton);
+        browseButton.setBounds(40, 130, 520, 40);
 
         buttonGroup1.add(downloadButton);
         downloadButton.setText(resourceMap.getString("downloadButton.text")); // NOI18N
+        downloadButton.setActionCommand(resourceMap.getString("downloadButton.actionCommand")); // NOI18N
         downloadButton.setName("downloadButton"); // NOI18N
+        getContentPane().add(downloadButton);
+        downloadButton.setBounds(40, 80, 499, 40);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(406, Short.MAX_VALUE)
-                .addComponent(returnButton)
-                .addGap(18, 18, 18)
-                .addComponent(nextButton)
-                .addGap(74, 74, 74))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(questionLabel)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(downloadButton)
-                            .addComponent(browseButton))))
-                .addContainerGap(32, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addComponent(questionLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(browseButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(downloadButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 120, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(nextButton)
-                    .addComponent(returnButton))
-                .addContainerGap())
-        );
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+        getContentPane().add(jLabel1);
+        jLabel1.setBounds(30, 190, 530, 50);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -121,18 +105,19 @@ public class SpeedSelector2 extends javax.swing.JFrame {
 private void returnButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_returnButtonMouseClicked
     saveButtonSelection();
     PropertyManager.saveProps(props);
-    new SpeedSelector(this.getLocationOnScreen(), this.getSize()).setVisible(true);
+    new SpeedSelector(this.getLocationOnScreen());
     this.dispose();
 }//GEN-LAST:event_returnButtonMouseClicked
 
 private void nextButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nextButtonMouseClicked
     saveButtonSelection();
     PropertyManager.saveProps(props);
-    new SpeedSelector3(this.getLocationOnScreen(), this.getSize()).setVisible(true);
+    new SpeedSelector3(this.getLocationOnScreen(), this.getSize());
     this.dispose();
 }//GEN-LAST:event_nextButtonMouseClicked
 
 private void loadButtonSelection() {
+    
     Enumeration<AbstractButton> elements = buttonGroup1.getElements();
     while(elements.hasMoreElements()) {
         AbstractButton button = elements.nextElement();
@@ -140,7 +125,7 @@ private void loadButtonSelection() {
             continue;
         if(props.getProperty(SpeedSelectorConstants.USERTYPE) == null)
             break;
-        String type = button.getText().split(":")[0];
+        String type = button.getActionCommand();
         if(type.equals(props.getProperty(SpeedSelectorConstants.USERTYPE))) {
             button.setSelected(true);
             break;
@@ -155,7 +140,7 @@ private void saveButtonSelection() {
         if(button == null)
             continue;
         if(button.isSelected()) {
-            String type = button.getText().split(":")[0];
+            String type = button.getActionCommand();
             props.setProperty(SpeedSelectorConstants.USERTYPE, type);
             break;
         }
@@ -166,6 +151,7 @@ private void saveButtonSelection() {
     private javax.swing.JRadioButton browseButton;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton downloadButton;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton nextButton;
     private javax.swing.JLabel questionLabel;
     private javax.swing.JButton returnButton;

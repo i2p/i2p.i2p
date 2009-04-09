@@ -25,4 +25,8 @@ public class SpeedHelper {
     public static int calculateMonthlyUsage(int kbytes) {
         return (int) ((((long)kbytes)*3600*24*31)/1000000);
     }
+    
+    public static int calculateSpeed(int gigabytes) {
+        return (int) (((long)gigabytes)*1000000/31/24/3600);
+    }
 }

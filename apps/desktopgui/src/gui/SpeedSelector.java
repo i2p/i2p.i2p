@@ -9,6 +9,7 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.Properties;
+import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import persistence.PropertyManager;
 import util.IntegerVerifier;
@@ -26,12 +27,13 @@ public class SpeedSelector extends javax.swing.JFrame {
         initComponentsCustom();
         initSpeeds(props);
         this.setVisible(true);
+        this.setLocationRelativeTo(null);
+        this.requestFocus();
     }
     
-    public SpeedSelector(Point point, Dimension dimension) {
+    public SpeedSelector(Point point) {
         this();
         this.setLocation(point);
-        this.setSize(dimension);
     }
     
     public void initComponentsCustom() {
@@ -53,100 +55,114 @@ public class SpeedSelector extends javax.swing.JFrame {
         downloadLabel = new javax.swing.JLabel();
         uploadChoice = new javax.swing.JComboBox();
         downloadChoice = new javax.swing.JComboBox();
-        kbps1 = new javax.swing.JLabel();
-        kbps2 = new javax.swing.JLabel();
+        speedExplanation = new javax.swing.JLabel();
+        uploadkbps = new javax.swing.JComboBox();
+        downloadkbps = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(desktopgui.Main.class).getContext().getResourceMap(SpeedSelector.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setMinimumSize(new java.awt.Dimension(610, 330));
         setName("Form"); // NOI18N
+        setResizable(false);
+        getContentPane().setLayout(null);
 
         nextButton.setText(resourceMap.getString("nextButton.text")); // NOI18N
+        nextButton.setMaximumSize(new java.awt.Dimension(72, 29));
+        nextButton.setMinimumSize(new java.awt.Dimension(72, 29));
         nextButton.setName("nextButton"); // NOI18N
         nextButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 nextButtonMouseClicked(evt);
             }
         });
+        getContentPane().add(nextButton);
+        nextButton.setBounds(440, 250, 90, 29);
 
         uploadLabel.setText(resourceMap.getString("uploadLabel.text")); // NOI18N
         uploadLabel.setName("uploadLabel"); // NOI18N
+        getContentPane().add(uploadLabel);
+        uploadLabel.setBounds(20, 60, 246, 30);
 
         downloadLabel.setText(resourceMap.getString("downloadLabel.text")); // NOI18N
         downloadLabel.setName("downloadLabel"); // NOI18N
+        getContentPane().add(downloadLabel);
+        downloadLabel.setBounds(20, 110, 263, 30);
 
         uploadChoice.setEditable(true);
         uploadChoice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "100", "200", "500", "1000", "2000", "4000", "8000", "10000", "20000", "50000", "100000" }));
         uploadChoice.setSelectedIndex(3);
         uploadChoice.setName("uploadChoice"); // NOI18N
+        getContentPane().add(uploadChoice);
+        uploadChoice.setBounds(300, 60, 154, 27);
 
         downloadChoice.setEditable(true);
         downloadChoice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "100", "200", "500", "1000", "2000", "4000", "8000", "10000", "20000", "50000", "100000" }));
         downloadChoice.setSelectedIndex(3);
         downloadChoice.setName("downloadChoice"); // NOI18N
+        getContentPane().add(downloadChoice);
+        downloadChoice.setBounds(300, 110, 154, 27);
 
-        kbps1.setText(resourceMap.getString("kbps1.text")); // NOI18N
-        kbps1.setName("kbps1"); // NOI18N
+        speedExplanation.setText(resourceMap.getString("speedExplanation.text")); // NOI18N
+        speedExplanation.setName("speedExplanation"); // NOI18N
+        getContentPane().add(speedExplanation);
+        speedExplanation.setBounds(20, 160, 570, 60);
 
-        kbps2.setText(resourceMap.getString("kbps2.text")); // NOI18N
-        kbps2.setName("kbps2"); // NOI18N
+        uploadkbps.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "kbps", "kBps" }));
+        uploadkbps.setName("uploadKbit"); // NOI18N
+        uploadkbps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadkbpsActionPerformed(evt);
+            }
+        });
+        getContentPane().add(uploadkbps);
+        uploadkbps.setBounds(470, 60, 68, 27);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(downloadLabel)
-                    .addComponent(uploadLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(downloadChoice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(kbps2))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(uploadChoice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(kbps1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(nextButton)
-                            .addGap(34, 34, 34))))
-                .addGap(40, 40, 40))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(67, 67, 67)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(uploadLabel)
-                    .addComponent(uploadChoice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(kbps1))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(downloadLabel)
-                    .addComponent(downloadChoice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(kbps2))
-                .addContainerGap(173, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(271, Short.MAX_VALUE)
-                .addComponent(nextButton)
-                .addContainerGap())
-        );
+        downloadkbps.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "kbps", "kBps" }));
+        downloadkbps.setName("downloadKbit"); // NOI18N
+        downloadkbps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downloadkbpsActionPerformed(evt);
+            }
+        });
+        getContentPane().add(downloadkbps);
+        downloadkbps.setBounds(470, 110, 68, 27);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
 private void nextButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nextButtonMouseClicked
-    props.setProperty(SpeedSelectorConstants.MAXUPLOADCAPABLE, uploadChoice.getSelectedItem().toString());
-    props.setProperty(SpeedSelectorConstants.MAXDOWNLOADCAPABLE, downloadChoice.getSelectedItem().toString());
+    if(uploadkbps.getSelectedIndex() == KILOBIT)
+        props.setProperty(SpeedSelectorConstants.MAXUPLOADCAPABLE, uploadChoice.getSelectedItem().toString());
+    else
+        props.setProperty(SpeedSelectorConstants.MAXUPLOADCAPABLE, "" + Integer.parseInt(uploadChoice.getSelectedItem().toString())*8);
+    if(downloadkbps.getSelectedIndex() == KILOBIT)
+        props.setProperty(SpeedSelectorConstants.MAXDOWNLOADCAPABLE, downloadChoice.getSelectedItem().toString());
+    else
+        props.setProperty(SpeedSelectorConstants.MAXDOWNLOADCAPABLE, "" + Integer.parseInt(downloadChoice.getSelectedItem().toString())*8);
     PropertyManager.saveProps(props);
-    new SpeedSelector2(this.getLocationOnScreen(), this.getSize());
+    new SpeedSelector2(this.getLocationOnScreen());
     this.dispose();
 }//GEN-LAST:event_nextButtonMouseClicked
+
+private void uploadkbpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadkbpsActionPerformed
+    kbpsSwitchPerformed(uploadkbps, uploadChoice);
+}//GEN-LAST:event_uploadkbpsActionPerformed
+
+private void downloadkbpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadkbpsActionPerformed
+    kbpsSwitchPerformed(downloadkbps, downloadChoice);
+}//GEN-LAST:event_downloadkbpsActionPerformed
+
+private void kbpsSwitchPerformed(JComboBox kbps, JComboBox speed) {
+    int index = kbps.getSelectedIndex();
+    int previous = Integer.parseInt(speed.getSelectedItem().toString());
+    if(index == KILOBIT) {
+        speed.setSelectedItem("" + previous*8);
+    }
+    else {
+        speed.setSelectedItem("" + previous/8);
+    }
+}
 
 private void initSpeeds(Properties props) {
     String up = props.getProperty(SpeedSelectorConstants.MAXUPLOADCAPABLE);
@@ -165,12 +181,15 @@ private void initSpeeds(Properties props) {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox downloadChoice;
     private javax.swing.JLabel downloadLabel;
-    private javax.swing.JLabel kbps1;
-    private javax.swing.JLabel kbps2;
+    private javax.swing.JComboBox downloadkbps;
     private javax.swing.JButton nextButton;
+    private javax.swing.JLabel speedExplanation;
     private javax.swing.JComboBox uploadChoice;
     private javax.swing.JLabel uploadLabel;
+    private javax.swing.JComboBox uploadkbps;
     // End of variables declaration//GEN-END:variables
 
     Properties props;
+    private static final int KILOBIT = 0;
+    private static final int KILOBYTE = 1;
 }
