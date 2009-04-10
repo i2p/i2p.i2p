@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import router.RouterHandler;
+import router.RouterHelper;
 
 /**
  *
@@ -50,7 +51,12 @@ public class Tray {
                 if(Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
                     try {
-                        desktop.browse(new URI("http://localhost:7657"));
+                        if(desktop.isSupported(Desktop.Action.BROWSE)) {
+                            desktop.browse(new URI("http://localhost:7657"));
+                        }
+                        else {
+                            trayIcon.displayMessage("Browser not found", "The default browser for your system was not found.", TrayIcon.MessageType.WARNING);
+                        }
                     } catch (URISyntaxException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     } catch(IOException ex) {
@@ -104,11 +110,26 @@ public class Tray {
             }
 
         });
+        MenuItem viewLog = new MenuItem("View log");
+        viewLog.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new LogViewer();
+            }
+            
+        });
         MenuItem shutdown = new MenuItem("Shutdown I2P");
         shutdown.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent arg0) {
                 RouterHandler.setStatus(RouterHandler.SHUTDOWN_GRACEFULLY);
+                long shutdownTime = RouterHelper.getGracefulShutdownTimeRemaining();
+                System.out.println(shutdownTime);
+                if(shutdownTime>0)
+                    trayIcon.displayMessage("Shutting down...", "Shutdown time remaining: " + shutdownTime/1000 + " seconds.", TrayIcon.MessageType.INFO);
+                else
+                    trayIcon.displayMessage("Shutting down...", "Shutting down immediately.", TrayIcon.MessageType.INFO);
             }
 
         });
@@ -120,6 +141,8 @@ public class Tray {
         config.add(speedConfig);
         config.add(advancedConfig);
         popup.add(config);
+        
+        popup.add(viewLog);
         
         popup.add(shutdown);
 
