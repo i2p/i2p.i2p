@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import net.i2p.client.I2PSession;
-import net.i2p.client.I2PSessionException;
+// import net.i2p.client.I2PSession;
+// import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.util.Log;
@@ -187,23 +187,25 @@ die:		{
 				}
 			}
 		}
+		// Previous level does this cleanup now.
+		//
 		// need to kill off the socket manager too.
-		I2PSession session = socketManager.getSession();
-		if (session != null) {
-			try {
-				session.destroySession();
-			} catch (I2PSessionException ex) {
+		// I2PSession session = socketManager.getSession();
+		// if (session != null) {
+		//	try {
+		//		session.destroySession();
+		//	} catch (I2PSessionException ex) {
 				// nop
-			}
-		}
+		//	}
+		//}
 		//System.out.println("TCPlistener: Waiting for children");
-		while (Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-			try {
-				Thread.sleep(100); //sleep for 100 ms (One tenth second)
-			} catch (Exception e) {
-				// nop
-			}
-		}
+		//while (Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
+		//	try {
+		//		Thread.sleep(100); //sleep for 100 ms (One tenth second)
+		//	} catch (Exception e) {
+		//		// nop
+		//	}
+		//}
 	//System.out.println("TCPlistener: Done.");
 	}
 }

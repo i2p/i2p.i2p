@@ -32,25 +32,6 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
-public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sink {
-
-    private final static Log _log = new Log(I2PTunnelUDPServerBase.class);
-
-    private Object lock = new Object();
-    protected Object slock = new Object();
-
-    private static volatile long __serverId = 0;
-
-    protected Logging l;
-
-    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
-    /** default timeout to 3 minutes - override if desired */
-    protected long readTimeout = DEFAULT_READ_TIMEOUT;
-
-    private I2PSession _session;
-    private Source _i2pSource;
-    private Sink _i2pSink;
-
     /**
      * Base client class that sets up an I2P Datagram server destination.
      * The UDP side is not implemented here, as there are at least
@@ -71,10 +52,33 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
      * So the implementing class must create a UDPSource and/or UDPSink,
      * and must call setSink().
      *
+     * @author zzz with portions from welterde's streamr
+     */
+
+public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sink {
+
+    private final static Log _log = new Log(I2PTunnelUDPServerBase.class);
+
+    private Object lock = new Object();
+    protected Object slock = new Object();
+
+    private static volatile long __serverId = 0;
+
+    protected Logging l;
+
+    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
+    /** default timeout to 3 minutes - override if desired */
+    protected long readTimeout = DEFAULT_READ_TIMEOUT;
+
+    private I2PSession _session;
+    private Source _i2pSource;
+    private Sink _i2pSink;
+
+    /**
+     *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      *
-     * @author zzz with portions from welterde's streamr
      */
 
     public I2PTunnelUDPServerBase(boolean verify, File privkey, String privkeyname, Logging l,

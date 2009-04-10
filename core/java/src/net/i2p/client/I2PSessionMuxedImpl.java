@@ -146,8 +146,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      *         I2PSession.PROTO_STREAMING
      *         I2PSession.PROTO_DATAGRAM
      *         255 disallowed
-     *  @param fromport 1-65535 or 0 for unset
-     *  @param toport 1-65535 or 0 for unset
+     *  @param fromPort 1-65535 or 0 for unset
+     *  @param toPort 1-65535 or 0 for unset
      */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                SessionKey keyUsed, Set tagsSent, long expires,

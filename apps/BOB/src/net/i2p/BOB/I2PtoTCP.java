@@ -23,6 +23,7 @@
  */
 package net.i2p.BOB;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -116,7 +117,22 @@ die:            {
 					try {
 						Thread.sleep(10); //sleep for 10 ms
 					} catch(InterruptedException e) {
-						// nop
+						try {
+							in.close();
+						} catch(Exception ex) {
+						}
+						try {
+							out.close();
+						} catch(Exception ex) {
+						}
+						try {
+							Iin.close();
+						} catch(Exception ex) {
+						}
+						try {
+							Iout.close();
+						} catch(Exception ex) {
+						}
 					}
 				}
 				// System.out.println("I2PtoTCP: Going away...");

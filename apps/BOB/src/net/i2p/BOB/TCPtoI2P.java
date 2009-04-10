@@ -114,11 +114,15 @@ public class TCPtoI2P implements Runnable {
 	 */
 	public void run() {
 		String line, input;
+		InputStream Iin = null;
+		OutputStream Iout = null;
+		InputStream in = null;
+		OutputStream out = null;
 
 		try {
 
-			InputStream in = sock.getInputStream();
-			OutputStream out = sock.getOutputStream();
+			in = sock.getInputStream();
+			out = sock.getOutputStream();
 			try {
 				line = lnRead(in);
 				input = line.toLowerCase();
@@ -136,8 +140,8 @@ public class TCPtoI2P implements Runnable {
 					I2P = socketManager.connect(dest);
 					I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
 					// make readers/writers
-					InputStream Iin = I2P.getInputStream();
-					OutputStream Iout = I2P.getOutputStream();
+					Iin = I2P.getInputStream();
+					Iout = I2P.getOutputStream();
 					// setup to cross the streams
 					TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
 					TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
@@ -147,11 +151,11 @@ public class TCPtoI2P implements Runnable {
 					t.start();
 					q.start();
 					while(t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
-						try {
+//						try {
 							Thread.sleep(10); //sleep for 10 ms
-						} catch(InterruptedException e) {
+//						} catch(InterruptedException e) {
 							// nop
-						}
+//						}
 					}
 					// System.out.println("TCPtoI2P: Going away...");
 
@@ -170,6 +174,22 @@ public class TCPtoI2P implements Runnable {
 			}
 		} catch(Exception e) {
 			// bail on anything else
+		}
+		try {
+			in.close();
+		} catch(Exception e) {
+		}
+		try {
+			out.close();
+		} catch(Exception e) {
+		}
+		try {
+			Iin.close();
+		} catch(Exception e) {
+		}
+		try {
+			Iout.close();
+		} catch(Exception e) {
 		}
 		try {
 			// System.out.println("TCPtoI2P: Close I2P");
