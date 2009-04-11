@@ -9,7 +9,6 @@ package net.i2p.i2ptunnel.streamr;
 import java.io.File;
 
 // i2p
-import net.i2p.client.I2PSession;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
@@ -45,12 +44,14 @@ public class StreamrProducer extends I2PTunnelUDPServerBase {
         this.server.setSink(this.multi);
     }
     
+    @Override
     public final void startRunning() {
         super.startRunning();
         this.server.start();
         l.log("Streamr server ready");
     }
     
+    @Override
     public boolean close(boolean forced) {
         this.server.stop();
         this.multi.stop();

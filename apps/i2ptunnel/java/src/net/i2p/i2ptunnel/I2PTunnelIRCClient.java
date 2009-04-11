@@ -51,11 +51,11 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();
             try {
-                Destination dest = I2PTunnel.destFromName(destination);
-                if (dest == null)
+                Destination destN = I2PTunnel.destFromName(destination);
+                if (destN == null)
                     l.log("Could not resolve " + destination);
                 else
-                    dests.add(dest);
+                    dests.add(destN);
             } catch (DataFormatException dfe) {
                 l.log("Bad format parsing \"" + destination + "\"");
             }

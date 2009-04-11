@@ -17,7 +17,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
@@ -55,7 +54,7 @@ import net.i2p.util.Log;
 public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelConnectClient.class);
 
-    private List<String> _proxyList;
+    private final List<String> _proxyList;
 
     private final static byte[] ERR_DESTINATION_UNKNOWN =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -116,12 +115,12 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
+        _proxyList = new ArrayList();
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openConnectClientResult", "error");
             return;
         }
 
-        _proxyList = new ArrayList();
         if (wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
             while (tok.hasMoreTokens())

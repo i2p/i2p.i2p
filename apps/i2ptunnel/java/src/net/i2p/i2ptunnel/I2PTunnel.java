@@ -75,7 +75,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private static long __tunnelId = 0;
     private long _tunnelId;
     private Properties _clientOptions;
-    private List _sessions;
+    private final List _sessions;
 
     public static final int PACKET_DELAY = 100;
 
@@ -89,7 +89,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     private static final String nocli_args[] = { "-nocli", "-die"};
 
-    private List tasks = new ArrayList();
+    private final List tasks = new ArrayList();
     private int next_task_id = 1;
 
     private Set listeners = new HashSet();
@@ -606,9 +606,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public void runHttpClient(String args[], Logging l) {
         if (args.length >= 1 && args.length <= 3) {
-            int port = -1;
+            int clientPort = -1;
             try {
-                port = Integer.parseInt(args[0]);
+                clientPort = Integer.parseInt(args[0]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
@@ -642,12 +642,12 @@ public class I2PTunnel implements Logging, EventDispatcher {
             I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
+                task = new I2PTunnelHTTPClient(clientPort, l, ownDest, proxy, (EventDispatcher) this, this);
                 addtask(task);
                 notifyEvent("httpclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
-                _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ port + "]", iae);
-                l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
+                _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ clientPort + "]", iae);
+                l.log("Invalid I2PTunnel configuration [" + host + ":" + clientPort + "]");
                 notifyEvent("httpclientTaskId", Integer.valueOf(-1));
             }
         } else {

@@ -6,17 +6,12 @@
 package net.i2p.i2ptunnel.streamr;
 
 // system
-import java.io.File;
 import java.util.Set;
 
 // i2p
 import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
-import net.i2p.i2ptunnel.I2PTunnel;
-import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
-import net.i2p.i2ptunnel.udpTunnel.I2PTunnelUDPServerBase;
-import net.i2p.util.EventDispatcher;
 import net.i2p.util.ConcurrentHashSet;
 
 /**

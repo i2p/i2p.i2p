@@ -379,7 +379,7 @@ public class SOCKS5Server extends SOCKSServer {
 
     // This isn't really the right place for this, we can't stop the tunnel once it starts.
     static SOCKSUDPTunnel _tunnel;
-    static Object _startLock = new Object();
+    static final Object _startLock = new Object();
     static byte[] dummyIP = new byte[4];
     /**
      * We got a UDP associate command.

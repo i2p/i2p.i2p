@@ -1,3 +1,8 @@
+2009-04-11 sponge
+    * i2ptunnel janitorial work and fixes on most locks.
+      Some locks still need work, and are marked with LINT in the comment.
+      Just grep for "LINT" to see where the remaining places are.
+
 2009-04-10 sponge
     * More BOB threadgroup fixes, plus debug dump when things go wrong.
     * Fixes to streaminglib, I2CP, which are related to the TG problem.

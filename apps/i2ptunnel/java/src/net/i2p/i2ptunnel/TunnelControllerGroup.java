@@ -40,7 +40,7 @@ public class TunnelControllerGroup {
      * no more tunnels are using it)
      *
      */
-    private Map _sessions;
+    private final Map _sessions;
     
     public static TunnelControllerGroup getInstance() { 
         synchronized (TunnelControllerGroup.class) {

@@ -5,21 +5,9 @@ package net.i2p.i2ptunnel.udpTunnel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 
 import net.i2p.I2PAppContext;
-import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
@@ -31,7 +19,6 @@ import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
     /**
@@ -107,11 +94,11 @@ import net.i2p.util.Log;
         
         // create i2pclient and destination
         I2PClient client = I2PClientFactory.createClient();
-        Destination dest;
+        Destination destN;
         byte[] key;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream(512);
-            dest = client.createDestination(out);
+            destN = client.createDestination(out);
             key = out.toByteArray();
         } catch(Exception exc) {
             throw new RuntimeException("failed to create i2p-destination", exc);

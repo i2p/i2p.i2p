@@ -7,10 +7,7 @@ import java.util.Map;
 
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
-import net.i2p.i2ptunnel.Logging;
-import net.i2p.i2ptunnel.udp.*;
 import net.i2p.i2ptunnel.udpTunnel.I2PTunnelUDPClientBase;
-import net.i2p.util.EventDispatcher;
 
 /**
  * A Datagram Tunnel that can have multiple bidirectional ports on the UDP side.
@@ -63,12 +60,14 @@ public class SOCKSUDPTunnel extends I2PTunnelUDPClientBase {
         }
     }
     
+    @Override
     public final void startRunning() {
         super.startRunning();
         // demuxer start() doesn't do anything
         startall();
     }
     
+    @Override
     public boolean close(boolean forced) {
         stopall();
         return super.close(forced);

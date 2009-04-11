@@ -18,8 +18,6 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
-import net.i2p.client.I2PClient;
-import net.i2p.client.I2PClientFactory;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -36,8 +34,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected I2PSocketManager sockMgr;
     protected I2PServerSocket i2pss;
 
-    private Object lock = new Object();
-    protected Object slock = new Object();
+    private final Object lock = new Object();
+    protected final Object slock = new Object();
 
     protected InetAddress remoteHost;
     protected int remotePort;
@@ -203,17 +201,17 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     
     public void run() {
         if (shouldUsePool()) {
-            I2PServerSocket i2pss = sockMgr.getServerSocket();
+            I2PServerSocket i2pS_S = sockMgr.getServerSocket();
             int handlers = getHandlerCount();
             for (int i = 0; i < handlers; i++) {
-                I2PThread handler = new I2PThread(new Handler(i2pss), "Handle Server " + i);
+                I2PThread handler = new I2PThread(new Handler(i2pS_S), "Handle Server " + i);
                 handler.start();
             }
         } else {
-            I2PServerSocket i2pss = sockMgr.getServerSocket();
+            I2PServerSocket i2pS_S = sockMgr.getServerSocket();
             while (true) {
                 try {
-                    final I2PSocket i2ps = i2pss.accept();
+                    final I2PSocket i2ps = i2pS_S.accept();
                     if (i2ps == null) throw new I2PException("I2PServerSocket closed");
                     new I2PThread(new Runnable() { public void run() { blockingHandle(i2ps); } }).start();
                 } catch (I2PException ipe) {

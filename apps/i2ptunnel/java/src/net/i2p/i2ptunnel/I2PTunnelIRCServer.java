@@ -3,22 +3,18 @@ package net.i2p.i2ptunnel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Properties;
 
-import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.crypto.SHA256Generator;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Base32;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -83,6 +79,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
         this.hostname = opts.getProperty(PROP_HOSTNAME, PROP_HOSTNAME_DEFAULT);
     }
     
+    @Override
     protected void blockingHandle(I2PSocket socket) {
         try {
             // give them 15 seconds to send in the request

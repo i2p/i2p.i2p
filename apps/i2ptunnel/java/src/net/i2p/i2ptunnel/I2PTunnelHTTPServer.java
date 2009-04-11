@@ -59,6 +59,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      * Called by the thread pool of I2PSocket handlers
      *
      */
+    @Override
     protected void blockingHandle(I2PSocket socket) {
         long afterAccept = getTunnel().getContext().clock().now();
         long afterSocket = -1;
@@ -247,7 +248,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             super(o);
         }
         
+        @Override
         protected boolean shouldCompress() { return true; }
+        @Override
         protected void finishHeaders() throws IOException {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Including x-i2p-gzip as the content encoding in the response");
@@ -255,6 +258,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             super.finishHeaders();
         }
 
+        @Override
         protected void beginProcessing() throws IOException {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Beginning compression processing");
