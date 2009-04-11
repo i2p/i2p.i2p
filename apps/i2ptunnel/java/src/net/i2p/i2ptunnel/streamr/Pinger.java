@@ -54,6 +54,6 @@ public class Pinger implements Source, Runnable {
 
     protected Sink sink;
     protected Thread thread;
-    protected Object waitlock;
+    protected Object waitlock; // should be final and use a factory. LINT
     protected boolean running;
 }

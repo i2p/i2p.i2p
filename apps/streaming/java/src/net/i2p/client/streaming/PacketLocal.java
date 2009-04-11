@@ -213,7 +213,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                         timeRemaining = 10*1000;
                     wait(timeRemaining);
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) { break; }
         }
         if (!writeSuccessful())
             releasePayload();

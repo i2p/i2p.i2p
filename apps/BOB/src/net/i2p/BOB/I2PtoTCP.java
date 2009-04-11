@@ -23,6 +23,7 @@
  */
 package net.i2p.BOB;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -105,8 +106,8 @@ die:            {
 					out.flush(); // not really needed, but...
 				}
 				// setup to cross the streams
-				TCPio conn_c = new TCPio(in, Iout, info, database); // app -> I2P
-				TCPio conn_a = new TCPio(Iin, out, info, database); // I2P -> app
+				TCPio conn_c = new TCPio(in, Iout /*, info, database */ ); // app -> I2P
+				TCPio conn_a = new TCPio(Iin, out /* , info, database */); // I2P -> app
 				Thread t = new Thread(conn_c, "TCPioA");
 				Thread q = new Thread(conn_a, "TCPioB");
 				// Fire!
@@ -116,7 +117,22 @@ die:            {
 					try {
 						Thread.sleep(10); //sleep for 10 ms
 					} catch(InterruptedException e) {
-						// nop
+						try {
+							in.close();
+						} catch(Exception ex) {
+						}
+						try {
+							out.close();
+						} catch(Exception ex) {
+						}
+						try {
+							Iin.close();
+						} catch(Exception ex) {
+						}
+						try {
+							Iout.close();
+						} catch(Exception ex) {
+						}
 					}
 				}
 				// System.out.println("I2PtoTCP: Going away...");

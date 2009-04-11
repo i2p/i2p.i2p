@@ -41,8 +41,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private static volatile long __clientId = 0;
     protected long _clientId;
-    protected Object sockLock = new Object(); // Guards sockMgr and mySockets
-    protected I2PSocketManager sockMgr;
+    protected final Object sockLock = new Object(); // Guards sockMgr and mySockets
+    protected I2PSocketManager sockMgr; // should be final and use a factory. LINT
     protected List mySockets = new ArrayList();
 
     protected Destination dest = null;
@@ -52,20 +52,20 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private ServerSocket ss;
 
-    private Object startLock = new Object();
+    private final Object startLock = new Object();
     private boolean startRunning = false;
 
-    private Object closeLock = new Object();
+    // private Object closeLock = new Object();
 
-    private byte[] pubkey;
+    // private byte[] pubkey;
 
     private String handlerName;
     private String privKeyFile;
 
-    private Object conLock = new Object();
+    // private Object conLock = new Object();
     
     /** List of Socket for those accept()ed but not yet started up */
-    private List _waitingSockets = new ArrayList();
+    private List _waitingSockets = new ArrayList(); // should be final and use a factory. LINT
     /** How many connections will we allow to be in the process of being built at once? */
     private int _numConnectionBuilders;
     /** How long will we allow sockets to sit in the _waitingSockets map before killing them? */
@@ -100,7 +100,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
-     * @param privKeyFile null to generate a transient key
+     * @param pkf null to generate a transient key
      *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
@@ -278,6 +278,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             }
         }
         sockManager.setName("Client");
+        tunnel.addSession(sockManager.getSession());
         return sockManager;
     }
 

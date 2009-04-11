@@ -5,21 +5,9 @@ package net.i2p.i2ptunnel.udpTunnel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 
 import net.i2p.I2PAppContext;
-import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
@@ -31,10 +19,31 @@ import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
-public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements Source, Sink {
+    /**
+     * Base client class that sets up an I2P Datagram client destination.
+     * The UDP side is not implemented here, as there are at least
+     * two possibilities:
+     *
+     * 1) UDP side is a "server"
+     *    Example: Streamr Consumer
+     *    - Configure a destination host and port
+     *    - External application sends no data
+     *    - Extending class must have a constructor with host and port arguments
+     *
+     * 2) UDP side is a client/server
+     *    Example: SOCKS UDP (DNS requests?)
+     *    - configure an inbound port and a destination host and port
+     *    - External application sends and receives data
+     *    - Extending class must have a constructor with host and 2 port arguments
+     *
+     * So the implementing class must create a UDPSource and/or UDPSink,
+     * and must call setSink().
+     *
+     * @author zzz with portions from welterde's streamr
+     */
+ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements Source, Sink {
 
     private static final Log _log = new Log(I2PTunnelUDPClientBase.class);
     protected I2PAppContext _context;
@@ -69,33 +78,11 @@ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements So
     private Source _i2pSource;
     private Sink _i2pSink;
     private Destination _otherDest;
-
     /**
-     * Base client class that sets up an I2P Datagram client destination.
-     * The UDP side is not implemented here, as there are at least
-     * two possibilities:
-     *
-     * 1) UDP side is a "server"
-     *    Example: Streamr Consumer
-     *    - Configure a destination host and port
-     *    - External application sends no data
-     *    - Extending class must have a constructor with host and port arguments
-     *
-     * 2) UDP side is a client/server
-     *    Example: SOCKS UDP (DNS requests?)
-     *    - configure an inbound port and a destination host and port
-     *    - External application sends and receives data
-     *    - Extending class must have a constructor with host and 2 port arguments
-     *
-     * So the implementing class must create a UDPSource and/or UDPSink,
-     * and must call setSink().
-     *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
-     *
-     * @author zzz with portions from welterde's streamr
      */
-    public I2PTunnelUDPClientBase(String destination, Logging l, EventDispatcher notifyThis,
+   public I2PTunnelUDPClientBase(String destination, Logging l, EventDispatcher notifyThis,
                                   I2PTunnel tunnel) throws IllegalArgumentException {
         super("UDPServer", notifyThis, tunnel);
         _clientId = ++__clientId;
@@ -107,11 +94,11 @@ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements So
         
         // create i2pclient and destination
         I2PClient client = I2PClientFactory.createClient();
-        Destination dest;
+        Destination destN;
         byte[] key;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream(512);
-            dest = client.createDestination(out);
+            destN = client.createDestination(out);
             key = out.toByteArray();
         } catch(Exception exc) {
             throw new RuntimeException("failed to create i2p-destination", exc);

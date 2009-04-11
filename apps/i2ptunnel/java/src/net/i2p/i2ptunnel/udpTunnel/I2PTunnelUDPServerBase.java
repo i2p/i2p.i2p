@@ -3,53 +3,23 @@
  */
 package net.i2p.i2ptunnel.udpTunnel;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.Iterator;
-import java.util.Properties;
 
-import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
-import net.i2p.data.Base64;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.I2PTunnelTask;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-
-public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sink {
-
-    private final static Log _log = new Log(I2PTunnelUDPServerBase.class);
-
-    private Object lock = new Object();
-    protected Object slock = new Object();
-
-    private static volatile long __serverId = 0;
-
-    protected Logging l;
-
-    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
-    /** default timeout to 3 minutes - override if desired */
-    protected long readTimeout = DEFAULT_READ_TIMEOUT;
-
-    private I2PSession _session;
-    private Source _i2pSource;
-    private Sink _i2pSink;
 
     /**
      * Base client class that sets up an I2P Datagram server destination.
@@ -71,10 +41,33 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
      * So the implementing class must create a UDPSource and/or UDPSink,
      * and must call setSink().
      *
+     * @author zzz with portions from welterde's streamr
+     */
+
+public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sink {
+
+    private final static Log _log = new Log(I2PTunnelUDPServerBase.class);
+
+    private final Object lock = new Object();
+    protected Object slock = new Object();
+
+    private static volatile long __serverId = 0;
+
+    protected Logging l;
+
+    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
+    /** default timeout to 3 minutes - override if desired */
+    protected long readTimeout = DEFAULT_READ_TIMEOUT;
+
+    private I2PSession _session;
+    private Source _i2pSource;
+    private Sink _i2pSink;
+
+    /**
+     *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      *
-     * @author zzz with portions from welterde's streamr
      */
 
     public I2PTunnelUDPServerBase(boolean verify, File privkey, String privkeyname, Logging l,

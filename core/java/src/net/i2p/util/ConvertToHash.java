@@ -16,12 +16,15 @@ import net.i2p.data.Hash;
  *    Base32 desthash.b32.i2p
  *    example.i2p
  *
- *  @return null on failure
- *
  *  @author zzz
  */
 public class ConvertToHash {
     
+    /**
+     *  Convert any kind of destination String to a hash
+     *
+     *  @return null on failure
+     */
     public static Hash getHash(String peer) {
         if (peer == null)
             return null;

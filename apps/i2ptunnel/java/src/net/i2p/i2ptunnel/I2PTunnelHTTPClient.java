@@ -50,7 +50,7 @@ import net.i2p.util.Log;
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
-    private List proxyList;
+    private final List proxyList;
 
     private HashMap addressHelpers = new HashMap();
 
@@ -145,12 +145,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
+        proxyList = new ArrayList();
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
             return;
         }
 
-        proxyList = new ArrayList();
         if (wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
             while (tok.hasMoreTokens())

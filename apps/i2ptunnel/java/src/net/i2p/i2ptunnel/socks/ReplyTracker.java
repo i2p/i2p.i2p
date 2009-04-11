@@ -1,6 +1,5 @@
 package net.i2p.i2ptunnel.socks;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 import net.i2p.data.Destination;

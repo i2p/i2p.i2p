@@ -7,7 +7,6 @@ package net.i2p.i2ptunnel.streamr;
 
 import java.net.InetAddress;
 
-import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.i2ptunnel.udp.*;
@@ -38,6 +37,7 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
         this.pinger.setSink(this);
     }
     
+    @Override
     public final void startRunning() {
         super.startRunning();
         // send subscribe-message
@@ -45,6 +45,7 @@ public class StreamrConsumer extends I2PTunnelUDPClientBase {
         l.log("Streamr client ready");
     }
     
+    @Override
     public boolean close(boolean forced) {
         // send unsubscribe-message
         this.pinger.stop();

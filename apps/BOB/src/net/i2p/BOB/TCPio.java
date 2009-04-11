@@ -23,6 +23,7 @@
  */
 package net.i2p.BOB;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -35,21 +36,21 @@ public class TCPio implements Runnable {
 
 	private InputStream Ain;
 	private OutputStream Aout;
-	private NamedDB info,  database;
+	// private NamedDB info,  database;
 
 	/**
 	 * Constructor
 	 *
-	 * @param Ain
-	 * @param Aout
-	 * @param info
-	 * @param database
+	 * @param Ain InputStream
+	 * @param Aout OutputStream
+	 *
+	 * param database
 	 */
-	TCPio(InputStream Ain, OutputStream Aout, NamedDB info, NamedDB database) {
+	TCPio(InputStream Ain, OutputStream Aout /*, NamedDB info , NamedDB database */) {
 		this.Ain = Ain;
 		this.Aout = Aout;
-		this.info = info;
-		this.database = database;
+		// this.info = info;
+		// this.database = database;
 	}
 
 	/**
@@ -86,11 +87,11 @@ public class TCPio implements Runnable {
 		boolean spin = true;
 		try {
 			while(spin) {
-				database.getReadLock();
-				info.getReadLock();
-				spin = info.get("RUNNING").equals(Boolean.TRUE);
-				info.releaseReadLock();
-				database.releaseReadLock();
+				// database.getReadLock();
+				// info.getReadLock();
+				// spin = info.get("RUNNING").equals(Boolean.TRUE);
+				// info.releaseReadLock();
+				// database.releaseReadLock();
 				b = Ain.read(a, 0, 1);
 				// System.out.println(info.get("NICKNAME").toString() + " " + b);
 				if(b > 0) {
@@ -98,11 +99,11 @@ public class TCPio implements Runnable {
 				} else if(b == 0) {
 					Thread.yield(); // this should act like a mini sleep.
 					if(Ain.available() == 0) {
-						try {
+//						try {
 							// Thread.yield();
 							Thread.sleep(10);
-						} catch(InterruptedException ex) {
-						}
+//						} catch(InterruptedException ex) {
+//						}
 					}
 				} else {
 					/* according to the specs:
@@ -113,13 +114,25 @@ public class TCPio implements Runnable {
 					 *
 					 */
 					// System.out.println("TCPio: End Of Stream");
+					Ain.close();
+					Aout.close();
 					return;
 				}
 			}
 			// System.out.println("TCPio: RUNNING = false");
 		} catch(Exception e) {
 			// Eject!!! Eject!!!
-			// System.out.println("TCPio: Caught an exception " + e);
+			//System.out.println("TCPio: Caught an exception " + e);
+			try {
+				Ain.close();
+			} catch (IOException ex) {
+//				Logger.getLogger(TCPio.class.getName()).log(Level.SEVERE, null, ex);
+			}
+			try {
+				Aout.close();
+			} catch (IOException ex) {
+//				Logger.getLogger(TCPio.class.getName()).log(Level.SEVERE, null, ex);
+			}
 			return;
 		}
 		// System.out.println("TCPio: Leaving.");

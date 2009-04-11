@@ -69,5 +69,5 @@ public class I2PSink implements Sink {
     protected boolean raw;
     protected I2PSession sess;
     protected Destination dest;
-    protected I2PDatagramMaker maker;
+    protected I2PDatagramMaker maker; // should be final and use a factory. LINT
 }
