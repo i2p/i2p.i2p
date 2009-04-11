@@ -1,3 +1,8 @@
+2009-04-10 sponge
+    * More BOB threadgroup fixes, plus debug dump when things go wrong.
+    * Fixes to streaminglib, I2CP, which are related to the TG problem.
+    * JavaDocs fixups.
+
 2009-04-08 sponge
     * More hopeful fixups to the infamous orpahned tunnel problem. *Sigh*
 

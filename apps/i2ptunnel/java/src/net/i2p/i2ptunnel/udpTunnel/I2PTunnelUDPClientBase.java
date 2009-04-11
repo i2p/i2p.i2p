@@ -34,7 +34,29 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
-public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements Source, Sink {
+    /**
+     * Base client class that sets up an I2P Datagram client destination.
+     * The UDP side is not implemented here, as there are at least
+     * two possibilities:
+     *
+     * 1) UDP side is a "server"
+     *    Example: Streamr Consumer
+     *    - Configure a destination host and port
+     *    - External application sends no data
+     *    - Extending class must have a constructor with host and port arguments
+     *
+     * 2) UDP side is a client/server
+     *    Example: SOCKS UDP (DNS requests?)
+     *    - configure an inbound port and a destination host and port
+     *    - External application sends and receives data
+     *    - Extending class must have a constructor with host and 2 port arguments
+     *
+     * So the implementing class must create a UDPSource and/or UDPSink,
+     * and must call setSink().
+     *
+     * @author zzz with portions from welterde's streamr
+     */
+ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements Source, Sink {
 
     private static final Log _log = new Log(I2PTunnelUDPClientBase.class);
     protected I2PAppContext _context;
@@ -69,33 +91,11 @@ public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements So
     private Source _i2pSource;
     private Sink _i2pSink;
     private Destination _otherDest;
-
     /**
-     * Base client class that sets up an I2P Datagram client destination.
-     * The UDP side is not implemented here, as there are at least
-     * two possibilities:
-     *
-     * 1) UDP side is a "server"
-     *    Example: Streamr Consumer
-     *    - Configure a destination host and port
-     *    - External application sends no data
-     *    - Extending class must have a constructor with host and port arguments
-     *
-     * 2) UDP side is a client/server
-     *    Example: SOCKS UDP (DNS requests?)
-     *    - configure an inbound port and a destination host and port
-     *    - External application sends and receives data
-     *    - Extending class must have a constructor with host and 2 port arguments
-     *
-     * So the implementing class must create a UDPSource and/or UDPSink,
-     * and must call setSink().
-     *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
-     *
-     * @author zzz with portions from welterde's streamr
      */
-    public I2PTunnelUDPClientBase(String destination, Logging l, EventDispatcher notifyThis,
+   public I2PTunnelUDPClientBase(String destination, Logging l, EventDispatcher notifyThis,
                                   I2PTunnel tunnel) throws IllegalArgumentException {
         super("UDPServer", notifyThis, tunnel);
         _clientId = ++__clientId;

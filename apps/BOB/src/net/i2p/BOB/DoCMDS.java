@@ -748,14 +748,12 @@ public class DoCMDS implements Runnable {
 									nickinfo = (NamedDB) database.get(Arg);
 									if (!tunnelactive(nickinfo)) {
 										nickinfo = null;
-										ns =
-											true;
+										ns = true;
 									}
 
 								} catch (Exception b) {
 									nickinfo = null;
-									ns =
-										true;
+									ns = true;
 								}
 
 								try {
@@ -775,10 +773,10 @@ public class DoCMDS implements Runnable {
 									try {
 										database.add(Arg, nickinfo);
 										nickinfo.add(P_NICKNAME, Arg);
-										nickinfo.add(P_STARTING, Boolean.FALSE);
-										nickinfo.add(P_RUNNING, Boolean.FALSE);
-										nickinfo.add(P_STOPPING, Boolean.FALSE);
-										nickinfo.add(P_QUIET, Boolean.FALSE);
+										nickinfo.add(P_STARTING, new Boolean(false));
+										nickinfo.add(P_RUNNING, new Boolean(false));
+										nickinfo.add(P_STOPPING, new Boolean(false));
+										nickinfo.add(P_QUIET, new Boolean(false));
 										nickinfo.add(P_INHOST, "localhost");
 										nickinfo.add(P_OUTHOST, "localhost");
 										Properties Q = new Properties();
@@ -1265,13 +1263,17 @@ public class DoCMDS implements Runnable {
 												tunnel = new MUXlisten(database, nickinfo, _log);
 												Thread t = new Thread(tunnel);
 												t.start();
+												try {
+													Thread.sleep(1000 * 10); // Slow down the startup.
+												} catch(InterruptedException ie) {
+													// ignore it
+												}
 												out.println("OK tunnel starting");
 											} catch (I2PException e) {
 												out.println("ERROR starting tunnel: " + e);
 											} catch (IOException e) {
 												out.println("ERROR starting tunnel: " + e);
 											}
-
 										}
 									} catch (Exception ex) {
 										break die;
@@ -1304,7 +1306,7 @@ public class DoCMDS implements Runnable {
 												break die;
 											}
 
-											nickinfo.add(P_STOPPING, Boolean.TRUE);
+											nickinfo.add(P_STOPPING, new Boolean(true));
 											try {
 												wunlock();
 

@@ -126,7 +126,7 @@ class ConnectionHandler {
                 if (timeoutMs <= 0) {
                     try {
                        syn = _synQueue.take(); // waits forever
-                    } catch (InterruptedException ie) {}
+                    } catch (InterruptedException ie) { break;}
                 } else {
                     long remaining = expiration - _context.clock().now();
                     // (dont think this applies anymore for LinkedBlockingQueue)
@@ -138,7 +138,7 @@ class ConnectionHandler {
                         break;
                     try {
                         syn = _synQueue.poll(remaining, TimeUnit.MILLISECONDS); // waits the specified time max
-                    } catch (InterruptedException ie) {}
+                    } catch (InterruptedException ie) { }
                     break;
                 }
             }

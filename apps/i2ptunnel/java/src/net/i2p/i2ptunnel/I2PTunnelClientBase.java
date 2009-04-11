@@ -100,7 +100,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
-     * @param privKeyFile null to generate a transient key
+     * @param pkf null to generate a transient key
      *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
