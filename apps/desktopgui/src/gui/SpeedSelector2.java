@@ -85,19 +85,19 @@ public class SpeedSelector2 extends javax.swing.JFrame {
         browseButton.setActionCommand(resourceMap.getString("browseButton.actionCommand")); // NOI18N
         browseButton.setName("browseButton"); // NOI18N
         getContentPane().add(browseButton);
-        browseButton.setBounds(40, 130, 520, 40);
+        browseButton.setBounds(40, 120, 520, 40);
 
         buttonGroup1.add(downloadButton);
         downloadButton.setText(resourceMap.getString("downloadButton.text")); // NOI18N
         downloadButton.setActionCommand(resourceMap.getString("downloadButton.actionCommand")); // NOI18N
         downloadButton.setName("downloadButton"); // NOI18N
         getContentPane().add(downloadButton);
-        downloadButton.setBounds(40, 80, 499, 40);
+        downloadButton.setBounds(40, 70, 499, 40);
 
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
         getContentPane().add(jLabel1);
-        jLabel1.setBounds(30, 190, 530, 50);
+        jLabel1.setBounds(30, 170, 530, 70);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

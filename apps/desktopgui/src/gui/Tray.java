@@ -9,9 +9,6 @@ import desktopgui.*;
 import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.Menu;
-import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -23,8 +20,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import router.RouterHandler;
 import router.RouterHelper;
+import router.configuration.PeerHelper;
 
 /**
  *
@@ -41,12 +42,13 @@ public class Tray {
 
         Image image = Toolkit.getDefaultToolkit().getImage("desktopgui/resources/logo/logo.jpg");
 
-        PopupMenu popup = new PopupMenu();
+        final JPopupMenu popup = new JPopupMenu();
 
         //Create menu items to put in the popup menu
-        MenuItem browserLauncher = new MenuItem("Launch browser");
+        JMenuItem browserLauncher = new JMenuItem("Launch browser");
         browserLauncher.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if(Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
@@ -66,9 +68,10 @@ public class Tray {
             }
 
         });
-        MenuItem howto = new MenuItem("How to use I2P");
+        JMenuItem howto = new JMenuItem("How to use I2P");
         howto.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if(Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
@@ -84,18 +87,20 @@ public class Tray {
             }
             
         });
-        Menu config = new Menu("Configuration");
-        MenuItem speedConfig = new MenuItem("Speed");
+        JMenu config = new JMenu("Configuration");
+        JMenuItem speedConfig = new JMenuItem("Speed");
         speedConfig.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 (new SpeedSelector()).setVisible(true);
             }
             
         });
-        MenuItem advancedConfig = new MenuItem("Advanced Configuration");
+        JMenuItem advancedConfig = new JMenuItem("Advanced Configuration");
         advancedConfig.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 if(Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
@@ -110,7 +115,7 @@ public class Tray {
             }
 
         });
-        MenuItem viewLog = new MenuItem("View log");
+        JMenuItem viewLog = new JMenuItem("View log");
         viewLog.addActionListener(new ActionListener() {
 
             @Override
@@ -119,17 +124,21 @@ public class Tray {
             }
             
         });
-        MenuItem shutdown = new MenuItem("Shutdown I2P");
+        JMenuItem shutdown = new JMenuItem("Shutdown I2P");
         shutdown.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 RouterHandler.setStatus(RouterHandler.SHUTDOWN_GRACEFULLY);
                 long shutdownTime = RouterHelper.getGracefulShutdownTimeRemaining();
                 System.out.println(shutdownTime);
-                if(shutdownTime>0)
-                    trayIcon.displayMessage("Shutting down...", "Shutdown time remaining: " + shutdownTime/1000 + " seconds.", TrayIcon.MessageType.INFO);
-                else
+                if(shutdownTime>0) {
+                    trayIcon.displayMessage("Shutting down...", "Shutdown time remaining: " + shutdownTime/1000 + " seconds."
+                            + System.getProperty("line.separator") + "Shutdown will not happen immediately, because we are still participating in the network.", TrayIcon.MessageType.INFO);
+                }
+                else {
                     trayIcon.displayMessage("Shutting down...", "Shutting down immediately.", TrayIcon.MessageType.INFO);
+                }
             }
 
         });
@@ -147,7 +156,31 @@ public class Tray {
         popup.add(shutdown);
 
         //Add tray icon
-        trayIcon = new TrayIcon(image, "I2P: the anonymous network", popup);
+        trayIcon = new JPopupTrayIcon(image, "I2P: the anonymous network", popup);
+        PeerHelper.addReachabilityListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                trayIcon.setToolTip("I2P Network status: " + PeerHelper.getReachability());
+            }
+            
+        });
+        PeerHelper.addActivePeerListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                int activePeers = PeerHelper.getActivePeers();
+                if(activePeers == 0)
+                    trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("desktopgui/resources/logo/logo_red.jpg"));
+                else if(activePeers < 10)
+                    trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("desktopgui/resources/logo/logo_orange.jpg"));
+                else
+                    trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("desktopgui/resources/logo/logo_green.jpg"));
+                
+            }
+            
+        });
+        
         try {
             tray.add(trayIcon);
         } catch (AWTException ex) {
@@ -156,6 +189,6 @@ public class Tray {
     }
     
     private SystemTray tray = null;
-    private TrayIcon trayIcon = null;
+    private JPopupTrayIcon trayIcon = null;
     
 }
