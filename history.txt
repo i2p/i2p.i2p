@@ -1,3 +1,6 @@
+2009-04-11 welterde
+    * fixed NPE in NTCP transport
+
 2009-04-11 sponge
     * i2ptunnel janitorial work and fixes on most locks.
       Some locks still need work, and are marked with LINT in the comment.
