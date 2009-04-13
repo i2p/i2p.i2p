@@ -288,7 +288,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         break;
                     }
                     host = request.substring(0, pos);
-
+                    
+                    // parse port
+                    pos = host.indexOf(":");
+                    int port = 80;
+                    if(pos != -1) {
+                        String[] parts = host.split(":");
+                        host = parts[0];
+                        try {
+                            port = Integer.parseInt(parts[1]);
+                        } catch(Exception exc) {
+                            // TODO: log this
+                        }
+                    }
+                    
                     // Quick hack for foo.bar.i2p
                     if (host.toLowerCase().endsWith(".i2p")) {
                         // Destination gets the host name
@@ -389,6 +402,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         
                         line = method + " " + request.substring(pos);
                     } else if (host.indexOf(".") != -1) {
+                        // rebuild host
+                        host = host + ":" + port;
                         // The request must be forwarded to a WWW proxy
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Before selecting outproxy for " + host);
