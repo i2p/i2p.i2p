@@ -1,6 +1,7 @@
 package router;
 
 import net.i2p.router.RouterContext;
+import net.i2p.router.RouterVersion;
 
 /**
  *
@@ -13,5 +14,9 @@ public class RouterHelper {
     
     public static long getGracefulShutdownTimeRemaining() {
         return RouterHelper.getContext().router().getShutdownTimeRemaining();
+    }
+    
+    public static String getVersion() {
+        return (RouterVersion.VERSION + "-" + RouterVersion.BUILD);
     }
 }

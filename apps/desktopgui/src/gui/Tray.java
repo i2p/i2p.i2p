@@ -77,7 +77,9 @@ public class Tray {
                     Desktop desktop = Desktop.getDesktop();
                     try {
                         File f = new File("desktopgui/resources/howto/howto.html");
-                        desktop.browse(new URI("file://" + f.getAbsolutePath()));
+                        System.out.println(new URI(null, null, null, 0, "file://" + f.getAbsolutePath(), null, null));
+                        desktop.browse(new URI(null, null, null, 0, "file://" + f.getAbsolutePath(), null, null));
+                        //desktop.browse(new URI("file://" + f.getAbsolutePath()));
                     } catch (URISyntaxException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     } catch(IOException ex) {
@@ -94,6 +96,15 @@ public class Tray {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 (new SpeedSelector()).setVisible(true);
+            }
+            
+        });
+        JMenuItem generalConfig = new JMenuItem("General Configuration");
+        generalConfig.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new GeneralConfiguration();
             }
             
         });
@@ -124,6 +135,15 @@ public class Tray {
             }
             
         });
+        JMenuItem version = new JMenuItem("Version");
+        version.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new Version();
+            }
+            
+        });
         JMenuItem shutdown = new JMenuItem("Shutdown I2P");
         shutdown.addActionListener(new ActionListener() {
 
@@ -147,11 +167,19 @@ public class Tray {
         popup.add(browserLauncher);
         popup.add(howto);
         
+        popup.addSeparator();
+        
         config.add(speedConfig);
+        //config.add(generalConfig);
         config.add(advancedConfig);
         popup.add(config);
         
+        popup.addSeparator();
+        
         popup.add(viewLog);
+        popup.add(version);
+        
+        popup.addSeparator();
         
         popup.add(shutdown);
 

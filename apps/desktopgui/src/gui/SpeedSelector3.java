@@ -122,12 +122,12 @@ public class SpeedSelector3 extends javax.swing.JFrame {
         uploadUsageLabel.setText(resourceMap.getString("uploadUsageLabel.text")); // NOI18N
         uploadUsageLabel.setName("uploadUsageLabel"); // NOI18N
         getContentPane().add(uploadUsageLabel);
-        uploadUsageLabel.setBounds(20, 150, 19, 30);
+        uploadUsageLabel.setBounds(20, 150, 140, 30);
 
         downloadUsageLabel.setText(resourceMap.getString("downloadUsageLabel.text")); // NOI18N
         downloadUsageLabel.setName("downloadUsageLabel"); // NOI18N
         getContentPane().add(downloadUsageLabel);
-        downloadUsageLabel.setBounds(340, 150, 19, 30);
+        downloadUsageLabel.setBounds(340, 150, 160, 30);
 
         uploadField.setText(resourceMap.getString("uploadField.text")); // NOI18N
         uploadField.setMinimumSize(new java.awt.Dimension(77, 27));
