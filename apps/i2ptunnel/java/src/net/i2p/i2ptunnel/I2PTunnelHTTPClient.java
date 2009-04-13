@@ -290,9 +290,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     host = request.substring(0, pos);
                     
                     // parse port
-                    pos = host.indexOf(":");
+                    int posPort = host.indexOf(":");
                     int port = 80;
-                    if(pos != -1) {
+                    if(posPort != -1) {
                         String[] parts = host.split(":");
                         host = parts[0];
                         try {
