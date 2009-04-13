@@ -185,11 +185,18 @@ public class Tray {
 
         //Add tray icon
         trayIcon = new JPopupTrayIcon(image, "I2P: the anonymous network", popup);
+        
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         PeerHelper.addReachabilityListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                trayIcon.setToolTip("I2P Network status: " + PeerHelper.getReachability());
+                updateTooltip();
             }
             
         });
@@ -197,6 +204,7 @@ public class Tray {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
+                updateTooltip();
                 int activePeers = PeerHelper.getActivePeers();
                 if(activePeers == 0)
                     trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("desktopgui/resources/logo/logo_red.jpg"));
@@ -208,12 +216,10 @@ public class Tray {
             }
             
         });
-        
-        try {
-            tray.add(trayIcon);
-        } catch (AWTException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    }
+    
+    public void updateTooltip() {
+        trayIcon.setToolTip("I2P Network status: " + PeerHelper.getReachability() + " / " + "Active Peers: " + PeerHelper.getActivePeers());
     }
     
     private SystemTray tray = null;

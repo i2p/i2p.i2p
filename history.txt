@@ -1,4 +1,10 @@
 2009-04-13 Mathiasdm
+    * Bugfix on tray icon updating
+    * Some more work on the general configuration menu
+      (currently not added to the tray icon menu yet, needs more work)
+    * Tweaked the desktopgui logo
+
+2009-04-13 Mathiasdm
     * Added I2P version and GUI version to desktopgui
     * Tweaks to the tray icon menu
     * Some starting work on a GUI general configuration menu

@@ -94,7 +94,7 @@ public class PeerHelper {
                         }
                     }
                 };
-                activePeerTimer.schedule(t, 60*1000);
+                activePeerTimer.schedule(t, 0, 60*1000);
             }
         }
     }
@@ -134,7 +134,7 @@ public class PeerHelper {
                     }
                     
                 };
-                reachabilityTimer.schedule(t, 60*1000);
+                reachabilityTimer.schedule(t, 0, 60*1000);
             }
         }
     }
