@@ -1,3 +1,6 @@
+2009-04-13 welterde
+    * small fix in the eepproxy
+
 2009-04-11 welterde
     * fixed NPE in NTCP transport
 
