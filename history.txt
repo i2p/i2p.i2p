@@ -1,4 +1,8 @@
 2009-04-17 sponge
+    * setIP wants to be a static method in the class, but it produces
+      warnings about it being static from other code.
+
+2009-04-17 sponge
     * Catch NPE in NTCP.
       This possibly augments fix 2009-04-11 welterde below.
     * Various LINT on NTCP sources, and removal of space-wasting
