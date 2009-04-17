@@ -505,7 +505,7 @@ public abstract class TransportImpl implements Transport {
             _log.warn(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
     }
 
-    public static void setIP(Hash peer, byte[] ip) {
+    public /* static */ void setIP(Hash peer, byte[] ip) {
         _IPMap.put(peer, ip);
     }
 

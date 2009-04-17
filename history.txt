@@ -1,4 +1,8 @@
 2009-04-17 sponge
+    * fixed setIP, just be sure to distclean before building :-)
+    * more lint taken care of as well.
+
+2009-04-17 sponge
     * setIP wants to be a static method in the class, but it produces
       warnings about it being static from other code.
 

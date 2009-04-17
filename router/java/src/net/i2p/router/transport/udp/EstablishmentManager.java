@@ -37,15 +37,15 @@ public class EstablishmentManager {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** map of RemoteHostId to InboundEstablishState */
-    private Map _inboundStates;
+    private final Map _inboundStates;
     /** map of RemoteHostId to OutboundEstablishState */
-    private Map _outboundStates;
+    private final Map _outboundStates;
     /** map of RemoteHostId to List of OutNetMessage for messages exceeding capacity */
-    private Map _queuedOutbound;
+    private final Map _queuedOutbound;
     /** map of nonce (Long) to OutboundEstablishState */
-    private Map _liveIntroductions;
+    private final Map _liveIntroductions;
     private boolean _alive;
-    private Object _activityLock;
+    private final Object _activityLock;
     private int _activity;
     
     private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 10;
