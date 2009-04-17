@@ -1,3 +1,9 @@
+2009-04-17 sponge
+    * Catch NPE in NTCP.
+      This possibly augments fix 2009-04-11 welterde below.
+    * Various LINT on NTCP sources, and removal of space-wasting
+      spaces at end of lines in sources touched.
+
 2009-04-13 Mathiasdm
     * Bugfix on tray icon updating
     * Some more work on the general configuration menu

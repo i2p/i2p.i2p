@@ -36,7 +36,7 @@ public class NTCPTransport extends TransportImpl {
     private SharedBid _fastBid;
     private SharedBid _slowBid;
     private SharedBid _transientFail;
-    private Object _conLock;
+    private final Object _conLock;
     private Map _conByIdent;
     private NTCPAddress _myAddress;
     private EventPumper _pumper;
@@ -46,14 +46,14 @@ public class NTCPTransport extends TransportImpl {
      * list of NTCPConnection of connections not yet established that we
      * want to remove on establishment or close on timeout
      */
-    private List _establishing;
+    private final List _establishing;
 
     private List _sent;
     private NTCPSendFinisher _finisher;
-    
+
     public NTCPTransport(RouterContext ctx) {
         super(ctx);
-        
+
         _log = ctx.logManager().getLog(getClass());
 
         _context.statManager().createRateStat("ntcp.sendTime", "Total message lifetime when sent completely", "ntcp", new long[] { 60*1000, 10*60*1000 });
@@ -122,19 +122,19 @@ public class NTCPTransport extends TransportImpl {
         _establishing = new ArrayList(4);
         _conLock = new Object();
         _conByIdent = new HashMap(64);
-        
+
         _sent = new ArrayList(4);
         _finisher = new NTCPSendFinisher(ctx, this);
-        
+
         _pumper = new EventPumper(ctx, this);
         _reader = new Reader(ctx);
         _writer = new net.i2p.router.transport.ntcp.Writer(ctx);
-        
+
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
     }
-    
+
     void inboundEstablished(NTCPConnection con) {
         _context.statManager().addRateData("ntcp.inboundEstablished", 1, 0);
         markReachable(con.getRemotePeer().calculateHash(), true);
@@ -150,7 +150,7 @@ public class NTCPTransport extends TransportImpl {
             old.close();
         }
     }
-    
+
     protected void outboundMessageReady() {
         OutNetMessage msg = getNextMessage();
         if (msg != null) {
@@ -219,7 +219,7 @@ public class NTCPTransport extends TransportImpl {
                     }
                     con.enqueueInfoMessage(); // enqueues a netDb store of our own info
                     con.send(msg); // doesn't do anything yet, just enqueues it
-     
+
                     try {
                         SocketChannel channel = SocketChannel.open();
                         con.setChannel(channel);
@@ -237,7 +237,8 @@ public class NTCPTransport extends TransportImpl {
              */
         }
     }
-    
+
+    @Override
     public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
         super.afterSend(msg, sendSuccessful, allowRequeue, msToSend);
     }
@@ -259,7 +260,7 @@ public class NTCPTransport extends TransportImpl {
             _context.statManager().addRateData("ntcp.attemptUnreachablePeer", 1, 0);
             return null;
         }
-        
+
         boolean established = isEstablished(toAddress.getIdentity());
         if (established) { // should we check the queue size?  nah, if its valid, use it
             if (_log.shouldLog(Log.DEBUG))
@@ -267,7 +268,7 @@ public class NTCPTransport extends TransportImpl {
             return _fastBid;
         }
         RouterAddress addr = toAddress.getTargetAddress(STYLE);
-        
+
         if (addr == null) {
             markUnreachable(peer);
             _context.statManager().addRateData("ntcp.bidRejectedNoNTCPAddress", 1, 0);
@@ -294,25 +295,26 @@ public class NTCPTransport extends TransportImpl {
                 return null;
             }
         }
-        
+
         if (!allowConnection()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + ", max connection limit reached");
             return _transientFail;
         }
 
-        //if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
+        //if ( (_myAddress != null) && (_myAddress.equals(addr)) )
         //    return null; // dont talk to yourself
-    
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("slow bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64());
         return _slowBid;
     }
-    
+
     public boolean allowConnection() {
         return countActivePeers() < getMaxConnections();
     }
 
+    @Override
     public boolean haveCapacity() {
         return countActivePeers() < getMaxConnections() * 4 / 5;
     }
@@ -323,21 +325,23 @@ public class NTCPTransport extends TransportImpl {
     private boolean isEstablished(RouterIdentity peer) {
         return isEstablished(peer.calculateHash());
     }
-    
+
+    @Override
     public boolean isEstablished(Hash dest) {
         synchronized (_conLock) {
             NTCPConnection con = (NTCPConnection)_conByIdent.get(dest);
             return (con != null) && con.isEstablished() && !con.isClosed();
         }
     }
-    
+
+    @Override
     public boolean isBacklogged(Hash dest) {
         synchronized (_conLock) {
             NTCPConnection con = (NTCPConnection)_conByIdent.get(dest);
             return (con != null) && con.isEstablished() && con.tooBacklogged();
         }
     }
-    
+
     void removeCon(NTCPConnection con) {
         NTCPConnection removed = null;
         synchronized (_conLock) {
@@ -352,15 +356,17 @@ public class NTCPTransport extends TransportImpl {
             removed.close();
         }
     }
-    
+
     /**
      * How many peers can we talk to right now?
      *
      */
+    @Override
     public int countActivePeers() { synchronized (_conLock) { return _conByIdent.size(); } }
     /**
      * How many peers are we actively sending messages to (this minute)
      */
+    @Override
     public int countActiveSendPeers() {
         int active = 0;
         synchronized (_conLock) {
@@ -372,11 +378,12 @@ public class NTCPTransport extends TransportImpl {
         }
         return active;
     }
-    
+
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
      */
+    @Override
     public Vector getClockSkews() {
 
         Vector peers = new Vector();
@@ -394,18 +401,18 @@ public class NTCPTransport extends TransportImpl {
             _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");
         return skews;
     }
-    
+
     private static final int NUM_CONCURRENT_READERS = 3;
     private static final int NUM_CONCURRENT_WRITERS = 3;
-    
+
     public RouterAddress startListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Starting ntcp transport listening");
         _finisher.start();
         _pumper.startPumping();
-        
+
         _reader.startReading(NUM_CONCURRENT_READERS);
         _writer.startWriting(NUM_CONCURRENT_WRITERS);
-        
+
         configureLocalAddress();
         return bindAddress();
     }
@@ -414,10 +421,10 @@ public class NTCPTransport extends TransportImpl {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Restarting ntcp transport listening");
         _finisher.start();
         _pumper.startPumping();
-        
+
         _reader.startReading(NUM_CONCURRENT_READERS);
         _writer.startWriting(NUM_CONCURRENT_WRITERS);
-        
+
         _myAddress = new NTCPAddress(addr);
         return bindAddress();
     }
@@ -448,7 +455,7 @@ public class NTCPTransport extends TransportImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Outbound NTCP connections only - no listener configured");
         }
-        
+
         if (_myAddress != null) {
             RouterAddress rv = _myAddress.toRouterAddress();
             if (rv != null)
@@ -458,12 +465,12 @@ public class NTCPTransport extends TransportImpl {
             return null;
         }
     }
-    
+
     Reader getReader() { return _reader; }
     net.i2p.router.transport.ntcp.Writer getWriter() { return _writer; }
     public String getStyle() { return STYLE; }
     EventPumper getPumper() { return _pumper; }
-    
+
     /**
      * how long from initial connection attempt (accept() or connect()) until
      * the con must be established to avoid premature close()ing
@@ -504,9 +511,9 @@ public class NTCPTransport extends TransportImpl {
         if ( (expired != null) && (expired.size() > 0) )
             _context.statManager().addRateData("ntcp.outboundEstablishFailed", expired.size(), 0);
     }
-    
+
     //private boolean bindAllInterfaces() { return true; }
-    
+
     private void configureLocalAddress() {
         RouterContext ctx = getContext();
         if (ctx == null) {
@@ -531,7 +538,7 @@ public class NTCPTransport extends TransportImpl {
             }
         }
     }
-    
+
     /**
      *  This doesn't (completely) block, caller should check isAlive()
      *  before calling startListening() or restartListening()
@@ -553,8 +560,9 @@ public class NTCPTransport extends TransportImpl {
         }
     }
     public static final String STYLE = "NTCP";
-    
+
     public void renderStatusHTML(java.io.Writer out, int sortFlags) throws IOException {}
+    @Override
     public void renderStatusHTML(java.io.Writer out, String urlBase, int sortFlags) throws IOException {
         TreeSet peers = new TreeSet(getComparator(sortFlags));
         synchronized (_conLock) {
@@ -575,7 +583,7 @@ public class NTCPTransport extends TransportImpl {
         long totalUptime = 0;
         long totalSend = 0;
         long totalRecv = 0;
-        
+
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size());
         buf.append(" limit: ").append(getMaxConnections());
@@ -666,19 +674,19 @@ public class NTCPTransport extends TransportImpl {
             buf.append("</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;");
             buf.append("</td></tr>\n");
         }
-                
+
         buf.append("</table>\n");
         buf.append("Peers currently reading I2NP messages: ").append(readingPeers).append("<br />\n");
         buf.append("Peers currently writing I2NP messages: ").append(writingPeers).append("<br />\n");
         out.write(buf.toString());
         buf.setLength(0);
     }
-    
-    private static NumberFormat _rateFmt = new DecimalFormat("#,#0.00");
+
+    private static final NumberFormat _rateFmt = new DecimalFormat("#,#0.00");
     private static String formatRate(float rate) {
         synchronized (_rateFmt) { return _rateFmt.format(rate); }
     }
-    
+
     private Comparator getComparator(int sortFlags) {
         Comparator rv = null;
         switch (Math.abs(sortFlags)) {
@@ -702,7 +710,7 @@ public class NTCPTransport extends TransportImpl {
     }
     private static class PeerComparator implements Comparator {
         public int compare(Object lhs, Object rhs) {
-            if ( (lhs == null) || (rhs == null) || !(lhs instanceof NTCPConnection) || !(rhs instanceof NTCPConnection)) 
+            if ( (lhs == null) || (rhs == null) || !(lhs instanceof NTCPConnection) || !(rhs instanceof NTCPConnection))
                 throw new IllegalArgumentException("rhs = " + rhs + " lhs = " + lhs);
             return compare((NTCPConnection)lhs, (NTCPConnection)rhs);
         }
@@ -711,13 +719,15 @@ public class NTCPTransport extends TransportImpl {
             return l.getRemotePeer().calculateHash().toBase64().compareTo(r.getRemotePeer().calculateHash().toBase64());
         }
     }
-    
+
     /**
      * Cache the bid to reduce object churn
      */
     private class SharedBid extends TransportBid {
         public SharedBid(int ms) { super(); setLatencyMs(ms); }
+        @Override
         public Transport getTransport() { return NTCPTransport.this; }
+        @Override
         public String toString() { return "NTCP bid @ " + getLatencyMs(); }
     }
 }
