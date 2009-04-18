@@ -1,3 +1,8 @@
+* 2009-04-18  0.7.2 released
+
+2009-04-18 Complication
+    * Update versions, package release
+
 2009-04-17 sponge
     * fixed setIP, just be sure to distclean before building :-)
     * more lint taken care of as well.
