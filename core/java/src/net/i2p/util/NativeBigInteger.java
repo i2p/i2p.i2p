@@ -23,6 +23,9 @@ import freenet.support.CPUInformation.CPUInfo;
 import freenet.support.CPUInformation.IntelCPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
  * which accounts for a massive segment of the processing cost of asymmetric 
@@ -89,6 +92,9 @@ public class NativeBigInteger extends BigInteger {
      * do we want to dump some basic success/failure info to stderr during 
      * initialization?  this would otherwise use the Log component, but this makes
      * it easier for other systems to reuse this class
+     *
+     * Well, we really want to use Log so if you are one of those "other systems"
+     * then comment out the I2PAppContext usage below.
      */
     private static final boolean _doLog = System.getProperty("jbigi.dontLog") == null;
     
@@ -401,38 +407,32 @@ public class NativeBigInteger extends BigInteger {
             boolean loaded = loadGeneric("jbigi");
             if (loaded) {
                 _nativeOk = true;
-                if (_doLog)
-                    System.err.println("INFO: Locally optimized native BigInteger loaded from the library path");
+                info("Locally optimized native BigInteger library loaded from the library path");
             } else {
                 loaded = loadFromResource("jbigi");
                 if (loaded) {
                     _nativeOk = true;
-                    if (_doLog)
-                        System.err.println("INFO: Locally optimized native BigInteger loaded from resource");
+                    info("Locally optimized native BigInteger library loaded from resource");
                 } else {
                     loaded = loadFromResource(true);
                     if (loaded) {
                         _nativeOk = true;
-                        if (_doLog)
-                            System.err.println("INFO: Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
+                        info("Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
                     } else {
                         loaded = loadGeneric(true);
                         if (loaded) {
                             _nativeOk = true;
-                            if (_doLog)
-                                System.err.println("INFO: Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
+                            info("Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
                         } else {
                             loaded = loadFromResource(false);
                             if (loaded) {
                                 _nativeOk = true;
-                                if (_doLog)
-                                    System.err.println("INFO: Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
+                                info("Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
                             } else {
                                 loaded = loadGeneric(false);
                                 if (loaded) {
                                     _nativeOk = true;
-                                    if (_doLog)
-                                        System.err.println("INFO: Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
+                                    info("Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
                                 } else {
                                     _nativeOk = false;          
                                 }
@@ -442,16 +442,27 @@ public class NativeBigInteger extends BigInteger {
                 }
             }
         }
-        if (_doLog && !_nativeOk)
-            System.err.println("INFO: Native BigInteger library jbigi not loaded - using pure java");
+        if (!_nativeOk) {
+            warn("Native BigInteger library jbigi not loaded - using pure Java - " +
+                 "poor performance may result - see http://www.i2p2.i2p/jbigi.html for help");
+        }
         }catch(Exception e){
-            if (_doLog) {
-                System.err.println("INFO: Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
-                e.printStackTrace();
-            }
+            warn("Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
         }
     }
     
+    private static void info(String s) {
+        if(_doLog)
+            System.err.println("INFO: " + s);
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).info(s);
+    }
+
+    private static void warn(String s) {
+        if(_doLog)
+            System.err.println("WARNING: " + s);
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).warn(s);
+    }
+
     /** 
      * <p>Try loading it from an explictly build jbigi.dll / libjbigi.so first, before 
      * looking into a jbigi.jar for any other libraries.</p>

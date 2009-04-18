@@ -88,6 +88,7 @@ function toggleAll(category)
      </td></tr><tr><td>Log</td><td>Graph</td><td></td></tr><%
      } // end iterating over required groups for the current stat %>
  <tr><td valign="top" align="left">
+     <a name="<%=statshelper.getCurrentStatName()%>"></a>
      <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
      if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
      <td valign="top" align="left">

@@ -163,7 +163,7 @@ public class UrlLauncher {
             if (args.length > 0)
                 launcher.openUrl(args[0]);
             else
-                launcher.openUrl("http://localhost:7657/index.jsp");
+                launcher.openUrl("http://127.0.0.1:7657/index.jsp");
          } catch (Exception e) {}
     }
 }

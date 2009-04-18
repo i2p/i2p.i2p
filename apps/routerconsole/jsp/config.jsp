@@ -112,6 +112,7 @@
  if you open up your port (generally 8887) to both UDP and TCP, and enable inbound TCP above.
  If you think you have opened up your firewall and I2P still thinks you are firewalled, remember
  that you may have multiple firewalls, for example both software packages and external hardware routers.
+ If there is an error, the <a href="logs.jsp">logs</a> may also help diagnose the problem.
  <ul>
  <li><b>OK</b> - Your UDP port does not appear to be firewalled.
  <li><b>Firewalled</b> - Your UDP port appears to be firewalled.
@@ -151,6 +152,9 @@
      You have not configured inbound TCP with a hostname and port above, however
      you have disabled UDP. Therefore your router cannot accept inbound connections.
      Please configure a TCP host and port above or enable UDP.
+ <li><b>ERR - Client Manager I2CP Error - check logs</b> -
+     This is usually due to a port 7654 conflict. Check the logs to verify. Do you have another I2P instance running?
+     Stop the conflicting program and restart I2P.
  </ul>
  </p>
  <hr />

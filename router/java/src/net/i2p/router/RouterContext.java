@@ -12,13 +12,10 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.Calculator;
 import net.i2p.router.peermanager.CapacityCalculator;
 import net.i2p.router.peermanager.IntegrationCalculator;
-import net.i2p.router.peermanager.IsFailingCalculator;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
-import net.i2p.router.peermanager.ReliabilityCalculator;
 import net.i2p.router.peermanager.SpeedCalculator;
-import net.i2p.router.peermanager.StrictSpeedCalculator;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
@@ -62,12 +59,9 @@ public class RouterContext extends I2PAppContext {
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
     private RouterClock _clock;
-    private Calculator _isFailingCalc;
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
-    private Calculator _reliabilityCalc;
     private Calculator _capacityCalc;
-    private Calculator _oldSpeedCalc;
 
 
     private static List _contexts = new ArrayList(1);
@@ -132,11 +126,8 @@ public class RouterContext extends I2PAppContext {
         _messageValidator = new MessageValidator(this);
         //_throttle = new RouterThrottleImpl(this);
         _throttle = new RouterDoSThrottle(this);
-        _isFailingCalc = new IsFailingCalculator(this);
         _integrationCalc = new IntegrationCalculator(this);
         _speedCalc = new SpeedCalculator(this);
-        _oldSpeedCalc = new StrictSpeedCalculator(this);
-        _reliabilityCalc = new ReliabilityCalculator(this);
         _capacityCalc = new CapacityCalculator(this);
     }
     
@@ -264,15 +255,10 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterThrottle throttle() { return _throttle; }
     
-    /** how do we rank the failure of profiles? */
-    public Calculator isFailingCalculator() { return _isFailingCalc; }
     /** how do we rank the integration of profiles? */
     public Calculator integrationCalculator() { return _integrationCalc; }
     /** how do we rank the speed of profiles? */
     public Calculator speedCalculator() { return _speedCalc; } 
-    public Calculator oldSpeedCalculator() { return _oldSpeedCalc; }
-    /** how do we rank the reliability of profiles? */
-    public Calculator reliabilityCalculator() { return _reliabilityCalc; }
     /** how do we rank the capacity of profiles? */
     public Calculator capacityCalculator() { return _capacityCalc; }
     
@@ -298,10 +284,8 @@ public class RouterContext extends I2PAppContext {
         buf.append(_statPublisher).append('\n');
         buf.append(_shitlist).append('\n');
         buf.append(_messageValidator).append('\n');
-        buf.append(_isFailingCalc).append('\n');
         buf.append(_integrationCalc).append('\n');
         buf.append(_speedCalc).append('\n');
-        buf.append(_reliabilityCalc).append('\n');
         return buf.toString();
     }
     

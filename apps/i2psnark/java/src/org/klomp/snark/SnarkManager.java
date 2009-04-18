@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
-import net.i2p.router.RouterContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -81,8 +80,7 @@ public class SnarkManager implements Snark.CompleteListener {
         I2PAppThread monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor");
         monitor.setDaemon(true);
         monitor.start();
-        if (_context instanceof RouterContext)
-            ((RouterContext)_context).router().addShutdownTask(new SnarkManagerShutdown());
+        _context.addShutdownTask(new SnarkManagerShutdown());
     }
     
     /** hook to I2PSnarkUtil for the servlet */
@@ -137,32 +135,31 @@ public class SnarkManager implements Snark.CompleteListener {
         } 
         // now add sane defaults
         if (!_config.containsKey(PROP_I2CP_HOST))
-            _config.setProperty(PROP_I2CP_HOST, "localhost");
+            _config.setProperty(PROP_I2CP_HOST, "127.0.0.1");
         if (!_config.containsKey(PROP_I2CP_PORT))
             _config.setProperty(PROP_I2CP_PORT, "7654");
         if (!_config.containsKey(PROP_I2CP_OPTS))
             _config.setProperty(PROP_I2CP_OPTS, "inbound.length=2 inbound.lengthVariance=0 outbound.length=2 outbound.lengthVariance=0 inbound.quantity=3 outbound.quantity=3");
         if (!_config.containsKey(PROP_EEP_HOST))
-            _config.setProperty(PROP_EEP_HOST, "localhost");
+            _config.setProperty(PROP_EEP_HOST, "127.0.0.1");
         if (!_config.containsKey(PROP_EEP_PORT))
             _config.setProperty(PROP_EEP_PORT, "4444");
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
-        if (!_config.containsKey(PROP_UPBW_MAX)) {
-            try {
-                if (_context instanceof RouterContext)
-                    _config.setProperty(PROP_UPBW_MAX, "" + (((RouterContext)_context).bandwidthLimiter().getOutboundKBytesPerSecond() / 2));
-                else
-                    _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
-            } catch (NoClassDefFoundError ncdfe) {
-                _config.setProperty(PROP_UPBW_MAX, "" + DEFAULT_MAX_UP_BW);
-            }
-        }
         if (!_config.containsKey(PROP_DIR))
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
         updateConfig();
+    }
+
+    /** call from DirMonitor since loadConfig() is called before router I2CP is up */
+    private void getBWLimit() {
+        if (!_config.containsKey(PROP_UPBW_MAX)) {
+            int[] limits = BWLimits.getBWLimits(_util.getI2CPHost(), _util.getI2CPPort());
+            if (limits != null && limits[1] > 0)
+                _util.setMaxUpBW(limits[1]);
+        }
     }
     
     private void updateConfig() {
@@ -539,7 +536,7 @@ public class SnarkManager implements Snark.CompleteListener {
         String announce = info.getAnnounce();
         // basic validation of url
         if ((!announce.startsWith("http://")) ||
-            (announce.indexOf(".i2p/") < 0))
+            (announce.indexOf(".i2p/") < 0)) // need to do better than this
             return "Non-i2p tracker in " + info.getName() + ", deleting it";
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
@@ -620,6 +617,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     _messages.remove(0);
             }
 
+            // here because we need to delay until I2CP is up
+            // although the user will see the default until then
+            getBWLimit();
             while (true) {
                 File dir = getDataDir();
                 _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());

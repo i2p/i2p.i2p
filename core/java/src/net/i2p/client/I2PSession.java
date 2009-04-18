@@ -40,6 +40,8 @@ public interface I2PSession {
      */
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException;
+    /** See I2PSessionMuxedImpl for details */
+    public boolean sendMessage(Destination dest, byte[] payload, int proto, int fromport, int toport) throws I2PSessionException;
 
     /**
      * Like sendMessage above, except the key used and the tags sent are exposed to the 
@@ -71,6 +73,12 @@ public interface I2PSession {
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire) throws I2PSessionException;
+    /** See I2PSessionMuxedImpl for details */
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
+                               int proto, int fromport, int toport) throws I2PSessionException;
+    /** See I2PSessionMuxedImpl for details */
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+                               int proto, int fromport, int toport) throws I2PSessionException;
 
     /** Receive a message that the router has notified the client about, returning
      * the payload.
@@ -134,4 +142,23 @@ public interface I2PSession {
      *
      */
     public Destination lookupDest(Hash h) throws I2PSessionException;
+
+    /**
+     * Get the current bandwidth limits
+     */
+    public int[] bandwidthLimits() throws I2PSessionException;
+
+    /** See I2PSessionMuxedImpl for details */
+    public void addSessionListener(I2PSessionListener lsnr, int proto, int port);
+    /** See I2PSessionMuxedImpl for details */
+    public void addMuxedSessionListener(I2PSessionMuxedListener l, int proto, int port);
+    /** See I2PSessionMuxedImpl for details */
+    public void removeListener(int proto, int port);
+
+    public static final int PORT_ANY = 0;
+    public static final int PORT_UNSPECIFIED = 0;
+    public static final int PROTO_ANY = 0;
+    public static final int PROTO_UNSPECIFIED = 0;
+    public static final int PROTO_STREAMING = 6;
+    public static final int PROTO_DATAGRAM = 17;
 }

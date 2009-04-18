@@ -108,6 +108,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
 
     private Log       _log;
     private ArrayList _trustedKeys;
+    private String _newVersion;
 
     /**
      * Constructs a new <code>TrustedUpdate</code> with the default global
@@ -127,6 +128,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         _context = context;
         _log = _context.logManager().getLog(TrustedUpdate.class);
         _trustedKeys = new ArrayList();
+        _newVersion = null;
 
         String propertyTrustedKeys = context.getProperty(PROP_TRUSTED_KEYS);
 
@@ -379,6 +381,11 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         }
     }
 
+    /** version in the .sud file, valid only after calling migrateVerified() */
+    public String newVersion() {
+        return _newVersion;
+    }
+
     /**
      * Verifies that the version of the given signed update file is newer than
      * <code>currentVersion</code>.
@@ -390,10 +397,8 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      *         than the current version, otherwise <code>false</code>.
      */
     public boolean isUpdatedVersion(String currentVersion, String signedFile) {
-        if (needsUpdate(currentVersion, getVersionString(signedFile)))
-            return true;
-        else
-            return false;
+        _newVersion = getVersionString(signedFile);
+        return needsUpdate(currentVersion, getVersionString(signedFile));
     }
 
     /**

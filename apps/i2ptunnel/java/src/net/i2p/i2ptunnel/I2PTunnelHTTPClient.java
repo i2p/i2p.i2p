@@ -50,7 +50,7 @@ import net.i2p.util.Log;
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
-    private List proxyList;
+    private final List proxyList;
 
     private HashMap addressHelpers = new HashMap();
 
@@ -145,12 +145,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
+        proxyList = new ArrayList();
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
             return;
         }
 
-        proxyList = new ArrayList();
         if (wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
             while (tok.hasMoreTokens())
@@ -185,7 +185,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     
     /** 
      * create the default options (using the default timeout, etc)
-     *
+     * unused?
      */
     protected I2PSocketOptions getDefaultOptions() {
         Properties defaultOpts = getTunnel().getClientOptions();
@@ -210,6 +210,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             defaultOpts.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, ""+DEFAULT_READ_TIMEOUT);
         if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
             defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        if (sockMgr == null)
+            sockMgr = getSocketManager();
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
@@ -285,7 +288,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         break;
                     }
                     host = request.substring(0, pos);
-
+                    
+                    // parse port
+                    int posPort = host.indexOf(":");
+                    int port = 80;
+                    if(posPort != -1) {
+                        String[] parts = host.split(":");
+                        host = parts[0];
+                        try {
+                            port = Integer.parseInt(parts[1]);
+                        } catch(Exception exc) {
+                            // TODO: log this
+                        }
+                    }
+                    
                     // Quick hack for foo.bar.i2p
                     if (host.toLowerCase().endsWith(".i2p")) {
                         // Destination gets the host name
@@ -386,6 +402,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         
                         line = method + " " + request.substring(pos);
                     } else if (host.indexOf(".") != -1) {
+                        // rebuild host
+                        host = host + ":" + port;
                         // The request must be forwarded to a WWW proxy
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Before selecting outproxy for " + host);

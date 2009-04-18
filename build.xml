@@ -276,6 +276,7 @@
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
         <copy file="readme_de.html" todir="pkg-temp/docs/" />
+        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
         <copy file="readme_nl.html" todir="pkg-temp/docs/" />
         <copy file="readme_sv.html" todir="pkg-temp/docs/" />
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
@@ -362,7 +363,7 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
         <mkdir dir="pkg-temp/docs" />
-        <copy file="readme_sv.html" todir="pkg-temp/docs/" />
+        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter">
         <delete dir="pkg-temp" />
@@ -485,5 +486,33 @@
             <arg value="build/systray.jar"/>
         </exec>
         <echo message="Findbugs output stored in findbugs.xml" />
+    </target>
+    <target name="buildWithDesktopgui" depends="buildrouter">
+        <ant dir="apps/desktopgui" target="build_jar" />
+    </target>
+    <target name="preppkgWithDesktopgui" depends="buildWithDesktopgui,preppkg">
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
+        <mkdir dir="pkg-temp/desktopgui/resources/" />
+        <copy todir="pkg-temp/desktopgui/resources/">
+            <fileset dir="apps/desktopgui/desktopgui/resources/" />
+        </copy>
+    </target>
+    <target name="installerWithDesktopgui" depends="preppkgWithDesktopgui,installer" />
+    <target name="prepupdateWithDesktopgui" depends="buildWithDesktopgui,prepupdate">
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
+        <mkdir dir="pkg-temp/desktopgui/resources/" />
+        <copy todir="pkg-temp/desktopgui/resources/">
+            <fileset dir="apps/desktopgui/desktopgui/resources/" />
+        </copy>
+    </target>
+    <target name="updaterWithDesktopgui" depends="prepupdateWithDesktopgui,updater" />
+    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, tarball" />
+    <target name="distWithDesktopgui" depends="pkgWithDesktopgui, javadoc" />
+    <target name="distcleanWithDesktopgui" depends="distclean">
+        <ant dir="apps/desktopgui" target="build_clean" />
     </target>
 </project>

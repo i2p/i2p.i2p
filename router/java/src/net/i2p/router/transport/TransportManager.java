@@ -33,7 +33,7 @@ import net.i2p.util.Log;
 
 public class TransportManager implements TransportEventListener {
     private Log _log;
-    private List _transports;
+    private List<Transport> _transports;
     private RouterContext _context;
     private UPnPManager _upnpManager;
 
@@ -231,6 +231,19 @@ public class TransportManager implements TransportEventListener {
                 return false;
         }
         return true;
+    }    
+    
+    /**
+     * IP of the peer from the last connection (in or out, any transport).
+     * This may be different from that advertised in the netDb,
+     * as the peer may be hidden, or connect from a different IP, or
+     * change his netDb later, in an attempt to avoid restrictions.
+     *
+     * For blocking purposes, etc. it's worth checking both
+     * the netDb addresses and this address.
+     */
+    public byte[] getIP(Hash dest) {
+        return TransportImpl.getIP(dest);
     }    
     
     Map getAddresses() {

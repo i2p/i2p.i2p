@@ -104,6 +104,15 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     
     private static final int META_FREQUENCY = 10*60*1000;
     private static final int INFO_FREQUENCY = 6*60*60*1000;
+    /**
+     *  Why this is 16K, and where it is documented, good question?
+     *  We claim we can do 32K datagrams so this is a problem.
+     *  Needs to be fixed. But SSU can handle it?
+     *  In the meantime, don't let the transport bid on big messages.
+     */
+    public static final int BUFFER_SIZE = 16*1024;
+    /** 2 bytes for length and 4 for CRC */
+    public static final int MAX_MSG_SIZE = BUFFER_SIZE - (2 + 4);
     
     /**
      * Create an inbound connected (though not established) NTCP connection

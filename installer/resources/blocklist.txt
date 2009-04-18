@@ -10,7 +10,7 @@
 # A more reasonable list: http://www.bluetack.co.uk/config/level1.zip
 #
 # You may also wish to add the bogons from http://www.cymru.com/Documents/bogon-list.html ,
-# but you will have top update your blocklist manually as IP ranges are assigned.
+# but you will have to update your blocklist manually as IP ranges are assigned.
 # You must update this list yourself, it is not overwritten by the update process.
 #
 #   * Acceptable formats (IPV4 only):

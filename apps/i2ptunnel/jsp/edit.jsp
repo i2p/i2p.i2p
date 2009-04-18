@@ -16,10 +16,8 @@ String tun = request.getParameter("tunnel");
   int curTunnel = -1;
   if (EditBean.isClient(type)) {
     %><jsp:include page="editClient.jsp" /><%
-  } else if ("server".equals(type) || "httpserver".equals(type)) {
-    %><jsp:include page="editServer.jsp" /><%
   } else {
-    %>Invalid tunnel type<%
+    %><jsp:include page="editServer.jsp" /><%
   }
 }
 %>

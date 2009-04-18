@@ -75,6 +75,11 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
         }
         DataHelper.toLong(out, curIndex, 2, _msgData.length);
         curIndex += 2;
+        // where is this coming from?
+        if (curIndex + _msgData.length > out.length) {
+            _log.log(Log.ERROR, "output buffer too small idx: " + curIndex + " len: " + _msgData.length + " outlen: " + out.length);
+            throw new I2NPMessageException("Too much data to write out (id=" + _tunnelId + " data=" + _msg + ")");
+        }
         System.arraycopy(_msgData, 0, out, curIndex, _msgData.length);
         curIndex += _msgData.length;
         return curIndex;

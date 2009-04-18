@@ -166,6 +166,8 @@ public class UpdateHandler {
                 } else {
                     _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
                     _status = "<b>Update downloaded</b><br />Click Restart to Install";
+                    if (up.newVersion() != null)
+                        _status += " Version " + up.newVersion();
                 }
             } else {
                 err = err + " from " + url;
@@ -185,7 +187,7 @@ public class UpdateHandler {
     }
     
     private void restart() {
-        _context.router().addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+        _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
 

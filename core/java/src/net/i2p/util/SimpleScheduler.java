@@ -1,7 +1,6 @@
 package net.i2p.util;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
@@ -43,6 +42,7 @@ public class SimpleScheduler {
         _name = name;
         _count = 0;
         _executor = new ScheduledThreadPoolExecutor(THREADS, new CustomThreadFactory());
+        _executor.prestartAllCoreThreads();
     }
     
     /**
@@ -91,6 +91,11 @@ public class SimpleScheduler {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
             rv.setName(_name +  ' ' + (++_count) + '/' + THREADS);
+// Uncomment this to test threadgrouping, but we should be all safe now that the constructor preallocates!
+//            String name = rv.getThreadGroup().getName();
+//            if(!name.equals("main")) {
+//                (new Exception("OWCH! DAMN! Wrong ThreadGroup `" + name +"', `" + rv.getName() + "'")).printStackTrace();
+//            }
             rv.setDaemon(true);
             return rv;
         }
@@ -144,9 +149,11 @@ public class SimpleScheduler {
             _timeoutMs = timeoutMs;
             _scheduled = initialDelay + System.currentTimeMillis();
         }
+        @Override
         public void schedule() {
             _executor.scheduleWithFixedDelay(this, _initialDelay, _timeoutMs, TimeUnit.MILLISECONDS);
         }
+        @Override
         public void run() {
             super.run();
             _scheduled = _timeoutMs + System.currentTimeMillis();

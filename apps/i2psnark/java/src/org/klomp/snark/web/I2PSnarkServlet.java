@@ -202,10 +202,14 @@ public class I2PSnarkServlet extends HttpServlet {
                 } catch (IOException ioe) {
                     _log.warn("hrm: " + local, ioe);
                 }
-            } else if ( (newURL != null) && (newURL.trim().length() > "http://.i2p/".length()) ) {
-                _manager.addMessage("Fetching " + newURL);
-                I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
-                fetch.start();
+            } else if (newURL != null) {
+                if (newURL.startsWith("http://")) {
+                    _manager.addMessage("Fetching " + newURL);
+                    I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
+                    fetch.start();
+                } else {
+                    _manager.addMessage("Invalid URL - must start with http://");
+                }
             } else {
                 // no file or URL specified
             }
@@ -644,7 +648,7 @@ public class I2PSnarkServlet extends HttpServlet {
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String uri = req.getRequestURI();
         String newURL = req.getParameter("newURL");
-        if ( (newURL == null) || (newURL.trim().length() <= 0) ) newURL = "http://";
+        if ( (newURL == null) || (newURL.trim().length() <= 0) ) newURL = "";
         String newFile = req.getParameter("newFile");
         if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
         
@@ -772,7 +776,7 @@ public class I2PSnarkServlet extends HttpServlet {
             return bytes + "B";
         else if (bytes < 5*1024*1024)
             return ((bytes + 512)/1024) + "KB";
-        else if (bytes < 5*1024*1024*1024l)
+        else if (bytes < 10*1024*1024*1024l)
             return ((bytes + 512*1024)/(1024*1024)) + "MB";
         else
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "GB";

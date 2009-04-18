@@ -13,12 +13,15 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
@@ -67,7 +70,8 @@ public class SOCKS5Server extends SOCKSServer {
             out = new DataOutputStream(clientSock.getOutputStream());
 
             init(in, out);
-            manageRequest(in, out);
+            if (manageRequest(in, out) == Command.UDP_ASSOCIATE)
+                handleUDP(in, out);
         } catch (IOException e) {
             throw new SOCKSException("Connection error (" + e.getMessage() + ")");
         }
@@ -111,7 +115,7 @@ public class SOCKS5Server extends SOCKSServer {
      * initialization, integrity/confidentiality encapsulations, etc)
      * has been stripped out of the input/output streams.
      */
-    private void manageRequest(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
+    private int manageRequest(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
         int socksVer = in.readByte() & 0xff;
         if (socksVer != SOCKS_VERSION_5) {
             _log.debug("error in SOCKS5 request (protocol != 5? wtf?)");
@@ -127,9 +131,12 @@ public class SOCKS5Server extends SOCKSServer {
             sendRequestReply(Reply.COMMAND_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("BIND command not supported");
         case Command.UDP_ASSOCIATE:
+          /*** if(!Boolean.valueOf(tunnel.getOptions().getProperty("i2ptunnel.socks.allowUDP")).booleanValue()) {
             _log.debug("UDP ASSOCIATE command is not supported!");
             sendRequestReply(Reply.COMMAND_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("UDP ASSOCIATE command not supported");
+           ***/
+            break;
         default:
             _log.debug("unknown command in request (" + Integer.toHexString(command) + ")");
             sendRequestReply(Reply.COMMAND_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
@@ -152,7 +159,8 @@ public class SOCKS5Server extends SOCKSServer {
                     connHostName += ".";
                 }
             }
-            _log.warn("IPV4 address type in request: " + connHostName + ". Is your client secure?");
+            if (command != Command.UDP_ASSOCIATE)
+                _log.warn("IPV4 address type in request: " + connHostName + ". Is your client secure?");
             break;
         case AddressType.DOMAINNAME:
             {
@@ -168,9 +176,12 @@ public class SOCKS5Server extends SOCKSServer {
             _log.debug("DOMAINNAME address type in request: " + connHostName);
             break;
         case AddressType.IPV6:
-            _log.warn("IP V6 address type in request! Is your client secure?" + " (IPv6 is not supported, anyway :-)");
-            sendRequestReply(Reply.ADDRESS_TYPE_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
-            throw new SOCKSException("IPV6 addresses not supported");
+            if (command != Command.UDP_ASSOCIATE) {
+                _log.warn("IP V6 address type in request! Is your client secure?" + " (IPv6 is not supported, anyway :-)");
+                sendRequestReply(Reply.ADDRESS_TYPE_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                throw new SOCKSException("IPV6 addresses not supported");
+            }
+            break;
         default:
             _log.debug("unknown address type in request (" + Integer.toHexString(command) + ")");
             sendRequestReply(Reply.ADDRESS_TYPE_NOT_SUPPORTED, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
@@ -183,6 +194,7 @@ public class SOCKS5Server extends SOCKSServer {
             sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             throw new SOCKSException("Invalid port number in request");
         }
+        return command;
     }
 
     protected void confirmConnection() throws SOCKSException {
@@ -293,6 +305,13 @@ public class SOCKS5Server extends SOCKSServer {
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
+                Destination dest = I2PTunnel.destFromName(connHostName);
+                if (dest == null) {
+                    try {
+                        sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                    } catch (IOException ioe) {}
+                    throw new SOCKSException("Host not found");
+                }
                 destSock = t.createI2PSocket(I2PTunnel.destFromName(connHostName));
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
@@ -356,6 +375,59 @@ public class SOCKS5Server extends SOCKSServer {
         }
 
         return destSock;
+    }
+
+    // This isn't really the right place for this, we can't stop the tunnel once it starts.
+    static SOCKSUDPTunnel _tunnel;
+    static final Object _startLock = new Object();
+    static byte[] dummyIP = new byte[4];
+    /**
+     * We got a UDP associate command.
+     * Loop here looking for more, never return normally,
+     * or else I2PSocksTunnel will create a streaming lib connection.
+     *
+     * Do UDP Socks clients actually send more than one Associate request?
+     * RFC 1928 isn't clear... maybe not.
+     */
+    private void handleUDP(DataInputStream in, DataOutputStream out) throws SOCKSException {
+        List<Integer> ports = new ArrayList(1);
+        synchronized (_startLock) {
+            if (_tunnel == null) {
+                // tunnel options?
+                _tunnel = new SOCKSUDPTunnel(new I2PTunnel());
+                _tunnel.startRunning();
+            }
+        }
+        while (true) {
+            // Set it up. connHostName and connPort are the client's info.
+            InetAddress ia = null;
+            try {
+                ia = InetAddress.getByAddress(connHostName, dummyIP);
+            } catch (UnknownHostException uhe) {} // won't happen, no resolving done here
+            int myPort = _tunnel.add(ia, connPort);
+            ports.add(Integer.valueOf(myPort));
+            try {
+                sendRequestReply(Reply.SUCCEEDED, AddressType.IPV4, InetAddress.getByName("127.0.0.1"), null, myPort, out);
+            } catch (IOException ioe) { break; }
+
+            // wait for more ???
+            try {
+                int command = manageRequest(in, out);
+                // don't do this...
+                if (command != Command.UDP_ASSOCIATE)
+                    break;
+            } catch (IOException ioe) { break; }
+            catch (SOCKSException ioe) { break; }
+        }
+
+        for (Integer i : ports)
+            _tunnel.remove(i);
+
+        // Prevent I2PSocksTunnel from calling getDestinationI2PSocket() above
+        // to create a streaming lib connection...
+        // This isn't very elegant...
+        //
+        throw new SOCKSException("End of UDP Processing");
     }
 
     /*

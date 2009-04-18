@@ -160,7 +160,8 @@
 <div id="add">
 <p class="add">
 <h3>Add new destination:</h3>
-Hostname: <input type="text" name="hostname" value="" size="20"> Destination: <textarea name="destination" rows="1" cols="20" wrap="off" ></textarea><br/>
+Hostname: <input type="text" name="hostname" value="${book.hostname}" size="20">
+Destination: <textarea name="destination" rows="1" cols="20" wrap="off" >${book.destination}</textarea><br/>
 <input type="image" name="action" value="add" src="images/add.png" alt="Add destination" />
 </p>
 </div>

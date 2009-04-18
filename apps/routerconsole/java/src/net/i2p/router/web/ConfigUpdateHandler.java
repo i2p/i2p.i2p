@@ -21,13 +21,13 @@ public class ConfigUpdateHandler extends FormHandler {
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
     public static final String DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
-    public static final String DEFAULT_REFRESH_FREQUENCY = 12*60*60*1000 + "";
+    public static final String DEFAULT_REFRESH_FREQUENCY = 24*60*60*1000 + "";
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
-    public static final String DEFAULT_UPDATE_POLICY = "notify";
+    public static final String DEFAULT_UPDATE_POLICY = "download";
     public static final String PROP_SHOULD_PROXY = "router.updateThroughProxy";
     public static final String DEFAULT_SHOULD_PROXY = Boolean.TRUE.toString();
     public static final String PROP_PROXY_HOST = "router.updateProxyHost";
-    public static final String DEFAULT_PROXY_HOST = "localhost";
+    public static final String DEFAULT_PROXY_HOST = "127.0.0.1";
     public static final String PROP_PROXY_PORT = "router.updateProxyPort";
     public static final String DEFAULT_PROXY_PORT = "4444";
     

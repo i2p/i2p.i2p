@@ -28,7 +28,7 @@ public class TunnelPool {
     private RouterContext _context;
     private Log _log;
     private TunnelPoolSettings _settings;
-    private ArrayList _tunnels;
+    private ArrayList<TunnelInfo> _tunnels;
     private TunnelPeerSelector _peerSelector;
     private TunnelPoolManager _manager;
     private boolean _alive;
@@ -227,7 +227,7 @@ public class TunnelPool {
      *
      * @return list of TunnelInfo objects
      */
-    public List listTunnels() {
+    public List<TunnelInfo> listTunnels() {
         synchronized (_tunnels) {
             return new ArrayList(_tunnels);
         }

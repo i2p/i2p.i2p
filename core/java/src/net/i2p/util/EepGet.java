@@ -18,7 +18,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 
 /**
- * EepGet [-p localhost:4444] 
+ * EepGet [-p 127.0.0.1:4444] 
  *        [-n #retries] 
  *        [-o outputFile] 
  *        [-m markSize lineLen]
@@ -123,11 +123,11 @@ public class EepGet {
     }
    
     /**
-     * EepGet [-p localhost:4444] [-n #retries] [-e etag] [-o outputFile] [-m markSize lineLen] url
+     * EepGet [-p 127.0.0.1:4444] [-n #retries] [-e etag] [-o outputFile] [-m markSize lineLen] url
      *
      */ 
     public static void main(String args[]) {
-        String proxyHost = "localhost";
+        String proxyHost = "127.0.0.1";
         int proxyPort = 4444;
         int numRetries = 5;
         int markSize = 1024;
@@ -212,7 +212,7 @@ public class EepGet {
     }
     
     private static void usage() {
-        System.err.println("EepGet [-p localhost:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] [-t timeout] url");
+        System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] [-t timeout] url");
     }
     
     public static interface StatusListener {

@@ -178,7 +178,11 @@ public class I2CPMessageReader {
                     // pause .5 secs when we're paused
                     try {
                         Thread.sleep(500);
-                    } catch (InterruptedException ie) { // nop
+                    } catch (InterruptedException ie) {
+                        // we should break away here.
+                        _log.warn("Breaking away stream", ie);
+                        _listener.disconnected(I2CPMessageReader.this);
+                        cancelRunner();
                     }
                 }
             }

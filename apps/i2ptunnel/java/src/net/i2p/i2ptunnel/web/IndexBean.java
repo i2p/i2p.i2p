@@ -142,7 +142,7 @@ public class IndexBean {
     }
     
     private String processAction() {
-        if ( (_action == null) || (_action.trim().length() <= 0) )
+        if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
         if ( (_prevNonce != _curNonce) && (!validPassphrase(_passphrase)) )
             return "Invalid nonce, are you being spoofed?";
@@ -351,6 +351,7 @@ public class IndexBean {
         		("httpclient".equals(type)) ||
         		("sockstunnel".equals(type)) ||
         		("connectclient".equals(type)) ||
+        		("streamrclient".equals(type)) ||
         		("ircclient".equals(type)));
     }
     
@@ -384,8 +385,11 @@ public class IndexBean {
         else if ("ircclient".equals(internalType)) return "IRC client";
         else if ("server".equals(internalType)) return "Standard server";
         else if ("httpserver".equals(internalType)) return "HTTP server";
-        else if ("sockstunnel".equals(internalType)) return "SOCKS 5 proxy";
+        else if ("sockstunnel".equals(internalType)) return "SOCKS 4/4a/5 proxy";
         else if ("connectclient".equals(internalType)) return "CONNECT/SSL/HTTPS proxy";
+        else if ("ircserver".equals(internalType)) return "IRC server";
+        else if ("streamrclient".equals(internalType)) return "Streamr client";
+        else if ("streamrserver".equals(internalType)) return "Streamr server";
         else return internalType;
     }
     
@@ -433,7 +437,8 @@ public class IndexBean {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
         String rv;
-        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType()))
+        if ("client".equals(tun.getType()) || "ircclient".equals(tun.getType()) ||
+            "streamrclient".equals(tun.getType()))
             rv = tun.getTargetDestination();
         else
             rv = tun.getProxyList();
@@ -609,8 +614,14 @@ public class IndexBean {
     public void setAccess(String moo) {
         _booleanOptions.add("i2cp.enableAccessList");
     }
-    public void setNewDest(String moo) {
-        _booleanOptions.add("i2cp.newDestOnResume");
+    public void setDelayOpen(String moo) {
+        _booleanOptions.add("i2cp.delayOpen");
+    }
+    public void setNewDest(String val) {
+        if ("1".equals(val))
+            _booleanOptions.add("i2cp.newDestOnResume");
+        else if ("2".equals(val))
+            _booleanOptions.add("persistentClientKey");
     }
 
     public void setReduceTime(String val) {
@@ -785,8 +796,6 @@ public class IndexBean {
                 config.setProperty("targetHost", _targetHost);
             if (_targetPort != null)
                 config.setProperty("targetPort", _targetPort);
-            if (_privKeyFile != null)
-                config.setProperty("privKeyFile", _privKeyFile);
             for (String p : _booleanServerOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
             for (String p : _otherServerOpts)
@@ -797,7 +806,7 @@ public class IndexBean {
         if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
-        } else if ("ircclient".equals(_type) || "client".equals(_type)) {
+        } else if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
         } else if ("httpserver".equals(_type)) {
@@ -814,7 +823,7 @@ public class IndexBean {
         "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
         };
     private static final String _booleanClientOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume"
+        "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
         };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
@@ -847,6 +856,8 @@ public class IndexBean {
         } else {
             config.setProperty("i2cpPort", "7654");
         }
+        if (_privKeyFile != null)
+            config.setProperty("privKeyFile", _privKeyFile);
         
         if (_customOptions != null) {
             StringTokenizer tok = new StringTokenizer(_customOptions);

@@ -59,6 +59,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      * Called by the thread pool of I2PSocket handlers
      *
      */
+    @Override
     protected void blockingHandle(I2PSocket socket) {
         long afterAccept = getTunnel().getContext().clock().now();
         long afterSocket = -1;
@@ -124,8 +125,17 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.error("Error while closing the received i2p con", ex);
             }
         } catch (IOException ex) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {}
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error while receiving the new HTTP request", ex);
+        } catch (OutOfMemoryError oom) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {}
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("OOM in HTTP server", oom);
         }
 
         long afterHandle = getTunnel().getContext().clock().now();
@@ -162,7 +172,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 sender.start();
                 
                 browserout = _browser.getOutputStream();
-                serverin = _webserver.getInputStream(); 
+                // NPE seen here in 0.7-7, caused by addition of socket.close() in the
+                // catch (IOException ioe) block above in blockingHandle() ???
+                // CRIT  [ad-130280.hc] net.i2p.util.I2PThread        : Killing thread Thread-130280.hc
+                // java.lang.NullPointerException
+                //     at java.io.FileInputStream.<init>(FileInputStream.java:131)
+                //     at java.net.SocketInputStream.<init>(SocketInputStream.java:44)
+                //     at java.net.PlainSocketImpl.getInputStream(PlainSocketImpl.java:401)
+                //     at java.net.Socket$2.run(Socket.java:779)
+                //     at java.security.AccessController.doPrivileged(Native Method)
+                //     at java.net.Socket.getInputStream(Socket.java:776)
+                //     at net.i2p.i2ptunnel.I2PTunnelHTTPServer$CompressedRequestor.run(I2PTunnelHTTPServer.java:174)
+                //     at java.lang.Thread.run(Thread.java:619)
+                //     at net.i2p.util.I2PThread.run(I2PThread.java:71)
+                try {
+                    serverin = _webserver.getInputStream(); 
+                } catch (NullPointerException npe) {
+                    throw new IOException("getInputStream NPE");
+                }
                 CompressedResponseOutputStream compressedOut = new CompressedResponseOutputStream(browserout);
                 Sender s = new Sender(compressedOut, serverin, "server: server to browser");
                 if (_log.shouldLog(Log.INFO))
@@ -221,7 +248,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             super(o);
         }
         
+        @Override
         protected boolean shouldCompress() { return true; }
+        @Override
         protected void finishHeaders() throws IOException {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Including x-i2p-gzip as the content encoding in the response");
@@ -229,6 +258,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             super.finishHeaders();
         }
 
+        @Override
         protected void beginProcessing() throws IOException {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Beginning compression processing");

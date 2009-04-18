@@ -39,23 +39,23 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                               Logging l, 
                               boolean ownDest,
                               EventDispatcher notifyThis,
-                              I2PTunnel tunnel) throws IllegalArgumentException {
+                              I2PTunnel tunnel, String pkf) throws IllegalArgumentException {
         super(localPort, 
               ownDest, 
               l, 
               notifyThis, 
-              "IRCHandler " + (++__clientId), tunnel);
+              "IRCHandler " + (++__clientId), tunnel, pkf);
         
         StringTokenizer tok = new StringTokenizer(destinations, ",");
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();
             try {
-                Destination dest = I2PTunnel.destFromName(destination);
-                if (dest == null)
+                Destination destN = I2PTunnel.destFromName(destination);
+                if (destN == null)
                     l.log("Could not resolve " + destination);
                 else
-                    dests.add(dest);
+                    dests.add(destN);
             } catch (DataFormatException dfe) {
                 l.log("Bad format parsing \"" + destination + "\"");
             }
@@ -83,9 +83,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             i2ps = createI2PSocket(dest);
             i2ps.setReadTimeout(readTimeout);
             StringBuffer expectedPong = new StringBuffer();
-            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong));
+            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in");
             in.start();
-            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps, expectedPong));
+            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " out");
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))

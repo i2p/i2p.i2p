@@ -65,7 +65,6 @@ public class Router {
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
     private I2PThread _gracefulShutdownDetector;
-    private Set _shutdownTasks;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -91,8 +90,6 @@ public class Router {
         System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
         System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
-        // until we handle restricted routes and/or all peers support v6, try v4 first
-        System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("http.agent", "I2P");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
@@ -136,7 +133,9 @@ public class Router {
                 envProps.setProperty(k, v);
             }
         }
-            
+        // This doesn't work, guess it has to be in the static block above?
+        // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
+        //    System.setProperty("java.net.preferIPv4Stack", "true");
 
         _context = new RouterContext(this, envProps);
         _routerInfo = null;
@@ -171,7 +170,6 @@ public class Router {
         watchdog.setDaemon(true);
         watchdog.start();
         
-        _shutdownTasks = new HashSet(0);
     }
     
     /**
@@ -446,13 +444,14 @@ public class Router {
      */
     private static final String _rebuildFiles[] = new String[] { "router.info", 
                                                                  "router.keys",
-                                                                 "netDb/my.info",
-                                                                 "connectionTag.keys",
+                                                                 "netDb/my.info",      // no longer used
+                                                                 "connectionTag.keys", // never used?
                                                                  "keyBackup/privateEncryption.key",
                                                                  "keyBackup/privateSigning.key",
                                                                  "keyBackup/publicEncryption.key",
                                                                  "keyBackup/publicSigning.key",
-                                                                 "sessionKeys.dat" };
+                                                                 "sessionKeys.dat"     // no longer used
+                                                               };
 
     static final String IDENTLOG = "identlog.txt";
     public static void killKeys() {
@@ -490,13 +489,12 @@ public class Router {
      */
     public void rebuildNewIdentity() {
         killKeys();
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
+        for (Runnable task : _context.getShutdownTasks()) {
+            try {
                 task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
         // hard and ugly
         finalShutdown(EXIT_HARD_RESTART);
@@ -781,12 +779,6 @@ public class Router {
         buf.setLength(0);
     }
     
-    public void addShutdownTask(Runnable task) {
-        synchronized (_shutdownTasks) {
-            _shutdownTasks.add(task);
-        }
-    }
-    
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
@@ -799,13 +791,12 @@ public class Router {
         I2PThread.removeOOMEventListener(_oomListener);
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
-        try {
-            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
-                Runnable task = (Runnable)iter.next();
+        for (Runnable task : _context.getShutdownTasks()) {
+            try {
                 task.run();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Error running shutdown task", t);
             }
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Error running shutdown task", t);
         }
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
@@ -859,6 +850,10 @@ public class Router {
     public void shutdownGracefully() {
         shutdownGracefully(EXIT_GRACEFUL);
     }
+    /**
+     * Call this with EXIT_HARD or EXIT_HARD_RESTART for a non-blocking,
+     * hard, non-graceful shutdown with a brief delay to allow a UI response
+     */
     public void shutdownGracefully(int exitCode) {
         _gracefulExitCode = exitCode;
         _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
@@ -887,7 +882,9 @@ public class Router {
     }
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
-        if (_gracefulExitCode <= 0) return -1;
+        if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
+        if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART)
+            return 0;
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
             return -1;
@@ -906,9 +903,20 @@ public class Router {
             while (true) {
                 boolean shutdown = (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
                 if (shutdown) {
-                    if (_context.tunnelManager().getParticipatingCount() <= 0) {
-                        if (_log.shouldLog(Log.CRIT))
+                    if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART ||
+                        _context.tunnelManager().getParticipatingCount() <= 0) {
+                        if (_gracefulExitCode == EXIT_HARD)
+                            _log.log(Log.CRIT, "Shutting down after a brief delay");
+                        else if (_gracefulExitCode == EXIT_HARD_RESTART)
+                            _log.log(Log.CRIT, "Restarting after a brief delay");
+                        else
                             _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
+                        // Allow time for a UI reponse
+                        try {
+                            synchronized (Thread.currentThread()) {
+                                Thread.currentThread().wait(2*1000);
+                            }
+                        } catch (InterruptedException ie) {}
                         shutdown(_gracefulExitCode);
                         return;
                     } else {
@@ -1198,13 +1206,13 @@ public class Router {
         return Math.max(send, recv);
     }
     
-}
+/* following classes are now private static inner classes, didn't bother to reindent */
 
 /**
  * coalesce the stats framework every minute
  *
  */
-class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
+private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
     private RouterContext _ctx;
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
@@ -1270,7 +1278,7 @@ class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
  * This is done here because we want to make sure the key is updated before anyone
  * uses it.
  */
-class UpdateRoutingKeyModifierJob extends JobImpl {
+private static class UpdateRoutingKeyModifierJob extends JobImpl {
     private Log _log;
     private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
     public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
@@ -1302,7 +1310,7 @@ class UpdateRoutingKeyModifierJob extends JobImpl {
     }
 }
 
-class MarkLiveliness implements Runnable {
+private static class MarkLiveliness implements Runnable {
     private RouterContext _context;
     private Router _router;
     private File _pingFile;
@@ -1334,7 +1342,7 @@ class MarkLiveliness implements Runnable {
     }
 }
 
-class ShutdownHook extends Thread {
+private static class ShutdownHook extends Thread {
     private RouterContext _context;
     private static int __id = 0;
     private int _id;
@@ -1351,7 +1359,7 @@ class ShutdownHook extends Thread {
 }
 
 /** update the router.info file whenever its, er, updated */
-class PersistRouterInfoJob extends JobImpl {
+private static class PersistRouterInfoJob extends JobImpl {
     private Log _log;
     public PersistRouterInfoJob(RouterContext ctx) { 
         super(ctx); 
@@ -1380,4 +1388,6 @@ class PersistRouterInfoJob extends JobImpl {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
+}
+
 }

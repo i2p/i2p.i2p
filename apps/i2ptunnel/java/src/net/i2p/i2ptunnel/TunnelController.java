@@ -58,7 +58,7 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
-        if (createKey && ("server".equals(getType()) || "httpserver".equals(getType())) )
+        if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
             createPrivateKey();
         _starting = getStartOnLoad();
     }
@@ -134,6 +134,8 @@ public class TunnelController implements Logging {
                 _log.warn("Cannot start the tunnel - no type specified");
             return;
         }
+        setI2CPOptions();
+        setSessionOptions();
         if ("httpclient".equals(type)) {
             startHttpClient();
         } else if("ircclient".equals(type)) {
@@ -144,19 +146,26 @@ public class TunnelController implements Logging {
             startConnectClient();
         } else if ("client".equals(type)) {
             startClient();
+        } else if ("streamrclient".equals(type)) {
+            startStreamrClient();
         } else if ("server".equals(type)) {
             startServer();
         } else if ("httpserver".equals(type)) {
             startHttpServer();
+        } else if ("ircserver".equals(type)) {
+            startIrcServer();
+        } else if ("streamrserver".equals(type)) {
+            startStreamrServer();
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot start tunnel - unknown type [" + type + "]");
+            return;
         }
+        acquire();
+        _running = true;
     }
     
     private void startHttpClient() {
-        setI2CPOptions();
-        setSessionOptions();
         setListenOn();
         String listenPort = getListenPort();
         String proxyList = getProxyList();
@@ -165,13 +174,9 @@ public class TunnelController implements Logging {
             _tunnel.runHttpClient(new String[] { listenPort, sharedClient }, this);
         else
             _tunnel.runHttpClient(new String[] { listenPort, sharedClient, proxyList }, this);
-        acquire();
-        _running = true;
     }
     
     private void startConnectClient() {
-        setI2CPOptions();
-        setSessionOptions();
         setListenOn();
         String listenPort = getListenPort();
         String proxyList = getProxyList();
@@ -180,31 +185,51 @@ public class TunnelController implements Logging {
             _tunnel.runConnectClient(new String[] { listenPort, sharedClient }, this);
         else
             _tunnel.runConnectClient(new String[] { listenPort, sharedClient, proxyList }, this);
-        acquire();
-        _running = true;
     }
     
     private void startIrcClient() {
-        setI2CPOptions();
-        setSessionOptions();
         setListenOn();
         String listenPort = getListenPort();
         String dest = getTargetDestination();
         String sharedClient = getSharedClient();
-        _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient }, this);
-        acquire();
-        _running = true;
+        if (getPersistentClientKey()) {
+            String privKeyFile = getPrivKeyFile(); 
+            _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient, privKeyFile }, this);
+        } else {
+            _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient }, this);
+        }
     }
     
     private void startSocksClient() {
-        setI2CPOptions();
-        setSessionOptions();
         setListenOn();
         String listenPort = getListenPort();
         String sharedClient = getSharedClient();
         _tunnel.runSOCKSTunnel(new String[] { listenPort, sharedClient }, this);
-        acquire();
-        _running = true;
+    }
+    
+    /*
+     *  Streamr client is a UDP server, use the listenPort field for targetPort
+     *  and the listenOnInterface field for the targetHost
+     */
+    private void startStreamrClient() {
+        String targetHost = getListenOnInterface();
+        String targetPort = getListenPort();
+        String dest = getTargetDestination();
+        _tunnel.runStreamrClient(new String[] { targetHost, targetPort, dest }, this);
+    }
+    
+    /**
+     *  Streamr server is a UDP client, use the targetPort field for listenPort
+     *  and the targetHost field for the listenOnInterface
+     */
+    private void startStreamrServer() {
+        String listenOn = getTargetHost();
+        if ( (listenOn != null) && (listenOn.length() > 0) ) {
+            _tunnel.runListenOn(new String[] { listenOn }, this);
+        }
+        String listenPort = getTargetPort();
+        String privKeyFile = getPrivKeyFile(); 
+        _tunnel.runStreamrServer(new String[] { listenPort, privKeyFile }, this);
     }
     
     /** 
@@ -240,38 +265,38 @@ public class TunnelController implements Logging {
     }
     
     private void startClient() {
-        setI2CPOptions();
-        setSessionOptions();
         setListenOn();
         String listenPort = getListenPort(); 
         String dest = getTargetDestination();
         String sharedClient = getSharedClient();
-        _tunnel.runClient(new String[] { listenPort, dest, sharedClient }, this);
-        acquire();
-        _running = true;
+        if (getPersistentClientKey()) {
+            String privKeyFile = getPrivKeyFile(); 
+            _tunnel.runClient(new String[] { listenPort, dest, sharedClient, privKeyFile }, this);
+        } else {
+            _tunnel.runClient(new String[] { listenPort, dest, sharedClient }, this);
+        }
     }
 
     private void startServer() {
-        setI2CPOptions();
-        setSessionOptions();
         String targetHost = getTargetHost(); 
         String targetPort = getTargetPort(); 
         String privKeyFile = getPrivKeyFile(); 
         _tunnel.runServer(new String[] { targetHost, targetPort, privKeyFile }, this);
-        acquire();
-        _running = true;
     }
     
     private void startHttpServer() {
-        setI2CPOptions();
-        setSessionOptions();
         String targetHost = getTargetHost(); 
         String targetPort = getTargetPort(); 
         String spoofedHost = getSpoofedHost(); 
         String privKeyFile = getPrivKeyFile(); 
         _tunnel.runHttpServer(new String[] { targetHost, targetPort, spoofedHost, privKeyFile }, this);
-        acquire();
-        _running = true;
+    }
+    
+    private void startIrcServer() {
+        String targetHost = getTargetHost(); 
+        String targetPort = getTargetPort(); 
+        String privKeyFile = getPrivKeyFile(); 
+        _tunnel.runIrcServer(new String[] { targetHost, targetPort, privKeyFile }, this);
     }
     
     private void setListenOn() {
@@ -380,6 +405,7 @@ public class TunnelController implements Logging {
     public String getProxyList() { return _config.getProperty("proxyList"); }
     public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
+    public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
     public String getMyDestination() {
         if (_tunnel != null) {
             List sessions = _tunnel.getSessions();

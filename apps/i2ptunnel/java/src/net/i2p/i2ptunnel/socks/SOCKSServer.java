@@ -9,7 +9,6 @@ package net.i2p.i2ptunnel.socks;
 import java.net.Socket;
 
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.Log;
 
 /**

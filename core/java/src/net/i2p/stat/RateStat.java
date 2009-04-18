@@ -134,7 +134,6 @@ public class RateStat {
             buf.append("# Period : ").append(DataHelper.formatDuration(_rates[i].getPeriod())).append(" for rate ")
                 .append(_groupName).append(" - ").append(_statName).append(NL);
             buf.append(NL);
-            out.write(buf.toString().getBytes());
             String curPrefix = prefix + "." + DataHelper.formatDuration(_rates[i].getPeriod());
             _rates[i].store(curPrefix, buf);
             out.write(buf.toString().getBytes());

@@ -133,6 +133,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.wasUnreachable(dest); 
     }
     
+    public byte[] getIP(Hash dest) { 
+        return _manager.getIP(dest); 
+    }
+    
     public List getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
     }

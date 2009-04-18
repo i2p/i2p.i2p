@@ -29,12 +29,9 @@ public class StatisticsManager implements Service {
     private Log _log;
     private RouterContext _context;
     private boolean _includePeerRankings;
-    private int _publishedStats;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
     public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "true";
-    public final static String PROP_MAX_PUBLISHED_PEERS = "router.publishPeerMax";
-    public final static int DEFAULT_MAX_PUBLISHED_PEERS = 10;
 
     private final DecimalFormat _fmt;
     private final DecimalFormat _pct;
@@ -52,45 +49,12 @@ public class StatisticsManager implements Service {
         startup();
     }
     public void startup() {
-        String val = _context.router().getConfigSetting(PROP_PUBLISH_RANKINGS);
-        try {
-            if (val == null) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Peer publishing setting " + PROP_PUBLISH_RANKINGS 
-                              + " not set - using default " + DEFAULT_PROP_PUBLISH_RANKINGS);
-                val = DEFAULT_PROP_PUBLISH_RANKINGS;
-            } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Peer publishing setting " + PROP_PUBLISH_RANKINGS 
-                              + " set to " + val);
-            }
-            boolean v = Boolean.TRUE.toString().equalsIgnoreCase(val);
-            _includePeerRankings = v;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Setting includePeerRankings = " + v);
-        } catch (Throwable t) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error determining whether to publish rankings [" 
-                           + PROP_PUBLISH_RANKINGS + "=" + val 
-                           + "], so we're defaulting to FALSE"); 
-            _includePeerRankings = false;
-        }
-        val = _context.router().getConfigSetting(PROP_MAX_PUBLISHED_PEERS);
-        if (val == null) {
-            _publishedStats = DEFAULT_MAX_PUBLISHED_PEERS;
-        } else {
-            try {
-                int num = Integer.parseInt(val);
-                _publishedStats = num;
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Invalid max number of peers to publish [" + val 
-                               + "], defaulting to " + DEFAULT_MAX_PUBLISHED_PEERS, nfe);
-                _publishedStats = DEFAULT_MAX_PUBLISHED_PEERS;
-            }
-        }
+        String val = _context.getProperty(PROP_PUBLISH_RANKINGS, DEFAULT_PROP_PUBLISH_RANKINGS);
+        _includePeerRankings = Boolean.valueOf(val);
     }
     
+    static final boolean CommentOutIn072 = RouterVersion.VERSION.equals("0.7.1");
+
     /** Retrieve a snapshot of the statistics that should be published */
     public Properties publishStatistics() { 
         Properties stats = new Properties();
@@ -124,9 +88,6 @@ public class StatisticsManager implements Service {
 ***/
         
         if (_includePeerRankings) {
-            if (false)
-                stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
-
             long publishedUptime = _context.router().getUptime();
             // Don't publish these for first hour
             if (publishedUptime > 60*60*1000)
@@ -172,12 +133,16 @@ public class StatisticsManager implements Service {
             //includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
 
-            // Round smaller uptimes to 1 hour, to frustrate uptime tracking
-            // Round 2nd hour to 90m since peers use 2h minimum to route
-            if (publishedUptime < 60*60*1000) publishedUptime = 60*60*1000;
-            else if (publishedUptime < 2*60*60*1000) publishedUptime = 90*60*1000;
-
-            stats.setProperty("stat_uptime", DataHelper.formatDuration(publishedUptime));
+            if (CommentOutIn072) {
+                // Round smaller uptimes to 1 hour, to frustrate uptime tracking
+                // Round 2nd hour to 90m since peers use 2h minimum to route
+                if (publishedUptime < 60*60*1000) publishedUptime = 60*60*1000;
+                else if (publishedUptime < 2*60*60*1000) publishedUptime = 90*60*1000;
+                stats.setProperty("stat_uptime", DataHelper.formatDuration(publishedUptime));
+            } else {
+                // So that we will still get build requests
+                stats.setProperty("stat_uptime", "90m");
+            }
             //stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             
             //includeRate("tunnel.decryptRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
@@ -185,12 +150,13 @@ public class StatisticsManager implements Service {
             //includeRate("udp.packetVerifyTime", stats, new long[] { 60*1000 });
             
             //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildClientExpire", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildClientReject", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildClientSuccess", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildExploratoryExpire", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildExploratoryReject", stats, new long[] { 10*60*1000 });
-            includeRate("tunnel.buildExploratorySuccess", stats, new long[] { 10*60*1000 });
+            long rate = CommentOutIn072 ? 10*60*1000 : 60*60*1000;
+            includeRate("tunnel.buildClientExpire", stats, new long[] { rate });
+            includeRate("tunnel.buildClientReject", stats, new long[] { rate });
+            includeRate("tunnel.buildClientSuccess", stats, new long[] { rate });
+            includeRate("tunnel.buildExploratoryExpire", stats, new long[] { rate });
+            includeRate("tunnel.buildExploratoryReject", stats, new long[] { rate });
+            includeRate("tunnel.buildExploratorySuccess", stats, new long[] { rate });
             //includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });

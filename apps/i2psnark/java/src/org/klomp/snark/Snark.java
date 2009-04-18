@@ -36,7 +36,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.i2p.I2PAppContext;
-import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
@@ -232,7 +231,7 @@ public class Snark
           }
         
         // Explicit shutdown.
-        Runtime.getRuntime().removeShutdownHook(snarkhook);
+        //Runtime.getRuntime().removeShutdownHook(snarkhook);
         snarkhook.start();
       }
   }
@@ -261,9 +260,9 @@ public class Snark
   public Snark(I2PAppContext ctx, Properties opts, String torrent,
                StorageListener slistener, boolean start, String rootDir) { 
     this(new I2PSnarkUtil(ctx), torrent, null, -1, slistener, null, null, null, null, false, rootDir);
-    String host = opts.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST);
+    String host = opts.getProperty("i2cp.hostname");
     int port = 0;
-    String s = opts.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
+    String s = opts.getProperty("i2cp.port");
     if (s != null) {
         try {
              port = Integer.parseInt(s);

@@ -1028,7 +1028,7 @@ public class ProfileOrganizer {
     
     /**
      * called after locking the reorganizeLock, place the profile in the appropriate tier.
-     * This is where we implement the (betterThanAverage ? goToPierX : goToPierY) algorithms
+     * This is where we implement the (betterThanAverage ? goToTierX : goToTierY) algorithms
      *
      */
     private void locked_placeProfile(PeerProfile profile) {
@@ -1153,7 +1153,6 @@ public class ProfileOrganizer {
                                      organizer.isHighCapacity(peer) ? "IR  " :
                                      organizer.isFailing(peer) ? "IX  " : "I   ") + "]: "
                            + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
-                           + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
                            + " Active?\t" + profile.getIsActive() 
@@ -1164,7 +1163,6 @@ public class ProfileOrganizer {
                                      organizer.isHighCapacity(peer) ? "R   " :
                                      organizer.isFailing(peer) ? "X   " : "    ") + "]: "
                            + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
-                           + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
                            + " Capacity:\t" + fmt.format(profile.getCapacityValue())
                            + " Integration:\t" + fmt.format(profile.getIntegrationValue())
                            + " Active?\t" + profile.getIsActive() 

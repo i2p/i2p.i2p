@@ -41,6 +41,18 @@ public class ConfigClientsHandler extends FormHandler {
                 startClient(appnum);
             else
                 startWebApp(app);
+        } else if (_action.toLowerCase().startsWith("start<span class=hide> ") &&
+                   _action.toLowerCase().endsWith("</span>")) {
+            // IE sucks
+            String app = _action.substring(23, _action.length() - 7);
+            int appnum = -1;
+            try {
+                appnum = Integer.parseInt(app);
+            } catch (NumberFormatException nfe) {}
+            if (appnum >= 0)
+                startClient(appnum);
+            else
+                startWebApp(app);
         } else {
             addFormError("Unsupported " + _action);
         }

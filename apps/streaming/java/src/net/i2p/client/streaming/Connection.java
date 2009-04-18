@@ -187,12 +187,12 @@ public class Connection {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "/" 
                                        + _activeResends + "), waiting " + timeLeft);
-                        try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) {}
+                        try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) { if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends +")"); return false;}
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
                                        + "), waiting indefinitely");
-                        try { _outboundPackets.wait(250); } catch (InterruptedException ie) {} //10*1000
+                        try { _outboundPackets.wait(250); } catch (InterruptedException ie) {if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends + ")"); return false;} //10*1000
                     }
                 } else {
                     _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
@@ -810,7 +810,11 @@ public class Connection {
                 synchronized (_connectLock) {
                     _connectLock.wait(timeLeft); 
                 }
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ie) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("waitForConnect(): InterruptedException");
+                _connectionError = "InterruptedException";
+                return;
+            }
         }
     }
     
