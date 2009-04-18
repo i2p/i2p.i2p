@@ -1,3 +1,6 @@
+2009-04-18 Complication
+    * Fix typo in "news.xml", no build number increase.
+
 * 2009-04-18  0.7.2 released
 
 2009-04-18 Complication

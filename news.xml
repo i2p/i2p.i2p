@@ -16,7 +16,7 @@
 The 0.7.2 release fixes multiple bugs and potential problems
 in I2P, while preparing ground for new functionality.
 </p><p>
-Threading issues with the SimpleTimer should no longer occur,
+Threading issues with the SimpleTimer class should no longer occur,
 the NTCP transport should no longer encounter null pointer exceptions,
 and "abandoned" tunnels should finish operation correctly.
 </p><p>
