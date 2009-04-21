@@ -92,14 +92,25 @@ public class UpdateHandler {
         return _updateRunner.getStatus();
     }
     
+    public boolean isDone() {
+        if(this._updateRunner == null)
+            return true;
+        return this._updateRunner.isDone();
+    }
+    
     public class UpdateRunner implements Runnable, EepGet.StatusListener {
         protected boolean _isRunning;
+        protected boolean done;
         protected String _status;
         public UpdateRunner() { 
-            _isRunning = false; 
+            _isRunning = false;
+            this.done = false;
             _status = "<b>Updating</b>";
         }
         public boolean isRunning() { return _isRunning; }
+        public boolean isDone() {
+            return this.done;
+        }
         public String getStatus() { return _status; }
         public void run() {
             _isRunning = true;
@@ -159,6 +170,7 @@ public class UpdateHandler {
             f.delete();
             if (err == null) {
                 String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
+                this.done = true;
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
                     _status = "<b>Update verified</b><br />Restarting";
