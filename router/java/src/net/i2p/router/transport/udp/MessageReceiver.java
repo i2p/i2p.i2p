@@ -24,7 +24,7 @@ public class MessageReceiver {
     private Log _log;
     private UDPTransport _transport;
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
-    private List _completeMessages;
+    private final List _completeMessages;
     private boolean _alive;
     private ByteCache _cache;
     

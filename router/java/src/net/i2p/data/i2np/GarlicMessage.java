@@ -67,15 +67,18 @@ public class GarlicMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getData());
     }
     
+    @Override
     protected void written() {
         super.written();
         _data = null;
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof GarlicMessage) ) {
             GarlicMessage msg = (GarlicMessage)object;
@@ -85,6 +88,7 @@ public class GarlicMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[GarlicMessage: ");

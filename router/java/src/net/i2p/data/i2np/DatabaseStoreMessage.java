@@ -231,6 +231,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getKey()) +
                DataHelper.hashCode(getLeaseSet()) +
@@ -241,6 +242,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
                DataHelper.hashCode(getReplyGateway());
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DatabaseStoreMessage) ) {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)object;
@@ -256,6 +258,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DatabaseStoreMessage: ");

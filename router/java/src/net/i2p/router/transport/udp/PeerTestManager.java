@@ -27,7 +27,7 @@ class PeerTestManager {
     private UDPTransport _transport;
     private PacketBuilder _packetBuilder;
     /** map of Long(nonce) to PeerTestState for tests currently in progress */
-    private Map _activeTests;
+    private final Map _activeTests;
     /** current test we are running, or null */
     private PeerTestState _currentTest;
     private boolean _currentTestComplete;

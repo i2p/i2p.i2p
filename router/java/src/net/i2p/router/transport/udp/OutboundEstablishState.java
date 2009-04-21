@@ -51,7 +51,7 @@ public class OutboundEstablishState {
     private RemoteHostId _remoteHostId;
     private RouterIdentity _remotePeer;
     private SessionKey _introKey;
-    private List _queuedMessages;
+    private final List _queuedMessages;
     private int _currentState;
     private long _introductionNonce;
     // intro
@@ -413,7 +413,7 @@ public class OutboundEstablishState {
     }
 
     /** uniquely identifies an attempt */
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }// LINT -- Exporting non-public type through public API
 
     /** we have received a real data packet, so we're done establishing */
     public synchronized void dataReceived() {

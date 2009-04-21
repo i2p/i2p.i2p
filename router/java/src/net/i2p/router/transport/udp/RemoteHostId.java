@@ -26,6 +26,7 @@ final class RemoteHostId {
     public int getPort() { return _port; }
     public byte[] getPeerHash() { return _peerHash; }
     
+    @Override
     public int hashCode() {
         int rv = 0;
         for (int i = 0; _ip != null && i < _ip.length; i++)
@@ -36,6 +37,7 @@ final class RemoteHostId {
         return rv;
     }
     
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) 
             throw new NullPointerException("obj is null");
@@ -45,6 +47,7 @@ final class RemoteHostId {
         return (_port == id.getPort()) && DataHelper.eq(_ip, id.getIP()) && DataHelper.eq(_peerHash, id.getPeerHash());
     }
     
+    @Override
     public String toString() { return toString(true); }
     public String toString(boolean includePort) {
         if (_ip != null) {

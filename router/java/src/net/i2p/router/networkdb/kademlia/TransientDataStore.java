@@ -10,9 +10,7 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,14 +117,17 @@ class TransientDataStore implements DataStore {
         }
     }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(_data);
     }
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || (obj.getClass() != getClass()) ) return false;
         TransientDataStore ds = (TransientDataStore)obj;
         return DataHelper.eq(ds._data, _data);
     }
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("Transient DataStore: ").append(_data.size()).append("\nKeys: ");

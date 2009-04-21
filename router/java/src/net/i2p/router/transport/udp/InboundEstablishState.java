@@ -210,7 +210,7 @@ public class InboundEstablishState {
     public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
     /** RemoteHostId, uniquely identifies an attempt */
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }// LINT -- Exporting non-public type through public API
 
     public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
         if (_receivedIdentity == null)
@@ -331,6 +331,7 @@ public class InboundEstablishState {
         _nextSend = _lastReceive;
     }
     
+    @Override
     public String toString() {            
         StringBuffer buf = new StringBuffer(128);
         buf.append(super.toString());

@@ -9,7 +9,6 @@ package net.i2p.router;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
@@ -53,7 +52,7 @@ import net.i2p.util.SimpleTimer;
 public class Router {
     private Log _log;
     private RouterContext _context;
-    private Properties _config;
+    private final Properties _config;
     private String _configFilename;
     private RouterInfo _routerInfo;
     private long _started;
@@ -64,7 +63,7 @@ public class Router {
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
-    private I2PThread _gracefulShutdownDetector;
+    private final I2PThread _gracefulShutdownDetector;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -1350,6 +1349,7 @@ private static class ShutdownHook extends Thread {
         _context = ctx;
         _id = ++__id;
     }
+        @Override
     public void run() {
         setName("Router " + _id + " shutdown");
         Log l = _context.logManager().getLog(Router.class);

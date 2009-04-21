@@ -18,7 +18,7 @@ class UDPFlooder implements Runnable {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;
-    private List _peers;
+    private final List _peers;
     private boolean _alive;
     private static final byte _floodData[] = new byte[4096];
     
@@ -37,9 +37,10 @@ class UDPFlooder implements Runnable {
             _peers.notifyAll();
         }
     }
+    @SuppressWarnings("empty-statement")
     public void removePeer(PeerState peer) {
         synchronized (_peers) {
-            while (_peers.remove(peer))
+            while (_peers.remove(peer)) // can this be written better?
                 ;// loops until its empty
             _peers.notifyAll();
         }

@@ -56,15 +56,18 @@ class PersistentDataStore extends TransientDataStore {
         writer.start();
     }
     
+    @Override
     public void restart() {
         _dbDir = _facade.getDbDir();
     }
     
+    @Override
     public DataStructure remove(Hash key) {
         _context.jobQueue().addJob(new RemoveJob(key));
         return super.remove(key);
     }
     
+    @Override
     public void put(Hash key, DataStructure data) {
         if ( (data == null) || (key == null) ) return;
         super.put(key, data);
@@ -105,7 +108,7 @@ class PersistentDataStore extends TransientDataStore {
      * Queue up writes, write up to 600 files every 10 minutes
      */
     private class Writer implements Runnable {
-        private Map _keys;
+        private final Map _keys;
         private List _keyOrder;
         public Writer() { 
             _keys = new HashMap(64);

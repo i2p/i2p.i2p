@@ -53,7 +53,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private Set _exploreKeys; // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    private final Set _exploreKeys = new HashSet(64); // set of Hash objects that we should search on (to fill up a bucket, not to get data)
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -69,7 +69,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * removed when the job decides to stop running.
      *
      */
-    private Map _publishingLeaseSets;   
+    private final Map _publishingLeaseSets;
     
     /** 
      * Hash of the key currently being searched for, pointing the SearchJob that
@@ -77,7 +77,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * added on to the list of jobs fired on success/failure
      *
      */
-    private Map _activeRequests;
+    private final Map _activeRequests;
     
     /**
      * The search for the given key is no longer active
@@ -176,7 +176,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _initialized = false;
         _kb = null;
         _ds = null;
-        _exploreKeys = null;
+        _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
+        // _exploreKeys = null;
     }
     
     public void restart() {
@@ -218,7 +219,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
         _ds = new PersistentDataStore(_context, dbDir, this);
         //_ds = new TransientDataStore();
-        _exploreKeys = new HashSet(64);
+//        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
         
         createHandlers();
@@ -331,6 +332,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return rv;
     }
     
+    @Override
     public int getKnownRouters() { 
         if (_kb == null) return 0;
         CountRouters count = new CountRouters();
@@ -349,11 +351,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    @Override
     public int getKnownLeaseSets() {  
         if (_ds == null) return 0;
         return _ds.countLeaseSets();
     }
-    
+
+    /* aparently, not used?? should be public if used elsewhere. */
     private class CountLeaseSets implements SelectionCollector {
         private int _count;
         public int size() { return _count; }
@@ -364,7 +368,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _count++;
         }
     }
-    
+
     /**
      *  This is fast and doesn't use synchronization,
      *  but it includes both routerinfos and leasesets.
@@ -868,6 +872,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
 
+    @Override
     public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
         StringBuffer buf = new StringBuffer(4*1024);
         buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
@@ -895,6 +900,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         renderStatusHTML(out, true);
     }
 
+    @Override
     public void renderStatusHTML(Writer out, boolean full) throws IOException {
         int size = getKnownRouters() * 512;
         if (full)

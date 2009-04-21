@@ -18,7 +18,7 @@ public class ACKSender implements Runnable {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** list of peers (PeerState) who we have received data from but not yet ACKed to */
-    private List _peersToACK;
+    private final List _peersToACK;
     private boolean _alive;
     
     /** how frequently do we want to send ACKs to a peer? */

@@ -36,6 +36,7 @@ class SearchMessageSelector implements MessageSelector {
             _log.debug("[" + _id + "] Created: " + toString());
     }
     
+    @Override
     public String toString() { 
         return "Search selector [" + _id + "] looking for a reply from " + _peer 
                + " with regards to " + _state.getTarget(); 

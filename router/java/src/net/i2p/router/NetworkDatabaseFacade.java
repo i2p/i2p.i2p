@@ -10,10 +10,6 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.Hash;

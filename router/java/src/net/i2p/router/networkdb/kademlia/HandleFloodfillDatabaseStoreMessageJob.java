@@ -184,6 +184,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
  
     public String getName() { return "Handle Database Store Message"; }
     
+    @Override
     public void dropped() {
         getContext().messageHistory().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
     }

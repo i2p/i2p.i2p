@@ -41,8 +41,8 @@ import net.i2p.util.Log;
 public class ClientManager {
     private Log _log;
     private ClientListenerRunner _listener;
-    private HashMap _runners;        // Destination --> ClientConnectionRunner
-    private Set _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
+    private final HashMap _runners;        // Destination --> ClientConnectionRunner
+    private final Set _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
     private RouterContext _ctx;
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */

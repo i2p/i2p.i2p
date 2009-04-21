@@ -138,6 +138,7 @@ public class InboundMessageState {
         }
         public boolean receivedComplete() { return false; }
         
+        @Override
         public String toString() { 
             StringBuffer buf = new StringBuffer(64);
             buf.append("Partial ACK of ");
@@ -162,6 +163,7 @@ public class InboundMessageState {
     }
     public int getFragmentCount() { return _lastFragment+1; }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(32);
         buf.append("Message: ").append(_messageId);

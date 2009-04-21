@@ -14,7 +14,7 @@ import net.i2p.util.Log;
 public class TunnelGatewayPumper implements Runnable {
     private RouterContext _context;
     private Log _log;
-    private List _wantsPumping;
+    private final List _wantsPumping;
     private boolean _stop;
     
     /** Creates a new instance of TunnelGatewayPumper */

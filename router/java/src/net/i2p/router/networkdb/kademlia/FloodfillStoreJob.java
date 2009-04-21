@@ -34,17 +34,21 @@ class FloodfillStoreJob extends StoreJob {
         _facade = facade;
     }
 
+    @Override
     protected int getParallelization() { return 1; }
+    @Override
     protected int getRedundancy() { return 1; }
 
     /**
      * Send was totally successful
      */
+    @Override
     protected void succeed() {
         super.succeed();
         if (_state != null)
             getContext().jobQueue().addJob(new FloodfillVerifyStoreJob(getContext(), _state.getTarget(), _facade));
     }
     
+    @Override
     public String getName() { return "Floodfill netDb store"; }
 }

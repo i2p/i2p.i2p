@@ -37,6 +37,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
     
     public FIFOBandwidthLimiter.Request getCurrentRequest() { return _currentRequest; }
     
+    @Override
     public void write(int val) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));
@@ -49,9 +50,11 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
             _log.warn("Waiting to write a byte took too long [" + waited + "ms");
         out.write(val);
     }
+    @Override
     public void write(byte src[]) throws IOException {
         write(src, 0, src.length);
     }
+    @Override
     public void write(byte src[], int off, int len) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing " + len + " bytes");
@@ -83,6 +86,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         }
     }
     
+    @Override
     public void close() throws IOException {
         synchronized (this) {
             if (_currentRequest != null)

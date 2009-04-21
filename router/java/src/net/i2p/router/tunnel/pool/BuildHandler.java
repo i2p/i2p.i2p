@@ -39,11 +39,11 @@ class BuildHandler {
     private Job _buildMessageHandlerJob;
     private Job _buildReplyMessageHandlerJob;
     /** list of BuildMessageState, oldest first */
-    private List _inboundBuildMessages;
+    private final List _inboundBuildMessages;
     /** list of BuildReplyMessageState, oldest first */
-    private List _inboundBuildReplyMessages;
+    private final List _inboundBuildReplyMessages;
     /** list of BuildEndMessageState, oldest first */
-    private List _inboundBuildEndMessages;
+    private final List _inboundBuildEndMessages;
     private BuildMessageProcessor _processor;
     
     public BuildHandler(RouterContext ctx, BuildExecutor exec) {
@@ -607,7 +607,7 @@ class BuildHandler {
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
             // (enough layers jrandom?)
             TunnelBuildReplyMessage replyMsg = new TunnelBuildReplyMessage(_context);
-            for (int i = 0; i < state.msg.RECORD_COUNT; i++)
+            for (int i = 0; i < state.msg.RECORD_COUNT; i++) // LINT -- Accessing Static field "RECORD_COUNT"
                 replyMsg.setRecord(i, state.msg.getRecord(i));
             replyMsg.setUniqueId(req.readReplyMessageId());
             replyMsg.setMessageExpiration(_context.clock().now() + 10*1000);

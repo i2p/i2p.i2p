@@ -30,11 +30,11 @@ import net.i2p.util.SimpleTimer;
 public class OutboundMessageRegistry {
     private Log _log;
     /** list of currently active MessageSelector instances */
-    private List _selectors;
+    private final List _selectors;
     /** map of active MessageSelector to either an OutNetMessage or a List of OutNetMessages causing it (for quick removal) */
-    private Map _selectorToMessage;
+    private final Map _selectorToMessage;
     /** set of active OutNetMessage (for quick removal and selector fetching) */
-    private Set _activeMessages;
+    private final Set _activeMessages;
     private CleanupTask _cleanupTask;
     private RouterContext _context;
     

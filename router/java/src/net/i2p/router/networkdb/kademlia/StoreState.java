@@ -15,12 +15,12 @@ class StoreState {
     private RouterContext _context;
     private Hash _key;
     private DataStructure _data;
-    private HashSet _pendingPeers;
+    private final HashSet _pendingPeers;
     private HashMap _pendingPeerTimes;
-    private HashSet _successfulPeers;
-    private HashSet _successfulExploratoryPeers;
-    private HashSet _failedPeers;
-    private HashSet _attemptedPeers;
+    private final HashSet _successfulPeers;
+    private final HashSet _successfulExploratoryPeers;
+    private final HashSet _failedPeers;
+    private final HashSet _attemptedPeers;
     private int _completeCount;
     private volatile long _completed;
     private volatile long _started;
@@ -147,6 +147,7 @@ class StoreState {
         }
     }
 
+    @Override
     public String toString() { 
         StringBuffer buf = new StringBuffer(256);
         buf.append("Storing ").append(_key);

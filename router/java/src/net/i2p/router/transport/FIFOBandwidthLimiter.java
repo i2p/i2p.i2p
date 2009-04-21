@@ -12,8 +12,8 @@ import net.i2p.util.Log;
 public class FIFOBandwidthLimiter {
     private Log _log;
     private I2PAppContext _context;
-    private List _pendingInboundRequests;
-    private List _pendingOutboundRequests;
+    private final List _pendingInboundRequests;
+    private final List _pendingOutboundRequests;
     /** how many bytes we can consume for inbound transmission immediately */
     private volatile int _availableInbound;
     /** how many bytes we can consume for outbound transmission immediately */
@@ -54,7 +54,7 @@ public class FIFOBandwidthLimiter {
     
     private static int __id = 0;
     
-    static long now() { 
+    public /* static */ long now() {
         // dont use the clock().now(), since that may jump
         return System.currentTimeMillis(); 
     }
@@ -769,6 +769,7 @@ public class FIFOBandwidthLimiter {
         }
         public void attach(Object obj) { _attachment = obj; }
         public Object attachment() { return _attachment; }
+        @Override
         public String toString() { return getRequestName(); }
     }
 

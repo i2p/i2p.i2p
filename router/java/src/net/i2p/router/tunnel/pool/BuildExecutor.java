@@ -21,11 +21,12 @@ import net.i2p.util.Log;
  *
  */
 class BuildExecutor implements Runnable {
+    private final List _recentBuildIds = new ArrayList(100);
     private RouterContext _context;
     private Log _log;
     private TunnelPoolManager _manager;
     /** list of TunnelCreatorConfig elements of tunnels currently being built */
-    private List _currentlyBuilding;
+    private final List _currentlyBuilding;
     private boolean _isRunning;
     private BuildHandler _handler;
     private boolean _repoll;
@@ -50,7 +51,7 @@ class BuildExecutor implements Runnable {
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
-        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS;
+        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS; // LINT -- Accessing static field "BW_CAPABILITY_CHARS"
         // For each bandwidth tier, create tunnel build agree/reject/expire stats
         for (int i = 0; i < bwTiers.length(); i++) {
             String bwTier = String.valueOf(bwTiers.charAt(i));
@@ -423,7 +424,6 @@ class BuildExecutor implements Runnable {
         }
     }
     
-    private List _recentBuildIds = new ArrayList(100);
     public boolean wasRecentlyBuilding(long replyId) {
         synchronized (_recentBuildIds) {
             return _recentBuildIds.contains(new Long(replyId));

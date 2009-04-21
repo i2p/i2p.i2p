@@ -445,7 +445,9 @@ public class PeerProfile {
     private boolean calculateIsFailing() { return false; }
     void setIsFailing(boolean val) { _isFailing = val; }
     
+    @Override
     public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (obj.getClass() != PeerProfile.class) return false;
@@ -453,6 +455,7 @@ public class PeerProfile {
         PeerProfile prof = (PeerProfile)obj;
         return _peer.equals(prof.getPeer());
     }
+    @Override
     public String toString() { return "Profile: " + getPeer().toBase64(); }
     
     /**

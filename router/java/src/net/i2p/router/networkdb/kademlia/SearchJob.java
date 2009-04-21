@@ -47,7 +47,7 @@ class SearchJob extends JobImpl {
     private boolean _isLease;
     private Job _pendingRequeueJob;
     private PeerSelector _peerSelector;
-    private List _deferredSearches;
+    private final List _deferredSearches;
     private boolean _deferredCleared;
     private long _startedOn;
     private boolean _floodfillPeersExhausted;
@@ -780,6 +780,7 @@ class SearchJob extends JobImpl {
     
     public String getName() { return "Kademlia NetDb Search"; }
     
+    @Override
     public String toString() { 
         return super.toString() + " started " 
                + DataHelper.formatDuration((getContext().clock().now() - _startedOn)) + " ago";

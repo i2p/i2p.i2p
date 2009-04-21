@@ -33,11 +33,11 @@ public class EventPumper implements Runnable {
     private Log _log;
     private boolean _alive;
     private Selector _selector;
-    private List _bufCache;
-    private List _wantsRead;
-    private List _wantsWrite;
-    private List _wantsRegister;
-    private List _wantsConRegister;
+    private final List _bufCache;
+    private final List _wantsRead = new ArrayList(16);
+    private final List _wantsWrite = new ArrayList(4);
+    private final List _wantsRegister = new ArrayList(1);
+    private final List _wantsConRegister = new ArrayList(4);
     private NTCPTransport _transport;
     private long _expireIdleWriteTime;
     
@@ -66,10 +66,10 @@ public class EventPumper implements Runnable {
     public void startPumping() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting pumper");
-        _wantsRead = new ArrayList(16);
-        _wantsWrite = new ArrayList(4);
-        _wantsRegister = new ArrayList(1);
-        _wantsConRegister = new ArrayList(4);
+//        _wantsRead = new ArrayList(16);
+//        _wantsWrite = new ArrayList(4);
+//        _wantsRegister = new ArrayList(1);
+//        _wantsConRegister = new ArrayList(4);
         try {
             _selector = Selector.open();
             _alive = true;

@@ -96,6 +96,7 @@ class PeerTestState {
     public int getPacketsRelayed() { return _packetsRelayed; }
     public void incrementPacketsRelayed() { ++_packetsRelayed; }
     
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(512);
         buf.append("Role: ");
