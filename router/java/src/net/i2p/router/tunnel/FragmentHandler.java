@@ -26,7 +26,7 @@ import net.i2p.util.SimpleTimer;
 public class FragmentHandler {
     private I2PAppContext _context;
     private Log _log;
-    private Map _fragmentedMessages;
+    private final Map _fragmentedMessages;
     private DefragmentedReceiver _receiver;
     private int _completed;
     private int _failed;

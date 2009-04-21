@@ -12,8 +12,8 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelGatewayZeroHop extends TunnelGateway {
-    private RouterContext _context;
-    private Log _log;
+    private RouterContext _context; // LINT -- field hides a field
+    private Log _log; // LINT -- field hides a field
     private TunnelCreatorConfig _config;
     private OutboundMessageDistributor _outDistributor;
     private InboundMessageDistributor _inDistributor;
@@ -37,6 +37,7 @@ public class TunnelGatewayZeroHop extends TunnelGateway {
      *
      * @param msg message received to be sent through the tunnel
      */
+    @Override
     public void add(TunnelGatewayMessage msg) {
         add(msg.getMessage(), null, null);
     }
@@ -50,6 +51,7 @@ public class TunnelGatewayZeroHop extends TunnelGateway {
      * @param toRouter router to send to after the endpoint (or null for endpoint processing)
      * @param toTunnel tunnel to send to after the endpoint (or null for endpoint or router processing)
      */
+    @Override
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("zero hop gateway: distribute " + (_config.isInbound() ? "inbound " : " outbound ")

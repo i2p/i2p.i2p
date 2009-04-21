@@ -84,7 +84,7 @@ public class ProfileOrganizer {
     public static final int DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS = 10;
     
     /** synchronized against this lock when updating the tier that peers are located in (and when fetching them from a peer) */
-    private Object _reorganizeLock = new Object();
+    private final Object _reorganizeLock = new Object();
     
     /** incredibly weak PRNG, just used for shuffling peers.  no need to waste the real PRNG on this */
     private Random _random = new Random();

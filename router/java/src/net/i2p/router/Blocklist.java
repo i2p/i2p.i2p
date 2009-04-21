@@ -13,14 +13,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
 /**
@@ -55,22 +53,22 @@ public class Blocklist {
     private RouterContext _context;
     private long _blocklist[];
     private int _blocklistSize;
-    private Object _lock;
+    private final Object _lock = new Object();
     private Entry _wrapSave;
-    private Set _inProcess;
-    private Map _peerBlocklist;
-    private Set _singleIPBlocklist;
+    private final Set _inProcess = new HashSet(0);
+    private Map _peerBlocklist = new HashMap(0);
+    private final Set _singleIPBlocklist = new HashSet(0);
     
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
         _blocklist = null;
         _blocklistSize = 0;
-        _lock = new Object();
+        // _lock = new Object();
         _wrapSave = null;
-        _inProcess = new HashSet(0);
-        _peerBlocklist = new HashMap(0);
-        _singleIPBlocklist = new HashSet(0);
+        // _inProcess = new HashSet(0);
+        // _peerBlocklist = new HashMap(0);
+        // _singleIPBlocklist = new HashSet(0);
     }
     
     public Blocklist() {

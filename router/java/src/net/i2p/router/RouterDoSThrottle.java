@@ -19,6 +19,7 @@ class RouterDoSThrottle extends RouterThrottleImpl {
     private static final long LOOKUP_THROTTLE_PERIOD = 10*1000;
     private static final long LOOKUP_THROTTLE_MAX = 20;
     
+    @Override
     public boolean acceptNetDbLookupRequest(Hash key) { 
         // if we were going to refuse it anyway, drop it
         boolean shouldAccept = super.acceptNetDbLookupRequest(key);

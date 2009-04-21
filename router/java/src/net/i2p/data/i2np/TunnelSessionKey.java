@@ -44,17 +44,20 @@ public class TunnelSessionKey extends DataStructureImpl {
 	_key.writeBytes(out);
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelSessionKey))
             return false;
 	return DataHelper.eq(getKey(), ((TunnelSessionKey)obj).getKey());
     }
     
+    @Override
     public int hashCode() {
 	if (_key == null) return 0;
         return getKey().hashCode(); 
     }
     
+    @Override
     public String toString() {
         return "[TunnelSessionKey: " + getKey() + "]";
     }

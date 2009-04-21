@@ -215,6 +215,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getSearchKey()) +
                DataHelper.hashCode(getFrom()) +
@@ -222,6 +223,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
                DataHelper.hashCode(_dontIncludePeers);
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DatabaseLookupMessage) ) {
             DatabaseLookupMessage msg = (DatabaseLookupMessage)object;
@@ -234,6 +236,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DatabaseLookupMessage: ");

@@ -59,7 +59,9 @@ class JobStats {
             return 0; 
     }
     
+    @Override
     public int hashCode() { return _job.hashCode(); }
+    @Override
     public boolean equals(Object obj) {
         if ( (obj != null) && (obj instanceof JobStats) ) {
             JobStats stats = (JobStats)obj;
@@ -73,6 +75,7 @@ class JobStats {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("Over ").append(getRuns()).append(" runs, job <b>").append(getName()).append("</b> took ");

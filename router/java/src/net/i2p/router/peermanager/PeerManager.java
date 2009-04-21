@@ -37,7 +37,7 @@ class PeerManager {
     private ProfileOrganizer _organizer;
     private ProfilePersistenceHelper _persistenceHelper;
     private List _peersByCapability[];
-    private Map _capabilitiesByPeer;
+    private final Map _capabilitiesByPeer;
     
     public PeerManager(RouterContext context) {
         _context = context;

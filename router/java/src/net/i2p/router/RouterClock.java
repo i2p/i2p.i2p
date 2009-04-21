@@ -15,11 +15,11 @@ import net.i2p.util.Log;
  */
 public class RouterClock extends Clock {
 
-    RouterContext _context;
+    RouterContext _contextRC; // LINT field hides another field
 
     public RouterClock(RouterContext context) {
         super(context);
-        _context = context;
+        _contextRC = context;
     }
 
     /**
@@ -27,6 +27,7 @@ public class RouterClock extends Clock {
      * value means that we are slow, while a negative value means we are fast.
      *
      */
+    @Override
     public void setOffset(long offsetMs, boolean force) {
 
         if (false) return;
@@ -53,10 +54,10 @@ public class RouterClock extends Clock {
             }
 
             // If so configured, check sanity of proposed clock offset
-            if (Boolean.valueOf(_context.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() == true) {
+            if (Boolean.valueOf(_contextRC.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() == true) {
 
                 // Try calculating peer clock skew
-                Long peerClockSkew = _context.commSystem().getFramedAveragePeerClockSkew(50);
+                Long peerClockSkew = _contextRC.commSystem().getFramedAveragePeerClockSkew(50);
 
                 if (peerClockSkew != null) {
 
@@ -88,9 +89,9 @@ public class RouterClock extends Clock {
                 getLog().info("Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
             
             if (!_statCreated)
-                _context.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
+                _contextRC.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
-            _context.statManager().addRateData("clock.skew", delta, 0);
+            _contextRC.statManager().addRateData("clock.skew", delta, 0);
         } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
         }

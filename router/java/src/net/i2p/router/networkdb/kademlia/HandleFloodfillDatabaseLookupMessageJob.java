@@ -30,6 +30,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
         super(ctx, receivedMessage, from, fromHash);    
     }
     
+    @Override
     protected boolean answerAllQueries() {
         if (!FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) return false;
         return FloodfillNetworkDatabaseFacade.isFloodfill(getContext().router().getRouterInfo());
@@ -40,6 +41,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
      * This gets the word out to routers that we are no longer floodfill, so they
      * will stop bugging us.
      */
+    @Override
     protected void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
         super.sendClosest(key, routerInfoSet, toPeer, replyTunnel);
 

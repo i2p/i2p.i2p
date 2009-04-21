@@ -58,14 +58,18 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _manager.restart();
     }
     
+    @Override
     public int countActivePeers() { return (_manager == null ? 0 : _manager.countActivePeers()); }
+    @Override
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
+    @Override
     public boolean haveCapacity() { return (_manager == null ? false : _manager.haveCapacity()); } 
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
      */
+    @Override
     public Long getFramedAveragePeerClockSkew(int percentToInclude) {
         if (_manager == null) {
             if (_log.shouldLog(Log.INFO))
@@ -121,14 +125,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         GetBidsJob.getBids(_context, this, msg);
     }
     
+    @Override
     public boolean isBacklogged(Hash dest) { 
         return _manager.isBacklogged(dest); 
     }
     
+    @Override
     public boolean isEstablished(Hash dest) { 
         return _manager.isEstablished(dest); 
     }
     
+    @Override
     public boolean wasUnreachable(Hash dest) { 
         return _manager.wasUnreachable(dest); 
     }
@@ -137,21 +144,26 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.getIP(dest); 
     }
     
+    @Override
     public List getMostRecentErrorMessages() { 
         return _manager.getMostRecentErrorMessages(); 
     }
 
+    @Override
     public short getReachabilityStatus() { 
         if (_manager == null) return CommSystemFacade.STATUS_UNKNOWN;
         if (_context.router().isHidden()) return CommSystemFacade.STATUS_OK;
         return _manager.getReachabilityStatus(); 
     }
+    @Override
     public void recheckReachability() { _manager.recheckReachability(); }
 
+    @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { 
         _manager.renderStatusHTML(out, urlBase, sortFlags); 
     }
     
+    @Override
     public Set createAddresses() {
         Map addresses = null;
         boolean newCreated = false;
@@ -225,6 +237,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      * UDP changed addresses, tell NTCP and restart
      */
+    @Override
     public void notifyReplaceAddress(RouterAddress UDPAddr) {
         if (UDPAddr == null)
             return;

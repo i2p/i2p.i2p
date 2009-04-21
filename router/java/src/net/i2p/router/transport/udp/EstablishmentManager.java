@@ -670,7 +670,7 @@ public class EstablishmentManager {
         }
     }
     
-    public void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
+    public void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {// LINT -- Exporting non-public type through public API
         long nonce = reader.getRelayResponseReader().readNonce();
         OutboundEstablishState state = null;
         synchronized (_liveIntroductions) {

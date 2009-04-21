@@ -17,7 +17,7 @@ import net.i2p.util.Log;
 class Reader {
     private RouterContext _context;
     private Log _log;
-    private List _pendingConnections;
+    private final List _pendingConnections;
     private List _liveReads;
     private List _readAfterLive;
     private List _runners;

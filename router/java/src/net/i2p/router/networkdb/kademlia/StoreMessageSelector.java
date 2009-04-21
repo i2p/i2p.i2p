@@ -55,6 +55,7 @@ class StoreMessageSelector implements MessageSelector {
         }
     }
 
+    @Override
     public String toString() {
         StringBuffer rv = new StringBuffer(64);
         rv.append("Waiting for netDb confirm from ").append(_peer.toBase64()).append(", found? ");

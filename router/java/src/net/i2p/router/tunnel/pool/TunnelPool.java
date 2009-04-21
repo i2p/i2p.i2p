@@ -25,10 +25,11 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelPool {
+    private final List _inProgress = new ArrayList();
     private RouterContext _context;
     private Log _log;
     private TunnelPoolSettings _settings;
-    private ArrayList<TunnelInfo> _tunnels;
+    private final ArrayList<TunnelInfo> _tunnels;
     private TunnelPeerSelector _peerSelector;
     private TunnelPoolManager _manager;
     private boolean _alive;
@@ -866,13 +867,13 @@ public class TunnelPool {
         return cfg;
     }
     
-    private List _inProgress = new ArrayList();
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         synchronized (_inProgress) { _inProgress.remove(cfg); }
         cfg.setTunnelPool(this);
         //_manager.buildComplete(cfg);
     }
     
+    @Override
     public String toString() {
         if (_settings.isExploratory()) {
             if (_settings.isInbound())

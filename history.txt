@@ -1,3 +1,8 @@
+2009-04-21 sponge
+    * Code janator work, basic corrections involving @Override, and
+      appling final where it is important. Also fixed some equals methods
+      and commented places that need fixing.
+
 2009-04-18 Complication
     * Fix typo in "news.xml", no build number increase.
 

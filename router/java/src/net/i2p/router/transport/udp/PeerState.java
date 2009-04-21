@@ -74,13 +74,13 @@ public class PeerState {
     /** when did we last have a failed send (beginning of period) */
     private long _lastFailedSendPeriod;
     /** list of messageIds (Long) that we have received but not yet sent */
-    private List _currentACKs;
+    private final List _currentACKs;
     /** 
      * list of the most recent messageIds (Long) that we have received and sent
      * an ACK for.  We keep a few of these around to retransmit with _currentACKs,
      * hopefully saving some spurious retransmissions
      */
-    private List _currentACKsResend;
+    private final List _currentACKsResend;
     /** when did we last send ACKs to the peer? */
     private volatile long _lastACKSend;
     /** when did we decide we need to ACK to this peer? */
@@ -169,9 +169,9 @@ public class PeerState {
     private long _packetsReceived;
     
     /** list of InboundMessageState for active message */
-    private Map _inboundMessages;
+    private final Map _inboundMessages;
     /** list of OutboundMessageState */
-    private List _outboundMessages;
+    private final List _outboundMessages;
     /** which outbound message is currently being retransmitted */
     private OutboundMessageState _retransmitter;
     
@@ -802,6 +802,7 @@ public class PeerState {
         public long getMessageId() { return _msgId; }
         public boolean received(int fragmentNum) { return true; }
         public boolean receivedComplete() { return true; }
+        @Override
         public String toString() { return "Full ACK of " + _msgId; }
     }
         
@@ -1010,7 +1011,7 @@ public class PeerState {
             return MAX_RTO;
     }
     
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }// LINT -- Exporting non-public type through public API
     
     public int add(OutboundMessageState state) {
         if (_dead) { 
@@ -1560,6 +1561,7 @@ public class PeerState {
     }
     */
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append(_remoteHostId.toString());

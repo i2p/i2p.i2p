@@ -302,6 +302,7 @@ public class OutNetMessage {
         super.finalize();
     }
     */
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[OutNetMessage contains ");
@@ -365,6 +366,7 @@ public class OutNetMessage {
         }
     }
     
+    @Override
     public int hashCode() {
         int rv = 0;
         rv += DataHelper.hashCode(_message);
@@ -373,7 +375,10 @@ public class OutNetMessage {
         return rv;
     }
     
+    @Override
     public boolean equals(Object obj) {
+        if(obj == null) return false;
+        if(obj.getClass() != OutNetMessage.class) return false;
         return obj == this; // two OutNetMessages are different even if they contain the same message
     }
 }

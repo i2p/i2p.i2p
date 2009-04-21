@@ -124,8 +124,10 @@ public class NTCPAddress {
         }
     }
     
+    @Override
     public String toString() { return _host + ":" + _port; }
     
+    @Override
     public int hashCode() {
         int rv = 0;
         rv += _port;
@@ -136,6 +138,7 @@ public class NTCPAddress {
         return rv;
     }
     
+    @Override
     public boolean equals(Object val) {
         if ( (val != null) && (val instanceof NTCPAddress) ) {
             NTCPAddress addr = (NTCPAddress)val;

@@ -44,17 +44,20 @@ public class EndPointPrivateKey extends DataStructureImpl {
 	_key.writeBytes(out);
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof EndPointPublicKey))
             return false;
 	return DataHelper.eq(getKey(), ((EndPointPublicKey)obj).getKey());
     }
     
+    @Override
     public int hashCode() {
 	if (_key == null) return 0;
         return getKey().hashCode(); 
     }
     
+    @Override
     public String toString() {
         return "[EndPointPrivateKey: " + getKey() + "]";
     }

@@ -4,16 +4,12 @@ import java.io.IOException;
 import java.io.Writer;
 
 import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
-import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.SessionKey;
-import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.KeyRing;
 
 /**
@@ -31,6 +27,7 @@ public class PersistentKeyRing extends KeyRing {
         addFromProperties();
     }
 
+    @Override
     public SessionKey put(Hash h, SessionKey sk) {
         SessionKey old = super.put(h, sk);
         if (!sk.equals(old)) {
@@ -67,6 +64,7 @@ public class PersistentKeyRing extends KeyRing {
         }
     }
 
+    @Override
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("\n<table border=\"1\"><tr><th align=\"left\">Destination Hash<th align=\"left\">Name or Dest.<th align=\"left\">Session Key</tr>");

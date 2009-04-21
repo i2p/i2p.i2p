@@ -53,10 +53,12 @@ public class DateMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return (int)getNow();
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DateMessage) ) {
             DateMessage msg = (DateMessage)object;
@@ -66,6 +68,7 @@ public class DateMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DateMessage: ");

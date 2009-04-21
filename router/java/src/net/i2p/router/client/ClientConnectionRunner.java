@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,7 +72,7 @@ public class ClientConnectionRunner {
      * This contains the last 10 MessageIds that have had their (non-ack) status 
      * delivered to the client (so that we can be sure only to update when necessary)
      */
-    private List _alreadyProcessed;
+    private final List _alreadyProcessed;
     private ClientWriterRunner _writer;
     private Hash _destHashCache;
     /** are we, uh, dead */
@@ -111,7 +110,7 @@ public class ClientConnectionRunner {
             t.setDaemon(true);
             t.setPriority(I2PThread.MAX_PRIORITY);
             t.start();
-            _out = _socket.getOutputStream();
+            _out = _socket.getOutputStream(); // LINT -- OWCH! needs a better way so it can be final.
             _reader.startReading();
         } catch (IOException ioe) {
             _log.error("Error starting up the runner", ioe);
@@ -412,7 +411,7 @@ public class ClientConnectionRunner {
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("after writeMessage("+ msg.getClass().getName() + "): " 
-                           + (_context.clock().now()-before) + "ms");;
+                           + (_context.clock().now()-before) + "ms");
         } catch (I2CPMessageException ime) {
             _log.error("Message exception sending I2CP message: " + ime);
             stopRunning();
@@ -464,7 +463,7 @@ public class ClientConnectionRunner {
     // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME
     private final static int MAX_MESSAGE_ID = 32767;
     private static volatile int _messageId = RandomSource.getInstance().nextInt(MAX_MESSAGE_ID); // messageId counter
-    private static Object _messageIdLock = new Object();
+    private final static Object _messageIdLock = new Object();
     
     static int getNextMessageId() { 
         synchronized (_messageIdLock) {
