@@ -44,16 +44,18 @@ public class SAMv3Handler extends SAMv1Handler
 {
 	private final static Log _log = new Log ( SAMv3Handler.class );
 
-	protected SAMv3StreamSession streamSession = null ;
 	protected SAMv3RawSession rawSession = null ;
 	protected SAMv3DatagramSession datagramSession = null ;
-	
-	protected SAMDatagramSession getDatagramSession() {
-		return datagramSession ;
-	}
+	protected SAMv3StreamSession streamSession = null ;
 	
 	protected SAMRawSession getRawSession() {
 		return rawSession ;
+	}
+	protected SAMDatagramSession getDatagramSession() {
+		return datagramSession ;
+	}
+	protected SAMStreamSession getStreamSession() {
+		return streamSession ;
 	}
 	
 	protected Session session = null ;

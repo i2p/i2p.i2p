@@ -42,8 +42,9 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     protected SAMRawSession rawSession = null;
     protected SAMDatagramSession datagramSession = null;
     protected SAMStreamSession streamSession = null;
-    protected SAMDatagramSession getDatagramSession() {return datagramSession ;}	
     protected SAMRawSession getRawSession() {return rawSession ;}
+    protected SAMDatagramSession getDatagramSession() {return datagramSession ;}	
+    protected SAMStreamSession getStreamSession() {return streamSession ;}
 
     protected long _id;
     protected static volatile long __id = 0;
@@ -331,8 +332,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             if (name.equals("ME")) {
                 if (getRawSession() != null) {
                     dest = getRawSession().getDestination();
-                } else if (streamSession != null) {
-                    dest = streamSession.getDestination();
+                } else if (getStreamSession() != null) {
+                    dest = getStreamSession().getDestination();
                 } else if (getDatagramSession() != null) {
                     dest = getDatagramSession().getDestination();
                 } else {
