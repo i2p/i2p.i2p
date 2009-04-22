@@ -56,10 +56,11 @@ public class Storage
   boolean changed;
 
   /** The default piece size. */
-  private static int MIN_PIECE_SIZE = 256*1024;
-  private static int MAX_PIECE_SIZE = 1024*1024;
+  private static final int MIN_PIECE_SIZE = 256*1024;
+  public static final int MAX_PIECE_SIZE = 1024*1024;
   /** The maximum number of pieces in a torrent. */
-  private static long MAX_PIECES = 100*1024/20;
+  public static final int MAX_PIECES = 10*1024;
+  public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
 
   /**
    * Creates a new storage based on the supplied MetaInfo.  This will
