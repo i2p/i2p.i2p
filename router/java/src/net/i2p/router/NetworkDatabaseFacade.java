@@ -58,5 +58,6 @@ public abstract class NetworkDatabaseFacade implements Service {
     public int getKnownRouters() { return 0; }
     public int getKnownLeaseSets() { return 0; }
     public void renderRouterInfoHTML(Writer out, String s) throws IOException {}
+    public void renderLeaseSetHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, boolean b) throws IOException {}
 }

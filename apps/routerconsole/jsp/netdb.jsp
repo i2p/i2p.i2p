@@ -16,6 +16,7 @@
  <jsp:setProperty name="netdbHelper" property="writer" value="<%=out%>" />
  <jsp:setProperty name="netdbHelper" property="full" value="<%=request.getParameter("f")%>" />
  <jsp:setProperty name="netdbHelper" property="router" value="<%=request.getParameter("r")%>" />
+ <jsp:setProperty name="netdbHelper" property="lease" value="<%=request.getParameter("l")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div>
 

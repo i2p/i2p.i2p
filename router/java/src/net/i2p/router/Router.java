@@ -685,6 +685,7 @@ public class Router {
         
         out.write("\n<hr /><a name=\"netdb\"> </a>\n");
         
+        _context.netDb().renderLeaseSetHTML(out);
         _context.netDb().renderStatusHTML(out);
         
         buf.setLength(0);

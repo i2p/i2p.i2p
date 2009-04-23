@@ -115,11 +115,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final static int MIN_REMAINING_ROUTERS = 25;
     
     /** 
-     * dont accept any dbDtore of a router over 24 hours old (unless we dont 
-     * know anyone or just started up) 
+     * limits for accepting a dbDtore of a router (unless we dont 
+     * know anyone or just started up) -- see validate() below
      */
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_MIN = 3*60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 45*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
     private final static long PUBLISH_JOB_DELAY = 5*60*1000l;
@@ -624,7 +626,22 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
-        
+        boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
+        // Once we're over 300 routers, reduce the expiration time down from the default,
+        // as a crude way of limiting memory usage.
+        // i.e. at 600 routers the expiration time will be about half the default, etc.
+        // And if we're floodfill, we can keep the expiration really short, since
+        // we are always getting the latest published to us.
+        // As the net grows this won't be sufficient, and we'll have to implement
+        // flushing some from memory, while keeping all on disk.
+        long adjustedExpiration;
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
+            adjustedExpiration = ROUTER_INFO_EXPIRATION_FLOODFILL;
+        else
+            adjustedExpiration = Math.min(ROUTER_INFO_EXPIRATION,
+                                          ROUTER_INFO_EXPIRATION_MIN +
+                                          ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * 300 / (_kb.size() + 1)));
+
         if (!key.equals(routerInfo.getIdentity().getHash())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
@@ -633,7 +650,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature on " + key.toBase64();
-        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION) && (_context.router().getUptime() > 60*60*1000) ) {
+        } else if (upLongEnough && !routerInfo.isCurrent(adjustedExpiration)) {
             if (routerInfo.getNetworkId() != Router.NETWORK_ID) {
                 _context.shitlist().shitlistRouter(key, "Peer is not in our network");
                 return "Peer is not in our network (" + routerInfo.getNetworkId() + ", wants " 
@@ -661,10 +678,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             String rv = "Peer " + key.toBase64() + " is from another network, not accepting it (id=" 
                         + routerInfo.getNetworkId() + ", want " + Router.NETWORK_ID + ")";
             return rv;
-        } else if ( (_context.router().getUptime() > 60*60*1000) && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
+        } else if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
             long age = _context.clock().now() - routerInfo.getPublished();
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
-        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT) && (_context.router().getUptime() > 60*60*1000) ) {
+        } else if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
             if (routerInfo.getAddresses().size() <= 0)
                 return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
@@ -901,23 +918,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     @Override
-    public void renderStatusHTML(Writer out, boolean full) throws IOException {
-        int size = getKnownRouters() * 512;
-        if (full)
-            size *= 4;
-        StringBuffer buf = new StringBuffer(size);
+    public void renderLeaseSetHTML(Writer out) throws IOException {
+        StringBuffer buf = new StringBuffer(4*1024);
         buf.append("<h2>Network Database Contents</h2>\n");
-        if (!_initialized) {
-            buf.append("<i>Not initialized</i>\n");
-            out.write(buf.toString());
-            out.flush();
-            return;
-        }
+        buf.append("<a href=\"netdb.jsp\">View RouterInfo</a>");
+        buf.append("<h3>LeaseSets</h3>\n");
         Set leases = new TreeSet(new LeaseSetComparator());
         leases.addAll(getLeases());
-        buf.append("<h3>Leases</h3>\n");
-        out.write(buf.toString());
-        buf.setLength(0);
         long now = _context.clock().now();
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
             LeaseSet ls = (LeaseSet)iter.next();
@@ -957,7 +964,25 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             out.write(buf.toString());
             buf.setLength(0);
         }
+        out.write(buf.toString());
+        out.flush();
+    }
+
+    @Override
+    public void renderStatusHTML(Writer out, boolean full) throws IOException {
+        int size = getKnownRouters() * 512;
+        if (full)
+            size *= 4;
+        StringBuffer buf = new StringBuffer(size);
+        out.write("<h2>Network Database Contents</h2>\n");
+        if (!_initialized) {
+            buf.append("<i>Not initialized</i>\n");
+            out.write(buf.toString());
+            out.flush();
+            return;
+        }
         
+        out.write("<a href=\"netdb.jsp?l=1\">View LeaseSets</a>");
         Hash us = _context.routerHash();
         out.write("<a name=\"routers\" /><h3>Routers (<a href=\"netdb.jsp");
         if (full)
