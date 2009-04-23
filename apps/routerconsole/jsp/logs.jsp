@@ -11,6 +11,14 @@
 <%@include file="summary.jsp" %>
 
 <div class="main" id="main">
+ <h4>Version:</h4><a name="version"> </a>
+ Please include this information in bug reports.
+ <p>
+I2P <jsp:getProperty name="helper" property="version" /><br />
+<%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%><br />
+<%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br />
+ </p>
+ <hr />
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <h4>Router logs:</h4>
@@ -21,14 +29,6 @@
  <hr />
  <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
- <hr />
- <h4>Version:</h4><a name="version"> </a>
- Please include this information in bug reports.
- <pre>
-I2P <jsp:getProperty name="helper" property="version" />
-<%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%>
-<%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%>
- </pre>
 </div>
 
 </body>

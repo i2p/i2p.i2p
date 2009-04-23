@@ -16,6 +16,11 @@ img {
 	border: none;
 }
 
+pre {
+	width: 100%;
+	overflow-x: scroll;
+}
+
 div.logo {
 	float: left;
 	width: 200px;
