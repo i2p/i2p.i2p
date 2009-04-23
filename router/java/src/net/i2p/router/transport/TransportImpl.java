@@ -36,6 +36,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages
@@ -72,6 +74,7 @@ public abstract class TransportImpl implements Transport {
         _unreachableEntries = new HashMap(16);
         _wasUnreachableEntries = new ConcurrentHashSet(16);
         _currentAddress = null;
+        SimpleScheduler.getInstance().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
     /**
@@ -462,13 +465,10 @@ public abstract class TransportImpl implements Transport {
         if (!isInbound)
             markWasUnreachable(peer, false);
     }
-    private class CleanupUnreachable extends JobImpl {
-        public CleanupUnreachable(RouterContext ctx) {
-            super(ctx);
-        }
-        public String getName() { return "Cleanup " + getStyle() + " unreachable list"; }
-        public void runJob() {
-            long now = getContext().clock().now();
+
+    private class CleanupUnreachable implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            long now = _context.clock().now();
             synchronized (_unreachableEntries) {
                 for (Iterator iter = _unreachableEntries.keySet().iterator(); iter.hasNext(); ) {
                     Hash peer = (Hash)iter.next();
@@ -477,7 +477,6 @@ public abstract class TransportImpl implements Transport {
                         iter.remove();
                 }
             }
-            requeue(60*1000);
         }
     }
 

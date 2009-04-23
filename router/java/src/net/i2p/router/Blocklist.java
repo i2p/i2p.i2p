@@ -19,6 +19,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -55,20 +56,16 @@ public class Blocklist {
     private int _blocklistSize;
     private final Object _lock = new Object();
     private Entry _wrapSave;
-    private final Set _inProcess = new HashSet(0);
-    private Map _peerBlocklist = new HashMap(0);
-    private final Set _singleIPBlocklist = new HashSet(0);
+    private final Set<Hash> _inProcess = new HashSet(0);
+    private Map<Hash, String> _peerBlocklist = new HashMap(0);
+    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet(0);
     
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
         _blocklist = null;
         _blocklistSize = 0;
-        // _lock = new Object();
         _wrapSave = null;
-        // _inProcess = new HashSet(0);
-        // _peerBlocklist = new HashMap(0);
-        // _singleIPBlocklist = new HashSet(0);
     }
     
     public Blocklist() {
@@ -446,15 +443,11 @@ public class Blocklist {
     }
 
     private boolean add(int ip) {
-        synchronized(_singleIPBlocklist) {
-            return _singleIPBlocklist.add(new Integer(ip));
-        }
+        return _singleIPBlocklist.add(Integer.valueOf(ip));
     }
 
     private boolean isOnSingleList(int ip) {
-        synchronized(_singleIPBlocklist) {
-            return _singleIPBlocklist.contains(new Integer(ip));
-        }
+        return _singleIPBlocklist.contains(Integer.valueOf(ip));
     }
 
     /**
@@ -586,11 +579,11 @@ public class Blocklist {
 
     // methods to get and store the from/to values in the array
 
-    private int getFrom(long entry) {
+    private static int getFrom(long entry) {
         return (int) ((entry >> 32) & 0xffffffff);
     }
 
-    private int getTo(long entry) {
+    private static int getTo(long entry) {
         return (int) (entry & 0xffffffff);
     }
 
@@ -602,7 +595,7 @@ public class Blocklist {
      * So the size is (cough) almost 2MB for the 240,000 line splist.txt.
      *
      */
-    private long toEntry(byte ip1[], byte ip2[]) {
+    private static long toEntry(byte ip1[], byte ip2[]) {
         long entry = 0;
         for (int i = 0; i < 4; i++)
             entry |= ((long) (ip2[i] & 0xff)) << ((3-i)*8);
@@ -621,14 +614,18 @@ public class Blocklist {
         _blocklist[idx] = entry;
     }
 
-    private int toInt(byte ip[]) {
+    private static int toInt(byte ip[]) {
         int rv = 0;
         for (int i = 0; i < 4; i++)
             rv |= (ip[i] & 0xff) << ((3-i)*8);
         return rv;
     }
 
-    private String toStr(long entry) {
+    public static String toStr(byte[] ip) {
+        return toStr(toInt(ip));
+    }
+
+    private static String toStr(long entry) {
         StringBuffer buf = new StringBuffer(32);
         for (int i = 7; i >= 0; i--) {
             buf.append((entry >> (8*i)) & 0xff);
@@ -640,7 +637,7 @@ public class Blocklist {
         return buf.toString();
     }
 
-    private String toStr(int ip) {
+    private static String toStr(int ip) {
         StringBuffer buf = new StringBuffer(16);
         for (int i = 3; i >= 0; i--) {
             buf.append((ip >> (8*i)) & 0xff);
@@ -756,9 +753,7 @@ public class Blocklist {
     public void renderStatusHTML(Writer out) throws IOException {
         out.write("<h2>IP Blocklist</h2>");
         Set singles = new TreeSet();
-        synchronized(_singleIPBlocklist) {
-            singles.addAll(_singleIPBlocklist);
-        }
+        singles.addAll(_singleIPBlocklist);
         if (singles.size() > 0) {
             out.write("<table><tr><td><b>Transient IPs</b></td></tr>");
             for (Iterator iter = singles.iterator(); iter.hasNext(); ) {
