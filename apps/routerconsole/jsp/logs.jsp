@@ -22,8 +22,10 @@
  <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
  <hr />
- <h4>Java Version:</h4><a name="version"> </a>
+ <h4>Version:</h4><a name="version"> </a>
+ Please include this information in bug reports.
  <pre>
+I2P <jsp:getProperty name="helper" property="version" />
 <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%>
 <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%>
  </pre>
