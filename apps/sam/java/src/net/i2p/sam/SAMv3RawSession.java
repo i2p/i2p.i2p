@@ -63,9 +63,9 @@ public class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Sess
     	
     		String host = props.getProperty("HOST");
     		if ( host==null ) {
-    			_log.debug("no host specified. Take from the client socket");
-    		
     			host = rec.getHandler().getClientIP();
+
+    			_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
     		}
 
     	

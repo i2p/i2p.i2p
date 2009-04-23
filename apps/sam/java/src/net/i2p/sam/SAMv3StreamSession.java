@@ -230,9 +230,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	
 	    	String host = props.getProperty("HOST");
 	    	if ( host==null ) {
-	    		_log.debug("no host specified. Take from the client socket");
-	    		
 	    		host = rec.getHandler().getClientIP();
+	    		_log.debug("no host specified. Taken from the client socket : " + host +':'+port);
 	    	}
 
 	    	
@@ -368,7 +367,32 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	}
 	    }
 	    
-
+	    /**
+	     * 
+	     * @param props
+	     * @throws SAMException
+	     * @throws InterruptedIOException
+	     */
+	    public void stopForwardingIncoming() throws SAMException, InterruptedIOException
+	    {
+	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+	        
+	        if ( rec==null ) throw new InterruptedIOException() ;
+	        
+	    	I2PServerSocket server = null ;
+	    	synchronized( this.socketServerLock )
+	    	{
+	    		if (this.socketServer==null) {
+	    			_log.debug("no socket server is defined for this destination");
+	    			throw new SAMException("no socket server is defined for this destination");
+    			}
+	    		server = this.socketServer ;
+	    		this.socketServer = null ;
+	    	}
+	    	try {
+	    		server.close();
+	    	} catch ( I2PException e) {}
+	    }
 
 	    /**
 	     * Close the stream session

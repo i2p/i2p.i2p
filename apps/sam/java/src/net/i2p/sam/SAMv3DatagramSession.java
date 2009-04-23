@@ -61,10 +61,9 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
     		int port = Integer.parseInt(portStr);
     	
     		String host = props.getProperty("HOST");
-    		if ( host==null ) {
-    			_log.debug("no host specified. Take from the client socket");
-    		
+    		if ( host==null ) {    		
     			host = rec.getHandler().getClientIP();
+    			_log.debug("no host specified. Taken from the client socket : " + host+':'+port);
     		}
 
     	
