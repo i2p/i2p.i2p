@@ -1,9 +1,3 @@
-/***
-html {
-	font-size: 14px;
-}
-***/
-
 body {
 	font-family: Verdana, Tahoma, Helvetica, sans-serif;
 	margin: 1em 0em;
@@ -55,6 +49,7 @@ div.routersummary {
 	padding: 5px;
 	text-align: left;
 	border: medium solid #efefff;
+	font-size: 0.82em;
 }
 
 div.warning {
@@ -76,7 +71,7 @@ div.main {
 }
 
 div.main textarea {
-	width: 100%;
+	width: 100% !important;
 }
 
 div.news {
