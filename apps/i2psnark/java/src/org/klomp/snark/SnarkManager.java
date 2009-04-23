@@ -362,7 +362,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Properties getConfig() { return _config; }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    private static final int MAX_FILES_PER_TORRENT = 256;
+    private static final int MAX_FILES_PER_TORRENT = 512;
     
     /** set of filenames that we are dealing with */
     public Set listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
@@ -543,16 +543,18 @@ public class SnarkManager implements Snark.CompleteListener {
             return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it";
         } else if (info.getPieces() <= 0) {
             return "No pieces in " + info.getName() + "?  deleting it";
-        } else if (info.getPieceLength(0) > 1*1024*1024) {
-            return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB), deleting it";
-        } else if (info.getTotalLength() > 10*1024*1024*1024l) {
+        } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
+            return "Pieces are too large in " + info.getName() + " (" + DataHelper.formatSize(info.getPieceLength(0)) +
+                   "B), deleting it";
+        } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
             if (lengths != null)
                 for (int i = 0; i < lengths.size(); i++)
                     System.out.println("File " + i + " is " + lengths.get(i) + " long");
             
-            return "Torrents larger than 10GB are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
+            return "Torrents larger than " + DataHelper.formatSize(Storage.MAX_TOTAL_SIZE) +
+                   "B are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
         } else {
             // ok
             return null;
@@ -637,8 +639,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void torrentComplete(Snark snark) {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
-        addMessage("Download complete of " + f.getName() 
-                   + (len < 5*1024*1024 ? " (size: " + (len/1024) + "KB)" : " (size: " + (len/(1024*1024l)) + "MB)"));
+        addMessage("Download complete of " + f.getName() + " (size: " + DataHelper.formatSize(len) + "B)");
         updateStatus(snark);
     }
     

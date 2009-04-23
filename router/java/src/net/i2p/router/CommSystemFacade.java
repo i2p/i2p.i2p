@@ -58,6 +58,7 @@ public abstract class CommSystemFacade implements Service {
     public boolean isBacklogged(Hash dest) { return false; }
     public boolean wasUnreachable(Hash dest) { return false; }
     public boolean isEstablished(Hash dest) { return false; }
+    public byte[] getIP(Hash dest) { return null; }
     
     /** 
      * Tell other transports our address changed

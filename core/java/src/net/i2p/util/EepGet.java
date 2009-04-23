@@ -159,6 +159,9 @@ public class EepGet {
                     markSize = Integer.parseInt(args[i+1]);
                     lineLen = Integer.parseInt(args[i+2]);
                     i += 2;
+                } else if (args[i].startsWith("-")) {
+                    usage();
+                    return;
                 } else {
                     url = args[i];
                 }

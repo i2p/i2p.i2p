@@ -398,6 +398,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 continue;
             
             RouterInfo info = fac.lookupRouterInfoLocally(peer);
+            if (info == null)
+                continue;
 
             OutNetMessage infoMsg = new OutNetMessage(_context);
             infoMsg.setExpiration(_context.clock().now()+10*1000);
