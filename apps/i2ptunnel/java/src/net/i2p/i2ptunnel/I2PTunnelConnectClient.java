@@ -122,7 +122,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
         }
 
         if (wwwProxy != null) {
-            StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
+            StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())
                 _proxyList.add(tok.nextToken().trim());
         }

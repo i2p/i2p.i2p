@@ -152,7 +152,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
 
         if (wwwProxy != null) {
-            StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
+            StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())
                 proxyList.add(tok.nextToken().trim());
         }
