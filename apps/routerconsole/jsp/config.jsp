@@ -78,7 +78,7 @@
     the <i>Status: Firewalled</i> line), or you can manually require them here.  
     Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
- <hr />
+ <p>
  <b>Inbound TCP connection configuration:</b><br />
  Externally reachable hostname or IP address:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" />
@@ -118,7 +118,13 @@
  <li><b>Firewalled</b> - Your UDP port appears to be firewalled.
      As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error.
      However, if it appears consistently, you should check whether both your external and internal
-     firewalls are open on port 8887.
+     firewalls are open on port 8887. I2P will work fine when firewalled, there is no reason for concern.
+     When firewalled, the router uses "introducers" to relay inbound connections.
+     However, you will get more participating traffic and help the network more if you can open your
+     firewall(s). If you think you have already done so, remember that you may have both a hardware
+     and a software firewall, or be behind an additional, institutional firewall you cannot control.
+     Also, some routers cannot correctly forward both TCP and UDP on a single port, or may have other
+     limitations or bugs that prevent them from passing traffic through to I2P.
  <li><b>Testing</b> - The router is currently testing whether your UDP port is firewalled.
  <li><b>Hidden</b> - The router is not configured to publish its address,
      therefore it does not expect incoming connections.
@@ -142,7 +148,8 @@
  <li><b>ERR - Private TCP Address</b> - You must never advertise an unroutable IP address such as
      127.0.0.1 or 192.168.1.1 as your external address. Correct the address or disable inbound TCP above.
  <li><b>ERR - SymmetricNAT</b> - I2P detected that you are firewalled by a Symmetric NAT.
-     I2P does not work behind this type of firewall.
+     I2P does not work well behind this type of firewall. You will probably not be able to
+     accept inbound connections, which will limit your participation in the network.
  <li><b>ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart</b> -
      I2P was unable to bind to port 8887 or other configured port.
      Check to see if another program is using port 8887. If so, stop that program or configure
