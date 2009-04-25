@@ -133,7 +133,7 @@ public class MUXlisten implements Runnable {
 	 */
 	public void run() {
 		I2PServerSocket SS = null;
-		int ticks = 1200; // Allow 120 seconds, no more.
+		int ticks = 100; // Allow 10 seconds, no more.
 		try {
 			wlock();
 			try {
@@ -267,7 +267,6 @@ die:
 				// System.out.println("MUXlisten: waiting for children");
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
 					while ((tg.activeCount() + tg.activeGroupCount() != 0) && ticks != 0) {
-						tg.interrupt(); // unwedge any blocking threads.
 						ticks--;
 						try {
 							Thread.sleep(100); //sleep for 100 ms (One tenth second)
@@ -308,7 +307,7 @@ die:
 			} catch (Exception e) {
 				// nop
 			}
-			ticks = 600; // 60 seconds
+			ticks = 100; // 10 seconds
 			if (tg.activeCount() + tg.activeGroupCount() != 0) {
 				while ((tg.activeCount() + tg.activeGroupCount() != 0) && ticks != 0) {
 					tg.interrupt(); // unwedge any blocking threads.
@@ -325,10 +324,14 @@ die:
 				// Zap reference to the ThreadGroup so the JVM can GC it.
 				tg = null;
 			} else {
-				System.out.println("BOB: MUXlisten: Can't kill threads. Please send the following dump to sponge@mail.i2p");
+				System.out.println("BOB: MUXlisten: Forcibly killing threads.");
 				System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN");
 				visit(tg, 0);
 				System.out.println("BOB: MUXlisten: ThreadGroup dump END\n\n");
+				nuke(tg,0);
+				tg.destroy();
+				// Zap reference to the ThreadGroup so the JVM can GC it.
+				tg = null;
 			}
 		}
 
@@ -354,7 +357,6 @@ die:
 			wunlock();
 		} catch (Exception e) {
 		}
-
 	}
 
 
@@ -400,6 +402,39 @@ die:
 		// Recursively visit each subgroup
 		for (int i = 0; i < numGroups; i++) {
 			visit(groups[i], level + 1);
+		}
+	}
+	private static void nuke(ThreadGroup group, int level) {
+		// Get threads in `group'
+		int numThreads = group.activeCount();
+		Thread[] threads = new Thread[numThreads * 2];
+		numThreads = group.enumerate(threads, false);
+		// Enumerate each thread in `group' and stop it.
+		for (int i = 0; i < numThreads; i++) {
+			// Get thread
+			Thread thread = threads[i];
+			try {
+				if(thread.isAlive()) thread.stop();
+			} catch(SecurityException se) {
+				//nop
+			}
+		}
+
+		// Get thread subgroups of `group'
+		int numGroups = group.activeGroupCount();
+		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+		numGroups = group.enumerate(groups, false);
+
+		// Recursively visit each subgroup
+		for (int i = 0; i < numGroups; i++) {
+			nuke(groups[i], level + 1);
+		}
+		try {
+			group.destroy();
+		} catch (IllegalThreadStateException IE) {
+			//nop
+		} catch(SecurityException se) {
+			//nop
 		}
 	}
 }

@@ -1,3 +1,7 @@
+2009-04-25 sponge
+    * I2PSessionMuxedImpl atomic fixes
+    * BOB fixes. This should be the final bug wack. Good Luck to everybody!
+
 2009-04-23 zzz
     * Blocklist: cleanup
     * eepget: handle -h, --help, bad options, etc.
