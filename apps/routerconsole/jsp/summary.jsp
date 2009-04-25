@@ -10,7 +10,7 @@
         // pass the new delay parameter to the iframe
         newDelay = "?refresh=" + d;
     if (!"0".equals(d))
-        out.print("<iframe src=\"summaryframe.jsp" + newDelay + "\" height=\"1000\" width=\"100%\" scrolling=\"auto\" frameborder=\"0\" allowtransparency=\"true\">\n");
+        out.print("<iframe src=\"summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"100%\" scrolling=\"auto\" frameborder=\"0\" allowtransparency=\"true\">\n");
 %>
 <div class="routersummary">
 <%@include file="summarynoframe.jsp" %>
