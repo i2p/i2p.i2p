@@ -156,8 +156,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	        WritableByteChannel toClient   = handler.getClientSocket();
 	        WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
 	        
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromClient,toI2P), "SAMPipeClientToI2P"))).start();
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromI2P,toClient), "SAMPipeClientToI2P"))).start();
+	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P"), "SAMPipeClientToI2P")).start();
+	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient"), "SAMPipeI2PToClient")).start();
 	        
 	    }
 
@@ -209,8 +209,8 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	        WritableByteChannel toClient   = handler.getClientSocket();
 	        WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
 	        
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromClient,toI2P), "SAMPipeClientToI2P"))).start();
-	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromI2P,toClient), "SAMPipeClientToI2P"))).start();	        
+	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P"), "SAMPipeClientToI2P")).start();
+	        (new Thread(rec.getThreadGroup(), new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient"), "SAMPipeI2PToClient")).start();	        
 	    }
 
 	    
@@ -245,8 +245,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	}
 	    	
 	    	SocketForwarder forwarder = new SocketForwarder(host, port, this, verbose);
-	    	(new Thread(rec.getThreadGroup(), new I2PAppThread(forwarder, "SAMStreamForwarder"))).start();
-	        
+	    	(new Thread(rec.getThreadGroup(), new I2PAppThread(forwarder, "SAMStreamForwarder"), "SAMStreamForwarder")).start();
 	    }
 	    
 	    public class SocketForwarder extends Thread
@@ -309,9 +308,11 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    				ReadableByteChannel fromI2P    = Channels.newChannel(i2ps.getInputStream());
 	    				WritableByteChannel toClient   = clientServerSock ;
 	    				WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
-	    				new I2PAppThread(new Pipe(fromClient,toI2P), "SAMPipeClientToI2P").start();
-	    				new I2PAppThread(new Pipe(fromI2P,toClient), "SAMPipeClientToI2P").start();	        
-
+	    				I2PAppThread send = new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P");
+	    				I2PAppThread recv = new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient");
+	    				send.start();
+	    				recv.start();
+	    				
 	    			} catch (IOException e) {
 	    				try {
 	    					clientServerSock.close();
@@ -330,8 +331,9 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	WritableByteChannel out ;
 	    	ByteBuffer buf ;
 	    	
-	    	public Pipe(ReadableByteChannel in, WritableByteChannel out)
+	    	public Pipe(ReadableByteChannel in, WritableByteChannel out, String name)
 	    	{
+	    		super(name);
 	    		this.in  = in ;
 	    		this.out = out ;
 	    		this.buf = ByteBuffer.allocate(BUFFER_SIZE) ;
