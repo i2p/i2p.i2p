@@ -135,7 +135,7 @@ Streams are bidirectional communication sockets between two I2P
 destinations, but their opening has to be requested by one of them. 
 Hereafter, CONNECT commands are used by the SAM client for such a
 request. FORWARD / ACCEPT commands are used by the SAM client when
-it wants to listen to requests coming from other I2P destinations.
+he wants to listen to requests coming from other I2P destinations.
 
 
 -----------------------------
@@ -231,10 +231,11 @@ I2P destination peer, until one of the peer closes the socket.
 SAM virtual streams : FORWARD
 -----------------------------
 
-A client waits for an incoming connection request by :
- * opening a new socket with the SAM bridge
- * passing the same HELLO handshake as above
- * sending the forward command :  
+A client can use a regular socket server and wait for connection requests
+coming from I2P. For that, the client has to :
+ * open a new socket with the SAM bridge
+ * pass the same HELLO handshake as above
+ * send the forward command :
 
 -> STREAM FORWARD
          ID={$nickname}
@@ -242,7 +243,7 @@ A client waits for an incoming connection request by :
          [HOST={$host}]
          [SILENCE={true,false}]
 
-This makes the session ${nickname} listen forever for incoming
+This makes the session ${nickname} listen for incoming
 connection requests from the I2P network.
 
 The SAM bridge answers with :
@@ -257,16 +258,12 @@ The RESULT value may be one of:
     I2P_ERROR
     INVALID_ID
 
-The socket is closed immediately after the message by the SAM
-bridge. If the result is OK, the SAM bridge starts waiting for
-incoming connection requests from other I2P peers. 
-
  * {$host} is the hostname or IP address of the socket server to which
 SAM will forward connection requests. If not given, SAM takes the IP
 of the socket that issued the forward command.
 
  * {$port} is the port number of the socket server to which SAM will
-forward connection requests. Is is mandatory.
+forward connection requests. It is mandatory.
 
 When a connexion request arrives from I2P, the SAM bridge requests a
 socket connexion from {$host}:{$port}. If it is accepted after no more
@@ -281,6 +278,11 @@ destination key of the requesting peer. After this '\n' terminated line,
 all remaining data passing through the socket is forwarded from and to 
 the connected I2P destination peer, until one of the sides closes the
 socket.
+
+
+
+The I2P router will stop listening to incoming connection requests as
+soon as the "forwarding" socket is closed.
 
 
 

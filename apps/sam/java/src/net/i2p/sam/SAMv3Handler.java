@@ -44,16 +44,18 @@ public class SAMv3Handler extends SAMv1Handler
 {
 	private final static Log _log = new Log ( SAMv3Handler.class );
 
-	protected SAMv3StreamSession streamSession = null ;
 	protected SAMv3RawSession rawSession = null ;
 	protected SAMv3DatagramSession datagramSession = null ;
-	
-	protected SAMDatagramSession getDatagramSession() {
-		return datagramSession ;
-	}
+	protected SAMv3StreamSession streamSession = null ;
 	
 	protected SAMRawSession getRawSession() {
 		return rawSession ;
+	}
+	protected SAMDatagramSession getDatagramSession() {
+		return datagramSession ;
+	}
+	protected SAMStreamSession getStreamSession() {
+		return streamSession ;
 	}
 	
 	protected Session session = null ;
@@ -321,6 +323,8 @@ public class SAMv3Handler extends SAMv1Handler
 	
 	boolean stolenSocket = false ;
 	
+	boolean streamForwardingSocket = false ;
+	
 	public void stealSocket()
 	{
 		stolenSocket = true ;
@@ -412,6 +416,20 @@ public class SAMv3Handler extends SAMv1Handler
 					_log.error("Error closing socket: " + e.getMessage());
 				}
 			}
+			if (streamForwardingSocket) 
+			{
+				if (this.streamSession!=null) {
+					try {
+						this.streamSession.stopForwardingIncoming();
+					} catch (SAMException e) {
+						_log.error("Error while stopping forwarding connections: " + e.getMessage());
+					} catch (InterruptedIOException e) {
+						_log.error("Interrupted while stopping forwarding connections: " + e.getMessage());
+					}
+				}
+			}
+		
+
 
 			die();
 		}
@@ -690,9 +708,10 @@ public class SAMv3Handler extends SAMv1Handler
 	protected boolean execStreamForwardIncoming( Properties props ) {
 		try {
 			try {
+				streamForwardingSocket = true ;
 				streamSession.startForwardingIncoming(props);
 				notifyStreamResult( true, "OK", null );
-				return false ;
+				return true ;
 			} catch (SAMException e) {
 				_log.debug("Forwarding STREAM connections failed: " + e.getMessage());
 				notifyStreamResult ( true, "I2P_ERROR", "Forwarding failed : " + e.getMessage() );
