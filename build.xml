@@ -16,6 +16,7 @@
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, news.xml, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
@@ -196,7 +197,7 @@
             <fileset dir="." includes="**/*.java~" />
         </delete>
     </target>
-    <target name="pkg" depends="distclean, updater, tarball, installer" />
+    <target name="pkg" depends="distclean, updaterWithJettyFixes, tarball, installer" />
     <target name="pkgclean">
         <delete dir="pkg-temp" />
         <delete>
@@ -328,6 +329,9 @@
     <target name="updaterWithJetty" depends="prepjupdate">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
+    <target name="updaterWithJettyFixes" depends="prepjupdatefixes">
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
     <target name="updaterSmall" depends="prepupdateSmall">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
@@ -384,6 +388,9 @@
         <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
         <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
         <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+    </target>
+    <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
     </target>
     <target name="installer" depends="preppkg">
