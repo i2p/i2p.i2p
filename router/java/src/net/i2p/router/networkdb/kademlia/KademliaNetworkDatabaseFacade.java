@@ -121,7 +121,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_MIN = 3*60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 45*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
     private final static long PUBLISH_JOB_DELAY = 5*60*1000l;
@@ -572,7 +572,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.error("LeaseSet to expire too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
+            return "Future expiring leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
                    + " expiring in " + DataHelper.formatDuration(age);
         }
         return null;
