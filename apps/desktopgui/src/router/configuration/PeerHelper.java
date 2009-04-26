@@ -160,6 +160,6 @@ public class PeerHelper {
     public final static String PROP_I2NP_INTERNAL_UDP_PORT = "i2np.udp.internalPort";
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
-    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoip";
-    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoport";
+    public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
+    public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
 }
