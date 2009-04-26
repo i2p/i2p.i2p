@@ -19,10 +19,13 @@
             </classpath>
         </depend>
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" deprecation="on" source="1.5" target="1.5" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" />
+        <javac srcdir="./src" debug="true" deprecation="on" source="1.5" target="1.5" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" />

@@ -7,6 +7,7 @@
 	<property name="dist" location="${user.home}/dist/${ant.project.name}" />
 	<property name="jar" location="./${ant.project.name}.jar" />
 	<property name="launch4j.dir" location="." />
+	<property name="javac.compilerargs" value="" />
 
 	<path id="dist.classpath">
 		<pathelement path="${build}" />
@@ -23,6 +24,8 @@
 
 	<target name="compile" depends="init" description="compile the source">
 		<javac srcdir="${src}" destdir="${build}" classpathref="dist.classpath" source="1.4" debug="on" />
+			<compilerarg line="${javac.compilerargs}" />
+		</javac>
 		<copy todir="${build}/images">
 			<fileset dir="${src}/images">
 				<include name="**/*" />

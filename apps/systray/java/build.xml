@@ -5,6 +5,7 @@
     <target name="builddep">
         <ant dir="../../../core/java/" target="build" />
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -16,7 +17,9 @@
             target="1.5"
             destdir="./build/obj"
             includes="**/*.java"
-            classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" />
+            classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="compile" unless="jar.uptodate">
         <mkdir dir="./build/jar_temp" />

@@ -40,6 +40,7 @@
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
         </dependset>
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="prepare, depend, dependVersion">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -47,6 +48,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
@@ -114,6 +116,7 @@
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                destdir="../jsp/WEB-INF/classes/" 
                srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
