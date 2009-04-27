@@ -1,3 +1,10 @@
+2009-04-27 sponge
+    * more BOB fixes, complete with warnings when things go wrong, and
+      success messages when things turn around and go right. Terminates
+      early so that applications wait no more than 10 seconds or so.
+    * Reversed a few earlier patches that caused some odd behavior.
+    * Changed some core println()'s to debugging messages.
+
 2009-04-27 zzz
     * Build files:
       - New updaterWithJettyFixes target, build it for pkg

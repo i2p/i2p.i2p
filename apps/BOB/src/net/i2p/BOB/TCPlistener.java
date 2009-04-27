@@ -73,16 +73,6 @@ public class TCPlistener implements Runnable {
 		info.releaseReadLock();
 	}
 
-	private void wlock() throws Exception {
-		database.getWriteLock();
-		info.getWriteLock();
-	}
-
-	private void wunlock() throws Exception {
-		info.releaseWriteLock();
-		database.releaseWriteLock();
-	}
-
 	/**
 	 * Simply listen on TCP port, and thread connections
 	 *
@@ -116,7 +106,7 @@ die:		{
 			}
 			try {
 				Socket server = new Socket();
-				listener.setSoTimeout(50); // Half of the expected time from MUXlisten
+				listener.setSoTimeout(50); // We don't block, we cycle and check.
 				while (spin) {
 					try {
 						rlock();
@@ -141,73 +131,20 @@ die:		{
 					}
 					if (g) {
 						// toss the connection to a new thread.
-						TCPtoI2P conn_c = new TCPtoI2P(socketManager, server /* , info, database */);
+						TCPtoI2P conn_c = new TCPtoI2P(socketManager, server);
 						Thread t = new Thread(conn_c, "BOBTCPtoI2P");
 						t.start();
 						g = false;
 					}
 				}
-				//System.out.println("TCPlistener: destroySession");
 				listener.close();
 			} catch (IOException ioe) {
 				try {
 					listener.close();
 				} catch (IOException e) {
 				}
-				// Fatal failure, cause a stop event
-				try {
-					rlock();
-					try {
-						spin = info.get("RUNNING").equals(Boolean.TRUE);
-					} catch (Exception e) {
-						runlock();
-						break die;
-					}
-				} catch (Exception e) {
-					break die;
-				}
-				if (spin) {
-					try {
-						wlock();
-						try {
-							info.add("STOPPING", new Boolean(true));
-							info.add("RUNNING", new Boolean(false));
-						} catch (Exception e) {
-							wunlock();
-							break die;
-						}
-					} catch (Exception e) {
-						break die;
-					}
-					try {
-						wunlock();
-					} catch (Exception e) {
-						break die;
-					}
-				}
 			}
 		}
-		// Previous level does this cleanup now.
-		//
-		// need to kill off the socket manager too.
-		// I2PSession session = socketManager.getSession();
-		// if (session != null) {
-		//	try {
-		//		session.destroySession();
-		//	} catch (I2PSessionException ex) {
-				// nop
-		//	}
-		//}
-		//System.out.println("TCPlistener: Waiting for children");
-		//while (Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-		//	try {
-		//		Thread.sleep(100); //sleep for 100 ms (One tenth second)
-		//	} catch (Exception e) {
-		//		// nop
-		//	}
-		//}
 	//System.out.println("TCPlistener: Done.");
 	}
 }
-
-

@@ -151,13 +151,8 @@ public class TCPtoI2P implements Runnable {
 					t.start();
 					q.start();
 					while(t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
-//						try {
 							Thread.sleep(10); //sleep for 10 ms
-//						} catch(InterruptedException e) {
-							// nop
-//						}
 					}
-					// System.out.println("TCPtoI2P: Going away...");
 
 				} catch(I2PException e) {
 					Emsg("ERROR " + e.toString(), out);
@@ -166,7 +161,7 @@ public class TCPtoI2P implements Runnable {
 				} catch(NoRouteToHostException e) {
 					Emsg("ERROR " + e.toString(), out);
 				} catch(InterruptedIOException e) {
-					Emsg("ERROR " + e.toString(), out);
+					// We're breaking away.
 				}
 
 			} catch(Exception e) {

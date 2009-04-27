@@ -246,7 +246,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
                 try {
                     msg = _msgs.take();
                 } catch (InterruptedException ie) {
-                    System.out.println("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive.toString());
+                    _log.debug("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive.toString());
                     continue;
                 }
                 if (msg.size == POISON_SIZE) {

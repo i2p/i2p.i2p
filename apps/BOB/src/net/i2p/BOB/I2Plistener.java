@@ -82,18 +82,6 @@ public class I2Plistener implements Runnable {
 die:		{
 
 			serverSocket.setSoTimeout(50);
-//			try {
-//				if (info.exists("INPORT")) {
-//					tgwatch = 2;
-//				}
-//			} catch (Exception e) {
-//				try {
-//					runlock();
-//				} catch (Exception e2) {
-//					break die;
-//				}
-//				break die;
-//			}
 			boolean spin = true;
 			while (spin) {
 
@@ -129,40 +117,12 @@ die:		{
 						t.start();
 					}
 
-				} catch (I2PException e) {
+				} catch (Exception e) {
 					//	System.out.println("Exception " + e);
 				}
 			}
 		}
 		// System.out.println("I2Plistener: Close");
-
-
-		// Previous level does this cleanup now.
-		//
-		// try {
-		//	serverSocket.close();
-		// } catch (I2PException e) {
-			// nop
-		//}
-		// need to kill off the socket manager too.
-		// I2PSession session = socketManager.getSession();
-		// if (session != null) {
-			// System.out.println("I2Plistener: destroySession");
-		//	try {
-		//		session.destroySession();
-		//	} catch (I2PSessionException ex) {
-				// nop
-		//	}
-		//}
-		// System.out.println("I2Plistener: Waiting for children");
-		// while (Thread.activeCount() > tgwatch) { // wait for all threads in our threadgroup to finish
-		//	try {
-		//		Thread.sleep(100); //sleep for 100 ms (One tenth second)
-		//	} catch (Exception e) {
-				// nop
-		//	}
-		//}
-
 	// System.out.println("I2Plistener: Done.");
 	}
 }
