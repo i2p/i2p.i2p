@@ -502,9 +502,10 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(filename);
         if (remaining == 0)
             out.write("</a>");
-        // temporarily hardcoded for postman and anonymity, requires bytemonsoon patch for lookup by info_hash
+        // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = snark.meta.getAnnounce();
-        if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr")) {
+        if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
+            announce.startsWith("http://lnQ6yoBT")) {
             Map trackers = _manager.getTrackers();
             for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry entry = (Map.Entry)iter.next();
