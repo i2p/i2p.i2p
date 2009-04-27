@@ -41,7 +41,9 @@
   <hr />
   <b>Log levels:</b> <br />
   <b>Default log level:</b>
-   <jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /><br />
+   <jsp:getProperty name="logginghelper" property="defaultLogLevelBox" />
+   <i>(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)</i>
+   <br />
    <jsp:getProperty name="logginghelper" property="logLevelTable" />
  <hr />
  <input type="submit" name="shouldsave" value="Save changes" /> 
