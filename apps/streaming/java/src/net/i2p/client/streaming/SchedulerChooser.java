@@ -55,7 +55,7 @@ class SchedulerChooser {
         }
         
         public void eventOccurred(Connection con) {
-            _log.log(Log.CRIT, "Yell at jrandom: Event occurred on " + con, new Exception("source"));
+            _log.log(Log.ERROR, "Yell at jrandom: Event occurred on " + con, new Exception("source"));
         }
         public boolean accept(Connection con) { return true; }
     };
