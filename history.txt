@@ -1,3 +1,21 @@
+2009-04-27 zzz
+    * Build files:
+      - New updaterWithJettyFixes target, build it for pkg
+      - Pass compiler args down from top build.xml
+    * GarlicMessageBuilder: Reduce bundled tags to 40 (was 100)
+    * i2psnark: Add Postman2 tracker
+    * I2PTunnel: Allow spaces in dest and proxy lists
+    * NetDb:
+      - Adjust RouterInfo expiration down to control memory usage
+      - Display LeaseSets and RouterInfos on separate console pages
+    * NTCP:
+      - Correct the meanings of the i2np.ntcp.autoip and i2np.ntcp.autoport
+        advanced config. If you have one of these set but not the other, you
+        will have to adjust your configuration on config.jsp.
+    * RouterConsole: iframe tweaks
+    * StatisticsManager: Cleanup
+    * Streaming: Don't let jrandom yell so loud
+
 2009-04-25 sponge
     * I2PSessionMuxedImpl atomic fixes
     * BOB fixes. This should be the final bug wack. Good Luck to everybody!
