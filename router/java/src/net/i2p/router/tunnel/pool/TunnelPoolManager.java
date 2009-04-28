@@ -38,9 +38,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private RouterContext _context;
     private Log _log;
     /** Hash (destination) to TunnelPool */
-    private Map _clientInboundPools;
+    private final Map _clientInboundPools;
     /** Hash (destination) to TunnelPool */
-    private Map _clientOutboundPools;
+    private final Map _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
     private LoadTestManager _loadTestManager;

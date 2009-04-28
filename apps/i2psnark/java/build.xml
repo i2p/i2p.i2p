@@ -24,6 +24,7 @@
             </classpath>
         </depend>
     </target>
+    <property name="javac.compilerargs" value="" />
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -31,7 +32,9 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/*Servlet.class">
@@ -55,6 +58,7 @@
     <target name="standalone_prep" depends="war">
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                destdir="./build" srcdir="src/" includes="org/klomp/snark/web/RunStandalone.java" >
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />

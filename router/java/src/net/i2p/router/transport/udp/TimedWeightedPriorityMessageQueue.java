@@ -33,7 +33,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
     /** how many bytes total have been pulled off the given queue */
     private long _bytesTransferred[];
     /** lock to notify message enqueue/removal (and block for getNext()) */
-    private Object _nextLock;
+    private final Object _nextLock;
     /** have we shut down or are we still alive? */
     private boolean _alive;
     /** which queue should we pull out of next */

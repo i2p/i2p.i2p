@@ -25,7 +25,7 @@ public class UDPReceiver {
     private Log _log;
     private DatagramSocket _socket;
     private String _name;
-    private List _inboundQueue;
+    private final List _inboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
     private UDPTransport _transport;

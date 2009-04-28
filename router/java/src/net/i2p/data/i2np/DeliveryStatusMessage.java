@@ -64,10 +64,12 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return (int)getMessageId() + (int)getArrival();
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DeliveryStatusMessage) ) {
             DeliveryStatusMessage msg = (DeliveryStatusMessage)object;
@@ -78,6 +80,7 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DeliveryStatusMessage: ");

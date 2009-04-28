@@ -6,6 +6,7 @@
 	<property name="dist"  location="dist"/>
 	<property name="jar" value="addressbook.jar"/>
 	<property name="war" value="addressbook.war"/>
+	<property name="javac.compilerargs" value="" />
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
@@ -38,6 +39,7 @@
 	<target name="compile" depends="init, depend">
 		<javac debug="true" deprecation="on" source="1.5" target="1.5" 
                        srcdir="${src}" destdir="${build}">
+            <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />

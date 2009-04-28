@@ -1,3 +1,68 @@
+2009-04-27 sponge
+    * more BOB fixes, complete with warnings when things go wrong, and
+      success messages when things turn around and go right. Terminates
+      early so that applications wait no more than 10 seconds or so.
+    * Reversed a few earlier patches that caused some odd behavior.
+    * Changed some core println()'s to debugging messages.
+
+2009-04-27 zzz
+    * Build files:
+      - New updaterWithJettyFixes target, build it for pkg
+      - Pass compiler args down from top build.xml
+    * GarlicMessageBuilder: Reduce bundled tags to 40 (was 100)
+    * i2psnark: Add Postman2 tracker
+    * I2PTunnel: Allow spaces in dest and proxy lists
+    * NetDb:
+      - Adjust RouterInfo expiration down to control memory usage
+      - Display LeaseSets and RouterInfos on separate console pages
+    * NTCP:
+      - Correct the meanings of the i2np.ntcp.autoip and i2np.ntcp.autoport
+        advanced config. If you have one of these set but not the other, you
+        will have to adjust your configuration on config.jsp.
+    * RouterConsole: iframe tweaks
+    * StatisticsManager: Cleanup
+    * Streaming: Don't let jrandom yell so loud
+
+2009-04-25 sponge
+    * I2PSessionMuxedImpl atomic fixes
+    * BOB fixes. This should be the final bug wack. Good Luck to everybody!
+
+2009-04-23 zzz
+    * Blocklist: cleanup
+    * eepget: handle -h, --help, bad options, etc.
+      (http://forum.i2p/viewtopic.php?p=16261#16261)
+    * Fragmenter: don't re-throw the corrupt fragment IllegalStateException,
+      to limit the damage - root cause still not found
+    * i2psnark: (http://forum.i2p/viewtopic.php?t=3317)
+      - Change file limit to 512 (was 256)
+      - Change size limit to 10GB (was 5GB)
+      - Change request size to 16KB (was 32KB)
+      - Change pipeline to 5 (was 3)
+    * logs.jsp: Move version info to the top
+    * Jetty: Fix temp dir name handling on windows, which was
+      causing susidns not to start
+      (http://forum.i2p/viewtopic.php?t=3364)
+    * NTCP: Prevent IllegalStateException
+    * PeerProfile:
+      - Replace a hot lock with concurrent RW lock
+      - Rewrite ugly IP Restriction code
+      - Also use transport IP in restriction code
+    * RouterConsole: Make summary bar a refreshing iframe
+    * Transport: Start the previously unused CleanupUnreachable
+
+2009-04-21 sponge
+    * Code janitor work, basic corrections involving @Override, and
+      appling final where it is important. Also fixed some equals methods
+      and commented places that need fixing.
+
+2009-04-18 Complication
+    * Fix typo in "news.xml", no build number increase.
+
+* 2009-04-18  0.7.2 released
+
+2009-04-18 Complication
+    * Update versions, package release
+
 2009-04-17 sponge
     * fixed setIP, just be sure to distclean before building :-)
     * more lint taken care of as well.

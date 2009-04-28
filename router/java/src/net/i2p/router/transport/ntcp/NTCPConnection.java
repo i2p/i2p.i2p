@@ -56,13 +56,13 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private SocketChannel _chan;
     private SelectionKey _conKey;
     /** list of ByteBuffer containing data we have read and are ready to process, oldest first */
-    private List _readBufs;
+    private final List _readBufs;
     /**
      * list of ByteBuffers containing fully populated and encrypted data, ready to write,
      * and already cleared through the bandwidth limiter.
      */
-    private List _writeBufs;
-    private List _bwRequests;
+    private final List _writeBufs;
+    private final List _bwRequests;
     private boolean _established;
     private long _establishedOn;
     private EstablishState _establishState;
@@ -75,7 +75,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /**
      * pending unprepared OutNetMessage instances
      */
-    private List _outbound;
+    private final List _outbound;
     /** current prepared OutNetMessage, or null */
     private OutNetMessage _currentOutbound;
     private SessionKey _sessionKey;
@@ -96,7 +96,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private long _created;
     private long _nextMetaTime;
     /** unencrypted outbound metadata buffer */
-    private byte _meta[] = new byte[16];
+    private final byte _meta[] = new byte[16];
     private boolean _sendingMeta;
     /** how many consecutive sends were failed due to (estimated) send queue time */
     private int _consecutiveBacklog;
@@ -398,6 +398,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 continue;
             
             RouterInfo info = fac.lookupRouterInfoLocally(peer);
+            if (info == null)
+                continue;
 
             OutNetMessage infoMsg = new OutNetMessage(_context);
             infoMsg.setExpiration(_context.clock().now()+10*1000);
@@ -704,7 +706,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private static int NUM_PREP_BUFS = 5;
     private static int __liveBufs = 0;
     private static int __consecutiveExtra;
-    private static List _bufs = new ArrayList(NUM_PREP_BUFS);
+    private final static List _bufs = new ArrayList(NUM_PREP_BUFS);
     private PrepBuffer acquireBuf() {
         synchronized (_bufs) {
             if (_bufs.size() > 0) {
@@ -1093,11 +1095,17 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         // enqueueInfoMessage(); // this often?
     }
     
+    @Override
     public int hashCode() { return System.identityHashCode(this); }
-    public boolean equals(Object obj) { return obj == this; }
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) return false;
+        if(obj.getClass() != NTCPConnection.class) return false;
+        return obj == this;
+    }
 
-    private static List _i2npHandlers = new ArrayList(4);
-    private static I2NPMessageHandler acquireHandler(RouterContext ctx) {
+    private final static List _i2npHandlers = new ArrayList(4);
+    private final static I2NPMessageHandler acquireHandler(RouterContext ctx) {
         I2NPMessageHandler rv = null;
         synchronized (_i2npHandlers) {
             if (_i2npHandlers.size() > 0)
@@ -1127,7 +1135,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
     
     private static int MAX_DATA_READ_BUFS = 16;
-    private static List _dataReadBufs = new ArrayList(16);
+    private final static List _dataReadBufs = new ArrayList(16);
     private static DataBuf acquireReadBuf() {
         synchronized (_dataReadBufs) {
             if (_dataReadBufs.size() > 0)
@@ -1289,6 +1297,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
     }
 
+    @Override
     public String toString() {
         return "NTCP Connection to " +
                (_remotePeer == null ? "unknown " : _remotePeer.calculateHash().toBase64().substring(0,6)) +

@@ -53,8 +53,6 @@ public class StatisticsManager implements Service {
         _includePeerRankings = Boolean.valueOf(val);
     }
     
-    static final boolean CommentOutIn072 = RouterVersion.VERSION.equals("0.7.1");
-
     /** Retrieve a snapshot of the statistics that should be published */
     public Properties publishStatistics() { 
         Properties stats = new Properties();
@@ -123,7 +121,7 @@ public class StatisticsManager implements Service {
             //includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
             //includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
             //includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("tunnel.participatingTunnels", stats, new long[] { 60*60*1000 });
             //includeRate("tunnel.testSuccessTime", stats, new long[] { 10*60*1000l });
             //includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
             //includeRate("udp.sendConfirmTime", stats, new long[] { 10*60*1000 });
@@ -133,16 +131,6 @@ public class StatisticsManager implements Service {
             //includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
 
-            if (CommentOutIn072) {
-                // Round smaller uptimes to 1 hour, to frustrate uptime tracking
-                // Round 2nd hour to 90m since peers use 2h minimum to route
-                if (publishedUptime < 60*60*1000) publishedUptime = 60*60*1000;
-                else if (publishedUptime < 2*60*60*1000) publishedUptime = 90*60*1000;
-                stats.setProperty("stat_uptime", DataHelper.formatDuration(publishedUptime));
-            } else {
-                // So that we will still get build requests
-                stats.setProperty("stat_uptime", "90m");
-            }
             //stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             
             //includeRate("tunnel.decryptRequestTime", stats, new long[] { 60*1000, 10*60*1000 });
@@ -150,7 +138,7 @@ public class StatisticsManager implements Service {
             //includeRate("udp.packetVerifyTime", stats, new long[] { 60*1000 });
             
             //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
-            long rate = CommentOutIn072 ? 10*60*1000 : 60*60*1000;
+            long rate = 60*60*1000;
             includeRate("tunnel.buildClientExpire", stats, new long[] { rate });
             includeRate("tunnel.buildClientReject", stats, new long[] { rate });
             includeRate("tunnel.buildClientSuccess", stats, new long[] { rate });
@@ -160,20 +148,15 @@ public class StatisticsManager implements Service {
             //includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });
-            
-            _log.debug("Publishing peer rankings");
-        } else {
-            // So that we will still get build requests
-            stats.setProperty("stat_uptime", "90m");
-            _log.debug("Not publishing peer rankings");
         }
+
+        // So that we will still get build requests
+        stats.setProperty("stat_uptime", "90m");
         if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
             stats.setProperty("netdb.knownRouters", ""+_context.netDb().getKnownRouters());
             stats.setProperty("netdb.knownLeaseSets", ""+_context.netDb().getKnownLeaseSets());
         }
 
-    if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Building status: " + stats);
         return stats;
     }
     

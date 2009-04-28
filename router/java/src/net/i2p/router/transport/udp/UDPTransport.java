@@ -40,13 +40,13 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class UDPTransport extends TransportImpl implements TimedWeightedPriorityMessageQueue.FailedListener {
-    private RouterContext _context;
+    private RouterContext _context; // LINT -- field hides a field
     private Log _log;
     private UDPEndpoint _endpoint;
     /** Peer (Hash) to PeerState */
-    private Map _peersByIdent;
+    private final Map _peersByIdent;
     /** RemoteHostId to PeerState */
-    private Map _peersByRemoteHost;
+    private final Map _peersByRemoteHost;
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
     private MessageQueue _outboundMessages;
@@ -90,7 +90,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private TransportBid _transientFail;
     
     /** list of RemoteHostId for peers whose packets we want to drop outright */
-    private List _dropList;
+    private final List _dropList;
     
     private int _expireTimeout;
 
@@ -437,7 +437,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
      */
-    public PeerState getPeerState(RemoteHostId hostInfo) {
+    public PeerState getPeerState(RemoteHostId hostInfo) { // LINT -- Exporting non-public type through public API
         synchronized (_peersByRemoteHost) {
             return (PeerState)_peersByRemoteHost.get(hostInfo);
         }
@@ -597,6 +597,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 ***/
     
+    @Override
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
         if (inMsg.getType() == DatabaseStoreMessage.MESSAGE_TYPE) {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage)inMsg;
@@ -673,7 +674,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
+    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }// LINT -- Exporting non-public type through public API
     
     void dropPeer(Hash peer, boolean shouldShitlist, String why) {
         PeerState state = getPeerState(peer);
@@ -935,6 +936,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MIN_EXPIRE_TIMEOUT = 10*60*1000;
     
     public String getStyle() { return STYLE; }
+    @Override
     public void send(OutNetMessage msg) { 
         if (msg == null) return;
         if (msg.getTarget() == null) return;
@@ -1242,6 +1244,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             super.afterSend(m, true);
     }
 
+    @Override
     public int countActivePeers() {
         long now = _context.clock().now();
         int active = 0;
@@ -1258,6 +1261,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
+    @Override
     public int countActiveSendPeers() {
         long now = _context.clock().now();
         int active = 0;
@@ -1274,6 +1278,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
+    @Override
     public boolean isEstablished(Hash dest) {
         return getPeerState(dest) != null;
     }
@@ -1284,6 +1289,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
 
+    @Override
     public boolean haveCapacity() {
         synchronized (_peersByIdent) {
             return _peersByIdent.size() < getMaxConnections() * 4 / 5;
@@ -1294,6 +1300,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
      */
+    @Override
     public Vector getClockSkews() {
 
         Vector skews = new Vector();
@@ -1419,6 +1426,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class IdleInComparator extends PeerComparator {
         private static final IdleInComparator _instance = new IdleInComparator();
         public static final IdleInComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = r.getLastReceiveTime() - l.getLastReceiveTime();
             if (rv == 0) // fallback on alpha
@@ -1430,6 +1438,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class IdleOutComparator extends PeerComparator {
         private static final IdleOutComparator _instance = new IdleOutComparator();
         public static final IdleOutComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = r.getLastSendTime() - l.getLastSendTime();
             if (rv == 0) // fallback on alpha
@@ -1441,6 +1450,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class RateInComparator extends PeerComparator {
         private static final RateInComparator _instance = new RateInComparator();
         public static final RateInComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getReceiveBps() - r.getReceiveBps();
             if (rv == 0) // fallback on alpha
@@ -1452,6 +1462,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class RateOutComparator extends PeerComparator {
         private static final RateOutComparator _instance = new RateOutComparator();
         public static final RateOutComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getSendBps() - r.getSendBps();
             if (rv == 0) // fallback on alpha
@@ -1463,6 +1474,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class UptimeComparator extends PeerComparator {
         private static final UptimeComparator _instance = new UptimeComparator();
         public static final UptimeComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = r.getKeyEstablishedTime() - l.getKeyEstablishedTime();
             if (rv == 0) // fallback on alpha
@@ -1474,6 +1486,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class SkewComparator extends PeerComparator {
         private static final SkewComparator _instance = new SkewComparator();
         public static final SkewComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = Math.abs(l.getClockSkew()) - Math.abs(r.getClockSkew());
             if (rv == 0) // fallback on alpha
@@ -1485,6 +1498,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class CwndComparator extends PeerComparator {
         private static final CwndComparator _instance = new CwndComparator();
         public static final CwndComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getSendWindowBytes() - r.getSendWindowBytes();
             if (rv == 0) // fallback on alpha
@@ -1496,6 +1510,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class SsthreshComparator extends PeerComparator {
         private static final SsthreshComparator _instance = new SsthreshComparator();
         public static final SsthreshComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getSlowStartThreshold() - r.getSlowStartThreshold();
             if (rv == 0) // fallback on alpha
@@ -1507,6 +1522,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class RTTComparator extends PeerComparator {
         private static final RTTComparator _instance = new RTTComparator();
         public static final RTTComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getRTT() - r.getRTT();
             if (rv == 0) // fallback on alpha
@@ -1518,6 +1534,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class DevComparator extends PeerComparator {
         private static final DevComparator _instance = new DevComparator();
         public static final DevComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getRTTDeviation() - r.getRTTDeviation();
             if (rv == 0) // fallback on alpha
@@ -1529,6 +1546,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class RTOComparator extends PeerComparator {
         private static final RTOComparator _instance = new RTOComparator();
         public static final RTOComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getRTO() - r.getRTO();
             if (rv == 0) // fallback on alpha
@@ -1540,6 +1558,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class MTUComparator extends PeerComparator {
         private static final MTUComparator _instance = new MTUComparator();
         public static final MTUComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getMTU() - r.getMTU();
             if (rv == 0) // fallback on alpha
@@ -1551,6 +1570,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class SendCountComparator extends PeerComparator {
         private static final SendCountComparator _instance = new SendCountComparator();
         public static final SendCountComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsTransmitted() - r.getPacketsTransmitted();
             if (rv == 0) // fallback on alpha
@@ -1562,6 +1582,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class RecvCountComparator extends PeerComparator {
         private static final RecvCountComparator _instance = new RecvCountComparator();
         public static final RecvCountComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsReceived() - r.getPacketsReceived();
             if (rv == 0) // fallback on alpha
@@ -1573,6 +1594,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class ResendComparator extends PeerComparator {
         private static final ResendComparator _instance = new ResendComparator();
         public static final ResendComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsRetransmitted() - r.getPacketsRetransmitted();
             if (rv == 0) // fallback on alpha
@@ -1584,6 +1606,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static class DupComparator extends PeerComparator {
         private static final DupComparator _instance = new DupComparator();
         public static final DupComparator instance() { return _instance; }
+        @Override
         protected int compare(PeerState l, PeerState r) {
             long rv = l.getPacketsReceivedDuplicate() - r.getPacketsReceivedDuplicate();
             if (rv == 0) // fallback on alpha
@@ -1628,6 +1651,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     //public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, 0); }
     public void renderStatusHTML(Writer out, int sortFlags) throws IOException {}
+    @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         TreeSet peers = new TreeSet(getComparator(sortFlags));
         synchronized (_peersByIdent) {
@@ -1970,12 +1994,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private class SharedBid extends TransportBid {
         public SharedBid(int ms) { super(); setLatencyMs(ms); }
+        @Override
         public Transport getTransport() { return UDPTransport.this; }
+        @Override
         public String toString() { return "UDP bid @ " + getLatencyMs(); }
     }
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
-        private List _expirePeers;
+        private final List _expirePeers;
         private List _expireBuffer;
         private boolean _alive;
         public ExpirePeerEvent() {
@@ -2102,11 +2128,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         return _reachabilityStatus; 
     }
+    @Override
     public void recheckReachability() {
         _testEvent.runTest();
     }
     
-    public PeerState pickTestPeer(RemoteHostId dontInclude) {
+    public PeerState pickTestPeer(RemoteHostId dontInclude) {// LINT -- Exporting non-public type through public API
         List peers = null;
         synchronized (_peersByIdent) {
             peers = new ArrayList(_peersByIdent.values());

@@ -20,7 +20,7 @@ public class UDPSender {
     private Log _log;
     private DatagramSocket _socket;
     private String _name;
-    private List _outboundQueue;
+    private final List _outboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
     

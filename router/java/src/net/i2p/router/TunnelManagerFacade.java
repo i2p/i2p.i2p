@@ -8,8 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Set;
 
 import net.i2p.data.Destination;

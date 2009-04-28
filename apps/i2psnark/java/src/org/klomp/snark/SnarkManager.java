@@ -362,7 +362,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Properties getConfig() { return _config; }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    private static final int MAX_FILES_PER_TORRENT = 256;
+    private static final int MAX_FILES_PER_TORRENT = 512;
     
     /** set of filenames that we are dealing with */
     public Set listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
@@ -543,16 +543,18 @@ public class SnarkManager implements Snark.CompleteListener {
             return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it";
         } else if (info.getPieces() <= 0) {
             return "No pieces in " + info.getName() + "?  deleting it";
-        } else if (info.getPieceLength(0) > 1*1024*1024) {
-            return "Pieces are too large in " + info.getName() + " (" + info.getPieceLength(0)/1024 + "KB), deleting it";
-        } else if (info.getTotalLength() > 10*1024*1024*1024l) {
+        } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
+            return "Pieces are too large in " + info.getName() + " (" + DataHelper.formatSize(info.getPieceLength(0)) +
+                   "B), deleting it";
+        } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
             if (lengths != null)
                 for (int i = 0; i < lengths.size(); i++)
                     System.out.println("File " + i + " is " + lengths.get(i) + " long");
             
-            return "Torrents larger than 10GB are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
+            return "Torrents larger than " + DataHelper.formatSize(Storage.MAX_TOTAL_SIZE) +
+                   "B are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
         } else {
             // ok
             return null;
@@ -637,8 +639,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void torrentComplete(Snark snark) {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
-        addMessage("Download complete of " + f.getName() 
-                   + (len < 5*1024*1024 ? " (size: " + (len/1024) + "KB)" : " (size: " + (len/(1024*1024l)) + "MB)"));
+        addMessage("Download complete of " + f.getName() + " (size: " + DataHelper.formatSize(len) + "B)");
         updateStatus(snark);
     }
     
@@ -694,6 +695,7 @@ public class SnarkManager implements Snark.CompleteListener {
 //       , "mastertracker", "http://VzXD~stRKbL3MOmeTn1iaCQ0CFyTmuFHiKYyo0Rd~dFPZFCYH-22rT8JD7i-C2xzYFa4jT5U2aqHzHI-Jre4HL3Ri5hFtZrLk2ax3ji7Qfb6qPnuYkuiF2E2UDmKUOppI8d9Ye7tjdhQVCy0izn55tBaB-U7UWdcvSK2i85sauyw3G0Gfads1Rvy5-CAe2paqyYATcDmGjpUNLoxbfv9KH1KmwRTNH6k1v4PyWYYnhbT39WfKMbBjSxVQRdi19cyJrULSWhjxaQfJHeWx5Z8Ev4bSPByBeQBFl2~4vqy0S5RypINsRSa3MZdbiAAyn5tr5slWR6QdoqY3qBQgBJFZppy-3iWkFqqKgSxCPundF8gdDLC5ddizl~KYcYKl42y9SGFHIukH-TZs8~em0~iahzsqWVRks3zRG~tlBcX2U3M2~OJs~C33-NKhyfZT7-XFBREvb8Szmd~p66jDxrwOnKaku-G6DyoQipJqIz4VHmY9-y5T8RrUcJcM-5lVoMpAAAA.i2p/announce.php=http://tracker.mastertracker.i2p/"
 //       , "Galen", "http://5jpwQMI5FT303YwKa5Rd38PYSX04pbIKgTaKQsWbqoWjIfoancFdWCShXHLI5G5ofOb0Xu11vl2VEMyPsg1jUFYSVnu4-VfMe3y4TKTR6DTpetWrnmEK6m2UXh91J5DZJAKlgmO7UdsFlBkQfR2rY853-DfbJtQIFl91tbsmjcA5CGQi4VxMFyIkBzv-pCsuLQiZqOwWasTlnzey8GcDAPG1LDcvfflGV~6F5no9mnuisZPteZKlrv~~TDoXTj74QjByWc4EOYlwqK8sbU9aOvz~s31XzErbPTfwiawiaZ0RUI-IDrKgyvmj0neuFTWgjRGVTH8bz7cBZIc3viy6ioD-eMQOrXaQL0TCWZUelRwHRvgdPiQrxdYQs7ixkajeHzxi-Pq0EMm5Vbh3j3Q9kfUFW3JjFDA-MLB4g6XnjCbM5J1rC0oOBDCIEfhQkszru5cyLjHiZ5yeA0VThgu~c7xKHybv~OMXION7V8pBKOgET7ZgAkw1xgYe3Kkyq5syAAAA.i2p/tr/announce.php=http://galen.i2p/tr/"
        , "crstrack", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
+       , "Postman2", "http://lnQ6yoBTxQuQU8EQ1FlF395ITIQF-HGJxUeFvzETLFnoczNjQvKDbtSB7aHhn853zjVXrJBgwlB9sO57KakBDaJ50lUZgVPhjlI19TgJ-CxyHhHSCeKx5JzURdEW-ucdONMynr-b2zwhsx8VQCJwCEkARvt21YkOyQDaB9IdV8aTAmP~PUJQxRwceaTMn96FcVenwdXqleE16fI8CVFOV18jbJKrhTOYpTtcZKV4l1wNYBDwKgwPx5c0kcrRzFyw5~bjuAKO~GJ5dR7BQsL7AwBoQUS4k1lwoYrG1kOIBeDD3XF8BWb6K3GOOoyjc1umYKpur3G~FxBuqtHAsDRICkEbKUqJ9mPYQlTSujhNxiRIW-oLwMtvayCFci99oX8MvazPS7~97x0Gsm-onEK1Td9nBdmq30OqDxpRtXBimbzkLbR1IKObbg9HvrKs3L-kSyGwTUmHG9rSQSoZEvFMA-S0EXO~o4g21q1oikmxPMhkeVwQ22VHB0-LZJfmLr4SAAAA.i2p/announce.php=http://tracker2.postman.i2p/"
     };
     
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */

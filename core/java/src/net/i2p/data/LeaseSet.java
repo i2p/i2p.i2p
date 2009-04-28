@@ -67,7 +67,7 @@ public class LeaseSet extends DataStructureImpl {
     private boolean _checked;
 
     /** This seems like plenty  */
-    private final static int MAX_LEASES = 6;
+    public final static int MAX_LEASES = 6;
 
     public LeaseSet() {
         setDestination(null);

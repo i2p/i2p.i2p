@@ -786,6 +786,7 @@ public class PacketBuilder {
     private int getOurExplicitPort() { return 0; }
     
     /** build intro packets for each of the published introducers */
+    @SuppressWarnings("static-access")
     public UDPPacket[] buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
@@ -878,7 +879,7 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
     
-    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
+    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {// LINT -- Exporting non-public type through public API
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
@@ -928,7 +929,7 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
     
-    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
+    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {// LINT -- Exporting non-public type through public API
         InetAddress aliceAddr = null;
         try {
             aliceAddr = InetAddress.getByAddress(alice.getIP());

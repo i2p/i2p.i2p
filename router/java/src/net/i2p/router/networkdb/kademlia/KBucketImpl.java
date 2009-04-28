@@ -26,7 +26,7 @@ import net.i2p.util.RandomSource;
 class KBucketImpl implements KBucket {
     private Log _log;
     /** set of Hash objects for the peers in the kbucket */
-    private List _entries;
+    private final List _entries;
     /** we center the kbucket set on the given hash, and derive distances from this */
     private Hash _local;
     /** include if any bits equal or higher to this bit (in big endian order) */
@@ -328,6 +328,7 @@ class KBucketImpl implements KBucket {
             return BigInteger.ZERO.setBit(_begin);
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("KBucketImpl: ");

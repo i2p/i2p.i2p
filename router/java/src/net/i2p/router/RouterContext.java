@@ -58,7 +58,7 @@ public class RouterContext extends I2PAppContext {
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
-    private RouterClock _clock;
+    private RouterClock _clockX;  // LINT field hides another field, hope rename won't break anything.
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
     private Calculator _capacityCalc;
@@ -262,6 +262,7 @@ public class RouterContext extends I2PAppContext {
     /** how do we rank the capacity of profiles? */
     public Calculator capacityCalculator() { return _capacityCalc; }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(512);
         buf.append("RouterContext: ").append(super.toString()).append('\n');
@@ -294,6 +295,7 @@ public class RouterContext extends I2PAppContext {
      * I2PAppContext says.
      *
      */
+    @Override
     public String getProperty(String propName) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -306,6 +308,7 @@ public class RouterContext extends I2PAppContext {
      * I2PAppContext says.
      *
      */
+    @Override
     public String getProperty(String propName, String defaultVal) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -317,6 +320,7 @@ public class RouterContext extends I2PAppContext {
     /**
      * Return an int with an int default
      */
+    @Override
     public int getProperty(String propName, int defaultVal) {
         if (_router != null) {
             String val = _router.getConfigSetting(propName);
@@ -339,14 +343,16 @@ public class RouterContext extends I2PAppContext {
      * that it triggers initializeClock() of which we definitely
      * need the local version to run.
      */
+    @Override
     public Clock clock() {
         if (!_clockInitialized) initializeClock();
-        return _clock;
+        return _clockX;
     }
+    @Override
     protected void initializeClock() {
         synchronized (this) {
-            if (_clock == null)
-                _clock = new RouterClock(this);
+            if (_clockX == null)
+                _clockX = new RouterClock(this);
             _clockInitialized = true;
         }
     }

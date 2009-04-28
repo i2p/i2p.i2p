@@ -25,7 +25,7 @@ public class IntroductionManager {
     /** map of relay tag to PeerState that should receive the introduction */
     private Map _outbound;
     /** list of peers (PeerState) who have given us introduction tags */
-    private List _inbound;
+    private final List _inbound;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -157,7 +157,7 @@ public class IntroductionManager {
         return found;
     }
     
-    public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
+    public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {// LINT -- Exporting non-public type through public API
         if (_context.router().isHidden())
             return;
         if (_log.shouldLog(Log.INFO))
@@ -166,7 +166,7 @@ public class IntroductionManager {
         _transport.send(_builder.buildHolePunch(reader));
     }
     
-    public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
+    public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {// LINT -- Exporting non-public type through public API
         if (_context.router().isHidden())
             return;
         long tag = reader.getRelayRequestReader().readTag();

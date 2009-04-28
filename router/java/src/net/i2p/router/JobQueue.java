@@ -33,7 +33,7 @@ public class JobQueue {
     private RouterContext _context;
     
     /** Integer (runnerId) to JobQueueRunner for created runners */
-    private HashMap _queueRunners;
+    private final HashMap _queueRunners;
     /** a counter to identify a job runner */
     private volatile static int _runnerId = 0;
     /** list of jobs that are ready to run ASAP */
@@ -41,7 +41,7 @@ public class JobQueue {
     /** list of jobs that are scheduled for running in the future */
     private ArrayList _timedJobs;
     /** job name to JobStat for that job */
-    private SortedMap _jobStats;
+    private final SortedMap _jobStats;
     /** how many job queue runners can go concurrently */
     private int _maxRunners = 1; 
     private QueuePumper _pumper;
@@ -50,7 +50,7 @@ public class JobQueue {
     /** have we been killed or are we alive? */
     private boolean _alive;
     
-    private Object _jobLock;
+    private final Object _jobLock;
     
     /** default max # job queue runners operating */
     private final static int DEFAULT_MAX_RUNNERS = 1;
@@ -94,7 +94,7 @@ public class JobQueue {
      * queue runners wait on this whenever they're not doing anything, and 
      * this gets notified *once* whenever there are ready jobs
      */
-    private Object _runnerLock = new Object();
+    private final Object _runnerLock = new Object();
     
     public JobQueue(RouterContext context) {
         _context = context;

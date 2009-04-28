@@ -3,10 +3,8 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 

@@ -23,7 +23,6 @@
  */
 package net.i2p.BOB;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;

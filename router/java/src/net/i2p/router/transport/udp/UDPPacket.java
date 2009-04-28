@@ -129,7 +129,7 @@ public class UDPPacket {
     int getFragmentCount() { return _fragmentCount; }
     void setFragmentCount(int count) { _fragmentCount = count; }
     
-    public RemoteHostId getRemoteHost() {
+    public RemoteHostId getRemoteHost() {// LINT -- Exporting non-public type through public API
         if (_remoteHost == null) {
             long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
@@ -238,6 +238,7 @@ public class UDPPacket {
     /** how many times we tried to validate the packet */
     int getValidateCount() { return _validateCount; }
     
+    @Override
     public String toString() {
         verifyNotReleased(); 
         StringBuffer buf = new StringBuffer(64);

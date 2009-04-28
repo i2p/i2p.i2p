@@ -74,9 +74,11 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             startup();
     }
     
+    @Override
     public boolean isAlive() { return _manager != null && _manager.isAlive(); }
 
     private static final long MAX_TIME_TO_REBUILD = 10*60*1000;
+    @Override
     public boolean verifyClientLiveliness() {
         if (_manager == null) return true;
         boolean lively = true;
@@ -167,6 +169,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
 
+    @Override
     public boolean shouldPublishLeaseSet(Hash destinationHash) { return _manager.shouldPublishLeaseSet(destinationHash); }
     
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {
@@ -196,6 +199,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
     
+    @Override
     public void renderStatusHTML(Writer out) throws IOException { 
         if (_manager != null)
             _manager.renderStatusHTML(out); 
@@ -206,6 +210,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      *
      * @return set of Destination objects
      */
+    @Override
     public Set listClients() {
         if (_manager != null)
             return _manager.listClients();

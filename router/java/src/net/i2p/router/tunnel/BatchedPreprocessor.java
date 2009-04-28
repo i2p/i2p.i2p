@@ -49,6 +49,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
     private static final int FORCE_BATCH_FLUSH = 50;
     
     /** how long do we want to wait before flushing */
+    @Override
     public long getDelayAmount() { return getDelayAmount(true); }
     private long getDelayAmount(boolean shouldStat) {
         long rv = -1;
@@ -62,6 +63,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         return rv;
     }
     
+    @Override
     public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
         StringBuffer timingBuf = null;
         if (_log.shouldLog(Log.DEBUG)) {

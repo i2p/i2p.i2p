@@ -133,7 +133,7 @@ public class MUXlisten implements Runnable {
 	 */
 	public void run() {
 		I2PServerSocket SS = null;
-		int ticks = 1200; // Allow 120 seconds, no more.
+		int ticks = 100; // Allow 10 seconds, no more.
 		try {
 			wlock();
 			try {
@@ -152,11 +152,11 @@ public class MUXlisten implements Runnable {
 		}
 //		socketManager.addDisconnectListener(new DisconnectListener());
 
-quit:
+		quit:
 		{
 			try {
 				tg = new ThreadGroup(N);
-die:
+				die:
 				{
 					// toss the connections to a new threads.
 					// will wrap with TCP and UDP when UDP works
@@ -255,7 +255,7 @@ die:
 					try {
 						session.destroySession();
 					} catch (I2PSessionException ex) {
-					// nop
+						// nop
 					}
 				}
 				try {
@@ -266,8 +266,8 @@ die:
 				// Wait for child threads and thread groups to die
 				// System.out.println("MUXlisten: waiting for children");
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
+					tg.interrupt(); // give my stuff a small smack.
 					while ((tg.activeCount() + tg.activeGroupCount() != 0) && ticks != 0) {
-						tg.interrupt(); // unwedge any blocking threads.
 						ticks--;
 						try {
 							Thread.sleep(100); //sleep for 100 ms (One tenth second)
@@ -288,58 +288,6 @@ die:
 			}
 		} // quit
 
-		// This is here to catch when something fucks up REALLY bad.
-		if (tg != null) {
-			if (SS != null) {
-				try {
-					SS.close();
-				} catch (I2PException ex) {
-					//Logger.getLogger(MUXlisten.class.getName()).log(Level.SEVERE, null, ex);
-				}
-			}
-			if (this.come_in) {
-				try {
-					listener.close();
-				} catch (IOException e) {
-				}
-			}
-			try {
-				socketManager.destroySocketManager();
-			} catch (Exception e) {
-				// nop
-			}
-			ticks = 600; // 60 seconds
-			if (tg.activeCount() + tg.activeGroupCount() != 0) {
-				while ((tg.activeCount() + tg.activeGroupCount() != 0) && ticks != 0) {
-					tg.interrupt(); // unwedge any blocking threads.
-					ticks--;
-					try {
-						Thread.sleep(100); //sleep for 100 ms (One tenth second)
-					} catch (InterruptedException ex) {
-						// nop
-					}
-				}
-			}
-			if (tg.activeCount() + tg.activeGroupCount() == 0) {
-				tg.destroy();
-				// Zap reference to the ThreadGroup so the JVM can GC it.
-				tg = null;
-			} else {
-				System.out.println("BOB: MUXlisten: Can't kill threads. Please send the following dump to sponge@mail.i2p");
-				System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN");
-				visit(tg, 0);
-				System.out.println("BOB: MUXlisten: ThreadGroup dump END\n\n");
-			}
-		}
-
-		// This is here to catch when something fucks up REALLY bad.
-//		if (tg != null) {
-//			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
-//			System.out.println("BOB: MUXlisten: Please email the following dump to sponge@mail.i2p");
-//			WrapperManager.requestThreadDump();
-//			System.out.println("BOB: MUXlisten: Something fucked up REALLY bad!");
-//			System.out.println("BOB: MUXlisten: Please email the above dump to sponge@mail.i2p");
-//		}
 		// zero out everything.
 		try {
 			wlock();
@@ -355,11 +303,101 @@ die:
 		} catch (Exception e) {
 		}
 
+		// This is here to catch when something fucks up REALLY bad, like those annoying stuck threads!
+		if (tg != null) {
+			tg.interrupt(); // give my stuff a small smack again.
+			if (SS != null) {
+				try {
+					SS.close();
+				} catch (I2PException ex) {
+					//Logger.getLogger(MUXlisten.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+			if (this.come_in) {
+				try {
+					listener.close();
+				} catch (IOException e) {
+				}
+			}
+			I2PSession session = socketManager.getSession();
+			if (session != null) {
+				// System.out.println("I2Plistener: destroySession");
+				try {
+					session.destroySession();
+				} catch (I2PSessionException ex) {
+					// nop
+					}
+			}
+			try {
+				socketManager.destroySocketManager();
+			} catch (Exception e) {
+				// nop
+			}
+			// ticks = 100; // 10 seconds
+			if (tg.activeCount() + tg.activeGroupCount() != 0) {
+				int foo = tg.activeCount() + tg.activeGroupCount();
+				int bar = foo;
+				String boner = tg.getName();
+				System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
+				System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+				visit(tg, 0, boner);
+				System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n\n");
+				// Happily spin forever :-(
+				while ((tg.activeCount() + tg.activeGroupCount() != 0)) {
+					foo = tg.activeCount() + tg.activeGroupCount();
+					if (foo != bar) {
+						System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+						visit(tg, 0, boner);
+						System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n\n");
+					}
+					bar = foo;
+					try {
+						session = socketManager.getSession();
+						if (session != null) {
+							// System.out.println("I2Plistener: destroySession");
+							try {
+								session.destroySession();
+							} catch (I2PSessionException ex) {
+								// nop
+							}
+						}
+						try {
+							socketManager.destroySocketManager();
+						} catch (Exception e) {
+							// nop
+						}
+					} catch (Exception e) {
+						// nop
+					}
+					// tg.interrupt(); // unwedge any blocking threads.
+					// ticks--;
+					try {
+						Thread.sleep(100); //sleep for 100 ms (One tenth second)
+					} catch (InterruptedException ex) {
+						// nop
+					}
+				}
+				System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
+			}
+//			if (tg.activeCount() + tg.activeGroupCount() == 0) {
+			tg.destroy();
+			// Zap reference to the ThreadGroup so the JVM can GC it.
+			tg = null;
+//			} else {
+//				System.out.println("BOB: MUXlisten: Forcibly killing threads.");
+//				System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN");
+//				visit(tg, 0);
+//				System.out.println("BOB: MUXlisten: ThreadGroup dump END\n\n");
+//				nuke(tg,0);
+//				tg.destroy();
+//				// Zap reference to the ThreadGroup so the JVM can GC it.
+//				tg = null;
+//			}
+		}
 	}
 
 
 	// Debugging...
-
 	/** 
 	 *	Find the root thread group and print them all.
 	 *
@@ -371,7 +409,7 @@ die:
 		}
 
 		// Visit each thread group
-		visit(root, 0);
+		visit(root, 0, root.getName());
 	}
 
 	/**
@@ -379,7 +417,7 @@ die:
 	 * @param group ThreadGroup to visit
 	 * @param level Current level
 	 */
-	private static void visit(ThreadGroup group, int level) {
+	private static void visit(ThreadGroup group, int level, String tn) {
 		// Get threads in `group'
 		int numThreads = group.activeCount();
 		Thread[] threads = new Thread[numThreads * 2];
@@ -389,7 +427,7 @@ die:
 		for (int i = 0; i < numThreads; i++) {
 			// Get thread
 			Thread thread = threads[i];
-			System.out.println("BOB: MUXlisten: " + indent + thread.toString());
+			System.out.println("BOB: MUXlisten: " + tn + ": " + indent + thread.toString());
 		}
 
 		// Get thread subgroups of `group'
@@ -399,7 +437,43 @@ die:
 
 		// Recursively visit each subgroup
 		for (int i = 0; i < numGroups; i++) {
-			visit(groups[i], level + 1);
+			visit(groups[i], level + 1, groups[i].getName());
+		}
+	}
+
+	private static void nuke(ThreadGroup group, int level) {
+		// Get threads in `group'
+		int numThreads = group.activeCount();
+		Thread[] threads = new Thread[numThreads * 2];
+		numThreads = group.enumerate(threads, false);
+		// Enumerate each thread in `group' and stop it.
+		for (int i = 0; i < numThreads; i++) {
+			// Get thread
+			Thread thread = threads[i];
+			try {
+				if (thread.isAlive()) {
+					thread.stop();
+				}
+			} catch (SecurityException se) {
+				//nop
+			}
+		}
+
+		// Get thread subgroups of `group'
+		int numGroups = group.activeGroupCount();
+		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+		numGroups = group.enumerate(groups, false);
+
+		// Recursively visit each subgroup
+		for (int i = 0; i < numGroups; i++) {
+			nuke(groups[i], level + 1);
+		}
+		try {
+			group.destroy();
+		} catch (IllegalThreadStateException IE) {
+			//nop
+		} catch (SecurityException se) {
+			//nop
 		}
 	}
 }

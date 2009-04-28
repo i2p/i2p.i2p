@@ -46,7 +46,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
               notifyThis, 
               "IRCHandler " + (++__clientId), tunnel, pkf);
         
-        StringTokenizer tok = new StringTokenizer(destinations, ",");
+        StringTokenizer tok = new StringTokenizer(destinations, ", ");
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();

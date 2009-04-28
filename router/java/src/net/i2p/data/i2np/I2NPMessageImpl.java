@@ -187,6 +187,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             return calculateWrittenLength()+5;
     }
     
+    @Override
     public byte[] toByteArray() {
         byte data[] = new byte[getMessageSize()];
         int written = toByteArray(data);

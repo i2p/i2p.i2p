@@ -30,6 +30,37 @@ import net.i2p.util.Log;
  *
  */
 public class GarlicMessageBuilder {
+
+    /**
+     *  This was 100 since 0.6.1.10 (50 before that). It's important because:
+     *  - Tags are 32 bytes. So it previously added 3200 bytes to an initial message.
+     *  - Too many tags adds a huge overhead to short-duration connections
+     *    (like http, datagrams, etc.)
+     *  - Large messages have a much higher chance of being dropped due to
+     *    one of their 1KB fragments being discarded by a tunnel participant.
+     *  - This reduces the effective maximum datagram size because the client
+     *    doesn't know when tags will be bundled, so the tag size must be
+     *    subtracted from the maximum I2NP size or transport limit.
+     *
+     *  Issues with too small a value:
+     *  - When tags are sent, a reply leaseset (~1KB) is always bundled.
+     *    Maybe don't need to bundle more than every minute or so
+     *    rather than every time?
+     *  - Does the number of tags (and the threshold of 20) limit the effective
+     *    streaming lib window size? Should the threshold and the number of
+     *    sent tags be variable based on the message rate?
+     *
+     *  We have to be very careful if we implement an adaptive scheme,
+     *  since the key manager is per-router, not per-local-dest.
+     *  Or maybe that's a bad idea, and we need to move to a per-dest manager.
+     *  This needs further investigation.
+     *
+     *  So a value somewhat higher than the low threshold
+     *  seems appropriate.
+     */
+    private static final int DEFAULT_TAGS = 40;
+    private static final int LOW_THRESHOLD = 20;
+
     public static int estimateAvailableTags(RouterContext ctx, PublicKey key) {
         SessionKey curKey = ctx.sessionKeyManager().getCurrentKey(key);
         if (curKey == null)
@@ -41,7 +72,7 @@ public class GarlicMessageBuilder {
         return buildMessage(ctx, config, new SessionKey(), new HashSet());
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, 100);
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, DEFAULT_TAGS);
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver) {
         return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, false);
@@ -74,13 +105,13 @@ public class GarlicMessageBuilder {
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Available tags for encryption to " + key + ": " + availTags);
 
-            if (availTags < 20) { // arbitrary threshold
+            if (availTags < LOW_THRESHOLD) { // arbitrary threshold
                 for (int i = 0; i < numTagsToDeliver; i++)
                     wrappedTags.add(new SessionTag(true));
                 if (log.shouldLog(Log.INFO))
-                    log.info("Less than 20 tags are available (" + availTags + "), so we're including more");
+                    log.info("Too few are available (" + availTags + "), so we're including more");
             } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 60*1000) {
-                // if we have > 20 tags, but they expire in under 30 seconds, we want more
+                // if we have enough tags, but they expire in under 30 seconds, we want more
                 for (int i = 0; i < numTagsToDeliver; i++)
                     wrappedTags.add(new SessionTag(true));
                 if (log.shouldLog(Log.INFO))

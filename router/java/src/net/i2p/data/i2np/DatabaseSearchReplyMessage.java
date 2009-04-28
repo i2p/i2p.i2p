@@ -110,6 +110,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DatabaseSearchReplyMessage) ) {
             DatabaseSearchReplyMessage msg = (DatabaseSearchReplyMessage)object;
@@ -121,12 +122,14 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getSearchKey()) +
         DataHelper.hashCode(getFromHash()) +
         DataHelper.hashCode(_peerHashes);
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DatabaseSearchReplyMessage: ");

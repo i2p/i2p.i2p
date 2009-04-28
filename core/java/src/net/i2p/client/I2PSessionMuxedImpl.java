@@ -4,18 +4,16 @@ package net.i2p.client;
  * public domain
  */
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
-import net.i2p.data.SessionTag;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -97,6 +95,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      *         255 disallowed
      *  @param port 1-65535 or PORT_ANY for all
      */
+    @Override
     public void addSessionListener(I2PSessionListener lsnr, int proto, int port) {
         _demultiplexer.addListener(lsnr, proto, port);
     }
@@ -107,11 +106,13 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      *  @param proto 1-254 or 0 for all; 255 disallowed
      *  @param port 1-65535 or 0 for all
      */
+    @Override
     public void addMuxedSessionListener(I2PSessionMuxedListener l, int proto, int port) {
         _demultiplexer.addMuxedListener(l, proto, port);
     }
 
     /** removes the specified listener (only) */
+    @Override
     public void removeListener(int proto, int port) {
         _demultiplexer.removeListener(proto, port);
     }
@@ -149,6 +150,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      *  @param fromPort 1-65535 or 0 for unset
      *  @param toPort 1-65535 or 0 for unset
      */
+    @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                SessionKey keyUsed, Set tagsSent, long expires,
                                int proto, int fromPort, int toPort)
@@ -198,24 +200,36 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {
         private LinkedBlockingQueue<MsgData> _msgs;
-        private boolean _alive;
+        private AtomicBoolean _alive = new AtomicBoolean(false);
         private static final int POISON_SIZE = -99999;
  
         public MuxedAvailabilityNotifier() {
             _msgs = new LinkedBlockingQueue();
         }
-        
-        public void stopNotifying() { 
-            _msgs.clear(); 
-            if (_alive) {
-                _alive = false; 
-                try {
-                    _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
-                } catch (InterruptedException ie) {}
+
+        @Override
+        public void stopNotifying() {
+            boolean again = true;
+            _msgs.clear();
+            // Thread.yield();
+            if (_alive.get()) {
+                // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
+                while(again) {
+                    _msgs.clear();
+                    try {
+                        _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
+                        again = false;
+                        // System.out.println("I2PSessionMuxedImpl.stopNotifying() success.");
+                    } catch (InterruptedException ie) {
+                        continue;
+                    }
+                }
             }
+            _alive.set(false);
         }
         
         /** unused */
+        @Override
         public void available(long msgId, int size) { throw new IllegalArgumentException("no"); }
 
         public void available(long msgId, int size, int proto, int fromPort, int toPort) {
@@ -224,20 +238,24 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
             } catch (InterruptedException ie) {}
         }
 
+        @Override
         public void run() {
-            _alive = true;
-            while (true) {
-                MsgData msg;
+            MsgData msg;
+            _alive.set(true);
+            while (_alive.get()) {
                 try {
                     msg = _msgs.take();
                 } catch (InterruptedException ie) {
+                    _log.debug("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive.toString());
                     continue;
                 }
-                if (msg.size == POISON_SIZE)
+                if (msg.size == POISON_SIZE) {
+                    // System.out.println("I2PSessionMuxedImpl.run() POISONED");
                     break;
+                }
                 try {
-                    _demultiplexer.messageAvailable(I2PSessionMuxedImpl.this, msg.id,
-                                                    msg.size, msg.proto, msg.fromPort, msg.toPort);
+                    _demultiplexer.messageAvailable(I2PSessionMuxedImpl.this,
+                        msg.id, msg.size, msg.proto, msg.fromPort, msg.toPort);
                 } catch (Exception e) {
                     _log.error("Error notifying app of message availability");
                 }

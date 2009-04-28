@@ -8,7 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.io.Writer;
 import java.util.List;
 
 import net.i2p.data.Hash;

@@ -2,7 +2,6 @@ package net.i2p.router.networkdb.kademlia;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.TunnelInfo;
@@ -23,8 +22,11 @@ class SingleSearchJob extends FloodOnlySearchJob {
         super(ctx, null, key, null, null, 5*1000, false);
         _to = to;
     }
+    @Override
     public String getName() { return "NetDb search key from DSRM"; }
+    @Override
     public boolean shouldProcessDSRM() { return false; } // don't loop
+    @Override
     public void runJob() {
         _onm = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
         DatabaseLookupMessage dlm = new DatabaseLookupMessage(getContext(), true);
@@ -44,8 +46,10 @@ class SingleSearchJob extends FloodOnlySearchJob {
         getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), _to);
         _lookupsRemaining = 1;
     }
+    @Override
     void failed() {
         getContext().messageRegistry().unregisterPending(_onm);
     }
+    @Override
     void success() {}
 }

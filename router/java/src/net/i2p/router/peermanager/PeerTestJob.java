@@ -50,7 +50,7 @@ public class PeerTestJob extends JobImpl {
     /** number of peers to test each round */
     private int getTestConcurrency() { return 1; }
     
-    public void startTesting(PeerManager manager) { 
+    public void startTesting(PeerManager manager) { // LINT -- Exporting non-public type through public API
         _manager = manager;
         _keepTesting = true;
         getContext().jobQueue().addJob(this); 
@@ -222,6 +222,7 @@ public class PeerTestJob extends JobImpl {
             return false;
         }
         public boolean matchFound() { return _matchFound; }
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer(64);
             buf.append("Test peer ").append(_peer.toBase64().substring(0,4));

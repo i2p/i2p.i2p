@@ -350,6 +350,7 @@ public class DeliveryInstructions extends DataStructureImpl {
                + getAdditionalInfoSize();
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof DeliveryInstructions))
             return false;
@@ -364,6 +365,7 @@ public class DeliveryInstructions extends DataStructureImpl {
                DataHelper.eq(getTunnelId(), instr.getTunnelId());
     }
     
+    @Override
     public int hashCode() {
         return (int)getDelaySeconds() +
                     getDeliveryMode() +
@@ -373,6 +375,7 @@ public class DeliveryInstructions extends DataStructureImpl {
                     DataHelper.hashCode(getTunnelId());
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[DeliveryInstructions: ");

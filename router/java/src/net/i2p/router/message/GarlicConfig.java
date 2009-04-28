@@ -156,6 +156,7 @@ public class GarlicConfig {
     
     protected String getSubData() { return ""; }
     private final static String NL = System.getProperty("line.separator");
+    @Override
     public String toString() {
 	StringBuffer buf = new StringBuffer();
 	buf.append("<garlicConfig>").append(NL);

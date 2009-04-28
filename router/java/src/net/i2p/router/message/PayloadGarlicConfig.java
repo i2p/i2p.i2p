@@ -33,6 +33,7 @@ public class PayloadGarlicConfig extends GarlicConfig {
     }
     public I2NPMessage getPayload() { return _payload; }
  
+    @Override
     protected String getSubData() { 
 	StringBuffer buf = new StringBuffer();
 	buf.append("<payloadMessage>").append(_payload).append("</payloadMessage>");

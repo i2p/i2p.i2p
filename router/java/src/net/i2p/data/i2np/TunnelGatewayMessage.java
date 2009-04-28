@@ -90,6 +90,7 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
         I2NPMessageHandler h = new I2NPMessageHandler(_context);
         readMessage(data, offset, dataSize, type, h);
     }
+    @Override
     public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
@@ -110,11 +111,13 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
     
     public int getType() { return MESSAGE_TYPE; }
     
+    @Override
     public int hashCode() {
         return DataHelper.hashCode(getTunnelId()) +
                DataHelper.hashCode(_msg);
     }
     
+    @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelGatewayMessage) ) {
             TunnelGatewayMessage msg = (TunnelGatewayMessage)object;
@@ -126,6 +129,7 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
         }
     }
     
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[TunnelGatewayMessage:");

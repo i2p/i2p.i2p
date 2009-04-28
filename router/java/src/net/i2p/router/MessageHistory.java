@@ -26,7 +26,7 @@ import net.i2p.util.Log;
 public class MessageHistory {
     private Log _log;
     private RouterContext _context;
-    private List _unwrittenEntries; // list of raw entries (strings) yet to be written
+    private final List _unwrittenEntries = new ArrayList(64); // list of raw entries (strings) yet to be written
     private String _historyFile; // where to write 
     private String _localIdent; // placed in each entry to uniquely identify the local router
     private boolean _doLog; // true == we want to log
@@ -104,7 +104,7 @@ public class MessageHistory {
             _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
             _historyFile = filename;
             _localIdent = getName(_context.routerHash());
-            _unwrittenEntries = new ArrayList(64);
+            // _unwrittenEntries = new ArrayList(64);
             updateSettings();
             // clear the history file on startup
             if (_firstPass) {

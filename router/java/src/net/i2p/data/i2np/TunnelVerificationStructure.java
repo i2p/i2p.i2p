@@ -69,6 +69,7 @@ public class TunnelVerificationStructure extends DataStructureImpl {
         _authSignature.writeBytes(out);
     }
     
+    @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelVerificationStructure))
             return false;
@@ -77,11 +78,13 @@ public class TunnelVerificationStructure extends DataStructureImpl {
         DataHelper.eq(getAuthorizationSignature(), str.getAuthorizationSignature());
     }
     
+    @Override
     public int hashCode() {
         if ( (_msgHash == null) || (_authSignature == null) ) return 0;
         return getMessageHash().hashCode() + getAuthorizationSignature().hashCode();
     }
     
+    @Override
     public String toString() {
         return "[TunnelVerificationStructure: " + getMessageHash() + " " + getAuthorizationSignature() + "]";
     }

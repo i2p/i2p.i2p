@@ -11,7 +11,6 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.List;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.router.RouterContext;
@@ -41,11 +40,11 @@ class ExploreJob extends SearchJob {
     /** only send the closest "dont tell me about" refs...
      *  Override to make this bigger because we want to include both the
      *  floodfills and the previously-queried peers */
-    static final int MAX_CLOSEST = 20;
+    static final int MAX_CLOSEST = 20; // LINT -- field hides another field, this isn't an override.
     
     /** Override to make this shorter, since we don't sort out the
      *  unresponsive ff peers like we do in FloodOnlySearchJob */
-    static final int PER_FLOODFILL_PEER_TIMEOUT = 5*1000;
+    static final int PER_FLOODFILL_PEER_TIMEOUT = 5*1000; // LINT -- field hides another field, this isn't an override.
 
     /**
      * Create a new search for the routingKey specified
@@ -78,6 +77,7 @@ class ExploreJob extends SearchJob {
      * @param replyGateway gateway for the reply tunnel
      * @param expiration when the search should stop
      */
+    @Override
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
@@ -112,11 +112,13 @@ class ExploreJob extends SearchJob {
      * replies sent back to us directly).  This uses the similar overrides as the other buildMessage above.
      *
      */
+    @Override
     protected DatabaseLookupMessage buildMessage(long expiration) {
         return buildMessage(null, getContext().router().getRouterInfo().getIdentity().getHash(), expiration);
     }
     
     /** max # of concurrent searches */
+    @Override
     protected int getBredth() { return EXPLORE_BREDTH; }
     
     
@@ -125,6 +127,7 @@ class ExploreJob extends SearchJob {
      * number of peers that we didn't know about before.
      *
      */
+    @Override
     protected void newPeersFound(int numNewPeers) {
         // who cares about how many new peers.  well, maybe we do.  but for now,
         // we'll do the simplest thing that could possibly work.
@@ -139,5 +142,6 @@ class ExploreJob extends SearchJob {
      *
      */
     
+    @Override
     public String getName() { return "Kademlia NetDb Explore"; }
 }
