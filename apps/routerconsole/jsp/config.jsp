@@ -104,6 +104,11 @@
     in your NAT or firewall for unsolicited TCP connections.  If you specify the wrong IP address or
     hostname, or do not properly configure your NAT or firewall, your network performance will degrade
     substantially.  When in doubt, leave the hostname and port number blank.</p>
+ <p>
+ <b>UPnP Configuration:</b><br />
+ Open firewall port using UPnP:
+    <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> /><br />
+ </p>
  <p><b>Note: changing any of these settings will terminate all of your connections and effectively
     restart your router.</b>
  </p>

@@ -109,6 +109,13 @@ public class ConfigNetHelper extends HelperBase {
             return "";
     }
 
+    public String getUpnpChecked() {
+        if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)).booleanValue())
+            return " checked ";
+        else
+            return "";
+    }
+
     public String getRequireIntroductionsChecked() {
         short status = _context.commSystem().getReachabilityStatus();
         switch (status) {

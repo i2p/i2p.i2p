@@ -4,6 +4,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
+import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
 import net.i2p.time.Timestamper;
@@ -28,6 +29,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _udpPort;
     private boolean _ntcpAutoIP;
     private boolean _ntcpAutoPort;
+    private boolean _upnp;
     private String _inboundRate;
     private String _inboundBurstRate;
     private String _inboundBurst;
@@ -37,7 +39,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _reseedFrom;
     private boolean _enableLoadTesting;
     private String _sharePct;
-    private boolean _ratesOnly;
+    private boolean _ratesOnly; // always false
     
     protected void processForm() {
         if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
@@ -55,10 +57,10 @@ public class ConfigNetHandler extends FormHandler {
     public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
     public void setHiddenMode(String moo) { _hiddenMode = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
-    public void setUpdateratesonly(String moo) { _ratesOnly = true; }
     public void setEnableloadtesting(String moo) { _enableLoadTesting = true; }
     public void setNtcpAutoIP(String moo) { _ntcpAutoIP = true; }
     public void setNtcpAutoPort(String moo) { _ntcpAutoPort = true; }
+    public void setUpnp(String moo) { _upnp = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -194,11 +196,16 @@ public class ConfigNetHandler extends FormHandler {
                 hiddenSwitch();
             }
 
-            if (_dynamicKeys) {
-                _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "true");
-            } else {
-                _context.router().removeConfigSetting(Router.PROP_DYNAMIC_KEYS);
+            _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
+
+            if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)).booleanValue() !=
+                _upnp) {
+                if (_upnp)
+                    addFormNotice("Enabling UPnP, restart required to take effect");
+                else
+                    addFormNotice("Disabling UPnP, restart required to take effect");
             }
+            _context.router().setConfigSetting(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
 
             if (_requireIntroductions) {
                 _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
@@ -207,12 +214,8 @@ public class ConfigNetHandler extends FormHandler {
                 _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
             }
 
-            if (true || _timeSyncEnabled) {
-                // Time sync enable, means NOT disabled 
-                _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
-            } else {
-                _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "true");
-            }
+            // Time sync enable, means NOT disabled 
+            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
             
             LoadTestManager.setEnableLoadTesting(_context, _enableLoadTesting);
         }

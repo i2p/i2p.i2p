@@ -41,6 +41,7 @@ public class TransportManager implements TransportEventListener {
     private final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     private final static String DEFAULT_ENABLE_NTCP = "true";
     private final static String DEFAULT_ENABLE_UDP = "true";
+    public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
     
     public TransportManager(RouterContext context) {
         _context = context;
@@ -52,7 +53,8 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ArrayList();
-        _upnpManager = new UPnPManager(context);
+        if (Boolean.valueOf(_context.getProperty(PROP_ENABLE_UPNP)).booleanValue())
+            _upnpManager = new UPnPManager(context);
     }
     
     public void addTransport(Transport transport) {
@@ -93,7 +95,8 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void startListening() {
-        _upnpManager.start();
+        if (_upnpManager != null)
+            _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");
         for (int i = 0; i < _transports.size(); i++) {
@@ -112,7 +115,8 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void stopListening() {
-        _upnpManager.stop();
+        if (_upnpManager != null)
+            _upnpManager.stop();
         for (int i = 0; i < _transports.size(); i++) {
             ((Transport)_transports.get(i)).stopListening();
         }
@@ -359,7 +363,8 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void transportAddressChanged() {
-        _upnpManager.update(getAddresses());
+        if (_upnpManager != null)
+            _upnpManager.update(getAddresses());
     }
 
     public List getMostRecentErrorMessages() { 
@@ -392,7 +397,8 @@ public class TransportManager implements TransportEventListener {
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
-        out.write(_upnpManager.renderStatusHTML());
+        if (_upnpManager != null)
+            out.write(_upnpManager.renderStatusHTML());
         buf.append("</p>\n");
         out.flush();
     }
