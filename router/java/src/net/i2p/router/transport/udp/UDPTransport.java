@@ -99,6 +99,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
+    public static final int DEFAULT_INTERNAL_PORT = 8887;
 
     /** define this to explicitly set an external IP address */
     public static final String PROP_EXTERNAL_HOST = "i2np.udp.host";
@@ -215,20 +216,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int port = -1;
         if (_externalListenPort <= 0) {
             // no explicit external port, so lets try an internal one
-            String portStr = _context.getProperty(PROP_INTERNAL_PORT);
-            if (portStr != null) {
-                try {
-                    port = Integer.parseInt(portStr);
-                } catch (NumberFormatException nfe) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Invalid port specified [" + portStr + "]");
-                }
-            }
+            port = _context.getProperty(PROP_INTERNAL_PORT, DEFAULT_INTERNAL_PORT);
             if (port <= 0) {
-                port = 8887;
+                port = DEFAULT_INTERNAL_PORT;
                 //port = 1024 + _context.random().nextInt(31*1024);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Selecting an arbitrary port to bind to: " + port);
+                //if (_log.shouldLog(Log.INFO))
+                //    _log.info("Selecting an arbitrary port to bind to: " + port);
                 _context.router().setConfigSetting(PROP_INTERNAL_PORT, port+"");
             }
             // attempt to use it as our external port - this will be overridden by
@@ -1013,14 +1006,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
-        String port = _context.getProperty(PROP_EXTERNAL_PORT);
-        if (port != null) { 
-            try {
-                _externalListenPort = Integer.parseInt(port);    
-            } catch (NumberFormatException nfe) {
-                _externalListenPort = -1;
-            }
-        }
+        _externalListenPort = _context.getProperty(PROP_EXTERNAL_PORT, -1);
         
         if (explicitAddressSpecified()) {
             try {

@@ -67,8 +67,11 @@
  <a href="oldstats.jsp#test.rtt">test.rtt</a> and related stats.</p>
  <hr />
 -->
- <b>External UDP address:</b> <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
- <b>Require SSU introductions? </b>
+ <b>UDP Configuration:</b><br />
+ Internal UDP port:
+ <input name ="udpPort" type="text" size="6" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
+ External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
+ Require SSU introductions?
 <input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> /><br />
  <p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
     you on your external UDP address.  If you can't, I2P now includes supports UDP hole punching

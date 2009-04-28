@@ -157,12 +157,9 @@ public class ConfigNetHandler extends FormHandler {
             }
 
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
-                String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT);
-                if ( (oldPort == null) && (_udpPort.equals("8887")) ) {
-                    // still on default.. noop
-                } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_udpPort)) ) {
-                    // its not the default OR it has changed
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT, _udpPort);
+                String oldPort = "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
+                if (!oldPort.equals(_udpPort)) {
+                    _context.router().setConfigSetting(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
                     addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
                     restartRequired = true;
                 }
@@ -229,9 +226,14 @@ public class ConfigNetHandler extends FormHandler {
         }
         
         if (restartRequired) {
-            addFormNotice("Performing a soft restart");
-            _context.router().restart();
-            addFormNotice("Soft restart complete");
+            //addFormNotice("Performing a soft restart");
+            //_context.router().restart();
+            //addFormNotice("Soft restart complete");
+            // Most of the time we aren't changing addresses, just enabling or disabling
+            // things, so let's try just a new routerInfo and see how that works.
+            // Maybe we should restart if we change addresses though?
+            _context.router().rebuildRouterInfo();
+            addFormNotice("Router Info rebuilt");
         }
     }
 

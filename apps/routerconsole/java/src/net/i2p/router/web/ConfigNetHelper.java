@@ -14,8 +14,6 @@ public class ConfigNetHelper extends HelperBase {
     public ConfigNetHelper() {}
     
     /** copied from various private components */
-    public final static String PROP_I2NP_UDP_PORT = "i2np.udp.port";
-    public final static String PROP_I2NP_INTERNAL_UDP_PORT = "i2np.udp.internalPort";
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
@@ -61,6 +59,10 @@ public class ConfigNetHelper extends HelperBase {
         if (ua.getPort() <= 0)
             return "unknown";
         return "" + ua.getPort();
+    }
+
+    public String getConfiguredUdpPort() {
+        return "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
     }
 
     public String getEnableTimeSyncChecked() {
