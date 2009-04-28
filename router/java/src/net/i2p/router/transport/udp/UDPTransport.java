@@ -589,12 +589,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return true;
     }
     
-    @Override
+/*** infinite loop
     public RouterAddress getCurrentAddress() {
         if (needsRebuild())
             rebuildExternalAddress(false);
         return super.getCurrentAddress();
     }
+***/
     
     @Override
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
@@ -999,6 +1000,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public void stopListening() {
         shutdown();
+        // will this work?
+        _externalAddress = null;
+        replaceAddress(null);
     }
     
     private boolean explicitAddressSpecified() {

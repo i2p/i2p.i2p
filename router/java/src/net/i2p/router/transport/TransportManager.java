@@ -35,6 +35,7 @@ public class TransportManager implements TransportEventListener {
     private Log _log;
     private List<Transport> _transports;
     private RouterContext _context;
+    private UPnPManager _upnpManager;
 
     private final static String PROP_ENABLE_UDP = "i2np.udp.enable";
     private final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
@@ -51,6 +52,7 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ArrayList();
+        _upnpManager = new UPnPManager(context);
     }
     
     public void addTransport(Transport transport) {
@@ -91,6 +93,7 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void startListening() {
+        _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");
         for (int i = 0; i < _transports.size(); i++) {
@@ -109,6 +112,7 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void stopListening() {
+        _upnpManager.stop();
         for (int i = 0; i < _transports.size(); i++) {
             ((Transport)_transports.get(i)).stopListening();
         }
@@ -354,6 +358,10 @@ public class TransportManager implements TransportEventListener {
         }
     }
     
+    public void transportAddressChanged() {
+        _upnpManager.update(getAddresses());
+    }
+
     public List getMostRecentErrorMessages() { 
         List rv = new ArrayList(16);
         for (int i = 0; i < _transports.size(); i++) {
@@ -374,7 +382,7 @@ public class TransportManager implements TransportEventListener {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         StringBuffer buf = new StringBuffer(4*1024);
-        buf.append("Listening on: <br /><pre>\n");
+        buf.append("<p><b>Router Transport Addresses:</b><br /><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             if (t.getCurrentAddress() != null)
@@ -384,6 +392,8 @@ public class TransportManager implements TransportEventListener {
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
+        out.write(_upnpManager.renderStatusHTML());
+        buf.append("</p>\n");
         out.flush();
     }
 }

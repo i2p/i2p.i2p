@@ -1,0 +1,415 @@
+/******************************************************************
+*
+*	CyberXML for Java
+*
+*	Copyright (C) Satoshi Konno 2002
+*
+*	File: Element.java
+*
+*	Revision;
+*
+*	11/27/02
+*		- first revision.
+*	11/01/03
+*		- Terje Bakken
+*		- fixed missing escaping of reserved XML characters
+*	11/19/04
+*		- Theo Beisch <theo.beisch@gmx.de>
+*		- Added "&" and "\"" "\\" to toXMLString().
+*	11/19/04
+*		- Theo Beisch <theo.beisch@gmx.de>
+*		- Changed XML::output() to use short notation when the tag value is null.
+*	12/02/04
+*		- Brian Owens <brian@b-owens.com>
+*		- Fixed toXMLString() to convert from "'" to "&apos;" instead of "\".
+*
+******************************************************************/
+
+package org.cybergarage.xml;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+
+public class Node
+{
+
+	public Node()
+	{
+		setUserData(null);
+		setParentNode(null);
+	}
+
+	public Node(String name)
+	{
+		this();
+		setName(name);
+	}
+
+	public Node(String ns, String name)
+	{
+		this();
+		setName(ns, name);
+	}
+
+	////////////////////////////////////////////////
+	//	parent node
+	////////////////////////////////////////////////
+
+	private Node parentNode = null;
+	
+	public void setParentNode(Node node)
+	{
+		parentNode = node;
+	}
+
+	public Node getParentNode()
+	{
+		return parentNode;
+	}
+
+	////////////////////////////////////////////////
+	//	root node
+	////////////////////////////////////////////////
+
+	public Node getRootNode()
+	{
+		Node rootNode = null;
+		Node parentNode = getParentNode();
+		while (parentNode != null) {
+			 rootNode = parentNode;
+			 parentNode = rootNode.getParentNode();
+		}
+		return rootNode;
+	}
+
+	////////////////////////////////////////////////
+	//	name
+	////////////////////////////////////////////////
+
+	private String name = new String();
+	
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public void setName(String ns, String name)
+	{
+		this.name = ns + ":" + name;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public boolean isName(String value)
+	{
+		return name.equals(value);
+	}
+	
+	////////////////////////////////////////////////
+	//	value
+	////////////////////////////////////////////////
+
+	private String value = "";
+	
+	public void setValue(String value)
+	{
+		this.value = value;
+	}
+
+	public void setValue(int value)
+	{
+		setValue(Integer.toString(value));
+	}
+
+	public String getValue()
+	{
+		return value;
+	}
+
+	////////////////////////////////////////////////
+	//	Attribute (Basic)
+	////////////////////////////////////////////////
+
+	private AttributeList attrList = new AttributeList();
+
+	public int getNAttributes() {
+		return attrList.size();
+	}
+
+	public Attribute getAttribute(int index) {
+		return attrList.getAttribute(index);
+	}
+
+	public Attribute getAttribute(String name)
+	{
+		return attrList.getAttribute(name);
+	}
+
+	public void addAttribute(Attribute attr) {
+		attrList.add(attr);
+	}
+
+	public void insertAttributeAt(Attribute attr, int index) {
+		attrList.insertElementAt(attr, index);
+	}
+
+	public void addAttribute(String name, String value) {
+		Attribute attr = new Attribute(name, value);
+		addAttribute(attr);
+	}
+
+	public boolean removeAttribute(Attribute attr) {
+		return attrList.remove(attr);
+	}
+
+	public boolean removeAttribute(String name) {
+		return removeAttribute(getAttribute(name));
+	}
+
+	public boolean hasAttributes()
+	{
+		if (0 < getNAttributes())
+			return true;
+		return false;
+	}
+
+	////////////////////////////////////////////////
+	//	Attribute (Extention)
+	////////////////////////////////////////////////
+
+	public void setAttribute(String name, String value) {
+		Attribute attr = getAttribute(name);
+		if (attr != null) {
+			attr.setValue(value);
+			return;
+		}
+		attr = new Attribute(name, value);
+		addAttribute(attr);
+	}
+
+	public void setAttribute(String name, int value) {
+		setAttribute(name, Integer.toString(value));
+	}
+
+	public String getAttributeValue(String name) {
+		Attribute attr = getAttribute(name);
+		if (attr != null)
+			return attr.getValue();
+		return "";
+	}
+
+	public int getAttributeIntegerValue(String name) {
+		String val = getAttributeValue(name);
+		try {
+			return Integer.parseInt(val);
+		}
+		catch (Exception e) {}
+		return 0;
+	}
+	
+	////////////////////////////////////////////////
+	//	Attribute (xmlns)
+	////////////////////////////////////////////////
+
+	public void setNameSpace(String ns, String value)
+	{
+		setAttribute("xmlns:" + ns, value);
+	}
+		
+	////////////////////////////////////////////////
+	//	Child node
+	////////////////////////////////////////////////
+
+	private NodeList nodeList = new NodeList();
+
+	public int getNNodes() {
+		return nodeList.size();
+	}
+
+	public Node getNode(int index) {
+		return nodeList.getNode(index);
+	}
+
+	public Node getNode(String name)
+	{
+		return nodeList.getNode(name);
+	}
+	
+	public Node getNodeEndsWith(String name)
+	{
+		return nodeList.getEndsWith(name);
+	}
+
+	public void addNode(Node node) {
+		node.setParentNode(this);
+		nodeList.add(node);
+	}
+
+	public void insertNode(Node node, int index) {
+		node.setParentNode(this);
+		nodeList.insertElementAt(node, index);
+	}
+
+	public boolean removeNode(Node node) {
+		node.setParentNode(null);
+		return nodeList.remove(node);
+	}
+
+	public boolean removeNode(String name) {
+		return nodeList.remove(getNode(name));
+	}
+
+	public void removeAllNodes()
+	{
+		nodeList.clear();
+	}
+	
+	public boolean hasNodes()
+	{
+		if (0 < getNNodes())
+			return true;
+		return false;
+	}
+	
+	////////////////////////////////////////////////
+	//	Element (Child Node)
+	////////////////////////////////////////////////
+
+	public void setNode(String name, String value) {
+		Node node = getNode(name);
+		if (node != null) {
+			node.setValue(value);
+			return;
+		}
+		node = new Node(name);
+		node.setValue(value);
+		addNode(node);
+	}
+
+	public String getNodeValue(String name) {
+		Node node = getNode(name);
+		if (node != null)
+			return node.getValue();
+		return "";
+	}
+
+	////////////////////////////////////////////////
+	//	userData
+	////////////////////////////////////////////////
+
+	private Object userData = null;
+	
+	public void setUserData(Object data)
+	{
+		userData = data;
+	}
+
+	public Object getUserData()
+	{
+		return userData;
+	}
+
+	
+	////////////////////////////////////////////////
+	//	toString
+	////////////////////////////////////////////////
+
+	public String getIndentLevelString(int nIndentLevel)
+	{
+		char indentString[] = new char[nIndentLevel];
+		for (int n=0; n<nIndentLevel; n++)
+			indentString[n] = '\t' ;
+		return new String(indentString);
+	}
+
+	public void outputAttributes(PrintWriter ps)
+	{
+		int nAttributes = getNAttributes();
+		for (int n=0; n<nAttributes; n++) {
+			Attribute attr = getAttribute(n);
+			ps.print(" " + attr.getName() + "=\"" + XML.escapeXMLChars(attr.getValue()) + "\"");
+		}
+	}
+
+	public void output(PrintWriter ps, int indentLevel, boolean hasChildNode)
+	{
+		String indentString = getIndentLevelString(indentLevel);
+
+		String name = getName();
+		String value = getValue();
+
+		if (hasNodes() == false || hasChildNode == false) {
+			ps.print(indentString + "<" + name);
+			outputAttributes(ps);
+			// Thnaks for Tho Beisch (11/09/04)
+			if (value == null || value.length() == 0) {
+				// No value, so use short notation <node />
+				ps.println(" />");
+			} else {
+				ps.println(">" + XML.escapeXMLChars(value) + "</" + name + ">");
+			}
+			
+			return;
+		}
+		
+		ps.print(indentString + "<" + name);
+		outputAttributes(ps);
+		ps.println(">");
+	
+		int nChildNodes = getNNodes();
+		for (int n=0; n<nChildNodes; n++) {
+			Node cnode = getNode(n);
+			cnode.output(ps, indentLevel+1, true);
+		}
+
+		ps.println(indentString +"</" + name + ">");
+	}
+
+	public String toString(boolean hasChildNode)
+	{
+		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+		PrintWriter pr = new PrintWriter(byteOut);
+		output(pr, 0, hasChildNode);
+		pr.flush();
+		return byteOut.toString();
+	}
+		
+	@Override
+    public String toString()
+	{
+		return toString(true);
+	}
+	
+	public String toXMLString(boolean hasChildNode)
+	{
+		String xmlStr = toString();
+		xmlStr = xmlStr.replaceAll("<", "&lt;");
+		xmlStr = xmlStr.replaceAll(">", "&gt;");
+		// Thanks for Theo Beisch (11/09/04)
+		xmlStr = xmlStr.replaceAll("&", "&amp;");
+		xmlStr = xmlStr.replaceAll("\"", "&quot;");
+		// Thanks for Brian Owens (12/02/04)
+		xmlStr = xmlStr.replaceAll("'", "&apos;");
+		return xmlStr;
+	}
+
+	public String toXMLString()
+	{
+		return toXMLString(true);
+	}
+	
+	public void print(boolean hasChildNode)
+	{
+		PrintWriter pr = new PrintWriter(System.out);
+		output(pr, 0, hasChildNode);
+		pr.flush();
+	}
+
+	public void print()
+	{
+		print(true);
+	}
+}

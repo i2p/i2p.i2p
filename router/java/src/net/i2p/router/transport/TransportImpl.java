@@ -416,6 +416,8 @@ public abstract class TransportImpl implements Transport {
     protected void replaceAddress(RouterAddress address) {
         // _log.error("Replacing address for " + getStyle() + " was " + _currentAddress + " now " + address);
         _currentAddress = address;
+        if (_listener != null)
+            _listener.transportAddressChanged();
         if ("SSU".equals(getStyle()))
             _context.commSystem().notifyReplaceAddress(address);
     }
