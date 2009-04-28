@@ -83,18 +83,26 @@
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
  <p>
  <b>Inbound TCP connection configuration:</b><br />
- Externally reachable hostname or IP address:
+ Externally reachable hostname or IP address:<br />
+    <input type="radio" name="ntcpAutoIP" value="0" <%=nethelper.getTcpAutoIPChecked(0) %> />
+    Disable<br />
+    <input type="radio" name="ntcpAutoIP" value="2" <%=nethelper.getTcpAutoIPChecked(2) %> />
+    Use IP address detected by SSU
+    (currently <jsp:getProperty name="nethelper" property="udpIP" />)<br />
+    <input type="radio" name="ntcpAutoIP" value="1" <%=nethelper.getTcpAutoIPChecked(1) %> />
+    Specify hostname or IP:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" />
     (dyndns and the like are fine)<br />
-    OR use IP address detected by SSU
-    (currently <jsp:getProperty name="nethelper" property="udpIP" />)?
-    <input type="checkbox" name="ntcpAutoIP" value="true" <jsp:getProperty name="nethelper" property="tcpAutoIPChecked" /> /><br />
  <p>
- Externally reachable TCP port:
+ Externally reachable TCP port:<br />
+    <input type="radio" name="ntcpAutoPort" value="0" <%=nethelper.getTcpAutoPortChecked(0) %> />
+    Disable<br />
+    <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
+    Use the same port configured for SSU
+    (currently <jsp:getProperty name="nethelper" property="udpPort" />)?<br />
+    <input type="radio" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
+    Specify Port:
     <input name ="ntcpport" type="text" size="6" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
-    OR use the same port configured for SSU
-    (currently <jsp:getProperty name="nethelper" property="udpPort" />)?
-    <input type="checkbox" name="ntcpAutoPort" value="true" <jsp:getProperty name="nethelper" property="tcpAutoPortChecked" /> /><br />
  <p>A hostname entered here will be published in the network database.
     It is <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.

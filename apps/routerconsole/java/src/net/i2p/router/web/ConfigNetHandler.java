@@ -29,6 +29,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _udpPort;
     private boolean _ntcpAutoIP;
     private boolean _ntcpAutoPort;
+    private boolean _ntcpInboundDisabled;
     private boolean _upnp;
     private String _inboundRate;
     private String _inboundBurstRate;
@@ -58,8 +59,16 @@ public class ConfigNetHandler extends FormHandler {
     public void setHiddenMode(String moo) { _hiddenMode = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
     public void setEnableloadtesting(String moo) { _enableLoadTesting = true; }
-    public void setNtcpAutoIP(String moo) { _ntcpAutoIP = true; }
-    public void setNtcpAutoPort(String moo) { _ntcpAutoPort = true; }
+    public void setNtcpAutoIP(String mode) {
+        _ntcpAutoIP = mode.equals("2");
+        if (mode.equals("0"))
+            _ntcpInboundDisabled = true;
+    }
+    public void setNtcpAutoPort(String mode) {
+        _ntcpAutoPort = mode.equals("2");
+        if (mode.equals("0"))
+            _ntcpInboundDisabled = true;
+    }
     public void setUpnp(String moo) { _upnp = true; }
     
     public void setHostname(String hostname) { 
@@ -122,8 +131,12 @@ public class ConfigNetHandler extends FormHandler {
             String sAutoPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT);
             boolean oldAutoHost = "true".equalsIgnoreCase(sAutoHost);
             boolean oldAutoPort = "true".equalsIgnoreCase(sAutoPort);
-            if (_ntcpHostname == null) _ntcpHostname = "";
-            if (_ntcpPort == null) _ntcpPort = "";
+            if (_ntcpHostname == null || _ntcpInboundDisabled) _ntcpHostname = "";
+            if (_ntcpPort == null || _ntcpInboundDisabled) _ntcpPort = "";
+            if (_ntcpInboundDisabled) {
+                _ntcpAutoIP = false;
+                _ntcpAutoPort = false;
+            }
 
             if (oldAutoHost != _ntcpAutoIP || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
                 if (_ntcpAutoIP) {
@@ -162,6 +175,7 @@ public class ConfigNetHandler extends FormHandler {
                 String oldPort = "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
                 if (!oldPort.equals(_udpPort)) {
                     _context.router().setConfigSetting(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
+                    _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
                     addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
                     restartRequired = true;
                 }

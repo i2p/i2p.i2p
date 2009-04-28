@@ -18,6 +18,8 @@ public class ConfigNetHelper extends HelperBase {
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
+    private final static String CHECKED = " checked=\"true\" ";
+    private final static String DISABLED = " disabled=\"true\" ";
     public String getNtcphostname() {
         if (!TransportManager.enableNTCP(_context))
             return "\" disabled=\"true";
@@ -70,68 +72,64 @@ public class ConfigNetHelper extends HelperBase {
         if ( (disabled != null) && ("true".equalsIgnoreCase(disabled)) )
             return "";
         else
-            return " checked ";
+            return CHECKED;
     }
     
+    /** @param prop must default to false */
+    public String getChecked(String prop) {
+        if (Boolean.valueOf(_context.getProperty(prop)).booleanValue())
+            return CHECKED;
+        return "";
+    }
+
     public String getHiddenModeChecked() {
-        String enabled = _context.getProperty(Router.PROP_HIDDEN, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+        return getChecked(Router.PROP_HIDDEN);
     }
 
     public String getDynamicKeysChecked() {
-        String enabled = _context.getProperty(Router.PROP_DYNAMIC_KEYS, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+        return getChecked(Router.PROP_DYNAMIC_KEYS);
     }
 
-    public String getTcpAutoPortChecked() {
+    public String getTcpAutoPortChecked(int mode) {
         if (!TransportManager.enableNTCP(_context))
-            return " disabled=\"true\" ";
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+            return DISABLED;
+        String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
+        boolean specified = port != null && port.length() > 0;
+        boolean auto = Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_PORT)).booleanValue();
+        if ((mode == 0 && (!specified) && !auto) ||
+            (mode == 1 && specified && !auto) ||
+            (mode == 2 && auto))
+            return CHECKED;
+        return "";
     }
 
-    public String getTcpAutoIPChecked() {
+    public String getTcpAutoIPChecked(int mode) {
         if (!TransportManager.enableNTCP(_context))
-            return " disabled=\"true\" ";
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
-            return " checked ";
-        else
-            return "";
+            return DISABLED;
+        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
+        boolean specified = hostname != null && hostname.length() > 0;
+        boolean auto = Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_IP)).booleanValue();
+        if ((mode == 0 && (!specified) && !auto) ||
+            (mode == 1 && specified && !auto) ||
+            (mode == 2 && auto))
+            return CHECKED;
+        return "";
     }
 
     public String getUpnpChecked() {
-        if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)).booleanValue())
-            return " checked ";
-        else
-            return "";
+        return getChecked(TransportManager.PROP_ENABLE_UPNP);
     }
 
     public String getRequireIntroductionsChecked() {
         short status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
-                if ("true".equalsIgnoreCase(_context.getProperty(UDPTransport.PROP_FORCE_INTRODUCERS, "false")))
-                    return "checked=\"true\"";
-                return "";
+            case CommSystemFacade.STATUS_UNKNOWN:
+                return getChecked(UDPTransport.PROP_FORCE_INTRODUCERS);
             case CommSystemFacade.STATUS_DIFFERENT:
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                return "checked=\"true\"";
-            case CommSystemFacade.STATUS_UNKNOWN:
-                if ("true".equalsIgnoreCase(_context.getProperty(UDPTransport.PROP_FORCE_INTRODUCERS, "false")))
-                    return "checked=\"true\"";
-                return "";
             default:
-                return "checked=\"true\"";
+                return CHECKED;
         }
     }
     
@@ -191,7 +189,7 @@ public class ConfigNetHelper extends HelperBase {
     
     public String getEnableLoadTesting() {
         if (LoadTestManager.isEnabled(_context))
-            return " checked ";
+            return CHECKED;
         else
             return "";
     }
