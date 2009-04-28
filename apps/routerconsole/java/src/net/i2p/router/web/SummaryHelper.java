@@ -48,7 +48,7 @@ public class SummaryHelper extends HelperBase {
      *
      */
     public String getVersion() { 
-        return RouterVersion.VERSION + "-" + RouterVersion.BUILD;
+        return RouterVersion.FULL_VERSION;
     }
     /**
      * Retrieve a pretty printed uptime count (ala 4d or 7h or 39m)

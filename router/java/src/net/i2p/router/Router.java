@@ -999,8 +999,7 @@ public class Router {
     }
     
     public static void main(String args[]) {
-        System.out.println("Starting I2P " + RouterVersion.VERSION + "-" + RouterVersion.BUILD);
-        System.out.println(RouterVersion.ID);
+        System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
         installUpdates();
         verifyWrapperConfig();
         Router r = new Router();
