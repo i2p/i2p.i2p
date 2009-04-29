@@ -5,6 +5,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.Addresses;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -20,6 +21,13 @@ public class ConfigNetHelper extends HelperBase {
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
     private final static String CHECKED = " checked=\"true\" ";
     private final static String DISABLED = " disabled=\"true\" ";
+
+    public String getUdphostname() {
+        String hostname = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST); 
+        if (hostname == null) return "";
+        return hostname;
+    }
+
     public String getNtcphostname() {
         if (!TransportManager.enableNTCP(_context))
             return "\" disabled=\"true";
@@ -116,6 +124,18 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
+//////////////// FIXME
+    public String getUdpAutoIPChecked(int mode) {
+        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
+        boolean specified = hostname != null && hostname.length() > 0;
+        boolean auto = Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_IP)).booleanValue();
+        if ((mode == 0 && (!specified) && !auto) ||
+            (mode == 1 && specified && !auto) ||
+            (mode == 2 && auto))
+            return CHECKED;
+        return "";
+    }
+
     public String getUpnpChecked() {
         return getChecked(TransportManager.PROP_ENABLE_UPNP);
     }
@@ -133,6 +153,10 @@ public class ConfigNetHelper extends HelperBase {
         }
     }
     
+    public String[] getAddresses() {
+        return Addresses.getAddresses();
+    }
+
     public String getInboundRate() {
         return "" + _context.bandwidthLimiter().getInboundKBytesPerSecond();
     }

@@ -68,17 +68,46 @@
  <hr />
 -->
  <b>UDP Configuration:</b><br />
+ Externally reachable hostname or IP address:<br />
+    <input type="radio" name="udpAutoIP" value="0" <%=nethelper.getUdpAutoIPChecked(0) %> />
+    Use SSU detection only<br />
+    <input type="radio" name="udpAutoIP" value="24" <%=nethelper.getUdpAutoIPChecked(24) %> />
+    Use local public address if available, then UPnP detection, then SSU detection<br />
+    <input type="radio" name="udpAutoIP" value="16" <%=nethelper.getUdpAutoIPChecked(16) %> />
+    Use local public address if available, then SSU detection<br />
+    <input type="radio" name="udpAutoIP" value="8" <%=nethelper.getUdpAutoIPChecked(8) %> />
+    Use UPnP detection if available, then SSU detection<br />
+    <input type="radio" name="udpAutoIP" value="1" <%=nethelper.getUdpAutoIPChecked(1) %> />
+    Specify hostname or IP:
+    <input name ="udphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" />
+    <% String[] ips = nethelper.getAddresses();
+       if (ips.length > 0) {
+           out.print(" or <select name=\"interface\"><option value=\"\" selected=\"true\">Select Interface</option>\n");
+           for (int i = 0; i < ips.length; i++) {
+               out.print("<option value=\"");
+               out.print(ips[i]);
+               out.print("\">");
+               out.print(ips[i]);
+               out.print("</option>\n");
+           }
+           out.print("</select>\n");
+       }
+    %>
+    <br />
+    <input type="radio" name="udpAutoIP" value="2" <%=nethelper.getUdpAutoIPChecked(2) %> />
+    Hidden mode - do not publish IP<i>(not recommended)</i><br />
  Internal UDP port:
  <input name ="udpPort" type="text" size="6" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
- External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
- Require SSU introductions?
-<input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> /><br />
+<input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
+ Require SSU introductions
+ <i>(Enable if you cannot open your firewall)</i><br />
+ Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
  <p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
     you on your external UDP address.  If you can't, I2P now includes supports UDP hole punching
     with "SSU introductions" - peers who will relay a request from someone you don't know to your
     router for your router so that you can make an outbound connection to them.  I2P will use these
     introductions automatically if it detects that the port is not forwarded (as shown by
-    the <i>Status: Firewalled</i> line), or you can manually require them here.  
+    the <i>Reachability: Firewalled</i> line), or you can manually require them here.  
     Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
  <p>
@@ -88,18 +117,18 @@
     Disable<br />
     <input type="radio" name="ntcpAutoIP" value="2" <%=nethelper.getTcpAutoIPChecked(2) %> />
     Use IP address detected by SSU
-    (currently <jsp:getProperty name="nethelper" property="udpIP" />)<br />
+    <i>(currently <jsp:getProperty name="nethelper" property="udpIP" />)</i><br />
     <input type="radio" name="ntcpAutoIP" value="1" <%=nethelper.getTcpAutoIPChecked(1) %> />
     Specify hostname or IP:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" />
-    (dyndns and the like are fine)<br />
+    <i>(dyndns and the like are fine)</i><br />
  <p>
  Externally reachable TCP port:<br />
     <input type="radio" name="ntcpAutoPort" value="0" <%=nethelper.getTcpAutoPortChecked(0) %> />
     Disable<br />
     <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
     Use the same port configured for SSU
-    (currently <jsp:getProperty name="nethelper" property="udpPort" />)?<br />
+    <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br />
     <input type="radio" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
     Specify Port:
     <input name ="ntcpport" type="text" size="6" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
