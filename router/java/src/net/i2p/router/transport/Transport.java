@@ -40,6 +40,7 @@ public interface Transport {
     public static final String SOURCE_CONFIG = "Configuration change";
     public void externalAddressReceived(String source, byte[] ip, int port);
     public void forwardPortStatus(int port, boolean success, String reason);
+    public int getRequestedPort();
     public void setListener(TransportEventListener listener);
     public String getStyle();
     

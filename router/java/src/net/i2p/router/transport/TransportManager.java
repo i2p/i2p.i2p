@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -139,6 +140,8 @@ public class TransportManager implements TransportEventListener {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Transport " + i + " (" + t.getStyle() + ") started");
         }
+        // kick UPnP - Do this to get the ports opened even before UDP registers an address
+        transportAddressChanged();
         _log.debug("Done start listening on transports");
         _context.router().rebuildRouterInfo();
     }
@@ -285,12 +288,43 @@ public class TransportManager implements TransportEventListener {
         return TransportImpl.getIP(dest);
     }    
     
-    Map getAddresses() {
-        Map rv = new HashMap(_transports.size());
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = (Transport)_transports.get(i);
+    public Map<String, RouterAddress> getAddresses() {
+        Map<String, RouterAddress> rv = new HashMap(_transports.size());
+        for (Transport t : _transports) {
             if (t.getCurrentAddress() != null)
                 rv.put(t.getStyle(), t.getCurrentAddress());
+        }
+        return rv;
+    }
+    
+    /**
+     * Include the published port, or the requested port, for each transport
+     * which we will pass along to UPnP
+     */
+    private Map<String, Integer> getPorts() {
+        Map<String, Integer> rv = new HashMap(_transports.size());
+        for (Transport t : _transports) {
+            int port = t.getRequestedPort();
+            if (t.getCurrentAddress() != null) {
+                Properties opts = t.getCurrentAddress().getOptions();
+                if (opts != null) {
+                    String s = opts.getProperty("port");
+                    if (s != null) {
+                        try {
+                            port = Integer.parseInt(s);
+                        } catch (NumberFormatException nfe) {}
+                    }
+                }
+            }
+            // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
+            if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&
+                Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue()) {
+                Transport udp = getTransport(UDPTransport.STYLE);
+                if (udp != null)
+                    port = t.getRequestedPort();
+            }
+            if (port > 0)
+                rv.put(t.getStyle(), Integer.valueOf(port));
         }
         return rv;
     }
@@ -399,7 +433,7 @@ public class TransportManager implements TransportEventListener {
     
     public void transportAddressChanged() {
         if (_upnpManager != null)
-            _upnpManager.update(getAddresses());
+            _upnpManager.update(getPorts());
     }
 
     public List getMostRecentErrorMessages() { 

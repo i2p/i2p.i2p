@@ -445,6 +445,15 @@ public abstract class TransportImpl implements Transport {
      */
     public void forwardPortStatus(int port, boolean success, String reason) {}
 
+    /**
+     * What port would the transport like to have forwarded by UPnP.
+     * This can't be passed via getCurrentAddress(), as we have to open the port
+     * before we can publish the address.
+     *
+     * @return port or -1 for none or 0 for any
+     */
+    public int getRequestedPort() { return -1; }
+
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }
     /** Make this stuff pretty (only used in the old console) */

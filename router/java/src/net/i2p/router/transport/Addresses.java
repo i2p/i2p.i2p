@@ -64,9 +64,8 @@ public class Addresses {
             ia.isMulticastAddress() ||
             ia.isSiteLocalAddress() ||
             !(ia instanceof Inet4Address)) {
-///////// testing
 //            System.err.println("Skipping: " + ia.getHostAddress());
-//            return;
+            return;
         }
         String ip = ia.getHostAddress();
         set.add(ip);

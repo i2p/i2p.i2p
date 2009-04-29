@@ -552,6 +552,14 @@ public class NTCPTransport extends TransportImpl {
         }
     }
 
+    public int getRequestedPort() {
+        // would be nice to do this here but we can't easily get to the UDP transport.getRequested_Port()
+        // from here, so we do it in TransportManager.
+        // if (Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue())
+        //    return foo;
+        return _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_PORT, -1);
+    }
+
     /**
      *  This doesn't (completely) block, caller should check isAlive()
      *  before calling startListening() or restartListening()

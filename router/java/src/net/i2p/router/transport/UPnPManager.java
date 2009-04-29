@@ -7,7 +7,6 @@ package net.i2p.router.transport;
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.RouterAddress;
@@ -66,26 +65,14 @@ public class UPnPManager {
     }
     
     /** call when the ports might have changed */
-    public void update(Map<String, RouterAddress> addresses) {
+    public void update(Map<String, Integer> ports) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Update:");
         if (!_isRunning)
             return;
-        Set<ForwardPort> forwards = new HashSet(addresses.size());
-        for (String style : addresses.keySet()) {
-            RouterAddress ra = addresses.get(style);
-            if (ra == null)
-                continue;
-            Properties opts = ra.getOptions();
-            if (opts == null)
-                continue;
-            String s = opts.getProperty("port");
-            if (s == null)
-                continue;
-            int port = -1;
-            try {
-                port = Integer.parseInt(s);
-            } catch (NumberFormatException nfe) { continue; }
+        Set<ForwardPort> forwards = new HashSet(ports.size());
+        for (String style : ports.keySet()) {
+            int port = ports.get(style).intValue();
             int protocol = -1;
             if ("SSU".equals(style))
                 protocol = ForwardPort.PROTOCOL_UDP_IPV4;
@@ -144,7 +131,7 @@ public class UPnPManager {
                     style = "NTCP";
                 else
                     continue;
-                boolean success = fps.status >= ForwardPortStatus.PROBABLE_SUCCESS;
+                boolean success = fps.status >= ForwardPortStatus.MAYBE_SUCCESS;
                 _manager.forwardPortStatus(style, fp.portNumber, success, fps.reasonString);
             }
         }

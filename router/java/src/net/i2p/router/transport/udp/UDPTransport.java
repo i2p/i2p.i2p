@@ -217,13 +217,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_externalListenPort <= 0) {
             // no explicit external port, so lets try an internal one
             port = _context.getProperty(PROP_INTERNAL_PORT, DEFAULT_INTERNAL_PORT);
-            if (port <= 0) {
-                port = DEFAULT_INTERNAL_PORT;
-                //port = 1024 + _context.random().nextInt(31*1024);
-                //if (_log.shouldLog(Log.INFO))
-                //    _log.info("Selecting an arbitrary port to bind to: " + port);
-                _context.router().setConfigSetting(PROP_INTERNAL_PORT, port+"");
-            }
             // attempt to use it as our external port - this will be overridden by
             // externalAddressReceived(...)
             _context.router().setConfigSetting(PROP_EXTERNAL_PORT, port+"");
@@ -314,7 +307,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int getLocalPort() { return _externalListenPort; }
     public InetAddress getLocalAddress() { return _externalListenHost; }
     public int getExternalPort() { return _externalListenPort; }
-    
+    public int getRequestedPort() {
+        if (_externalListenPort > 0)
+            return _externalListenPort;
+        return _context.getProperty(PROP_INTERNAL_PORT, DEFAULT_INTERNAL_PORT);
+    }
+
     /**
      * If we have received an inbound connection in the last 2 minutes, don't allow 
      * our IP to change.
