@@ -422,6 +422,29 @@ public abstract class TransportImpl implements Transport {
             _context.commSystem().notifyReplaceAddress(address);
     }
 
+    /**
+     *  Notify a transport of an external address change.
+     *  This may be from a local interface, UPnP, a config change, etc.
+     *  This should not be called if the ip didn't change
+     *  (from that source's point of view), or is a local address,
+     *  or if the ip is IPv6, but the transport should check anyway.
+     *  The transport should also do its own checking on whether to accept
+     *  notifications from this source.
+     *
+     *  This can be called before startListening() to set an initial address,
+     *  or after the transport is running.
+     *
+     *  @param source defined in Transport.java
+     *  @param ip typ. IPv4 non-local
+     *  @param port 0 for unknown or unchanged
+     */
+    public void externalAddressReceived(String source, byte[] ip, int port) {}
+
+    /**
+     *  Notify a transport of the results of trying to forward a port
+     */
+    public void forwardPortStatus(int port, boolean success, String reason) {}
+
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }
     /** Make this stuff pretty (only used in the old console) */

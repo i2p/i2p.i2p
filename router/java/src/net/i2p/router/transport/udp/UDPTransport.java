@@ -327,6 +327,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     /**
+     * From config, UPnP, local i/f, ...
+     */
+    public void externalAddressReceived(String source, byte[] ip, int port) {
+        String s = RemoteHostId.toString(ip);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Received address: " + s + " port: " + port + " from: " + source);
+    }
+
+    /**
      * Someone we tried to contact gave us what they think our IP address is.
      * Right now, we just blindly trust them, changing our IP and port on a
      * whim.  this is not good ;)

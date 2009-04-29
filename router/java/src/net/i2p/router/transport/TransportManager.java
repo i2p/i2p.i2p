@@ -10,6 +10,8 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ArrayList();
         if (Boolean.valueOf(_context.getProperty(PROP_ENABLE_UPNP)).booleanValue())
-            _upnpManager = new UPnPManager(context);
+            _upnpManager = new UPnPManager(context, this);
     }
     
     public void addTransport(Transport transport) {
@@ -75,14 +77,11 @@ public class TransportManager implements TransportEventListener {
             enableUDP = DEFAULT_ENABLE_UDP;
         if ("true".equalsIgnoreCase(enableUDP)) {
             UDPTransport udp = new UDPTransport(_context);
-            udp.setListener(this);
-            _transports.add(udp);
+            addTransport(udp);
+            initializeAddress(udp);
         }
-        if (enableNTCP(_context)) {
-            NTCPTransport ntcp = new NTCPTransport(_context);
-            ntcp.setListener(this);
-            _transports.add(ntcp);
-        }
+        if (enableNTCP(_context))
+            addTransport(new NTCPTransport(_context));
         if (_transports.size() <= 0)
             _log.log(Log.CRIT, "No transports are enabled");
     }
@@ -94,6 +93,41 @@ public class TransportManager implements TransportEventListener {
         return "true".equalsIgnoreCase(enableNTCP);
     }
     
+    private static void initializeAddress(Transport t) {
+        String ips = Addresses.getAnyAddress();
+        if (ips == null)
+            return;
+        InetAddress ia = null;
+        try {
+            ia = InetAddress.getByName(ips);
+        } catch (UnknownHostException e) {return;}
+        if (ia == null)
+            return;
+        byte[] ip = ia.getAddress();
+        t.externalAddressReceived(Transport.SOURCE_INTERFACE, ip, 0);
+    }
+
+    /**
+     * callback from UPnP
+     * Only tell SSU, it will tell NTCP
+     *
+     */
+    public void externalAddressReceived(String source, byte[] ip, int port) {
+        Transport t = getTransport(UDPTransport.STYLE);
+        if (t != null)
+            t.externalAddressReceived(source, ip, port);
+    }
+
+    /**
+     * callback from UPnP
+     *
+     */
+    public void forwardPortStatus(String style, int port, boolean success, String reason) {
+        Transport t = getTransport(style);
+        if (t != null)
+            t.forwardPortStatus(port, success, reason);
+    }
+
     public void startListening() {
         if (_upnpManager != null)
             _upnpManager.start();
@@ -102,7 +136,8 @@ public class TransportManager implements TransportEventListener {
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             RouterAddress addr = t.startListening();
-            _log.debug("Transport " + i + " (" + t.getStyle() + ") started");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Transport " + i + " (" + t.getStyle() + ") started");
         }
         _log.debug("Done start listening on transports");
         _context.router().rebuildRouterInfo();
@@ -123,10 +158,10 @@ public class TransportManager implements TransportEventListener {
         _transports.clear();
     }
     
-    public Transport getNTCPTransport() {
+    public Transport getTransport(String style) {
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
-            if("NTCP".equals(t.getStyle()))
+            if(style.equals(t.getStyle()))
                 return t;
         }
         return null;

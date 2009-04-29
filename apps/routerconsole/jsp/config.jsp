@@ -100,9 +100,10 @@
  <input name ="udpPort" type="text" size="6" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
 <input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
  Require SSU introductions
- <i>(Enable if you cannot open your firewall)</i><br />
+ <i>(Enable if you cannot open your firewall)</i>
+ <p>
  Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
- <p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
+ </p><p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
     you on your external UDP address.  If you can't, I2P now includes supports UDP hole punching
     with "SSU introductions" - peers who will relay a request from someone you don't know to your
     router for your router so that you can make an outbound connection to them.  I2P will use these

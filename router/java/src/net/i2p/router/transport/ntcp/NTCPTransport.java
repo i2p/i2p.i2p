@@ -540,6 +540,19 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     *  If we didn't used to be forwarded, and we have an address,
+     *  and we are configured to use UPnP, update our RouterAddress
+     */
+    public void forwardPortStatus(int port, boolean success, String reason) {
+        if (_log.shouldLog(Log.WARN)) {
+            if (success)
+                _log.warn("UPnP has opened the NTCP port: " + port);
+            else
+                _log.warn("UPnP has failed to open the NTCP port: " + port + " reason: " + reason);
+        }
+    }
+
+    /**
      *  This doesn't (completely) block, caller should check isAlive()
      *  before calling startListening() or restartListening()
      */

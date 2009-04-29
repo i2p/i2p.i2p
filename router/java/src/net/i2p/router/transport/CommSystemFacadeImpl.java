@@ -241,7 +241,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public void notifyReplaceAddress(RouterAddress UDPAddr) {
         if (UDPAddr == null)
             return;
-        NTCPTransport t = (NTCPTransport) _manager.getNTCPTransport();
+        NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
         if (t == null)
             return;
         Properties UDPProps = UDPAddr.getOptions();
