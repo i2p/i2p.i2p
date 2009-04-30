@@ -27,9 +27,8 @@ public class ConfigNetHandler extends FormHandler {
     private String _ntcpPort;
     private String _tcpPort;
     private String _udpPort;
-    private boolean _ntcpAutoIP;
+    private String _ntcpAutoIP;
     private boolean _ntcpAutoPort;
-    private boolean _ntcpInboundDisabled;
     private boolean _upnp;
     private String _inboundRate;
     private String _inboundBurstRate;
@@ -60,9 +59,7 @@ public class ConfigNetHandler extends FormHandler {
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
     public void setEnableloadtesting(String moo) { _enableLoadTesting = true; }
     public void setNtcpAutoIP(String mode) {
-        _ntcpAutoIP = mode.equals("2");
-        if (mode.equals("0"))
-            _ntcpInboundDisabled = true;
+        _ntcpAutoIP = mode;
     }
     public void setNtcpAutoPort(String mode) {
         _ntcpAutoPort = mode.equals("2");
@@ -125,31 +122,24 @@ public class ConfigNetHandler extends FormHandler {
             if (oldNHost == null) oldNHost = "";
             String oldNPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
             if (oldNPort == null) oldNPort = "";
-            String sAutoHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP);
+            String oldAutoHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP);
             String sAutoPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT);
-            boolean oldAutoHost = "true".equalsIgnoreCase(sAutoHost);
             boolean oldAutoPort = "true".equalsIgnoreCase(sAutoPort);
-            if (_ntcpHostname == null || _ntcpInboundDisabled) _ntcpHostname = "";
-            if (_ntcpPort == null || _ntcpInboundDisabled) _ntcpPort = "";
-            if (_ntcpInboundDisabled) {
-                _ntcpAutoIP = false;
-                _ntcpAutoPort = false;
-            }
+            if (_ntcpHostname == null) _ntcpHostname = "";
+            if (_ntcpPort == null) _ntcpPort = "";
 
             if (oldAutoHost != _ntcpAutoIP || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
-                if (_ntcpAutoIP) {
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, "true");
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
-                    addFormNotice("Updating inbound TCP address to auto");
-                } else if (_ntcpHostname.length() > 0) {
+                if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP);
                     addFormNotice("Updating inbound TCP address to " + _ntcpHostname);
                 } else {
                     _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP);
-                    addFormNotice("Disabling inbound TCP");
+                    if ("false".equals(_ntcpAutoIP))
+                        addFormNotice("Disabling inbound TCP");
+                    else
+                        addFormNotice("Updating inbound TCP address to auto");
                 }
+                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
                 restartRequired = true;
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {

@@ -114,12 +114,14 @@
  <p>
  <b>Inbound TCP connection configuration:</b><br />
  Externally reachable hostname or IP address:<br />
-    <input type="radio" name="ntcpAutoIP" value="0" <%=nethelper.getTcpAutoIPChecked(0) %> />
-    Disable<br />
-    <input type="radio" name="ntcpAutoIP" value="2" <%=nethelper.getTcpAutoIPChecked(2) %> />
-    Use IP address detected by SSU
+    <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
+    Disable (Firewalled)<br />
+    <input type="radio" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> />
+    Use IP address detected by SSU (Not firewalled)
     <i>(currently <jsp:getProperty name="nethelper" property="udpIP" />)</i><br />
-    <input type="radio" name="ntcpAutoIP" value="1" <%=nethelper.getTcpAutoIPChecked(1) %> />
+    <input type="radio" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> />
+    Use IP address detected by SSU, only if we do not appear to be firewalled<br />
+    <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> />
     Specify hostname or IP:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" />
     <i>(dyndns and the like are fine)</i><br />

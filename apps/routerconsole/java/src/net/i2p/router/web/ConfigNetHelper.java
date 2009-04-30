@@ -114,10 +114,13 @@ public class ConfigNetHelper extends HelperBase {
             return DISABLED;
         String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
         boolean specified = hostname != null && hostname.length() > 0;
-        boolean auto = Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_IP)).booleanValue();
-        if ((mode == 0 && (!specified) && !auto) ||
-            (mode == 1 && specified && !auto) ||
-            (mode == 2 && auto))
+        String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP);
+        if (auto == null)
+            auto = "false";
+        if ((mode == 0 && (!specified) && auto.equals("false")) ||
+            (mode == 1 && specified && auto.equals("false")) ||
+            (mode == 2 && auto.equals("true")) ||
+            (mode == 3 && auto.equals("always")))
             return CHECKED;
         return "";
     }

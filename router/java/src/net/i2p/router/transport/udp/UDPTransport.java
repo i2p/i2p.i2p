@@ -2102,7 +2102,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
-            if (needsRebuild())
+            // Always rebuild when the status changes, even if our address hasn't changed,
+            // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
+            // which will start up NTCP inbound when we transition to OK.
+            // if (needsRebuild())
                 rebuildExternalAddress();
         }
     }

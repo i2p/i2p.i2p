@@ -269,6 +269,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         boolean changed = false;
+
+        // Auto Port Setting
         // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
         // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
         String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
@@ -288,9 +290,26 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             changed = true;
         }
 
+        // Auto IP Setting
+        // old behavior (<= 0.7.3): auto-ip defaults to false, and trumps configured hostname,
+        //                          and ignores reachability status - leading to
+        //                          "firewalled with inbound TCP enabled" warnings.
+        // new behavior (>= 0.7.4): auto-ip defaults to true, and explicit setting trumps auto,
+        //                          and only takes effect if reachability is OK.
+        //                          And new "always" setting ignores reachability status, like
+        //                          "true" was in 0.7.3
         String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
-        if (Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_IP)).booleanValue()) {
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true");
+        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        if (name != null && name.length() > 0)
+            enabled = "false";
+        if (_log.shouldLog(Log.INFO))
+            _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + getReachabilityStatus());
+        if (enabled.equalsIgnoreCase("always") ||
+            (enabled.equalsIgnoreCase("true") && getReachabilityStatus() == CommSystemFacade.STATUS_OK)) {
             String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
             if (nhost == null || nhost.length() <= 0)
                 return;
             if (ohost == null || ! ohost.equalsIgnoreCase(nhost)) {
