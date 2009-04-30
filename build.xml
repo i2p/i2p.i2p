@@ -323,6 +323,14 @@
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
+    <target name="consoleDocs">
+        <delete dir="pkg-temp" />
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="." includes="readme*.html" />
+          <fileset dir="installer/resources/" includes="*-header.ht" />
+        </copy>
+        <zip destfile="docs.zip" basedir="pkg-temp" />
+    </target>
     <target name="updater" depends="prepupdate">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
@@ -373,8 +381,10 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
+        <!--
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme_fr.html" todir="pkg-temp/docs/" />
+        -->
     </target>
     <target name="prepupdateRouter" depends="buildrouter">
         <delete dir="pkg-temp" />
