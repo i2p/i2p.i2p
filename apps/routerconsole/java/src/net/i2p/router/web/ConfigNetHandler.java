@@ -66,8 +66,6 @@ public class ConfigNetHandler extends FormHandler {
     }
     public void setNtcpAutoPort(String mode) {
         _ntcpAutoPort = mode.equals("2");
-        if (mode.equals("0"))
-            _ntcpInboundDisabled = true;
     }
     public void setUpnp(String moo) { _upnp = true; }
     
@@ -155,19 +153,14 @@ public class ConfigNetHandler extends FormHandler {
                 restartRequired = true;
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
-                if ( _ntcpAutoPort ) {
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "true");
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
-                    addFormNotice("Updating inbound TCP port to auto");
-                } else if (_ntcpPort.length() > 0) {
+                if (_ntcpPort.length() > 0 && !_ntcpAutoPort) {
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT);
                     addFormNotice("Updating inbound TCP port to " + _ntcpPort);
                 } else {
                     _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT);
-                    addFormNotice("Disabling inbound TCP");
+                    addFormNotice("Updating inbound TCP port to auto");
                 }
+                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "" + _ntcpAutoPort);
                 restartRequired = true;
             }
 

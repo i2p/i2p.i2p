@@ -125,8 +125,6 @@
     <i>(dyndns and the like are fine)</i><br />
  <p>
  Externally reachable TCP port:<br />
-    <input type="radio" name="ntcpAutoPort" value="0" <%=nethelper.getTcpAutoPortChecked(0) %> />
-    Disable<br />
     <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
     Use the same port configured for SSU
     <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br />

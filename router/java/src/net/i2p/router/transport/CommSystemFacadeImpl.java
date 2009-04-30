@@ -193,6 +193,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
     
+    /**
+     * This should really be moved to ntcp/NTCPTransport.java, why is it here?
+     */
     public static RouterAddress createNTCPAddress(RouterContext ctx) {
         if (!TransportManager.enableNTCP(ctx)) return null;
         RouterAddress addr = new RouterAddress();
@@ -236,6 +239,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     /**
      * UDP changed addresses, tell NTCP and restart
+     * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
     @Override
     public void notifyReplaceAddress(RouterAddress UDPAddr) {
@@ -249,7 +253,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             return;
         Properties newProps;
         RouterAddress oldAddr = t.getCurrentAddress();
-        //_log.warn("Changing NTCP Address? was " + oldAddr);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Changing NTCP Address? was " + oldAddr);
         RouterAddress newAddr = oldAddr;
         if (newAddr == null) {
             newAddr = new RouterAddress();
@@ -264,23 +269,27 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         boolean changed = false;
+        // old behavior (<= 0.7.3): auto-port defaults to false, and true trumps explicit setting
+        // new behavior (>= 0.7.4): auto-port defaults to true, but explicit setting trumps auto
         String oport = newProps.getProperty(NTCPAddress.PROP_PORT);
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) ) {
-            String nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
-            if (nport == null || nport.length() <= 0)
-                return;
-            if (oport == null || ! oport.equals(nport)) {
-                newProps.setProperty(NTCPAddress.PROP_PORT, nport);
-                changed = true;
-            }
-        } else if (oport == null || oport.length() <= 0) {
+        String nport = null;
+        String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
+        if (cport != null && cport.length() > 0) {
+            nport = cport;
+        } else if (Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "true")).booleanValue()) {
+            nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("old: " + oport + " config: " + cport + " new: " + nport);
+        if (nport == null || nport.length() <= 0)
             return;
+        if (oport == null || ! oport.equals(nport)) {
+            newProps.setProperty(NTCPAddress.PROP_PORT, nport);
+            changed = true;
         }
 
         String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
-        enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
-        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) ) {
+        if (Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_IP)).booleanValue()) {
             String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
             if (nhost == null || nhost.length() <= 0)
                 return;
@@ -293,12 +302,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         if (!changed) {
-            //_log.warn("No change to NTCP Address");
+            _log.warn("No change to NTCP Address");
             return;
         }
 
         // stopListening stops the pumper, readers, and writers, so required even if
         // oldAddr == null since startListening starts them all again
+        //
+        // really need to fix this so that we can change or create an inbound address
+        // without tearing down everything
+        //
         _log.warn("Halting NTCP to change address");
         t.stopListening();
         newAddr.setOptions(newProps);

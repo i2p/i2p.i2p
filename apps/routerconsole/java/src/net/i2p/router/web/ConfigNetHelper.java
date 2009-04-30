@@ -103,10 +103,8 @@ public class ConfigNetHelper extends HelperBase {
             return DISABLED;
         String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
         boolean specified = port != null && port.length() > 0;
-        boolean auto = Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_PORT)).booleanValue();
-        if ((mode == 0 && (!specified) && !auto) ||
-            (mode == 1 && specified && !auto) ||
-            (mode == 2 && auto))
+        if ((mode == 1 && specified) ||
+            (mode == 2 && !specified))
             return CHECKED;
         return "";
     }
