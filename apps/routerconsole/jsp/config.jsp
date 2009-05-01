@@ -29,20 +29,28 @@
  <input type="hidden" name="action" value="blah" />
 
  <b>Bandwidth limiter</b><br />
- Inbound rate: 
-    <input name="inboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
+ <p>
+    <table>
+    <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
+    In <td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)<br />
+<!-- let's keep this simple...
  bursting up to 
-    <input name="inboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" /> KBps for
+    <input name="inboundburstrate" type="text" size="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" /> KBps for
     <jsp:getProperty name="nethelper" property="inboundBurstFactorBox" /><br />
- Outbound rate:
-    <input name="outboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBps
+-->
+    <tr><td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBps
+    Out <td>(<jsp:getProperty name="nethelper" property="outboundRateBits" />)<br />
+<!-- let's keep this simple...
  bursting up to 
     <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
   <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
  <i>KBps = kilobytes per second = 1024 bytes per second = 8192 bits per second.<br />
     A negative rate sets the default.</i><br />
- Bandwidth share percentage:
-   <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
+-->
+    <tr><td><jsp:getProperty name="nethelper" property="sharePercentageBox" />
+    Share <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)<br />
+    </table>
+ </p><p>
  <% int share = nethelper.getShareBandwidth();
     if (share < 12) {
         out.print("<b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
@@ -54,7 +62,7 @@
         out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<br />");
     }
  %>
- <p>
+ </p><p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
 <!--
@@ -70,7 +78,7 @@
  <p>
  <b>UPnP Configuration:</b><br />
     <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
-    Enable UPnP to open firewall ports
+    Enable UPnP to open firewall ports <a href="peers.jsp#upnp">UPnP status</a>
  </p><p>
  <b>IP Configuration:</b><br />
  Externally reachable hostname or IP address:<br />
@@ -104,7 +112,7 @@
  </p><p>
  <b>UDP Configuration:</b><br />
  Internal UDP port:
- <input name ="udpPort" type="text" size="6" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
+ <input name ="udpPort" type="text" size="5" maxlength="5" vvalue="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
 <input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
  Require SSU introductions
  <i>(Enable if you cannot open your firewall)</i>
@@ -139,7 +147,7 @@
     <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br />
     <input type="radio" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
     Specify Port:
-    <input name ="ntcpport" type="text" size="6" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
+    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
  </p><p>Hostnames entered here will be published in the network database.
     They are <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.

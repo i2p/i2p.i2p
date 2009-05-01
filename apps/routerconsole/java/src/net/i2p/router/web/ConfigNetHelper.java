@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.LoadTestManager;
@@ -158,6 +159,18 @@ public class ConfigNetHelper extends HelperBase {
     public String getOutboundRate() {
         return "" + _context.bandwidthLimiter().getOutboundKBytesPerSecond();
     }
+    public String getInboundRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getInboundKBytesPerSecond());
+    }
+    public String getOutboundRateBits() {
+        return kbytesToBits(_context.bandwidthLimiter().getOutboundKBytesPerSecond());
+    }
+    public String getShareRateBits() {
+        return kbytesToBits(getShareBandwidth());
+    }
+    private String kbytesToBits(int kbytes) {
+        return DataHelper.formatSize(kbytes * 8 * 1024) + " bits per second";
+    }
     public String getInboundBurstRate() {
         return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
     }
@@ -231,7 +244,7 @@ public class ConfigNetHelper extends HelperBase {
                 buf.append("selected=\"true\" ");
                 found = true;
             }
-            buf.append(">Up to ").append(val).append("%</option>\n");
+            buf.append(">").append(val).append("%</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();

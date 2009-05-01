@@ -403,7 +403,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 	
 	public String renderStatusHTML() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("<b>UPnP Status:</b><br />");
+		sb.append("<a name=\"upnp\"><b>UPnP Status:</b><br />");
 		
 		if(isDisabled) {
 			sb.append("The plugin has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?");
