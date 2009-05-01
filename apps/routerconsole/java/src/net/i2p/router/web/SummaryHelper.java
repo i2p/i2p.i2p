@@ -135,7 +135,7 @@ public class SummaryHelper extends HelperBase {
                 return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
-                ra = _context.router().getRouterInfo().getTargetAddress("UDP");
+                ra = _context.router().getRouterInfo().getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)

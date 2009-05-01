@@ -325,6 +325,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         int recent = 0;
         int tags = 0;
         int toRemove = overage * 2;
+        _log.log(Log.CRIT, "TOO MANY SESSION TAGS! Starting cleanup, overage = " + overage);
         List removed = new ArrayList(toRemove);
         synchronized (_inboundTagSets) {
             for (Iterator iter = _inboundTagSets.values().iterator(); iter.hasNext(); ) {

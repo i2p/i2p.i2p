@@ -17,6 +17,8 @@
 I2P <jsp:getProperty name="helper" property="version" /><br />
 <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%><br />
 <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br />
+CPU <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br />
+jbigi <%=net.i2p.util.NativeBigInteger.loadStatus()%><br />
  </p>
  <hr />
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />

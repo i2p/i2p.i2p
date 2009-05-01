@@ -39,7 +39,7 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             return;
         }
 
-        StringTokenizer tok = new StringTokenizer(destinations, ",");
+        StringTokenizer tok = new StringTokenizer(destinations, ", ");
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();

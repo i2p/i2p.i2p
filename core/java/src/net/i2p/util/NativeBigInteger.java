@@ -88,6 +88,8 @@ import net.i2p.util.Log;
 public class NativeBigInteger extends BigInteger {
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
+    private static String _loadStatus = "uninitialized";
+    private static String _cpuModel = "uninitialized";
     /** 
      * do we want to dump some basic success/failure info to stderr during 
      * initialization?  this would otherwise use the Log component, but this makes
@@ -140,6 +142,9 @@ public class NativeBigInteger extends BigInteger {
         
         try {
             CPUInfo c = CPUID.getInfo();
+            try {
+                _cpuModel = c.getCPUModelString();
+            } catch (UnknownCPUException e) {}
             if (c.IsC3Compatible())
                 return JBIGI_OPTIMIZATION_VIAC3;
             if (c instanceof AMDCPUInfo) {
@@ -254,6 +259,20 @@ public class NativeBigInteger extends BigInteger {
      */
     public static boolean isNative(){
         return _nativeOk;
+    }
+ 
+    public static String loadStatus() {
+        return _loadStatus;
+    }
+ 
+    public static String cpuType() {
+        if (sCPUType != null)
+            return sCPUType;
+        return "unrecognized";
+    }
+ 
+    public static String cpuModel() {
+        return _cpuModel;
     }
  
     /**
@@ -455,12 +474,14 @@ public class NativeBigInteger extends BigInteger {
         if(_doLog)
             System.err.println("INFO: " + s);
         I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).info(s);
+        _loadStatus = s;
     }
 
     private static void warn(String s) {
         if(_doLog)
             System.err.println("WARNING: " + s);
         I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).warn(s);
+        _loadStatus = s;
     }
 
     /** 
