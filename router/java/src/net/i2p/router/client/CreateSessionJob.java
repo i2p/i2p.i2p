@@ -59,10 +59,10 @@ class CreateSessionJob extends JobImpl {
         // XXX props.putAll(Router.getInstance().getConfigMap());
         
         // override them by the client's settings
-        props.putAll(_runner.getConfig().getOptions());
+        props.putAll(cfg.getOptions());
         
         // and load 'em up (using anything not yet set as the software defaults)
         settings.readFromProperties(props);
-        getContext().tunnelManager().buildTunnels(_runner.getConfig().getDestination(), settings);
+        getContext().tunnelManager().buildTunnels(cfg.getDestination(), settings);
     }
 }
