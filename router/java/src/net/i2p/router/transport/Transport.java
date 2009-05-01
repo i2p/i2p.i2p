@@ -35,9 +35,9 @@ public interface Transport {
     public RouterAddress startListening();
     public void stopListening();
     public RouterAddress getCurrentAddress();
-    public static final String SOURCE_UPNP = "UPnP";
-    public static final String SOURCE_INTERFACE = "Local interface";
-    public static final String SOURCE_CONFIG = "Configuration change";
+    public static final String SOURCE_UPNP = "upnp";
+    public static final String SOURCE_INTERFACE = "local";
+    public static final String SOURCE_CONFIG = "config"; // unused
     public void externalAddressReceived(String source, byte[] ip, int port);
     public void forwardPortStatus(int port, boolean success, String reason);
     public int getRequestedPort();

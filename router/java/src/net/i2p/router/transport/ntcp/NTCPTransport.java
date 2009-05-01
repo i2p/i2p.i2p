@@ -542,6 +542,12 @@ public class NTCPTransport extends TransportImpl {
     /**
      *  If we didn't used to be forwarded, and we have an address,
      *  and we are configured to use UPnP, update our RouterAddress
+     *
+     *  Don't do anything now. If it fails, we don't know if it's
+     *  because there is no firewall, or if the firewall rejected the request.
+     *  So we just use the SSU reachability status
+     *  to decide whether to enable inbound NTCP. SSU will have CSFI build a new
+     *  NTCP address when it transitions to OK.
      */
     public void forwardPortStatus(int port, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {

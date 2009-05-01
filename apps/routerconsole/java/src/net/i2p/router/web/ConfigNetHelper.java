@@ -23,24 +23,19 @@ public class ConfigNetHelper extends HelperBase {
     private final static String DISABLED = " disabled=\"true\" ";
 
     public String getUdphostname() {
-        String hostname = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST); 
-        if (hostname == null) return "";
-        return hostname;
+        return _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, ""); 
     }
 
     public String getNtcphostname() {
         if (!TransportManager.enableNTCP(_context))
             return "\" disabled=\"true";
-        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
-        if (hostname == null) return "";
-        return hostname;
+        return _context.getProperty(PROP_I2NP_NTCP_HOSTNAME, "");
     }
+
     public String getNtcpport() { 
         if (!TransportManager.enableNTCP(_context))
             return "\" disabled=\"true";
-        String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
-        if (port == null) return "";
-        return port;
+        return _context.getProperty(PROP_I2NP_NTCP_PORT, ""); 
     }
     
     public String getUdpAddress() {
@@ -90,10 +85,6 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
-    public String getHiddenModeChecked() {
-        return getChecked(Router.PROP_HIDDEN);
-    }
-
     public String getDynamicKeysChecked() {
         return getChecked(Router.PROP_DYNAMIC_KEYS);
     }
@@ -125,14 +116,17 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
-//////////////// FIXME
     public String getUdpAutoIPChecked(int mode) {
-        String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
+        String hostname = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST);
         boolean specified = hostname != null && hostname.length() > 0;
-        boolean auto = Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_IP)).booleanValue();
-        if ((mode == 0 && (!specified) && !auto) ||
-            (mode == 1 && specified && !auto) ||
-            (mode == 2 && auto))
+        boolean hidden = _context.router().isHidden();
+        String sources = _context.getProperty(UDPTransport.PROP_SOURCES, UDPTransport.DEFAULT_SOURCES);
+        if ((mode == 0 && sources.equals("ssu") && !hidden) ||
+            (mode == 1 && specified && !hidden) ||
+            (mode == 2 && hidden) ||
+            (mode == 3 && sources.equals("local,upnp,ssu") && !hidden) ||
+            (mode == 4 && sources.equals("local,ssu") && !hidden) ||
+            (mode == 5 && sources.equals("upnp,ssu") && !hidden))
             return CHECKED;
         return "";
     }

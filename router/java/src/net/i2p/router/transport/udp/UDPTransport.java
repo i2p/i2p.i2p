@@ -100,6 +100,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
     public static final int DEFAULT_INTERNAL_PORT = 8887;
+    private static final int MIN_EXTERNAL_PORT = 1024;
 
     /** define this to explicitly set an external IP address */
     public static final String PROP_EXTERNAL_HOST = "i2np.udp.host";
@@ -118,8 +119,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_PREFER_UDP = "i2np.udp.preferred";
     private static final String DEFAULT_PREFER_UDP = "false";
     
+    /** if true (default), we don't change our advertised port no matter what our peers tell us */
     public static final String PROP_FIXED_PORT = "i2np.udp.fixedPort";
     private static final String DEFAULT_FIXED_PORT = "true";
+
+    /** allowed sources of address updates */
+    public static final String PROP_SOURCES = "i2np.udp.addressSources";
+    public static final String DEFAULT_SOURCES = "local,upnp,ssu";
 
     /** do we require introducers, regardless of our status? */
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
@@ -326,11 +332,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /**
      * From config, UPnP, local i/f, ...
+     *
+     * @param source used for logging only
+     * @param ip publicly routable IPv4 only
+     * @param port 0 if unknown
      */
     public void externalAddressReceived(String source, byte[] ip, int port) {
         String s = RemoteHostId.toString(ip);
         if (_log.shouldLog(Log.WARN))
             _log.warn("Received address: " + s + " port: " + port + " from: " + source);
+        if (explicitAddressSpecified())
+            return;
+        String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
+        if (!sources.contains(source))
+            return;
+        changeAddress(ip, port);
     }
 
     /**
@@ -338,9 +354,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Right now, we just blindly trust them, changing our IP and port on a
      * whim.  this is not good ;)
      *
+     * Todo:
+     *   - Much better tracking of troublemakers
+     *   - Disable if we have good local address or UPnP
+     *
+     * @param ip publicly routable IPv4 only
+     * @param ourPort >= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
-        boolean isValid = isValid(ourIP);
+        boolean isValid = isValid(ourIP) && ourPort >= MIN_EXTERNAL_PORT;
         boolean explicitSpecified = explicitAddressSpecified();
         boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
@@ -350,15 +372,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         if (explicitSpecified) 
             return;
+        String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
+        if (!sources.contains("ssu"))
+            return;
         
-        boolean fixedPort = getIsPortFixed();
-        boolean updated = false;
-        boolean fireTest = false;
         if (!isValid) {
             // ignore them 
             if (_log.shouldLog(Log.ERROR))
                 _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
-                           + RemoteHostId.toString(ourIP) + ".  Lets throw tomatoes at them");
+                           + RemoteHostId.toString(ourIP) + " port " +  ourPort + ".  Lets throw tomatoes at them");
             markUnreachable(from);
             //_context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
@@ -367,6 +389,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.INFO))
                 _log.info("Ignoring IP address suggestion, since we have received an inbound con recently");
         } else {
+            changeAddress(ourIP, ourPort);
+        }
+        
+    }
+    
+    /**
+     * @param ourPort >= 1024 or 0 for no change
+     */
+    private void changeAddress(byte ourIP[], int ourPort) {
+        boolean fixedPort = getIsPortFixed();
+        boolean updated = false;
+        boolean fireTest = false;
+
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
@@ -378,11 +413,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             _log.info("Trying to change our external address...");
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
-                            if (!fixedPort)
+                            if (ourPort >= MIN_EXTERNAL_PORT && !fixedPort)
                                 _externalListenPort = ourPort;
-                            rebuildExternalAddress();
-                            replaceAddress(_externalAddress);
-                            updated = true;
+                            if (_externalListenPort >= MIN_EXTERNAL_PORT)  {
+                                rebuildExternalAddress();
+                                replaceAddress(_externalAddress);
+                                updated = true;
+                            }
                         } catch (UnknownHostException uhe) {
                             _externalListenHost = null;
                             if (_log.shouldLog(Log.INFO))
@@ -401,8 +438,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         _log.info("Same address as the current one");
                 }
             }
-        }
-        
+
         if (fireTest) {
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1, 0);
             _testEvent.forceRun();
@@ -417,7 +453,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
         }
     }
-    
+
     private static final boolean eq(byte laddr[], int lport, byte raddr[], int rport) {
         return (rport == lport) && DataHelper.eq(laddr, raddr);
     }

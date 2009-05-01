@@ -26,7 +26,10 @@ public class ConfigNetHandler extends FormHandler {
     private String _ntcpHostname;
     private String _ntcpPort;
     private String _tcpPort;
+    private String _udpHost1;
+    private String _udpHost2;
     private String _udpPort;
+    private String _udpAutoIP;
     private String _ntcpAutoIP;
     private boolean _ntcpAutoPort;
     private boolean _upnp;
@@ -40,6 +43,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _enableLoadTesting;
     private String _sharePct;
     private boolean _ratesOnly; // always false
+    private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
     protected void processForm() {
         if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
@@ -55,9 +59,12 @@ public class ConfigNetHandler extends FormHandler {
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
     public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
-    public void setHiddenMode(String moo) { _hiddenMode = true; }
     public void setDynamicKeys(String moo) { _dynamicKeys = true; }
     public void setEnableloadtesting(String moo) { _enableLoadTesting = true; }
+    public void setUdpAutoIP(String mode) {
+        _udpAutoIP = mode;
+        _hiddenMode = "hidden".equals(mode);
+    }
     public void setNtcpAutoIP(String mode) {
         _ntcpAutoIP = mode;
     }
@@ -77,6 +84,12 @@ public class ConfigNetHandler extends FormHandler {
     }
     public void setNtcpport(String port) {
         _ntcpPort = (port != null ? port.trim() : null);
+    }
+    public void setUdpHost1(String host) { 
+        _udpHost1 = (host != null ? host.trim() : null); 
+    }
+    public void setUdpHost2(String host) { 
+        _udpHost2 = (host != null ? host.trim() : null); 
     }
     public void setUdpPort(String port) { 
         _udpPort = (port != null ? port.trim() : null); 
@@ -117,6 +130,28 @@ public class ConfigNetHandler extends FormHandler {
         boolean restartRequired = false;
         
         if (!_ratesOnly) {
+            // IP Settings
+            String oldUdp = _context.getProperty(UDPTransport.PROP_SOURCES, UDPTransport.DEFAULT_SOURCES);
+            String oldUHost = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, "");
+            if (_udpAutoIP != null) {
+                String uhost = "";
+                if (_udpAutoIP.equals("fixed")) {
+                    if (_udpHost1 != null && _udpHost1.length() > 0)
+                        uhost =  _udpHost1;
+                    else if (_udpHost2 != null && _udpHost2.length() > 0)
+                        uhost =  _udpHost1;
+                    else
+                        _udpAutoIP = UDPTransport.DEFAULT_SOURCES;
+                }
+                _context.router().setConfigSetting(UDPTransport.PROP_SOURCES, _udpAutoIP);
+                _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
+                if ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost))) {
+                   addFormNotice("Updating IP address");
+                   restartRequired = true;
+                }
+            }
+
+            // NTCP Settings
             // Normalize some things to make the following code a little easier...
             String oldNHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
             if (oldNHost == null) oldNHost = "";
@@ -154,6 +189,7 @@ public class ConfigNetHandler extends FormHandler {
                 restartRequired = true;
             }
 
+            // UDP Settings
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
                 String oldPort = "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
                 if (!oldPort.equals(_udpPort)) {
@@ -168,6 +204,7 @@ public class ConfigNetHandler extends FormHandler {
         
         updateRates();
         
+        boolean switchRequired = false;
         if (!_ratesOnly) {
             if (_sharePct != null) {
                 String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
@@ -178,19 +215,14 @@ public class ConfigNetHandler extends FormHandler {
             }
 
             // If hidden mode value changes, restart is required
-            if (_hiddenMode && "false".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
-                _context.router().setConfigSetting(Router.PROP_HIDDEN, "true");
-                _context.router().addCapabilities(_context.router().getRouterInfo());
-                addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
+            switchRequired = _hiddenMode != _context.router().isHidden();
+            if (switchRequired) {
+                _context.router().setConfigSetting(PROP_HIDDEN, "" + _hiddenMode);
+                if (_hiddenMode)
+                    addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
                               + "<a href=\"configtunnels.jsp\">tunnels!</a>");
-                hiddenSwitch();
-            }
-
-            if (!_hiddenMode && "true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
-                _context.router().removeConfigSetting(Router.PROP_HIDDEN);
-                _context.router().getRouterInfo().delCapability(RouterInfo.CAPABILITY_HIDDEN);
-                addFormNotice("Gracefully restarting to exit Hidden Router Mode");
-                hiddenSwitch();
+                else
+                    addFormNotice("Gracefully restarting to exit Hidden Router Mode");
             }
 
             _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
@@ -225,7 +257,9 @@ public class ConfigNetHandler extends FormHandler {
                 addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
         }
         
-        if (restartRequired) {
+        if (switchRequired) {
+            hiddenSwitch();
+        } else if (restartRequired) {
             //addFormNotice("Performing a soft restart");
             //_context.router().restart();
             //addFormNotice("Soft restart complete");
