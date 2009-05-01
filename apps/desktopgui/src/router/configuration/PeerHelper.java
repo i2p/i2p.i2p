@@ -49,7 +49,7 @@ public class PeerHelper {
                 return "ERROR: The UDP port is already in use. Set i2np.udp.internalPort=xxxx to a different value in the advanced config and restart";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
-                ra = context.router().getRouterInfo().getTargetAddress("UDP");
+                ra = context.router().getRouterInfo().getTargetAddress("SSU");
                 if (ra == null && context.router().getUptime() > 5*60*1000) {
                     if (context.getProperty(PROP_I2NP_NTCP_HOSTNAME) == null ||
                         context.getProperty(PROP_I2NP_NTCP_PORT) == null)
