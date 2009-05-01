@@ -143,7 +143,6 @@ public class I2CPMessageReader {
                     _log.error("Error closing the stream", ioe);
                 }
             }
-            _stream = null;
         }
 
         public void run() {
@@ -186,7 +185,7 @@ public class I2CPMessageReader {
                     }
                 }
             }
-            // boom bye bye bad bwoy
+            _stream = null;
         }
     }
 }
