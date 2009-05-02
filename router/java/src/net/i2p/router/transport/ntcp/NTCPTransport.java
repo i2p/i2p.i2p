@@ -20,6 +20,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.CommSystemFacadeImpl;
@@ -37,7 +38,7 @@ public class NTCPTransport extends TransportImpl {
     private SharedBid _slowBid;
     private SharedBid _transientFail;
     private final Object _conLock;
-    private Map _conByIdent;
+    private Map<Hash, NTCPConnection> _conByIdent;
     private NTCPAddress _myAddress;
     private EventPumper _pumper;
     private Reader _reader;
@@ -564,6 +565,27 @@ public class NTCPTransport extends TransportImpl {
         // if (Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue())
         //    return foo;
         return _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_PORT, -1);
+    }
+
+    /**
+     * Maybe we should trust UPnP here and report OK if it opened the port, but
+     * for now we don't. Just go through and if we have one inbound connection,
+     * we must be good. As we drop idle connections pretty quickly, this will
+     * be fairly accurate.
+     *
+     * We have to be careful here because much of the router console code assumes
+     * that the reachability status is really just the UDP status.
+     */
+    public short getReachabilityStatus() { 
+        if (isAlive() && _myAddress != null) {
+            synchronized (_conLock) {
+                for (NTCPConnection con : _conByIdent.values()) {
+                    if (con.isInbound())
+                        return CommSystemFacade.STATUS_OK;
+                }
+            }
+        }
+        return CommSystemFacade.STATUS_UNKNOWN;
     }
 
     /**

@@ -44,6 +44,7 @@ public class TransportManager implements TransportEventListener {
     private final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
     private final static String DEFAULT_ENABLE_NTCP = "true";
     private final static String DEFAULT_ENABLE_UDP = "true";
+    /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
     
     public TransportManager(RouterContext context) {
@@ -56,7 +57,7 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _transports = new ArrayList();
-        if (Boolean.valueOf(_context.getProperty(PROP_ENABLE_UPNP)).booleanValue())
+        if (Boolean.valueOf(_context.getProperty(PROP_ENABLE_UPNP, "true")).booleanValue())
             _upnpManager = new UPnPManager(context, this);
     }
     
@@ -227,15 +228,15 @@ public class TransportManager implements TransportEventListener {
         return skews;
     }
     
+    /** @return the best status of any transport */
     public short getReachabilityStatus() { 
-        if (_transports.size() <= 0) return CommSystemFacade.STATUS_UNKNOWN;
-        short status[] = new short[_transports.size()];
-        for (int i = 0; i < _transports.size(); i++) {
-            status[i] = ((Transport)_transports.get(i)).getReachabilityStatus();
+        short rv = CommSystemFacade.STATUS_UNKNOWN;
+        for (Transport t : _transports) {
+            short s = t.getReachabilityStatus();
+            if (s < rv)
+                rv = s;
         }
-        // the values for the statuses are increasing for their 'badness'
-        Arrays.sort(status);
-        return status[0];
+        return rv;
     }
 
     public void recheckReachability() { 

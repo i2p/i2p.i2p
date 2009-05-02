@@ -232,7 +232,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 	public void unregisterPortMappings() {
 		Set ports;
 		synchronized(lock) {
-			ports = portsForwarded;
+			ports = new HashSet(portsForwarded);
 		}
 		this.unregisterPorts(ports);
 	}
@@ -406,10 +406,10 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		sb.append("<a name=\"upnp\"><b>UPnP Status:</b><br />");
 		
 		if(isDisabled) {
-			sb.append("The plugin has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?");
+			sb.append("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?");
 			return sb.toString();
 		} else if(!isNATPresent()) {
-			sb.append("The plugin hasn't found any UPnP aware, compatible device on your LAN.");
+			sb.append("UPnP has not found any UPnP-aware, compatible device on your LAN.");
 			return sb.toString();
 		}
 		

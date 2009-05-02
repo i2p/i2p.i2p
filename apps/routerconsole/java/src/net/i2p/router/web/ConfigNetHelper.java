@@ -132,8 +132,11 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
+    /** default true */
     public String getUpnpChecked() {
-        return getChecked(TransportManager.PROP_ENABLE_UPNP);
+        if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP, "true")).booleanValue())
+            return CHECKED;
+        return "";
     }
 
     public String getRequireIntroductionsChecked() {
@@ -229,7 +232,7 @@ public class ConfigNetHelper extends HelperBase {
     public String getSharePercentageBox() {
         int pct = (int) (100 * _context.router().getSharePercentage());
         StringBuffer buf = new StringBuffer(256);
-        buf.append("<select name=\"sharePercentage\">\n");
+        buf.append("<select style=\"text-align: right;\" name=\"sharePercentage\">\n");
         boolean found = false;
         for (int i = 30; i <= 110; i += 10) {
             int val = i;
@@ -239,7 +242,7 @@ public class ConfigNetHelper extends HelperBase {
                 else
                     val = pct;
             }
-            buf.append("<option value=\"").append(val).append("\" ");
+            buf.append("<option style=\"text-align: right;\" value=\"").append(val).append("\" ");
             if (pct == val) {
                 buf.append("selected=\"true\" ");
                 found = true;

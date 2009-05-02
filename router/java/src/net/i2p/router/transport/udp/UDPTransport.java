@@ -346,7 +346,28 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
         if (!sources.contains(source))
             return;
-        changeAddress(ip, port);
+        boolean changed = changeAddress(ip, port);
+        // Assume if we have an interface with a public IP that we aren't firewalled.
+        // If this is wrong, the peer test will figure it out and change the status.
+        if (changed && source.equals(Transport.SOURCE_INTERFACE))
+            setReachabilityStatus(CommSystemFacade.STATUS_OK);
+    }
+
+    /**
+     *  Callback from UPnP.
+     *  If we we have an IP address and UPnP claims success, believe it.
+     *  If this is wrong, the peer test will figure it out and change the status.
+     *  Don't do anything if UPnP claims failure.
+     */
+    public void forwardPortStatus(int port, boolean success, String reason) {
+        if (_log.shouldLog(Log.WARN)) {
+            if (success)
+                _log.warn("UPnP has opened the SSU port: " + port);
+            else
+                _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
+        }
+        if (success && _externalListenHost != null)
+            setReachabilityStatus(CommSystemFacade.STATUS_OK);
     }
 
     /**
@@ -397,7 +418,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      * @param ourPort >= 1024 or 0 for no change
      */
-    private void changeAddress(byte ourIP[], int ourPort) {
+    private boolean changeAddress(byte ourIP[], int ourPort) {
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         boolean fireTest = false;
@@ -405,7 +426,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                    if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
+                    if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
                          (_externalListenHost == null) || (_externalListenPort <= 0) ||
                          (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
@@ -452,6 +473,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _testEvent.forceRun();
             SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
         }
+        return updated;
     }
 
     private static final boolean eq(byte laddr[], int lport, byte raddr[], int rport) {
@@ -1199,8 +1221,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //                + " lastSentFully: " + sendDelay
             //                + " expired? " + msg.isExpired());
             consecutive = msg.getPeer().incrementConsecutiveFailedSends();
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Consecutive failure #" + consecutive 
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Consecutive failure #" + consecutive 
                           + " on " + msg.toString()
                           + " to " + msg.getPeer());
             if ( (_context.clock().now() - msg.getPeer().getLastSendFullyTime() <= 60*1000) || (consecutive < MAX_CONSECUTIVE_FAILED) ) {
@@ -1220,6 +1242,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private void noteSend(OutboundMessageState msg, boolean successful) {
+        // bail before we do all the work
+        if (!_context.messageHistory().getDoLog())
+            return;
         int pushCount = msg.getPushCount();
         int sends = msg.getMaxSends();
         boolean expired = msg.isExpired();
@@ -1256,10 +1281,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public void failed(OutNetMessage msg, String reason) {
         if (msg == null) return;
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Sending message failed: " + msg, new Exception("failed from"));
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending message failed: " + msg, new Exception("failed from"));
         
-        _context.messageHistory().sendMessage(msg.getMessageType(), msg.getMessageId(), msg.getExpiration(), 
+        if (!_context.messageHistory().getDoLog())
+            _context.messageHistory().sendMessage(msg.getMessageType(), msg.getMessageId(), msg.getExpiration(), 
                                               msg.getTarget().getIdentity().calculateHash(), false, reason);
         super.afterSend(msg, false);
     }

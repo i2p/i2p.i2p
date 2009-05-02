@@ -61,7 +61,7 @@ public class MessageHistory {
     }
     
     void setDoLog(boolean log) { _doLog = log; }
-    boolean getDoLog() { return _doLog; }
+    public boolean getDoLog() { return _doLog; }
     
     void setPauseFlushes(boolean doPause) { _doPause = doPause; }
     String getFilename() { return _historyFile; }
