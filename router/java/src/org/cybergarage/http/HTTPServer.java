@@ -174,7 +174,7 @@ public class HTTPServer implements Runnable
 			Thread.yield();
 			Socket sock;
 			try {
-				Debug.message("accept ...");
+				//Debug.message("accept ...");
 				sock = accept();
 				if (sock != null)
 					Debug.message("sock = " + sock.getRemoteSocketAddress());
@@ -185,7 +185,7 @@ public class HTTPServer implements Runnable
 			}
 			HTTPServerThread httpServThread = new HTTPServerThread(this, sock);
 			httpServThread.start(); 
-			Debug.message("httpServThread ...");
+			//Debug.message("httpServThread ...");
 		}
 	}
 	

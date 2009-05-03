@@ -12,7 +12,6 @@ import java.util.Set;
 
 import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
-import net.i2p.router.RouterContext;
 
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.ActionList;
@@ -94,6 +93,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 	public void terminate() {
 		unregisterPortMappings();
 		super.stop();
+		_router = null;
+		_service = null;
 	}
 	
 	public DetectedIP[] getAddress() {
@@ -140,10 +141,13 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 				return;
 			}
 		}
-		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice())
-				return; // Silently ignore non-IGD devices
-		else if(isNATPresent()) {
-			_log.error("We got a second IGD on the network! the plugin doesn't handle that: let's disable it.");
+		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice()) {
+			_log.warn("UP&P non-IGD device found, ignoring : " + dev.getFriendlyName());
+			return; // ignore non-IGD devices
+		} else if(isNATPresent()) {
+                        // maybe we should see if the old one went away before ignoring the new one?
+			_log.warn("UP&P ignoring additional IGD device found: " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+			/********** seems a little drastic
 			isDisabled = true;
 			
 			synchronized(lock) {
@@ -152,18 +156,21 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 			}
 			
 			stop();
+			**************/
 			return;
 		}
 		
-		_log.warn("UP&P IGD found : " + dev.getFriendlyName());
+		_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
 		synchronized(lock) {
 			_router = dev;
 		}
 		
 		discoverService();
 		// We have found the device we need: stop the listener thread
-		stop();
+		/// No, let's stick around to get notifications
+		//stop();
 		synchronized(lock) {
+			/// we should look for the next one
 			if(_service == null) {
 				_log.error("The IGD device we got isn't suiting our needs, let's disable the plugin");
 				isDisabled = true;
@@ -238,15 +245,29 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 	}
 	
 	public void deviceRemoved(Device dev ){
+		_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
 		synchronized (lock) {
 			if(_router == null) return;
-			if(_router.equals(dev)) {
+			// I2P this wasn't working
+			//if(_router.equals(dev)) {
+		        if(ROUTER_DEVICE.equals(dev.getDeviceType()) &&
+			   dev.isRootDevice() &&
+			   stringEquals(_router.getFriendlyName(), dev.getFriendlyName()) &&
+			   stringEquals(_router.getUDN(), dev.getUDN())) {
+				_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
 				_router = null;
 				_service = null;
 			}
 		}
 	}
 	
+	/** compare two strings, either of which could be null */
+	private static boolean stringEquals(String a, String b) {
+		if (a != null)
+			return a.equals(b);
+		return b == null;
+	}
+
 	/**
 	 * @return whether we are behind an UPnP-enabled NAT/router
 	 */
@@ -266,7 +287,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		if(getIP == null || !getIP.postControlAction())
 			return null;
 
-		return (getIP.getOutputArgumentList().getArgument("NewExternalIPAddress")).getValue();
+		String rv = (getIP.getOutputArgumentList().getArgument("NewExternalIPAddress")).getValue();
+		// I2P some devices return 0.0.0.0 when not connected
+		if ("0.0.0.0".equals(rv))
+			return null;
+		return rv;
 	}
 
 	/**
@@ -416,7 +441,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		// FIXME L10n!
 		sb.append("<p>Found ");
 		listSubDev(null, _router, sb);
-		sb.append("<br>The current external IP address reported by UPnP is " + getNATAddress());
+		String addr = getNATAddress();
+		if (addr != null)
+		    sb.append("<br>The current external IP address reported by UPnP is " + addr);
+		else
+		    sb.append("<br>The current external IP address is not available.");
 		int downstreamMaxBitRate = getDownstreamMaxBitRate();
 		int upstreamMaxBitRate = getUpstramMaxBitRate();
 		if(downstreamMaxBitRate > 0)
@@ -554,36 +583,78 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		return "?";
 	}
 
+	private static int __id = 0;
+
+	/**
+	 *  postControlAction() can take many seconds, especially if it's failing,
+         *  and onChangePublicPorts() may be called from threads we don't want to slow down,
+         *  so throw this in a thread.
+         */
 	private void registerPorts(Set<ForwardPort> portsToForwardNow) {
-		for(ForwardPort port : portsToForwardNow) {
-			String proto = protoToString(port.protocol);
-			if (proto.length() <= 1) {
-				HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-				map.put(port, new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber));
-				forwardCallback.portForwardStatus(map);
-				continue;
-			}
-			if(tryAddMapping(proto, port.portNumber, port.name, port)) {
-				HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-				map.put(port, new ForwardPortStatus(ForwardPortStatus.MAYBE_SUCCESS, "Port apparently forwarded by UPnP", port.portNumber));
-				forwardCallback.portForwardStatus(map);
-				continue;
-			} else {
-				HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-				map.put(port, new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber));
-				forwardCallback.portForwardStatus(map);
-				continue;
+	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));
+		t.setName("UPnP Port Opener " + (++__id));
+		t.setDaemon(true);
+		t.start();
+	}
+
+	private class RegisterPortsThread implements Runnable {
+		private Set<ForwardPort> portsToForwardNow;
+
+		public RegisterPortsThread(Set<ForwardPort> ports) {
+			portsToForwardNow = ports;
+		}
+
+		public void run() {
+			for(ForwardPort port : portsToForwardNow) {
+				String proto = protoToString(port.protocol);
+				if (proto.length() <= 1) {
+					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
+					map.put(port, new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber));
+					forwardCallback.portForwardStatus(map);
+					continue;
+				}
+				if(tryAddMapping(proto, port.portNumber, port.name, port)) {
+					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
+					map.put(port, new ForwardPortStatus(ForwardPortStatus.MAYBE_SUCCESS, "Port apparently forwarded by UPnP", port.portNumber));
+					forwardCallback.portForwardStatus(map);
+					continue;
+				} else {
+					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
+					map.put(port, new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber));
+					forwardCallback.portForwardStatus(map);
+					continue;
+				}
 			}
 		}
 	}
 
+	/**
+	 *  postControlAction() can take many seconds, especially if it's failing,
+         *  and onChangePublicPorts() may be called from threads we don't want to slow down,
+         *  so throw this in a thread.
+         */
 	private void unregisterPorts(Set<ForwardPort> portsToForwardNow) {
-		for(ForwardPort port : portsToForwardNow) {
-			String proto = protoToString(port.protocol);
-			if (proto.length() <= 1)
-				// Ignore, we've already complained about it
-				continue;
-			removeMapping(proto, port.portNumber, port, false);
+	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
+		t.setName("UPnP Port Opener " + (++__id));
+		t.setDaemon(true);
+		t.start();
+	}
+
+	private class UnregisterPortsThread implements Runnable {
+		private Set<ForwardPort> portsToForwardNow;
+
+		public UnregisterPortsThread(Set<ForwardPort> ports) {
+			portsToForwardNow = ports;
+		}
+
+		public void run() {
+			for(ForwardPort port : portsToForwardNow) {
+				String proto = protoToString(port.protocol);
+				if (proto.length() <= 1)
+					// Ignore, we've already complained about it
+					continue;
+				removeMapping(proto, port.portNumber, port, false);
+			}
 		}
 	}
 
