@@ -265,23 +265,23 @@ public class MUXlisten implements Runnable {
 				}
 				// Wait for child threads and thread groups to die
 				// System.out.println("MUXlisten: waiting for children");
-				if (tg.activeCount() + tg.activeGroupCount() != 0) {
-					tg.interrupt(); // give my stuff a small smack.
-					while ((tg.activeCount() + tg.activeGroupCount() != 0) && ticks != 0) {
-						ticks--;
-						try {
-							Thread.sleep(100); //sleep for 100 ms (One tenth second)
-						} catch (InterruptedException ex) {
-							break quit;
-						}
-					}
-					if (tg.activeCount() + tg.activeGroupCount() != 0) {
-						break quit; // Uh-oh.
-					}
-				}
-				tg.destroy();
+				// if (tg.activeCount() + tg.activeGroupCount() != 0) {
+				//	tg.interrupt(); // give my stuff a small smack.
+				//	while ((tg.activeCount() + tg.activeGroupCount() != 0) && ticks != 0) {
+				//		ticks--;
+				//		try {
+				//			Thread.sleep(100); //sleep for 100 ms (One tenth second)
+				//		} catch (InterruptedException ex) {
+				//			break quit;
+				//		}
+				//	}
+				//	if (tg.activeCount() + tg.activeGroupCount() != 0) {
+				//		break quit; // Uh-oh.
+				//	}
+				//}
+				//tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
-				tg = null;
+				//tg = null;
 			} catch (Exception e) {
 				// System.out.println("MUXlisten: Caught an exception" + e);
 				break quit;
@@ -305,7 +305,7 @@ public class MUXlisten implements Runnable {
 
 		// This is here to catch when something fucks up REALLY bad, like those annoying stuck threads!
 		if (tg != null) {
-			tg.interrupt(); // give my stuff a small smack again.
+			// tg.interrupt(); // give my stuff a small smack again.
 			if (SS != null) {
 				try {
 					SS.close();
@@ -319,21 +319,11 @@ public class MUXlisten implements Runnable {
 				} catch (IOException e) {
 				}
 			}
-			I2PSession session = socketManager.getSession();
-			if (session != null) {
-				// System.out.println("I2Plistener: destroySession");
-				try {
-					session.destroySession();
-				} catch (I2PSessionException ex) {
-					// nop
-					}
-			}
 			try {
 				socketManager.destroySocketManager();
 			} catch (Exception e) {
 				// nop
 			}
-			// ticks = 100; // 10 seconds
 			if (tg.activeCount() + tg.activeGroupCount() != 0) {
 				int foo = tg.activeCount() + tg.activeGroupCount();
 				int bar = foo;
@@ -352,15 +342,6 @@ public class MUXlisten implements Runnable {
 					}
 					bar = foo;
 					try {
-						session = socketManager.getSession();
-						if (session != null) {
-							// System.out.println("I2Plistener: destroySession");
-							try {
-								session.destroySession();
-							} catch (I2PSessionException ex) {
-								// nop
-							}
-						}
 						try {
 							socketManager.destroySocketManager();
 						} catch (Exception e) {
@@ -369,8 +350,6 @@ public class MUXlisten implements Runnable {
 					} catch (Exception e) {
 						// nop
 					}
-					// tg.interrupt(); // unwedge any blocking threads.
-					// ticks--;
 					try {
 						Thread.sleep(100); //sleep for 100 ms (One tenth second)
 					} catch (InterruptedException ex) {
@@ -379,20 +358,9 @@ public class MUXlisten implements Runnable {
 				}
 				System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
 			}
-//			if (tg.activeCount() + tg.activeGroupCount() == 0) {
 			tg.destroy();
 			// Zap reference to the ThreadGroup so the JVM can GC it.
 			tg = null;
-//			} else {
-//				System.out.println("BOB: MUXlisten: Forcibly killing threads.");
-//				System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN");
-//				visit(tg, 0);
-//				System.out.println("BOB: MUXlisten: ThreadGroup dump END\n\n");
-//				nuke(tg,0);
-//				tg.destroy();
-//				// Zap reference to the ThreadGroup so the JVM can GC it.
-//				tg = null;
-//			}
 		}
 	}
 

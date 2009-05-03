@@ -1,3 +1,7 @@
+2009-05-03 sponge
+    * More hopeful fixes for BOB.
+    * Added new Robert ID to snark
+
 2009-05-01 zzz
     * Build files:
       - Fix up susidns build file so it will work with gcj
