@@ -53,6 +53,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.cybergarage.util.Debug;
+
 public class HTTPRequest extends HTTPPacket
 {
 	////////////////////////////////////////////////
@@ -378,8 +380,20 @@ public class HTTPRequest extends HTTPPacket
 		InputStream in = null;
 		
  		try {
- 			if (postSocket == null)
-				postSocket = new Socket(host, port);
+ 			if (postSocket == null) {
+				// Mod for I2P
+				// We can't handle the default system soTimeout of 3 minutes or so
+				// as when the device goes away, this hangs the display of peers.jsp
+				// and who knows what else.
+				// Set the timeout to be nice and short, the device should be local and fast.
+				// If he can't get back to us in 2 seconds, forget it.
+				// And set the soTimeout to 1 second (for reads).
+				//postSocket = new Socket(host, port);
+				postSocket = new Socket();
+				postSocket.setSoTimeout(1000);
+				SocketAddress sa = new InetSocketAddress(host, port);
+				postSocket.connect(sa, 2000);
+			}
 
 			out = postSocket.getOutputStream();
 			PrintStream pout = new PrintStream(out);
@@ -416,6 +430,8 @@ public class HTTPRequest extends HTTPPacket
 		}
 		catch (Exception e) {
 			httpRes.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR);
+			// I2P addition
+			Debug.warning(e);
 		} finally {
 			if (isKeepAlive == false) {	
 				try {

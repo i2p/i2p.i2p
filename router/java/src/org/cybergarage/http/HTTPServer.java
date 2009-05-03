@@ -119,7 +119,7 @@ public class HTTPServer implements Runnable
 			return null;
 		try {
 			Socket sock = serverSock.accept();
-			sock.setSoTimeout(HTTP.DEFAULT_PORT * 1000);
+			sock.setSoTimeout(HTTP.DEFAULT_TIMEOUT * 1000);
 			return sock;
 		}
 		catch (Exception e) {
