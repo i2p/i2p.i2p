@@ -25,6 +25,7 @@ import org.cybergarage.upnp.ServiceList;
 import org.cybergarage.upnp.ServiceStateTable;
 import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.device.DeviceChangeListener;
+import org.cybergarage.upnp.event.EventListener;
 import org.freenetproject.DetectedIP;
 import org.freenetproject.ForwardPort;
 import org.freenetproject.ForwardPortCallback;
@@ -53,7 +54,7 @@ import org.freenetproject.ForwardPortStatus;
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  */ 
-public class UPnP extends ControlPoint implements DeviceChangeListener {
+public class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private Log _log;
 	private I2PAppContext _context;
 	
@@ -86,8 +87,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		addDeviceChangeListener(this);
 	}
 	
-	public void runPlugin() {
-		super.start();
+	public boolean runPlugin() {
+		return super.start();
 	}
 
 	public void terminate() {
@@ -160,7 +161,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 			return;
 		}
 		
-		_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+		_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN() + " lease time: " + dev.getLeaseTime());
 		synchronized(lock) {
 			_router = dev;
 		}
@@ -177,6 +178,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 				_router = null;
 				return;
 			}
+			subscribe(_service);
 		}
 		registerPortMappings();
 	}
@@ -261,6 +263,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 		}
 	}
 	
+	/** event callback */
+	public void eventNotifyReceived(String uuid, long seq, String varName, String value) {
+		_log.error("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
+	}
+
 	/** compare two strings, either of which could be null */
 	private static boolean stringEquals(String a, String b) {
 		if (a != null)
@@ -459,7 +466,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener {
 					if(portsForwarded.contains(port))
 						sb.append(" has been forwarded successfully by UPnP.\n");
 					else
-						sb.append(" has not been forwarded UPnP.\n");
+						sb.append(" has not been forwarded by UPnP.\n");
 				}
 			}
 		}

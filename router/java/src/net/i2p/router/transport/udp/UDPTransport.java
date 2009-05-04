@@ -126,6 +126,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** allowed sources of address updates */
     public static final String PROP_SOURCES = "i2np.udp.addressSources";
     public static final String DEFAULT_SOURCES = "local,upnp,ssu";
+    /** remember IP changes */
+    public static final String PROP_IP= "i2np.lastIP";
+    public static final String PROP_IP_CHANGE = "i2np.lastIPChange";
 
     /** do we require introducers, regardless of our status? */
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
@@ -462,17 +465,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         if (fireTest) {
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1, 0);
-            _testEvent.forceRun();
-            SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
         } else if (updated) {
             _context.statManager().addRateData("udp.addressUpdated", 1, 0);
             if (!fixedPort)
                 _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
+            // store these for laptop-mode (change ident on restart... or every time... when IP changes)
+            _context.router().setConfigSetting(PROP_IP, _externalListenHost.getHostAddress());
+            _context.router().setConfigSetting(PROP_IP_CHANGE, "" + _context.clock().now());
             _context.router().saveConfig();
             _context.router().rebuildRouterInfo();
-            _testEvent.forceRun();
-            SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
         }
+        _testEvent.forceRun();
+        SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
         return updated;
     }
 
@@ -485,7 +489,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (addr.length < 4) return false;
         if (isPubliclyRoutable(addr)) 
             return true;
-        return Boolean.valueOf(_context.getProperty("i2np.udp.allowLocal", "false")).booleanValue();
+        return Boolean.valueOf(_context.getProperty("i2np.udp.allowLocal")).booleanValue();
     }
     
     private boolean getIsPortFixed() {

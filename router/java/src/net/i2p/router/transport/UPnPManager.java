@@ -51,8 +51,9 @@ public class UPnPManager {
             Debug.on();  // UPnP stuff -> wrapper log
         }
         if (!_isRunning)
-            _upnp.runPlugin();
-        _isRunning = true;
+            _isRunning = _upnp.runPlugin();
+        if (!_isRunning)
+            _log.error("UPnP start failed - port conflict?");
     }
 
     public synchronized void stop() {

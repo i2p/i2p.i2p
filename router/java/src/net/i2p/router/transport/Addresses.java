@@ -9,6 +9,7 @@ import java.net.Inet4Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -54,7 +55,9 @@ public class Addresses {
             }
         } catch (SocketException e) {}
 
-        return rv.toArray(new String[rv.size()]);
+        String[] rva = rv.toArray(new String[rv.size()]);
+        Arrays.sort(rva);
+        return rva;
     }
 
     private static void add(Set<String> set, InetAddress ia) {
