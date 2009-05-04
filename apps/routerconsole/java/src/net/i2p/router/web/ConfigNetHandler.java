@@ -153,17 +153,16 @@ public class ConfigNetHandler extends FormHandler {
 
             // NTCP Settings
             // Normalize some things to make the following code a little easier...
-            String oldNHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
-            if (oldNHost == null) oldNHost = "";
-            String oldNPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
-            if (oldNPort == null) oldNPort = "";
-            String oldAutoHost = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP);
-            String sAutoPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT);
+            String oldNHost = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, "");
+            String oldNPort = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT, "");
+            String oldAutoHost = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, "true");
+            String sAutoPort = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "true");
             boolean oldAutoPort = "true".equalsIgnoreCase(sAutoPort);
             if (_ntcpHostname == null) _ntcpHostname = "";
             if (_ntcpPort == null) _ntcpPort = "";
+            if (_ntcpAutoIP == null) _ntcpAutoIP = "true";
 
-            if (oldAutoHost != _ntcpAutoIP || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
+            if ((!oldAutoHost.equals(_ntcpAutoIP)) || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
                 if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
                     addFormNotice("Updating inbound TCP address to " + _ntcpHostname);
@@ -172,7 +171,7 @@ public class ConfigNetHandler extends FormHandler {
                     if ("false".equals(_ntcpAutoIP))
                         addFormNotice("Disabling inbound TCP");
                     else
-                        addFormNotice("Updating inbound TCP address to auto");
+                        addFormNotice("Updating inbound TCP address to auto"); // true or always
                 }
                 _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
                 restartRequired = true;
@@ -206,14 +205,6 @@ public class ConfigNetHandler extends FormHandler {
         
         boolean switchRequired = false;
         if (!_ratesOnly) {
-            if (_sharePct != null) {
-                String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
-                if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
-                    _context.router().setConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
-                    addFormNotice("Updating bandwidth share percentage");
-                }
-            }
-
             // If hidden mode value changes, restart is required
             switchRequired = _hiddenMode != _context.router().isHidden();
             if (switchRequired) {
@@ -279,19 +270,33 @@ public class ConfigNetHandler extends FormHandler {
     
     private void updateRates() {
         boolean updated = false;
-        if ( (_inboundRate != null) && (_inboundRate.length() > 0) ) {
+
+        if (_sharePct != null) {
+            String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
+            if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
+                _context.router().setConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
+                addFormNotice("Updating bandwidth share percentage");
+                updated = true;
+            }
+        }
+
+        if ( (_inboundRate != null) && (_inboundRate.length() > 0) &&
+            !_inboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, _inboundRate);
             updated = true;
         }
-        if ( (_outboundRate != null) && (_outboundRate.length() > 0) ) {
+        if ( (_outboundRate != null) && (_outboundRate.length() > 0) &&
+            !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
             updated = true;
         }
-        if ( (_inboundBurstRate != null) && (_inboundBurstRate.length() > 0) ) {
+        if ( (_inboundBurstRate != null) && (_inboundBurstRate.length() > 0) &&
+            !_inboundBurstRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BURST_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, _inboundBurstRate);
             updated = true;
         }
-        if ( (_outboundBurstRate != null) && (_outboundBurstRate.length() > 0) ) {
+        if ( (_outboundBurstRate != null) && (_outboundBurstRate.length() > 0) &&
+            !_outboundBurstRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BURST_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, _outboundBurstRate);
             updated = true;
         }
@@ -332,8 +337,9 @@ public class ConfigNetHandler extends FormHandler {
             }
         }
         
-        if (updated && !_ratesOnly)
+        if (updated && !_ratesOnly) {
             _context.bandwidthLimiter().reinitialize();
             addFormNotice("Updated bandwidth limits");
+        }
     }
 }
