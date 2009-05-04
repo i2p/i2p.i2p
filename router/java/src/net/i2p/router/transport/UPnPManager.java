@@ -23,8 +23,6 @@ import org.freenetproject.ForwardPortStatus;
  * Bridge from the I2P RouterAddress data structure to
  * the freenet data structures
  *
- * UPnP listens on ports 1900, 8008, and 8058 - no config option yet.
- *
  * @author zzz
  */
 public class UPnPManager {
@@ -35,12 +33,24 @@ public class UPnPManager {
     private boolean _isRunning;
     private InetAddress _detectedAddress;
     private TransportManager _manager;
+    /**
+     *  This is the TCP HTTP Event listener
+     *  We move these so we don't conflict with other users of the same upnp library
+     *  UPnP also binds to port 1900 UDP for multicast reception - this cannot be changed.
+     */
+    private static final String PROP_HTTP_PORT = "i2np.upnp.HTTPPort";
+    private static final int DEFAULT_HTTP_PORT = 7652;
+    /** this is the UDP SSDP Search reply listener */
+    private static final String PROP_SSDP_PORT = "i2np.upnp.SSDPPort";
+    private static final int DEFAULT_SSDP_PORT = 7653;
 
     public UPnPManager(RouterContext context, TransportManager manager) {
         _context = context;
         _manager = manager;
         _log = _context.logManager().getLog(UPnPManager.class);
         _upnp = new UPnP(context);
+        _upnp.setHTTPPort(_context.getProperty(PROP_HTTP_PORT, DEFAULT_HTTP_PORT));
+        _upnp.setSSDPPort(_context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT));
         _upnpCallback = new UPnPCallback();
         _isRunning = false;
     }
