@@ -130,6 +130,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     
     public void messageAvailable(I2PSession session, int msgId, long size) {
         try {
+            I2PSocketImpl s;
             byte msg[] = session.receiveMessage(msgId);
             if (msg.length == 1 && msg[0] == -1) {
                 _log.debug(getName() + ": Ping received");

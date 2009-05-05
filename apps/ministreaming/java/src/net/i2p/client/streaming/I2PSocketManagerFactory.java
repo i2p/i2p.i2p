@@ -13,6 +13,7 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 /**

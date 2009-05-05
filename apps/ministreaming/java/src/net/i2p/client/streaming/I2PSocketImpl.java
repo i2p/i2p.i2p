@@ -350,6 +350,7 @@ class I2PSocketImpl implements I2PSocket {
                 read = bc.startToByteArray(len);
                 bc.notifyAll();
             }
+            boolean timedOut = false;
 
             while ( (read.length == 0) && (!inStreamClosed) ) {
                 synchronized (flagLock) {

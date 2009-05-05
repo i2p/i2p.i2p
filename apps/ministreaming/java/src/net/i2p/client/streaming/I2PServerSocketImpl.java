@@ -1,7 +1,6 @@
 package net.i2p.client.streaming;
 
 import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,82 +50,6 @@ class I2PServerSocketImpl implements I2PServerSocket {
     }
     
     /**
-     * Waits until there is a socket waiting for acception or the timeout is
-     * reached.
-     * 
-     * @param timeoutMs timeout in ms. A negative value waits forever.
-     *
-     * @throws I2PException if there is a problem with reading a new socket
-     *         from the data available (aka the I2PSession closed, etc)
-     * @throws ConnectException if the I2PServerSocket is closed
-     * @throws InterruptedException if thread is interrupted while waiting
-     */
-    public void waitIncoming(long timeoutMs) throws I2PException, ConnectException, InterruptedException {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("waitIncoming() called, pending: " + pendingSockets.size());
-        
-        boolean isTimed = (timeoutMs>0);
-        if (isTimed) {
-            Clock clock = I2PAppContext.getGlobalContext().clock();
-            long now = clock.now();
-            long end = now + timeoutMs;
-            while (pendingSockets.size() <= 0 && now<end) {
-                if (closing) throw new ConnectException("I2PServerSocket closed");
-                synchronized(socketAddedLock) {
-                    socketAddedLock.wait(end - now);
-                }
-                now = clock.now();
-            }
-        } else {
-            while (pendingSockets.size() <= 0) {
-                if (closing) throw new ConnectException("I2PServerSocket closed");
-                try {
-                    synchronized(socketAddedLock) {
-                        socketAddedLock.wait();
-                    }
-                } catch (InterruptedException ie) {}
-            }
-        }
-	}
-
-    /**
-     * accept(timeout) waits timeout ms for a socket connecting. If a socket is
-     * not available during the timeout, return null. accept(0) behaves like accept() 
-     *
-     * @param timeout in ms
-     *
-     * @return a connected I2PSocket, or null
-     *
-     * @throws I2PException if there is a problem with reading a new socket
-     *         from the data available (aka the I2PSession closed, etc)
-     * @throws ConnectException if the I2PServerSocket is closed
-     * @throws InterruptedException if thread is interrupted while waiting
-     */
-	public I2PSocket accept(long timeout) throws I2PException, ConnectException, InterruptedException {
-        I2PSocket ret = null;
-        
-        if (timeout<=0) {
-        	ret = accept();
-        } else {
-        	long now  = I2PAppContext.getGlobalContext().clock().now();
-            long expiration = timeout + now ;
-        	synchronized (pendingSockets) {
-                while (pendingSockets.size() == 0 && expiration>now) {
-                	pendingSockets.wait(expiration-now);
-                	now  = I2PAppContext.getGlobalContext().clock().now();
-                }
-                ret = (I2PSocket)pendingSockets.remove(0);
-            } 
-            if (ret != null) {
-                synchronized (socketAcceptedLock) {
-                    socketAcceptedLock.notifyAll();
-                }
-            }      	
-        }
-		return ret;
-	}
-
-	/**
      * Waits for the next socket connecting.  If a remote user tried to make a 
      * connection and the local application wasn't .accept()ing new connections,
      * they should get refused (if .accept() doesnt occur in some small period -
@@ -145,12 +68,24 @@ class I2PServerSocketImpl implements I2PServerSocket {
         I2PSocket ret = null;
         
         while ( (ret == null) && (!closing) ){
-        	try {
-        		this.waitIncoming(0);
-        		ret = accept(1);
-        	} catch (InterruptedException e) {
-        		throw new I2PException("Thread interrupted") ;
-        	}
+            while (pendingSockets.size() <= 0) {
+                if (closing) throw new ConnectException("I2PServerSocket closed");
+                try {
+                    synchronized(socketAddedLock) {
+                        socketAddedLock.wait();
+                    }
+                } catch (InterruptedException ie) {}
+            }
+            synchronized (pendingSockets) {
+                if (pendingSockets.size() > 0) {
+                    ret = (I2PSocket)pendingSockets.remove(0);
+                }
+            } 
+            if (ret != null) {
+                synchronized (socketAcceptedLock) {
+                    socketAcceptedLock.notifyAll();
+                }
+            }
         }
         
         if (_log.shouldLog(Log.DEBUG))

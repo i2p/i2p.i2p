@@ -21,7 +21,6 @@ class ConnectionHandler {
     private Log _log;
     private ConnectionManager _manager;
     private LinkedBlockingQueue<Packet> _synQueue;
-    private Object _synSignal;
     private boolean _active;
     private int _acceptTimeout;
     
@@ -41,7 +40,6 @@ class ConnectionHandler {
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
         _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
-        _synSignal= new Object();
         _active = false;
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
@@ -81,43 +79,12 @@ class ConnectionHandler {
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
             SimpleScheduler.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
-            // advertise the new syn packet to threads that could be waiting
-            // (by calling waitSyn(long)
-            if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
-            	synchronized (this._synSignal) {this._synSignal.notifyAll();}
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
                 sendReset(packet);
         }
-    }
-    
-    /**
-     * Wait until some SYN packet is available
-     * @param ms max amount of time to wait for a connection (if negative or null,
-     *                wait indefinitely)
-     * @throws InterruptedException
-     */
-    public void waitSyn( long ms ) throws InterruptedException {
-    	synchronized (this._synSignal)
-    	{
-    		long now = this._context.clock().now() ;
-    		long expiration = now + ms ;
-    		while ( expiration > now || ms<=0 ) {
-    			// check if there is a SYN packet in the queue
-    			for ( Packet p : this._synQueue ) {
-    				if ( p.isFlagSet(Packet.FLAG_SYNCHRONIZE) ) return ;
-    			}
-    			// wait until a SYN is signaled
-    			if ( ms == 0) {
-    				this._synSignal.wait();
-    			} else {
-    				this._synSignal.wait(expiration-now);
-    				now = this._context.clock().now();
-    			}
-    		}
-    	}
     }
     
     /**
