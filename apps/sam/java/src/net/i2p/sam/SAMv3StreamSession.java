@@ -266,20 +266,17 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	{
 	    		while (session.socketServer!=null) {
 	    			
+	    			// wait and accept a connection from I2P side
 	    			I2PSocket i2ps = null ;
 	    			try {
-	    				session.socketServer.waitIncoming(0);
-	    			} catch (ConnectException e) {
-	    				_log.debug("ConnectException");
-	    				break ;
-	    			} catch (I2PException e) {
-	    				_log.debug("I2PServerSocket has been closed");
-	    				break ;
-	    			} catch (InterruptedException e) {
-	    				_log.debug("InterruptedException");
-	    				break ;
-	    			}
+	    				i2ps = session.socketServer.accept();
+	    			} catch (Exception e) {}
 	    			
+	    			if (i2ps==null) {
+	    				continue ;
+	    			}
+
+	    			// open a socket towards client
 	    			java.net.InetSocketAddress addr = new java.net.InetSocketAddress(host,port);
 	    			
 	    			SocketChannel clientServerSock = null ;
@@ -289,17 +286,14 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    			catch ( IOException e ) {
 	    				continue ;
 	    			}
-	    			
-	    			try {
-	    				i2ps = session.socketServer.accept(1);
-	    			} catch (Exception e) {}
-	    			
-	    			if (i2ps==null) {
+	    			if (clientServerSock==null) {
 	    				try {
-	    					clientServerSock.close();
+	    					i2ps.close();
 	    				} catch (IOException ee) {}
 	    				continue ;
 	    			}
+
+	    			// build pipes between both sockets
 	    			try {
 	    				if (this.verbose)
 	    					SAMv3Handler.notifyStreamIncomingConnection(
@@ -308,11 +302,9 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    				ReadableByteChannel fromI2P    = Channels.newChannel(i2ps.getInputStream());
 	    				WritableByteChannel toClient   = clientServerSock ;
 	    				WritableByteChannel toI2P      = Channels.newChannel(i2ps.getOutputStream());
-	    				I2PAppThread send = new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P");
-	    				I2PAppThread recv = new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient");
-	    				send.start();
-	    				recv.start();
-	    				
+	    				(new I2PAppThread(new Pipe(fromClient,toI2P, "SAMPipeClientToI2P"), "SAMPipeClientToI2P")).start();
+	    				(new I2PAppThread(new Pipe(fromI2P,toClient, "SAMPipeI2PToClient"), "SAMPipeI2PToClient")).start();
+
 	    			} catch (IOException e) {
 	    				try {
 	    					clientServerSock.close();
