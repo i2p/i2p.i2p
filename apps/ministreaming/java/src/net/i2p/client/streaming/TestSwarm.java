@@ -28,6 +28,10 @@ public class TestSwarm {
     private String _conOptions; // unused? used elsewhere?
     private boolean _dead; // unused? used elsewhere?
     
+    public void antiCompilationWarnings() {
+    	_log.debug(""+_conOptions+_dead);
+    }
+    
     public static void main(String args[]) {
         if (args.length < 1) {
             System.err.println("Usage: TestSwarm myDestFile [peerDestFile ]*");
@@ -131,6 +135,14 @@ public class TestSwarm {
             _context.statManager().createRateStat("swarm." + _connectionId + ".lifetime", "How long we talk to a peer", "swarm", new long[] { 5*60*1000 });
         }
         
+        public void antiCompilationWarnings() {
+        	_log.debug(""+this._lastReceived+this._lastReceivedOn+this._started);
+        }
+        public void antiCompilationWarnings(long x, long y) {
+        	if (false)
+        		_log.debug(""+x+y);
+        }
+
         public Flooder(I2PSocket socket) {
             _socket = socket;
             _remoteDestination = socket.getPeerDestination();
@@ -154,6 +166,8 @@ public class TestSwarm {
             _context.random().nextBytes(data);
             long value = 0;
             long lastSend = _context.clock().now();
+            this.antiCompilationWarnings(value, lastSend);
+            
             if (_socket == null) {
                 try {
                     _socket = _manager.connect(_remoteDestination);

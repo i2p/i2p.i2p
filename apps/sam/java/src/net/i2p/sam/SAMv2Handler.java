@@ -9,7 +9,7 @@ package net.i2p.sam;
  */
 
 import java.io.IOException;
-import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
@@ -36,7 +36,7 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 		 * @param verMajor SAM major version to manage (should be 2)
 		 * @param verMinor SAM minor version to manage
 		 */
-		public SAMv2Handler ( Socket s, int verMajor, int verMinor ) throws SAMException, IOException
+		public SAMv2Handler ( SocketChannel s, int verMajor, int verMinor ) throws SAMException, IOException
 		{
 			this ( s, verMajor, verMinor, new Properties() );
 		}
@@ -52,7 +52,7 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 		 * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
 		 */
 
-		public SAMv2Handler ( Socket s, int verMajor, int verMinor, Properties i2cpProps ) throws SAMException, IOException
+		public SAMv2Handler ( SocketChannel s, int verMajor, int verMinor, Properties i2cpProps ) throws SAMException, IOException
 		{
 			super ( s, verMajor, verMinor, i2cpProps );
 		}

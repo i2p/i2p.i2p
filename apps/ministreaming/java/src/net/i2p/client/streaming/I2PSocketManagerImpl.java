@@ -43,12 +43,12 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     private I2PSession _session;
     private I2PServerSocketImpl _serverSocket = null;
     private Object lock = new Object(); // for locking socket lists
-    private HashMap _outSockets;
-    private HashMap _inSockets;
+    private HashMap<String,I2PSocket> _outSockets;
+    private HashMap<String,I2PSocket> _inSockets;
     private I2PSocketOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
-    private List _listeners;
+    private List<DisconnectListener> _listeners;
     private static int __managerId = 0;
     
     public static final short ACK = 0x51;
@@ -76,10 +76,10 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
         _name = name;
         _context = context;
         _log = _context.logManager().getLog(I2PSocketManager.class);
-        _inSockets = new HashMap(16);
-        _outSockets = new HashMap(16);
+        _inSockets = new HashMap<String,I2PSocket>(16);
+        _outSockets = new HashMap<String,I2PSocket>(16);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
-        _listeners = new ArrayList(1);
+        _listeners = new ArrayList<DisconnectListener>(1);
         setSession(session);
         setDefaultOptions(buildOptions(opts));
         _context.statManager().createRateStat("streaming.lifetime", "How long before the socket is closed?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -113,9 +113,9 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     public void disconnected(I2PSession session) {
         _log.info(getName() + ": Disconnected from the session");
         destroySocketManager();
-        List listeners = null;
+        List<DisconnectListener> listeners = null;
         synchronized (_listeners) {
-            listeners = new ArrayList(_listeners);
+            listeners = new ArrayList<DisconnectListener>(_listeners);
             _listeners.clear();
         }
         for (int i = 0; i < listeners.size(); i++) {
@@ -130,7 +130,6 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     
     public void messageAvailable(I2PSession session, int msgId, long size) {
         try {
-            I2PSocketImpl s;
             byte msg[] = session.receiveMessage(msgId);
             if (msg.length == 1 && msg[0] == -1) {
                 _log.debug(getName() + ": Ping received");
@@ -660,7 +659,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
      *
      */
     public Set listSockets() {
-        Set sockets = new HashSet(8);
+        Set<I2PSocket> sockets = new HashSet<I2PSocket>(8);
         synchronized (lock) {
             sockets.addAll(_inSockets.values());
             sockets.addAll(_outSockets.values());
