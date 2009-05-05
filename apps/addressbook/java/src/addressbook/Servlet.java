@@ -54,6 +54,7 @@ public class Servlet extends GenericServlet {
         args[0] = config.getInitParameter("home");
         DaemonThread thread = new DaemonThread(args);
         thread.setDaemon(true);
+        thread.setName("Addressbook");
         thread.start();
         System.out.println("INFO: Starting Addressbook " + Daemon.VERSION);
         System.out.println("INFO: config root under " + args[0]);
