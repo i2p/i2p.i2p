@@ -1,3 +1,9 @@
+2009-05-06 Mathiasdm
+    * Improvements to popup menu rightclick action
+    * Added general configuration options (still not available by default)
+    * General fixes
+    * Added ant build options (irc says eche|on would like that ;))
+
 2009-05-06 sponge
     * Hopefully the last fixes for BOB.
     * Fixes to prevent race in client-side I2CP and Notifier.

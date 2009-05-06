@@ -6,6 +6,8 @@
 
 package gui;
 
+import router.configuration.SpeedHelper;
+
 /**
  *
  * @author  mathias
@@ -15,8 +17,13 @@ public class GeneralConfiguration extends javax.swing.JFrame {
     /** Creates new form GeneralConfiguration */
     public GeneralConfiguration() {
         initComponents();
+        extraInitComponents();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setVisible(true);
+    }
+    
+    private void extraInitComponents() {
+        downloadspeed.setText(SpeedHelper.getInboundBandwidth());
     }
 
     /** This method is called from within the constructor to
@@ -28,25 +35,26 @@ public class GeneralConfiguration extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        applyPanel = new javax.swing.JPanel();
         cancel = new javax.swing.JToggleButton();
         ok = new javax.swing.JToggleButton();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox();
-        jComboBox2 = new javax.swing.JComboBox();
+        settingsPanel = new javax.swing.JTabbedPane();
+        speedPanel = new javax.swing.JPanel();
+        uploadSpeedLabel = new javax.swing.JLabel();
+        downloadSpeedLabel = new javax.swing.JLabel();
+        uploadspeed = new javax.swing.JTextField();
+        downloadspeed = new javax.swing.JTextField();
+        uploadkbps = new javax.swing.JComboBox();
+        downloadkbps = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        uploadgb = new javax.swing.JTextField();
+        downloadgb = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        updatesPanel = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
@@ -54,130 +62,164 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         jToggleButton1 = new javax.swing.JToggleButton();
         jToggleButton2 = new javax.swing.JToggleButton();
         jToggleButton3 = new javax.swing.JToggleButton();
-        jPanel4 = new javax.swing.JPanel();
+        tunnelPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        networkPanel = new javax.swing.JPanel();
+        advancedPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(desktopgui.Main.class).getContext().getResourceMap(GeneralConfiguration.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        jPanel1.setName("jPanel1"); // NOI18N
+        applyPanel.setName("applyPanel"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(desktopgui.Main.class).getContext().getResourceMap(GeneralConfiguration.class);
         cancel.setText(resourceMap.getString("cancel.text")); // NOI18N
         cancel.setName("cancel"); // NOI18N
 
         ok.setText(resourceMap.getString("ok.text")); // NOI18N
         ok.setName("ok"); // NOI18N
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout applyPanelLayout = new javax.swing.GroupLayout(applyPanel);
+        applyPanel.setLayout(applyPanelLayout);
+        applyPanelLayout.setHorizontalGroup(
+            applyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, applyPanelLayout.createSequentialGroup()
                 .addContainerGap(475, Short.MAX_VALUE)
                 .addComponent(ok)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cancel)
                 .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        applyPanelLayout.setVerticalGroup(
+            applyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(applyPanelLayout.createSequentialGroup()
+                .addGroup(applyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancel)
                     .addComponent(ok))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.setName("jTabbedPane1"); // NOI18N
+        settingsPanel.setName("settingsPanel"); // NOI18N
 
-        jPanel2.setName("jPanel2"); // NOI18N
-        jPanel2.setLayout(null);
+        speedPanel.setName("speedPanel"); // NOI18N
+        speedPanel.setLayout(null);
 
-        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
-        jLabel1.setName("jLabel1"); // NOI18N
-        jPanel2.add(jLabel1);
-        jLabel1.setBounds(20, 20, 140, 30);
+        uploadSpeedLabel.setText(resourceMap.getString("uploadSpeedLabel.text")); // NOI18N
+        uploadSpeedLabel.setName("uploadSpeedLabel"); // NOI18N
+        speedPanel.add(uploadSpeedLabel);
+        uploadSpeedLabel.setBounds(20, 20, 140, 30);
 
-        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
-        jLabel2.setName("jLabel2"); // NOI18N
-        jPanel2.add(jLabel2);
-        jLabel2.setBounds(20, 60, 140, 30);
+        downloadSpeedLabel.setText(resourceMap.getString("downloadSpeedLabel.text")); // NOI18N
+        downloadSpeedLabel.setName("downloadSpeedLabel"); // NOI18N
+        speedPanel.add(downloadSpeedLabel);
+        downloadSpeedLabel.setBounds(20, 60, 140, 30);
 
-        jTextField1.setText(resourceMap.getString("jTextField1.text")); // NOI18N
-        jTextField1.setName("jTextField1"); // NOI18N
-        jPanel2.add(jTextField1);
-        jTextField1.setBounds(160, 20, 77, 27);
+        uploadspeed.setText(resourceMap.getString("uploadspeed.text")); // NOI18N
+        uploadspeed.setName("uploadspeed"); // NOI18N
+        uploadspeed.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                speedKeyTyped(evt);
+            }
+        });
+        speedPanel.add(uploadspeed);
+        uploadspeed.setBounds(160, 20, 77, 27);
 
-        jTextField2.setText(resourceMap.getString("jTextField2.text")); // NOI18N
-        jTextField2.setName("jTextField2"); // NOI18N
-        jPanel2.add(jTextField2);
-        jTextField2.setBounds(160, 60, 77, 27);
+        downloadspeed.setText(resourceMap.getString("downloadspeed.text")); // NOI18N
+        downloadspeed.setName("downloadspeed"); // NOI18N
+        downloadspeed.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                speedKeyTyped(evt);
+            }
+        });
+        speedPanel.add(downloadspeed);
+        downloadspeed.setBounds(160, 60, 77, 27);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox1.setName("jComboBox1"); // NOI18N
-        jPanel2.add(jComboBox1);
-        jComboBox1.setBounds(240, 20, 78, 27);
+        uploadkbps.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "kbps", "kBps" }));
+        uploadkbps.setName("uploadkbps"); // NOI18N
+        uploadkbps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadkbpsActionPerformed(evt);
+            }
+        });
+        speedPanel.add(uploadkbps);
+        uploadkbps.setBounds(240, 20, 68, 27);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox2.setName("jComboBox2"); // NOI18N
-        jPanel2.add(jComboBox2);
-        jComboBox2.setBounds(240, 60, 78, 27);
+        downloadkbps.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "kbps", "kBps" }));
+        downloadkbps.setName("downloadkbps"); // NOI18N
+        downloadkbps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downloadkbpsActionPerformed(evt);
+            }
+        });
+        speedPanel.add(downloadkbps);
+        downloadkbps.setBounds(240, 60, 68, 27);
 
         jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
-        jPanel2.add(jLabel3);
+        speedPanel.add(jLabel3);
         jLabel3.setBounds(330, 20, 97, 30);
 
         jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
         jLabel4.setName("jLabel4"); // NOI18N
-        jPanel2.add(jLabel4);
+        speedPanel.add(jLabel4);
         jLabel4.setBounds(330, 60, 97, 30);
 
-        jTextField3.setText(resourceMap.getString("jTextField3.text")); // NOI18N
-        jTextField3.setName("jTextField3"); // NOI18N
-        jPanel2.add(jTextField3);
-        jTextField3.setBounds(440, 20, 60, 27);
+        uploadgb.setText(resourceMap.getString("uploadgb.text")); // NOI18N
+        uploadgb.setName("uploadgb"); // NOI18N
+        uploadgb.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                uploadgbKeyTyped(evt);
+            }
+        });
+        speedPanel.add(uploadgb);
+        uploadgb.setBounds(440, 20, 60, 27);
 
-        jTextField4.setText(resourceMap.getString("jTextField4.text")); // NOI18N
-        jTextField4.setName("jTextField4"); // NOI18N
-        jPanel2.add(jTextField4);
-        jTextField4.setBounds(440, 60, 60, 27);
+        downloadgb.setText(resourceMap.getString("downloadgb.text")); // NOI18N
+        downloadgb.setName("downloadgb"); // NOI18N
+        downloadgb.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                downloadgbKeyTyped(evt);
+            }
+        });
+        speedPanel.add(downloadgb);
+        downloadgb.setBounds(440, 60, 60, 27);
 
         jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
         jLabel5.setName("jLabel5"); // NOI18N
-        jPanel2.add(jLabel5);
+        speedPanel.add(jLabel5);
         jLabel5.setBounds(510, 20, 19, 30);
 
         jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
         jLabel6.setName("jLabel6"); // NOI18N
-        jPanel2.add(jLabel6);
+        speedPanel.add(jLabel6);
         jLabel6.setBounds(510, 60, 19, 30);
 
         jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
         jLabel7.setName("jLabel7"); // NOI18N
-        jPanel2.add(jLabel7);
+        speedPanel.add(jLabel7);
         jLabel7.setBounds(20, 100, 520, 70);
 
-        jTabbedPane1.addTab(resourceMap.getString("jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
+        settingsPanel.addTab(resourceMap.getString("speedPanel.TabConstraints.tabTitle"), speedPanel); // NOI18N
 
-        jPanel3.setName("jPanel3"); // NOI18N
+        updatesPanel.setName("updatesPanel"); // NOI18N
 
         jLabel8.setText(resourceMap.getString("jLabel8.text")); // NOI18N
         jLabel8.setName("jLabel8"); // NOI18N
 
+        buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText(resourceMap.getString("jRadioButton1.text")); // NOI18N
         jRadioButton1.setName("jRadioButton1"); // NOI18N
 
+        buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText(resourceMap.getString("jRadioButton2.text")); // NOI18N
         jRadioButton2.setName("jRadioButton2"); // NOI18N
 
+        buttonGroup1.add(jRadioButton3);
         jRadioButton3.setText(resourceMap.getString("jRadioButton3.text")); // NOI18N
         jRadioButton3.setName("jRadioButton3"); // NOI18N
 
@@ -190,35 +232,35 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         jToggleButton3.setText(resourceMap.getString("jToggleButton3.text")); // NOI18N
         jToggleButton3.setName("jToggleButton3"); // NOI18N
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout updatesPanelLayout = new javax.swing.GroupLayout(updatesPanel);
+        updatesPanel.setLayout(updatesPanelLayout);
+        updatesPanelLayout.setHorizontalGroup(
+            updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(updatesPanelLayout.createSequentialGroup()
+                .addGroup(updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(updatesPanelLayout.createSequentialGroup()
                         .addGap(20, 20, 20)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addGroup(updatesPanelLayout.createSequentialGroup()
                                 .addComponent(jToggleButton1)
                                 .addGap(18, 18, 18)
                                 .addComponent(jToggleButton2))))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(updatesPanelLayout.createSequentialGroup()
                         .addGap(40, 40, 40)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jRadioButton2)
                             .addComponent(jRadioButton1)
                             .addComponent(jRadioButton3))))
                 .addGap(9, 9, 9))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatesPanelLayout.createSequentialGroup()
                 .addContainerGap(339, Short.MAX_VALUE)
                 .addComponent(jToggleButton3)
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        updatesPanelLayout.setVerticalGroup(
+            updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(updatesPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -228,7 +270,7 @@ public class GeneralConfiguration extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton3)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jToggleButton1)
                     .addComponent(jToggleButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
@@ -236,9 +278,9 @@ public class GeneralConfiguration extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab(resourceMap.getString("jPanel3.TabConstraints.tabTitle"), jPanel3); // NOI18N
+        settingsPanel.addTab(resourceMap.getString("updatesPanel.TabConstraints.tabTitle"), updatesPanel); // NOI18N
 
-        jPanel4.setName("jPanel4"); // NOI18N
+        tunnelPanel.setName("tunnelPanel"); // NOI18N
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
@@ -253,13 +295,13 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         jLabel11.setText(resourceMap.getString("jLabel11.text")); // NOI18N
         jLabel11.setName("jLabel11"); // NOI18N
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout tunnelPanelLayout = new javax.swing.GroupLayout(tunnelPanel);
+        tunnelPanel.setLayout(tunnelPanelLayout);
+        tunnelPanelLayout.setHorizontalGroup(
+            tunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tunnelPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(tunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
                     .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
                     .addComponent(jLabel10)
@@ -267,9 +309,9 @@ public class GeneralConfiguration extends javax.swing.JFrame {
                     .addComponent(jLabel11))
                 .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        tunnelPanelLayout.setVerticalGroup(
+            tunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tunnelPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -283,67 +325,110 @@ public class GeneralConfiguration extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab(resourceMap.getString("jPanel4.TabConstraints.tabTitle"), jPanel4); // NOI18N
+        settingsPanel.addTab(resourceMap.getString("tunnelPanel.TabConstraints.tabTitle"), tunnelPanel); // NOI18N
 
-        jPanel5.setName("jPanel5"); // NOI18N
+        networkPanel.setName("networkPanel"); // NOI18N
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout networkPanelLayout = new javax.swing.GroupLayout(networkPanel);
+        networkPanel.setLayout(networkPanelLayout);
+        networkPanelLayout.setHorizontalGroup(
+            networkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 562, Short.MAX_VALUE)
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        networkPanelLayout.setVerticalGroup(
+            networkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 388, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab(resourceMap.getString("jPanel5.TabConstraints.tabTitle"), jPanel5); // NOI18N
+        settingsPanel.addTab(resourceMap.getString("networkPanel.TabConstraints.tabTitle"), networkPanel); // NOI18N
 
-        jPanel6.setName("jPanel6"); // NOI18N
+        advancedPanel.setName("advancedPanel"); // NOI18N
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout advancedPanelLayout = new javax.swing.GroupLayout(advancedPanel);
+        advancedPanel.setLayout(advancedPanelLayout);
+        advancedPanelLayout.setHorizontalGroup(
+            advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 562, Short.MAX_VALUE)
         );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        advancedPanelLayout.setVerticalGroup(
+            advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 388, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab(resourceMap.getString("jPanel6.TabConstraints.tabTitle"), jPanel6); // NOI18N
+        settingsPanel.addTab(resourceMap.getString("advancedPanel.TabConstraints.tabTitle"), advancedPanel); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(applyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE))
+                .addComponent(settingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jTabbedPane1)
+                .addComponent(settingsPanel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(applyPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+private void speedKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_speedKeyTyped
+    try {
+        String upload = "";
+        if(uploadkbps.getSelectedIndex() == KILOBIT)
+            upload = "" + Integer.parseInt(uploadspeed.getText())/8;
+        else
+            upload = uploadspeed.getText();
+        String download = "";
+        if(downloadkbps.getSelectedIndex() == KILOBIT)
+            download = "" + Integer.parseInt(downloadspeed.getText())/8;
+        else
+            download = downloadspeed.getText();
+        initUsage(upload, download);
+    }
+    catch(NumberFormatException e) {
+        e.printStackTrace();
+        return;
+    }
+}//GEN-LAST:event_speedKeyTyped
+
+private void uploadkbpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadkbpsActionPerformed
+    // TODO add your handling code here:
+}//GEN-LAST:event_uploadkbpsActionPerformed
+
+private void downloadkbpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadkbpsActionPerformed
+    // TODO add your handling code here:
+}//GEN-LAST:event_downloadkbpsActionPerformed
+
+private void uploadgbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_uploadgbKeyTyped
+    // TODO add your handling code here:
+}//GEN-LAST:event_uploadgbKeyTyped
+
+private void downloadgbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_downloadgbKeyTyped
+    // TODO add your handling code here:
+}//GEN-LAST:event_downloadgbKeyTyped
+
+    protected void initUsage(String upload, String download) {
+        uploadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(upload)));
+        downloadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(download)));
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel advancedPanel;
+    private javax.swing.JPanel applyPanel;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JToggleButton cancel;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JComboBox jComboBox2;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel downloadSpeedLabel;
+    private javax.swing.JTextField downloadgb;
+    private javax.swing.JComboBox downloadkbps;
+    private javax.swing.JTextField downloadspeed;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -351,26 +436,26 @@ public class GeneralConfiguration extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JToggleButton jToggleButton3;
+    private javax.swing.JPanel networkPanel;
     private javax.swing.JToggleButton ok;
+    private javax.swing.JTabbedPane settingsPanel;
+    private javax.swing.JPanel speedPanel;
+    private javax.swing.JPanel tunnelPanel;
+    private javax.swing.JPanel updatesPanel;
+    private javax.swing.JLabel uploadSpeedLabel;
+    private javax.swing.JTextField uploadgb;
+    private javax.swing.JComboBox uploadkbps;
+    private javax.swing.JTextField uploadspeed;
     // End of variables declaration//GEN-END:variables
 
+    public static final int KILOBIT = 0;
+    public static final int KILOBYTE = 1;
 }

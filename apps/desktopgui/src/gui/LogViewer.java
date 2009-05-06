@@ -73,6 +73,8 @@ public class LogViewer extends javax.swing.JFrame {
         clearButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(desktopgui.Main.class).getContext().getResourceMap(LogViewer.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
         textScroll.setName("textScroll"); // NOI18N
@@ -82,7 +84,6 @@ public class LogViewer extends javax.swing.JFrame {
         logText.setName("logText"); // NOI18N
         textScroll.setViewportView(logText);
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(desktopgui.Main.class).getContext().getResourceMap(LogViewer.class);
         explanationText.setText(resourceMap.getString("explanationText.text")); // NOI18N
         explanationText.setName("explanationText"); // NOI18N
 
