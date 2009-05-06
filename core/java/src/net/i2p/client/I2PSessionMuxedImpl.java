@@ -202,20 +202,23 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
         private LinkedBlockingQueue<MsgData> _msgs;
         private AtomicBoolean _alive = new AtomicBoolean(false);
         private static final int POISON_SIZE = -99999;
- 
+        private AtomicBoolean stopping = new AtomicBoolean(false);
+
         public MuxedAvailabilityNotifier() {
             _msgs = new LinkedBlockingQueue();
         }
 
         @Override
         public void stopNotifying() {
+            if(stopping.get()) return;
+            stopping.set(true);
             boolean again = true;
-            _msgs.clear();
+            // _msgs.clear();
             // Thread.yield();
             if (_alive.get()) {
                 // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
+                _msgs.clear();
                 while(again) {
-                    _msgs.clear();
                     try {
                         _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
                         again = false;
@@ -226,6 +229,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
                 }
             }
             _alive.set(false);
+            stopping.set(false); // Do we need this?
         }
         
         /** unused */

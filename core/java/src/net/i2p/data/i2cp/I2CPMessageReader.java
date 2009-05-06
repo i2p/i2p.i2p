@@ -115,8 +115,8 @@ public class I2CPMessageReader {
     }
 
     private class I2CPMessageReaderRunner implements Runnable {
-        private boolean _doRun;
-        private boolean _stayAlive;
+        private volatile boolean _doRun;
+        private volatile boolean _stayAlive;
 
         public I2CPMessageReaderRunner() {
             _doRun = true;
