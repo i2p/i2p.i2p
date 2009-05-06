@@ -28,8 +28,10 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
 
- <b>Bandwidth limiter</b><br />
+ <h3>Bandwidth limiter</h3>
  <p>
+ <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
+ </p><p>
     <table>
     <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
     In <td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)<br />
@@ -75,7 +77,10 @@
  <a href="oldstats.jsp#test.rtt">test.rtt</a> and related stats.</p>
  <hr />
 -->
+ <h3>IP and Transport Configuration</h3>
  <p>
+ <b>The default settings will work for most people. There is <a href="#chelp">help below</a>.</b>
+ </p><p>
  <b>UPnP Configuration:</b><br />
     <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     Enable UPnP to open firewall ports <a href="peers.jsp#upnp">UPnP status</a>
@@ -108,7 +113,7 @@
     %>
     <br />
     <input type="radio" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
-    Hidden mode - do not publish IP<i>(not recommended; change restarts router)</i><br />
+    Hidden mode - do not publish IP<i>(prevents participating traffic; change restarts router)</i><br />
  </p><p>
  <b>UDP Configuration:</b><br />
  UDP port:
@@ -135,7 +140,7 @@
     Specify hostname or IP:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" /><br />
     <input type="radio" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
-    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP - restart required)</i><br />
+    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP - change requires restart)</i><br />
  </p><p>
  Externally reachable TCP port:<br />
     <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
