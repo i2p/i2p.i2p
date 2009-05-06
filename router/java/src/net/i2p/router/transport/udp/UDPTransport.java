@@ -100,6 +100,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
     public static final int DEFAULT_INTERNAL_PORT = 8887;
+    /** since fixed port defaults to true, this doesnt do anything at the moment.
+     *  We should have an exception if it matches the existing low port. */
     private static final int MIN_EXTERNAL_PORT = 1024;
 
     /** define this to explicitly set an external IP address */
@@ -386,7 +388,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ourPort >= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
-        boolean isValid = isValid(ourIP) && ourPort >= MIN_EXTERNAL_PORT;
+        boolean isValid = isValid(ourIP) &&
+                          (ourPort >= MIN_EXTERNAL_PORT || ourPort == _externalListenPort || _externalListenPort <= 0);
         boolean explicitSpecified = explicitAddressSpecified();
         boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
@@ -422,6 +425,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ourPort >= 1024 or 0 for no change
      */
     private boolean changeAddress(byte ourIP[], int ourPort) {
+        /** this defaults to true, which means we never change our external port based on what somebody tells us */
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         boolean fireTest = false;
@@ -437,9 +441,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             _log.info("Trying to change our external address...");
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
+                            // fixed port defaults to true so we never do this
                             if (ourPort >= MIN_EXTERNAL_PORT && !fixedPort)
                                 _externalListenPort = ourPort;
-                            if (_externalListenPort >= MIN_EXTERNAL_PORT)  {
+                            if (_externalListenPort > 0)  {
                                 rebuildExternalAddress();
                                 replaceAddress(_externalAddress);
                                 updated = true;
@@ -1171,12 +1176,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public boolean introducersRequired() {
+        /******************
+         *  Don't do this anymore, as we are removing the checkbox from the UI,
+         *  and we rarely if ever see the problem of false negatives for firewall detection -
+         *  it's usually false positives.
+         ******************
         String forceIntroducers = _context.getProperty(PROP_FORCE_INTRODUCERS);
         if ( (forceIntroducers != null) && (Boolean.valueOf(forceIntroducers).booleanValue()) ) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Force introducers specified");
             return true;
         }
+        *******************/
         short status = getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
@@ -1194,6 +1205,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    /** default true */
     private boolean allowDirectUDP() {
         String allowDirect = _context.getProperty(PROP_ALLOW_DIRECT);
         return ( (allowDirect == null) || (Boolean.valueOf(allowDirect).booleanValue()) );

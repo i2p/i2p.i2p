@@ -40,10 +40,10 @@ public class TransportManager implements TransportEventListener {
     private RouterContext _context;
     private UPnPManager _upnpManager;
 
-    private final static String PROP_ENABLE_UDP = "i2np.udp.enable";
-    private final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
-    private final static String DEFAULT_ENABLE_NTCP = "true";
-    private final static String DEFAULT_ENABLE_UDP = "true";
+    public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
+    public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
+    public final static String DEFAULT_ENABLE_NTCP = "true";
+    public final static String DEFAULT_ENABLE_UDP = "true";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
     

@@ -28,14 +28,10 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getNtcphostname() {
-        if (!TransportManager.enableNTCP(_context))
-            return "\" disabled=\"true";
         return _context.getProperty(PROP_I2NP_NTCP_HOSTNAME, "");
     }
 
     public String getNtcpport() { 
-        if (!TransportManager.enableNTCP(_context))
-            return "\" disabled=\"true";
         return _context.getProperty(PROP_I2NP_NTCP_PORT, ""); 
     }
     
@@ -91,8 +87,6 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getTcpAutoPortChecked(int mode) {
-        if (!TransportManager.enableNTCP(_context))
-            return DISABLED;
         String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
         boolean specified = port != null && port.length() > 0;
         if ((mode == 1 && specified) ||
@@ -102,17 +96,15 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getTcpAutoIPChecked(int mode) {
-        if (!TransportManager.enableNTCP(_context))
-            return DISABLED;
+        boolean enabled = TransportManager.enableNTCP(_context);
         String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
         boolean specified = hostname != null && hostname.length() > 0;
-        String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP);
-        if (auto == null)
-            auto = "false";
-        if ((mode == 0 && (!specified) && auto.equals("false")) ||
-            (mode == 1 && specified && auto.equals("false")) ||
-            (mode == 2 && auto.equals("true")) ||
-            (mode == 3 && auto.equals("always")))
+        String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
+        if ((mode == 0 && (!specified) && auto.equals("false") && enabled) ||
+            (mode == 1 && specified && auto.equals("false") && enabled) ||
+            (mode == 2 && auto.equals("true") && enabled) ||
+            (mode == 3 && auto.equals("always") && enabled) ||
+            (mode == 4 && !enabled))
             return CHECKED;
         return "";
     }

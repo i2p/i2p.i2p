@@ -111,15 +111,17 @@
     Hidden mode - do not publish IP<i>(not recommended; change restarts router)</i><br />
  </p><p>
  <b>UDP Configuration:</b><br />
- Internal UDP port:
+ UDP port:
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
+<!-- let's keep this simple...
 <input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
  Require SSU introductions
  <i>(Enable if you cannot open your firewall)</i>
  </p><p>
  Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
+-->
  </p><p>
- <b>Inbound TCP Configuration:</b><br />
+ <b>TCP Configuration:</b><br />
  Externally reachable hostname or IP address:<br />
     <input type="radio" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> />
     Use auto-detected IP address
@@ -128,11 +130,12 @@
     <input type="radio" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> />
     Always use auto-detected IP address (Not firewalled)<br />
     <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
-    Disable (Firewalled)<br />
+    Disable inbound (Firewalled)<br />
     <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> />
     Specify hostname or IP:
-    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" />
-    <br />
+    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" /><br />
+    <input type="radio" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
+    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP - restart required)</i><br />
  </p><p>
  Externally reachable TCP port:<br />
     <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
@@ -152,9 +155,11 @@
     with "SSU introductions" - peers who will relay a request from someone you don't know to your
     router for your router so that you can make an outbound connection to them.  I2P will use these
     introductions automatically if it detects that the port is not forwarded (as shown by
-    the <i>Reachability: Firewalled</i> line), or you can manually require them here.  
+    the <i>Reachability: Firewalled</i> line).
     Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
+<!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
+-->
  <p>Hostnames entered here will be published in the network database.
     They are <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.

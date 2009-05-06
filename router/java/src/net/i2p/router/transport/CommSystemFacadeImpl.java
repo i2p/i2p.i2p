@@ -27,6 +27,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPAddress;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPAddress;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
@@ -151,8 +152,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     @Override
     public short getReachabilityStatus() { 
-        if (_manager == null) return CommSystemFacade.STATUS_UNKNOWN;
-        if (_context.router().isHidden()) return CommSystemFacade.STATUS_OK;
+        if (_manager == null) return STATUS_UNKNOWN;
+        if (_context.router().isHidden()) return STATUS_OK;
         return _manager.getReachabilityStatus(); 
     }
     @Override
@@ -303,10 +304,14 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
         if (name != null && name.length() > 0)
             enabled = "false";
+        Transport udp = _manager.getTransport(UDPTransport.STYLE);
+        short status = STATUS_UNKNOWN;
+        if (udp != null)
+            status = udp.getReachabilityStatus();
         if (_log.shouldLog(Log.INFO))
-            _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + getReachabilityStatus());
+            _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
         if (enabled.equalsIgnoreCase("always") ||
-            (enabled.equalsIgnoreCase("true") && getReachabilityStatus() == CommSystemFacade.STATUS_OK)) {
+            (enabled.equalsIgnoreCase("true") && status == STATUS_OK)) {
             String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
             if (_log.shouldLog(Log.INFO))
                 _log.info("old: " + ohost + " config: " + name + " new: " + nhost);

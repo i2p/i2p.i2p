@@ -163,7 +163,9 @@ public class ConfigNetHandler extends FormHandler {
             if (_ntcpAutoIP == null) _ntcpAutoIP = "true";
 
             if ((!oldAutoHost.equals(_ntcpAutoIP)) || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
-                if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
+                if ("disabled".equals(_ntcpAutoIP)) {
+                    addFormNotice("Disabling TCP completely");
+                } else if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
                     addFormNotice("Updating inbound TCP address to " + _ntcpHostname);
                 } else {
@@ -174,6 +176,7 @@ public class ConfigNetHandler extends FormHandler {
                         addFormNotice("Updating inbound TCP address to auto"); // true or always
                 }
                 _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
+                _context.router().setConfigSetting(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
                 restartRequired = true;
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
