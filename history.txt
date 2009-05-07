@@ -1,3 +1,12 @@
+2009-05-07 zzz
+    * Addressbook: Name the thread
+    * Console:
+      - More IE button fixes, try harder to not refresh the iframe after shutdown
+      - Disable idle options for streamr client, it will never be
+        idle because it pings the server
+    * Floodfill Monitor: Slow down the volunteers
+    * Throttle: Throttle at 90% so we throttle before we WRED
+
 2009-05-06 Mathiasdm
     * Improvements to popup menu rightclick action
     * Added general configuration options (still not available by default)
