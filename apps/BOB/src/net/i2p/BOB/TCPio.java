@@ -87,23 +87,13 @@ public class TCPio implements Runnable {
 		boolean spin = true;
 		try {
 			while(spin) {
-				// database.getReadLock();
-				// info.getReadLock();
-				// spin = info.get("RUNNING").equals(Boolean.TRUE);
-				// info.releaseReadLock();
-				// database.releaseReadLock();
 				b = Ain.read(a, 0, 1);
-				// System.out.println(info.get("NICKNAME").toString() + " " + b);
 				if(b > 0) {
 					Aout.write(a, 0, b);
 				} else if(b == 0) {
 					Thread.yield(); // this should act like a mini sleep.
 					if(Ain.available() == 0) {
-//						try {
-							// Thread.yield();
 							Thread.sleep(10);
-//						} catch(InterruptedException ex) {
-//						}
 					}
 				} else {
 					/* according to the specs:
@@ -119,19 +109,16 @@ public class TCPio implements Runnable {
 					return;
 				}
 			}
-			// System.out.println("TCPio: RUNNING = false");
 		} catch(Exception e) {
 			// Eject!!! Eject!!!
 			//System.out.println("TCPio: Caught an exception " + e);
 			try {
 				Ain.close();
 			} catch (IOException ex) {
-//				Logger.getLogger(TCPio.class.getName()).log(Level.SEVERE, null, ex);
 			}
 			try {
 				Aout.close();
 			} catch (IOException ex) {
-//				Logger.getLogger(TCPio.class.getName()).log(Level.SEVERE, null, ex);
 			}
 			return;
 		}

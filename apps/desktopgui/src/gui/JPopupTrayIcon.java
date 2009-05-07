@@ -37,13 +37,12 @@ import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JWindow;
 import javax.swing.RootPaneContainer;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import java.util.Date;
 
 
 
@@ -62,6 +61,10 @@ public class JPopupTrayIcon extends TrayIcon {
     private PopupMenuListener popupListener;
     
     private final static boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
+
+    private static MouseEvent previous = null;
+    private static Date previousTime = new Date();
+    private static Date time = new Date();
 
     public JPopupTrayIcon(Image image) {
         super(image);
@@ -92,12 +95,12 @@ public class JPopupTrayIcon extends TrayIcon {
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-//                System.out.println("popupMenuWillBecomeVisible");
+                //System.out.println("popupMenuWillBecomeVisible");
             }
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-//                System.out.println("popupMenuWillBecomeInvisible");
+                //System.out.println("popupMenuWillBecomeInvisible");
                 if(window != null) {
                     window.dispose();
                     window = null;
@@ -117,21 +120,27 @@ public class JPopupTrayIcon extends TrayIcon {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-//                System.out.println(e.getPoint());
-                showJPopupMenu(e);
+                //System.out.println("Pressed " + e.getPoint());
+                showJPopupMenu(e, previous);
+                previous = e;
+                previousTime = time;
+                time = new Date();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-//                System.out.println(e.getPoint());
-                showJPopupMenu(e);
+                //System.out.println("Released " + e.getPoint());
+                showJPopupMenu(e, previous);
+                previous = e;
+                previousTime = time;
+                time = new Date();
             }
         });
 
     }
 
-    private final void showJPopupMenu(MouseEvent e) {
-        if(e.isPopupTrigger() && menu != null) {
+    private final void showJPopupMenu(MouseEvent e, MouseEvent previous) {
+        if((e.isPopupTrigger() || previous.isPopupTrigger()) && (time.getTime() - previousTime.getTime() < 1000) && menu != null) {
             if (window == null) {
 
                 if(IS_WINDOWS) {

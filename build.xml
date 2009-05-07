@@ -25,6 +25,10 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
+        <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
+        <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
+        <echo message="  distWithDesktopgui: pkgWithDesktopgui and javadoc" />
+        <echo message="  distcleanWithDesktopgui: clean up all derived files (including desktopgui files)" />
     </target>
     <target name="debianhowto">
         <echo message="To build debian packages, you must run dpkg-buildpackage as root in the source directory. It will then run ant for you. dpkg-buildpackage is found in the 'dpkg-dev' package. Also it should work fine to use the 'fakeroot' package with dpkg-buildpackage, if you don't want to run as root. Please read 'man dpkg-buildpackage' before building any packages yourself." />

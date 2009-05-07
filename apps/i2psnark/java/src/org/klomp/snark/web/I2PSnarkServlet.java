@@ -587,6 +587,8 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "I2PSnarkXL";
                 else if ("ZV".equals(ch.substring(2,4)))
                     client = "Robert";
+                else if ("VUZP".equals(ch))
+                    client = "Robert";
                 else
                     client = "Unknown (" + ch + ')';
                 out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");

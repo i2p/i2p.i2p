@@ -2,8 +2,6 @@ package net.i2p.client.streaming;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -126,7 +124,7 @@ class ConnectionHandler {
                 if (timeoutMs <= 0) {
                     try {
                        syn = _synQueue.take(); // waits forever
-                    } catch (InterruptedException ie) { break;}
+                    } catch (InterruptedException ie) { } // { break;}
                 } else {
                     long remaining = expiration - _context.clock().now();
                     // (dont think this applies anymore for LinkedBlockingQueue)

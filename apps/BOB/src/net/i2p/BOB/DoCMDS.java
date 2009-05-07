@@ -1263,11 +1263,11 @@ public class DoCMDS implements Runnable {
 												tunnel = new MUXlisten(database, nickinfo, _log);
 												Thread t = new Thread(tunnel);
 												t.start();
-												try {
-													Thread.sleep(1000 * 10); // Slow down the startup.
-												} catch(InterruptedException ie) {
-													// ignore it
-												}
+												// try {
+												//	Thread.sleep(1000 * 10); // Slow down the startup.
+												// } catch(InterruptedException ie) {
+												//	// ignore it
+												// }
 												out.println("OK tunnel starting");
 											} catch (I2PException e) {
 												out.println("ERROR starting tunnel: " + e);

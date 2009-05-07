@@ -64,17 +64,17 @@ public class TCPtoI2P implements Runnable {
 
 		S = new String();
 
-		while(true) {
+		while (true) {
 			b = in.read();
-			if(b == 13) {
+			if (b == 13) {
 				//skip CR
 				continue;
 			}
-			if(b < 20 || b > 126) {
+			if (b < 20 || b > 126) {
 				// exit on anything not legal
 				break;
 			}
-			c = (char)(b & 0x7f); // We only really give a fuck about ASCII
+			c = (char) (b & 0x7f); // We only really give a fuck about ASCII
 			S = new String(S + c);
 		}
 		return S;
@@ -118,90 +118,87 @@ public class TCPtoI2P implements Runnable {
 		OutputStream Iout = null;
 		InputStream in = null;
 		OutputStream out = null;
-
 		try {
-
-			in = sock.getInputStream();
-			out = sock.getOutputStream();
 			try {
-				line = lnRead(in);
-				input = line.toLowerCase();
-				Destination dest = null;
 
-				if(input.endsWith(".i2p")) {
-					dest = I2PTunnel.destFromName(input);
-					line = dest.toBase64();
-				}
-				dest = new Destination();
-				dest.fromBase64(line);
-
+				in = sock.getInputStream();
+				out = sock.getOutputStream();
 				try {
-					// get a client socket
-					I2P = socketManager.connect(dest);
-					I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
-					// make readers/writers
-					Iin = I2P.getInputStream();
-					Iout = I2P.getOutputStream();
-					// setup to cross the streams
-					TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
-					TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
-					Thread t = new Thread(conn_c, "TCPioA");
-					Thread q = new Thread(conn_a, "TCPioB");
-					// Fire!
-					t.start();
-					q.start();
-					while(t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
-//						try {
-							Thread.sleep(10); //sleep for 10 ms
-//						} catch(InterruptedException e) {
-							// nop
-//						}
-					}
-					// System.out.println("TCPtoI2P: Going away...");
+					line = lnRead(in);
+					input = line.toLowerCase();
+					Destination dest = null;
 
-				} catch(I2PException e) {
-					Emsg("ERROR " + e.toString(), out);
-				} catch(ConnectException e) {
-					Emsg("ERROR " + e.toString(), out);
-				} catch(NoRouteToHostException e) {
-					Emsg("ERROR " + e.toString(), out);
-				} catch(InterruptedIOException e) {
+					if (input.endsWith(".i2p")) {
+						dest = I2PTunnel.destFromName(input);
+						line = dest.toBase64();
+					}
+					dest = new Destination();
+					dest.fromBase64(line);
+
+					try {
+						// get a client socket
+						I2P = socketManager.connect(dest);
+						I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
+						// make readers/writers
+						Iin = I2P.getInputStream();
+						Iout = I2P.getOutputStream();
+						// setup to cross the streams
+						TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
+						TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
+						Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
+						Thread q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
+						// Fire!
+						t.start();
+						q.start();
+						while (t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
+							Thread.sleep(10); //sleep for 10 ms
+						}
+
+					} catch (I2PException e) {
+						Emsg("ERROR " + e.toString(), out);
+					} catch (ConnectException e) {
+						Emsg("ERROR " + e.toString(), out);
+					} catch (NoRouteToHostException e) {
+						Emsg("ERROR " + e.toString(), out);
+					} catch (InterruptedIOException e) {
+						// We're breaking away.
+					}
+
+				} catch (Exception e) {
 					Emsg("ERROR " + e.toString(), out);
 				}
-
-			} catch(Exception e) {
-				Emsg("ERROR " + e.toString(), out);
+			} catch (Exception e) {
+				// bail on anything else
 			}
-		} catch(Exception e) {
-			// bail on anything else
-		}
-		try {
-			in.close();
-		} catch(Exception e) {
-		}
-		try {
-			out.close();
-		} catch(Exception e) {
-		}
-		try {
-			Iin.close();
-		} catch(Exception e) {
-		}
-		try {
-			Iout.close();
-		} catch(Exception e) {
-		}
-		try {
-			// System.out.println("TCPtoI2P: Close I2P");
-			I2P.close();
-		} catch(Exception e) {
-		}
+		} finally {
+			try {
+				in.close();
+			} catch (Exception e) {
+			}
+			try {
+				out.close();
+			} catch (Exception e) {
+			}
+			try {
+				Iin.close();
+			} catch (Exception e) {
+			}
+			try {
+				Iout.close();
+			} catch (Exception e) {
+			}
+			try {
+				// System.out.println("TCPtoI2P: Close I2P");
+				I2P.close();
+			} catch (Exception e) {
+			}
 
-		try {
-			// System.out.println("TCPtoI2P: Close sock");
-			sock.close();
-		} catch(Exception e) {
+			try {
+				// System.out.println("TCPtoI2P: Close sock");
+				sock.close();
+			} catch (Exception e) {
+			}
 		}
-		// System.out.println("TCPtoI2P: Done.");
+	// System.out.println("TCPtoI2P: Done.");
 	}
 }
