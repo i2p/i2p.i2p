@@ -29,6 +29,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 // import net.i2p.client.I2PSession;
 // import net.i2p.client.I2PSessionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.util.Log;
@@ -80,71 +82,80 @@ public class TCPlistener implements Runnable {
 	public void run() {
 		boolean g = false;
 		boolean spin = true;
-
-die:		{
-			try {
-				rlock();
-			} catch (Exception e) {
-				break die;
-			}
-			try {
-				if (info.exists("OUTPORT")) {
-					tgwatch = 2;
-				}
-			} catch (Exception e) {
+		int conn = 0;
+		try {
+			die:
+			{
 				try {
-					runlock();
-				} catch (Exception e2) {
+					rlock();
+				} catch (Exception e) {
 					break die;
 				}
-				break die;
-			}
-			try {
-				runlock();
-			} catch (Exception e) {
-				break die;
-			}
-			try {
-				Socket server = new Socket();
-				listener.setSoTimeout(50); // We don't block, we cycle and check.
-				while (spin) {
+				try {
+					if (info.exists("OUTPORT")) {
+						tgwatch = 2;
+					}
+				} catch (Exception e) {
 					try {
-						rlock();
-					} catch (Exception e) {
+						runlock();
+					} catch (Exception e2) {
 						break die;
 					}
-					try {
-						spin = info.get("RUNNING").equals(Boolean.TRUE);
-					} catch (Exception e) {
+					break die;
+				}
+				try {
+					runlock();
+				} catch (Exception e) {
+					break die;
+				}
+				try {
+					Socket server = new Socket();
+					listener.setSoTimeout(50); // We don't block, we cycle and check.
+					while (spin) {
 						try {
-							runlock();
-						} catch (Exception e2) {
+							rlock();
+						} catch (Exception e) {
 							break die;
 						}
-						break die;
+						try {
+							spin = info.get("RUNNING").equals(Boolean.TRUE);
+						} catch (Exception e) {
+							try {
+								runlock();
+							} catch (Exception e2) {
+								break die;
+							}
+							break die;
+						}
+						try {
+							server = listener.accept();
+							g = true;
+						} catch (SocketTimeoutException ste) {
+							g = false;
+						}
+						if (g) {
+							conn++;
+							// toss the connection to a new thread.
+							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server);
+							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
+							t.start();
+							g = false;
+						}
 					}
-					try {
-						server = listener.accept();
-						g = true;
-					} catch (SocketTimeoutException ste) {
-						g = false;
-					}
-					if (g) {
-						// toss the connection to a new thread.
-						TCPtoI2P conn_c = new TCPtoI2P(socketManager, server);
-						Thread t = new Thread(conn_c, "BOBTCPtoI2P");
-						t.start();
-						g = false;
-					}
-				}
-				listener.close();
-			} catch (IOException ioe) {
-				try {
 					listener.close();
-				} catch (IOException e) {
+				} catch (IOException ioe) {
+					try {
+						listener.close();
+					} catch (IOException e) {
+					}
 				}
 			}
+		} finally {
+			try {
+				listener.close();
+			} catch (IOException ex) {
+			}
+		//System.out.println("TCPlistener: " + Thread.currentThread().getName() +  "Done.");
 		}
-	//System.out.println("TCPlistener: Done.");
 	}
 }

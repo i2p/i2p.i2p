@@ -231,7 +231,7 @@ public class SpeedSelector3 extends javax.swing.JFrame {
         downloadGB.setText(resourceMap.getString("downloadUsageLabel.text")); // NOI18N
         downloadGB.setName("downloadUsageLabel"); // NOI18N
         getContentPane().add(downloadGB);
-        downloadGB.setBounds(580, 150, 19, 30);
+        downloadGB.setBounds(580, 150, 40, 30);
 
         explanation.setText(resourceMap.getString("explanation.text")); // NOI18N
         explanation.setName("explanation"); // NOI18N

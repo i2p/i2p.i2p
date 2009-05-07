@@ -1,3 +1,25 @@
+2009-05-07 zzz
+    * Add nibble.i2p to proxy list and hosts.txt
+
+2009-05-07 zzz
+    * Addressbook: Name the thread
+    * Console:
+      - More IE button fixes, try harder to not refresh the iframe after shutdown
+      - Disable idle options for streamr client, it will never be
+        idle because it pings the server
+    * Floodfill Monitor: Slow down the volunteers
+    * Throttle: Throttle at 90% so we throttle before we WRED
+
+2009-05-06 Mathiasdm
+    * Improvements to popup menu rightclick action
+    * Added general configuration options (still not available by default)
+    * General fixes
+    * Added ant build options (irc says eche|on would like that ;))
+
+2009-05-06 sponge
+    * Hopefully the last fixes for BOB.
+    * Fixes to prevent race in client-side I2CP and Notifier.
+
 2009-05-03 sponge
     * More hopeful fixes for BOB.
     * Added new Robert ID to snark
@@ -46,6 +68,7 @@
     * RouterConsole: iframe tweaks
     * StatisticsManager: Cleanup
     * Streaming: Don't let jrandom yell so loud
+    * Tunnel Pool: Don't self-destruct if more than 6 IB tunnels configured
 
 2009-04-25 sponge
     * I2PSessionMuxedImpl atomic fixes

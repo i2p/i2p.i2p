@@ -1,5 +1,8 @@
 package router.configuration;
 
+import net.i2p.router.transport.FIFOBandwidthRefiller;
+import router.RouterHelper;
+
 /**
  *
  * @author mathias
@@ -28,5 +31,9 @@ public class SpeedHelper {
     
     public static int calculateSpeed(int gigabytes) {
         return (int) (((long)gigabytes)*1000000/31/24/3600);
+    }
+    
+    public static String getInboundBandwidth() {
+        return RouterHelper.getContext().router().getConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH);
     }
 }

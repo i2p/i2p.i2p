@@ -10,5 +10,5 @@ package desktopgui;
  * @author mathias
  */
 public class GUIVersion {
-    public static final String VERSION = "0.0.1.1";
+    public static final String VERSION = "0.0.1.2";
 }

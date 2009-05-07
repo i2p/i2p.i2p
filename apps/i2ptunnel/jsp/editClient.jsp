@@ -284,6 +284,7 @@
                 <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
             </div>
                  
+         <% if (!"streamrclient".equals(tunnelType)) { // streamr client sends pings so it will never be idle %>
             <div class="subdivider">
                 <hr />
             </div>
@@ -362,6 +363,7 @@
                 </label>
                 <input value="1" type="checkbox" id="startOnLoad" name="delayOpen" title="Delay Tunnel Open"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
+         <% } // !streamrclient %>
                  
             <div class="subdivider">
                 <hr />

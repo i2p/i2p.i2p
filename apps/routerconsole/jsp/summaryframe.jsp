@@ -16,7 +16,9 @@
     // try hard to avoid an error page in the iframe after shutdown
     String action = request.getParameter("action");
     String d = request.getParameter("refresh");
-    boolean shutdownSoon = "shutdownImmediate".equals(action) || "restartImmediate".equals(action);
+    // Normal browsers send value, IE sends button label
+    boolean shutdownSoon = "shutdownImmediate".equals(action) || "restartImmediate".equals(action) ||
+                           "Shutdown immediately".equals(action) || "Restart immediately".equals(action);
     if (!shutdownSoon) {
         if (d == null || "".equals(d)) {
             d = System.getProperty("routerconsole.summaryRefresh");
@@ -30,6 +32,14 @@
         if (!"0".equals(d)) {
             // doesn't work for restart or shutdown with no expl. tunnels,
             // since the call to ConfigRestartBean.renderStatus() hasn't happened yet...
+            // So we delay slightly
+            if ("restart".equalsIgnoreCase(action) || "shutdown".equalsIgnoreCase(action)) {
+                synchronized(this) {
+                    try {
+                        wait(1000);
+                    } catch(InterruptedException ie) {}
+                }
+            }
             long timeleft = net.i2p.router.web.ConfigRestartBean.getRestartTimeRemaining();
             long delay = 60;
             try { delay = Long.parseLong(d); } catch (NumberFormatException nfe) {}

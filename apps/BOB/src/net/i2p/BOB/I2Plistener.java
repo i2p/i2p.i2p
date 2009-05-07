@@ -25,6 +25,8 @@ package net.i2p.BOB;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
@@ -78,51 +80,59 @@ public class I2Plistener implements Runnable {
 	public void run() {
 		boolean g = false;
 		I2PSocket sessSocket = null;
+		int conn = 0;
+		try {
+			die:
+			{
 
-die:		{
+				serverSocket.setSoTimeout(50);
+				boolean spin = true;
+				while (spin) {
 
-			serverSocket.setSoTimeout(50);
-			boolean spin = true;
-			while (spin) {
-
-				try {
-					rlock();
-				} catch (Exception e) {
-					break die;
-				}
-				try {
-					spin = info.get("RUNNING").equals(Boolean.TRUE);
-				} catch (Exception e) {
 					try {
-						runlock();
-					} catch (Exception e2) {
+						rlock();
+					} catch (Exception e) {
 						break die;
 					}
-					break die;
-				}
-				try {
 					try {
-						sessSocket = serverSocket.accept();
-						g = true;
-					} catch (ConnectException ce) {
-						g = false;
-					} catch (SocketTimeoutException ste) {
-						g = false;
+						spin = info.get("RUNNING").equals(Boolean.TRUE);
+					} catch (Exception e) {
+						try {
+							runlock();
+						} catch (Exception e2) {
+							break die;
+						}
+						break die;
 					}
-					if (g) {
-						g = false;
-						// toss the connection to a new thread.
-						I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database);
-						Thread t = new Thread(conn_c, "BOBI2PtoTCP");
-						t.start();
-					}
+					try {
+						try {
+							sessSocket = serverSocket.accept();
+							g = true;
+						} catch (ConnectException ce) {
+							g = false;
+						} catch (SocketTimeoutException ste) {
+							g = false;
+						}
+						if (g) {
+							g = false;
+							conn++;
+							// toss the connection to a new thread.
+							I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database);
+							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " I2PtoTCP " + conn);
+							t.start();
+						}
 
-				} catch (Exception e) {
-					//	System.out.println("Exception " + e);
+					} catch (Exception e) {
+						//	System.out.println("Exception " + e);
+					}
 				}
 			}
-		}
+		} finally {
+			try {
+				serverSocket.close();
+			} catch (I2PException ex) {
+			}
 		// System.out.println("I2Plistener: Close");
-	// System.out.println("I2Plistener: Done.");
+		}
 	}
 }
