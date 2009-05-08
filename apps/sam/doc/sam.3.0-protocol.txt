@@ -297,6 +297,8 @@ address (leaving up to 1KB for header material).  This FROM address
 is authenticated internally by SAM (making use of the destination's 
 signing key to verify the source) and includes replay prevention.
 
+** First method :
+
 After establishing a SAM session with STYLE=DATAGRAM, the client can
 send datagrams through SAM's UDP port (7655).
 
@@ -313,6 +315,12 @@ following format :
 
 The first line will be discarded by SAM before sending the remaining
 of the message to the specified destination.
+
+** Second method :
+
+Datagrams can also be sent through the socket from which the datagram
+session was opened. See the "DATAGRAM SEND" command of SAM versions 1
+and 2.
 
 ----------------------------------------------------------------------
 SAM repliable datagrams : receiving a datagram
