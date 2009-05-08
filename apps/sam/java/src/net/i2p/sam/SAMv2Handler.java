@@ -72,7 +72,7 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 		/* Parse and execute a STREAM message */
 		protected boolean execStreamMessage ( String opcode, Properties props )
 		{
-			if ( streamSession == null )
+			if ( getStreamSession() == null )
 			{
 				_log.error ( "STREAM message received, but no STREAM session exists" );
 				return false;
@@ -173,7 +173,7 @@ public class SAMv2Handler extends SAMv1Handler implements SAMRawReceiver, SAMDat
 				}
 			}
 
-			streamSession.setReceiveLimit ( id, limit, nolimit ) ;
+			getStreamSession().setReceiveLimit ( id, limit, nolimit ) ;
 
 			return true;
 		}

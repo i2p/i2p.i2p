@@ -178,8 +178,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             if (getDatagramSession() != null) {
             	getDatagramSession().close();
             }
-            if (streamSession != null) {
-                streamSession.close();
+            if (getStreamSession() != null) {
+            	getStreamSession().close();
             }
         }
     }
@@ -192,7 +192,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         try{
             if (opcode.equals("CREATE")) {
                 if ((getRawSession() != null) || (getDatagramSession() != null)
-                    || (streamSession != null)) {
+                    || (getStreamSession() != null)) {
                     _log.debug("Trying to create a session, but one still exists");
                     return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
                 }
@@ -408,7 +408,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
                 in.readFully(data);
 
-                if (!datagramSession.sendBytes(dest, data)) {
+                if (!getDatagramSession().sendBytes(dest, data)) {
                     _log.error("DATAGRAM SEND failed");
                     return true;
                 }
@@ -507,7 +507,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
     /* Parse and execute a STREAM message */
     protected boolean execStreamMessage(String opcode, Properties props) {
-        if (streamSession == null) {
+        if (getStreamSession() == null) {
             _log.error("STREAM message received, but no STREAM session exists");
             return false;
         }
@@ -567,11 +567,11 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         }
 
         try {
-            if (!streamSession.sendBytes(id, getClientSocket().socket().getInputStream(), size)) { // data)) {
+            if (!getStreamSession().sendBytes(id, getClientSocket().socket().getInputStream(), size)) { // data)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("STREAM SEND [" + size + "] failed");
                 boolean rv = writeString("STREAM CLOSED RESULT=CANT_REACH_PEER ID=" + id + " MESSAGE=\"Send of " + size + " bytes failed\"\n");
-                streamSession.closeConnection(id);
+                getStreamSession().closeConnection(id);
                 return rv;
             }
 
@@ -622,7 +622,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         try {
             try {
-                if (!streamSession.connect(id, dest, props)) {
+                if (!getStreamSession().connect(id, dest, props)) {
                     _log.debug("STREAM connection failed");
                     return false;
                 }
@@ -673,7 +673,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             }
         }
 
-        boolean closed = streamSession.closeConnection(id);
+        boolean closed = getStreamSession().closeConnection(id);
         if ( (!closed) && (_log.shouldLog(Log.WARN)) )
             _log.warn("Stream unable to be closed, but this is non fatal");
         return true;
@@ -765,7 +765,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
     public void streamSendAnswer( int id, String result, String bufferState ) throws IOException
     {
-        if ( streamSession == null )
+        if ( getStreamSession() == null )
         {
             _log.error ( "BUG! Want to answer to stream SEND, but session is null!" );
             throw new NullPointerException ( "BUG! STREAM session is null!" );
@@ -783,7 +783,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
     public void notifyStreamSendBufferFree( int id ) throws IOException
     {
-        if ( streamSession == null )
+        if ( getStreamSession() == null )
         {
             _log.error ( "BUG! Stream outgoing buffer is free, but session is null!" );
             throw new NullPointerException ( "BUG! STREAM session is null!" );
@@ -797,7 +797,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
 
     public void notifyStreamIncomingConnection(int id, Destination d) throws IOException {
-        if (streamSession == null) {
+        if (getStreamSession() == null) {
             _log.error("BUG! Received stream connection, but session is null!");
             throw new NullPointerException("BUG! STREAM session is null!");
         }
@@ -811,7 +811,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
     public void notifyStreamOutgoingConnection ( int id, String result, String msg ) throws IOException
     {
-        if ( streamSession == null )
+        if ( getStreamSession() == null )
         {
             _log.error ( "BUG! Received stream connection, but session is null!" );
             throw new NullPointerException ( "BUG! STREAM session is null!" );
@@ -832,7 +832,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     }
   
     public void receiveStreamBytes(int id, ByteBuffer data) throws IOException {
-        if (streamSession == null) {
+        if (getStreamSession() == null) {
             _log.error("Received stream bytes, but session is null!");
             throw new NullPointerException("BUG! STREAM session is null!");
         }
@@ -852,7 +852,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     }
 
     public void notifyStreamDisconnection(int id, String result, String msg) throws IOException {
-        if (streamSession == null) {
+        if (getStreamSession() == null) {
             _log.error("BUG! Received stream disconnection, but session is null!");
             throw new NullPointerException("BUG! STREAM session is null!");
         }
@@ -868,7 +868,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     public void stopStreamReceiving() {
         _log.debug("stopStreamReceiving() invoked", new Exception("stopped"));
 
-        if (streamSession == null) {
+        if (getStreamSession() == null) {
             _log.error("BUG! Got stream receiving stop, but session is null!");
             throw new NullPointerException("BUG! STREAM session is null!");
         }
