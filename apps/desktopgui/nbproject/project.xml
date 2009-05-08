@@ -13,7 +13,7 @@
             </test-roots>
         </data>
         <swingapp xmlns="http://www.netbeans.org/ns/form-swingapp/1">
-            <application-class name="desktopgui.Main"/>
+            <application-class name="net.i2p.desktopgui.desktopgui.Main"/>
         </swingapp>
     </configuration>
 </project>
