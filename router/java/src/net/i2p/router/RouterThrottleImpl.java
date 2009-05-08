@@ -262,6 +262,7 @@ class RouterThrottleImpl implements RouterThrottle {
     }
 
     private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 40; // .067KBps
+    /** also limited to 90% - see below */
     private static final int MIN_AVAILABLE_BPS = 4*1024; // always leave at least 4KBps free when allowing
     private static final String LIMIT_STR = "Rejecting tunnels: Bandwidth limit";
     
@@ -282,8 +283,11 @@ class RouterThrottleImpl implements RouterThrottle {
         int used1mOut = _context.router().get1mRate(true);
 
         // Check the inbound and outbound total bw available (separately)
-        int availBps = (maxKBpsIn*1024) - usedIn;
-        availBps = Math.min(availBps, (maxKBpsOut*1024) - usedOut);
+        // We block all tunnels when share bw is over (max * 0.9) - 4KB
+        // This gives reasonable growth room for existing tunnels on both low and high
+        // bandwidth routers. We want to be rejecting tunnels more aggressively than
+        // dropping packets with WRED
+        int availBps = Math.min((maxKBpsIn*1024*9/10) - usedIn, (maxKBpsOut*1024*9/10) - usedOut);
         if (availBps < MIN_AVAILABLE_BPS) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Reject, avail (" + availBps + ") less than min");
             setTunnelStatus(LIMIT_STR);
@@ -303,8 +307,7 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
 
         // Now see if 1m rates are too high
-        long overage = used1mIn - (maxKBpsIn*1024);
-        overage = Math.max(overage, used1mOut - (maxKBpsOut*1024));
+        long overage = Math.max(used1mIn - (maxKBpsIn*1024), used1mOut - (maxKBpsOut*1024));
         if ( (overage > 0) && 
              ((overage/(float)(maxKBps*1024f)) > _context.random().nextFloat()) ) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Reject tunnel, 1m rate (" + overage + " over) indicates overload.");
@@ -312,7 +315,8 @@ class RouterThrottleImpl implements RouterThrottle {
             return false;
         }
 
-            float maxBps = maxKBps * 1024f;
+            // limit at 90% - 4KBps (see above)
+            float maxBps = (maxKBps * 1024f * 0.9f) - MIN_AVAILABLE_BPS;
             float pctFull = (maxBps - availBps) / (maxBps);
             double probReject = Math.pow(pctFull, 16); // steep curve 
             double rand = _context.random().nextFloat();
