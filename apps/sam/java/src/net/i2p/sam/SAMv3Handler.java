@@ -390,6 +390,8 @@ public class SAMv3Handler extends SAMv1Handler
 					canContinue = execDestMessage(opcode, props);
 				} else if (domain.equals("NAMING")) {
 					canContinue = execNamingMessage(opcode, props);
+				} else if (domain.equals("DATAGRAM")) {
+					canContinue = execDatagramMessage(opcode, props);
 				} else {
 					_log.debug("Unrecognized message domain: \""
 							+ domain + "\"");
@@ -418,7 +420,7 @@ public class SAMv3Handler extends SAMv1Handler
 			}
 			if (streamForwardingSocket) 
 			{
-				if (this.streamSession!=null) {
+				if (this.getStreamSession()!=null) {
 					try {
 						this.streamSession.stopForwardingIncoming();
 					} catch (SAMException e) {
@@ -464,7 +466,7 @@ public class SAMv3Handler extends SAMv1Handler
 		try{
 			if (opcode.equals("CREATE")) {
 				if ((this.getRawSession()!= null) || (this.getDatagramSession() != null)
-						|| (streamSession != null)) {
+						|| (this.getStreamSession() != null)) {
 					_log.debug("Trying to create a session, but one still exists");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
 				}
@@ -761,7 +763,7 @@ public class SAMv3Handler extends SAMv1Handler
     }
 
 	public void notifyStreamIncomingConnection(Destination d) throws IOException {
-	    if (streamSession == null) {
+	    if (getStreamSession() == null) {
 	        _log.error("BUG! Received stream connection, but session is null!");
 	        throw new NullPointerException("BUG! STREAM session is null!");
 	    }
