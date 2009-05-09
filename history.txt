@@ -1,3 +1,6 @@
+2009-05-09 sponge
+    * fixed OOM on lock (woops! my bad!)
+
 2009-05-08 Mathiasdm
     * desktopgui: moved files to stop polluting the namespace
           (everything now in net.i2p.desktopgui)
