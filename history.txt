@@ -1,3 +1,14 @@
+2009-05-09 sponge
+    * merge
+
+2009-05-09 sponge
+    * fixed OOM on lock (woops! my bad!)
+
+2009-05-08 Mathiasdm
+    * desktopgui: moved files to stop polluting the namespace
+          (everything now in net.i2p.desktopgui)
+    * desktopgui: some variable renaming in general configuration
+
 2009-05-07 mkvore
     * SAM: version 3 added
     * SAM: blocking case corrected on simultaneous client connection (v.1-3)

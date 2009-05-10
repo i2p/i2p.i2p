@@ -200,9 +200,9 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {
         private LinkedBlockingQueue<MsgData> _msgs;
-        private AtomicBoolean _alive = new AtomicBoolean(false);
+        private volatile Boolean _alive = new Boolean(false);
         private static final int POISON_SIZE = -99999;
-        private AtomicBoolean stopping = new AtomicBoolean(false);
+        private final AtomicBoolean stopping = new AtomicBoolean(false);
 
         public MuxedAvailabilityNotifier() {
             _msgs = new LinkedBlockingQueue();
@@ -210,28 +210,29 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
 
         @Override
         public void stopNotifying() {
-            if(stopping.get()) return;
-            stopping.set(true);
             boolean again = true;
-            // _msgs.clear();
-            // Thread.yield();
-            if (_alive.get()) {
-                // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
-                _msgs.clear();
-                while(again) {
-                    try {
-                        _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
-                        again = false;
-                        // System.out.println("I2PSessionMuxedImpl.stopNotifying() success.");
-                    } catch (InterruptedException ie) {
-                        continue;
+            synchronized (stopping) {
+                if(!stopping.get()) {
+                    stopping.set(true);
+                    if (_alive.equals(true)) {
+                        // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
+                        _msgs.clear();
+                        while(again) {
+                            try {
+                                _msgs.put(new MsgData(0, POISON_SIZE, 0, 0, 0));
+                                again = false;
+                                // System.out.println("I2PSessionMuxedImpl.stopNotifying() success.");
+                            } catch (InterruptedException ie) {
+                                continue;
+                            }
+                        }
                     }
+                    _alive = false;
+                    stopping.set(false);
                 }
+                stopping.notifyAll();
             }
-            _alive.set(false);
-            stopping.set(false); // Do we need this?
         }
-        
         /** unused */
         @Override
         public void available(long msgId, int size) { throw new IllegalArgumentException("no"); }
@@ -245,8 +246,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
         @Override
         public void run() {
             MsgData msg;
-            _alive.set(true);
-            while (_alive.get()) {
+            _alive=true;
+            while (_alive) {
                 try {
                     msg = _msgs.take();
                 } catch (InterruptedException ie) {
