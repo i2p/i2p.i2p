@@ -42,7 +42,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _reseedFrom;
     private boolean _enableLoadTesting;
     private String _sharePct;
-    private boolean _ratesOnly; // always false
+    private static final boolean _ratesOnly = false; // always false - delete me
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
     protected void processForm() {
@@ -139,11 +139,12 @@ public class ConfigNetHandler extends FormHandler {
                     if (_udpHost1 != null && _udpHost1.length() > 0)
                         uhost =  _udpHost1;
                     else if (_udpHost2 != null && _udpHost2.length() > 0)
-                        uhost =  _udpHost1;
+                        uhost =  _udpHost2;
                     else
                         _udpAutoIP = UDPTransport.DEFAULT_SOURCES;
                 }
                 _context.router().setConfigSetting(UDPTransport.PROP_SOURCES, _udpAutoIP);
+                // Todo: Catch local IPs right here rather than complaining later
                 _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
                 if ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost))) {
                    addFormNotice("Updating IP address");
@@ -166,6 +167,7 @@ public class ConfigNetHandler extends FormHandler {
                 if ("disabled".equals(_ntcpAutoIP)) {
                     addFormNotice("Disabling TCP completely");
                 } else if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
+                    // Todo: Catch local IPs right here rather than complaining later
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
                     addFormNotice("Updating inbound TCP address to " + _ntcpHostname);
                 } else {

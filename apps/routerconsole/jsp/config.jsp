@@ -83,7 +83,7 @@
  </p><p>
  <b>UPnP Configuration:</b><br />
     <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
-    Enable UPnP to open firewall ports <a href="peers.jsp#upnp">UPnP status</a>
+    Enable UPnP to open firewall ports - <a href="peers.jsp#upnp">UPnP status</a>
  </p><p>
  <b>IP Configuration:</b><br />
  Externally reachable hostname or IP address:<br />
@@ -134,11 +134,11 @@
     if we are not firewalled<br />
     <input type="radio" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> />
     Always use auto-detected IP address (Not firewalled)<br />
-    <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
-    Disable inbound (Firewalled)<br />
     <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> />
     Specify hostname or IP:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" /><br />
+    <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
+    Disable inbound (Firewalled)<br />
     <input type="radio" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
     Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP - change requires restart)</i><br />
  </p><p>
@@ -155,30 +155,45 @@
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
  <b><a name="chelp">Configuration Help:</a></b>
- <p>If you can, please poke a hole in your NAT or firewall to allow unsolicited UDP packets to reach
-    you on your external UDP address.  If you can't, I2P now includes supports UDP hole punching
-    with "SSU introductions" - peers who will relay a request from someone you don't know to your
-    router for your router so that you can make an outbound connection to them.  I2P will use these
-    introductions automatically if it detects that the port is not forwarded (as shown by
-    the <i>Reachability: Firewalled</i> line).
-    Users behind symmetric NATs, such as OpenBSD's pf, are not currently supported.</p>
+ <p>
+ While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
+ if the I2P port (generally 8887) is forwarded for both UDP and TCP.
+ </p><p>
+ If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach
+    you.  If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching
+    with "SSU introductions" to relay traffic. Most of the options above are for special situations,
+    for example where UPnP does not work correctly, or a firewall not under your control is doing
+    harm. Certain firewalls such as symmetric NATs may not work well with I2P.
+ </p>
 <!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
 -->
- <p>Hostnames entered here will be published in the network database.
+ </p><p>
+ UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address
+ and forward ports.
+ UPnP support is beta, and may not work for any number of reasons:
+ <ul>
+ <li>No UPnP-compatible device present
+ <li>UPnP disabled on the device
+ <li>Software firewall interference with UPnP
+ <li>Bugs in the device's UPnP implementation
+ <li>Multiple firewall/routers in the internet connection path
+ <li>UPnP device change, reset, or address change
+ </ul>
+ Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
+ UPnP may be enabled or disabled above, but a change requires a router restart to take effect.
+ </p><p>Hostnames entered above will be published in the network database.
     They are <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.
- </p>
- <p>You do <i>not</i> need to allow inbound TCP connections - outbound connections work with no
-    configuration.  However, if you want to receive inbound TCP connections, you <b>must</b> poke a hole
-    in your NAT or firewall for unsolicited TCP connections.  If you specify the wrong IP address or
+    If you specify the wrong IP address or
     hostname, or do not properly configure your NAT or firewall, your network performance will degrade
-    substantially.  When in doubt, leave the hostname and port number blank.</p>
+    substantially.  When in doubt, leave the settings at the defaults.</p>
+ </p>
  <hr />
  <b><a name="help">Reachability Help:</a></b>
  <p>
- While I2P will work adequately behind a firewall, your speeds and network integration will generally improve
- if you open up your port (generally 8887) to both UDP and TCP, and enable inbound TCP above.
+ While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
+ if the I2P port (generally 8887) to both UDP and TCP.
  If you think you have opened up your firewall and I2P still thinks you are firewalled, remember
  that you may have multiple firewalls, for example both software packages and external hardware routers.
  If there is an error, the <a href="logs.jsp">logs</a> may also help diagnose the problem.

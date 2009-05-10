@@ -131,7 +131,12 @@ public class TransportManager implements TransportEventListener {
     }
 
     public void startListening() {
-        if (_upnpManager != null)
+        // For now, only start UPnP if we have no publicly-routable addresses
+        // so we don't open the listener ports to the world.
+        // Maybe we need a config option to force on? Probably not.
+        // What firewall supports UPnP and is configured with a public address on the LAN side?
+        // Unlikely.
+        if (_upnpManager != null && Addresses.getAnyAddress() == null)
             _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");
