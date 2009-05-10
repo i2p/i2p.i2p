@@ -264,12 +264,12 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	
 	    	public void run()
 	    	{
-	    		while (session.socketServer!=null) {
+	    		while (session.getSocketServer()!=null) {
 	    			
 	    			// wait and accept a connection from I2P side
 	    			I2PSocket i2ps = null ;
 	    			try {
-	    				i2ps = session.socketServer.accept();
+	    				i2ps = session.getSocketServer().accept();
 	    			} catch (Exception e) {}
 	    			
 	    			if (i2ps==null) {
@@ -361,8 +361,14 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	}
 	    }
 	    
+	    public I2PServerSocket getSocketServer()
+	    {
+	    	synchronized ( this.socketServerLock ) {
+	    		return this.socketServer ;
+	    	}
+	    }
 	    /**
-	     * 
+	     *  stop Forwarding Incoming connection coming from I2P
 	     * @param props
 	     * @throws SAMException
 	     * @throws InterruptedIOException
@@ -382,6 +388,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
     			}
 	    		server = this.socketServer ;
 	    		this.socketServer = null ;
+	    		_log.debug("nulling socketServer in stopForwardingIncoming. Object " + this );
 	    	}
 	    	try {
 	    		server.close();
@@ -400,5 +407,4 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    {
 	    	throw new DataFormatException(null);
 	    }
-
 }

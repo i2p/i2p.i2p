@@ -350,12 +350,12 @@ public class SAMv3Handler extends SAMv1Handler
 					_log.debug("Stop request found");
 					break;
 				}
-
-				msg = DataHelper.readLine(in).trim();
-				if (msg == null) {
-					_log.debug("Connection closed by client");
+				String line = DataHelper.readLine(in) ;
+				if (line==null) {
+					_log.debug("Connection closed by client (line read : null)");
 					break;
 				}
+				msg = line.trim();
 
 				if (_log.shouldLog(Log.DEBUG)) {
 					_log.debug("New message received: [" + msg + "]");
