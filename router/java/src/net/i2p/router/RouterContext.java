@@ -87,7 +87,7 @@ public class RouterContext extends I2PAppContext {
         return envProps;
     }
     private void initAll() {
-        _adminManager = new AdminManager(this);
+        //_adminManager = new AdminManager(this);
         if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
             _clientManagerFacade = new ClientManagerFacadeImpl(this);
         else
