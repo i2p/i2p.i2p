@@ -1,3 +1,5 @@
+2009-05-11 mkvore
+    * SAM: fix: removed ERROR level logging when a client disconnects
 2009-05-09 sponge
     * merge
 
