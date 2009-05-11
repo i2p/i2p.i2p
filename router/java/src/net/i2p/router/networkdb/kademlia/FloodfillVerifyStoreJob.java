@@ -100,16 +100,10 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         public boolean isMatch(I2NPMessage message) {
             if (message instanceof DatabaseStoreMessage) {
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
-                if (_key.equals(dsm.getKey()))
-                    return true;
-                else
-                    return false;
+                return _key.equals(dsm.getKey());
             } else if (message instanceof DatabaseSearchReplyMessage) {
                 DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
-                if (_key.equals(dsrm.getSearchKey()))
-                    return true;
-                else
-                    return false;
+                return _key.equals(dsrm.getSearchKey());
             }
             return false;
         }

@@ -156,6 +156,12 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             defaultOpts.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, ""+DEFAULT_READ_TIMEOUT);
         if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
             defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        // delayed start
+        if (sockMgr == null) {
+            synchronized(sockLock) {
+                sockMgr = getSocketManager();
+            }
+        }
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
