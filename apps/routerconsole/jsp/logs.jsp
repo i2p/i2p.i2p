@@ -23,11 +23,11 @@ jbigi <%=net.i2p.util.NativeBigInteger.loadStatus()%><br />
  <hr />
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <h4>Router logs:</h4>
- <jsp:getProperty name="logsHelper" property="logs" />
- <hr />
  <h4>Critical logs:</h4><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
+ <hr />
+ <h4>Router logs:</h4>
+ <jsp:getProperty name="logsHelper" property="logs" />
  <hr />
  <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
