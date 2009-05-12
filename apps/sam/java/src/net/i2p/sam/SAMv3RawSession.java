@@ -29,8 +29,10 @@ public class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Sess
 	public String getNick() { return nick; }
 
 	/**
+	 *   Build a Raw Datagram Session according to information
+	 *   registered with the given nickname
+	 *   
 	 * @param nick nickname of the session
-	 * @param server DatagramServer used for communication with the client
 	 * @throws IOException
 	 * @throws DataFormatException
 	 * @throws I2PSessionException

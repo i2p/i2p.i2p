@@ -30,8 +30,9 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
 	public String getNick() { return nick; }
 
 	/**
+	 *   build a DatagramSession according to informations registered
+	 *   with the given nickname
 	 * @param nick nickname of the session
-	 * @param server DatagramServer used for communication with the client
 	 * @throws IOException
 	 * @throws DataFormatException
 	 * @throws I2PSessionException

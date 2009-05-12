@@ -222,7 +222,7 @@ on the client socket : all remaining data passing through the
 current socket is forwarded from and to the connected I2P destination
 peer.
  * If SILENCE=false was passed, which is the default value, the SAM bridge
-sends the client a ASCII line containing the base64 public destination key
+sends the client an ASCII line containing the base64 public destination key
 of the requesting peer. After this '\n' terminated line, all remaining data 
 passing through the current socket is forwarded from and to the connected
 I2P destination peer, until one of the peer closes the socket.

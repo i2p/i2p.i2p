@@ -55,12 +55,10 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 		}
 		
 		   /**
-	     * Create a new SAM STREAM session.
+	     * Create a new SAM STREAM session, according to information
+	     * registered with the given nickname
 	     *
-	     * @param dest Base64-encoded destination (private key)
-	     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
-	     * @param props Properties to setup the I2P session
-	     * @param recv Object that will receive incoming data
+	     * @param login The nickname
 	     * @throws IOException
 	     * @throws DataFormatException
 	     * @throws SAMException 
@@ -116,11 +114,10 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    /**
 	     * Connect the SAM STREAM session to the specified Destination
 	     *
-	     * @param id Unique id for the connection
+	     * @param handler The handler that communicates with the requesting client
 	     * @param dest Base64-encoded Destination to connect to
 	     * @param props Options to be used for connection
 	     *
-	     * @return true if successful
 	     * @throws DataFormatException if the destination is not valid
 	     * @throws ConnectException if the destination refuses connections
 	     * @throws NoRouteToHostException if the destination can't be reached
@@ -128,7 +125,9 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	     * @throws I2PException if there's another I2P-related error
 	     * @throws IOException 
 	     */
-	    public void connect ( SAMv3Handler handler, String dest, Properties props ) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedIOException, IOException {
+	    public void connect ( SAMv3Handler handler, String dest, Properties props ) 
+	    throws I2PException, ConnectException, NoRouteToHostException, 
+	    		DataFormatException, InterruptedIOException, IOException {
 
 	    	boolean verbose = (props.getProperty("SILENT", "false").equals("false"));
 	        Destination d = SAMUtils.getDest(dest);
@@ -164,11 +163,11 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    /**
 	     * Accept an incoming STREAM
 	     *
-	     * @param id Unique id for the connection
-	     * @param dest Base64-encoded Destination to connect to
-	     * @param props Options to be used for connection
+	     * @param handler The handler that communicates with the requesting client
+	     * @param verbose If true, SAM will send the Base64-encoded peer Destination of an
+	     *                incoming socket as the first line of data sent to its client
+	     *                on the handler socket
 	     *
-	     * @return true if successful
 	     * @throws DataFormatException if the destination is not valid
 	     * @throws ConnectException if the destination refuses connections
 	     * @throws NoRouteToHostException if the destination can't be reached
@@ -369,7 +368,6 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    }
 	    /**
 	     *  stop Forwarding Incoming connection coming from I2P
-	     * @param props
 	     * @throws SAMException
 	     * @throws InterruptedIOException
 	     */
