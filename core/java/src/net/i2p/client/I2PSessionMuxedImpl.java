@@ -200,7 +200,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
 
     protected class MuxedAvailabilityNotifier extends AvailabilityNotifier {
         private LinkedBlockingQueue<MsgData> _msgs;
-        private volatile Boolean _alive = new Boolean(false);
+        private volatile boolean _alive = false;
         private static final int POISON_SIZE = -99999;
         private final AtomicBoolean stopping = new AtomicBoolean(false);
 
@@ -212,9 +212,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
         public void stopNotifying() {
             boolean again = true;
             synchronized (stopping) {
-                if(!stopping.get()) {
-                    stopping.set(true);
-                    if (_alive.equals(true)) {
+                if( !stopping.getAndSet(true)) {
+                    if (_alive == true) {
                         // System.out.println("I2PSessionMuxedImpl.stopNotifying()");
                         _msgs.clear();
                         while(again) {
@@ -230,7 +229,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
                     _alive = false;
                     stopping.set(false);
                 }
-                stopping.notifyAll();
+                // stopping.notifyAll();
             }
         }
         /** unused */
@@ -251,7 +250,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
                 try {
                     msg = _msgs.take();
                 } catch (InterruptedException ie) {
-                    _log.debug("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive.toString());
+                    _log.debug("I2PSessionMuxedImpl.run() InterruptedException " + String.valueOf(_msgs.size()) + " Messages, Alive " + _alive);
                     continue;
                 }
                 if (msg.size == POISON_SIZE) {

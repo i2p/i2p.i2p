@@ -235,27 +235,13 @@ public class MUXlisten implements Runnable {
 						}
 					} // die
 
-				// I2PSession session = socketManager.getSession();
-				// if (session != null) {
-				// System.out.println("I2Plistener: destroySession");
-				//	try {
-				//		session.destroySession();
-				//	} catch (I2PSessionException ex) {
-				// nop
-				//	}
-				// }
-				// try {
-				//	socketManager.destroySocketManager();
-				//} catch (Exception e) {
-				// nop
-				//}
 				} catch (Exception e) {
 					// System.out.println("MUXlisten: Caught an exception" + e);
 					break quit;
 				}
 			} // quit
 		} finally {
-			// allow threads above this one to catch the stop signal.
+			// Start cleanup. Allow threads above this one to catch the stop signal.
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException ex) {
@@ -275,10 +261,6 @@ public class MUXlisten implements Runnable {
 			} catch (Exception e) {
 			}
 
-			//try {
-			//	Thread.sleep(1000 * 20); // how long?? is this even needed??
-			//} catch (InterruptedException ex) {
-			//}
 
 			if (SS != null) {
 				try {
@@ -292,32 +274,34 @@ public class MUXlisten implements Runnable {
 				} catch (IOException e) {
 				}
 			}
+
 			try {
 				socketManager.destroySocketManager();
 			} catch (Exception e) {
 				// nop
 				}
-			// This is here to catch when something fucks up REALLY bad, like those annoying stuck threads!
+			// Wait around till all threads are collected.
 			if (tg != null) {
 				String boner = tg.getName();
+				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
 				// tg.interrupt(); // give my stuff a small smack again.
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
 					int foo = tg.activeCount() + tg.activeGroupCount();
-					int bar = foo;
 					// hopefully no longer needed!
+					// int bar = foo;
 					// System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
-					// System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+					// System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
 					// visit(tg, 0, boner);
-					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n\n");
+					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
 					// Happily spin forever :-(
-					while ((tg.activeCount() + tg.activeGroupCount() != 0)) {
+					while (foo != 0) {
 						foo = tg.activeCount() + tg.activeGroupCount();
 						//	if (foo != bar) {
-						//		System.out.println("\n\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+						//		System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
 						//		visit(tg, 0, boner);
-						//		System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n\n");
+						//		System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
 						//	}
-						bar = foo;
+						// bar = foo;
 						try {
 							Thread.sleep(100); //sleep for 100 ms (One tenth second)
 						} catch (InterruptedException ex) {
@@ -325,7 +309,7 @@ public class MUXlisten implements Runnable {
 						}
 					}
 				}
-				System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
+				_log.warn("BOB: MUXlisten: Threads went away. Success: " + boner);
 				tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
 				tg = null;
@@ -334,7 +318,7 @@ public class MUXlisten implements Runnable {
 	}
 
 
-	// Debugging...
+	// Debugging... None of this is normally used.
 	/**
 	 *	Find the root thread group and print them all.
 	 *
