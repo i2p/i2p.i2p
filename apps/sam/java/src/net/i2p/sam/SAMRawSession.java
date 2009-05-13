@@ -26,7 +26,7 @@ public class SAMRawSession extends SAMMessageSession {
     private final static Log _log = new Log(SAMRawSession.class);
     public static final int RAW_SIZE_MAX = 32*1024;
 
-    private SAMRawReceiver recv = null;
+    protected SAMRawReceiver recv = null;
     /**
      * Create a new SAM RAW session.
      *

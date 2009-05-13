@@ -20,7 +20,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
     private final static Log _log = new Log(I2PServerSocketImpl.class);
     private I2PSocketManager mgr;
     /** list of sockets waiting for the client to accept them */
-    private List pendingSockets = Collections.synchronizedList(new ArrayList(4));
+    private List<I2PSocket> pendingSockets = Collections.synchronizedList(new ArrayList<I2PSocket>(4));
     
     /** have we been closed */
     private volatile boolean closing = false;

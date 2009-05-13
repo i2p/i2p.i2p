@@ -16,7 +16,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +89,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2PAppContext _context;
 
     /** monitor for waiting until a lease set has been granted */
-    private Object _leaseSetWait = new Object();
+    private final Object _leaseSetWait = new Object();
 
     /** whether the session connection has already been closed (or not yet opened) */
     protected boolean _closed;
@@ -101,7 +100,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** have we received the current date from the router yet? */
     private boolean _dateReceived;
     /** lock that we wait upon, that the SetDateMessageHandler notifies */
-    private Object _dateReceivedLock = new Object();
+    private final Object _dateReceivedLock = new Object();
     
     /** 
      * thread that we tell when new messages are available who then tells us 
@@ -253,6 +252,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         try {
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "connect begin to " + _hostname + ":" + _portNum);
             _socket = new Socket(_hostname, _portNum);
+            // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
             _out = _socket.getOutputStream();
             synchronized (_out) {
                 _out.write(I2PClient.PROTOCOL_BYTE);

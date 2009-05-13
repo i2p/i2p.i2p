@@ -46,7 +46,7 @@ public class DoCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "05",  BEXT = "";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "06",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -1263,11 +1263,11 @@ public class DoCMDS implements Runnable {
 												tunnel = new MUXlisten(database, nickinfo, _log);
 												Thread t = new Thread(tunnel);
 												t.start();
-												try {
-													Thread.sleep(1000 * 10); // Slow down the startup.
-												} catch(InterruptedException ie) {
-													// ignore it
-												}
+												// try {
+												//	Thread.sleep(1000 * 10); // Slow down the startup.
+												// } catch(InterruptedException ie) {
+												//	// ignore it
+												// }
 												out.println("OK tunnel starting");
 											} catch (I2PException e) {
 												out.println("ERROR starting tunnel: " + e);
