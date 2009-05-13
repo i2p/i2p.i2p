@@ -627,9 +627,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
         boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
-        // Once we're over 300 routers, reduce the expiration time down from the default,
+        // Once we're over 150 routers, reduce the expiration time down from the default,
         // as a crude way of limiting memory usage.
-        // i.e. at 600 routers the expiration time will be about half the default, etc.
+        // i.e. at 300 routers the expiration time will be about half the default, etc.
         // And if we're floodfill, we can keep the expiration really short, since
         // we are always getting the latest published to us.
         // As the net grows this won't be sufficient, and we'll have to implement
@@ -638,9 +638,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
             adjustedExpiration = ROUTER_INFO_EXPIRATION_FLOODFILL;
         else
+            // _kb.size() includes leasesets but that's ok
             adjustedExpiration = Math.min(ROUTER_INFO_EXPIRATION,
                                           ROUTER_INFO_EXPIRATION_MIN +
-                                          ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * 300 / (_kb.size() + 1)));
+                                          ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * 150 / (_kb.size() + 1)));
 
         if (!key.equals(routerInfo.getIdentity().getHash())) {
             if (_log.shouldLog(Log.WARN))
