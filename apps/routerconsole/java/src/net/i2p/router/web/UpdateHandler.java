@@ -93,9 +93,11 @@ public class UpdateHandler {
     }
     
     public boolean isDone() {
-        if(this._updateRunner == null)
-            return true;
-        return this._updateRunner.isDone();
+        return false;
+        // this needs to be fixed and tested
+        //if(this._updateRunner == null)
+        //    return true;
+        //return this._updateRunner.isDone();
     }
     
     public class UpdateRunner implements Runnable, EepGet.StatusListener {
