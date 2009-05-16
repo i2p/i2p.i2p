@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2009-04-18 00:00:00 $">
- <i2p.release version="0.7.2" date="2009/04/18" minVersion="0.6"
+<i2p.news date="$Date: 2009-05-16 00:00:00 $">
+ <i2p.release version="0.7.3" date="2009/05/16" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,25 +11,22 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2009-04-18: <b>0.7.2 <a href="http://www.i2p2.i2p/release-0.7.2.html">Released</a></b>
+2009-05-16: <b>0.7.3 <a href="http://www.i2p2.i2p/release-0.7.3.html">Released</a></b>
 </p><p>
-The 0.7.2 release fixes multiple bugs and potential problems
-in I2P, while preparing ground for new functionality.
+I2P version 0.7.3 contains several buxfixes and improvements,
+includes a lot of maintenance work and new versions of
+both the SAM and BOB application gateway protocols.
 </p><p>
-Threading issues with the SimpleTimer class should no longer occur,
-the NTCP transport should no longer encounter null pointer exceptions,
-and "abandoned" tunnels should finish operation correctly.
+A patch to I2P's internal web server Jetty is included
+to correct SusiDNS behaviour on Windows. The way I2P nodes
+volunteer to participate in the Network Database is changed
+to avoid too many doing this simultaneously, and creation
+of new participating tunnels is now throttled before messages
+in existing tunnels start to get dropped.
 </p><p>
-Support is added for accessing the Router Console over IPv6,
-a new message type enables I2CP applications to query
-the router's bandwidth limits, an experimental desktop interface
-for managing the router is included for the first time
-(but not enabled automatically yet) and participation of a single peer
-in too many tunnels is prevented to improve reliability and safety.
-</p><p>
-Besides other maintenance work, several old statistics calculators
-are dropped to make router profiles smaller and quicker, while
-new build scripts are supplied for I2P's big integer math library.
-Updating is highly recommended.
+Multiple improvements to the Router Console and other components
+are included, I2PSnark can handle bigger torrents and more files,
+while work continues on the experimental desktop interface.
+Updating is recommended.
 </p>
 </i2p.news>
