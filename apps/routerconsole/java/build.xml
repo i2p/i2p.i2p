@@ -86,7 +86,7 @@
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
-        <java classname="org.apache.jasper.JspC" fork="true">
+        <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
