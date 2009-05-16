@@ -121,7 +121,6 @@ Applications:
    Copyright 2000-2004 Mort Bay Consulting Pty. Ltd.
    See licenses/LICENSE-Apache1.1.txt
    See licenses/LICENSE-Apache2.0.txt
-   See licenses/NOTICE-Ant.txt
    See licenses/NOTICE-Commons-Logging.txt
 
    JRobin 1.4.0:
