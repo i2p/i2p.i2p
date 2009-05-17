@@ -1,4 +1,74 @@
 2009-05-17 zzz
+    * Merge i2p.i2p.zzz.upnp branch
+     * Major changes:
+      - Detect IP with UPnP
+      - Open firewall ports with UPnP
+      - Detect IP by checking local interface addresses
+      - Enable TCP auto-IP and auto-port by default, if UDP status is "OK"
+      - Network configuration page rework
+     * Other stuff:
+      - Remove unused verifyupdate.jsp
+     * Details of the UPnP and related Transport changes:
+      - Add UDP Port configuration to config.jsp
+      - Don't restart router when configs change on config.jsp;
+        simply rebuild router info.
+      - Clean up some port config code in UDP
+      - Implement UPnP enable/disable
+      - Start to rework inbound configuration
+      - Tweak UPnP warning messages
+      - Start of callbacks from UPnP to transports
+      - Tell UDP local addresses at startup
+      - NTCP Port must now be either auto or configured;
+        now defaults to auto; and configured now trumps auto.
+        Port configuration now does not affect whether inbound
+        NTCP is enabled - the host configuration alone can do that.
+      - i2np.ntcp.autoip=true redefined to enable inbound only if
+        SSU reachability is OK. i2np.ntcp.autoip=always for the old behavior.
+        autoip default is now "true".
+        i2np.ntcp.hostname=xxx now trumps i2np.tcp.autoip.
+      - SSU always tells NTCP when status changes.
+      - Implement config save of new IP address options
+      - Implement local address and UPnP configuration of UDP address
+      - Limit received port to 1024 minimum
+      - Simplify bw form
+      - Add config link to UPnP status
+      - Make short timeouts for UPnP HTTP POST so we don't hang when
+        the UPnP device goes away
+      - Fix a bug in UPnP HTTP Server timeout
+      - Make short timeouts for the XML parser so we don't hang when
+        the UPnP device goes away - same as for HTTP POST
+      - Stuff the port mapping requester into a thread so it doesn't
+        delay everything for several seconds
+      - Handle UPnP devices that return IP = 0.0.0.0
+      - Better HTML output when no IP found
+      - Tweak logging
+      - Set Disposer thread name
+      - Keep the control point running after we find an IGD,
+        so that we get notifications of it leaving or
+        coming back or replaced.
+      - Detect UPnP start failure
+      - Sort local addresses
+      - Store last IP for future laptop mode
+      - Subscribe to service, doesn't seem to do anything though,
+        need to test it more
+      - Change UPnP listener port defaults, allow configuration option
+      - Don't notify for non-changed options on config.jsp
+      - Simplify config.jsp some more
+      - No longer use i2np.udp.forceIntroducers
+      - Tweak UDP port qualification
+      - Fix allowing low ports again
+      - Add option to completely disable NTCP, for those behind nasty firewalls
+      - Use SSU reachability rather than global reachability for determining NTCP reachability,
+        since we are now reporting NTCP reachability too
+      - Tweak the config sub-navbar
+      - Don't start UPnP if we have a public interface address
+      - Fix setting IP to a local interface address
+      - Work on the configuration help some more
+      - Rework UDP peers.jsp table a little
+      - Don't let UDP bid on messages that are too long
+      - Clean up the max fragments code in UDP
+
+2009-05-17 zzz
     * Build files:
       - Remove unneeded ant.jar from package (900KB)
       - Fail on Jsp compile errors

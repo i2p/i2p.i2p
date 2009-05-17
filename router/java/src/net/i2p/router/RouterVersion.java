@@ -13,14 +13,14 @@ import net.i2p.CoreVersion;
 /**
  * Expose a version string
  *
- */
+n */
 public class RouterVersion {
     /** deprecated */
     public final static String ID = "Monotone";
     public final static String VERSION = CoreVersion.VERSION;
-    public final static long BUILD = 0;
+    public final static long BUILD = 1;
     /** for example "-test" */
-    public final static String EXTRA = "-upnp";
+    public final static String EXTRA = "";
     public final static String FULL_VERSION = VERSION + "-" + BUILD + EXTRA;
     public static void main(String args[]) {
         System.out.println("I2P Router version: " + FULL_VERSION);
