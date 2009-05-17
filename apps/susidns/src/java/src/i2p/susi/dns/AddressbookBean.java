@@ -37,11 +37,13 @@ import java.util.Properties;
 public class AddressbookBean
 {
 	private String book, action, serial, lastSerial, filter, search, hostname, destination;
+	private int beginIndex, endIndex;
 	private Properties properties, addressbook;
 	private int trClass;
 	private LinkedList deletionMarks;
 	private static Comparator sorter;
-	
+	private static final int DISPLAY_SIZE=100;
+
 	static {
 		sorter = new AddressByNameSorter();
 	}
@@ -74,6 +76,8 @@ public class AddressbookBean
 	{
 		properties = new Properties();
 		deletionMarks = new LinkedList();
+		beginIndex = 0;
+		endIndex = DISPLAY_SIZE - 1;
 	}
 	private long configLastLoaded = 0;
 	private static final String PRIVATE_BOOK = "private_addressbook";
@@ -106,6 +110,8 @@ public class AddressbookBean
 	{
 		loadConfig();
 		String filename = properties.getProperty( getBook() + "_addressbook" );
+		if (filename.startsWith("../"))
+			return filename.substring(3);
 		return ConfigBean.addressbookPrefix + filename;
 	}
 	private Object[] entries;
@@ -174,17 +180,45 @@ public class AddressbookBean
 				}
 				list.addLast( new AddressBean( name, destination ) );
 			}
-			// Format a message about filtered addressbook size, and the number of displayed entries
-			if( filter != null && filter.length() > 0 )
-				message = "Filtered l";
-			else
-				message = "L";
-			message += "ist contains " + list.size() + " entries";
-			if (list.size() > 300) message += ", displaying the first 300."; else message += ".";
-
 			Object array[] = list.toArray();
 			Arrays.sort( array, sorter );
 			entries = array;
+
+			// Format a message about filtered addressbook size, and the number of displayed entries
+			// addressbook.jsp catches the case where the whole book is empty.
+			String filterArg = "";
+			if( search != null && search.length() > 0 ) {
+				message = "Search ";
+			}
+			if( filter != null && filter.length() > 0 ) {
+				if( search != null && search.length() > 0 )
+					message += "within ";
+				message += "Filtered list ";
+				filterArg = "&filter=" + filter;
+			}
+			if (entries.length == 0) {
+				message += "- no matches";
+			} else if (getBeginInt() == 0 && getEndInt() == entries.length - 1) {
+				if (message.length() == 0)
+					message = "Addressbook ";
+				message += "contains " + entries.length + " entries";
+			} else {
+				if (getBeginInt() > 0) {
+					int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
+					int newEnd = Math.max(0, getBeginInt() - 1);
+			       		message += "<a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+					           "&begin=" + newBegin + "&end=" + newEnd + "\">" + newBegin +
+					           '-' + newEnd + "</a> | ";
+		       		}
+				message += "Showing " + getBegin() + '-' + getEnd() + " of " + entries.length;
+				if (getEndInt() < entries.length - 1) {
+					int newBegin = Math.min(entries.length - 1, getEndInt() + 1);
+					int newEnd = Math.min(entries.length, getEndInt() + DISPLAY_SIZE);
+			       		message += " | <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+					           "&begin=" + newBegin + "&end=" + newEnd + "\">" + newBegin +
+					           '-' + newEnd + "</a>";
+				}
+			}
 		}
 		catch (Exception e) {
 			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
@@ -301,5 +335,27 @@ public class AddressbookBean
 	}
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+	private int getBeginInt() {
+		return Math.max(0, Math.min(entries.length - 1, beginIndex));
+	}
+	public String getBegin() {
+		return "" + getBeginInt();
+	}
+	public void setBegin(String s) {
+		try {
+			beginIndex = Integer.parseInt(s);
+		} catch (NumberFormatException nfe) {}
+	}
+	private int getEndInt() {
+		return Math.max(0, Math.max(getBeginInt(), Math.min(entries.length - 1, endIndex)));
+	}
+	public String getEnd() {
+		return "" + getEndInt();
+	}
+	public void setEnd(String s) {
+		try {
+			endIndex = Integer.parseInt(s);
+		} catch (NumberFormatException nfe) {}
 	}
 }

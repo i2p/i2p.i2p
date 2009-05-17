@@ -63,6 +63,11 @@ public class ConfigTunnelsHelper extends HelperBase {
             out.getLength() <= 0 ||
             out.getLength() + out.getLengthVariance() <= 0)
             buf.append("<tr><td colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 0-hop tunnels</font></td></tr>");
+        else if (in.getLength() <= 1 ||
+            in.getLength() + in.getLengthVariance() <= 1 ||
+            out.getLength() <= 1 ||
+            out.getLength() + out.getLengthVariance() <= 1)
+            buf.append("<tr><td colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 1-hop tunnels</font></td></tr>");
         if (in.getLength() + Math.abs(in.getLengthVariance()) >= WARN_LENGTH ||
             out.getLength() + Math.abs(out.getLengthVariance()) >= WARN_LENGTH)
             buf.append("<tr><td colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include very long tunnels</font></td></tr>");

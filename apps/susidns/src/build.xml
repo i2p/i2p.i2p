@@ -35,7 +35,7 @@
         <delete file="WEB-INF/web-out.xml" />
     	<mkdir dir="${tmp}" />
         <echo message="Ignore any warning about /WEB-INF/web.xml not found" />
-        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp">
+        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp" failonerror="true">
             <arg value="-d" />
             <arg value="${tmp}" />
             <arg value="-v" />

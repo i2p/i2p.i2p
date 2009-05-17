@@ -72,7 +72,6 @@
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
         <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/ant.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
@@ -103,7 +102,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
@@ -210,7 +209,6 @@
     </target>
     <target name="preppkg" depends="build, buildexe">
         <delete dir="pkg-temp" />
-        <copy file="build/ant.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
@@ -396,7 +394,6 @@
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
     </target>
     <target name="prepjupdate" depends="prepupdate, buildWEB">
-        <copy file="build/ant.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
         <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
@@ -491,7 +488,7 @@
             <arg value="-output"/>
             <arg value="findbugs.xml"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/ant.jar:build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->

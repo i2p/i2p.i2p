@@ -26,7 +26,7 @@ jbigi <%=net.i2p.util.NativeBigInteger.loadStatus()%><br />
  <h4>Critical logs:</h4><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
  <hr />
- <h4>Router logs:</h4>
+ <h4>Router logs (<a href="configlogging.jsp">configure</a>):</h4>
  <jsp:getProperty name="logsHelper" property="logs" />
  <hr />
  <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
