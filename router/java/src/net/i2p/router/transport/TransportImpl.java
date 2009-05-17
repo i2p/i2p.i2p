@@ -416,9 +416,43 @@ public abstract class TransportImpl implements Transport {
     protected void replaceAddress(RouterAddress address) {
         // _log.error("Replacing address for " + getStyle() + " was " + _currentAddress + " now " + address);
         _currentAddress = address;
+        if (_listener != null)
+            _listener.transportAddressChanged();
         if ("SSU".equals(getStyle()))
             _context.commSystem().notifyReplaceAddress(address);
     }
+
+    /**
+     *  Notify a transport of an external address change.
+     *  This may be from a local interface, UPnP, a config change, etc.
+     *  This should not be called if the ip didn't change
+     *  (from that source's point of view), or is a local address,
+     *  or if the ip is IPv6, but the transport should check anyway.
+     *  The transport should also do its own checking on whether to accept
+     *  notifications from this source.
+     *
+     *  This can be called before startListening() to set an initial address,
+     *  or after the transport is running.
+     *
+     *  @param source defined in Transport.java
+     *  @param ip typ. IPv4 non-local
+     *  @param port 0 for unknown or unchanged
+     */
+    public void externalAddressReceived(String source, byte[] ip, int port) {}
+
+    /**
+     *  Notify a transport of the results of trying to forward a port
+     */
+    public void forwardPortStatus(int port, boolean success, String reason) {}
+
+    /**
+     * What port would the transport like to have forwarded by UPnP.
+     * This can't be passed via getCurrentAddress(), as we have to open the port
+     * before we can publish the address.
+     *
+     * @return port or -1 for none or 0 for any
+     */
+    public int getRequestedPort() { return -1; }
 
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }

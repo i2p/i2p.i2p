@@ -73,7 +73,10 @@ public class Router {
     /** used to differentiate routerInfo files on different networks */
     public static final int NETWORK_ID = 2;
     
+    /** this puts an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN = "router.hiddenMode";
+    /** this does not put an 'H' in your routerInfo **/
+    public final static String PROP_HIDDEN_HIDDEN = "router.isHidden";
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
     public final static String PROP_INFO_FILENAME = "router.info.location";
     public final static String PROP_INFO_FILENAME_DEFAULT = "router.info";
@@ -423,7 +426,7 @@ public class Router {
         RouterInfo ri = _routerInfo;
         if ( (ri != null) && (ri.isHidden()) )
             return true;
-        return Boolean.valueOf(_context.getProperty("router.isHidden", "false")).booleanValue();
+        return Boolean.valueOf(_context.getProperty(PROP_HIDDEN_HIDDEN)).booleanValue();
     }
     public Certificate createCertificate() {
         Certificate cert = new Certificate();

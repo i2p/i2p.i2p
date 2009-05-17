@@ -20,6 +20,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.CommSystemFacadeImpl;
@@ -37,7 +38,7 @@ public class NTCPTransport extends TransportImpl {
     private SharedBid _slowBid;
     private SharedBid _transientFail;
     private final Object _conLock;
-    private Map _conByIdent;
+    private Map<Hash, NTCPConnection> _conByIdent;
     private NTCPAddress _myAddress;
     private EventPumper _pumper;
     private Reader _reader;
@@ -540,6 +541,54 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     *  If we didn't used to be forwarded, and we have an address,
+     *  and we are configured to use UPnP, update our RouterAddress
+     *
+     *  Don't do anything now. If it fails, we don't know if it's
+     *  because there is no firewall, or if the firewall rejected the request.
+     *  So we just use the SSU reachability status
+     *  to decide whether to enable inbound NTCP. SSU will have CSFI build a new
+     *  NTCP address when it transitions to OK.
+     */
+    public void forwardPortStatus(int port, boolean success, String reason) {
+        if (_log.shouldLog(Log.WARN)) {
+            if (success)
+                _log.warn("UPnP has opened the NTCP port: " + port);
+            else
+                _log.warn("UPnP has failed to open the NTCP port: " + port + " reason: " + reason);
+        }
+    }
+
+    public int getRequestedPort() {
+        // would be nice to do this here but we can't easily get to the UDP transport.getRequested_Port()
+        // from here, so we do it in TransportManager.
+        // if (Boolean.valueOf(_context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_PORT)).booleanValue())
+        //    return foo;
+        return _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_PORT, -1);
+    }
+
+    /**
+     * Maybe we should trust UPnP here and report OK if it opened the port, but
+     * for now we don't. Just go through and if we have one inbound connection,
+     * we must be good. As we drop idle connections pretty quickly, this will
+     * be fairly accurate.
+     *
+     * We have to be careful here because much of the router console code assumes
+     * that the reachability status is really just the UDP status.
+     */
+    public short getReachabilityStatus() { 
+        if (isAlive() && _myAddress != null) {
+            synchronized (_conLock) {
+                for (NTCPConnection con : _conByIdent.values()) {
+                    if (con.isInbound())
+                        return CommSystemFacade.STATUS_OK;
+                }
+            }
+        }
+        return CommSystemFacade.STATUS_UNKNOWN;
+    }
+
+    /**
      *  This doesn't (completely) block, caller should check isAlive()
      *  before calling startListening() or restartListening()
      */
@@ -558,6 +607,8 @@ public class NTCPTransport extends TransportImpl {
             NTCPConnection con = (NTCPConnection)iter.next();
             con.close();
         }
+        // will this work?
+        replaceAddress(null);
     }
     public static final String STYLE = "NTCP";
 

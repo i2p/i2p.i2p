@@ -34,8 +34,11 @@ public class OutboundMessageState {
     private short _maxSends;
     private int _nextSendFragment;
     
-    public static final int MAX_FRAGMENTS = 32;
-    private static final ByteCache _cache = ByteCache.getInstance(64, MAX_FRAGMENTS*1024);
+    public static final int MAX_MSG_SIZE = 32 * 1024;
+    /** is this enough for a high-bandwidth router? */
+    private static final int MAX_ENTRIES = 64;
+    /** would two caches, one for small and one for large messages, be better? */
+    private static final ByteCache _cache = ByteCache.getInstance(MAX_ENTRIES, MAX_MSG_SIZE);
     
     public OutboundMessageState(I2PAppContext context) {
         _context = context;
@@ -226,7 +229,9 @@ public class OutboundMessageState {
         int numFragments = totalSize / fragmentSize;
         if (numFragments * fragmentSize < totalSize)
             numFragments++;
-        
+        // This should never happen, as 534 bytes * 64 fragments > 32KB, and we won't bid on > 32KB
+        if (numFragments > InboundMessageState.MAX_FRAGMENTS)
+            throw new IllegalArgumentException("Fragmenting a " + totalSize + " message into " + numFragments + " fragments - too many!");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Fragmenting a " + totalSize + " message into " + numFragments + " fragments");
         

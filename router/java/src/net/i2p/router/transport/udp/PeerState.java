@@ -287,15 +287,7 @@ public class PeerState {
     }
     
     private int getDefaultMTU() {
-        String mtu = _context.getProperty(PROP_DEFAULT_MTU);
-        if (mtu != null) {
-            try {
-                return Integer.valueOf(mtu).intValue();
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-        }
-        return DEFAULT_MTU;
+        return _context.getProperty(PROP_DEFAULT_MTU, DEFAULT_MTU);
     }
     
     /**
