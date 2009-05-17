@@ -1,3 +1,17 @@
+2009-05-17 zzz
+    * Build files:
+      - Remove unneeded ant.jar from package (900KB)
+      - Fail on Jsp compile errors
+    * FloodfillVerifyJob: Don't consider an older search result as verified
+    * logs.jsp: Add link to config
+    * NetDb: Lower the routerinfo expiration again
+    * SusiDNS:
+      - Reduce displayed entries from 300 to 100
+      - Add ability to go forward or back
+      - Make textareas bigger
+      - Clean up file names
+      - Clarify messages about filter and search
+
 * 2009-05-16  0.7.3 released
 
 2009-05-16 Complication
