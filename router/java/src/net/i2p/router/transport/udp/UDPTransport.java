@@ -929,6 +929,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
+        if (dataSize > OutboundMessageState.MAX_MSG_SIZE) {
+            // NTCP max is lower, so msg will get dropped
+            return null;
+        }
         Hash to = toAddress.getIdentity().calculateHash();
         PeerState peer = getPeerState(to);
         if (peer != null) {
@@ -1753,7 +1757,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(" V ");
         else
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
-        buf.append("</td><td><b><a href=\"#def.idle\">idle</a></b>");
+        buf.append("</td><td>dir/intro</td><td><b><a href=\"#def.idle\">idle</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle inbound", FLAG_IDLE_IN);
         buf.append("/");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle outbound", FLAG_IDLE_OUT);
@@ -1809,32 +1813,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(name);
             buf.append("\">");
             buf.append(name);
-/*
-            buf.append("@");
-            byte ip[] = peer.getRemoteIP();
-            for (int j = 0; j < ip.length; j++) {
-                int num = ip[j] & 0xFF;
-                if (num < 10)
-                    buf.append("00");
-                else if (num < 100)
-                    buf.append("0");
-                buf.append(num);
-                if (j + 1 < ip.length)
-                    buf.append('.');
-            }
-            buf.append(':');
-            int port = peer.getRemotePort();
-            if (port < 10)
-                buf.append("0000");
-            else if (port < 100)
-                buf.append("000");
-            else if (port < 1000)
-                buf.append("00");
-            else if (port < 10000)
-                buf.append("0");
-            buf.append(port);
-*/
-            buf.append("</a>&nbsp;");
+            buf.append("</a>");
+            //byte ip[] = peer.getRemoteIP();
+            //if (ip != null)
+            //    buf.append(' ').append(_context.blocklist().toStr(ip));
+            buf.append("</td><td>");
             if (peer.isInbound())
                 buf.append("in ");
             else
@@ -1990,8 +1973,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             numPeers++;
         }
         
-        buf.append("<tr><td colspan=\"15\"><hr /></td></tr>\n");
-        buf.append(" <tr><td colspan=\"2\"><b>Total</b></td>");
+        buf.append("<tr><td colspan=\"16\"><hr /></td></tr>\n");
+        buf.append(" <tr><td colspan=\"3\"><b>Total</b></td>");
         buf.append("     <td align=\"right\">");
         buf.append(formatKBps(bpsIn)).append("/").append(formatKBps(bpsOut));
         buf.append("KBps</td>");
