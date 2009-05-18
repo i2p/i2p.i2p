@@ -177,6 +177,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void shutdown() {
         _initialized = false;
         _kb = null;
+        _ds.stop();
         _ds = null;
         _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
         // _exploreKeys = null;
@@ -702,9 +703,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * @throws IllegalArgumentException if the routerInfo is not valid
      */
     public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
+        return store(key, routerInfo, true);
+    }
+
+    public RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        RouterInfo rv = (RouterInfo)_ds.get(key);
+        RouterInfo rv = (RouterInfo)_ds.get(key, persist);
         
         if ( (rv != null) && (rv.equals(routerInfo)) ) {
             // no need to validate
@@ -721,7 +726,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                        + new Date(routerInfo.getPublished()));
     
         _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
-        _ds.put(key, routerInfo);
+        _ds.put(key, routerInfo, persist);
         if (rv == null)
             _kb.add(key);
         return rv;
@@ -752,10 +757,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // if we dont know the key, lets make sure it isn't a now-dead peer
         }
         
-        if (isRouterInfo)
-            _ds.remove(dbEntry);
-        else
-            _ds.removeLease(dbEntry);
+        _ds.remove(dbEntry, isRouterInfo);
     }
     
     /** don't use directly - see F.N.D.F. override */

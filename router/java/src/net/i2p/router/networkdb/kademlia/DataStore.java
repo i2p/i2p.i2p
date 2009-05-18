@@ -16,10 +16,13 @@ import net.i2p.data.Hash;
 public interface DataStore {
     public boolean isKnown(Hash key);
     public DataStructure get(Hash key);
+    public DataStructure get(Hash key, boolean persist);
     public void put(Hash key, DataStructure data);
+    public void put(Hash key, DataStructure data, boolean persist);
     public DataStructure remove(Hash key);
-    public DataStructure removeLease(Hash key);
+    public DataStructure remove(Hash key, boolean persist);
     public Set getKeys();
+    public void stop();
     public void restart();
     public int countLeaseSets();
 

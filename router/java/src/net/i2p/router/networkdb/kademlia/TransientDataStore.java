@@ -35,14 +35,23 @@ class TransientDataStore implements DataStore {
             _log.info("Data Store initialized");
     }
     
-    public void restart() {
+    public void stop() {
         _data.clear();
+    }
+    
+    public void restart() {
+        stop();
     }
     
     public Set getKeys() {
         return new HashSet(_data.keySet());
     }
     
+    /** for PersistentDataStore only - don't use here */
+    public DataStructure get(Hash key, boolean persist) {
+        throw new IllegalArgumentException("no");
+    }
+
     public DataStructure get(Hash key) {
         return _data.get(key);
     }
@@ -65,6 +74,11 @@ class TransientDataStore implements DataStore {
     /** don't accept tunnels set to expire more than 3 hours in the future, which is insane */
     private final static long MAX_FUTURE_EXPIRATION_DATE = KademliaNetworkDatabaseFacade.MAX_LEASE_FUTURE;
     
+    /** for PersistentDataStore only - don't use here */
+    public void put(Hash key, DataStructure data, boolean persist) {
+        throw new IllegalArgumentException("no");
+    }
+
     public void put(Hash key, DataStructure data) {
         if (data == null) return;
         if (_log.shouldLog(Log.DEBUG))
@@ -140,8 +154,9 @@ class TransientDataStore implements DataStore {
         return buf.toString();
     }
     
-    public DataStructure removeLease(Hash key) {
-        return remove(key);
+    /** for PersistentDataStore only - don't use here */
+    public DataStructure remove(Hash key, boolean persist) {
+        throw new IllegalArgumentException("no");
     }
 
     public DataStructure remove(Hash key) {
