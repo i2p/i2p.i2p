@@ -97,19 +97,9 @@ class ProfileOrganizerRenderer {
                 buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
             prevTier = tier;
             
-            buf.append("<tr>");
-            buf.append("<td><code>");
-            if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">-- ").append(peer.toBase64().substring(0,6)).append("</font>");
-            } else {
-                if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++ ").append(peer.toBase64().substring(0,6)).append("</font>");
-                } else {
-                    buf.append("&nbsp;&nbsp;&nbsp;").append(peer.toBase64().substring(0,6));
-                }
-            }
-            buf.append("</code></td>");
-            buf.append("<td>");
+            buf.append("<tr><td>");
+            buf.append(_context.commSystem().renderPeerHTML(peer));
+            buf.append("</td><td>");
             
             switch (tier) {
                 case 1: buf.append("Fast, High Capacity"); break;
@@ -159,10 +149,7 @@ class ProfileOrganizerRenderer {
                     buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
             }
             buf.append("&nbsp</td>");
-            //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
-            //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
-            buf.append("<td nowrap><a href=\"netdb.jsp?r=").append(peer.toBase64().substring(0,6)).append("\">netDb</a>");
-            buf.append("/<a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("<td nowrap><a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
             buf.append("/<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
         }
@@ -192,17 +179,9 @@ class ProfileOrganizerRenderer {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
 
-            buf.append("<tr>");
-            buf.append("<td><code>");
-            if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">-- ").append(peer.toBase64().substring(0,6)).append("</font>");
-            } else {
-                if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++ ").append(peer.toBase64().substring(0,6)).append("</font>");
-                } else {
-                    buf.append("&nbsp;&nbsp;&nbsp;").append(peer.toBase64().substring(0,6));
-                }
-            }
+            buf.append("<tr><td>");
+            buf.append(_context.commSystem().renderPeerHTML(peer));
+            buf.append("</td>");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null)
                 buf.append("<td align=\"center\">" + info.getCapabilities() + "</td>");

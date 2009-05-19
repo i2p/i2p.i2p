@@ -79,6 +79,7 @@ Public domain except as listed below:
    XMLPull library used by UPnP:
    See licenses/LICENSE-Apache2.0.txt
 
+   GeoIP data free to use, courtesy http://ip-to-country.webhosting.info/
 
 
 Installer:
@@ -146,6 +147,7 @@ Applications:
 
    Router console:
    Public domain.
+   Flag icons public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
 
    SAM:
    Public domain.

@@ -734,8 +734,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
 
-    private static String netDbLink(Hash peer) {
-        String h = peer.toBase64().substring(0, 4);
-        return "<a href=\"netdb.jsp?r=" + h + "\">" + h + "</a>";
+    private String netDbLink(Hash peer) {
+        return _context.commSystem().renderPeerHTML(peer);
     }
 }

@@ -29,16 +29,20 @@ import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
     private Log _log;
     private RouterContext _context;
     private TransportManager _manager;
+    private GeoIP _geoIP;
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(CommSystemFacadeImpl.class);
         _manager = null;
+        startGeoIP();
     }
     
     public void startup() {
@@ -348,4 +352,56 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return;     	
     }
     
+    private static final int START_DELAY = 5*60*1000;
+    private static final int LOOKUP_TIME = 30*60*1000;
+    private void startGeoIP() {
+        _geoIP = new GeoIP(_context);
+        SimpleScheduler.getInstance().addPeriodicEvent(new Lookup(), START_DELAY, LOOKUP_TIME);
+    }
+
+    private class Lookup implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            _geoIP.blockingLookup();
+        }
+    }
+
+    public void queueLookup(byte[] ip) {
+        _geoIP.add(ip);
+    }
+
+    /**
+     *  Right now this only uses the transport IP,
+     *  which is present only after you've connected to the peer.
+     *  We could also check the IP in the netDb entry...
+     */
+    public String getCountry(Hash peer) {
+        byte[] ip = TransportImpl.getIP(peer);
+        if (ip == null)
+            return null;
+        return _geoIP.get(ip);
+    }
+
+    public String renderPeerHTML(Hash peer) {
+        String h = peer.toBase64().substring(0, 4);
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("<tt><font size=\"+1\">");
+        boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
+        if (found)
+            buf.append("<a title=\"NetDb entry\" href=\"netdb.jsp?r=").append(h).append("\">");
+        buf.append(h);
+        if (found)
+            buf.append("</a>");
+        buf.append("</font></tt>");
+        String c = getCountry(peer);
+        if (c != null) {
+            buf.append(" <img alt=\"").append(c.toUpperCase()).append("\" title=\"");
+            String n = _geoIP.fullName(c);
+            if (n != null)
+                buf.append(n);
+            else
+                buf.append(c);
+            buf.append("\" src=\"/flags.jsp?c=").append(c).append("\">");
+        }
+        return buf.toString();
+    }
 }

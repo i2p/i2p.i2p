@@ -17,6 +17,7 @@
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
+        <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, news.xml, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
@@ -319,6 +320,11 @@
         <copy todir="pkg-temp/licenses/" >
           <fileset dir="licenses/" />
         </copy>
+        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <copy todir="pkg-temp/icons/flags" >
+          <fileset dir="installer/resources/icons/flags" />
+        </copy>
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -331,21 +337,20 @@
           <fileset dir="." includes="readme*.html" />
           <fileset dir="installer/resources/" includes="*-header.ht" />
         </copy>
+        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <copy todir="pkg-temp/icons/flags" >
+          <fileset dir="installer/resources/icons/flags" />
+        </copy>
         <zip destfile="docs.zip" basedir="pkg-temp" />
     </target>
-    <target name="updater" depends="prepupdate">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
-    </target>
-    <target name="updaterWithJetty" depends="prepjupdate">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
-    </target>
-    <target name="updaterWithJettyFixes" depends="prepjupdatefixes">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
-    </target>
-    <target name="updaterSmall" depends="prepupdateSmall">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
-    </target>
-    <target name="updaterRouter" depends="prepupdateRouter">
+    <target name="updater" depends="prepupdate, zipit" />
+    <target name="updaterWithGeoIP" depends="prepgeoupdate, zipit" />
+    <target name="updaterWithJetty" depends="prepjupdate, zipit" />
+    <target name="updaterWithJettyFixes" depends="prepjupdatefixes, zipit" />
+    <target name="updaterSmall" depends="prepupdateSmall, zipit" />
+    <target name="updaterRouter" depends="prepupdateRouter, zipit" />
+    <target name="zipit">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <target name="updateTest" depends="prepupdate">
@@ -392,6 +397,13 @@
         <delete dir="pkg-temp" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
+    </target>
+    <target name="prepgeoupdate" depends="prepupdate">
+        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+        <copy todir="pkg-temp/icons/flags" >
+          <fileset dir="installer/resources/icons/flags" />
+        </copy>
     </target>
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />

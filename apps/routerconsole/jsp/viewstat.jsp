@@ -1,4 +1,10 @@
 <%
+/*
+ * USE CAUTION WHEN EDITING
+ * Trailing whitespace OR NEWLINE on the last line will cause
+ * IllegalStateExceptions !!!
+ */
+
 boolean rendered = false;
 String templateFile = request.getParameter("template");
 if (templateFile != null) {

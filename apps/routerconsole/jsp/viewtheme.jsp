@@ -1,4 +1,10 @@
 <% 
+/*
+ * USE CAUTION WHEN EDITING
+ * Trailing whitespace OR NEWLINE on the last line will cause
+ * IllegalStateExceptions !!!
+ */
+
 String uri = request.getRequestURI();
 if (uri.endsWith(".css")) {
   response.setContentType("text/css");
