@@ -193,9 +193,11 @@ class PersistentDataStore extends TransientDataStore {
             while (true) {
                 // get a new iterator every time to get a random entry without
                 // having concurrency issues or copying to a List or Array
-                Iterator<Hash> iter = _keys.keySet().iterator();
+                Iterator<Map.Entry<Hash, DataStructure>> iter = _keys.entrySet().iterator();
                 try {
-                    key = iter.next();
+                    Map.Entry<Hash, DataStructure> entry = iter.next();
+                    key = entry.getKey();
+                    data = entry.getValue();
                     iter.remove();
                     count++;
                 } catch (NoSuchElementException nsee) {
@@ -207,7 +209,6 @@ class PersistentDataStore extends TransientDataStore {
                 }
 
                 if (key != null) {
-                    data = _keys.get(key);
                     if (data != null) {
                         write(key, data);
                         data = null;
