@@ -37,7 +37,8 @@ public class UPnP
 	public final static String NAME = "CyberLink";
 	public final static String VERSION = "1.7";
 
-	public final static int SERVER_RETRY_COUNT = 100;
+	// I2P was 100
+	public final static int SERVER_RETRY_COUNT = 4;
 	public final static int DEFAULT_EXPIRED_DEVICE_EXTRA_TIME = 60;
 
 	public final static String getServerName()

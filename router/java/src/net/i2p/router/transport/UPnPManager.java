@@ -48,6 +48,9 @@ public class UPnPManager {
         _context = context;
         _manager = manager;
         _log = _context.logManager().getLog(UPnPManager.class);
+        // UPnP wants to bind to IPv6 link local interfaces by default, but what UPnP router
+        // is going to want to talk IPv6 anyway? Just make it easy and force IPv4 only
+        org.cybergarage.upnp.UPnP.setEnable(org.cybergarage.upnp.UPnP.USE_ONLY_IPV4_ADDR);
         _upnp = new UPnP(context);
         _upnp.setHTTPPort(_context.getProperty(PROP_HTTP_PORT, DEFAULT_HTTP_PORT));
         _upnp.setSSDPPort(_context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT));
@@ -150,7 +153,7 @@ public class UPnPManager {
 
     public String renderStatusHTML() {
         if (!_isRunning)
-            return "<a name=\"upnp\"><<b>UPnP is not enabled</b>\n";
+            return "<a name=\"upnp\"><b>UPnP is not enabled</b>\n";
         return _upnp.renderStatusHTML();
     }
 }

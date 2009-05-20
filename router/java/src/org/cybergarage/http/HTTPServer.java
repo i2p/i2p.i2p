@@ -91,6 +91,7 @@ public class HTTPServer implements Runnable
 			serverSock.setSoTimeout(10*1000);
 		}
 		catch (IOException e) {
+			Debug.warning("HTTP server open failed " + addr + " " + port, e);
 			return false;
 		}
 		return true;
