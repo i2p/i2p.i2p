@@ -657,8 +657,8 @@ public class NTCPTransport extends TransportImpl {
         buf.setLength(0);
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
-            String name = con.getRemotePeer().calculateHash().toBase64().substring(0,6);
-            buf.append("<tr><td><code><a href=\"netdb.jsp?r=").append(name).append("\">").append(name).append("</a>");
+            buf.append("<tr><td>");
+            buf.append(_context.commSystem().renderPeerHTML(con.getRemotePeer().calculateHash()));
             //byte[] ip = getIP(con.getRemotePeer().calculateHash());
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));

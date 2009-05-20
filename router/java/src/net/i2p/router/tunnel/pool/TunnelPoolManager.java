@@ -546,12 +546,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             out.write("<td align=right>" + info.getProcessedMessagesCount() + "KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);
-                String cap = getCapacity(peer);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
-                if (_context.routerHash().equals(peer))
+                if (_context.routerHash().equals(peer)) {
                     out.write("<td>" + (id == null ? "" : "" + id) + "</td>");
-                else
-                    out.write("<td>" + netDbLink(peer) + (id == null ? "" : ":" + id) + cap + "</td>");                
+                } else {
+                    String cap = getCapacity(peer);
+                    out.write("<td>" + netDbLink(peer) + (id == null ? "" : " " + id) + cap + "</td>");                
+                }
             }
             out.write("</tr>\n");
             
@@ -563,18 +564,14 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.write("</table>\n");
         if (in != null) {
             List pending = in.listPending();
-            for (int i = 0; i < pending.size(); i++) {
-                TunnelInfo info = (TunnelInfo)pending.get(i);
-                out.write("In progress: <code>" + info.toString() + "</code><br />\n");
-            }
+            if (pending.size() > 0)
+                out.write("Build in progress: " + pending.size() + " inbound<br />\n");
             live += pending.size();
         }
         if (outPool != null) {
             List pending = outPool.listPending();
-            for (int i = 0; i < pending.size(); i++) {
-                TunnelInfo info = (TunnelInfo)pending.get(i);
-                out.write("In progress: <code>" + info.toString() + "</code><br />\n");
-            }
+            if (pending.size() > 0)
+                out.write("In progress: " + pending.size() + " outbound<br />\n");
             live += pending.size();
         }
         if (live <= 0)
@@ -716,22 +713,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (info != null) {
             String caps = info.getCapabilities();
-            if (caps.indexOf(Router.CAPABILITY_BW12) >= 0) {
-                return "[&lt;12&nbsp;]";
-            } else if (caps.indexOf(Router.CAPABILITY_BW32) >= 0) {
-                return "[&lt;=32&nbsp;]";
-            } else if (caps.indexOf(Router.CAPABILITY_BW64) >= 0) {
-                return "[&lt;=64&nbsp;]";
-            } else if (caps.indexOf(Router.CAPABILITY_BW128) >= 0) {
-                return "<b>[&lt;=128]</b>";
-            } else if (caps.indexOf(Router.CAPABILITY_BW256) >= 0) {
-                return "<b>[&gt;128]</b>";
-            } else {
-                return "[old&nbsp;]";
+            for (char c = Router.CAPABILITY_BW12; c <= Router.CAPABILITY_BW256; c++) {
+                if (caps.indexOf(c) >= 0)
+                    return " " + c;
             }
-        } else {
-            return "[unkn]";
         }
+        return "";
     }
 
     private String netDbLink(Hash peer) {

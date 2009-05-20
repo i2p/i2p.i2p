@@ -1753,9 +1753,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
         buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b>");
-        if (sortFlags == FLAG_ALPHA)
-            buf.append(" V ");
-        else
+        if (sortFlags != FLAG_ALPHA)
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
         buf.append("</td><td>dir/intro</td><td><b><a href=\"#def.idle\">idle</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle inbound", FLAG_IDLE_IN);
@@ -1807,13 +1805,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<tr>");
             
-            String name = peer.getRemotePeer().toBase64().substring(0,6);
-            buf.append("<td valign=\"top\" nowrap=\"nowrap\"><code>");
-            buf.append("<a href=\"netdb.jsp?r=");
-            buf.append(name);
-            buf.append("\">");
-            buf.append(name);
-            buf.append("</a>");
+            buf.append("<td>");
+            buf.append(_context.commSystem().renderPeerHTML(peer.getRemotePeer()));
             //byte ip[] = peer.getRemoteIP();
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));

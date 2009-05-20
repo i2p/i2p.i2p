@@ -263,8 +263,7 @@ public class Shitlist {
         for (Map.Entry<Hash, Entry> e : entries.entrySet()) {
             Hash key = e.getKey();
             Entry entry = e.getValue();
-            buf.append("<li><b>").append(key.toBase64()).append("</b>");
-            buf.append(" (<a href=\"netdb.jsp?r=").append(key.toBase64().substring(0, 6)).append("\">netdb</a>)");
+            buf.append("<li>").append(_context.commSystem().renderPeerHTML(key));
             buf.append(" expiring in ");
             buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
             Set transports = entry.transports;
