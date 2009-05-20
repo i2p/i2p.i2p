@@ -87,3 +87,11 @@ div.news {
 	text-align: left;
 	color: inherit;
 }
+
+div.confignav {
+	background-color: #efefff;
+}
+
+div.configure {
+	background-color: #ffffc0;
+}

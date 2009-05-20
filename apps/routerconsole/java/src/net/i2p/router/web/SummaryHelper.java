@@ -78,24 +78,10 @@ public class SummaryHelper extends HelperBase {
         
         long ms = _context.clock().getOffset();
         
-        long diff = ms;
-        if (diff < 0)
-            diff = 0 - diff;
-        if (diff == 0) {
-            return now + " (no skew)";
-        } else if (diff < 1000) {
-            return now + " (" + ms + "ms skew)";
-        } else if (diff < 5 * 1000) {
-            return now + " (" + (ms / 1000) + "s skew)";
-        } else if (diff < 60 * 1000) {
-            return now + " <b>(" + (ms / 1000) + "s skew)</b>";
-        } else if (diff < 60 * 60 * 1000) {
-            return now + " <b>(" + (ms / (60 * 1000)) + "m skew)</b>";
-        } else if (diff < 24 * 60 * 60 * 1000) {
-            return now + " <b>(" + (ms / (60 * 60 * 1000)) + "h skew)</b>";
-        } else {
-            return now + " <b>(" + (ms / (24 * 60 * 60 * 1000)) + "d skew)</b>";
-        }
+        long diff = Math.abs(ms);
+        if (diff < 100)
+            return now;
+        return now + " (" + DataHelper.formatDuration(diff) + " skew)";
     }
     
     public boolean allowReseed() {

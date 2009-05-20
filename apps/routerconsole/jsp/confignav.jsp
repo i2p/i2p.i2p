@@ -1,5 +1,6 @@
+<div class="confignav" id="confignav">
 <center>
-<h4>
+<b>
 <% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network<% }
  else if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
@@ -20,7 +21,7 @@
  %>Stats<% }
  else if (request.getRequestURI().indexOf("configadvanced.jsp") != -1) {
  %>Advanced<% }%>
-Configuration</h4>
+Configuration</b>
 <h4><% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
  if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
@@ -43,3 +44,4 @@ Configuration</h4>
  %>Advanced<% } else { %><a href="configadvanced.jsp">Advanced</a><% } %></h4>
 </center>
 <hr />
+</div>

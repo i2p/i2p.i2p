@@ -28,6 +28,7 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
 
+<div class="configure" id="configure">
  <h3>Bandwidth limiter</h3>
  <p>
  <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
@@ -66,6 +67,8 @@
  %>
  </p><p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
+ </p>
+</div>
  <hr />
 <!--
  <b>Enable load testing: </b>
