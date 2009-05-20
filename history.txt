@@ -1,3 +1,7 @@
+2009-05-20 Mathiasdm
+    * General configuration enabled by default
+    * General configuration speed tab works completely
+
 2009-05-17 zzz
     * Merge i2p.i2p.zzz.upnp branch
      * Major changes:
