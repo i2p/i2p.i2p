@@ -30,6 +30,16 @@ import net.i2p.util.SimpleTimer;
 /**
  * Manage the current state of the statistics
  *
+ * All the capabilities methods appear to be almost unused -
+ * TunnelPeerSelector just looks for unreachables, and that's it?
+ * If so, a lot of this can go away, including the array of 26 ArrayLists,
+ * and a lot of synchronization on _capabilitiesByPeer.
+ *
+ * We don't trust any published capabilities except for 'K' and 'U'.
+ * This should be cleaned up.
+ *
+ * setCapabilities() and removeCapabilities() can just add/remove the profile and that's it.
+ *
  */
 class PeerManager {
     private Log _log;
