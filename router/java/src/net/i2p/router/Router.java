@@ -1029,7 +1029,10 @@ public class Router {
                 System.out.println("ERROR: Unable to delete the update file!");
                 updateFile.deleteOnExit();
             }
-            System.out.println("INFO: Restarting after update");
+            if (System.getProperty("wrapper.version") != null)
+                System.out.println("INFO: Restarting after update");
+            else
+                System.out.println("WARNING: Exiting after update, restart I2P");
             System.exit(EXIT_HARD_RESTART);
         }
     }

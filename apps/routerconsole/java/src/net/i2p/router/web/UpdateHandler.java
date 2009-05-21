@@ -179,7 +179,11 @@ public class UpdateHandler {
                     restart();
                 } else {
                     _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
-                    _status = "<b>Update downloaded</b><br />Click Restart to Install";
+                    _status = "<b>Update downloaded</b><br />";
+                    if (System.getProperty("wrapper.version") != null)
+                        _status += "Click Restart to install";
+                    else
+                        _status += "Click Shutdown and restart to install";
                     if (up.newVersion() != null)
                         _status += " Version " + up.newVersion();
                 }
