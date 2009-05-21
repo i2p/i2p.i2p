@@ -2,7 +2,7 @@
 
 <Form version="1.5" maxVersion="1.6" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
+    <Component class="javax.swing.ButtonGroup" name="updateButtonGroup">
     </Component>
   </NonVisualComponents>
   <Properties>
@@ -371,7 +371,7 @@
             <Component class="javax.swing.JRadioButton" name="updateInform">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="buttonGroup1"/>
+                  <ComponentRef name="updateButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="updateInform.text"/>
                 <Property name="name" type="java.lang.String" value="updateInform" noResource="true"/>
@@ -380,7 +380,7 @@
             <Component class="javax.swing.JRadioButton" name="updateDownload">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="buttonGroup1"/>
+                  <ComponentRef name="updateButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="updateDownload.text"/>
                 <Property name="name" type="java.lang.String" value="updateDownload" noResource="true"/>
@@ -389,7 +389,7 @@
             <Component class="javax.swing.JRadioButton" name="updateDownloadRestart">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="buttonGroup1"/>
+                  <ComponentRef name="updateButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="updateDownloadRestart.text"/>
                 <Property name="name" type="java.lang.String" value="updateDownloadRestart" noResource="true"/>
@@ -400,18 +400,27 @@
                 <Property name="text" type="java.lang.String" resourceKey="checkUpdates.text"/>
                 <Property name="name" type="java.lang.String" value="checkUpdates" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkUpdatesActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JToggleButton" name="updateNow">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="updateNow.text"/>
                 <Property name="name" type="java.lang.String" value="updateNow" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateNowActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JToggleButton" name="advancedUpdateConfig">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="advancedUpdateConfig.text"/>
                 <Property name="name" type="java.lang.String" value="advancedUpdateConfig" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="advancedUpdateConfigActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

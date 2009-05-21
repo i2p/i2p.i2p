@@ -6,10 +6,23 @@
 
 package net.i2p.desktopgui.gui;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.i2p.desktopgui.router.configuration.SpeedHelper;
 import javax.swing.JComboBox;
+import javax.swing.ButtonModel;
 import javax.swing.JTextField;
+import net.i2p.desktopgui.router.RouterHelper;
 import net.i2p.desktopgui.router.configuration.SpeedHandler;
+import net.i2p.desktopgui.router.configuration.UpdateHelper;
+import net.i2p.router.web.NewsFetcher;
+import net.i2p.desktopgui.router.configuration.UpdateHandler;
+import java.util.Date;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -22,11 +35,14 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         initComponents();
         extraInitComponents();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+        this.requestFocus();
         this.setVisible(true);
     }
     
     private void extraInitComponents() {
         initSpeedTab();
+        initUpdateTab();
     }
 
     private void initSpeedTab() {
@@ -34,14 +50,40 @@ public class GeneralConfiguration extends javax.swing.JFrame {
             String inbound = SpeedHelper.getInboundBandwidth();
             String outbound = SpeedHelper.getOutboundBandwidth();
 
-            initSpeeds(inbound, outbound);
-            initUsage("" + Integer.parseInt(inbound)/8, "" + Integer.parseInt(outbound)/8);
+            initSpeeds("" + Integer.parseInt(inbound)*8, "" + Integer.parseInt(outbound)*8);
+            initUsage("" + Integer.parseInt(inbound), "" + Integer.parseInt(outbound));
         }
         catch(Exception e) {
             e.printStackTrace();
             System.out.println("Exception noticed, probably running desktopgui in a debugger instead of along with I2P!?");
             initSpeeds("100", "100");
             initUsage("12", "12");
+        }
+    }
+
+    private void initUpdateTab() {
+        //Set update policy
+        String updatePolicy = UpdateHelper.getUpdatePolicy();
+        if(updatePolicy.equals(UpdateHelper.NOTIFY_UPDATE_POLICY)) {
+            updateButtonGroup.setSelected(updateInform.getModel(), true);
+        }
+        else if(updatePolicy.equals(UpdateHelper.DOWNLOAD_UPDATE_POLICY)) {
+            updateButtonGroup.setSelected(updateDownload.getModel(), true);
+        }
+        else if(updatePolicy.equals(UpdateHelper.INSTALL_UPDATE_POLICY)) {
+            updateButtonGroup.setSelected(updateDownloadRestart.getModel(), true);
+        }
+        else {
+            System.out.println("desktopgui: no updates for you!");
+        }
+
+        //Check if an update is available
+        //TODO: move this method out of the routerconsole so desktopgui doesn't depend on routerconsole!!!
+        if(NewsFetcher.getInstance(RouterHelper.getContext()).updateAvailable()) {
+            updateNow.setVisible(true);
+        }
+        else {
+            updateNow.setVisible(false);
         }
     }
 
@@ -54,7 +96,7 @@ public class GeneralConfiguration extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        updateButtonGroup = new javax.swing.ButtonGroup();
         applyPanel = new javax.swing.JPanel();
         cancel = new javax.swing.JToggleButton();
         ok = new javax.swing.JToggleButton();
@@ -240,26 +282,41 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         updateMethod.setText(resourceMap.getString("updateMethod.text")); // NOI18N
         updateMethod.setName("updateMethod"); // NOI18N
 
-        buttonGroup1.add(updateInform);
+        updateButtonGroup.add(updateInform);
         updateInform.setText(resourceMap.getString("updateInform.text")); // NOI18N
         updateInform.setName("updateInform"); // NOI18N
 
-        buttonGroup1.add(updateDownload);
+        updateButtonGroup.add(updateDownload);
         updateDownload.setText(resourceMap.getString("updateDownload.text")); // NOI18N
         updateDownload.setName("updateDownload"); // NOI18N
 
-        buttonGroup1.add(updateDownloadRestart);
+        updateButtonGroup.add(updateDownloadRestart);
         updateDownloadRestart.setText(resourceMap.getString("updateDownloadRestart.text")); // NOI18N
         updateDownloadRestart.setName("updateDownloadRestart"); // NOI18N
 
         checkUpdates.setText(resourceMap.getString("checkUpdates.text")); // NOI18N
         checkUpdates.setName("checkUpdates"); // NOI18N
+        checkUpdates.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkUpdatesActionPerformed(evt);
+            }
+        });
 
         updateNow.setText(resourceMap.getString("updateNow.text")); // NOI18N
         updateNow.setName("updateNow"); // NOI18N
+        updateNow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateNowActionPerformed(evt);
+            }
+        });
 
         advancedUpdateConfig.setText(resourceMap.getString("advancedUpdateConfig.text")); // NOI18N
         advancedUpdateConfig.setName("advancedUpdateConfig"); // NOI18N
+        advancedUpdateConfig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                advancedUpdateConfigActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout updatesPanelLayout = new javax.swing.GroupLayout(updatesPanel);
         updatesPanel.setLayout(updatesPanelLayout);
@@ -468,8 +525,64 @@ private void cancelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:even
 
 private void okMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_okMouseClicked
     saveSpeeds();
+    saveUpdatePolicy();
     this.dispose();
 }//GEN-LAST:event_okMouseClicked
+
+private void checkUpdatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkUpdatesActionPerformed
+    long current = new Date().getTime();
+    if(current < newsLastFetched + 5*60*1000) {
+        return;
+    }
+    checkUpdates.setText("Checking for updates");
+    checkUpdates.setEnabled(false);
+    newsLastFetched = current;
+    SwingWorker sw = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                NewsFetcher.getInstance(RouterHelper.getContext()).fetchNews();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                checkUpdates.setText("Check for updates now");
+                checkUpdates.setEnabled(true);
+                if(NewsFetcher.getInstance(RouterHelper.getContext()).updateAvailable()) {
+                    updateNow.setVisible(true);
+                }
+            }
+
+    };
+}//GEN-LAST:event_checkUpdatesActionPerformed
+
+private void updateNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateNowActionPerformed
+    SwingWorker sw = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                new net.i2p.router.web.UpdateHandler().update();
+                return null;
+            }
+        
+    };
+    updateNow.setEnabled(false);
+    updateNow.setText("Updating...");
+    checkUpdates.setEnabled(false);
+
+}//GEN-LAST:event_updateNowActionPerformed
+
+private void advancedUpdateConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_advancedUpdateConfigActionPerformed
+    try {
+        Desktop.getDesktop().browse(new URI("http://127.0.0.1:7657/configupdate.jsp"));
+    } catch (URISyntaxException ex) {
+        Logger.getLogger(GeneralConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    catch (IOException ex) {
+            Logger.getLogger(GeneralConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}//GEN-LAST:event_advancedUpdateConfigActionPerformed
 
     protected void initUsage(String upload, String download) {
         uploadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(upload)));
@@ -513,11 +626,23 @@ private void okMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ok
         }
     }
 
+    protected void saveUpdatePolicy() {
+        ButtonModel policyButton = updateButtonGroup.getSelection();
+        if(policyButton.equals(updateInform.getModel())) {
+            UpdateHandler.setUpdatePolicy(UpdateHelper.NOTIFY_UPDATE_POLICY);
+        }
+        else if(policyButton.equals(updateDownload.getModel())) {
+            UpdateHandler.setUpdatePolicy(UpdateHelper.DOWNLOAD_UPDATE_POLICY);
+        }
+        else if(policyButton.equals(updateDownloadRestart.getModel())) {
+            UpdateHandler.setUpdatePolicy(UpdateHelper.INSTALL_UPDATE_POLICY);
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel advancedPanel;
     private javax.swing.JToggleButton advancedUpdateConfig;
     private javax.swing.JPanel applyPanel;
-    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JToggleButton cancel;
     private javax.swing.JToggleButton checkUpdates;
     private javax.swing.JScrollPane clientFrame;
@@ -537,6 +662,7 @@ private void okMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ok
     private javax.swing.JPanel speedPanel;
     private javax.swing.JPanel tunnelPanel;
     private javax.swing.JLabel tunnelsExplanation;
+    private javax.swing.ButtonGroup updateButtonGroup;
     private javax.swing.JRadioButton updateDownload;
     private javax.swing.JRadioButton updateDownloadRestart;
     private javax.swing.JRadioButton updateInform;
@@ -553,4 +679,6 @@ private void okMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ok
 
     public static final int KILOBIT = 0;
     public static final int KILOBYTE = 1;
+
+    private long newsLastFetched = 0;
 }

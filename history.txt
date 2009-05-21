@@ -1,3 +1,8 @@
+2009-05-22 Mathiasdm
+    * desktopgui:
+      - Updating works in general config
+      - Switched to Swingworker threads for improved responsiveness
+
 2009-05-21 zzz
     * Router Watchdog:
       - Log memory stats

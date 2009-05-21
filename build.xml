@@ -524,7 +524,7 @@
         </exec>
         <echo message="Findbugs output stored in findbugs.xml" />
     </target>
-    <target name="buildWithDesktopgui" depends="buildrouter">
+    <target name="buildWithDesktopgui" depends="buildrouter,builddepSmall">
         <ant dir="apps/desktopgui" target="build_jar" />
     </target>
     <target name="preppkgWithDesktopgui" depends="buildWithDesktopgui,preppkg">

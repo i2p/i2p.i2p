@@ -151,7 +151,7 @@ public class Tray {
             public void actionPerformed(ActionEvent arg0) {
                 RouterHandler.setStatus(RouterHandler.SHUTDOWN_GRACEFULLY);
                 long shutdownTime = RouterHelper.getGracefulShutdownTimeRemaining();
-                System.out.println(shutdownTime);
+                System.out.println("Shutdowntime remaining: " + shutdownTime);
                 if(shutdownTime>0) {
                     trayIcon.displayMessage("Shutting down...", "Shutdown time remaining: " + shutdownTime/1000 + " seconds."
                             + System.getProperty("line.separator") + "Shutdown will not happen immediately, because we are still participating in the network.", TrayIcon.MessageType.INFO);
