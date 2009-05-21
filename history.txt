@@ -1,4 +1,10 @@
 2009-05-21 zzz
+    * Router Watchdog:
+      - Log memory stats
+      - Dump threads on linux
+      - Restart after 20 minutes (give the dog his teeth back)
+
+2009-05-21 zzz
     * DataStore:
       - Adjust interface to have persistent and non-persistent methods,
         to prepare for partial storage in RAM
