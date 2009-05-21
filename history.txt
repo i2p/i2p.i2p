@@ -1,3 +1,34 @@
+2009-05-21 zzz
+    * DataStore:
+      - Adjust interface to have persistent and non-persistent methods,
+        to prepare for partial storage in RAM
+    * ExpireRoutersJob:
+      - Rewrite, not enabled yet
+    * I2Punnel:
+      - Increase eepsite default to 3+0 for new installs
+    * PersistentDataStore:
+      - Cleanup, simplify, and concurrentify
+      - Tweak stats
+      - Remove write limit
+      - Flush to disk on shutdown
+      - Don't write out what we just read in
+    * Router and console:
+      - Bundle geoIP files and flags in new installs,
+        spiff up tunnels.jsp and profiles.jsp.
+        Existing installs can get files with 'ant updaterWIthGeoIP'
+        or in the console docs bundle 'ant consoleDocs'
+      - Use flags for shitlist and peers.jsp too
+      - Tweak tunnels.jsp to show class letters
+      - Hide in-progress details on tunnels.jsp
+      - Add a little color to confignav
+      - Remove 'no skew' message
+      - More message tweaks if no wrapper
+    * TunnelManager:
+      - Remove now-unused isInUse()
+    * UPnP:
+      - Fix up port binding, add some logging on bind fails
+      - Force IPv4 only for binds
+
 2009-05-20 Mathiasdm
     * General configuration enabled by default
     * General configuration speed tab works completely
