@@ -7,6 +7,9 @@
 package net.i2p.desktopgui.gui;
 
 import net.i2p.desktopgui.router.configuration.SpeedHelper;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import net.i2p.desktopgui.router.configuration.SpeedHandler;
 
 /**
  *
@@ -23,7 +26,23 @@ public class GeneralConfiguration extends javax.swing.JFrame {
     }
     
     private void extraInitComponents() {
-        downloadspeed.setText(SpeedHelper.getInboundBandwidth());
+        initSpeedTab();
+    }
+
+    private void initSpeedTab() {
+        try {
+            String inbound = SpeedHelper.getInboundBandwidth();
+            String outbound = SpeedHelper.getOutboundBandwidth();
+
+            initSpeeds(inbound, outbound);
+            initUsage("" + Integer.parseInt(inbound)/8, "" + Integer.parseInt(outbound)/8);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            System.out.println("Exception noticed, probably running desktopgui in a debugger instead of along with I2P!?");
+            initSpeeds("100", "100");
+            initUsage("12", "12");
+        }
     }
 
     /** This method is called from within the constructor to
@@ -47,13 +66,13 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         downloadspeed = new javax.swing.JTextField();
         uploadkbps = new javax.swing.JComboBox();
         downloadkbps = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        uploadUsageLabel = new javax.swing.JLabel();
+        downloadUsageLabel = new javax.swing.JLabel();
         uploadgb = new javax.swing.JTextField();
         downloadgb = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        gbUploadLabel = new javax.swing.JLabel();
+        gbDownloadLabel = new javax.swing.JLabel();
+        uploadDownloadExplanation = new javax.swing.JLabel();
         updatesPanel = new javax.swing.JPanel();
         updateMethod = new javax.swing.JLabel();
         updateInform = new javax.swing.JRadioButton();
@@ -80,9 +99,19 @@ public class GeneralConfiguration extends javax.swing.JFrame {
 
         cancel.setText(resourceMap.getString("cancel.text")); // NOI18N
         cancel.setName("cancel"); // NOI18N
+        cancel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cancelMouseClicked(evt);
+            }
+        });
 
         ok.setText(resourceMap.getString("ok.text")); // NOI18N
         ok.setName("ok"); // NOI18N
+        ok.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                okMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout applyPanelLayout = new javax.swing.GroupLayout(applyPanel);
         applyPanel.setLayout(applyPanelLayout);
@@ -122,8 +151,8 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         uploadspeed.setText(resourceMap.getString("uploadspeed.text")); // NOI18N
         uploadspeed.setName("uploadspeed"); // NOI18N
         uploadspeed.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                speedKeyTyped(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                speedKeyReleased(evt);
             }
         });
         speedPanel.add(uploadspeed);
@@ -132,8 +161,8 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         downloadspeed.setText(resourceMap.getString("downloadspeed.text")); // NOI18N
         downloadspeed.setName("downloadspeed"); // NOI18N
         downloadspeed.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                speedKeyTyped(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                speedKeyReleased(evt);
             }
         });
         speedPanel.add(downloadspeed);
@@ -159,21 +188,21 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         speedPanel.add(downloadkbps);
         downloadkbps.setBounds(240, 60, 68, 27);
 
-        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
-        jLabel3.setName("jLabel3"); // NOI18N
-        speedPanel.add(jLabel3);
-        jLabel3.setBounds(330, 20, 97, 30);
+        uploadUsageLabel.setText(resourceMap.getString("uploadUsageLabel.text")); // NOI18N
+        uploadUsageLabel.setName("uploadUsageLabel"); // NOI18N
+        speedPanel.add(uploadUsageLabel);
+        uploadUsageLabel.setBounds(330, 20, 97, 30);
 
-        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
-        jLabel4.setName("jLabel4"); // NOI18N
-        speedPanel.add(jLabel4);
-        jLabel4.setBounds(330, 60, 97, 30);
+        downloadUsageLabel.setText(resourceMap.getString("downloadUsageLabel.text")); // NOI18N
+        downloadUsageLabel.setName("downloadUsageLabel"); // NOI18N
+        speedPanel.add(downloadUsageLabel);
+        downloadUsageLabel.setBounds(330, 60, 97, 30);
 
         uploadgb.setText(resourceMap.getString("uploadgb.text")); // NOI18N
         uploadgb.setName("uploadgb"); // NOI18N
         uploadgb.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                uploadgbKeyTyped(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                monthKeyReleased(evt);
             }
         });
         speedPanel.add(uploadgb);
@@ -182,27 +211,27 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         downloadgb.setText(resourceMap.getString("downloadgb.text")); // NOI18N
         downloadgb.setName("downloadgb"); // NOI18N
         downloadgb.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                downloadgbKeyTyped(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                monthKeyReleased(evt);
             }
         });
         speedPanel.add(downloadgb);
         downloadgb.setBounds(440, 60, 60, 27);
 
-        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
-        jLabel5.setName("jLabel5"); // NOI18N
-        speedPanel.add(jLabel5);
-        jLabel5.setBounds(510, 20, 19, 30);
+        gbUploadLabel.setText(resourceMap.getString("gbUploadLabel.text")); // NOI18N
+        gbUploadLabel.setName("gbUploadLabel"); // NOI18N
+        speedPanel.add(gbUploadLabel);
+        gbUploadLabel.setBounds(510, 20, 19, 30);
 
-        jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
-        jLabel6.setName("jLabel6"); // NOI18N
-        speedPanel.add(jLabel6);
-        jLabel6.setBounds(510, 60, 19, 30);
+        gbDownloadLabel.setText(resourceMap.getString("gbDownloadLabel.text")); // NOI18N
+        gbDownloadLabel.setName("gbDownloadLabel"); // NOI18N
+        speedPanel.add(gbDownloadLabel);
+        gbDownloadLabel.setBounds(510, 60, 19, 30);
 
-        jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
-        jLabel7.setName("jLabel7"); // NOI18N
-        speedPanel.add(jLabel7);
-        jLabel7.setBounds(20, 100, 520, 70);
+        uploadDownloadExplanation.setText(resourceMap.getString("uploadDownloadExplanation.text")); // NOI18N
+        uploadDownloadExplanation.setName("uploadDownloadExplanation"); // NOI18N
+        speedPanel.add(uploadDownloadExplanation);
+        uploadDownloadExplanation.setBounds(20, 100, 520, 70);
 
         settingsPanel.addTab(resourceMap.getString("speedPanel.TabConstraints.tabTitle"), speedPanel); // NOI18N
 
@@ -377,7 +406,7 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void speedKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_speedKeyTyped
+    private void speedKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_speedKeyReleased
     try {
         String upload = "";
         if(uploadkbps.getSelectedIndex() == KILOBIT)
@@ -395,27 +424,93 @@ private void speedKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_speed
         e.printStackTrace();
         return;
     }
-}//GEN-LAST:event_speedKeyTyped
+}//GEN-LAST:event_speedKeyReleased
 
 private void uploadkbpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadkbpsActionPerformed
-    // TODO add your handling code here:
+    kbpsSwitchPerformed(uploadkbps, uploadspeed);
 }//GEN-LAST:event_uploadkbpsActionPerformed
 
 private void downloadkbpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadkbpsActionPerformed
-    // TODO add your handling code here:
+    kbpsSwitchPerformed(downloadkbps, downloadspeed);
 }//GEN-LAST:event_downloadkbpsActionPerformed
 
-private void uploadgbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_uploadgbKeyTyped
-    // TODO add your handling code here:
-}//GEN-LAST:event_uploadgbKeyTyped
+private void monthKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_monthKeyReleased
+    try {
+        int uploadMonthValue = Integer.parseInt(uploadgb.getText());
+        int downloadMonthValue = Integer.parseInt(downloadgb.getText());
 
-private void downloadgbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_downloadgbKeyTyped
-    // TODO add your handling code here:
-}//GEN-LAST:event_downloadgbKeyTyped
+        String upload = "";
+        String burstUpload = "";
+        String download = "";
+        String burstDownload = "";
+
+        if(uploadkbps.getSelectedIndex() == KILOBIT)
+            upload = "" + SpeedHelper.calculateSpeed(uploadMonthValue)*8; //kbit
+        else
+            upload = "" + SpeedHelper.calculateSpeed(uploadMonthValue); //kbyte
+
+        if(downloadkbps.getSelectedIndex() == KILOBIT)
+            download = "" + SpeedHelper.calculateSpeed(downloadMonthValue)*8; //kbit
+        else
+            download = "" + SpeedHelper.calculateSpeed(downloadMonthValue); //kbyte
+
+        initSpeeds(upload, download);
+    }
+    catch(NumberFormatException e) {
+        e.printStackTrace();
+        return;
+    }
+}//GEN-LAST:event_monthKeyReleased
+
+private void cancelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cancelMouseClicked
+    this.dispose();
+}//GEN-LAST:event_cancelMouseClicked
+
+private void okMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_okMouseClicked
+    saveSpeeds();
+    this.dispose();
+}//GEN-LAST:event_okMouseClicked
 
     protected void initUsage(String upload, String download) {
         uploadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(upload)));
         downloadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(download)));
+    }
+
+    protected void initSpeeds(String upload, String download) {
+        uploadspeed.setText(upload);
+        downloadspeed.setText(download);
+    }
+
+    private void kbpsSwitchPerformed(JComboBox kbps, JTextField speed) {
+        int index = kbps.getSelectedIndex();
+        int previous = Integer.parseInt(speed.getText());
+        if(index == KILOBIT) {
+            speed.setText("" + previous*8);
+        }
+        else {
+            speed.setText("" + previous/8);
+        }
+    }
+
+    protected void saveSpeeds() {
+        int maxDownload = Integer.parseInt(downloadspeed.getText());
+        int maxUpload = Integer.parseInt(uploadspeed.getText());
+        if(uploadkbps.getSelectedIndex() == KILOBIT) {
+            SpeedHandler.setOutboundBandwidth(maxUpload/8);
+            SpeedHandler.setOutboundBurstBandwidth(maxUpload/8);
+        }
+        else {
+            SpeedHandler.setOutboundBandwidth(maxUpload);
+            SpeedHandler.setOutboundBurstBandwidth(maxUpload);
+        }
+        if(downloadkbps.getSelectedIndex() == KILOBIT) {
+            SpeedHandler.setInboundBandwidth(maxDownload/8);
+            SpeedHandler.setInboundBurstBandwidth(maxDownload/8);
+        }
+        else {
+            SpeedHandler.setInboundBandwidth(maxDownload);
+            SpeedHandler.setInboundBurstBandwidth(maxDownload);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -428,14 +523,12 @@ private void downloadgbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_
     private javax.swing.JScrollPane clientFrame;
     private javax.swing.JLabel clientTunnelLabel;
     private javax.swing.JLabel downloadSpeedLabel;
+    private javax.swing.JLabel downloadUsageLabel;
     private javax.swing.JTextField downloadgb;
     private javax.swing.JComboBox downloadkbps;
     private javax.swing.JTextField downloadspeed;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel gbDownloadLabel;
+    private javax.swing.JLabel gbUploadLabel;
     private javax.swing.JPanel networkPanel;
     private javax.swing.JToggleButton ok;
     private javax.swing.JScrollPane serverFrame;
@@ -450,7 +543,9 @@ private void downloadgbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_
     private javax.swing.JLabel updateMethod;
     private javax.swing.JToggleButton updateNow;
     private javax.swing.JPanel updatesPanel;
+    private javax.swing.JLabel uploadDownloadExplanation;
     private javax.swing.JLabel uploadSpeedLabel;
+    private javax.swing.JLabel uploadUsageLabel;
     private javax.swing.JTextField uploadgb;
     private javax.swing.JComboBox uploadkbps;
     private javax.swing.JTextField uploadspeed;

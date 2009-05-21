@@ -170,7 +170,7 @@ public class Tray {
         popup.addSeparator();
         
         config.add(speedConfig);
-        //config.add(generalConfig);
+        config.add(generalConfig);
         config.add(advancedConfig);
         popup.add(config);
         
