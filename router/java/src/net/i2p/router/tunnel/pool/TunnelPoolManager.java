@@ -195,13 +195,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public int getParticipatingCount() { return _context.tunnelDispatcher().getParticipatingCount(); }
     public long getLastParticipatingExpiration() { return _context.tunnelDispatcher().getLastParticipatingExpiration(); }
     
-    public boolean isInUse(Hash peer) { 
-        // this lets peers that are in our tunnels expire (forcing us to refetch them) 
-        // if the info is old
-        //!! no, dont.  bad.
-        return true; 
-    }
-    
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel) {
         if (tunnel.getExpiration() < _context.clock().now())
             return false;
@@ -571,7 +564,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (outPool != null) {
             List pending = outPool.listPending();
             if (pending.size() > 0)
-                out.write("In progress: " + pending.size() + " outbound<br />\n");
+                out.write("Build in progress: " + pending.size() + " outbound<br />\n");
             live += pending.size();
         }
         if (live <= 0)

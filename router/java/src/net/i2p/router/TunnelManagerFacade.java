@@ -35,12 +35,6 @@ public interface TunnelManagerFacade extends Service {
     /** pick an outbound tunnel bound to the given destination */
     TunnelInfo selectOutboundTunnel(Hash destination);
     
-    /**
-     * True if the peer currently part of a tunnel
-     *
-     */
-    boolean isInUse(Hash peer);
-
     /** Is a tunnel a valid member of the pool? */
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel);
     

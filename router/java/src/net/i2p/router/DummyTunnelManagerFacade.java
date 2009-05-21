@@ -27,7 +27,6 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public TunnelInfo selectInboundTunnel(Hash destination) { return null; } 
     public TunnelInfo selectOutboundTunnel() { return null; }
     public TunnelInfo selectOutboundTunnel(Hash destination) { return null; }
-    public boolean isInUse(Hash peer) { return false; }
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel) { return false; }
     public int getParticipatingCount() { return 0; }
     public int getFreeTunnelCount() { return 0; }
