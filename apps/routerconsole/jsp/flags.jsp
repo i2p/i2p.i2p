@@ -16,7 +16,7 @@ if (c != null && c.length() > 0) {
     response.setContentType("image/png");
     response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
     try {
-        net.i2p.util.FileUtil.readFile(c + ".png", "icons/flags", cout);
+        net.i2p.util.FileUtil.readFile(c + ".png", "docs/icons/flags", cout);
         rendered = true;
     } catch (java.io.IOException ioe) {}
     if (rendered)

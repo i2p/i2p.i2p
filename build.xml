@@ -322,7 +322,7 @@
         </copy>
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy todir="pkg-temp/icons/flags" >
+        <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />
         </copy>
     </target>
@@ -339,7 +339,7 @@
         </copy>
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy todir="pkg-temp/icons/flags" >
+        <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />
         </copy>
         <zip destfile="docs.zip" basedir="pkg-temp" />
@@ -401,7 +401,7 @@
     <target name="prepgeoupdate" depends="prepupdate">
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy todir="pkg-temp/icons/flags" >
+        <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />
         </copy>
     </target>
