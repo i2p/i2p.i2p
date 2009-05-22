@@ -112,9 +112,9 @@ public class GeoIP {
 
    /**
     * Read in and parse the country file.
-    * The geoip file need not be sorted.
+    * The file need not be sorted.
     *
-    * Acceptable formats (IPV4 only):
+    * Acceptable formats:
     *   #comment (# must be in column 1)
     *   code,full name
     *
@@ -180,8 +180,9 @@ public class GeoIP {
     * unzip ip-to-country.csv.zip
     * cut -d, -f0-3 < ip-to-country.csv|sed 's/"//g' > geoip.txt
     *
-    * @param search a sorted map of IPs to search, with null values
-    * returns the map with values entered
+    * @param search a sorted array of IPs to search
+    * @return an array of country codes, same order as the search param,
+    *         or a zero-length array on failure
     *
     */
     private String[] readGeoIPFile(Long[] search) {
