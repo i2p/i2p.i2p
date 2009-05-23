@@ -15,8 +15,20 @@
 
 package org.cybergarage.util;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 public final class Debug
 {
+	private static Log _log;
+
+	/** I2P this is all static so have the UPnPManager call this */
+	public static void initialize(I2PAppContext ctx) {
+		_log = ctx.logManager().getLog(Debug.class);
+		// org.cybergarage.util.Debug=DEBUG at startup
+		enabled = _log.shouldLog(Log.DEBUG);
+	}
+
 	public static boolean enabled = false;
 	
 	public static final void on() {
@@ -29,23 +41,25 @@ public final class Debug
 		return enabled;
 	}
 	public static final void message(String s) {
-		if (enabled == true)
-			System.out.println("UPnP message : " + s);
+		if (_log != null)
+			_log.debug(s);
 	}
 	public static final void message(String m1, String m2) {
-		if (enabled == true)
-			System.out.println("UPnP message : ");
-			System.out.println(m1);
-			System.out.println(m2);
+		if (_log != null) {
+			_log.debug(m1);
+			_log.debug(m2);
+		}
 	}
 	public static final void warning(String s) {
-		System.out.println("UPnP warning : " + s);
+		if (_log != null)
+			_log.error(s);
 	}
 	public static final void warning(String m, Exception e) {
-		System.out.println("UPnP warning : " + m + " (" + e.getMessage() + ")");
+		if (_log != null)
+			_log.error(m, e);
 	}
 	public static final void warning(Exception e) {
-		warning(e.getMessage());
-		e.printStackTrace();
+		if (_log != null)
+			_log.error("", e);
 	}
 }

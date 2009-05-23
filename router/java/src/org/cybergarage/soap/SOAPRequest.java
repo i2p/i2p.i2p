@@ -172,12 +172,12 @@ public class SOAPRequest extends HTTPRequest
 	
 	public void print()
 	{
-		System.out.println(toString());
+		Debug.message(toString());
 		if (hasContent() == true)
 			return;
 		Node rootElem = getRootNode();
 		if (rootElem == null)
 			return;
-		System.out.println(rootElem.toString());
+		Debug.message(rootElem.toString());
 	}
 }

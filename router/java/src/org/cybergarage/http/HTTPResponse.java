@@ -20,6 +20,7 @@
 package org.cybergarage.http;
 
 import java.io.*;
+import org.cybergarage.util.Debug;
 
 public class HTTPResponse extends HTTPPacket
 {
@@ -110,6 +111,6 @@ public class HTTPResponse extends HTTPPacket
 
 	public void print()
 	{
-		System.out.println(toString());
+		Debug.message(toString());
 	}
 }

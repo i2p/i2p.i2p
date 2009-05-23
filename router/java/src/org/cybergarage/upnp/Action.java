@@ -333,7 +333,7 @@ public class Action
 
 	public void print()
 	{
-		System.out.println("Action : " + getName());
+		Debug.message("Action : " + getName());
 		ArgumentList argList = getArgumentList();
 		int nArgs = argList.size();
 		for (int n=0; n<nArgs; n++) {
@@ -341,7 +341,7 @@ public class Action
 			String name = arg.getName();
 			String value = arg.getValue();
 			String dir = arg.getDirection();
-			System.out.println(" [" + n + "] = " + dir + ", " + name + ", " + value);
+			Debug.message(" [" + n + "] = " + dir + ", " + name + ", " + value);
 		}
 	}
 	
