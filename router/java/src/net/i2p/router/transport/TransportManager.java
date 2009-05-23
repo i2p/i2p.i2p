@@ -204,13 +204,24 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
-      * Is at least one transport below its connection limit + some margin
+      * Is at least one transport below its outbound connection limit + some margin
       * Use for throttling in the router.
-      * Perhaps we should just use SSU?
       */
-    public boolean haveCapacity() { 
+    public boolean haveOutboundCapacity() { 
         for (int i = 0; i < _transports.size(); i++) {
             if (((Transport)_transports.get(i)).haveCapacity())
+                return true;
+        }
+        return false;
+    }
+    
+    /**
+      * Is at least one transport below its inbound connection limit + some margin
+      * Use for throttling in the router.
+      */
+    public boolean haveInboundCapacity() { 
+        for (int i = 0; i < _transports.size(); i++) {
+            if (_transports.get(i).getCurrentAddress() != null && _transports.get(i).haveCapacity())
                 return true;
         }
         return false;

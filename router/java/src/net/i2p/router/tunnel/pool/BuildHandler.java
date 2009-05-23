@@ -509,9 +509,9 @@ class BuildHandler {
          * approaching our connection limit (i.e. !haveCapacity()),
          * reject this request.
          */
-        if (response == 0 && (isInGW || isOutEnd) &&
-            (Boolean.valueOf(_context.getProperty(PROP_REJECT_NONPARTICIPANT)).booleanValue() ||
-             ! _context.commSystem().haveCapacity())) {
+        if (response == 0 &&
+            ((isInGW && ! _context.commSystem().haveInboundCapacity()) ||
+             (isOutEnd && ! _context.commSystem().haveOutboundCapacity()))) {
                 _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }

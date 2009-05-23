@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -21,6 +22,7 @@ import java.util.Vector;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
@@ -68,7 +70,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
     @Override
-    public boolean haveCapacity() { return (_manager == null ? false : _manager.haveCapacity()); } 
+    public boolean haveInboundCapacity() { return (_manager == null ? false : _manager.haveInboundCapacity()); } 
+    @Override
+    public boolean haveOutboundCapacity() { return (_manager == null ? false : _manager.haveOutboundCapacity()); } 
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
@@ -352,11 +356,41 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return;     	
     }
     
+    /*
+     * GeoIP stuff
+     *
+     * This is only used in the router console for now, but we put it here because
+     * 1) it's a lot easier, and 2) we could use it in the future for peer selection,
+     * tunnel selection, shitlisting, etc.
+     */
+
+    /* We hope the routerinfos are read in and things have settled down by now, but it's not required to be so */
     private static final int START_DELAY = 5*60*1000;
     private static final int LOOKUP_TIME = 30*60*1000;
     private void startGeoIP() {
         _geoIP = new GeoIP(_context);
-        SimpleScheduler.getInstance().addPeriodicEvent(new Lookup(), START_DELAY, LOOKUP_TIME);
+        SimpleScheduler.getInstance().addEvent(new QueueAll(), START_DELAY);
+    }
+
+    /**
+     * Collect the IPs for all routers in the DB, and queue them for lookup,
+     * then fire off the periodic lookup task for the first time.
+     *
+     * We could use getAllRouters() if it were public, and that would be faster, but
+     * we only do this once.
+     */
+    private class QueueAll implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            Set routers = _context.netDb().findNearestRouters(_context.routerHash(), _context.netDb().getKnownRouters(), null);
+            for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
+                RouterInfo ri = (RouterInfo) iter.next();
+                String host = getIPString(ri);
+                if (host == null)
+                    continue;
+                _geoIP.add(host);
+            }
+            SimpleScheduler.getInstance().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
+        }
     }
 
     private class Lookup implements SimpleTimer.TimedEvent {
@@ -370,17 +404,35 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /**
-     *  Right now this only uses the transport IP,
-     *  which is present only after you've connected to the peer.
-     *  We could also check the IP in the netDb entry...
+     *  Uses the transport IP first because that lookup is fast,
+     *  then the SSU IP from the netDb.
      */
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
-        if (ip == null)
+        if (ip != null)
+            return _geoIP.get(ip);
+        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
+        if (ri == null)
             return null;
-        return _geoIP.get(ip);
+        String s = getIPString(ri);
+        if (s != null)
+            return _geoIP.get(s);
+        return null;
     }
 
+    private String getIPString(RouterInfo ri) {
+        // use SSU only, it is likely to be an IP not a hostname,
+        // we don't want to generate a lot of DNS queries at startup
+        RouterAddress ra = ri.getTargetAddress("SSU");
+        if (ra == null)
+            return null;
+        Properties props = ra.getOptions();
+        if (props == null)
+            return null;
+        return props.getProperty("host");
+    }
+
+    /** Provide a consistent "look" for displaying router IDs in the console */
     public String renderPeerHTML(Hash peer) {
         String h = peer.toBase64().substring(0, 4);
         StringBuffer buf = new StringBuffer(128);
