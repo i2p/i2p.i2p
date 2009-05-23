@@ -1,3 +1,7 @@
+2009-05-23 Mathiasdm
+    * Router netDB:
+      - Added flags to the netDB page
+
 2009-05-22 Mathiasdm
     * desktopgui:
       - Updating works in general config
