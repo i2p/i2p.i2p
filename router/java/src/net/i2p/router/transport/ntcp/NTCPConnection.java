@@ -1027,7 +1027,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _curReadState.receiveBlock(_decryptBlockBuf);
         if (_curReadState.getSize() > 16*1024) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("i2np message more than 16KB?  nuh uh: " + _curReadState.getSize());
+                _log.error("I2NP message too big - size: " + _curReadState.getSize() + " Dropping " + toString());
             _context.statManager().addRateData("ntcp.corruptTooLargeI2NP", _curReadState.getSize(), getUptime());
             close();
             return false;
