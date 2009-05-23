@@ -1070,7 +1070,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append(" <img alt=\"").append(country.toUpperCase()).append("\"");
-            buf.append("\" src=\"/flags.jsp?c=").append(country).append("\">");
+            buf.append(" src=\"/flags.jsp?c=").append(country).append("\">");
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
