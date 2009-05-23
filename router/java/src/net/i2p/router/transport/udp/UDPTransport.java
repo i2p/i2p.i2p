@@ -1747,7 +1747,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int numPeers = 0;
         
         StringBuffer buf = new StringBuffer(512);
-        buf.append("<b id=\"udpcon\">UDP connections: ").append(peers.size());
+        buf.append("<p><b id=\"udpcon\">UDP connections: ").append(peers.size());
         buf.append(" limit: ").append(getMaxConnections());
         buf.append(" timeout: ").append(DataHelper.formatDuration(_expireTimeout));
         buf.append("</b><br />\n");
@@ -1984,8 +1984,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(sendTotal).append("</td><td align=\"right\">").append(recvTotal).append("</td>\n");
         buf.append("     <td align=\"right\">").append(resentTotal);
         buf.append("</td><td align=\"right\">").append(dupRecvTotal).append("</td>\n");
-        buf.append(" </tr>\n");
-        buf.append("<tr><td colspan=\"15\" valign=\"top\" align=\"left\">");
+        buf.append(" </tr></table></p><p>\n");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         // NPE here early
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();
@@ -1994,12 +1993,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         double nondupSent = ((double)bytesTransmitted - ((double)resentTotal)*averagePacketSize);
         double bwResent = (nondupSent <= 0 ? 0d : ((((double)resentTotal)*averagePacketSize) / nondupSent));
         buf.append("Percentage of bytes retransmitted (lifetime): ").append(formatPct(bwResent));
-        buf.append(" <i>(includes retransmission required by packet loss)</i><br />\n");
-        buf.append("</td></tr>\n");
+        buf.append(" <i>(includes retransmission required by packet loss)</i><br /></p>\n");
         out.write(buf.toString());
         buf.setLength(0);
         out.write(KEY);
-        out.write("</table>\n");
     }
     
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
@@ -2015,8 +2012,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    private static final String KEY = "<tr><td colspan=\"15\" valign=\"top\" align=\"left\">" +
-        "<b id=\"def.peer\">peer</b>: the remote peer (&lt; inbound, &gt; outbound, v means they offer to introduce us, ^ means we offer to introduce them)<br />\n" +
+    private static final String KEY = "<p>" +
+        "<b id=\"def.peer\">peer</b>: the remote peer<br />\n" +
+        "<b id=\"def.dir\">dir</b>: v means they offer to introduce us, ^ means we offer to introduce them<br />\n" +
         "<b id=\"def.idle\">idle</b>: the idle time is how long since a packet has been received or sent<br />\n" +
         "<b id=\"def.rate\">in/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second)<br />\n" +
         "<b id=\"def.up\">up</b>: the uptime is how long ago this session was established<br />\n" +
@@ -2034,7 +2032,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.recv\">recv</b>: the number of packets received from the peer<br />\n" +
         "<b id=\"def.resent\">resent</b>: the number of packets retransmitted to the peer<br />\n" +
         "<b id=\"def.dupRecv\">dupRecv</b>: the number of duplicate packets received from the peer" +
-        "</td></tr>\n";
+        "</p>\n";
     
     /**
      * Cache the bid to reduce object churn

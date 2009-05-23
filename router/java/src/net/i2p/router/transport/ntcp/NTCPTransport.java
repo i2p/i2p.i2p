@@ -627,8 +627,6 @@ public class NTCPTransport extends TransportImpl {
         long sendTotal = 0;
         long recvTotal = 0;
         int numPeers = 0;
-        int readingPeers = 0;
-        int writingPeers = 0;
         float bpsSend = 0;
         float bpsRecv = 0;
         long totalUptime = 0;
@@ -636,7 +634,7 @@ public class NTCPTransport extends TransportImpl {
         long totalRecv = 0;
 
         StringBuffer buf = new StringBuffer(512);
-        buf.append("<b id=\"ntcpcon\">NTCP connections: ").append(peers.size());
+        buf.append("<p><b id=\"ntcpcon\">NTCP connections: ").append(peers.size());
         buf.append(" limit: ").append(getMaxConnections());
         buf.append(" timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
         buf.append("</b><br />\n");
@@ -700,7 +698,6 @@ public class NTCPTransport extends TransportImpl {
                 buf.append("</code></td><td align=\"right\"><code>").append(outQueue).append(" message");
                 if (outQueue > 1)
                     buf.append("s");
-                writingPeers++;
             }
             buf.append("</code></td><td align=\"center\"><code>").append(con.getConsecutiveBacklog() > 0 ? "true" : "false");
             long readTime = con.getReadTime();
@@ -708,7 +705,6 @@ public class NTCPTransport extends TransportImpl {
                 buf.append("</code></td><td align=\"center\"><code>No");
             } else {
                 buf.append("</code></td><td><code>For ").append(DataHelper.formatDuration(readTime));
-                readingPeers++;
             }
             buf.append("</code></td></tr>\n");
             out.write(buf.toString());
@@ -726,9 +722,7 @@ public class NTCPTransport extends TransportImpl {
             buf.append("</td></tr>\n");
         }
 
-        buf.append("</table>\n");
-        buf.append("Peers currently reading I2NP messages: ").append(readingPeers).append("<br />\n");
-        buf.append("Peers currently writing I2NP messages: ").append(writingPeers).append("<br />\n");
+        buf.append("</table></p>\n");
         out.write(buf.toString());
         buf.setLength(0);
     }
