@@ -107,11 +107,26 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     break;
                 }
 
-                msg = DataHelper.readLine(getClientSocket().socket().getInputStream()).trim();
+                SocketChannel clientSocketChannel = getClientSocket() ;
+                if (clientSocketChannel == null) {
+                	_log.info("Connection closed by client");
+                	break;
+                }
+                if (clientSocketChannel.socket() == null) {
+                	_log.info("Connection closed by client");
+                	break;
+                }
+                java.io.InputStream is = clientSocketChannel.socket().getInputStream();
+                if (is == null) {
+                	_log.info("Connection closed by client");
+                	break;
+                }
+                msg = DataHelper.readLine(is);
                 if (msg == null) {
-                    _log.debug("Connection closed by client");
+                    _log.info("Connection closed by client (line read : null)");
                     break;
                 }
+                msg = msg.trim();
 
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("New message received: [" + msg + "]");

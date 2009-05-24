@@ -1,3 +1,6 @@
+2009-05-24 mkvore
+    * SAM: logging some exceptions at INFO level instead of ERROR
+
 2009-05-24 zzz
     * Connection limits / throttle:
       - Better limits when no inbound TCP
