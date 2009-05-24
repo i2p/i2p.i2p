@@ -564,7 +564,7 @@ public class SAMv3Handler extends SAMv1Handler
 			_log.debug("I2P error when instantiating session", e);
 			return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
 		} catch (SAMException e) {
-			_log.error("Unexpected SAM error", e);
+			_log.info("Funny SAM error", e);
 			return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
 		} catch (IOException e) {
 			_log.error("Unexpected IOException", e);

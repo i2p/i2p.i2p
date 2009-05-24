@@ -1,3 +1,6 @@
+2009-05-24 mkvore
+    * SAM: logging some exceptions at INFO level instead of ERROR
+
 2009-05-23 Mathiasdm
     * Router netDB:
       - Added flags to the netDB page

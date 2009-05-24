@@ -197,7 +197,7 @@ public class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handle
 	    	
 	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 	        
-	        if ( rec==null ) throw new InterruptedIOException() ;
+	        if ( rec==null || i2ps==null ) throw new InterruptedIOException() ;
 	        
 			if (verbose)
 				handler.notifyStreamIncomingConnection(i2ps.getPeerDestination()) ;
