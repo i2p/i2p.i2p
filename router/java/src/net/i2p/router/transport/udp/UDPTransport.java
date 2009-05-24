@@ -474,6 +474,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.statManager().addRateData("udp.addressUpdated", 1, 0);
             if (!fixedPort)
                 _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
+            // queue a country code lookup of the new IP
+            _context.commSystem().queueLookup(ourIP);
             // store these for laptop-mode (change ident on restart... or every time... when IP changes)
             _context.router().setConfigSetting(PROP_IP, _externalListenHost.getHostAddress());
             _context.router().setConfigSetting(PROP_IP_CHANGE, "" + _context.clock().now());

@@ -404,6 +404,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the SSU IP from the netDb.
+     *
+     *  @return two-letter lower-case country code or null
      */
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
