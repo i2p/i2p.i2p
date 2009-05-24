@@ -285,11 +285,9 @@
         <copy file="core/perl/i2pbench.sh" todir="pkg-temp/scripts/" />
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
         <mkdir dir="pkg-temp/docs" />
-        <copy file="readme.html" todir="pkg-temp/docs/" />
-        <copy file="readme_de.html" todir="pkg-temp/docs/" />
-        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
-        <copy file="readme_nl.html" todir="pkg-temp/docs/" />
-        <copy file="readme_sv.html" todir="pkg-temp/docs/" />
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="." includes="readme*.html" />
+        </copy>
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
@@ -388,10 +386,8 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
-        <!--
         <mkdir dir="pkg-temp/docs" />
-        <copy file="readme_fr.html" todir="pkg-temp/docs/" />
-        -->
+        <copy file="readme_zh.html" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter">
         <delete dir="pkg-temp" />
