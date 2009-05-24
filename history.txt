@@ -1,6 +1,21 @@
 2009-05-24 mkvore
     * SAM: logging some exceptions at INFO level instead of ERROR
 
+2009-05-24 zzz
+    * Connection limits / throttle:
+      - Better limits when no inbound TCP
+        (limit inbound and outbound separately)
+      - Don't offer to SSU introduce when near connection limit
+    * Console:
+      - Move flags from icons/ to docs/icons
+      - peers.jsp cleanup
+      - Add readme_zh.html
+    * GeoIP:
+      - Check netDb SSU IP too
+      - Check whole netDb at startup
+    * NTCP: Log who is sending us big messages
+    * UPnP: Move logging from wrapper log to router log
+
 2009-05-23 Mathiasdm
     * Router netDB:
       - Added flags to the netDB page
