@@ -282,7 +282,10 @@ public class EstablishmentManager {
         }
         if (isNew) {
             // we don't expect inbound connections when hidden, but it could happen
-            if ((!_context.router().isHidden()) && !_transport.introducersRequired()) {
+            // Don't offer if we are approaching max connections. While Relay Intros do not
+            // count as connections, we have to keep the connection to this peer up longer if
+            // we are offering introductions.
+            if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity()) {
                 long tag = _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
                 if (_log.shouldLog(Log.INFO))
@@ -570,7 +573,8 @@ public class EstablishmentManager {
     
     private void sendCreated(InboundEstablishState state) {
         long now = _context.clock().now();
-        if (!_transport.introducersRequired()) {
+        // don't offer if we are approaching max connections (see comments above)
+        if ((!_transport.introducersRequired()) && _transport.haveCapacity()) {
             // offer to relay
             // (perhaps we should check our bw usage and/or how many peers we are 
             //  already offering introducing?)
