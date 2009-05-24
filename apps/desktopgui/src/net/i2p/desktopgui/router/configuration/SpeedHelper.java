@@ -36,4 +36,8 @@ public class SpeedHelper {
     public static String getInboundBandwidth() {
         return RouterHelper.getContext().router().getConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH);
     }
+
+    public static String getOutboundBandwidth() {
+        return RouterHelper.getContext().router().getConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH);
+    }
 }
