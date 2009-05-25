@@ -1,3 +1,17 @@
+2009-05-25 zzz
+    * GeoIP:
+      - Save our own location in the config
+      - Check whole netDb at startup (last try didn't work)
+    * NTCP:
+      - Increasse routerinfo send frequency to every 90m (was 9h)
+      - Don't send 3 floodfill infos at startup or with routerinfo
+    * Profile Organizer: Increase min fast peers based on
+      number of local destinations
+    * Timestamper:
+      - Use GeoIP to query a closer ntp source if available
+      - Lengthen query time if well-synced
+      - Cleanup
+
 2009-05-24 mkvore
     * SAM: logging some exceptions at INFO level instead of ERROR
 
