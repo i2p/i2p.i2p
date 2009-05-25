@@ -61,7 +61,7 @@ public class PeerSelector {
         
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         Set allHashes = kbuckets.getAll(peersToIgnore);
         removeFailingPeers(allHashes);
         Map diffMap = new HashMap(allHashes.size());
@@ -94,7 +94,7 @@ public class PeerSelector {
     public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { // LINT -- Exporting non-public type through public API
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         MatchSelectionCollector matches = new MatchSelectionCollector(key, peersToIgnore);
         kbuckets.getAll(matches);
         List rv = matches.get(maxNumRouters);
