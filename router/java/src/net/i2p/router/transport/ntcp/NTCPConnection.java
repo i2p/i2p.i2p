@@ -103,7 +103,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private long _nextInfoTime;
     
     private static final int META_FREQUENCY = 10*60*1000;
-    private static final int INFO_FREQUENCY = 6*60*60*1000;
+    /** how often we send our routerinfo unsolicited */
+    private static final int INFO_FREQUENCY = 90*60*1000;
     /**
      *  Why this is 16K, and where it is documented, good question?
      *  We claim we can do 32K datagrams so this is a problem.
@@ -200,7 +201,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _transport.inboundEstablished(this);
         _establishState = null;
         _nextMetaTime = System.currentTimeMillis() + _context.random().nextInt(META_FREQUENCY);
-        _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
+        _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
     }
     public long getClockSkew() { return _clockSkew; }
     public long getUptime() { 
@@ -370,7 +371,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             _context.statManager().addRateData("ntcp.infoMessageEnqueued", 1, 0);
             send(infoMsg);
             
-            enqueueFloodfillMessage(target);
+            // See comment below
+            //enqueueFloodfillMessage(target);
         } else {
             if (_isInbound) {
                 // ok, we shouldn't have enqueued it yet, as we havent received their info
@@ -380,12 +382,18 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
     }
 
-    private static final int PEERS_TO_FLOOD = 3;
+    //private static final int PEERS_TO_FLOOD = 3;
 
     /**
      * to prevent people from losing track of the floodfill peers completely, lets periodically
      * send those we are connected to references to the floodfill peers that we know
+     *
+     * Do we really need this anymore??? Peers shouldn't lose track anymore, and if they do,
+     * FloodOnlyLookupJob should recover.
+     * The bandwidth isn't so much, but it is a lot of extra data at connection startup, which
+     * hurts latency of new connections.
      */
+/**********
     private void enqueueFloodfillMessage(RouterInfo target) {
         FloodfillNetworkDatabaseFacade fac = (FloodfillNetworkDatabaseFacade)_context.netDb();
         List peers = fac.getFloodfillPeers();
@@ -414,6 +422,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             send(infoMsg);
         }
     }
+***********/
     
     /** 
      * @param clockSkew alice's clock minus bob's clock in seconds (may be negative, obviously, but |val| should
@@ -439,7 +448,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             msgs = (_outbound.size() > 0);
         }
         _nextMetaTime = System.currentTimeMillis() + _context.random().nextInt(META_FREQUENCY);
-        _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
+        _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         if (msgs)
             _transport.getWriter().wantsWrite(this, "outbound established");
     }
@@ -465,11 +474,12 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
      *
      */
     synchronized void prepareNextWrite() {
-        if (FAST_LARGE)
+        //if (FAST_LARGE)
             prepareNextWriteFast();
-        else
-            prepareNextWriteSmall();
+        //else
+        //    prepareNextWriteSmall();
     }
+/**********  nobody's tried this one in years
     private void prepareNextWriteSmall() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("prepare next write w/ isInbound? " + _isInbound + " established? " + _established);
@@ -563,9 +573,10 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
 	// the floodfill netDb servers, but they may...)
         if (_nextInfoTime <= System.currentTimeMillis()) {
             enqueueInfoMessage();
-            _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
+            _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         }
     }
+**********/
     
     /**
      * prepare the next i2np message for transmission.  this should be run from
@@ -647,7 +658,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         if (_nextInfoTime <= System.currentTimeMillis()) {
             // perhaps this should check to see if we are bw throttled, etc?
             enqueueInfoMessage();
-            _nextInfoTime = System.currentTimeMillis() + INFO_FREQUENCY + _context.random().nextInt(INFO_FREQUENCY);
+            _nextInfoTime = System.currentTimeMillis() + (INFO_FREQUENCY / 2) + _context.random().nextInt(INFO_FREQUENCY);
         }
     }
     
