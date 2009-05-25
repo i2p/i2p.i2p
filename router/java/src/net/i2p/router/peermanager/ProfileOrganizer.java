@@ -76,6 +76,7 @@ public class ProfileOrganizer {
      */
     public static final String PROP_MINIMUM_FAST_PEERS = "profileOrganizer.minFastPeers";
     public static final int DEFAULT_MINIMUM_FAST_PEERS = 8;
+    private static final int DEFAULT_MAXIMUM_FAST_PEERS = 16;
     /**
      * Defines the minimum number of 'high capacity' peers that the organizer should 
      * select when using the mean - if less than this many are available, select the 
@@ -1141,10 +1142,14 @@ public class ProfileOrganizer {
      * This parameter should help deal with a lack of diversity in the tunnels created when some 
      * peers are particularly fast.
      *
+     * Increase default by two for every local destination, up to a max.
+     *
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumFastPeers() {
-        return _context.getProperty(PROP_MINIMUM_FAST_PEERS, DEFAULT_MINIMUM_FAST_PEERS);
+        int def = Math.min(DEFAULT_MAXIMUM_FAST_PEERS,
+                           (2 *_context.clientManager().listClients().size()) + DEFAULT_MINIMUM_FAST_PEERS - 2);
+        return _context.getProperty(PROP_MINIMUM_FAST_PEERS, def);
     }
     
     

@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
@@ -37,14 +37,14 @@ import net.i2p.util.Log;
  */
 public class GeoIP {
     private Log _log;
-    private I2PAppContext _context;
+    private RouterContext _context;
     private final Map<String, String> _codeToName;
     private final Map<Long, String> _IPToCountry;
     private final Set<Long> _pendingSearch;
     private final Set<Long> _notFound;
     private final AtomicBoolean _lock;
     
-    public GeoIP(I2PAppContext context) {
+    public GeoIP(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(GeoIP.class);
         _codeToName = new ConcurrentHashMap();
@@ -59,6 +59,7 @@ public class GeoIP {
     static final String GEOIP_DIR_DEFAULT = "geoip";
     static final String GEOIP_FILE_DEFAULT = "geoip.txt";
     static final String COUNTRY_FILE_DEFAULT = "countries.txt";
+    public static final String PROP_IP_COUNTRY = "i2np.lastCountry";
 
     /**
      * Fire off a thread to lookup all pending IPs.
@@ -87,6 +88,7 @@ public class GeoIP {
         }
         LookupJob j = new LookupJob();
         j.run();
+        updateOurCountry();
     }
 
     private class LookupJob implements Runnable {
@@ -233,6 +235,19 @@ public class GeoIP {
     }
 
     /**
+     *  Put our country code in the config, where others (such as Timestamper) can get it,
+     *  and it will be there next time at startup.
+     */
+    private void updateOurCountry() {
+        String oldCountry = _context.router().getConfigSetting(PROP_IP_COUNTRY);
+        String country = _context.commSystem().getCountry(_context.routerHash());
+        if (country != null && !country.equals(oldCountry)) {
+            _context.router().setConfigSetting(PROP_IP_COUNTRY, country);
+            _context.router().saveConfig();
+        }
+    }
+
+    /**
      * Add to the list needing lookup
      */
     public void add(String ip) {
@@ -296,6 +311,7 @@ public class GeoIP {
         return _codeToName.get(code);
     }
 
+/*** doesn't work since switched to RouterContext above
     public static void main(String args[]) {
         GeoIP g = new GeoIP(new I2PAppContext());
         String tests[] = {"0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.255", "1.0.0.0",
@@ -309,4 +325,5 @@ public class GeoIP {
             System.out.println(tests[i] + " : " + g.get(tests[i]));
 
     }
+***/
 }

@@ -311,7 +311,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     /** get the hashes for all known routers */
-    Set getAllRouters() {
+    public Set<Hash> getAllRouters() {
         if (!_initialized) return new HashSet(0);
         Set keys = _ds.getKeys();
         Set rv = new HashSet(keys.size());

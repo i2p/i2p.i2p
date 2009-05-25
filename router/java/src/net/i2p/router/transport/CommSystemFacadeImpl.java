@@ -375,15 +375,13 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      * Collect the IPs for all routers in the DB, and queue them for lookup,
      * then fire off the periodic lookup task for the first time.
-     *
-     * We could use getAllRouters() if it were public, and that would be faster, but
-     * we only do this once.
      */
     private class QueueAll implements SimpleTimer.TimedEvent {
         public void timeReached() {
-            Set routers = _context.netDb().findNearestRouters(_context.routerHash(), _context.netDb().getKnownRouters(), null);
-            for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
-                RouterInfo ri = (RouterInfo) iter.next();
+            for (Iterator<Hash> iter = _context.netDb().getAllRouters().iterator(); iter.hasNext(); ) {
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(iter.next());
+                if (ri == null)
+                    continue;
                 String host = getIPString(ri);
                 if (host == null)
                     continue;
@@ -406,6 +404,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the SSU IP from the netDb.
+     *
+     *  @return two-letter lower-case country code or null
      */
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
