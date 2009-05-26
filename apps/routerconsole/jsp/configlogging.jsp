@@ -27,27 +27,27 @@
     System.setProperty("net.i2p.router.web.ConfigLoggingHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
- <b>Logging filename:</b> 
-    <input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" /><br />
-    <i>(the symbol '@' will be replaced during log rotation)</i><br />
- <b>Log record format:</b>
-    <input type="text" name="logformat" size="20" value="<jsp:getProperty name="logginghelper" property="recordPattern" />" /><br />
-    <i>(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)</i><br />
- <b>Log date format:</b>
-    <input type="text" name="logdateformat" size="20" value="<jsp:getProperty name="logginghelper" property="datePattern" />" /><br />
-    <i>('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)</i><br />
- <b>Max log file size:</b>
-    <input type="text" name="logfilesize" size="4" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" /><br />
-  <hr />
-  <b>Log levels:</b> <br />
-  <b>Default log level:</b>
-   <jsp:getProperty name="logginghelper" property="defaultLogLevelBox" />
-   <i>(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)</i>
-   <br />
-   <jsp:getProperty name="logginghelper" property="logLevelTable" />
- <hr />
+ <table border="0" cellspacing="5">
+ <tr><td valign="top"><b>Logging filename:</b> 
+ <td><input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" /><br />
+ <i>(the symbol '@' will be replaced during log rotation)</i>
+ <tr><td valign="top"><b>Log record format:</b>
+ <td><input type="text" name="logformat" size="20" value="<jsp:getProperty name="logginghelper" property="recordPattern" />" /><br />
+ <i>(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)</i>
+ <tr><td valign="top"><b>Log date format:</b>
+ <td><input type="text" name="logdateformat" size="20" value="<jsp:getProperty name="logginghelper" property="datePattern" />" /><br />
+ <i>('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)</i>
+ <tr><td valign="top"><b>Max log file size:</b>
+ <td><input type="text" name="logfilesize" size="4" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" /><br />
+ <tr><td valign="top"><b>Default log level:</b>
+ <td><jsp:getProperty name="logginghelper" property="defaultLogLevelBox" />
+ <br /><i>(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)</i>
+ <tr><td valign="top"><b>Log level overrides:</b>
+ <td><jsp:getProperty name="logginghelper" property="logLevelTable" />
+ <tr><td><td>
  <input type="submit" name="shouldsave" value="Save changes" /> 
  <input type="reset" value="Cancel" />
+ </table>
  </form>
 </div>
 
