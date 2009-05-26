@@ -110,6 +110,39 @@ class RouterThrottleImpl implements RouterThrottle {
             setTunnelStatus("Rejecting tunnels: High message delay");
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
+
+        //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
+        if(r != null) {
+            double totalEvents = r.getCurrentEventCount() + r.getLastEventCount();
+            double avg = 0;
+            double current = 0;
+            double last = 0;
+            //Calculate times
+            if(r.getCurrentEventCount() > 0) {
+                current = r.getCurrentTotalValue()/r.getCurrentEventCount();
+            }
+            if(r.getLastEventCount() > 0) {
+                last = r.getLastTotalValue()/r.getLastEventCount();
+            }
+            if(totalEvents > 0) {
+                avg =  (r.getCurrentTotalValue() + r.getLastTotalValue())/totalEvents;
+            }
+            else {
+                avg = r.getAverageValue();
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
+                }
+            }
+            //Set throttling if necessary
+            if(avg > 400 || current > 500 || last > 500) {
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("Refusing tunnel request due to sendProcessingTime of " + avg
+                            + " ms over the last two minutes, which is too much.");
+                }
+                setTunnelStatus("Rejecting tunnels: High message delay implying possible congestion");
+                return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
+            }
+        }
         
         int numTunnels = _context.tunnelManager().getParticipatingCount();
 

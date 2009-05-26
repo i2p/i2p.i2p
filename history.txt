@@ -1,3 +1,6 @@
+2009-05-26 Mathiasdm
+    * Throttling extension by looking at sendProcessingTime
+
 2009-05-26 zzz
     * Console:
       - configlogging.jsp cleanup
