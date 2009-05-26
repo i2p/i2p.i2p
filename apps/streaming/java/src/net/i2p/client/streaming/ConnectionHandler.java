@@ -171,7 +171,9 @@ class ConnectionHandler {
             // Send it through the packet handler again
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Found con for queued non-syn packet: " + packet);
-            _manager.getPacketHandler().receivePacket(packet);
+            // false -> don't requeue, fixes a race where a SYN gets dropped
+            // between here and PacketHandler, causing the packet to loop forever....
+            _manager.getPacketHandler().receivePacketDirect(packet, false);
         } else {
             // goodbye
             if (_log.shouldLog(Log.WARN))
