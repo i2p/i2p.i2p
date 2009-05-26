@@ -136,7 +136,7 @@ public class SubscriptionsBean
 				}
 			}			
 			else {
-				message = "Invalid nonce. Are you being spoofed?";
+				message = "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
 			}
 		}
 		if( message.length() > 0 )

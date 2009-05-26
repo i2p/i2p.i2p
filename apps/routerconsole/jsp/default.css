@@ -89,9 +89,24 @@ div.news {
 }
 
 div.confignav {
+	padding: 1em;
 	background-color: #efefff;
 }
 
 div.configure {
+	padding: 1em;
 	background-color: #ffffc0;
+}
+
+div.messages {
+	padding: 1em;
+	background-color: #fafaff;
+}
+
+div.messages span.error {
+	color: #d00000;
+}
+
+div.messages span.notice {
+	font-style: italic;
 }

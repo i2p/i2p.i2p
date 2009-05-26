@@ -16,8 +16,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
+ <jsp:getProperty name="formhandler" property="allMessages" />
  
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

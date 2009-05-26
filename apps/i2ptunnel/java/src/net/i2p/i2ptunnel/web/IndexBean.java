@@ -145,7 +145,7 @@ public class IndexBean {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
         if ( (_prevNonce != _curNonce) && (!validPassphrase(_passphrase)) )
-            return "Invalid nonce, are you being spoofed?";
+            return "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))

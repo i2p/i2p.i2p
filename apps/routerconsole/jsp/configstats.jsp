@@ -61,8 +61,7 @@ function toggleAll(category)
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="formhandler" property="*" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
+ <jsp:getProperty name="formhandler" property="allMessages" />
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHelper" id="statshelper" scope="request" />
  <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

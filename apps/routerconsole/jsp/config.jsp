@@ -18,8 +18,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigNetHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
+ <jsp:getProperty name="formhandler" property="allMessages" />
 
  <form action="config.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce");
@@ -116,7 +115,7 @@
     %>
     <br />
     <input type="radio" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
-    Hidden mode - do not publish IP<i>(prevents participating traffic; change restarts router)</i><br />
+    Hidden mode - do not publish IP <i>(prevents participating traffic; change restarts router)</i><br />
  </p><p>
  <b>UDP Configuration:</b><br />
  UDP port:

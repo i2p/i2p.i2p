@@ -26,8 +26,7 @@ button span.hide{
  <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
+ <jsp:getProperty name="formhandler" property="allMessages" />
  
  <form action="configclients.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce");

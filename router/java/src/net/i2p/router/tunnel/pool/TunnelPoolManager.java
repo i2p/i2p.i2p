@@ -523,8 +523,25 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         long processedIn = (in != null ? in.getLifetimeProcessed() : 0);
         long processedOut = (outPool != null ? outPool.getLifetimeProcessed() : 0);
         
-        out.write("<table border=\"1\"><tr><td><b>Direction</b></td><td><b>Expiration</b></td><td><b>Usage</b></td><td align=\"left\">Hops (gateway first)</td></tr>\n");
         int live = 0;
+        int maxLength = 1;
+        for (int i = 0; i < tunnels.size(); i++) {
+            TunnelInfo info = (TunnelInfo)tunnels.get(i);
+            if (info.getLength() > maxLength)
+                maxLength = info.getLength();
+        }
+        out.write("<table border=\"1\"><tr><th>Direction</th><th>Expiration</th><th>Usage</th><th>Gateway</th>");
+        if (maxLength > 3) {
+            out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
+            out.write("\">Participants</th>");
+        }
+        else if (maxLength == 3) {
+            out.write("<th>Participant</th>");
+        }
+        if (maxLength > 1) {
+            out.write("<th>Endpoint</th>");
+        }
+        out.write("</tr>\n");
         for (int i = 0; i < tunnels.size(); i++) {
             TunnelInfo info = (TunnelInfo)tunnels.get(i);
             long timeLeft = info.getExpiration()-_context.clock().now();
@@ -545,6 +562,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 } else {
                     String cap = getCapacity(peer);
                     out.write("<td>" + netDbLink(peer) + (id == null ? "" : " " + id) + cap + "</td>");                
+                }
+                if (info.getLength() < maxLength && (info.getLength() == 1 || j == info.getLength() - 2)) {
+                    for (int k = info.getLength(); k < maxLength; k++)
+                        out.write("<td>&nbsp</td>");
                 }
             }
             out.write("</tr>\n");

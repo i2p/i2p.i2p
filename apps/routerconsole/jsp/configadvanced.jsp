@@ -19,8 +19,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
- <i><jsp:getProperty name="formhandler" property="notices" /></i>
+ <jsp:getProperty name="formhandler" property="allMessages" />
  
  <form action="configadvanced.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce");
