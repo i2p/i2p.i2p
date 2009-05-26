@@ -265,7 +265,7 @@ public class NTCPTransport extends TransportImpl {
         boolean established = isEstablished(toAddress.getIdentity());
         if (established) { // should we check the queue size?  nah, if its valid, use it
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("fast bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as its already established");
+                _log.debug("fast bid when trying to send to " + peer.toBase64() + " as its already established");
             return _fastBid;
         }
         RouterAddress addr = toAddress.getTargetAddress(STYLE);
@@ -275,7 +275,7 @@ public class NTCPTransport extends TransportImpl {
             _context.statManager().addRateData("ntcp.bidRejectedNoNTCPAddress", 1, 0);
             //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "No NTCP address", STYLE);
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they don't have an ntcp address");
+                _log.debug("no bid when trying to send to " + peer.toBase64() + " as they don't have an ntcp address");
             return null;
         }
         NTCPAddress naddr = new NTCPAddress(addr);
@@ -284,7 +284,7 @@ public class NTCPTransport extends TransportImpl {
             markUnreachable(peer);
             //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "Invalid NTCP address", STYLE);
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they don't have a valid ntcp address");
+                _log.debug("no bid when trying to send to " + peer.toBase64() + " as they don't have a valid ntcp address");
             return null;
         }
         if (!naddr.isPubliclyRoutable()) {
@@ -292,14 +292,14 @@ public class NTCPTransport extends TransportImpl {
                 _context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1, 0);
                 markUnreachable(peer);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + " as they have a private ntcp address");
+                    _log.debug("no bid when trying to send to " + peer.toBase64() + " as they have a private ntcp address");
                 return null;
             }
         }
 
         if (!allowConnection()) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("no bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64() + ", max connection limit reached");
+                _log.warn("no bid when trying to send to " + peer.toBase64() + ", max connection limit reached");
             return _transientFail;
         }
 
@@ -307,7 +307,7 @@ public class NTCPTransport extends TransportImpl {
         //    return null; // dont talk to yourself
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("slow bid when trying to send to " + toAddress.getIdentity().calculateHash().toBase64());
+            _log.debug("slow bid when trying to send to " + peer.toBase64());
         return _slowBid;
     }
 
@@ -655,7 +655,7 @@ public class NTCPTransport extends TransportImpl {
         buf.setLength(0);
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
-            buf.append("<tr><td>");
+            buf.append("<tr><td nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(con.getRemotePeer().calculateHash()));
             //byte[] ip = getIP(con.getRemotePeer().calculateHash());
             //if (ip != null)

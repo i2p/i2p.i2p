@@ -128,6 +128,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     int getTransportCount() { return _manager.getTransportCount(); }
     
+    /** Send the message out */
     public void processMessage(OutNetMessage msg) {	
         //GetBidsJob j = new GetBidsJob(_context, this, msg);
         //j.runJob();
@@ -436,6 +437,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public String renderPeerHTML(Hash peer) {
         String h = peer.toBase64().substring(0, 4);
         StringBuffer buf = new StringBuffer(128);
+        String c = getCountry(peer);
+        if (c != null) {
+            buf.append("<img alt=\"").append(c.toUpperCase()).append("\" title=\"");
+            String n = _geoIP.fullName(c);
+            if (n != null)
+                buf.append(n);
+            else
+                buf.append(c);
+            buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
+        }
         buf.append("<tt><font size=\"+1\">");
         boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
         if (found)
@@ -444,16 +455,6 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (found)
             buf.append("</a>");
         buf.append("</font></tt>");
-        String c = getCountry(peer);
-        if (c != null) {
-            buf.append(" <img alt=\"").append(c.toUpperCase()).append("\" title=\"");
-            String n = _geoIP.fullName(c);
-            if (n != null)
-                buf.append(n);
-            else
-                buf.append(c);
-            buf.append("\" src=\"/flags.jsp?c=").append(c).append("\">");
-        }
         return buf.toString();
     }
 }

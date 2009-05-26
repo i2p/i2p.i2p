@@ -1807,7 +1807,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<tr>");
             
-            buf.append("<td>");
+            buf.append("<td nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer.getRemotePeer()));
             //byte ip[] = peer.getRemoteIP();
             //if (ip != null)

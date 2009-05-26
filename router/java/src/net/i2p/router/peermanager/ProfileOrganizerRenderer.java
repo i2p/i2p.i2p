@@ -58,9 +58,10 @@ class ProfileOrganizerRenderer {
         int failing = 0;
         StringBuffer buf = new StringBuffer(16*1024);
         buf.append("<h2>Peer Profiles</h2>\n");
+        buf.append("<p>Showing ").append(order.size()).append(" recent profiles, hiding ").append(peers.size()-order.size()).append(" older profiles</p>");
         buf.append("<table border=\"1\">");
         buf.append("<tr>");
-        buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(")</td>");
+        buf.append("<td><b>Peer</b></td>");
         buf.append("<td><b>Groups (Caps)</b></td>");
         buf.append("<td><b>Speed</b></td>");
         buf.append("<td><b>Capacity</b></td>");
@@ -97,7 +98,7 @@ class ProfileOrganizerRenderer {
                 buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
             prevTier = tier;
             
-            buf.append("<tr><td>");
+            buf.append("<tr><td nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             buf.append("</td><td>");
             
@@ -179,7 +180,7 @@ class ProfileOrganizerRenderer {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
 
-            buf.append("<tr><td>");
+            buf.append("<tr><td nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             buf.append("</td>");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
