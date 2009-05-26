@@ -90,10 +90,10 @@ public class PacketHandler {
     void receivePacket(Packet packet) {
         //boolean ok = choke(packet);
         //if (ok)
-            receivePacketDirect(packet);
+            receivePacketDirect(packet, true);
     }
     
-    private void receivePacketDirect(Packet packet) {
+    void receivePacketDirect(Packet packet, boolean queueIfNoConn) {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("packet received: " + packet);
         
@@ -105,7 +105,7 @@ public class PacketHandler {
             if (_log.shouldLog(Log.INFO))
                 displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
         } else {
-            receiveUnknownCon(packet, sendId);
+            receiveUnknownCon(packet, sendId, queueIfNoConn);
             displayPacket(packet, "UNKN", null);
         }
     }
@@ -228,7 +228,7 @@ public class PacketHandler {
         _manager.getPacketQueue().enqueue(reply);
     }
     
-    private void receiveUnknownCon(Packet packet, long sendId) {
+    private void receiveUnknownCon(Packet packet, long sendId, boolean queueIfNoConn) {
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
             if (packet.getSendStreamId() > 0) {
                 receivePing(packet);
@@ -262,7 +262,7 @@ public class PacketHandler {
             
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                 _manager.getConnectionHandler().receiveNewSyn(packet);
-            } else {
+            } else if (queueIfNoConn) {
                 // We can get here on the 2nd+ packet if the 1st (SYN) packet
                 // is still on the _synQueue in the ConnectionHandler, and
                 // ConnectionManager.receiveConnection() hasn't run yet to put
@@ -287,6 +287,10 @@ public class PacketHandler {
                 }
                 //packet.releasePayload();
                 _manager.getConnectionHandler().receiveNewSyn(packet);
+            } else {
+                // don't queue again (infinite loop!)
+                sendReset(packet);
+                packet.releasePayload();
             }
         }
     }

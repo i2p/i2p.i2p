@@ -44,7 +44,7 @@ class FloodfillPeerSelector extends PeerSelector {
     public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        peersToIgnore.add(_context.routerHash());
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
         if (kbuckets == null) return new ArrayList();
         kbuckets.getAll(matches);

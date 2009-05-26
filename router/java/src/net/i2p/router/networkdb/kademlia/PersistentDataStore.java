@@ -106,8 +106,10 @@ class PersistentDataStore extends TransientDataStore {
      */
     @Override
     public DataStructure remove(Hash key, boolean persist) {
-        if (persist)
+        if (persist) {
+            _writer.remove(key);
             _context.jobQueue().addJob(new RemoveJob(key));
+        }
         return super.remove(key);
     }
     
@@ -181,6 +183,10 @@ class PersistentDataStore extends TransientDataStore {
         /** check to see if it's in the write queue */
         public DataStructure get(Hash key) {
             return _keys.get(key);
+        }
+
+        public void remove(Hash key) {
+            _keys.remove(key);
         }
 
         public void run() {
