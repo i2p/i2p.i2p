@@ -112,35 +112,60 @@ class RouterThrottleImpl implements RouterThrottle {
         }
 
         //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
-        if(r != null) {
-            double totalEvents = r.getCurrentEventCount() + r.getLastEventCount();
-            double avg = 0;
-            double current = 0;
-            double last = 0;
+        Rate r2 = _context.statManager().getRate("tunnel.testSuccessTime").getRate(60*1000);
+        if(r != null && r2 != null) {
+            double totalSendProcessingTimeEvents = r.getCurrentEventCount() + r.getLastEventCount();
+            double avgSendProcessingTime = 0;
+            double currentSendProcessingTime = 0;
+            double lastSendProcessingTime = 0;
+
+            double totalTestSuccessTimeEvents = r2.getCurrentEventCount() + r2.getLastEventCount();
+            double avgTestSuccessTime = 0;
+            double currentTestSuccessTime = 0;
+            double lastTestSuccessTime = 0;
+            
             //Calculate times
             if(r.getCurrentEventCount() > 0) {
-                current = r.getCurrentTotalValue()/r.getCurrentEventCount();
+                currentSendProcessingTime = r.getCurrentTotalValue()/r.getCurrentEventCount();
             }
             if(r.getLastEventCount() > 0) {
-                last = r.getLastTotalValue()/r.getLastEventCount();
+                lastSendProcessingTime = r.getLastTotalValue()/r.getLastEventCount();
             }
-            if(totalEvents > 0) {
-                avg =  (r.getCurrentTotalValue() + r.getLastTotalValue())/totalEvents;
+            if(totalSendProcessingTimeEvents > 0) {
+                avgSendProcessingTime =  (r.getCurrentTotalValue() + r.getLastTotalValue())/totalSendProcessingTimeEvents;
             }
             else {
-                avg = r.getAverageValue();
+                avgSendProcessingTime = r.getAverageValue();
                 if(_log.shouldLog(Log.WARN)) {
                     _log.warn("No events occurred. Using 1 minute average to look at message delay.");
                 }
             }
-            //Set throttling if necessary
-            if(avg > 400 || current > 500 || last > 500) {
+
+            if(r2.getCurrentEventCount() > 0) {
+                currentTestSuccessTime = r2.getCurrentTotalValue()/r.getCurrentEventCount();
+            }
+            if(r2.getLastEventCount() > 0) {
+                lastTestSuccessTime = r2.getLastTotalValue()/r2.getLastEventCount();
+            }
+            if(totalTestSuccessTimeEvents > 0) {
+                avgTestSuccessTime = (r2.getCurrentTotalValue() + r.getLastTotalValue())/totalTestSuccessTimeEvents;
+            }
+            else {
+                avgTestSuccessTime = r2.getAverageValue();
                 if(_log.shouldLog(Log.WARN)) {
-                    _log.warn("Refusing tunnel request due to sendProcessingTime of " + avg
+                    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
+                }
+            }
+
+            //Set throttling if necessary
+            if((avgSendProcessingTime > 800 || currentSendProcessingTime > 1000 || lastSendProcessingTime > 1000)
+                    && (currentTestSuccessTime > 3000 || lastTestSuccessTime > 3000)) {
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("Refusing tunnel request due to sendProcessingTime of " + avgSendProcessingTime
                             + " ms over the last two minutes, which is too much.");
                 }
-                setTunnelStatus("Rejecting tunnels: High message delay implying possible congestion");
-                return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
+                setTunnelStatus("Rejecting tunnels: congestion");
+                return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
             }
         }
         

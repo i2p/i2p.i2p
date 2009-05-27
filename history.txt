@@ -1,3 +1,7 @@
+2009-05-27 Mathiasdm
+    * Increased sendProcessingTime limits and added testSuccessTime
+      to avoid unwanted throttling
+
 2009-05-26 Mathiasdm
     * Throttling extension by looking at sendProcessingTime
 
