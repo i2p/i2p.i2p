@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
@@ -477,6 +478,19 @@ public abstract class TunnelPeerSelector {
             Collections.sort(rv, new HashComparator(hash));
     }
 
+    /**
+     *  Implement a deterministic comparison that cannot be predicted by
+     *  others. A naive implementation (using the distance from a random key)
+     *  allows an attacker who runs two routers with hashes far apart
+     *  to maximize his chances of those two routers being at opposite
+     *  ends of a tunnel.
+     *
+     *  Previous:
+     *     d(l, h) - d(r, h)
+     *
+     *  Now:
+     *     d((H(l+h), h) - d(H(r+h), h)
+     */
     private class HashComparator implements Comparator {
         private Hash _hash;
 
@@ -484,8 +498,14 @@ public abstract class TunnelPeerSelector {
             _hash = h;
         }
         public int compare(Object l, Object r) {
-            BigInteger ll = PeerSelector.getDistance(_hash, (Hash) l);
-            BigInteger rr = PeerSelector.getDistance(_hash, (Hash) r);
+            byte[] data = new byte[2*Hash.HASH_LENGTH];
+            System.arraycopy(_hash.getData(), 0, data, Hash.HASH_LENGTH, Hash.HASH_LENGTH);
+            System.arraycopy(((Hash) l).getData(), 0, data, 0, Hash.HASH_LENGTH);
+            Hash lh = SHA256Generator.getInstance().calculateHash(data);
+            System.arraycopy(((Hash) r).getData(), 0, data, 0, Hash.HASH_LENGTH);
+            Hash rh = SHA256Generator.getInstance().calculateHash(data);
+            BigInteger ll = PeerSelector.getDistance(_hash, lh);
+            BigInteger rr = PeerSelector.getDistance(_hash, rh);
             return ll.compareTo(rr);
         }
     }
