@@ -1,4 +1,8 @@
 2009-05-27 Mathiasdm
+    * Increase sendProcessingTime some more, add a property to configure.
+      Configure with 'router.defaultProcessingTimeThrottle'.
+
+2009-05-27 Mathiasdm
     * Increased sendProcessingTime limits and added testSuccessTime
       to avoid unwanted throttling
 
