@@ -639,23 +639,23 @@ public class NTCPTransport extends TransportImpl {
         buf.append(" timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
         buf.append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td>");
-        buf.append("     <td><b>dir</b></td>");
-        buf.append("     <td align=\"right\"><b><a href=\"#def.idle\">idle</a></b></td>");
-        buf.append("     <td align=\"right\"><b><a href=\"#def.rate\">in/out</a></b></td>");
-        buf.append("     <td align=\"right\"><b><a href=\"#def.up\">up</a></b></td>");
-        buf.append("     <td align=\"right\"><b><a href=\"#def.skew\">skew</a></b></td>");
-        buf.append("     <td align=\"right\"><b><a href=\"#def.send\">send</a></b></td>");
-        buf.append("     <td align=\"right\"><b><a href=\"#def.recv\">recv</a></b></td>");
-        buf.append("     <td><b>out queue</b></td>");
-        buf.append("     <td><b>backlogged?</b></td>");
-        buf.append("     <td><b>reading?</b></td>");
+        buf.append("<tr><th><a href=\"#def.peer\">Peer</a></th>");
+        buf.append("<th>Dir</th>");
+        buf.append("<th align=\"right\"><a href=\"#def.idle\">Idle</a></th>");
+        buf.append("<th align=\"right\"><a href=\"#def.rate\">In/Out</a></th>");
+        buf.append("<th align=\"right\"><a href=\"#def.up\">Up</a></th>");
+        buf.append("<th align=\"right\"><a href=\"#def.skew\">Skew</a></th>");
+        buf.append("<th align=\"right\"><a href=\"#def.send\">Send</a></th>");
+        buf.append("<th align=\"right\"><a href=\"#def.recv\">Recv</a></th>");
+        buf.append("<th>Out queue</th>");
+        buf.append("<th>Backlogged?</th>");
+        buf.append("<th>Reading?</th>");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
-            buf.append("<tr><td nowrap>");
+            buf.append("<tr><td align=\"right\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(con.getRemotePeer().calculateHash()));
             //byte[] ip = getIP(con.getRemotePeer().calculateHash());
             //if (ip != null)

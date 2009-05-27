@@ -1754,49 +1754,49 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(" timeout: ").append(DataHelper.formatDuration(_expireTimeout));
         buf.append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b>");
+        buf.append("<tr><td><b><a href=\"#def.peer\">Peer</a></b>");
         if (sortFlags != FLAG_ALPHA)
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
-        buf.append("</td><td>dir/intro</td><td><b><a href=\"#def.idle\">idle</a></b>");
+        buf.append("</td><td>dir/intro</td><td><b><a href=\"#def.idle\">Idle</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle inbound", FLAG_IDLE_IN);
         buf.append("/");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle outbound", FLAG_IDLE_OUT);
         buf.append("</td>");
-        buf.append("     <td><b><a href=\"#def.rate\">in/out</a></b>");
+        buf.append("<td><b><a href=\"#def.rate\">In/Out</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by inbound rate", FLAG_RATE_IN);
         buf.append("/");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by outbound rate", FLAG_RATE_OUT);
         buf.append("</td>\n");
-        buf.append("     <td><b><a href=\"#def.up\">up</a></b>");
+        buf.append("<td><b><a href=\"#def.up\">Up</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by connection uptime", FLAG_UPTIME);
         buf.append("</td><td><b><a href=\"#def.skew\">skew</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by clock skew", FLAG_SKEW);
         buf.append("</td>\n");
-        buf.append("     <td><b><a href=\"#def.cwnd\">cwnd</a></b>");
+        buf.append("<td><b><a href=\"#def.cwnd\">Cwnd</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by congestion window", FLAG_CWND);
-        buf.append("</td><td><b><a href=\"#def.ssthresh\">ssthresh</a></b>");
+        buf.append("</td><td><b><a href=\"#def.ssthresh\">Ssthresh</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by slow start threshold", FLAG_SSTHRESH);
         buf.append("</td>\n");
-        buf.append("     <td><b><a href=\"#def.rtt\">rtt</a></b>");
+        buf.append("<td><b><a href=\"#def.rtt\">Rtt</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by round trip time", FLAG_RTT);
-        buf.append("</td><td><b><a href=\"#def.dev\">dev</a></b>");
+        buf.append("</td><td><b><a href=\"#def.dev\">Dev</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by round trip time deviation", FLAG_DEV);
-        buf.append("</td><td><b><a href=\"#def.rto\">rto</a></b>");
+        buf.append("</td><td><b><a href=\"#def.rto\">Rto</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by retransmission timeout", FLAG_RTO);
         buf.append("</td>\n");
-        buf.append("     <td><b><a href=\"#def.mtu\">mtu</a></b>");
+        buf.append("<td><b><a href=\"#def.mtu\">Mtu</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by maximum transmit unit", FLAG_MTU);
-        buf.append("</td><td><b><a href=\"#def.send\">send</a></b>");
+        buf.append("</td><td><b><a href=\"#def.send\">Send</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by packets sent", FLAG_SEND);
-        buf.append("</td><td><b><a href=\"#def.recv\">recv</a></b>");
+        buf.append("</td><td><b><a href=\"#def.recv\">Recv</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by packets received", FLAG_RECV);
         buf.append("</td>\n");
-        buf.append("     <td><b><a href=\"#def.resent\">resent</a></b>");
+        buf.append("<td><b><a href=\"#def.resent\">Resent</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by packets retransmitted", FLAG_RESEND);
-        buf.append("</td><td><b><a href=\"#def.dupRecv\">dupRecv</a></b>");
+        buf.append("</td><td><b><a href=\"#def.dupRecv\">DupRecv</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by packets received more than once", FLAG_DUP);
         buf.append("</td>\n");
-        buf.append(" </tr>\n");
+        buf.append("</tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
         long now = _context.clock().now();
@@ -1805,9 +1805,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (now-peer.getLastReceiveTime() > 60*60*1000)
                 continue; // don't include old peers
             
-            buf.append("<tr>");
-            
-            buf.append("<td nowrap>");
+            buf.append("<tr><td align=\"right\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer.getRemotePeer()));
             //byte ip[] = peer.getRemoteIP();
             //if (ip != null)

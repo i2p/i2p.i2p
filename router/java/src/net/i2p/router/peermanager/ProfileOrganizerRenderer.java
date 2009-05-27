@@ -180,7 +180,7 @@ class ProfileOrganizerRenderer {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
 
-            buf.append("<tr><td nowrap>");
+            buf.append("<tr><td align=\"right\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             buf.append("</td>");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
