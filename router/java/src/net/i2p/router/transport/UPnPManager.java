@@ -30,7 +30,7 @@ public class UPnPManager {
     private RouterContext _context;
     private UPnP _upnp;
     private UPnPCallback _upnpCallback;
-    private boolean _isRunning;
+    private volatile boolean _isRunning;
     private InetAddress _detectedAddress;
     private TransportManager _manager;
     /**

@@ -215,16 +215,16 @@ public class ConfigNetHandler extends FormHandler {
             if (switchRequired) {
                 _context.router().setConfigSetting(PROP_HIDDEN, "" + _hiddenMode);
                 if (_hiddenMode)
-                    addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
-                              + "<a href=\"configtunnels.jsp\">tunnels!</a>");
+                    addFormError("Gracefully restarting into Hidden Router Mode");
                 else
-                    addFormNotice("Gracefully restarting to exit Hidden Router Mode");
+                    addFormError("Gracefully restarting to exit Hidden Router Mode");
             }
 
             _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
 
             if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)).booleanValue() !=
                 _upnp) {
+                // This is minor, don't set restartRequired
                 if (_upnp)
                     addFormNotice("Enabling UPnP, restart required to take effect");
                 else
@@ -240,9 +240,11 @@ public class ConfigNetHandler extends FormHandler {
             }
 
             // Time sync enable, means NOT disabled 
-            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
+            // Hmm router sets this at startup, not required here
+            //_context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
             
-            LoadTestManager.setEnableLoadTesting(_context, _enableLoadTesting);
+            // Hidden in the GUI
+            //LoadTestManager.setEnableLoadTesting(_context, _enableLoadTesting);
         }
         
         boolean saved = _context.router().saveConfig();
@@ -256,14 +258,24 @@ public class ConfigNetHandler extends FormHandler {
         if (switchRequired) {
             hiddenSwitch();
         } else if (restartRequired) {
+            // Wow this dumps all conns immediately and really isn't nice
             //addFormNotice("Performing a soft restart");
             //_context.router().restart();
             //addFormNotice("Soft restart complete");
+
             // Most of the time we aren't changing addresses, just enabling or disabling
             // things, so let's try just a new routerInfo and see how that works.
             // Maybe we should restart if we change addresses though?
-            _context.router().rebuildRouterInfo();
-            addFormNotice("Router Info rebuilt");
+            // No, this doesn't work well, really need to call SSU Transport externalAddressReceived(),
+            // but that's hard to get to, and doesn't handle port changes, etc.
+            // So don't do this...
+            //_context.router().rebuildRouterInfo();
+            //addFormNotice("Router Info rebuilt");
+
+            // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
+            // But it would be hard to get right, so just do a restart.
+            addFormError("Gracefully restarting I2P to change published router address");
+            _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
         }
     }
 

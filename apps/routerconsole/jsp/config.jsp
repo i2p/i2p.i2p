@@ -115,7 +115,7 @@
     %>
     <br />
     <input type="radio" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
-    Hidden mode - do not publish IP <i>(prevents participating traffic; change restarts router)</i><br />
+    Hidden mode - do not publish IP <i>(prevents participating traffic)</i><br />
  </p><p>
  <b>UDP Configuration:</b><br />
  UDP port:
@@ -142,7 +142,7 @@
     <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
     Disable inbound (Firewalled)<br />
     <input type="radio" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
-    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP - change requires restart)</i><br />
+    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP)</i><br />
  </p><p>
  Externally reachable TCP port:<br />
     <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
@@ -151,8 +151,7 @@
     <input type="radio" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
     Specify Port:
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
- </p><p><b>Note: changing any of these settings will terminate all of your connections and effectively
-    restart your router.</b>
+ </p><p><b>Note: Changing these settings will restart your router.</b>
  </p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  <hr />
