@@ -81,6 +81,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private TransportBid _fastBid;
     /** shared slow bid for unconnected peers when we want to prefer UDP */
     private TransportBid _slowBid;
+    /** save some conns for inbound */
+    private TransportBid _nearCapacityBid;
     /** shared slow bid for unconnected peers */
     private TransportBid _slowestBid;
     /** shared fast bid for unconnected peers when we want to prefer UDP */
@@ -170,7 +172,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _slowBid = new SharedBid(65);
         _fastPreferredBid = new SharedBid(15);
         _slowPreferredBid = new SharedBid(20);
-        _slowestBid = new SharedBid(1000);
+        _slowestBid = new SharedBid(80);
+        _nearCapacityBid = new SharedBid(100);
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
         
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
@@ -988,8 +991,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return _slowPreferredBid;
             else if (preferUDP())
                 return _slowBid;
-            else
+            else if (haveCapacity())
                 return _slowestBid;
+            else
+                return _nearCapacityBid;
         }
     }
 
@@ -1760,7 +1765,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("<tr><td><b><a href=\"#def.peer\">Peer</a></b>");
         if (sortFlags != FLAG_ALPHA)
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
-        buf.append("</td><td>dir/intro</td><td><b><a href=\"#def.idle\">Idle</a></b>");
+        buf.append("</td><td><b><a href=\"#def.dir\">Dir/Intro</a></b></td><td><b><a href=\"#def.idle\">Idle</a></b>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle inbound", FLAG_IDLE_IN);
         buf.append("/");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle outbound", FLAG_IDLE_OUT);
@@ -1813,7 +1818,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //byte ip[] = peer.getRemoteIP();
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
-            buf.append("</td><td>");
+            buf.append("</td><td><code>");
             if (peer.isInbound())
                 buf.append("in ");
             else

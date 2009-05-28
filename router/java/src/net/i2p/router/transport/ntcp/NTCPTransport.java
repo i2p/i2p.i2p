@@ -36,6 +36,8 @@ public class NTCPTransport extends TransportImpl {
     private Log _log;
     private SharedBid _fastBid;
     private SharedBid _slowBid;
+    /** save some conns for inbound */
+    private SharedBid _nearCapacityBid;
     private SharedBid _transientFail;
     private final Object _conLock;
     private Map<Hash, NTCPConnection> _conByIdent;
@@ -133,6 +135,7 @@ public class NTCPTransport extends TransportImpl {
 
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
+        _nearCapacityBid = new SharedBid(90); // not better than ssu - save our conns for inbound
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
     }
 
@@ -308,7 +311,10 @@ public class NTCPTransport extends TransportImpl {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("slow bid when trying to send to " + peer.toBase64());
-        return _slowBid;
+        if (haveCapacity())
+            return _slowBid;
+        else
+            return _nearCapacityBid;
     }
 
     public boolean allowConnection() {
@@ -660,7 +666,7 @@ public class NTCPTransport extends TransportImpl {
             //byte[] ip = getIP(con.getRemotePeer().calculateHash());
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
-            buf.append("</code></td><td align=\"center\"><code>");
+            buf.append("</td><td align=\"center\"><code>");
             if (con.isInbound())
                 buf.append("in");
             else
