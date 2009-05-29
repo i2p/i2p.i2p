@@ -59,11 +59,18 @@ public class ElGamalAESEngine {
     }
 
     /**
+     * Decrypt the message using the given private key using tags from the given key manager.
+     */
+    public byte[] decrypt(byte data[], PrivateKey targetPrivateKey) throws DataFormatException {
+        return decrypt(data, targetPrivateKey, _context.sessionKeyManager());
+    }
+
+    /**
      * Decrypt the message using the given private key.  This works according to the
      * ElGamal+AES algorithm in the data structure spec.
      *
      */
-    public byte[] decrypt(byte data[], PrivateKey targetPrivateKey) throws DataFormatException {
+    public byte[] decrypt(byte data[], PrivateKey targetPrivateKey, SessionKeyManager keyManager) throws DataFormatException {
         if (data == null) {
             if (_log.shouldLog(Log.ERROR)) _log.error("Null data being decrypted?");
             return null;
@@ -76,7 +83,7 @@ public class ElGamalAESEngine {
         byte tag[] = new byte[32];
         System.arraycopy(data, 0, tag, 0, tag.length);
         SessionTag st = new SessionTag(tag);
-        SessionKey key = _context.sessionKeyManager().consumeTag(st);
+        SessionKey key = keyManager.consumeTag(st);
         SessionKey foundKey = new SessionKey();
         foundKey.setData(null);
         SessionKey usedKey = new SessionKey();
@@ -124,11 +131,11 @@ public class ElGamalAESEngine {
             if (foundKey.getData() != null) {
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);
-                _context.sessionKeyManager().tagsReceived(foundKey, foundTags);
+                keyManager.tagsReceived(foundKey, foundTags);
             } else {
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Used key: " + usedKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);
-                _context.sessionKeyManager().tagsReceived(usedKey, foundTags);
+                keyManager.tagsReceived(usedKey, foundTags);
             }
         }
         return decrypted;

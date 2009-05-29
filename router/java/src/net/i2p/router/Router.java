@@ -57,7 +57,7 @@ public class Router {
     private RouterInfo _routerInfo;
     private long _started;
     private boolean _higherVersionSeen;
-    private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
+    //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     private boolean _killVMOnEnd;
     private boolean _isAlive;
     private int _gracefulExitCode;
@@ -144,7 +144,7 @@ public class Router {
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);
         _log.info("New router created with config file " + _configFilename);
-        _sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
+        //_sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
         _killVMOnEnd = true;
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
@@ -261,7 +261,7 @@ public class Router {
         SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), 20*1000);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
-        _sessionKeyPersistenceHelper.startup();
+        //_sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
         _context.blocklist().startup();
         
@@ -813,7 +813,7 @@ public class Router {
         try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
-        try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         RouterContext.listContexts().remove(_context);
         dumpStats();
         finalShutdown(exitCode);

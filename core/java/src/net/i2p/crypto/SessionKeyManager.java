@@ -93,7 +93,7 @@ public class SessionKeyManager {
      * method after receiving an ack to a message delivering them)
      *
      */
-    public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) { // nop
+    public void tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) { // nop
     }
 
     /**
@@ -109,7 +109,7 @@ public class SessionKeyManager {
      * Accept the given tags and associate them with the given key for decryption
      *
      */
-    public void tagsReceived(SessionKey key, Set sessionTags) { // nop
+    public void tagsReceived(SessionKey key, Set<SessionTag> sessionTags) { // nop
     }
 
     /**

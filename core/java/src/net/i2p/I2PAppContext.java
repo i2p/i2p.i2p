@@ -17,9 +17,9 @@ import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
 import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
-import net.i2p.crypto.PersistentSessionKeyManager;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
@@ -256,7 +256,8 @@ public class I2PAppContext {
     private void initializeSessionKeyManager() {
         synchronized (this) {
             if (_sessionKeyManager == null) 
-                _sessionKeyManager = new PersistentSessionKeyManager(this);
+                //_sessionKeyManager = new PersistentSessionKeyManager(this);
+                _sessionKeyManager = new TransientSessionKeyManager(this);
             _sessionKeyManagerInitialized = true;
         }
     }
