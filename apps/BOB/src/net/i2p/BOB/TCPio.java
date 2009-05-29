@@ -49,8 +49,8 @@ public class TCPio implements Runnable {
 	TCPio(InputStream Ain, OutputStream Aout /*, NamedDB info , NamedDB database */) {
 		this.Ain = Ain;
 		this.Aout = Aout;
-		// this.info = info;
-		// this.database = database;
+	// this.info = info;
+	// this.database = database;
 	}
 
 	/**
@@ -86,30 +86,35 @@ public class TCPio implements Runnable {
 		byte a[] = new byte[1];
 		boolean spin = true;
 		try {
-			while(spin) {
-				b = Ain.read(a, 0, 1);
-				if(b > 0) {
-					Aout.write(a, 0, b);
-				} else if(b == 0) {
-					Thread.yield(); // this should act like a mini sleep.
-					if(Ain.available() == 0) {
+			try {
+				while (spin) {
+					b = Ain.read(a, 0, 1);
+					if (b > 0) {
+						Aout.write(a, 0, b);
+					} else if (b == 0) {
+						Thread.yield(); // this should act like a mini sleep.
+						if (Ain.available() == 0) {
 							Thread.sleep(10);
+						}
+					} else {
+						/* according to the specs:
+						 *
+						 * The total number of bytes read into the buffer,
+						 * or -1 if there is no more data because the end of
+						 * the stream has been reached.
+						 *
+						 */
+						// System.out.println("TCPio: End Of Stream");
+						// Ain.close();
+						// Aout.close();
+						//return;
+						break;
 					}
-				} else {
-					/* according to the specs:
-					 *
-					 * The total number of bytes read into the buffer,
-					 * or -1 if there is no more data because the end of
-					 * the stream has been reached.
-					 *
-					 */
-					// System.out.println("TCPio: End Of Stream");
-					Ain.close();
-					Aout.close();
-					return;
 				}
+			} catch (Exception e) {
 			}
-		} catch(Exception e) {
+		// System.out.println("TCPio: Leaving.");
+		} finally {
 			// Eject!!! Eject!!!
 			//System.out.println("TCPio: Caught an exception " + e);
 			try {
@@ -122,6 +127,5 @@ public class TCPio implements Runnable {
 			}
 			return;
 		}
-		// System.out.println("TCPio: Leaving.");
 	}
 }

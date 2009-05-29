@@ -29,8 +29,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 // import net.i2p.client.I2PSession;
 // import net.i2p.client.I2PSessionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.util.Log;
@@ -142,12 +140,7 @@ public class TCPlistener implements Runnable {
 							g = false;
 						}
 					}
-					listener.close();
 				} catch (IOException ioe) {
-					try {
-						listener.close();
-					} catch (IOException e) {
-					}
 				}
 			}
 		} finally {

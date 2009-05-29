@@ -1,3 +1,8 @@
+2009-05-29 sponge
+    * added big fat start/stop lock into BOB
+    * added zap command to shut down BOB... now we need a way to start it
+      after it stops. :-)
+
 2009-05-27 Mathiasdm
     * Increase sendProcessingTime some more, add a property to configure.
       Configure with 'router.defaultProcessingTimeThrottle'.
