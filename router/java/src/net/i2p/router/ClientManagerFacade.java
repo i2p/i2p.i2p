@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -91,5 +92,6 @@ public abstract class ClientManagerFacade implements Service {
      *
      */
     public abstract SessionConfig getClientSessionConfig(Destination dest);
+    public abstract SessionKeyManager getClientSessionKeyManager(Destination dest);
     public void renderStatusHTML(Writer out) throws IOException { }
 }

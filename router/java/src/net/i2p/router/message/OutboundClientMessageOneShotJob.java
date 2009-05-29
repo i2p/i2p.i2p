@@ -471,7 +471,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return;
         }
 
-        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey());
+        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey(), _from);
         _outTunnel = selectOutboundTunnel(_to);
         // boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
         // what's the point of 5% random? possible improvements or replacements:

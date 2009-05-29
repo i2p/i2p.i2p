@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -310,6 +311,18 @@ public class ClientManager {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)
             return runner.getConfig();
+        else
+            return null;
+    }
+    
+    /**
+     * Return the client's SessionKeyManager
+     *
+     */
+    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+        ClientConnectionRunner runner = getRunner(dest);
+        if (runner != null)
+            return runner.getSessionKeyManager();
         else
             return null;
     }

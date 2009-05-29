@@ -40,6 +40,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     /** Map allowing us to go from a SessionTag to the containing TagSet */
     private Map<SessionTag, TagSet> _inboundTagSets;
     protected I2PAppContext _context;
+    private volatile boolean _alive;
 
     /** 
      * Let session tags sit around for 10 minutes before expiring them.  We can now have such a large
@@ -75,18 +76,33 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         _inboundTagSets = new HashMap(1024);
         context.statManager().createRateStat("crypto.sessionTagsExpired", "How many tags/sessions are expired?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
         context.statManager().createRateStat("crypto.sessionTagsRemaining", "How many tags/sessions are remaining after a cleanup?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
-        SimpleScheduler.getInstance().addPeriodicEvent(new CleanupEvent(), 60*1000);
+         _alive = true;
+        SimpleScheduler.getInstance().addEvent(new CleanupEvent(), 60*1000);
     }
     private TransientSessionKeyManager() { this(null); }
     
+    public void shutdown() {
+         _alive = false;
+        synchronized (_inboundTagSets) {
+            _inboundTagSets.clear();
+        }
+        synchronized (_outboundSessions) {
+            _outboundSessions.clear();
+        }
+    }
+
     private class CleanupEvent implements SimpleTimer.TimedEvent {
         public void timeReached() {
+            if (!_alive)
+                return;
             long beforeExpire = _context.clock().now();
             int expired = aggressiveExpire();
             long expireTime = _context.clock().now() - beforeExpire;
             _context.statManager().addRateData("crypto.sessionTagsExpired", expired, expireTime);
+            SimpleScheduler.getInstance().addEvent(this, 60*1000);
         }
     }
+
 
     /** TagSet */
     protected Set<TagSet> getInboundTagSets() {

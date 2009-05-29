@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -195,6 +196,19 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             return _manager.getClientSessionConfig(dest);
         else {
             _log.error("Null manager on getClientSessionConfig!");
+            return null;
+        }
+    }
+    
+    /**
+     * Return the client's current manager or null if not connected
+     *
+     */
+    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+        if (_manager != null)
+            return _manager.getClientSessionKeyManager(dest);
+        else {
+            _log.error("Null manager on getClientSessionKeyManager!");
             return null;
         }
     }

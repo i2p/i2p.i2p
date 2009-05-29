@@ -14,8 +14,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
@@ -61,22 +63,30 @@ public class GarlicMessageBuilder {
     private static final int DEFAULT_TAGS = 40;
     private static final int LOW_THRESHOLD = 20;
 
-    public static int estimateAvailableTags(RouterContext ctx, PublicKey key) {
-        SessionKey curKey = ctx.sessionKeyManager().getCurrentKey(key);
+    public static int estimateAvailableTags(RouterContext ctx, PublicKey key, Destination local) {
+        // per-dest Unimplemented
+        //SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
+        SessionKeyManager skm = ctx.sessionKeyManager();
+        if (skm == null)
+            return 0;
+        SessionKey curKey = skm.getCurrentKey(key);
         if (curKey == null)
             return 0;
-        return ctx.sessionKeyManager().getAvailableTags(key, curKey);
+        return skm.getAvailableTags(key, curKey);
     }
     
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
         return buildMessage(ctx, config, new SessionKey(), new HashSet());
     }
+
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
         return buildMessage(ctx, config, wrappedKey, wrappedTags, DEFAULT_TAGS);
     }
+
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver) {
         return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, false);
     }
+
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver, boolean forceElGamal) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
