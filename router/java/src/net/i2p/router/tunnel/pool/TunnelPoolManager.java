@@ -20,7 +20,6 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
-import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -43,7 +42,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private final Map _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
-    private LoadTestManager _loadTestManager;
     private BuildExecutor _executor;
     private boolean _isShutdown;
     
@@ -59,8 +57,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
         _clientInboundPools = new HashMap(4);
         _clientOutboundPools = new HashMap(4);
-        if (! LoadTestManager.FORCE_DISABLE)
-            _loadTestManager = new LoadTestManager(_context);
         
         _isShutdown = false;
         _executor = new BuildExecutor(ctx, this);
@@ -311,8 +307,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         buildComplete();
-        if (_loadTestManager != null)
-            _loadTestManager.addTunnelTestCandidate(cfg);
         if (cfg.getLength() > 1) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
@@ -340,8 +334,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
     void buildComplete() {}
-    
-    private static final String PROP_LOAD_TEST = "router.loadTest";
     
     public void startup() { 
         _isShutdown = false;

@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
-import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Addresses;
@@ -214,11 +213,9 @@ public class ConfigNetHelper extends HelperBase {
         return buf.toString();
     }
     
+    /** removed */
     public String getEnableLoadTesting() {
-        if (LoadTestManager.isEnabled(_context))
-            return CHECKED;
-        else
-            return "";
+        return "";
     }
     
     public String getSharePercentageBox() {

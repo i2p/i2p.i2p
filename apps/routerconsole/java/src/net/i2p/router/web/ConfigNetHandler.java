@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import net.i2p.data.RouterInfo;
-import net.i2p.router.LoadTestManager;
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
 import net.i2p.router.transport.TransportManager;
@@ -307,6 +306,9 @@ public class ConfigNetHandler extends FormHandler {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
             updated = true;
         }
+
+/******* These aren't in the GUI for now
+
         if ( (_inboundBurstRate != null) && (_inboundBurstRate.length() > 0) &&
             !_inboundBurstRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BURST_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, _inboundBurstRate);
@@ -353,6 +355,9 @@ public class ConfigNetHandler extends FormHandler {
                 updated = true;
             }
         }
+
+***********/
+
         
         if (updated && !_ratesOnly) {
             _context.bandwidthLimiter().reinitialize();
