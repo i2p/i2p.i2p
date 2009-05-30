@@ -28,14 +28,12 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <textarea rows="20" cols="100" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br />
- <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" /><!-- <br />
- <b>Force restart:</b> <input type="checkbox" name="restart" value="force" /> <i>(specify this
- if the changes made above require the router to reset itself - e.g. you are updating TCP ports 
- or hostnames, etc)</i>-->
- If you are changing any of the I2NP settings, you should go to the 
- <a href="configservice.jsp">service config</a> page and do a graceful restart after saving.
+<p>
+ <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
+</p><p>
+ NOTE: Some changes may require a restart to take effect.
+</p>
  </form>
 </div>
-
 </body>
 </html>
