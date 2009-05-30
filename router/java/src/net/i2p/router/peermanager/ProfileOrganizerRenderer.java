@@ -98,7 +98,7 @@ class ProfileOrganizerRenderer {
                 buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
             prevTier = tier;
             
-            buf.append("<tr><td nowrap>");
+            buf.append("<tr><td align=\"right\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             buf.append("</td><td>");
             
