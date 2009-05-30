@@ -120,7 +120,7 @@ public class SendMessageDirectJob extends JobImpl {
         }
         _sent = true;
         Hash to = _router.getIdentity().getHash();
-        Hash us = getContext().router().getRouterInfo().getIdentity().getHash();
+        Hash us = getContext().routerHash();
         if (us.equals(to)) {
             if (_selector != null) {
                 OutNetMessage outM = new OutNetMessage(getContext());
