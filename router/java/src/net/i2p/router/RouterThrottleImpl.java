@@ -33,6 +33,8 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final int DEFAULT_MAX_TUNNELS = 2000;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
+    private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
+    private static final int DEFAULT_MAX_PROCESSINGTIME = 1500;
 
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
@@ -96,19 +98,48 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
 
         long lag = _context.jobQueue().getMaxLag();
-// reject here if lag too high???
+        // reject here if lag too high???
+        
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
         Rate r = null;
-        if (rs != null)
-            r = rs.getRate(60*1000);
-        double processTime = (r != null ? r.getAverageValue() : 0);
-        if (processTime > 5000) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Refusing tunnel request with the job lag of " + lag 
-                           + "since the 1 minute message processing time is too slow (" + processTime + ")");
-            _context.statManager().addRateData("router.throttleTunnelProcessingTime1m", (long)processTime, (long)processTime);
-            setTunnelStatus("Rejecting tunnels: High message delay");
-            return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
+
+        //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
+        if(r != null) {
+            double totalSendProcessingTimeEvents = r.getCurrentEventCount() + r.getLastEventCount();
+            double avgSendProcessingTime = 0;
+            double currentSendProcessingTime = 0;
+            double lastSendProcessingTime = 0;
+            
+            //Calculate times
+            if(r.getCurrentEventCount() > 0) {
+                currentSendProcessingTime = r.getCurrentTotalValue()/r.getCurrentEventCount();
+            }
+            if(r.getLastEventCount() > 0) {
+                lastSendProcessingTime = r.getLastTotalValue()/r.getLastEventCount();
+            }
+            if(totalSendProcessingTimeEvents > 0) {
+                avgSendProcessingTime =  (r.getCurrentTotalValue() + r.getLastTotalValue())/totalSendProcessingTimeEvents;
+            }
+            else {
+                avgSendProcessingTime = r.getAverageValue();
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("No events occurred. Using 1 minute average to look at message delay.");
+                }
+            }
+
+            int maxProcessingTime = _context.getProperty(PROP_MAX_PROCESSINGTIME, DEFAULT_MAX_PROCESSINGTIME);
+
+            //Set throttling if necessary
+            if((avgSendProcessingTime > maxProcessingTime*0.9 
+                    || currentSendProcessingTime > maxProcessingTime
+                    || lastSendProcessingTime > maxProcessingTime)) {
+                if(_log.shouldLog(Log.WARN)) {
+                    _log.warn("Refusing tunnel request due to sendProcessingTime of " + avgSendProcessingTime
+                            + " ms over the last two minutes, which is too much.");
+                }
+                setTunnelStatus("Rejecting tunnels: congestion");
+                return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            }
         }
         
         int numTunnels = _context.tunnelManager().getParticipatingCount();

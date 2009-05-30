@@ -2,7 +2,7 @@
 
 <Form version="1.5" maxVersion="1.6" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
+    <Component class="javax.swing.ButtonGroup" name="updateButtonGroup">
     </Component>
   </NonVisualComponents>
   <Properties>
@@ -81,12 +81,18 @@
             <Property name="text" type="java.lang.String" resourceKey="cancel.text"/>
             <Property name="name" type="java.lang.String" value="cancel" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="cancelMouseClicked"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JToggleButton" name="ok">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="ok.text"/>
             <Property name="name" type="java.lang.String" value="ok" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="okMouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -141,7 +147,7 @@
                 <Property name="name" type="java.lang.String" value="uploadspeed" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="speedKeyTyped"/>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="speedKeyReleased"/>
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -155,7 +161,7 @@
                 <Property name="name" type="java.lang.String" value="downloadspeed" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="speedKeyTyped"/>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="speedKeyReleased"/>
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -201,10 +207,10 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel3">
+            <Component class="javax.swing.JLabel" name="uploadUsageLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="jLabel3.text"/>
-                <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="uploadUsageLabel.text"/>
+                <Property name="name" type="java.lang.String" value="uploadUsageLabel" noResource="true"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -212,10 +218,10 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel4">
+            <Component class="javax.swing.JLabel" name="downloadUsageLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
-                <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="downloadUsageLabel.text"/>
+                <Property name="name" type="java.lang.String" value="downloadUsageLabel" noResource="true"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -229,7 +235,7 @@
                 <Property name="name" type="java.lang.String" value="uploadgb" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="uploadgbKeyTyped"/>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="monthKeyReleased"/>
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -243,7 +249,7 @@
                 <Property name="name" type="java.lang.String" value="downloadgb" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="downloadgbKeyTyped"/>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="monthKeyReleased"/>
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -251,10 +257,10 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel5">
+            <Component class="javax.swing.JLabel" name="gbUploadLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
-                <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="gbUploadLabel.text"/>
+                <Property name="name" type="java.lang.String" value="gbUploadLabel" noResource="true"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -262,10 +268,10 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel6">
+            <Component class="javax.swing.JLabel" name="gbDownloadLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="jLabel6.text"/>
-                <Property name="name" type="java.lang.String" value="jLabel6" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="gbDownloadLabel.text"/>
+                <Property name="name" type="java.lang.String" value="gbDownloadLabel" noResource="true"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -273,10 +279,10 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel7">
+            <Component class="javax.swing.JLabel" name="uploadDownloadExplanation">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="jLabel7.text"/>
-                <Property name="name" type="java.lang.String" value="jLabel7" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="uploadDownloadExplanation.text"/>
+                <Property name="name" type="java.lang.String" value="uploadDownloadExplanation" noResource="true"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -365,7 +371,7 @@
             <Component class="javax.swing.JRadioButton" name="updateInform">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="buttonGroup1"/>
+                  <ComponentRef name="updateButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="updateInform.text"/>
                 <Property name="name" type="java.lang.String" value="updateInform" noResource="true"/>
@@ -374,7 +380,7 @@
             <Component class="javax.swing.JRadioButton" name="updateDownload">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="buttonGroup1"/>
+                  <ComponentRef name="updateButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="updateDownload.text"/>
                 <Property name="name" type="java.lang.String" value="updateDownload" noResource="true"/>
@@ -383,7 +389,7 @@
             <Component class="javax.swing.JRadioButton" name="updateDownloadRestart">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                  <ComponentRef name="buttonGroup1"/>
+                  <ComponentRef name="updateButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="updateDownloadRestart.text"/>
                 <Property name="name" type="java.lang.String" value="updateDownloadRestart" noResource="true"/>
@@ -394,18 +400,27 @@
                 <Property name="text" type="java.lang.String" resourceKey="checkUpdates.text"/>
                 <Property name="name" type="java.lang.String" value="checkUpdates" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkUpdatesActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JToggleButton" name="updateNow">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="updateNow.text"/>
                 <Property name="name" type="java.lang.String" value="updateNow" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateNowActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JToggleButton" name="advancedUpdateConfig">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="advancedUpdateConfig.text"/>
                 <Property name="name" type="java.lang.String" value="advancedUpdateConfig" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="advancedUpdateConfigActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

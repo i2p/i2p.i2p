@@ -38,7 +38,7 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
 	 * @throws I2PSessionException
 	 */
 	public SAMv3DatagramSession(String nick) 
-	throws IOException, DataFormatException, I2PSessionException {
+	throws IOException, DataFormatException, I2PSessionException, SAMException {
 		
 		super(SAMv3Handler.sSessionsHash.get(nick).getDest(),
 				SAMv3Handler.sSessionsHash.get(nick).getProps(),
@@ -49,7 +49,7 @@ public class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Han
 		this.server = SAMv3Handler.DatagramServer.getInstance() ;
 
 		SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
-        if ( rec==null ) throw new InterruptedIOException() ;
+        if ( rec==null ) throw new SAMException("Record disappeared for nickname : \""+nick+"\"") ;
 
         this.handler = rec.getHandler();
 		

@@ -179,6 +179,10 @@ distributions. See the source package for the additional license information.
    Atalk:
    Public domain
 
+   Desktopgui
+   Copyright (c) Mathias De Maré
+   See apps/desktopgui/LICENSE
+
    SAM C Library:
    Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>
    See apps/sam/c/doc/license.txt

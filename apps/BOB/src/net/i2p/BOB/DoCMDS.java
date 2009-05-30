@@ -31,10 +31,12 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleStore;
 
 /**
  * Simplistic command parser for BOB
@@ -57,6 +59,8 @@ public class DoCMDS implements Runnable {
 	private boolean dk,  ns,  ip,  op;
 	private NamedDB nickinfo;
 	private Log _log;
+	private AtomicBoolean LIVE;
+	private AtomicBoolean lock;
 	/* database strings */
 	private static final String P_DEST = "DESTINATION";
 	private static final String P_INHOST = "INHOST";
@@ -94,6 +98,7 @@ public class DoCMDS implements Runnable {
 	private static final String C_status = "status";
 	private static final String C_stop = "stop";
 	private static final String C_verify = "verify";
+	private static final String C_zap = "zap";
 
 	/* all the coomands available, plus description */
 	private static final String C_ALL[][] = {
@@ -119,6 +124,7 @@ public class DoCMDS implements Runnable {
 		{C_status, C_status + " nickname * Display status of a nicknamed tunnel."},
 		{C_stop, C_stop + " * Stops the current nicknamed tunnel."},
 		{C_verify, C_verify + " BASE64_key * Verifies BASE64 destination."},
+		{C_zap, C_zap + " * Shuts down BOB."},
 		{"", "COMMANDS: " + // this is ugly, but...
 			C_help + " " +
 			C_clear + " " +
@@ -141,19 +147,22 @@ public class DoCMDS implements Runnable {
 			C_start + " " +
 			C_status + " " +
 			C_stop + " " +
-			C_verify
+			C_verify + " " +
+			C_zap
 		},
 		{" ", " "} // end of list
 	};
 
 	/**
-	 *
+	 * @parm LIVE
 	 * @param server
 	 * @param props
 	 * @param database
 	 * @param _log
 	 */
-	DoCMDS(Socket server, Properties props, NamedDB database, Log _log) {
+	DoCMDS(AtomicBoolean LIVE, AtomicBoolean lock, Socket server, Properties props, NamedDB database, Log _log) {
+		this.lock = lock;
+		this.LIVE = LIVE;
 		this.server = server;
 		this.props = new Properties();
 		this.database = database;
@@ -507,6 +516,11 @@ public class DoCMDS implements Runnable {
 								}
 								out.println("OK Listing done");
 							} else if (Command.equals(C_quit)) {
+								// End the command session
+								break quit;
+							} else if (Command.equals(C_zap)) {
+								// Kill BOB!! (let's hope this works!)
+								LIVE.set(false);
 								// End the command session
 								break quit;
 							} else if (Command.equals(C_newkeys)) {
@@ -1260,7 +1274,10 @@ public class DoCMDS implements Runnable {
 										} else {
 											MUXlisten tunnel;
 											try {
-												tunnel = new MUXlisten(database, nickinfo, _log);
+												while(!lock.compareAndSet(false, true)) {
+													// wait
+												}
+												tunnel = new MUXlisten(lock, database, nickinfo, _log);
 												Thread t = new Thread(tunnel);
 												t.start();
 												// try {
@@ -1270,8 +1287,10 @@ public class DoCMDS implements Runnable {
 												// }
 												out.println("OK tunnel starting");
 											} catch (I2PException e) {
+												lock.set(false);
 												out.println("ERROR starting tunnel: " + e);
 											} catch (IOException e) {
+												lock.set(false);
 												out.println("ERROR starting tunnel: " + e);
 											}
 										}

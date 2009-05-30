@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -52,6 +53,7 @@ public class MUXlisten implements Runnable {
 	private int backlog = 50; // should this be more? less?
 	boolean go_out;
 	boolean come_in;
+	private AtomicBoolean lock;
 
 	/**
 	 * Constructor Will fail if INPORT is occupied.
@@ -62,9 +64,10 @@ public class MUXlisten implements Runnable {
 	 * @throws net.i2p.I2PException
 	 * @throws java.io.IOException
 	 */
-	MUXlisten(NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
+	MUXlisten(AtomicBoolean lock, NamedDB database, NamedDB info, Log _log) throws I2PException, IOException, RuntimeException {
 		int port = 0;
 		InetAddress host = null;
+		this.lock = lock;
 		this.tg = null;
 		this.database = database;
 		this.info = info;
@@ -151,7 +154,7 @@ public class MUXlisten implements Runnable {
 				return;
 			}
 //		socketManager.addDisconnectListener(new DisconnectListener());
-
+			lock.set(false);
 			quit:
 			{
 				try {
@@ -216,7 +219,7 @@ public class MUXlisten implements Runnable {
 								break die;
 							}
 						}
-
+						/* cleared in the finally...
 						try {
 							wlock();
 							try {
@@ -233,6 +236,7 @@ public class MUXlisten implements Runnable {
 						} catch (Exception e) {
 							break die;
 						}
+						*/
 					} // die
 
 				} catch (Exception e) {
@@ -241,11 +245,11 @@ public class MUXlisten implements Runnable {
 				}
 			} // quit
 		} finally {
-			// Start cleanup. Allow threads above this one to catch the stop signal.
-			try {
-				Thread.sleep(250);
-			} catch (InterruptedException ex) {
+			// Start cleanup.
+			while (!lock.compareAndSet(false, true)) {
+				// wait
 			}
+
 			// zero out everything.
 			try {
 				wlock();
@@ -260,7 +264,6 @@ public class MUXlisten implements Runnable {
 				wunlock();
 			} catch (Exception e) {
 			}
-
 
 			if (SS != null) {
 				try {
@@ -279,7 +282,14 @@ public class MUXlisten implements Runnable {
 				socketManager.destroySocketManager();
 			} catch (Exception e) {
 				// nop
-				}
+			}
+			// Some grace time.
+			try {
+				Thread.sleep(250);
+			} catch (InterruptedException ex) {
+			}
+
+			lock.set(false); // Should we force waiting for all threads??
 			// Wait around till all threads are collected.
 			if (tg != null) {
 				String boner = tg.getName();
@@ -362,39 +372,41 @@ public class MUXlisten implements Runnable {
 		}
 	}
 
+	/*
 	private static void nuke(ThreadGroup group, int level) {
-		// Get threads in `group'
-		int numThreads = group.activeCount();
-		Thread[] threads = new Thread[numThreads * 2];
-		numThreads = group.enumerate(threads, false);
-		// Enumerate each thread in `group' and stop it.
-		for (int i = 0; i < numThreads; i++) {
-			// Get thread
-			Thread thread = threads[i];
-			try {
-				if (thread.isAlive()) {
-					thread.stop();
-				}
-			} catch (SecurityException se) {
-				//nop
-			}
-		}
-
-		// Get thread subgroups of `group'
-		int numGroups = group.activeGroupCount();
-		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
-		numGroups = group.enumerate(groups, false);
-
-		// Recursively visit each subgroup
-		for (int i = 0; i < numGroups; i++) {
-			nuke(groups[i], level + 1);
-		}
-		try {
-			group.destroy();
-		} catch (IllegalThreadStateException IE) {
-			//nop
-		} catch (SecurityException se) {
-			//nop
-		}
+	// Get threads in `group'
+	int numThreads = group.activeCount();
+	Thread[] threads = new Thread[numThreads * 2];
+	numThreads = group.enumerate(threads, false);
+	// Enumerate each thread in `group' and stop it.
+	for (int i = 0; i < numThreads; i++) {
+	// Get thread
+	Thread thread = threads[i];
+	try {
+	if (thread.isAlive()) {
+	thread.stop();
 	}
+	} catch (SecurityException se) {
+	//nop
+	}
+	}
+
+	// Get thread subgroups of `group'
+	int numGroups = group.activeGroupCount();
+	ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+	numGroups = group.enumerate(groups, false);
+
+	// Recursively visit each subgroup
+	for (int i = 0; i < numGroups; i++) {
+	nuke(groups[i], level + 1);
+	}
+	try {
+	group.destroy();
+	} catch (IllegalThreadStateException IE) {
+	//nop
+	} catch (SecurityException se) {
+	//nop
+	}
+	}
+	 */
 }
