@@ -146,7 +146,7 @@
  </p><p>
  Externally reachable TCP port:<br />
     <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
-    Use the same port configured for SSU
+    Use the same port configured for UDP
     <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br />
     <input type="radio" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
     Specify Port:
