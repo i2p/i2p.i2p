@@ -76,7 +76,12 @@ public class UPnPManager {
         _detectedAddress = null;
     }
     
-    /** call when the ports might have changed */
+    /**
+     * Call when the ports might have changed
+     * The transports can call this pretty quickly at startup,
+     * which can have multiple UPnP threads running at once, but
+     * that should be ok.
+     */
     public void update(Map<String, Integer> ports) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("UPnP Update:");
@@ -97,6 +102,7 @@ public class UPnPManager {
             ForwardPort fp = new ForwardPort(style, false, protocol, port);
             forwards.add(fp);
         }
+        // non-blocking
         _upnp.onChangePublicPorts(forwards, _upnpCallback);
     }
 

@@ -386,13 +386,14 @@ public class HTTPRequest extends HTTPPacket
 				// as when the device goes away, this hangs the display of peers.jsp
 				// and who knows what else.
 				// Set the timeout to be nice and short, the device should be local and fast.
-				// If he can't get back to us in 2 seconds, forget it.
+				// Yeah, the UPnP standard is a minute or something, too bad.
+				// If he can't get back to us in a few seconds, forget it.
 				// And set the soTimeout to 1 second (for reads).
 				//postSocket = new Socket(host, port);
 				postSocket = new Socket();
 				postSocket.setSoTimeout(1000);
 				SocketAddress sa = new InetSocketAddress(host, port);
-				postSocket.connect(sa, 2000);
+				postSocket.connect(sa, 3000);
 			}
 
 			out = postSocket.getOutputStream();

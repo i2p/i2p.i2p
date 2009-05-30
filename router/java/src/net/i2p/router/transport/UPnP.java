@@ -263,9 +263,10 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		}
 	}
 	
-	/** event callback */
+	/** event callback - unused for now - how many devices support events? */
 	public void eventNotifyReceived(String uuid, long seq, String varName, String value) {
-		_log.error("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
+		if (_log.shouldLog(Log.WARN))
+			_log.error("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
 	}
 
 	/** compare two strings, either of which could be null */
@@ -304,7 +305,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	/**
 	 * @return the reported upstream bit rate in bits per second. -1 if it's not available. Blocking.
 	 */
-	public int getUpstramMaxBitRate() {
+	public int getUpstreamMaxBitRate() {
 		if(!isNATPresent() || thinksWeAreDoubleNatted)
 			return -1;
 
@@ -361,13 +362,32 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	}
 ***/
 	
-	private String toString(String action, String Argument, Service serv) {
-		Action getIP = serv.getAction(action);
-		if(getIP == null || !getIP.postControlAction())
-			return null;
-		
-		Argument ret = getIP.getOutputArgumentList().getArgument(Argument);
-		return ret.getValue();
+	/**
+	 * A blocking toString(). That's interesting.
+         * Cache the last ArgumentList to speed it up some.
+	 * Count on listSubServices() to call multiple combinations of arguments
+         * so we don't get old data.
+         */
+	private String _lastAction;
+	private Service _lastService;
+	private ArgumentList _lastArgumentList;
+	private Object toStringLock = new Object();
+	private String toString(String action, String arg, Service serv) {
+		synchronized(toStringLock) {
+			if ((!action.equals(_lastAction)) ||
+			    (!serv.equals(_lastService)) ||
+			    _lastArgumentList == null) {
+				Action getIP = serv.getAction(action);
+				if(getIP == null || !getIP.postControlAction()) {
+					_lastAction = null;
+					return null;
+				}
+				_lastAction = action;
+				_lastService = serv;
+				_lastArgumentList = getIP.getOutputArgumentList();
+			}
+			return _lastArgumentList.getArgument(arg).getValue();
+		}
 	}
 	
 	// TODO: extend it! RTFM
@@ -433,6 +453,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		sb.append("</ul>\n");
 	}
 	
+	/** warning - slow */
 	public String renderStatusHTML() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<a name=\"upnp\"><b>UPnP Status:</b><br />");
@@ -454,11 +475,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		else
 		    sb.append("<br>The current external IP address is not available.");
 		int downstreamMaxBitRate = getDownstreamMaxBitRate();
-		int upstreamMaxBitRate = getUpstramMaxBitRate();
+		int upstreamMaxBitRate = getUpstreamMaxBitRate();
 		if(downstreamMaxBitRate > 0)
-			sb.append("<br>UPnP reports the max downstream bit rate is : " + getDownstreamMaxBitRate()+ " bits/sec\n");
+			sb.append("<br>UPnP reports the max downstream bit rate is : " + downstreamMaxBitRate+ " bits/sec\n");
 		if(upstreamMaxBitRate > 0)
-			sb.append("<br>UPnP reports the max upstream bit rate is : " + getUpstramMaxBitRate()+ " bits/sec\n");
+			sb.append("<br>UPnP reports the max upstream bit rate is : " + upstreamMaxBitRate+ " bits/sec\n");
 		synchronized(lock) {
 			if(portsToForward != null) {
 				for(ForwardPort port : portsToForward) {
@@ -475,6 +496,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		return sb.toString();
 	}
 	
+	/** blocking */
 	private boolean addMapping(String protocol, int port, String description, ForwardPort fp) {
 		if(isDisabled || !isNATPresent() || _router == null) {
                         _log.error("Can't addMapping: " + isDisabled + " " + isNATPresent() + " " + _router);
@@ -509,6 +531,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		} else return false;
 	}
 	
+	/** blocking */
 	private boolean removeMapping(String protocol, int port, ForwardPort fp, boolean noLog) {
 		if(isDisabled || !isNATPresent())
 			return false;
@@ -533,6 +556,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		return retval;
 	}
 
+	/** non-blocking */
 	public void onChangePublicPorts(Set<ForwardPort> ports, ForwardPortCallback cb) {
 		Set<ForwardPort> portsToDumpNow = null;
 		Set<ForwardPort> portsToForwardNow = null;
@@ -555,7 +579,9 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				// Ports in ports but not in portsToForwardNow we must forward
 				// Ports in portsToForwardNow but not in ports we must dump
 				for(ForwardPort port: ports) {
-					if(portsToForward.contains(port)) {
+					//if(portsToForward.contains(port)) {
+					// If not in portsForwarded, it wasn't successful, try again
+					if(portsForwarded.contains(port)) {
 						// We have forwarded it, and it should be forwarded, cool.
 					} else {
 						// Needs forwarding
