@@ -1,3 +1,36 @@
+2009-05-30 zzz
+    * Console:
+      - config.jsp now cause graceful restart
+      - More peers.jsp and profiles.jsp cleanup
+      - tunnels.jsp improvements
+      - Use CSS for form messages
+      - Goodbye nonce spoof messages (sorry jr)
+      - config.jsp: Comment out unused burst config code
+      - Don't forget Serbia!
+      - configadvanced.jsp cleanup
+    * LoadTestManager: Delete, unused
+    * Peer Selector: Make strict order opaque to hash value
+    * SendGarlicMessageJob: Delete, unused
+    * Session Keys:
+      - Don't instantiate unused SessionKeyPersistenceHelper
+      - Use TransientSessionKeyManager instead of PersistentSessionKeyManager
+      - Add generics to TransientSessionKeyManager to help understand it
+      - Change initial session map size to 64 (was 1024)
+      - Prepare for per-destination SessionKeyManagers in ElGamalAESEngine
+      - More stubs for per-destination managers in the client manager
+    * Transports:
+      - Adjust bids when near conn capacity
+    * UDP:
+      - Remove unused stats and test code
+      - Only save IP when it changes
+    * UPnP:
+      - Prevent NPE after ParserException
+      - Tweak to help startup problems?
+      - Retry port forward if it fails
+      - Make peers.jsp display faster
+      - Lengthen POST timeout
+      - More comments
+
 2009-05-29 sponge
     * added big fat start/stop lock into BOB
     * added zap command to shut down BOB... now we need a way to start it
