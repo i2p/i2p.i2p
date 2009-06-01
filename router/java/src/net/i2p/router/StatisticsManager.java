@@ -87,9 +87,14 @@ public class StatisticsManager implements Service {
         
         if (_includePeerRankings) {
             long publishedUptime = _context.router().getUptime();
+            boolean commentOutIn074 = RouterVersion.VERSION.equals("0.7.3");
             // Don't publish these for first hour
-            if (publishedUptime > 60*60*1000)
-                includeThroughput(stats);
+            if (publishedUptime > 62*60*1000) {
+                if (commentOutIn074)
+                    includeThroughput(stats);
+                else
+                    includeAverageThroughput(stats);
+            }
             //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             //includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             //includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
@@ -223,16 +228,26 @@ public class StatisticsManager implements Service {
         return buf.toString();
     }
 
+    /* report the same data for tx and rx, for enhanced anonymity */
+    private void includeAverageThroughput(Properties stats) {
+        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
+        RateStat recvRate = _context.statManager().getRate("bw.recvRate");
+        if (sendRate == null || recvRate == null)
+            return;
+        Rate s = sendRate.getRate(60*60*1000);
+        Rate r = recvRate.getRate(60*60*1000);
+        if (s == null || r == null)
+            return;
+        double speed = (s.getAverageValue() + r.getAverageValue()) / 2;
+        double max = Math.max(s.getExtremeAverageValue(), r.getExtremeAverageValue());
+        String str = num(speed) + ';' + num(max) + ";0;0;";
+        stats.setProperty("stat_bandwidthSendBps.60m", str);
+        stats.setProperty("stat_bandwidthReceiveBps.60m", str);
+    }
+
     private void includeThroughput(Properties stats) {
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
         if (sendRate != null) {
-            /****
-            if (_context.router().getUptime() > 5*60*1000) {
-                Rate r = sendRate.getRate(5*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthSendBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
-            ****/
             if (_context.router().getUptime() > 60*60*1000) { 
                 Rate r = sendRate.getRate(60*60*1000);
                 if (r != null)
@@ -242,13 +257,6 @@ public class StatisticsManager implements Service {
         
         RateStat recvRate = _context.statManager().getRate("bw.recvRate");
         if (recvRate != null) {
-            /****
-            if (_context.router().getUptime() > 5*60*1000) {
-                Rate r = recvRate.getRate(5*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthReceiveBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
-            ****/
             if (_context.router().getUptime() > 60*60*1000) {
                 Rate r = recvRate.getRate(60*60*1000);
                 if (r != null)
