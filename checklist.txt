@@ -18,6 +18,10 @@ Review the complete diff from the last release:
         mtn diff -r t:i2p-0.7.(xx-1) > out.diff
         vi out.diff
 
+Verify that no untrusted revisions were inadvertently
+blessed by a trusted party:
+        mtn log --brief --no-graph --to t:i2p-0.7.(xx-1) | cut -d ' ' -f 2- | sort
+
 Build and tag:
 	ant pkg
 	mtn ci
