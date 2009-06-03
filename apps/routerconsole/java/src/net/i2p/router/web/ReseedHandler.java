@@ -91,8 +91,9 @@ public class ReseedHandler {
         public boolean isRunning() { return _isRunning; }
         public void run() {
             _isRunning = true;
+            System.out.println("Reseed start");
             reseed(false);
-            System.out.println("Reseeding complete");
+            System.out.println("Reseed complete");
             System.setProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false");
             _isRunning = false;
         }
@@ -133,7 +134,7 @@ public class ReseedHandler {
         }
 
         /**
-         *  Fetch a directory listing and then all the routerInfo files in the listing.
+         *  Fetch a directory listing and then up to 200 routerInfo files in the listing.
          *  The listing must contain (exactly) strings that match:
          *           href="routerInfo-{hash}.dat">
          * and then it fetches the files
@@ -147,6 +148,7 @@ public class ReseedHandler {
             try {
                 System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
                 System.setProperty("net.i2p.router.web.ReseedHandler.statusMessage","Reseeding: fetching seed URL.");
+                System.err.println("Reseed from " + seedURL);
                 URL dir = new URL(seedURL);
                 byte contentRaw[] = readURL(dir);
                 if (contentRaw == null) {
@@ -160,7 +162,8 @@ public class ReseedHandler {
                 String content = new String(contentRaw);
                 Set urls = new HashSet();
                 int cur = 0;
-                while (true) {
+                int total = 0;
+                while (total++ < 1000) {
                     int start = content.indexOf("href=\"routerInfo-", cur);
                     if (start < 0)
                         break;
@@ -170,7 +173,7 @@ public class ReseedHandler {
                     urls.add(name);
                     cur = end + 1;
                 }
-                if (urls.size() <= 0) {
+                if (total <= 0) {
                     _log.error("Read " + contentRaw.length + " bytes from seed " + seedURL + ", but found no routerInfo URLs.");
                     System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
                         "Last reseed failed fully (no routerInfo URLs at seed URL). " +
@@ -178,13 +181,16 @@ public class ReseedHandler {
                     return;
                 }
 
+                List urlList = new ArrayList(urls);
+                Collections.shuffle(urlList);
                 int fetched = 0;
                 int errors = 0;
-                for (Iterator iter = urls.iterator(); iter.hasNext(); ) {
+                // 200 max from one URL
+                for (Iterator iter = urlList.iterator(); iter.hasNext() && fetched < 200; ) {
                     try {
                         System.setProperty("net.i2p.router.web.ReseedHandler.statusMessage",
                             "Reseeding: fetching router info from seed URL (" +
-                            fetched + " successful, " + errors + " errors, " + urls.size() + " total).");
+                            fetched + " successful, " + errors + " errors, " + total + " total).");
 
                         fetchSeed(seedURL, (String)iter.next());
                         fetched++;
@@ -197,24 +203,24 @@ public class ReseedHandler {
                         errors++;
                     }
                 }
-                if (echoStatus) System.out.println();
+                System.err.println("Reseed got " + fetched + " router infos from " + seedURL);
                 
-                int failPercent = 100 * errors / urls.size();
+                int failPercent = 100 * errors / total;
                 
                 // Less than 10% of failures is considered success,
                 // because some routerInfos will always fail.
                 if ((failPercent >= 10) && (failPercent < 90)) {
                     System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
-                        "Last reseed failed partly (" + failPercent + "% of " + urls.size() + "). " +
+                        "Last reseed failed partly (" + failPercent + "% of " + total + "). " +
                         RESEED_TIPS);
                 }
                 if (failPercent >= 90) {
                     System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
-                        "Last reseed failed (" + failPercent + "% of " + urls.size() + "). " +
+                        "Last reseed failed (" + failPercent + "% of " + total + "). " +
                         RESEED_TIPS);
                 }
                 // Don't go on to the next URL if we have enough
-                if (fetched > 25)
+                if (fetched >= 100)
                     _isRunning = false;
             } catch (Throwable t) {
                 System.setProperty("net.i2p.router.web.ReseedHandler.errorMessage",
