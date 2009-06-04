@@ -12,6 +12,7 @@ Change revision in:
 	installer/install.xml
 	news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
+		(change to BUILD = 0 and EXTRA = "")
 	core/java/src/net/i2p/CoreVersion.java
 
 Review the complete diff from the last release:
