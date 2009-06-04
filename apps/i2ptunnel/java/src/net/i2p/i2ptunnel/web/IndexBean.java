@@ -77,6 +77,7 @@ public class IndexBean {
     public static final int RUNNING = 1;
     public static final int STARTING = 2;
     public static final int NOT_RUNNING = 3;
+    public static final int STANDBY = 4;
     
     public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
     static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
@@ -412,8 +413,12 @@ public class IndexBean {
     public int getTunnelStatus(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return NOT_RUNNING;
-        if (tun.getIsRunning()) return RUNNING;
-        else if (tun.getIsStarting()) return STARTING;
+        if (tun.getIsRunning()) {
+            if (isClient(tunnel) && tun.getIsStandby())
+                return STANDBY;
+            else
+                return RUNNING;
+        } else if (tun.getIsStarting()) return STARTING;
         else return NOT_RUNNING;
     }
     
