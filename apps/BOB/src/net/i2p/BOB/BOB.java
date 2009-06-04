@@ -23,6 +23,7 @@
  */
 package net.i2p.BOB;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -34,6 +35,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.RetransmissionTimer;
 import net.i2p.util.Log;
@@ -186,16 +189,19 @@ public class BOB {
 		i = Y2.hashCode();
 		try {
 			{
+    				File cfg = new File(configLocation);
+				if (!cfg.isAbsolute())
+					cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
 				try {
-					FileInputStream fi = new FileInputStream(configLocation);
+					FileInputStream fi = new FileInputStream(cfg);
 					props.load(fi);
 					fi.close();
 				} catch (FileNotFoundException fnfe) {
-					warn("Unable to load up the BOB config file " + configLocation + ", Using defaults.");
+					warn("Unable to load up the BOB config file " + cfg.getAbsolutePath() + ", Using defaults.");
 					warn(fnfe.toString());
 					save = true;
 				} catch (IOException ioe) {
-					warn("IOException on BOB config file " + configLocation + ", using defaults.");
+					warn("IOException on BOB config file " + cfg.getAbsolutePath() + ", using defaults.");
 					warn(ioe.toString());
 				}
 			}
@@ -228,13 +234,16 @@ public class BOB {
 				props.setProperty(PROP_BOB_HOST, "localhost");
 			}
 			if (save) {
+    				File cfg = new File(configLocation);
+				if (!cfg.isAbsolute())
+					cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
 				try {
-					warn("Writing new defaults file " + configLocation);
-					FileOutputStream fo = new FileOutputStream(configLocation);
-					props.store(fo, configLocation);
+					warn("Writing new defaults file " + cfg.getAbsolutePath());
+					FileOutputStream fo = new FileOutputStream(cfg);
+					props.store(fo, cfg.getAbsolutePath());
 					fo.close();
 				} catch (IOException ioe) {
-					error("IOException on BOB config file " + configLocation + ", " + ioe);
+					error("IOException on BOB config file " + cfg.getAbsolutePath() + ", " + ioe);
 				}
 			}
 

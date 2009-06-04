@@ -27,6 +27,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private long _lastUpdated;
     private String _updateVersion;
     private String _lastModified;
+    private File _newsFile;
+    private File _tempFile;
     private static NewsFetcher _instance;
     //public static final synchronized NewsFetcher getInstance() { return _instance; }
     public static final synchronized NewsFetcher getInstance(I2PAppContext ctx) { 
@@ -35,25 +37,26 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _instance = new NewsFetcher(ctx);
         return _instance;
     }
-    
+
     private static final String NEWS_FILE = "docs/news.xml";
-    private static final String TEMP_NEWS_FILE = "docs/news.xml.temp";
+    private static final String TEMP_NEWS_FILE = "news.xml.temp";
     
     private NewsFetcher(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
         _lastFetch = 0;
+        _newsFile = new File(_context.getBaseDir(), NEWS_FILE);
+        _tempFile = new File(_context.getTempDir(), TEMP_NEWS_FILE);
         updateLastFetched();
         _lastUpdated = _lastFetch;
         _updateVersion = "";
     }
     
     private void updateLastFetched() {
-        File news = new File(NEWS_FILE);
-        if (news.exists()) {
+        if (_newsFile.exists()) {
             if (_lastFetch == 0)
-                _lastFetch = news.lastModified();
+                _lastFetch = _newsFile.lastModified();
         } else
             _lastFetch = 0;
     }
@@ -82,7 +85,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
         if ("notify".equals(policy))
             return false;
-        File zip = new File(Router.UPDATE_FILE);
+        File zip = new File(_context.getRouterDir(), Router.UPDATE_FILE);
         return !zip.exists();
     }
     
@@ -114,18 +117,17 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
-        File tempFile = new File(TEMP_NEWS_FILE);
-        if (tempFile.exists())
-            tempFile.delete();
+        if (_tempFile.exists())
+            _tempFile.delete();
         
         int proxyPort = -1;
         try {
             proxyPort = Integer.parseInt(port);
             EepGet get = null;
             if (shouldProxy)
-                get = new EepGet(_context, true, proxyHost, proxyPort, 2, TEMP_NEWS_FILE, newsURL, true, null, _lastModified);
+                get = new EepGet(_context, true, proxyHost, proxyPort, 2, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
             else
-                get = new EepGet(_context, false, null, 0, 0, TEMP_NEWS_FILE, newsURL, true, null, _lastModified);
+                get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
             get.addStatusListener(this);
             if (get.fetch())
                 _lastModified = get.getLastModified();
@@ -138,11 +140,10 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private static final String VERSION_PREFIX = "version=\"";
     private void checkForUpdates() {
         _updateAvailable = false;
-        File news = new File(NEWS_FILE);
-        if ( (!news.exists()) || (news.length() <= 0) ) return;
+        if ( (!_newsFile.exists()) || (_newsFile.length() <= 0) ) return;
         FileInputStream in = null;
         try {
-            in = new FileInputStream(news);
+            in = new FileInputStream(_newsFile);
             StringBuffer buf = new StringBuffer(128);
             while (DataHelper.readLine(in, buf)) {
                 int index = buf.indexOf(VERSION_PREFIX);
@@ -220,13 +221,12 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         if (_log.shouldLog(Log.INFO))
             _log.info("News fetched from " + url + " with " + (alreadyTransferred+bytesTransferred));
         
-        File temp = new File(TEMP_NEWS_FILE);
         long now = _context.clock().now();
-        if (temp.exists()) {
-            boolean copied = FileUtil.copy(TEMP_NEWS_FILE, NEWS_FILE, true);
+        if (_tempFile.exists()) {
+            boolean copied = FileUtil.copy(_tempFile.getAbsolutePath(), _newsFile.getAbsolutePath(), true);
             if (copied) {
                 _lastUpdated = now;
-                temp.delete();
+                _tempFile.delete();
                 checkForUpdates();
             } else {
                 if (_log.shouldLog(Log.ERROR))
@@ -242,8 +242,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
         if (_log.shouldLog(Log.WARN))
             _log.warn("Failed to fetch the news from " + url);
-        File temp = new File(TEMP_NEWS_FILE);
-        temp.delete();
+        _tempFile.delete();
     }
     public void headerReceived(String url, int attemptNum, String key, String val) {}
     public void attempting(String url) {}

@@ -1,4 +1,4 @@
-<% 
+% 
 /*
  * USE CAUTION WHEN EDITING
  * Trailing whitespace OR NEWLINE on the last line will cause
@@ -16,5 +16,7 @@ if (uri.endsWith(".css")) {
   response.setContentType("image/jpeg");
 }
 
-net.i2p.util.FileUtil.readFile(uri, "./docs", response.getOutputStream());
+String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
+              java.io.File.separatorChar + "docs";
+net.i2p.util.FileUtil.readFile(uri, base, response.getOutputStream());
 %>

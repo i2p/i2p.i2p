@@ -410,7 +410,7 @@ class PersistentDataStore extends TransientDataStore {
     
     
     private File getDbDir() throws IOException {
-        File f = new File(_dbDir);
+        File f = new File(_context.getRouterDir(), _dbDir);
         if (!f.exists()) {
             boolean created = f.mkdirs();
             if (!created)

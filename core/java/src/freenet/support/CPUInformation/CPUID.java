@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import net.i2p.I2PAppContext;
+
 /**
  * @author Iakin
  * A class for retrieveing details about the CPU using the CPUID assembly instruction.
@@ -503,9 +505,10 @@ public class CPUID {
         FileOutputStream fos = null;
         try {
             InputStream libStream = resource.openStream();
-            outFile = new File(libPrefix + "jcpuid" + libSuffix);
+            outFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), libPrefix + "jcpuid" + libSuffix);
             fos = new FileOutputStream(outFile);
-            byte buf[] = new byte[4096*1024];
+            // wtf this was 4096*1024 which is really excessive for a roughly 4KB file
+            byte buf[] = new byte[4096];
             while (true) {
                 int read = libStream.read(buf);
                 if (read < 0) break;

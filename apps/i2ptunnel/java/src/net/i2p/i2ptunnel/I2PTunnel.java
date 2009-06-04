@@ -372,6 +372,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
 
             privKeyFile = new File(args[2]);
+            if (!privKeyFile.isAbsolute())
+                privKeyFile = new File(_context.getAppDir(), args[2]);
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
@@ -419,6 +421,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
 
             privKeyFile = new File(args[2]);
+            if (!privKeyFile.isAbsolute())
+                privKeyFile = new File(_context.getAppDir(), args[2]);
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
@@ -476,6 +480,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             String spoofedHost = args[2];
             
             privKeyFile = new File(args[3]);
+            if (!privKeyFile.isAbsolute())
+                privKeyFile = new File(_context.getAppDir(), args[3]);
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[3]);
@@ -870,6 +876,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
 
             File privKeyFile = new File(args[1]);
+            if (!privKeyFile.isAbsolute())
+                privKeyFile = new File(_context.getAppDir(), args[1]);
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[3]);

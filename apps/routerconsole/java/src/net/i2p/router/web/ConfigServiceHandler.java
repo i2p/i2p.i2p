@@ -41,7 +41,7 @@ public class ConfigServiceHandler extends FormHandler {
         }
         public void run() {
             try {
-                Router.killKeys();
+                ContextHelper.getContext(null).router().killKeys();
                 WrapperManager.signalStopped(_exitCode);
             } catch (Throwable t) {
                 t.printStackTrace();

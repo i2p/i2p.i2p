@@ -18,6 +18,12 @@ import java.util.zip.ZipFile;
 /**
  * General helper methods for messing with files
  *
+ * These are static methods that do NOT convert arguments
+ * to absolute paths for a particular context and directtory.
+ *
+ * Callers should ALWAYS provide absolute paths as arguments,
+ * and should NEVER assume files are in the current working directory.
+ *
  */
 public class FileUtil {
     /**

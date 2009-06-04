@@ -147,10 +147,8 @@ public class KeyManager {
             super(KeyManager.this._context);
         }
         public void runJob() {
-            String keyDir = getContext().getProperty(PROP_KEYDIR);
-            if (keyDir == null) 
-                keyDir = DEFAULT_KEYDIR;
-            File dir = new File(keyDir);
+            String keyDir = getContext().getProperty(PROP_KEYDIR, DEFAULT_KEYDIR);
+            File dir = new File(getContext().getRouterDir(), keyDir);
             if (!dir.exists())
                 dir.mkdirs();
             if (dir.exists() && dir.isDirectory() && dir.canRead() && dir.canWrite()) {

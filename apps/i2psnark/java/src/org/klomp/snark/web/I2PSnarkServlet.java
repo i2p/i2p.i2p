@@ -173,6 +173,7 @@ public class I2PSnarkServlet extends HttpServlet {
         } else if ("Add torrent".equals(action)) {
             String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
+            // NOTE - newFile currently disabled in HTML form - see below
             File f = null;
             if ( (newFile != null) && (newFile.trim().length() > 0) )
                 f = new File(newFile.trim());

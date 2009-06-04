@@ -109,6 +109,10 @@ public class PrivateKeyFile {
         this(new File(file), I2PClientFactory.createClient());
     }
 
+    public PrivateKeyFile(File file) {
+        this(file, I2PClientFactory.createClient());
+    }
+
     public PrivateKeyFile(File file, I2PClient client) {
         this.file = file;
         this.client = client;

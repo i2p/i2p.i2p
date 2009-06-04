@@ -1,6 +1,7 @@
 package net.i2p.stat;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -109,6 +110,9 @@ public class BufferedStatLog implements StatLog {
         String filename = _context.getProperty(StatManager.PROP_STAT_FILE);
         if (filename == null)
             filename = StatManager.DEFAULT_STAT_FILE;
+        File foo = new File(filename);
+        if (!foo.isAbsolute())
+            filename = (new File(_context.getRouterDir(), filename)).getAbsolutePath();
         if ( (_outFile != null) && (_outFile.equals(filename)) ) {
             // noop
         } else {

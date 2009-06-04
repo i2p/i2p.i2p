@@ -297,18 +297,8 @@ class ProfilePersistenceHelper {
     
     private File getProfileDir() {
         if (_profileDir == null) {
-            String dir = null;
-            if (_context.router() == null) {
-                dir = _context.getProperty(PROP_PEER_PROFILE_DIR, DEFAULT_PEER_PROFILE_DIR);
-            } else {
-                dir = _context.router().getConfigSetting(PROP_PEER_PROFILE_DIR);
-                if (dir == null) {
-                    _log.info("No peer profile dir specified [" + PROP_PEER_PROFILE_DIR 
-                              + "], using [" + DEFAULT_PEER_PROFILE_DIR + "]");
-                    dir = DEFAULT_PEER_PROFILE_DIR;
-                }
-            }
-            _profileDir = new File(dir);
+            String dir = _context.getProperty(PROP_PEER_PROFILE_DIR, DEFAULT_PEER_PROFILE_DIR);
+            _profileDir = new File(_context.getRouterDir(), dir);
         }
         return _profileDir;
     }

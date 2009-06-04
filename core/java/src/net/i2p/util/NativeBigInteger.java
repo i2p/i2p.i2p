@@ -540,9 +540,10 @@ public class NativeBigInteger extends BigInteger {
         FileOutputStream fos = null;
         try {
             InputStream libStream = resource.openStream();
-            outFile = new File(_libPrefix + "jbigi" + _libSuffix);
+            outFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), _libPrefix + "jbigi" + _libSuffix);
             fos = new FileOutputStream(outFile);
-            byte buf[] = new byte[4096*1024];
+            // wtf this was 4096*1024 which is really excessive for a roughly 50KB file
+            byte buf[] = new byte[4096];
             while (true) {
                 int read = libStream.read(buf);
                 if (read < 0) break;

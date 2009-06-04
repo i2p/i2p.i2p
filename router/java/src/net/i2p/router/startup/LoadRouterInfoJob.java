@@ -51,21 +51,17 @@ public class LoadRouterInfoJob extends JobImpl {
     }
     
     private void loadRouterInfo() {
-        String routerInfoFile = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-        if (routerInfoFile == null)
-            routerInfoFile = Router.PROP_INFO_FILENAME_DEFAULT;
+        String routerInfoFile = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
         RouterInfo info = null;
         boolean failedRead = false;
         
         
-        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-        if (keyFilename == null)
-            keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
+        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
         
-        File rif = new File(routerInfoFile);
+        File rif = new File(getContext().getRouterDir(), routerInfoFile);
         if (rif.exists())
             _infoExists = true;
-        File rkf = new File(keyFilename);
+        File rkf = new File(getContext().getRouterDir(), keyFilename);
         if (rkf.exists())
             _keysExist = true;
         
@@ -98,14 +94,14 @@ public class LoadRouterInfoJob extends JobImpl {
             
             _us = info;
         } catch (IOException ioe) {
-            _log.error("Error reading the router info from " + routerInfoFile + " and the keys from " + keyFilename, ioe);
+            _log.error("Error reading the router info from " + rif.getAbsolutePath() + " and the keys from " + rkf.getAbsolutePath(), ioe);
             _us = null;
             rif.delete();
             rkf.delete();
             _infoExists = false;
             _keysExist = false;
         } catch (DataFormatException dfe) {
-            _log.error("Corrupt router info or keys at " + routerInfoFile + " / " + keyFilename, dfe);
+            _log.error("Corrupt router info or keys at " + rif.getAbsolutePath() + " / " + rkf.getAbsolutePath(), dfe);
             _us = null;
             rif.delete();
             rkf.delete();
