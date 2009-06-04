@@ -778,12 +778,6 @@ public class IndexBean {
                 config.setProperty("interface", _reachableByOther);
             else
                 config.setProperty("interface", _reachableBy);
-            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            if (_name != null && !_sharedClient) {
-                 config.setProperty("option.inbound.nickname", _name);
-                 config.setProperty("option.outbound.nickname", _name);
-            }
             config.setProperty("sharedClient", _sharedClient + "");
             for (String p : _booleanClientOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
@@ -896,14 +890,12 @@ public class IndexBean {
             config.setProperty("option.i2p.streaming.connectDelay", "1000");
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
-        if (_name != null) {
-            if ( (!isClient(_type)) || (!_sharedClient) ) {
-                config.setProperty("option.inbound.nickname", _name);
-                config.setProperty("option.outbound.nickname", _name);
-            } else {
-                config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-                config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            }
+        if (isClient(_type) && _sharedClient) {
+            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
+            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+        } else if (_name != null) {
+            config.setProperty("option.inbound.nickname", _name);
+            config.setProperty("option.outbound.nickname", _name);
         }
         if ("interactive".equals(_profile))
             // This was 1 which doesn't make much sense
