@@ -49,11 +49,15 @@ class RouterWatchdog implements Runnable {
     }
     
     private boolean shutdownOnHang() {
+        // prop default true
+        if (!Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "true")).booleanValue())
+            return false;
+
         // Client manager starts complaining after 10 minutes, and we run every minute,
-        // so this will restart 20 minutes after we lose a lease, if the wrapper is present.
-        if (_consecutiveErrors >= 10 && System.getProperty("wrapper.version") != null)
+        // so this will restart 30 minutes after we lose a lease, if the wrapper is present.
+        if (_consecutiveErrors >= 20 && System.getProperty("wrapper.version") != null)
             return true;
-        return Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "false")).booleanValue();
+        return false;
     }
     
     private void dumpStatus() {
@@ -90,13 +94,14 @@ class RouterWatchdog implements Runnable {
             long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
             _log.error("Memory: " + DataHelper.formatSize(used) + '/' + DataHelper.formatSize(max));
             if (_consecutiveErrors == 1) {
+                _log.log(Log.CRIT, "Router appears hung!  Will restart in 20 minutes if it doesn't fix itself");
                 // This might work on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
                 ShellCommand sc = new ShellCommand();
                 boolean success = sc.executeSilentAndWaitTimed("./i2prouter dump", 10);
                 if (success)
-                    _log.error("DUMPED THREADS TO WRAPPER LOG");
+                    _log.log(Log.CRIT, "Threads dumped to wrapper log");
             }
         }
     }
@@ -127,7 +132,7 @@ class RouterWatchdog implements Runnable {
             _consecutiveErrors++;
             dumpStatus();
             if (shutdownOnHang()) {
-                _log.log(Log.CRIT, "Router hung!  hard restart!");
+                _log.log(Log.CRIT, "Router hung!  Restart forced by watchdog!");
                 try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
                 // halt and not system.exit, since some of the shutdown hooks might be misbehaving
                 Runtime.getRuntime().halt(Router.EXIT_HARD_RESTART);
