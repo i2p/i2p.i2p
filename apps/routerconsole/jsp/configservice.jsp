@@ -32,6 +32,7 @@
  <input type="submit" name="action" value="Shutdown immediately" />
  <input type="submit" name="action" value="Cancel graceful shutdown" />
  
+ <% if (System.getProperty("wrapper.version") != null) { %>
  <p>If you want the router to restart itself after shutting down, you can choose one of 
  the following.  This is useful in some situations - for example, if you changed
  some settings that client applications only read at startup, such as the routerconsole password
@@ -41,6 +42,7 @@
  
  <input type="submit" name="action" value="Graceful restart" />
  <input type="submit" name="action" value="Hard restart" />
+ <% } %>
  
  <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
  <h4>Systray integration</h4>
@@ -61,11 +63,14 @@
  down your router immediately.  You may want to consider shutting down gracefully, as
  above, then running uninstall_i2p_service_winnt.bat.</p>
  <% } %>
+
+ <% if (System.getProperty("wrapper.version") != null) { %>
  <h4>Debugging</h4>
  <p>At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
  please select the following option and review the thread dumped to 
  <a href="logs.jsp#servicelogs">wrapper.log</a>.</p>
  <input type="submit" name="action" value="Dump threads" />
+ <% } %>
  
  <h4>Launch browser on router startup?</h4>
  <p>I2P's main configuration interface is this web console, so for your convenience

@@ -44,6 +44,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected final Object sockLock = new Object(); // Guards sockMgr and mySockets
     protected I2PSocketManager sockMgr; // should be final and use a factory. LINT
     protected List mySockets = new ArrayList();
+    protected boolean _ownDest;
 
     protected Destination dest = null;
     private int localPort;
@@ -114,6 +115,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         this.l = l;
         this.handlerName = handlerName + _clientId;
         this.privKeyFile = pkf;
+        _ownDest = ownDest; // == ! shared client
 
 
         _context = tunnel.getContext();
@@ -129,13 +131,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         boolean openNow = !Boolean.valueOf(tunnel.getClientOptions().getProperty("i2cp.delayOpen")).booleanValue();
         if (openNow) {
             while (sockMgr == null) {
-                synchronized (sockLock) {
-                    if (ownDest) {
-                        sockMgr = buildSocketManager();
-                    } else {
-                        sockMgr = getSocketManager();
-                    }
-                }
+                verifySocketManager();
                 if (sockMgr == null) {
                     _log.log(Log.CRIT, "Unable to create socket manager (our own? " + ownDest + ")");
                     try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
@@ -209,27 +205,67 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
     }
 
+    /**
+     * Sets the this.sockMgr field if it is null, or if we want a new one
+     *
+     * We need a socket manager before getDefaultOptions() and most other things
+     */
+    protected void verifySocketManager() {
+        synchronized(sockLock) {
+            boolean newManager = false;
+            if (this.sockMgr == null) {
+                newManager = true;
+            } else {
+                I2PSession sess = sockMgr.getSession();
+                if (sess == null) {
+                    newManager = true;
+                } else if (sess.isClosed() &&
+                           Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.closeOnIdle")).booleanValue() &&
+                           Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.newDestOnResume")).booleanValue()) {
+                    // build a new socket manager and a new dest if the session is closed.
+                    getTunnel().removeSession(sess);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(getTunnel().getClientOptions().getProperty("inbound.nickname") + ": Built a new destination on resume");
+                    newManager = true;
+                }  // else the old socket manager will reconnect the old session if necessary
+            }
+            if (newManager) {
+                if (_ownDest)
+                    this.sockMgr = buildSocketManager();
+                else
+                    this.sockMgr = getSocketManager();
+            }
+        }
+    }
+
+    /** this is ONLY for shared clients */
     private static I2PSocketManager socketManager;
 
+    /** this is ONLY for shared clients */
     protected synchronized I2PSocketManager getSocketManager() {
         return getSocketManager(getTunnel(), this.privKeyFile);
     }
+    /** this is ONLY for shared clients */
     protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel) {
         return getSocketManager(tunnel, null);
     }
+    /** this is ONLY for shared clients */
     protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel, String pkf) {
         if (socketManager != null) {
             I2PSession s = socketManager.getSession();
             if ( (s == null) || (s.isClosed()) ) {
-                _log.info("Building a new socket manager since the old one closed [s=" + s + "]");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since the old one closed [s=" + s + "]");
                 if (s != null)
                     tunnel.removeSession(s);
                 socketManager = buildSocketManager(tunnel, pkf);
             } else {
-                _log.info("Not building a new socket manager since the old one is open [s=" + s + "]");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Not building a new socket manager since the old one is open [s=" + s + "]");
             }
         } else {
-            _log.info("Building a new socket manager since there is no other one");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since there is no other one");
             socketManager = buildSocketManager(tunnel, pkf);
         }
         return socketManager;
@@ -278,6 +314,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             }
         }
         sockManager.setName("Client");
+        if (_log.shouldLog(Log.INFO))
+            _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Built a new socket manager [s=" + sockManager.getSession() + "]");
         tunnel.addSession(sockManager.getSession());
         return sockManager;
     }
@@ -343,12 +381,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @return a new I2PSocket
      */
     public I2PSocket createI2PSocket(Destination dest) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
-        if (sockMgr == null) {
-            // we need this before getDefaultOptions()
-            synchronized(sockLock) {
-                sockMgr = getSocketManager();
-            }
-        }
+        verifySocketManager();
         return createI2PSocket(dest, getDefaultOptions());
     }
 
@@ -369,22 +402,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     public I2PSocket createI2PSocket(Destination dest, I2PSocketOptions opt) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
         I2PSocket i2ps;
 
-        if (sockMgr == null) {
-            // delayed open - call get instead of build because the locking is up there
-            synchronized(sockLock) {
-                sockMgr = getSocketManager();
-            }
-        } else if (Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.closeOnIdle")).booleanValue() &&
-                   Boolean.valueOf(getTunnel().getClientOptions().getProperty("i2cp.newDestOnResume")).booleanValue()) {
-            synchronized(sockLock) {
-                I2PSocketManager oldSockMgr = sockMgr;
-                // This will build a new socket manager and a new dest if the session is closed.
-                sockMgr = getSocketManager();
-                if (oldSockMgr != sockMgr) {
-                    _log.warn("Built a new destination on resume");
-                }
-            }
-        }  // else the old socket manager will reconnect the old session if necessary
+        verifySocketManager();
         i2ps = sockMgr.connect(dest, opt);
         synchronized (sockLock) {
             mySockets.add(i2ps);

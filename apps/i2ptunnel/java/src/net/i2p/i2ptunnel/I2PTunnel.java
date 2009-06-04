@@ -75,7 +75,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private static long __tunnelId = 0;
     private long _tunnelId;
     private Properties _clientOptions;
-    private final List _sessions;
+    private final List<I2PSession> _sessions;
 
     public static final int PACKET_DELAY = 100;
 
@@ -179,7 +179,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         }
     }
 
-    List getSessions() { 
+    List<I2PSession> getSessions() { 
         synchronized (_sessions) {
             return new ArrayList(_sessions); 
         }

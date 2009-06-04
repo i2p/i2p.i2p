@@ -99,6 +99,11 @@
             <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
         <%
                 break;
+                case IndexBean.STANDBY:
+          %><div class="statusStarting text">Standby</div>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
+        <%
+                break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text">Running</div>
             <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>

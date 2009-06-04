@@ -100,8 +100,10 @@ class FloodOnlySearchJob extends FloodSearchJob {
         if (floodfillPeers.size() <= 3)
             _shouldProcessDSRM = true;
         if (floodfillPeers.size() <= 0) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Running netDb searches against the floodfill peers, but we don't know any");
+            // ask anybody, they may not return the answer but they will return a few ff peers we can go look up,
+            // so this situation should be temporary
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running netDb searches against the floodfill peers, but we don't know any");
             floodfillPeers = new ArrayList(_facade.getAllRouters());
             if (floodfillPeers.size() <= 0) {
                 if (_log.shouldLog(Log.ERROR))

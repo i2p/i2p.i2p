@@ -278,7 +278,7 @@
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="install-headless.txt" todir="pkg-temp/" />
+        <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
