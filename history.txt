@@ -1,3 +1,12 @@
+2009-06-05 sponge
+    * BOB now cleans up tunnels, although they can take up to 5 minutes to
+      disapear. This is due to the fact that the streaming lib doesn't
+      actually remove the connections properly and kill them off when the
+      manager is destroyed. I'm not certain if this is a bug, or a feature,
+      but it sure is annoying, and you have to wait for the connections to
+      time out. What should happen is the streaming lib should cause an IO
+      error to the pending read or write.
+
 2009-05-30 zzz
     * Console:
       - config.jsp now cause graceful restart

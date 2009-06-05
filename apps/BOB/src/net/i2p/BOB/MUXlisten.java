@@ -159,7 +159,6 @@ public class MUXlisten implements Runnable {
 			{
 				try {
 					tg = new ThreadGroup(N);
-					die:
 					{
 						// toss the connections to a new threads.
 						// will wrap with TCP and UDP when UDP works
@@ -185,22 +184,22 @@ public class MUXlisten implements Runnable {
 								info.add("STARTING", new Boolean(false));
 							} catch (Exception e) {
 								wunlock();
-								break die;
+								break quit;
 							}
 						} catch (Exception e) {
-							break die;
+							break quit;
 						}
 						try {
 							wunlock();
 						} catch (Exception e) {
-							break die;
+							break quit;
 						}
 						boolean spin = true;
 						while (spin) {
 							try {
 								Thread.sleep(1000); //sleep for 1 second
 							} catch (InterruptedException e) {
-								break die;
+								break quit;
 							}
 							try {
 								rlock();
@@ -208,35 +207,17 @@ public class MUXlisten implements Runnable {
 									spin = info.get("STOPPING").equals(Boolean.FALSE);
 								} catch (Exception e) {
 									runlock();
-									break die;
+									break quit;
 								}
 							} catch (Exception e) {
-								break die;
+								break quit;
 							}
 							try {
 								runlock();
 							} catch (Exception e) {
-								break die;
+								break quit;
 							}
 						}
-						/* cleared in the finally...
-						try {
-							wlock();
-							try {
-								info.add("RUNNING", new Boolean(false));
-							} catch (Exception e) {
-								wunlock();
-								break die;
-							}
-						} catch (Exception e) {
-							break die;
-						}
-						try {
-							wunlock();
-						} catch (Exception e) {
-							break die;
-						}
-						*/
 					} // die
 
 				} catch (Exception e) {
@@ -278,11 +259,6 @@ public class MUXlisten implements Runnable {
 				}
 			}
 
-			try {
-				socketManager.destroySocketManager();
-			} catch (Exception e) {
-				// nop
-			}
 			// Some grace time.
 			try {
 				Thread.sleep(250);
@@ -293,25 +269,27 @@ public class MUXlisten implements Runnable {
 			// Wait around till all threads are collected.
 			if (tg != null) {
 				String boner = tg.getName();
+				System.out.println("BOB: MUXlisten: Starting thread collection for: " + boner);
 				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
 				// tg.interrupt(); // give my stuff a small smack again.
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
+					visit(tg, 0, boner);
 					int foo = tg.activeCount() + tg.activeGroupCount();
 					// hopefully no longer needed!
-					// int bar = foo;
-					// System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
-					// System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
-					// visit(tg, 0, boner);
-					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+					int bar = foo;
+					System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
+					System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+					visit(tg, 0, boner);
+					System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
 					// Happily spin forever :-(
 					while (foo != 0) {
 						foo = tg.activeCount() + tg.activeGroupCount();
-						//	if (foo != bar) {
-						//		System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
-						//		visit(tg, 0, boner);
-						//		System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
-						//	}
-						// bar = foo;
+						if (foo != bar && foo != 0) {
+							System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+							visit(tg, 0, boner);
+							System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+						}
+						bar = foo;
 						try {
 							Thread.sleep(100); //sleep for 100 ms (One tenth second)
 						} catch (InterruptedException ex) {
@@ -319,11 +297,18 @@ public class MUXlisten implements Runnable {
 						}
 					}
 				}
+				System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
 				_log.warn("BOB: MUXlisten: Threads went away. Success: " + boner);
 				tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
 				tg = null;
 			}
+			try {
+				socketManager.destroySocketManager();
+			} catch (Exception e) {
+				// nop
+			}
+
 		}
 	}
 

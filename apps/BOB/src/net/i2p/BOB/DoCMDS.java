@@ -36,7 +36,6 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleStore;
 
 /**
  * Simplistic command parser for BOB
@@ -98,6 +97,7 @@ public class DoCMDS implements Runnable {
 	private static final String C_status = "status";
 	private static final String C_stop = "stop";
 	private static final String C_verify = "verify";
+	private static final String C_visit = "visit";
 	private static final String C_zap = "zap";
 
 	/* all the coomands available, plus description */
@@ -124,6 +124,7 @@ public class DoCMDS implements Runnable {
 		{C_status, C_status + " nickname * Display status of a nicknamed tunnel."},
 		{C_stop, C_stop + " * Stops the current nicknamed tunnel."},
 		{C_verify, C_verify + " BASE64_key * Verifies BASE64 destination."},
+		{C_visit, C_visit + " * Thread dump to wrapper.log."},
 		{C_zap, C_zap + " * Shuts down BOB."},
 		{"", "COMMANDS: " + // this is ugly, but...
 			C_help + " " +
@@ -148,13 +149,14 @@ public class DoCMDS implements Runnable {
 			C_status + " " +
 			C_stop + " " +
 			C_verify + " " +
+			C_visit + " " +
 			C_zap
 		},
 		{" ", " "} // end of list
 	};
 
 	/**
-	 * @parm LIVE
+	 * @param LIVE
 	 * @param server
 	 * @param props
 	 * @param database
@@ -438,6 +440,9 @@ public class DoCMDS implements Runnable {
 									}
 
 								}
+							} else if (Command.equals(C_visit)) {
+								visitAllThreads();
+								out.println("OK ");
 							} else if (Command.equals(C_getdest)) {
 								if (ns) {
 									if (dk) {
@@ -1274,7 +1279,7 @@ public class DoCMDS implements Runnable {
 										} else {
 											MUXlisten tunnel;
 											try {
-												while(!lock.compareAndSet(false, true)) {
+												while (!lock.compareAndSet(false, true)) {
 													// wait
 												}
 												tunnel = new MUXlisten(lock, database, nickinfo, _log);
@@ -1443,6 +1448,50 @@ public class DoCMDS implements Runnable {
 		} catch (IOException ioe) {
 			BOB.warn("IOException on socket listen: " + ioe);
 			ioe.printStackTrace();
+		}
+	}
+	// Debugging... None of this is normally used.
+
+	/**
+	 *	Find the root thread group and print them all.
+	 *
+	 */
+	private void visitAllThreads() {
+		ThreadGroup root = Thread.currentThread().getThreadGroup().getParent();
+		while (root.getParent() != null) {
+			root = root.getParent();
+		}
+
+		// Visit each thread group
+		visit(root, 0, root.getName());
+	}
+
+	/**
+	 * Recursively visits all thread groups under `group' and dumps them.
+	 * @param group ThreadGroup to visit
+	 * @param level Current level
+	 */
+	private static void visit(ThreadGroup group, int level, String tn) {
+		// Get threads in `group'
+		int numThreads = group.activeCount();
+		Thread[] threads = new Thread[numThreads * 2];
+		numThreads = group.enumerate(threads, false);
+		String indent = "------------------------------------".substring(0, level) + "-> ";
+		// Enumerate each thread in `group' and print it.
+		for (int i = 0; i < numThreads; i++) {
+			// Get thread
+			Thread thread = threads[i];
+			System.out.println("BOB: "  + indent +  tn + ": " +thread.toString());
+		}
+
+		// Get thread subgroups of `group'
+		int numGroups = group.activeGroupCount();
+		ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
+		numGroups = group.enumerate(groups, false);
+
+		// Recursively visit each subgroup
+		for (int i = 0; i < numGroups; i++) {
+			visit(groups[i], level + 1, groups[i].getName());
 		}
 	}
 }

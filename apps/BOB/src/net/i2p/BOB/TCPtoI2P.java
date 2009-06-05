@@ -45,7 +45,7 @@ import net.i2p.i2ptunnel.I2PTunnel;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	// private NamedDB info,  database;
+	private NamedDB info,  database;
 	private Socket sock;
 	private I2PSocketManager socketManager;
 
@@ -108,6 +108,16 @@ public class TCPtoI2P implements Runnable {
 		out.flush();
 	}
 
+	private void rlock() throws Exception {
+		database.getReadLock();
+		info.getReadLock();
+	}
+
+	private void runlock() throws Exception {
+		database.releaseReadLock();
+		info.releaseReadLock();
+	}
+
 	/**
 	 * TCP stream to I2P stream thread starter
 	 *
@@ -118,6 +128,8 @@ public class TCPtoI2P implements Runnable {
 		OutputStream Iout = null;
 		InputStream in = null;
 		OutputStream out = null;
+		Thread t = null;
+		Thread q = null;
 		try {
 			try {
 
@@ -145,15 +157,18 @@ public class TCPtoI2P implements Runnable {
 						// setup to cross the streams
 						TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
 						TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
-						Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
-						Thread q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
+						t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
+						q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
 						// Fire!
 						t.start();
 						q.start();
+						boolean spin = true;
 						while (t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
 							Thread.sleep(10); //sleep for 10 ms
+							rlock();
+							spin = info.get("RUNNING").equals(Boolean.TRUE);
+							runlock();
 						}
-
 					} catch (I2PException e) {
 						Emsg("ERROR " + e.toString(), out);
 					} catch (ConnectException e) {
@@ -171,6 +186,14 @@ public class TCPtoI2P implements Runnable {
 				// bail on anything else
 			}
 		} finally {
+			try {
+				t.interrupt();
+			} catch (Exception e) {
+			}
+			try {
+				q.interrupt();
+			} catch (Exception e) {
+			}
 			try {
 				in.close();
 			} catch (Exception e) {
