@@ -458,7 +458,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             else
                 out.write("<td>n/a</td>");
             if (cfg.getReceiveFrom() != null)
-                out.write("<td>" + netDbLink(cfg.getReceiveFrom()) +"</td>");
+                out.write("<td align=\"right\">" + netDbLink(cfg.getReceiveFrom()) +"</td>");
             else
                 out.write("<td>&nbsp;</td>");
             if (cfg.getSendTunnel() != null)
@@ -466,7 +466,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             else
                 out.write("<td>&nbsp;</td>");
             if (cfg.getSendTo() != null)
-                out.write("<td>" + netDbLink(cfg.getSendTo()) +"</td>");
+                out.write("<td align=\"right\">" + netDbLink(cfg.getSendTo()) +"</td>");
             else
                 out.write("<td>&nbsp;</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
@@ -603,7 +603,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.write("<h2><a name=\"peers\">Tunnel Counts By Peer</a>:</h2>\n");
         out.write("<table border=\"1\"><tr><td><b>Peer</b></td><td><b>Expl. + Client</b></td><td><b>% of total</b></td><td><b>Part. from + to</b></td><td><b>% of total</b></td></tr>\n");
         for (Hash h : peerList) {
-             out.write("<tr><td>");
+             out.write("<tr><td align=\"right\">");
              out.write(netDbLink(h));
              out.write("<td align=\"right\">" + lc.count(h));
              out.write("<td align=\"right\">");
