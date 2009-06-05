@@ -1,4 +1,7 @@
 2009-06-05 sponge
+    * Merge and bump to -12
+
+2009-06-05 sponge
     * BOB now cleans up tunnels, although they can take up to 5 minutes to
       disapear. This is due to the fact that the streaming lib doesn't
       actually remove the connections properly and kill them off when the
@@ -6,6 +9,30 @@
       but it sure is annoying, and you have to wait for the connections to
       time out. What should happen is the streaming lib should cause an IO
       error to the pending read or write.
+
+2009-06-04 zzz
+    * Console:
+      - Hide some controls if no wrapper on configservice.jsp
+    * I2PTunnel:
+      - Fix bug where delayed-open and close-on-idle tunnels would
+        use a different tunnel pool instead of building their own
+      - Add standby indication to web page
+    * NetDb:
+      - Try to talk directly to a floodfill if we don't know enough,
+        to help integrate more quickly
+      - Change a no-floodfill error to a warn
+    * NetDb Stats:
+      - Average TX and RX bw stats for additional anonymity,
+        effective in next release
+    * Reseed:
+      - Limit to 200 pulled randomly from the full fetched list
+    * Transport:
+      - Increase default bw for new installs to 96/40
+        (was 64/32). This is as high as we can go upstream
+        without making the default class M.
+    * Watchdog:
+      - Allow disabling by property again
+      - Logging tweaks
 
 2009-05-30 zzz
     * Console:
