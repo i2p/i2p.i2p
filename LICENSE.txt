@@ -72,7 +72,7 @@ Public domain except as listed below:
    From freenet
    See licenses/LICENSE-GPLv2.txt
 
-   UPnP subsystem:
+   UPnP subsystem 1.7:
    Copyright (C) 2003-2006 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
@@ -83,18 +83,47 @@ Public domain except as listed below:
 
 
 Installer:
-   Launch4j:
+   Launch4j 2.0.RC3:
    Copyright (C) 2005 Grzegorz Kowal
    See licenses/LICENSE-GPLv2.txt
+   The following projects are used by Launch4j...
+	MinGW binutils (http://www.mingw.org/)
+
+	Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
+
+ 	Commons Logging (http://jakarta.apache.org/commons/logging/)
+        See licenses/LICENSE-Apache1.1.txt
+        See licenses/NOTICE-Commons-Logging.txt
+
+	XStream (http://xstream.codehaus.org/)
+        Copyright (c) 2003-2004, Joe Walnes
+        See licenses/LICENSE-XStream.txt
+
+	JGoodies Forms (http://www.jgoodies.com/freeware/forms/)
+        Copyright (c) 2002-2004 JGoodies Karsten Lentzsch. All rights reserved.
+        See licenses/LICENSE-JGoodies-Forms.txt
+
+	JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
+        Copyright (c) 2003 JGoodies Karsten Lentzsch. All rights reserved.
+        See licenses/LICENSE-JGoodies-Looks.txt
+
+	Foxtrot (http://foxtrot.sourceforge.net/)
+        Copyright (c) 2002, Simone Bordet & Marco Cravero. All rights reserved.
+        See licenses/LICENSE-Foxtrot.txt
+
+	Nuvola Icon Theme (http://www.icon-king.com)
+        See licenses/LICENSE-LGPLv2.1.txt
+
+	Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
 
    Izpack:
    See licenses/LICENSE-Apache1.1.txt
 
 
 
-Wrapper:
-Copyright (c) 1999, 2004 Tanuki Software
-See licenses/LICENSE-Wrapper.txt
+Wrapper 3.1.1:
+   Copyright (c) 1999, 2004 Tanuki Software
+   See licenses/LICENSE-Wrapper.txt
 
 
 
