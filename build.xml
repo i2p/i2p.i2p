@@ -202,14 +202,12 @@
         </delete>
     </target>
     <target name="pkg" depends="distclean, updaterWithJettyFixes, tarball, installer" />
-    <target name="pkgclean">
-        <delete dir="pkg-temp" />
+    <target name="pkgclean" depends="deletepkg-temp">
         <delete>
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
         </delete>
     </target>
-    <target name="preppkg" depends="build, buildexe">
-        <delete dir="pkg-temp" />
+    <target name="preppkg" depends="build, buildexe, preplicenses, prepconsoleDocs">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
@@ -278,16 +276,12 @@
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="install-headless.txt" todir="pkg-temp/" />
+        <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
         <copy file="core/perl/i2pbench.sh" todir="pkg-temp/scripts/" />
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
-        <mkdir dir="pkg-temp/docs" />
-        <copy todir="pkg-temp/docs/" >
-          <fileset dir="." includes="readme*.html" />
-        </copy>
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
@@ -296,11 +290,6 @@
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/uninstall.ico" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnf-header.ht" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnfp-header.ht" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnfb-header.ht" todir="pkg-temp/docs/" />
-        <copy file="installer/resources/dnfh-header.ht" todir="pkg-temp/docs/" />
-	<copy file="installer/resources/ahelper-conflict-header.ht" todir="pkg-temp/docs/" />
         <mkdir dir="pkg-temp/docs/themes/" />
         <copy todir="pkg-temp/docs/themes/" >
           <fileset dir="installer/resources/themes/" />
@@ -313,24 +302,26 @@
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
+    </target>
+    <target name="preplicenses">
         <copy file="LICENSE.txt" todir="pkg-temp/" />
-        <mkdir dir="pkg-temp/licenses/" />
         <copy todir="pkg-temp/licenses/" >
           <fileset dir="licenses/" />
         </copy>
-        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
-        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
-        <copy todir="pkg-temp/docs/icons/flags" >
-          <fileset dir="installer/resources/icons/flags" />
-        </copy>
+        <copy file="installer/lib/launch4j/lib/foxtrot.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Foxtrot.txt" />
+        <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
+        <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
+        <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
-    <target name="consoleDocs">
+    <target name="deletepkg-temp">
         <delete dir="pkg-temp" />
+    </target>
+    <target name="prepconsoleDocs">
         <copy todir="pkg-temp/docs/" >
           <fileset dir="." includes="readme*.html" />
           <fileset dir="installer/resources/" includes="*-header.ht" />
@@ -340,16 +331,18 @@
         <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />
         </copy>
-        <zip destfile="docs.zip" basedir="pkg-temp" />
     </target>
-    <target name="updater" depends="prepupdate, zipit" />
-    <target name="updaterWithGeoIP" depends="prepgeoupdate, zipit" />
-    <target name="updaterWithJetty" depends="prepjupdate, zipit" />
-    <target name="updaterWithJettyFixes" depends="prepjupdatefixes, zipit" />
+    <target name="consoleDocs" depends="deletepkg-temp, prepconsoleDocs">
+        <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
+    </target>
+    <target name="updater" depends="prepupdate, preplicenses, zipit" />
+    <target name="updaterWithGeoIP" depends="prepgeoupdate, preplicenses, zipit" />
+    <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
+    <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
     <target name="updaterSmall" depends="prepupdateSmall, zipit" />
     <target name="updaterRouter" depends="prepupdateRouter, zipit" />
     <target name="zipit">
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
     <target name="updateTest" depends="prepupdate">
         <ant dir="core/java/" target="jarTest" />    
@@ -366,31 +359,20 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
-        <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
-        <copy file="LICENSE.txt" todir="pkg-temp/" />
-        <mkdir dir="pkg-temp/licenses/" />
-        <copy todir="pkg-temp/licenses/" >
-          <fileset dir="licenses/" />
-        </copy>
     </target>
-    <target name="prepupdateSmall" depends="buildSmall">
-        <delete dir="pkg-temp" />
-        <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
-        <mkdir dir="pkg-temp/docs" />
         <copy file="readme_zh.html" todir="pkg-temp/docs/" />
     </target>
-    <target name="prepupdateRouter" depends="buildrouter">
-        <delete dir="pkg-temp" />
+    <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
     </target>

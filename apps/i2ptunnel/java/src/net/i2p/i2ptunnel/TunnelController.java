@@ -434,6 +434,16 @@ public class TunnelController implements Logging {
     
     public boolean getIsRunning() { return _running; }
     public boolean getIsStarting() { return _starting; }
+    /** if running but no open sessions, we are in standby */
+    public boolean getIsStandby() {
+        if (!_running)
+            return false;
+        for (I2PSession sess : _tunnel.getSessions()) {
+            if (!sess.isClosed())
+                return false;
+        }
+        return true;
+    }
     
     public void getSummary(StringBuffer buf) {
         String type = getType();

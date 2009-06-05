@@ -77,6 +77,7 @@ public class IndexBean {
     public static final int RUNNING = 1;
     public static final int STARTING = 2;
     public static final int NOT_RUNNING = 3;
+    public static final int STANDBY = 4;
     
     public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
     static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
@@ -412,8 +413,12 @@ public class IndexBean {
     public int getTunnelStatus(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return NOT_RUNNING;
-        if (tun.getIsRunning()) return RUNNING;
-        else if (tun.getIsStarting()) return STARTING;
+        if (tun.getIsRunning()) {
+            if (isClient(tunnel) && tun.getIsStandby())
+                return STANDBY;
+            else
+                return RUNNING;
+        } else if (tun.getIsStarting()) return STARTING;
         else return NOT_RUNNING;
     }
     
@@ -778,12 +783,6 @@ public class IndexBean {
                 config.setProperty("interface", _reachableByOther);
             else
                 config.setProperty("interface", _reachableBy);
-            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            if (_name != null && !_sharedClient) {
-                 config.setProperty("option.inbound.nickname", _name);
-                 config.setProperty("option.outbound.nickname", _name);
-            }
             config.setProperty("sharedClient", _sharedClient + "");
             for (String p : _booleanClientOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
@@ -896,14 +895,12 @@ public class IndexBean {
             config.setProperty("option.i2p.streaming.connectDelay", "1000");
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
-        if (_name != null) {
-            if ( (!isClient(_type)) || (!_sharedClient) ) {
-                config.setProperty("option.inbound.nickname", _name);
-                config.setProperty("option.outbound.nickname", _name);
-            } else {
-                config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-                config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
-            }
+        if (isClient(_type) && _sharedClient) {
+            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
+            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+        } else if (_name != null) {
+            config.setProperty("option.inbound.nickname", _name);
+            config.setProperty("option.outbound.nickname", _name);
         }
         if ("interactive".equals(_profile))
             // This was 1 which doesn't make much sense
