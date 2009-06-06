@@ -1076,6 +1076,7 @@ public class Router {
      * Unzip update file found in the router dir OR base dir, to the base dir
      *
      * If we can't write to the base dir, complain.
+     * Note: _log not available here.
      */
     private void installUpdates() {
         File updateFile = new File(_context.getRouterDir(), UPDATE_FILE);
@@ -1085,12 +1086,11 @@ public class Router {
             exists = updateFile.exists();
         }
         if (exists) {
+            // do a simple permissions test, if it fails leave the file in place and don't restart
             File test = new File(_context.getBaseDir(), "history.txt");
-            if ((!test.canWrite()) || (!_context.getBaseDir().canWrite())) {
-                String msg = "ERROR: No write permissions on " + _context.getBaseDir() +
-                             " to extract software update file";
-                System.out.println(msg);
-                _log.log(Log.CRIT, msg);
+            if ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite())) {
+                System.out.println("ERROR: No write permissions on " + _context.getBaseDir() +
+                                   " to extract software update file");
                 // carry on
                 return;
             }
@@ -1100,10 +1100,23 @@ public class Router {
                 System.out.println("INFO: Update installed");
             else
                 System.out.println("ERROR: Update failed!");
-            boolean deleted = updateFile.delete();
-            if (!deleted) {
-                System.out.println("ERROR: Unable to delete the update file!");
-                updateFile.deleteOnExit();
+            if (!ok) {
+                // we can't leave the file in place or we'll continually restart, so rename it
+                File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
+                boolean renamed = updateFile.renameTo(bad);
+                if (renamed) {
+                    System.out.println("Moved update file to " + bad.getAbsolutePath());
+                } else {
+                    System.out.println("Deleting file " + updateFile.getAbsolutePath());
+                    ok = true;  // so it will be deleted
+                }
+            }
+            if (ok) {
+                boolean deleted = updateFile.delete();
+                if (!deleted) {
+                    System.out.println("ERROR: Unable to delete the update file!");
+                    updateFile.deleteOnExit();
+                }
             }
             if (System.getProperty("wrapper.version") != null)
                 System.out.println("INFO: Restarting after update");

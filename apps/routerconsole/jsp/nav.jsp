@@ -14,9 +14,10 @@
  <a href="index.jsp"><img src="i2plogo.png" alt="Router Console" width="187" height="35" /></a><br />
 </div>
 <div class="toolbar">
- <% if (new File("docs/toolbar.html").exists()) { %>
+ <% File path = new File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");
+    if (path.exists()) { %>
    <jsp:useBean class="net.i2p.router.web.ContentHelper" id="toolbarhelper" scope="request" />
-   <jsp:setProperty name="toolbarhelper" property="page" value="docs/toolbar.html" />
+   <jsp:setProperty name="toolbarhelper" property="page" value="<%=path.getAbsolutePath()%>" />
    <jsp:setProperty name="toolbarhelper" property="maxLines" value="300" />
    <jsp:getProperty name="toolbarhelper" property="content" />
 <% } else { %>
