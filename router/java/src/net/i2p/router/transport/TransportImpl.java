@@ -106,6 +106,9 @@ public abstract class TransportImpl implements Transport {
                 ! ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                 def = MAX_CONNECTION_FACTOR * (1 + bw - Router.CAPABILITY_BW12);
         }
+        // increase limit for SSU, for now
+        if (style.equals("udp"))
+            def = def * 4 / 3;
         return _context.getProperty("i2np." + style + ".maxConnections", def);
     }
 

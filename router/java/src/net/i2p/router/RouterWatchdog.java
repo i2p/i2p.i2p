@@ -49,8 +49,8 @@ class RouterWatchdog implements Runnable {
     }
     
     private boolean shutdownOnHang() {
-        // prop default true
-        if (!Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "true")).booleanValue())
+        // prop default false
+        if (!Boolean.valueOf(_context.getProperty("watchdog.haltOnHang")).booleanValue())
             return false;
 
         // Client manager starts complaining after 10 minutes, and we run every minute,
@@ -94,7 +94,7 @@ class RouterWatchdog implements Runnable {
             long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
             _log.error("Memory: " + DataHelper.formatSize(used) + '/' + DataHelper.formatSize(max));
             if (_consecutiveErrors == 1) {
-                _log.log(Log.CRIT, "Router appears hung!  Will restart in 20 minutes if it doesn't fix itself");
+                _log.log(Log.CRIT, "Router appears hung, or there is severe network congestion.  Watchdog starts barking!");
                 // This might work on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
