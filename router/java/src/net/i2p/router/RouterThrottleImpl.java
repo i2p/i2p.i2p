@@ -101,7 +101,7 @@ class RouterThrottleImpl implements RouterThrottle {
         // reject here if lag too high???
         
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
-        Rate r = null;
+        Rate r = rs.getRate(60*1000);
 
         //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
         if(r != null) {
