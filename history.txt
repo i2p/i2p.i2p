@@ -1,3 +1,8 @@
+2009-06-06 sponge
+    * Added BOB's liscense to liscenses
+    * Janitorial javadoc fixes *sigh*
+    * bump to -13
+
 2009-06-05 sponge
     * Merge and bump to -12
 
