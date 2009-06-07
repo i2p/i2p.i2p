@@ -51,7 +51,8 @@ public class EventPumper implements Runnable {
      * the time to iterate across them to check a few flags shouldn't be a problem.
      */
     private static final long FAILSAFE_ITERATION_FREQ = 2*1000l;
-    private static final long MIN_EXPIRE_IDLE_TIME = 5*60*1000l;
+    /** tunnel test is every 30-60s, so this should be longer than, say, 3*45s to allow for drops */
+    private static final long MIN_EXPIRE_IDLE_TIME = 3*60*1000l;
     private static final long MAX_EXPIRE_IDLE_TIME = 15*60*1000l;
     
     public EventPumper(RouterContext ctx, NTCPTransport transport) {

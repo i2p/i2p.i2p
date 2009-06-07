@@ -104,7 +104,7 @@ public abstract class Parser
 	public Node parse(String descr) throws ParserException
 	{
 		try {
-			StringBufferInputStream decrIn = new StringBufferInputStream(descr);
+			InputStream decrIn = new ByteArrayInputStream(descr.getBytes());
 			Node root = parse(decrIn);
 			return root;
 		} catch (Exception e) {

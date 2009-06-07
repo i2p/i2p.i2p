@@ -2,6 +2,7 @@ package net.i2p.time;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -246,7 +247,12 @@ public class Timestamper implements Runnable {
         if ( (serverList == null) || (serverList.trim().length() <= 0) ) {
             serverList = DEFAULT_SERVER_LIST;
             String country = _context.getProperty(PROP_IP_COUNTRY);
-            if (country != null) {
+            if (country == null) {
+                country = Locale.getDefault().getCountry();
+                if (country != null)
+                    country = country.toLowerCase();
+            }
+            if (country != null &&  country.length() > 0) {
                 _priorityServers = new ArrayList(3);
                 for (int i = 0; i < 3; i++)
                      _priorityServers.add(i + "." + country + ".pool.ntp.org");
