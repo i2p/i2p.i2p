@@ -5,6 +5,8 @@
     * Console:
       - netdb.jsp cleanup
       - tunnels.jsp cleanup
+    * ExploratoryPeerSelector:
+      - Limit to connected peers when near connection limit
     * Timestamper:
       - Use locale country if geoip unavailable
     * Transport:
