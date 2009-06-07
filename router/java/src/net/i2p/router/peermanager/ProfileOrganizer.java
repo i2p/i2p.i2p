@@ -379,34 +379,30 @@ public class ProfileOrganizer {
      * Return a set of Hashes for peers that are both not failing and we're actively
      * talking with.
      *
+     * We use commSystem().isEstablished(), not profile.getIsActive(), as the
+     * NTCP idle time is now shorter than the 5 minute getIsActive() threshold,
+     * and we're using this to try and limit connections.
+     *
+     * Caution, this does NOT cascade further to non-connected peers, so it should only
+     * be used when there is a good number of connected peers.
+     *
+     * @param exclude non-null
+     * No mask parameter, to be fixed
      */
-    /*
-    private void selectActiveNotFailingPeers(int howMany, Set exclude, Set matches) {
-        if (true) {
-            selectAllNotFailingPeers(howMany, exclude, matches);
-            return;
-        }
-        // pick out the not-failing peers that we're actively talking with
+    public void selectActiveNotFailingPeers(int howMany, Set exclude, Set matches) {
         if (matches.size() < howMany) {
-            synchronized (_reorganizeLock) {
-                for (Iterator iter = _notFailingPeers.keySet().iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
-                    if ( (exclude != null) && exclude.contains(peer) ) continue;
-                    if (matches.contains(peer)) continue;
-                    PeerProfile prof = (PeerProfile)_notFailingPeers.get(peer);
-                    if (prof.getIsActive())
-                        matches.add(peer);
-                    if (matches.size() >= howMany)
-                        return;
+            getReadLock();
+            try {
+                for (Iterator<Hash> iter = _notFailingPeers.keySet().iterator(); iter.hasNext(); ) {
+                    Hash peer = iter.next();
+                    if (!_context.commSystem().isEstablished(peer))
+                        exclude.add(peer);
                 }
-            }
+                locked_selectPeers(_notFailingPeers, howMany, exclude, matches, 0);
+            } finally { releaseReadLock(); }
         }
-        // ok, still not enough, pick out the not-failing peers that we aren't talking with
-        if (matches.size() < howMany)
-            selectAllNotFailingPeers(howMany, exclude, matches);
-        return;
     }
-    */
+
     /**
      * Return a set of Hashes for peers that are not failing.
      *
@@ -414,6 +410,10 @@ public class ProfileOrganizer {
     public void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
         selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
+    /**
+     * @param mask ignored, should call locked_selectPeers, to be fixed
+     *
+     */
     private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany) {
             int orig = matches.size();
