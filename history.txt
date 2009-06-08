@@ -1,4 +1,7 @@
 2009-06-08 sponge
+    * Removed BOB debugging as-per zzz
+
+2009-06-08 sponge
     * Fixed NPE and some other goofups in BOB.
     * BOB bump version
 
