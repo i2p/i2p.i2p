@@ -52,12 +52,12 @@ public class I2PtoTCP implements Runnable {
 		this.database = database;
 	}
 
-	private void rlock() throws Exception {
+	private void rlock() {
 		database.getReadLock();
 		info.getReadLock();
 	}
 
-	private void runlock() throws Exception {
+	private void runlock() {
 		database.releaseReadLock();
 		info.releaseReadLock();
 	}

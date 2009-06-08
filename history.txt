@@ -1,3 +1,7 @@
+2009-06-08 sponge
+    * Fixed NPE and some other goofups in BOB.
+    * BOB bump version
+
 2009-06-07 zzz
     * Build file:
       - Add updaterWithJettyFixesAndGeoIP, use it in pkg for one release

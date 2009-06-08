@@ -43,7 +43,7 @@ import net.i2p.util.Log;
  */
 public class MUXlisten implements Runnable {
 
-	private NamedDB database,  info;
+	private NamedDB database, info;
 	private Log _log;
 	private I2PSocketManager socketManager;
 	private ByteArrayInputStream prikey;

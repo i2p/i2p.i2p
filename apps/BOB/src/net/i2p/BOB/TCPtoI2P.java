@@ -33,6 +33,7 @@ import java.net.Socket;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 
@@ -50,14 +51,28 @@ public class TCPtoI2P implements Runnable {
 	private I2PSocketManager socketManager;
 
 	/**
+	 * Constructor
+	 * @param i2p
+	 * @param socket
+	 * param info
+	 * param database
+	 */
+	TCPtoI2P(I2PSocketManager i2p, Socket socket , NamedDB info, NamedDB database) {
+		this.sock = socket;
+		this.info = info;
+		this.database = database;
+		this.socketManager = i2p;
+	}
+
+	/**
 	 * This is a more forgiving readline,
 	 * it works on unbuffered streams
 	 *
 	 * @param in
 	 * @return line of text as a String
-	 * @throws Exception
+	 * @throws IOException
 	 */
-	private static String lnRead(InputStream in) throws Exception {
+	private static String lnRead(InputStream in) throws IOException {
 		String S;
 		int b;
 		char c;
@@ -81,20 +96,6 @@ public class TCPtoI2P implements Runnable {
 	}
 
 	/**
-	 * Constructor
-	 * @param i2p
-	 * @param socket
-	 * param info
-	 * param database
-	 */
-	TCPtoI2P(I2PSocketManager i2p, Socket socket /*, NamedDB info, NamedDB database */) {
-		this.sock = socket;
-		// this.info = info;
-		// this.database = database;
-		this.socketManager = i2p;
-	}
-
-	/**
 	 * Print an error message to out
 	 *
 	 * @param e
@@ -103,19 +104,22 @@ public class TCPtoI2P implements Runnable {
 	 */
 	private void Emsg(String e, OutputStream out) throws IOException {
 // Debugging		System.out.println("ERROR TCPtoI2P: " + e);
-		out.write("ERROR".concat(e).getBytes());
-		out.write(13); // cr
+		out.write("ERROR ".concat(e).getBytes());
+		out.write(13);
+		out.write(10);
 		out.flush();
 	}
 
-	private void rlock() throws Exception {
+//	private void rlock() throws Exception {
+	private void rlock() {
 		database.getReadLock();
 		info.getReadLock();
 	}
 
-	private void runlock() throws Exception {
-		database.releaseReadLock();
+//	private void runlock() throws Exception {
+	private void runlock() {
 		info.releaseReadLock();
+		database.releaseReadLock();
 	}
 
 	/**
@@ -135,56 +139,64 @@ public class TCPtoI2P implements Runnable {
 
 				in = sock.getInputStream();
 				out = sock.getOutputStream();
-				try {
-					line = lnRead(in);
-					input = line.toLowerCase();
-					Destination dest = null;
-
-					if (input.endsWith(".i2p")) {
-						dest = I2PTunnel.destFromName(input);
-						line = dest.toBase64();
-					}
-					dest = new Destination();
-					dest.fromBase64(line);
-
-					try {
-						// get a client socket
-						I2P = socketManager.connect(dest);
-						I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
-						// make readers/writers
-						Iin = I2P.getInputStream();
-						Iout = I2P.getOutputStream();
-						// setup to cross the streams
-						TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
-						TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
-						t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
-						q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
-						// Fire!
-						t.start();
-						q.start();
-						boolean spin = true;
-						while (t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
-							Thread.sleep(10); //sleep for 10 ms
-							rlock();
-							spin = info.get("RUNNING").equals(Boolean.TRUE);
-							runlock();
-						}
-					} catch (I2PException e) {
-						Emsg("ERROR " + e.toString(), out);
-					} catch (ConnectException e) {
-						Emsg("ERROR " + e.toString(), out);
-					} catch (NoRouteToHostException e) {
-						Emsg("ERROR " + e.toString(), out);
-					} catch (InterruptedIOException e) {
-						// We're breaking away.
-					}
-
-				} catch (Exception e) {
-					Emsg("ERROR " + e.toString(), out);
+				line = lnRead(in);
+				input = line.toLowerCase();
+				Destination dest = null;
+				if (input.endsWith(".i2p")) {
+					dest = I2PTunnel.destFromName(input);
+					line = dest.toBase64();
 				}
-			} catch (Exception e) {
-				// bail on anything else
+				dest = new Destination();
+				dest.fromBase64(line);
+
+				try {
+					// get a client socket
+					I2P = socketManager.connect(dest);
+					I2P.setReadTimeout(0); // temp bugfix, this *SHOULD* be the default
+					// make readers/writers
+					Iin = I2P.getInputStream();
+					Iout = I2P.getOutputStream();
+					// setup to cross the streams
+					TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
+					TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
+					t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
+					q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
+					// Fire!
+					t.start();
+					q.start();
+					boolean spin = true;
+					while (t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
+						Thread.sleep(10); //sleep for 10 ms
+						rlock();
+						spin = info.get("RUNNING").equals(Boolean.TRUE);
+						runlock();
+					}
+				} catch (I2PException e) {
+					Emsg(e.toString(), out);
+				} catch (ConnectException e) {
+					Emsg(e.toString(), out);
+				} catch (NoRouteToHostException e) {
+					Emsg(e.toString(), out);
+				}
+
+			} catch (InterruptedIOException e) {
+				// We're breaking away.
+			} catch (InterruptedException e) {
+				// ditto
+			} catch (IOException e) {
+				try {
+					Emsg(e.toString(), out);
+				} catch (IOException ex) {
+					// ditto
+				}
+			} catch (DataFormatException e) {
+				try {
+					Emsg(e.toString(), out);
+				} catch (IOException ex) {
+					// ditto
+				}
 			}
+
 		} finally {
 			try {
 				t.interrupt();
