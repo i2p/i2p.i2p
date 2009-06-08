@@ -1,4 +1,8 @@
 2009-06-08 sponge
+    * Last commit for this cycle. All debugging except for WARN removed.
+      I can use the visit command to debug now anyway.
+
+2009-06-08 sponge
     * Removed BOB debugging as-per zzz
 
 2009-06-08 sponge

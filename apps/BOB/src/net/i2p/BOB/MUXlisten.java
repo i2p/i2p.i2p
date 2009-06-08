@@ -273,7 +273,7 @@ public class MUXlisten implements Runnable {
 				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
 				// tg.interrupt(); // give my stuff a small smack again.
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
-					visit(tg, 0, boner);
+					// visit(tg, 0, boner);
 					int foo = tg.activeCount() + tg.activeGroupCount();
 					// hopefully no longer needed!
 					// int bar = foo;
