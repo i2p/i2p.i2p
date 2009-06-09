@@ -1,3 +1,6 @@
+2009-06-09 zzz
+    * NTCP: Fix startup race NPE (thanks postman!)
+
 2009-06-08 sponge
     * Last commit for this cycle. All debugging except for WARN removed.
       I can use the visit command to debug now anyway.
