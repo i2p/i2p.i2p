@@ -4,7 +4,7 @@
 
 <html><head>
 <title>I2P Router Console - tunnel summary</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head><body>
 
 <%@include file="nav.jsp" %>

@@ -1,15 +1,4 @@
 <%@page import="java.io.File" %>
-<% response.setHeader("Pragma", "no-cache");
-   response.setHeader("Cache-Control","no-cache");
-   response.setDateHeader("Expires", 0);
-   // the above will b0rk if the servlet engine has already flushed
-   // the response prior to including nav.jsp, so nav should be 
-   // near the top
-   
-   if (request.getParameter("i2p.contextId") != null) {
-       session.setAttribute("i2p.contextId", request.getParameter("i2p.contextId")); 
-   }%>
-
 <div class="logo">
  <a href="index.jsp"><img src="i2plogo.png" alt="Router Console" width="187" height="35" /></a><br />
 </div>
@@ -35,7 +24,9 @@
  <a href="graphs.jsp">Graphs</a> |
  <a href="oldstats.jsp">Stats</a> <!-- |
  <a href="oldconsole.jsp">Internals</a> -->
-<% } %>
+<% }
+// the following is unused and a candidate for removal
+%>
  <jsp:useBean class="net.i2p.router.web.NavHelper" id="navhelper" scope="request" />
  <jsp:setProperty name="navhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="navhelper" property="clientAppLinks" />

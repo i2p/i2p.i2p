@@ -371,6 +371,9 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
         <copy file="readme_zh.html" todir="pkg-temp/docs/" />
+        <!-- CSS now in docs/, not in the .war -->
+        <copy file="apps/routerconsole/jsp/default.css" tofile="pkg-temp/docs/themes/console/console.css" />
+        <copy file="apps/routerconsole/jsp/default.css" tofile="pkg-temp/docs/themes/console/defCon1/console.css" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
