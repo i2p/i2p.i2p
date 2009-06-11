@@ -73,6 +73,7 @@ rm -rf ./lib/wrapper
 rm -f ./lib/*.dll
 rm -f ./*.bat
 rm -f ./*.exe
+rm -rf ./installer
 ./i2prouter start
 exit 0
 

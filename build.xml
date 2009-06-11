@@ -399,13 +399,14 @@
     </target>
     <target name="installer" depends="preppkg">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
-        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
+        <mkdir dir="pkg-temp/installer" />
+        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
+        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Delete" /></manifest>
         </jar>
-        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
+        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
         </jar>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />

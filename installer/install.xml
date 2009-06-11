@@ -103,27 +103,27 @@
             <fileset dir="pkg-temp" includes="**/*" targetdir="$INSTALL_PATH"/>
             
             <!-- postinstall stuff for windows -->
-            <executable targetfile="$INSTALL_PATH/lib/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\i2prouter" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install_i2p_service_unix" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install-headless.txt" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\osid" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\postinstall.sh" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\postinstall.bat" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\uninstall_i2p_service_unix" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper" /></args></executable>
 
             <!-- workaround for vista permission problems - see comments above -->
@@ -132,13 +132,13 @@
                 <args><arg value="$INSTALL_PATH" /></args>
             </executable>
             <!-- else delete it -->
-            <executable targetfile="$INSTALL_PATH/lib/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"
                 condition="izpack.windowsinstall.xp|izpack.windowsinstall.2003" >
                 <args><arg value="$INSTALL_PATH\fixperms.bat" /></args>
             </executable>
 
             <!--
-            <executable targetfile="$INSTALL_PATH/lib/exec.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/installer/exec.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH" /><arg value="$INSTALL_PATH\I2Psvc.exe" /><arg value="-c" /><arg value="$INSTALL_PATH\wrapper.config" /></args></executable>
             -->
                 
