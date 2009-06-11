@@ -95,13 +95,15 @@ class RouterWatchdog implements Runnable {
             _log.error("Memory: " + DataHelper.formatSize(used) + '/' + DataHelper.formatSize(max));
             if (_consecutiveErrors == 1) {
                 _log.log(Log.CRIT, "Router appears hung, or there is severe network congestion.  Watchdog starts barking!");
-                // This might work on linux...
+                // This works on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
-                ShellCommand sc = new ShellCommand();
-                boolean success = sc.executeSilentAndWaitTimed("./i2prouter dump", 10);
-                if (success)
-                    _log.log(Log.CRIT, "Threads dumped to wrapper log");
+                if (System.getProperty("wrapper.version") != null && !System.getProperty("os.name").startsWith("Win")) {
+                    ShellCommand sc = new ShellCommand();
+                    boolean success = sc.executeSilentAndWaitTimed("./i2prouter dump", 10);
+                    if (success)
+                        _log.log(Log.CRIT, "Threads dumped to wrapper log");
+                }
             }
         }
     }
