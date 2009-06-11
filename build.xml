@@ -203,7 +203,7 @@
         </delete>
     </target>
     <!-- one release only, then back to updaterWithJettyFixes -->
-    <target name="pkg" depends="distclean, updaterWithJettyFixesAndGeoIP, tarball, installer" />
+    <target name="pkg" depends="distclean, updaterWithJettyFixesAndGeoIP, preppkg, installer" />
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
@@ -249,6 +249,7 @@
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
         <!-- <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
@@ -315,6 +316,7 @@
         <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
+    <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
@@ -523,7 +525,7 @@
         </copy>
     </target>
     <target name="updaterWithDesktopgui" depends="prepupdateWithDesktopgui,updater" />
-    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, tarball" />
+    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, preppkg" />
     <target name="distWithDesktopgui" depends="pkgWithDesktopgui, javadoc" />
     <target name="distcleanWithDesktopgui" depends="distclean">
         <ant dir="apps/desktopgui" target="build_clean" />

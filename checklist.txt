@@ -45,7 +45,6 @@ Make the source tarball:
 
 Until the build script gets this ability, you need to rename some files:
 	mv i2pinstall.exe i2pinstall-0.7.xx.exe
-	mv i2p.tar.bz2 i2pheadless-0.7.xx.tar.bz2
 	mv i2pupdate.zip i2pupdate-0.7.xx.zip
 	you probably don't need to rename i2pupdate.sud
 
@@ -56,7 +55,6 @@ Generate hashes:
 
 Generate PGP signatures:
 	gpg -b i2pinstall-0.7.xx.exe
-	gpg -b i2pheadless-0.7.xx.tar.bz2
 	gpg -b i2psource-0.7.xx.tar.bz2
 	gpg -b i2pupdate-0.7.xx.zip
 	gpg -b i2pupdate.sud
