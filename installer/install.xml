@@ -101,6 +101,13 @@
         <pack name="Base" required="yes">
             <description>Base installation files</description>
             <fileset dir="pkg-temp" includes="**/*" targetdir="$INSTALL_PATH"/>
+            <!--
+              Do variable substitution in the wrapper.config and i2prouter files. See:
+              http://www.javalobby.org/forums/thread.jspa?threadID=15967&tstart=0
+              and the izpack docs for some guidance.
+             -->
+            <parsable targetfile="$INSTALL_PATH/wrapper.config" type="javaprop" />
+            <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
             
             <!-- postinstall stuff for windows -->
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
