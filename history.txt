@@ -1,3 +1,58 @@
+2009-06-12 zzz
+    * Console:
+      - Move the console css from default.css in the .war to docs/themes/console/console.css,
+        and support console themes in the main console with routerconsole.theme=foo
+      - Remove unused NoticeHelper
+
+    * Installer:
+        Upgrade to izpack 4.3.0 and add a short script to fix Vista install problems.
+        (previous izpack was 3.7.2 from 2005-04-22)
+        
+        izpack 4.3.0 from :
+        http://dist.codehaus.org/izpack/releases/4.3.0/IzPack-install-4.3.0.jar
+        SHA1 f06da6b26ac2c68fed64ab38980352989b8d8841
+        (no signatures or sha1sums found on website, and the jar is unsigned)
+        License: Apache 2.0
+        
+        upack izpack:
+        java -jar IzPack-install-4.3.0.jar
+        or
+        java -jar IzPack-install-4.3.0.jar -console
+        
+        get the standalone-compiler.jar from the installation lib/ directory:
+        SHA1 6d2b4a5657bfb864a333b1c4b1c0f8223aa57d80
+        (no signatures or sha1sums found on website, and the jar is unsigned)
+        
+        This fixes the bug with the install windows centered in all the
+        workspaces, not the current workspace. And who knows what other
+        bugs in the last 4 years.
+        
+        To fix Vista (and presumably Windows 7) permissiom problems,
+        add a run-privileged flag for those, and run the new fixperms.bat
+        which calls icacls to add the privileges to the install directory.
+        
+        Add support for 6 more language packs found in the new release.
+        Change from ISO3 codes to native language names.
+        
+        Disable creation of the i2p.tar.bz2 file in build.xml
+        (distributed as i2pheadless-0.7.x.tar.bz2), as izpack 4.3.0 now
+        supports headless installation with java -jar i2pinstall.exe -console.
+        Update INSTALL.txt and INSTALL-headless.txt accordingly.
+
+      - Add install and temp path substitution to wrapper.config and
+        i2prouter on install
+
+      - Change the wrapper.config classpath to one line: lib/*.jar
+        This means we lose control of classpath load order, so move the windows installer
+        jars copy.jar, delete.jar, and exec.jar to a new installer/ directory so
+        these jars won't be in the classpath or potentially conflict, since
+        copy.jar and delete.jar include FileUtil.class, and we don't want to have
+        to remember to add them to the updater if we ever change FileUtil.class.
+        Delete the installer/ directory in postinstall.sh since it is windows-only.
+
+    * Watchdog: Only try to dump threads if there is a wrapper
+         and we aren't on windows
+
 * 2009-06-12  0.7.4 released
 
 2009-06-12 Complication
