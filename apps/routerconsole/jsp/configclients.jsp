@@ -4,7 +4,7 @@
 
 <html><head>
 <title>I2P Router Console - config clients</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 <style type='text/css'>
 button span.hide{
     display:none;

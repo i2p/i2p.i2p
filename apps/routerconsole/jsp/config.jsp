@@ -3,7 +3,7 @@
 
 <html><head>
 <title>I2P Router Console - config networking</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head><body>
 
 <%@include file="nav.jsp" %>

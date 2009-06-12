@@ -6,16 +6,20 @@ and package up the appropriate installer by running:
   ant pkg
 
 This will produce a few key files:
-* i2p.tar.bz2:   the headless installation
-* install.jar:   the GUI installer
-* i2pupdate.zip: the update package
+* install.jar:    the GUI and console installer
+* i2pinstall.exe: the GUI and console installer wrapped for cross-platform execution
+* i2pupdate.zip:  the update package
 
-From there, you can follow the headless installation instructions
-with the headless installer, run the GUI installer, or deploy
-the update into an existing installation.
+From there, you can run the headless (console mode) installer:
+  java -jar i2pinstall.exe -console
+
+Or run the GUI installer:
+  java -jar i2pinstall.exe
+
+Or move the update file into an existing installation directory and restart.
 
 You will need to have ant installed from http://ant.apache.org/
-(1.5 or newer)
+(1.7.0 or newer)
 
 Supported JVMs:
   Windows: Latest available from http://java.sun.com/ (1.5+ supported)

@@ -8,6 +8,10 @@
 # if you have changed the default location set in the
 # wrapper configuration file.
 #
+# Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
+# should have been replaced by
+# the izpack installer. If you did not run the installer,
+# replace them with the appropriate path.
 
 #-----------------------------------------------------------------------------
 # These settings can be modified to fit the needs of your application
@@ -17,15 +21,15 @@ APP_NAME="i2p"
 APP_LONG_NAME="I2P Service"
 
 # Wrapper
-WRAPPER_CMD="./i2psvc"
-WRAPPER_CONF="wrapper.config"
+WRAPPER_CMD="%INSTALL_PATH/i2psvc"
+WRAPPER_CONF="%INSTALL_PATH/wrapper.config"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="."
+PIDDIR="%SYSTEM_java_io_tmpdir"
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and

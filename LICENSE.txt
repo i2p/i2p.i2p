@@ -116,8 +116,9 @@ Installer:
 
 	Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
 
-   Izpack:
-   See licenses/LICENSE-Apache1.1.txt
+   Izpack 4.3.0:
+   Copyright (c) 2001-2008 Julien Ponge
+   See licenses/LICENSE-Apache2.0.txt
 
 
 

@@ -4,7 +4,7 @@
 
 <html><head>
 <title>I2P Router Console - config stats</title>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 <script type="text/javascript">
 function init()
 {

@@ -50,7 +50,7 @@
         }
     }
 %>
-<link rel="stylesheet" href="default.css" type="text/css" />
+<%@include file="css.jsp" %>
 </head>
 
 <body style="margin: 0;">
