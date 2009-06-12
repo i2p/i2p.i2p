@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2009-05-16 00:00:00 $">
- <i2p.release version="0.7.3" date="2009/05/16" minVersion="0.6"
+<i2p.news date="$Date: 2009-06-12 00:00:00 $">
+ <i2p.release version="0.7.4" date="2009/06/12" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,22 +11,22 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2009-05-16: <b>0.7.3 <a href="http://www.i2p2.i2p/release-0.7.3.html">Released</a></b>
+2009-06-12: <b>0.7.4 <a href="http://www.i2p2.i2p/release-0.7.4.html">Released</a></b>
 </p><p>
-I2P version 0.7.3 contains several buxfixes and improvements,
-includes a lot of maintenance work and new versions of
-both the SAM and BOB application gateway protocols.
+I2P version 0.7.4 introduces notable new features
+like GeoIP capability and UPnP support. While the former
+can become a basis for geographically aware tunnel-building,
+the latter should immediately enable more routers to accept
+inbound TCP connections, helping distribute workload more evenly.
 </p><p>
-A patch to I2P's internal web server Jetty is included
-to correct SusiDNS behaviour on Windows. The way I2P nodes
-volunteer to participate in the Network Database is changed
-to avoid too many doing this simultaneously, and creation
-of new participating tunnels is now throttled before messages
-in existing tunnels start to get dropped.
+Inbound NTCP is now enabled automaticaly if the router
+does not appear firewalled, and default bandwidth limits
+for new installations are increased.
 </p><p>
-Multiple improvements to the Router Console and other components
-are included, I2PSnark can handle bigger torrents and more files,
-while work continues on the experimental desktop interface.
-Updating is recommended.
+In addition, multiple bugfixes and updates are included,
+addressing issues with the NTCP transport, BOB protocol,
+connection limiting, behaviour of new I2PTunnel options
+and the SusiDNS user interface. Improvements to the Router Console
+are likewise included. Updating is recommended.
 </p>
 </i2p.news>
