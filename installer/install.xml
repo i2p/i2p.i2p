@@ -109,6 +109,7 @@
             <parsable targetfile="$INSTALL_PATH/wrapper.config" type="javaprop" />
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
             
             <!-- postinstall stuff for windows -->
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />

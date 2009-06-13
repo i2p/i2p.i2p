@@ -52,7 +52,7 @@ public class WorkingDir {
      * Only call this once on router invocation.
      * Caller should store the return value for future reference.
      */
-    public static String getWorkingDir(boolean migrateOldData) {
+    public static String getWorkingDir(boolean migrateOldConfig) {
         String dir = System.getProperty(PROP_WORKING_DIR);
         boolean isWindows = System.getProperty("os.name").startsWith("Win");
         File dirf = null;
@@ -73,6 +73,18 @@ public class WorkingDir {
         String cwd = System.getProperty(PROP_BASE_DIR);
         if (cwd == null)
             cwd = System.getProperty("user.dir");
+
+        // Check for a hosts.txt file, if it exists then I2P is there
+        File oldDirf = new File(cwd);
+        File test = new File(oldDirf, "hosts.txt");
+        if (!test.exists()) {
+            System.err.println("ERROR - Cannot find I2P installation in " + cwd +
+                  " - Will probably be just a router with no apps or console at all!");
+            // until we move reseeding from the console to the router, we
+            // won't be able to reseed, so we are probably doomed
+            return cwd;
+        }
+
         // where we want to go
         String rv = dirf.getAbsolutePath();
         if (dirf.exists()) {
@@ -86,19 +98,19 @@ public class WorkingDir {
             return cwd;
         }
 
-        // Check for a hosts.txt file, if it exists then I2P is there
-        File oldDirf = new File(cwd);
-        File test = new File(oldDirf, "hosts.txt");
-        if (!test.exists()) {
-            System.err.println("ERROR - Cannot find I2P installation in " + cwd);
-            return cwd;
-        }
-
-        // Check for a router.keys file, if it exists it's an old install,
+        // Check for a router.keys file or logs dir, if either exists it's an old install,
         // and only migrate the data files if told to do so
+        // (router.keys could be deleted later by a killkeys())
         test = new File(oldDirf, "router.keys");
         boolean oldInstall = test.exists();
-        migrateOldData &= oldInstall;
+        if (!oldInstall) {
+            test = new File(oldDirf, "logs");
+            oldInstall = test.exists();
+        }
+        // keep everything where it is, in one place...
+        if (oldInstall && !migrateOldConfig)
+            return cwd;
+        boolean migrateOldData = false; // this is a terrible idea
 
         // Do the copying
         if (migrateOldData)

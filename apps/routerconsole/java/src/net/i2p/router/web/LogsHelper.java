@@ -17,16 +17,23 @@ public class LogsHelper extends HelperBase {
     }
     
     public String getServiceLogs() {
-        // look in new and old place
-        File f = new File(_context.getLogDir(), "wrapper.log");
-        if (!f.exists())
-            f = new File(_context.getBaseDir(), "wrapper.log");
+        // RouterLaunch puts the location here if no wrapper
+        String path = System.getProperty("wrapper.logfile");
+        File f;
+        if (path != null) {
+            f = new File(path);
+        } else {
+            // look in new and old places
+            f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
+            if (!f.exists())
+                f = new File(_context.getBaseDir(), "wrapper.log");
+        }
         String str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
         if (str == null) 
             return "";
         else {
             str = str.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-            return "<pre>" + str + "</pre>";
+            return "Location: " + f.getAbsolutePath() + "<pre>" + str + "</pre>";
         }
     }
     
