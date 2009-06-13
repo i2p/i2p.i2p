@@ -74,6 +74,19 @@ public class RouterConsoleRunner {
             props.setProperty(PREFIX + ROUTERCONSOLE + ENABLED, "true");
             rewrite = true;
         }
+
+        // Get an absolute path with a trailing slash for the webapps dir
+        // We assume relative to the base install dir for backward compatibility
+        File app = new File(_webAppsDir);
+        if (!app.isAbsolute()) {
+            app = new File(I2PAppContext.getGlobalContext().getBaseDir(), _webAppsDir);
+            try {
+                _webAppsDir = app.getCanonicalPath();
+            } catch (IOException ioe) {}
+        }
+        if (!_webAppsDir.endsWith("/"))
+            _webAppsDir += '/';
+
         try {
             StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
             int boundAddresses = 0;
@@ -99,7 +112,7 @@ public class RouterConsoleRunner {
             tmpdir.mkdir();
             wac.setTempDirectory(tmpdir);
             initialize(wac);
-            File dir = new File(I2PAppContext.getGlobalContext().getBaseDir(), _webAppsDir);
+            File dir = new File(_webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());
             if (fileNames != null) {
                 for (int i = 0; i < fileNames.length; i++) {

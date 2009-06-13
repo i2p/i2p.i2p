@@ -60,11 +60,10 @@ public class ConfigFile {
             _properties.load(fileInputStream);
         } catch (Exception e) {
             rv = false;
-        }
-        try {
-            fileInputStream.close();
-        } catch (IOException e) {
-            // No worries.
+        } finally {
+            if (fileInputStream != null) {
+                try { fileInputStream.close(); } catch (IOException e) {}
+            }
         }
         return rv;
     }
@@ -78,11 +77,10 @@ public class ConfigFile {
             _properties.store(fileOutputStream, null);
         } catch (Exception e) {
             rv = false;
-        }
-        try {
-            fileOutputStream.close();
-        } catch (IOException e) {
-            // No worries.
+        } finally {
+            if (fileOutputStream != null) {
+                try { fileOutputStream.close(); } catch (IOException e) {}
+            }
         }
         return rv;
     }

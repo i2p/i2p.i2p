@@ -10,9 +10,12 @@
 package net.i2p.apps.systray;
 
 import java.awt.Frame;
+import java.io.File;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;
@@ -36,7 +39,8 @@ public class SysTray implements SysTrayMenuListener {
     private static UrlLauncher    _urlLauncher    = new UrlLauncher();
 
     static {
-        if (!_configFile.init("systray.config")) {
+        File config = new File(I2PAppContext.getGlobalContext().getConfigDir(), "systray.config");
+        if (!_configFile.init(config.getAbsolutePath())) {
             _configFile.setProperty("browser", "default");
             _configFile.setProperty("port", "7657");
         }
