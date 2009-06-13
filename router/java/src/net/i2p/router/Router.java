@@ -44,6 +44,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.WorkingDir;
 
 /**
  * Main driver for the router.
@@ -53,6 +54,7 @@ public class Router {
     private Log _log;
     private RouterContext _context;
     private final Properties _config;
+    /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
     private long _started;
@@ -104,14 +106,6 @@ public class Router {
     public Router(Properties envProps) { this(null, envProps); }
     public Router(String configFilename) { this(configFilename, null); }
     public Router(String configFilename, Properties envProps) {
-        if (!beginMarkingLiveliness(envProps)) {
-            System.err.println("ERROR: There appears to be another router already running!");
-            System.err.println("       Please make sure to shut down old instances before starting up");
-            System.err.println("       a new one.  If you are positive that no other instance is running,");
-            System.err.println("       please delete the file " + getPingFile(envProps));
-            System.exit(-1);
-        }
-
         _gracefulExitCode = -1;
         _config = new Properties();
 
@@ -125,7 +119,35 @@ public class Router {
             _configFilename = configFilename;
         }
                     
+        // we need the user directory figured out by now, so figure it out here rather than
+        // in the RouterContext() constructor.
+        //
+        // Fixme read config file before migration? or before? or both?
+        //
+        // Then add it to envProps (but not _config, we don't want it in the router.config file)
+        // where it will then be available to all via _context.dir()
+        //
+        // This call also migrates all files to the new working directory,
+        // including router.config
+        //
+
+        // Do we copy all the data files to the new directory? default false
+        String migrate = System.getProperty("i2p.dir.migrate");
+        boolean migrateFiles = Boolean.valueOf(migrate).booleanValue();
+        String userDir = WorkingDir.getWorkingDir(migrateFiles);
+
+        // Use the router.config file specified in the router.configLocation property
+        // (default "router.config"),
+        // if it is an abolute path, otherwise look in the userDir returned by getWorkingDir
+        // replace relative path with absolute
+        File cf = new File(_configFilename);
+        if (!cf.isAbsolute()) {
+            cf = new File(userDir, _configFilename);
+            _configFilename = cf.getAbsolutePath();
+        }
+
         readConfig();
+
         if (envProps == null) {
             envProps = _config;
         } else {
@@ -135,11 +157,42 @@ public class Router {
                 envProps.setProperty(k, v);
             }
         }
+
         // This doesn't work, guess it has to be in the static block above?
         // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
         //    System.setProperty("java.net.preferIPv4Stack", "true");
 
+        if (envProps.getProperty("i2p.dir.config") == null)
+            envProps.setProperty("i2p.dir.config", userDir);
+
+        // The important thing that happens here is the directory paths are set and created
+        // i2p.dir.router defaults to i2p.dir.config
+        // i2p.dir.app defaults to i2p.dir.router
+        // i2p.dir.log defaults to i2p.dir.router
+        // i2p.dir.pid defaults to i2p.dir.router
+        // i2p.dir.base defaults to user.dir == $CWD
         _context = new RouterContext(this, envProps);
+
+        // This is here so that we can get the directory location from the context
+        // for the ping file
+        if (!beginMarkingLiveliness()) {
+            System.err.println("ERROR: There appears to be another router already running!");
+            System.err.println("       Please make sure to shut down old instances before starting up");
+            System.err.println("       a new one.  If you are positive that no other instance is running,");
+            System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
+            System.exit(-1);
+        }
+
+        // This is here so that we can get the directory location from the context
+        // for the zip file and the base location to unzip to.
+        // If it does an update, it never returns.
+        // I guess it's better to have the other-router check above this, we don't want to
+        // overwrite an existing running router's jar files. Other than ours.
+        installUpdates();
+
+        // NOW we start all the activity
+        _context.initAll();
+
         _routerInfo = null;
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);
@@ -245,6 +298,7 @@ public class Router {
         
         _context.keyManager().startup();
         
+        // why are we reading this again, it's read in the constructor
         readConfig();
         
         setupHandlers();
@@ -285,6 +339,7 @@ public class Router {
         }
     }
     
+    /** this does not use ctx.getConfigDir(), must provide a full path in filename */
     private static Properties getConfig(RouterContext ctx, String filename) {
         Log log = null;
         if (ctx != null) {
@@ -456,11 +511,11 @@ public class Router {
                                                                };
 
     static final String IDENTLOG = "identlog.txt";
-    public static void killKeys() {
+    public void killKeys() {
         new Exception("Clearing identity files").printStackTrace();
         int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
-            File f = new File(_rebuildFiles[i]);
+            File f = new File(_context.getRouterDir(),_rebuildFiles[i]);
             if (f.exists()) {
                 boolean removed = f.delete();
                 if (removed) {
@@ -474,7 +529,7 @@ public class Router {
         if (remCount > 0) {
             FileOutputStream log = null;
             try {
-                log = new FileOutputStream(IDENTLOG, true);
+                log = new FileOutputStream(new File(_context.getRouterDir(), IDENTLOG), true);
                 log.write((new Date() + ": Old router identity keys cleared\n").getBytes());
             } catch (IOException ioe) {
                 // ignore
@@ -814,8 +869,9 @@ public class Router {
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
         //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        _context.deleteTempDir();
         RouterContext.listContexts().remove(_context);
-        dumpStats();
+        //dumpStats();
         finalShutdown(exitCode);
     }
 
@@ -833,7 +889,7 @@ public class Router {
                 killKeys();
         }
 
-        File f = new File(getPingFile());
+        File f = getPingFile();
         f.delete();
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
@@ -1003,8 +1059,9 @@ public class Router {
     
     public static void main(String args[]) {
         System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
-        installUpdates();
-        verifyWrapperConfig();
+        // installUpdates() moved to constructor so we can get file locations from the context
+        // installUpdates();
+        //verifyWrapperConfig();
         Router r = new Router();
         if ( (args != null) && (args.length == 1) && ("rebuild".equals(args[0])) ) {
             r.rebuildNewIdentity();
@@ -1015,19 +1072,51 @@ public class Router {
     
     public static final String UPDATE_FILE = "i2pupdate.zip";
     
-    private static void installUpdates() {
-        File updateFile = new File(UPDATE_FILE);
-        if (updateFile.exists()) {
+    /**
+     * Unzip update file found in the router dir OR base dir, to the base dir
+     *
+     * If we can't write to the base dir, complain.
+     * Note: _log not available here.
+     */
+    private void installUpdates() {
+        File updateFile = new File(_context.getRouterDir(), UPDATE_FILE);
+        boolean exists = updateFile.exists();
+        if (!exists) {
+            updateFile = new File(_context.getBaseDir(), UPDATE_FILE);
+            exists = updateFile.exists();
+        }
+        if (exists) {
+            // do a simple permissions test, if it fails leave the file in place and don't restart
+            File test = new File(_context.getBaseDir(), "history.txt");
+            if ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite())) {
+                System.out.println("ERROR: No write permissions on " + _context.getBaseDir() +
+                                   " to extract software update file");
+                // carry on
+                return;
+            }
             System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
-            boolean ok = FileUtil.extractZip(updateFile, new File("."));
+            boolean ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             if (ok)
                 System.out.println("INFO: Update installed");
             else
                 System.out.println("ERROR: Update failed!");
-            boolean deleted = updateFile.delete();
-            if (!deleted) {
-                System.out.println("ERROR: Unable to delete the update file!");
-                updateFile.deleteOnExit();
+            if (!ok) {
+                // we can't leave the file in place or we'll continually restart, so rename it
+                File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
+                boolean renamed = updateFile.renameTo(bad);
+                if (renamed) {
+                    System.out.println("Moved update file to " + bad.getAbsolutePath());
+                } else {
+                    System.out.println("Deleting file " + updateFile.getAbsolutePath());
+                    ok = true;  // so it will be deleted
+                }
+            }
+            if (ok) {
+                boolean deleted = updateFile.delete();
+                if (!deleted) {
+                    System.out.println("ERROR: Unable to delete the update file!");
+                    updateFile.deleteOnExit();
+                }
             }
             if (System.getProperty("wrapper.version") != null)
                 System.out.println("INFO: Restarting after update");
@@ -1037,6 +1126,7 @@ public class Router {
         }
     }
     
+/*******
     private static void verifyWrapperConfig() {
         File cfgUpdated = new File("wrapper.config.updated");
         if (cfgUpdated.exists()) {
@@ -1046,15 +1136,22 @@ public class Router {
             System.exit(EXIT_HARD);
         }
     }
+*******/
     
+/*
     private static String getPingFile(Properties envProps) {
         if (envProps != null) 
             return envProps.getProperty("router.pingFile", "router.ping");
         else
             return "router.ping";
     }
-    private String getPingFile() {
-        return _context.getProperty("router.pingFile", "router.ping");
+*/
+    private File getPingFile() {
+        String s = _context.getProperty("router.pingFile", "router.ping");
+        File f = new File(s);
+        if (!f.isAbsolute())
+            f = new File(_context.getPIDDir(), s);
+        return f;
     }
     
     static final long LIVELINESS_DELAY = 60*1000;
@@ -1066,9 +1163,8 @@ public class Router {
      * 
      * @return true if the router is the only one running 
      */
-    private boolean beginMarkingLiveliness(Properties envProps) {
-        String filename = getPingFile(envProps);
-        File f = new File(filename);
+    private boolean beginMarkingLiveliness() {
+        File f = getPingFile();
         if (f.exists()) {
             long lastWritten = f.lastModified();
             if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
@@ -1376,15 +1472,14 @@ private static class PersistRouterInfoJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Persisting updated router info");
 
-        String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME);
-        if (infoFilename == null)
-            infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
+        String infoFilename = getContext().getProperty(PROP_INFO_FILENAME, PROP_INFO_FILENAME_DEFAULT);
+        File infoFile = new File(getContext().getRouterDir(), infoFilename);
 
         RouterInfo info = getContext().router().getRouterInfo();
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(infoFilename);
+            fos = new FileOutputStream(infoFile);
             info.writeBytes(fos);
         } catch (DataFormatException dfe) {
             _log.error("Error rebuilding the router information", dfe);

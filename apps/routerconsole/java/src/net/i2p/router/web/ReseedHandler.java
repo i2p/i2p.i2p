@@ -256,7 +256,7 @@ public class ReseedHandler {
     
         private void writeSeed(String name, byte data[]) throws Exception {
             String dirName = "netDb"; // _context.getProperty("router.networkDatabase.dbDir", "netDb");
-            File netDbDir = new File(dirName);
+            File netDbDir = new File(_context.getRouterDir(), dirName);
             if (!netDbDir.exists()) {
                 boolean ok = netDbDir.mkdirs();
             }

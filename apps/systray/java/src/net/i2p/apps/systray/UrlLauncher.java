@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.ShellCommand;
 
 /**
@@ -68,10 +69,11 @@ public class UrlLauncher {
                 String         browserString  = "\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" -nohome";
                 BufferedReader bufferedReader = null;
 
-                _shellCommand.executeSilentAndWait("regedit /E browser.reg \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"");
+                File foo = new File(I2PAppContext.getGlobalContext().getTempDir(), "browser.reg");
+                _shellCommand.executeSilentAndWait("regedit /E \"" + foo.getAbsolutePath() + "\" \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"");
 
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("browser.reg"), "UTF-16"));
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(foo), "UTF-16"));
                     for (String line; (line = bufferedReader.readLine()) != null; ) {
                         if (line.startsWith("@=")) {
                             // we should really use the whole line and replace %1 with the url
@@ -86,7 +88,7 @@ public class UrlLauncher {
                     } catch (IOException e) {
                         // No worries.
                     }
-                    new File("browser.reg").delete();
+                    foo.delete();
                 } catch (Exception e) {
                     // Defaults to IE.
                 } finally {

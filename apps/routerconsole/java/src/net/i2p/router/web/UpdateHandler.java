@@ -31,6 +31,7 @@ public class UpdateHandler {
     protected RouterContext _context;
     protected Log _log;
     protected DecimalFormat _pct = new DecimalFormat("00.0%");
+    protected String _updateFile;
     
     protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
     protected static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
@@ -41,6 +42,7 @@ public class UpdateHandler {
     public UpdateHandler(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(UpdateHandler.class);
+        _updateFile = (new File(ctx.getRouterDir(), SIGNED_UPDATE_FILE)).getAbsolutePath();
     }
     
     /**
@@ -137,9 +139,9 @@ public class UpdateHandler {
             try {
                 EepGet get = null;
                 if (shouldProxy)
-                    get = new EepGet(_context, proxyHost, proxyPort, 20, SIGNED_UPDATE_FILE, updateURL, false);
+                    get = new EepGet(_context, proxyHost, proxyPort, 20, _updateFile, updateURL, false);
                 else
-                    get = new EepGet(_context, 1, SIGNED_UPDATE_FILE, updateURL, false);
+                    get = new EepGet(_context, 1, _updateFile, updateURL, false);
                 get.addStatusListener(UpdateRunner.this);
                 get.fetch();
             } catch (Throwable t) {
@@ -167,8 +169,9 @@ public class UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             _status = "<b>Update downloaded</b>";
             TrustedUpdate up = new TrustedUpdate(_context);
-            String err = up.migrateVerified(RouterVersion.VERSION, SIGNED_UPDATE_FILE, Router.UPDATE_FILE);
-            File f = new File(SIGNED_UPDATE_FILE);
+            File f = new File(_updateFile);
+            File to = new File(_context.getBaseDir(), Router.UPDATE_FILE);
+            String err = up.migrateVerified(RouterVersion.VERSION, f, to);
             f.delete();
             if (err == null) {
                 String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);

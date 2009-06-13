@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import java.io.File;
 import java.util.Locale;
 
-import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 
 public class ContentHelper extends HelperBase {
@@ -14,6 +13,9 @@ public class ContentHelper extends HelperBase {
     
     public ContentHelper() {}
     
+    /**
+     * Caution, use absolute paths only, do not assume files are in CWD
+     */
     public void setPage(String page) { _page = page; }
     public void setStartAtBeginning(String moo) { 
         _startAtBeginning = Boolean.valueOf(""+moo).booleanValue(); 

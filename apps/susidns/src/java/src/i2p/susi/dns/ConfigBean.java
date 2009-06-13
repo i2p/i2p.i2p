@@ -33,12 +33,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import net.i2p.I2PAppContext;
+
 public class ConfigBean implements Serializable {
 	
 	/*
 	 * as this is not provided as constant in addressbook, we define it here
 	 */
-	public static final String addressbookPrefix = "addressbook/";
+ 	public static final String addressbookPrefix =
+ 		(new File(I2PAppContext.getGlobalContext().getRouterDir(), "addressbook")).getAbsolutePath()
+			+ File.separatorChar;
 	public static final String configFileName = addressbookPrefix + "config.txt";
 	
 	private String action, config;

@@ -59,7 +59,7 @@ public class RouterConsoleRunner {
     }
     
     public void startConsole() {
-        File workDir = new File("work");
+        File workDir = new File(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
         if (!workDirRemoved)
             System.err.println("ERROR: Unable to remove Jetty temporary work directory");
@@ -95,8 +95,11 @@ public class RouterConsoleRunner {
             }
             _server.setRootWebApp(ROUTERCONSOLE);
             WebApplicationContext wac = _server.addWebApplication("/", _webAppsDir + ROUTERCONSOLE + ".war");
+            File tmpdir = new File(workDir, ROUTERCONSOLE + "-" + _listenPort);
+            tmpdir.mkdir();
+            wac.setTempDirectory(tmpdir);
             initialize(wac);
-            File dir = new File(_webAppsDir);
+            File dir = new File(I2PAppContext.getGlobalContext().getBaseDir(), _webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());
             if (fileNames != null) {
                 for (int i = 0; i < fileNames.length; i++) {
@@ -106,6 +109,9 @@ public class RouterConsoleRunner {
                         if (! "false".equals(enabled)) {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
                             wac = _server.addWebApplication("/"+ appName, path);
+                            tmpdir = new File(workDir, appName + "-" + _listenPort);
+                            tmpdir.mkdir();
+                            wac.setTempDirectory(tmpdir);
                             initialize(wac);
                             if (enabled == null) {
                                 // do this so configclients.jsp knows about all apps from reading the config
@@ -144,10 +150,10 @@ public class RouterConsoleRunner {
         // don't have an installation directory that they can put the flag in yet.
         File noReseedFile = new File(new File(System.getProperty("user.home")), ".i2pnoreseed");
         File noReseedFileAlt1 = new File(new File(System.getProperty("user.home")), "noreseed.i2p");
-        File noReseedFileAlt2 = new File(".i2pnoreseed");
-        File noReseedFileAlt3 = new File("noreseed.i2p");
+        File noReseedFileAlt2 = new File(I2PAppContext.getGlobalContext().getConfigDir(), ".i2pnoreseed");
+        File noReseedFileAlt3 = new File(I2PAppContext.getGlobalContext().getConfigDir(), "noreseed.i2p");
         if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
-            File netDb = new File("netDb");
+            File netDb = new File(I2PAppContext.getGlobalContext().getRouterDir(), "netDb");
             // sure, some of them could be "my.info" or various leaseSet- files, but chances are, 
             // if someone has those files, they've already been seeded (at least enough to let them
             // get i2p started - they can reseed later in the web console)
@@ -216,7 +222,7 @@ public class RouterConsoleRunner {
         Properties rv = new Properties();
         // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
-        File cfgFile = new File(webappConfigFile);
+        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), webappConfigFile);
         
         try {
             DataHelper.loadProps(rv, cfgFile);
@@ -230,7 +236,7 @@ public class RouterConsoleRunner {
     public static void storeWebAppProperties(Properties props) {
         // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
-        File cfgFile = new File(webappConfigFile);
+        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), webappConfigFile);
         
         try {
             DataHelper.storeProps(props, cfgFile);

@@ -4,6 +4,7 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -135,6 +136,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
+
+    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
+
 
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -372,7 +376,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             {
                                 String str;
                                 byte[] header;
-                                str = FileUtil.readTextFile("docs/ahelper-conflict-header.ht", 100, true);
+                                str = FileUtil.readTextFile((new File(_errorDir, "ahelper-conflict-header.ht")).getAbsolutePath(), 100, true);
                                 if (str != null) header = str.getBytes();
                                   else header = ERR_AHELPER_CONFLICT;
 
@@ -558,13 +562,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 byte[] header;
                 boolean showAddrHelper = false;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else if(ahelper != 0)
-                    str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfb-header.ht")).getAbsolutePath(), 100, true);
                 else if (destination.length() == 60 && destination.endsWith(".b32.i2p"))
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
                 else {
-                    str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfh-header.ht")).getAbsolutePath(), 100, true);
                     showAddrHelper = true;
                 }
                 if (str != null)
@@ -733,9 +737,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 String str;
                 byte[] header;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
                 if (str != null)
                     header = str.getBytes();
                 else

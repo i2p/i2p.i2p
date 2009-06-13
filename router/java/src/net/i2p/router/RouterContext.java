@@ -70,7 +70,11 @@ public class RouterContext extends I2PAppContext {
     public RouterContext(Router router, Properties envProps) { 
         super(filterProps(envProps));
         _router = router;
-        initAll();
+        // Disabled here so that the router can get a context and get the
+        // directory locations from it, to do an update, without having
+        // to init everything. Caller MUST call initAll() afterwards.
+        // Sorry, this breaks some main() unit tests out there.
+        //initAll();
         _contexts.add(this);
     }
     /**
@@ -86,7 +90,7 @@ public class RouterContext extends I2PAppContext {
             envProps.setProperty("time.disabled", "false");
         return envProps;
     }
-    private void initAll() {
+    public void initAll() {
         //_adminManager = new AdminManager(this);
         if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
             _clientManagerFacade = new ClientManagerFacadeImpl(this);

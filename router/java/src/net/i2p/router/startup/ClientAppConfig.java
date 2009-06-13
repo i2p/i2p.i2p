@@ -43,6 +43,8 @@ public class ClientAppConfig {
         Properties rv = new Properties();
         String clientConfigFile = ctx.getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
         File cfgFile = new File(clientConfigFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(ctx.getConfigDir(), clientConfigFile);
         
         // fall back to use router.config's clientApp.* lines
         if (!cfgFile.exists()) 
@@ -91,9 +93,12 @@ public class ClientAppConfig {
 
     public static void writeClientAppConfig(RouterContext ctx, List apps) {
         String clientConfigFile = ctx.getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
+        File cfgFile = new File(clientConfigFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(ctx.getConfigDir(), clientConfigFile);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(clientConfigFile);
+            fos = new FileOutputStream(cfgFile);
             StringBuffer buf = new StringBuffer(2048);
             for(int i = 0; i < apps.size(); i++) {
                 ClientAppConfig app = (ClientAppConfig) apps.get(i);

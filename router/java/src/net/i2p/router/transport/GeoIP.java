@@ -130,7 +130,8 @@ public class GeoIP {
     *
     */
     private void readCountryFile() {
-        File GeoFile = new File(GEOIP_DIR_DEFAULT, COUNTRY_FILE_DEFAULT);
+        File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        GeoFile = new File(GeoFile, COUNTRY_FILE_DEFAULT);
         if (GeoFile == null || (!GeoFile.exists())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Country file not found: " + GeoFile.getAbsolutePath());
@@ -188,7 +189,8 @@ public class GeoIP {
     *
     */
     private String[] readGeoIPFile(Long[] search) {
-        File GeoFile = new File(GEOIP_DIR_DEFAULT, GEOIP_FILE_DEFAULT);
+        File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
+        GeoFile = new File(GeoFile, GEOIP_FILE_DEFAULT);
         if (GeoFile == null || (!GeoFile.exists())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("GeoIP file not found: " + GeoFile.getAbsolutePath());
