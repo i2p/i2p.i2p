@@ -202,8 +202,7 @@
             <fileset dir="." includes="**/*.java~" />
         </delete>
     </target>
-    <!-- one release only, then back to updaterWithJettyFixes -->
-    <target name="pkg" depends="distclean, updaterWithJettyFixesAndGeoIP, preppkg, installer" />
+    <target name="pkg" depends="distclean, updaterWithJettyFixes, preppkg, installer" />
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
