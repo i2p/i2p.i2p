@@ -178,12 +178,12 @@ public class I2PAppContext {
     *  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
     *  Temp	i2p.dir.temp	getTempDir()	Temporary files
     *  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
+    *  PID	i2p.dir.pid	getPIDDir()	wrapper *.pid files, router.ping
     *
     *  (the following all default to the same as Config)
     *
     *  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
     *  Log	i2p.dir.log	getLogDir()	wrapper.log*, logs/
-    *  PID	i2p.dir.pid	getPIDDir()	wrapper *.pid files, router.ping
     *  App	i2p.dir.app	getAppDir()	eepsite/, ...
     *
     *  Note that we can't control where the wrapper puts its files.
@@ -234,15 +234,12 @@ public class I2PAppContext {
         } else {
             _routerDir = _configDir;
         }
+        // pid defaults to system temp directory
+        s = getProperty("i2p.dir.pid", System.getProperty("java.io.tmpdir"));
+        _pidDir = new File(s);
+        if (!_pidDir.exists())
+            _pidDir.mkdir();
         // these all default to router
-        s = getProperty("i2p.dir.pid");
-        if (s != null) {
-            _pidDir = new File(s);
-            if (!_pidDir.exists())
-                _pidDir.mkdir();
-        } else {
-            _pidDir = _routerDir;
-        }
         s = getProperty("i2p.dir.log");
         if (s != null) {
             _logDir = new File(s);
