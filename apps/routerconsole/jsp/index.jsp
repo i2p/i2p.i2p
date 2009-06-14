@@ -19,7 +19,7 @@ if (System.getProperty("router.consoleNonce") == null) {
 
 <div class="news" id="news">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="newshelper" scope="request" />
- <% File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/news.xml"); %>
+ <% File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml"); %>
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />

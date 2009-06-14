@@ -46,7 +46,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
         _lastFetch = 0;
-        _newsFile = new File(_context.getBaseDir(), NEWS_FILE);
+        _newsFile = new File(_context.getRouterDir(), NEWS_FILE);
         _tempFile = new File(_context.getTempDir(), TEMP_NEWS_FILE);
         updateLastFetched();
         _lastUpdated = _lastFetch;

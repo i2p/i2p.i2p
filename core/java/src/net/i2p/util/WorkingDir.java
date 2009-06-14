@@ -121,6 +121,7 @@ public class WorkingDir {
         // this one must be after MIGRATE_BASE
         success &= migrateJettyXml(oldDirf, dirf);
         success &= migrateClientsConfig(oldDirf, dirf);
+        success &= copy(new File(oldDirf, "docs/news.xml"), new File(dirf, "docs"));
 
         // Report success or failure
         if (success) {
