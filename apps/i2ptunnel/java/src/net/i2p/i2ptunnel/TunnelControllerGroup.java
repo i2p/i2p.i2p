@@ -231,6 +231,8 @@ public class TunnelControllerGroup {
     public void saveConfig(String configFile) {
         _configFile = configFile;
         File cfgFile = new File(configFile);
+        if (!cfgFile.isAbsolute())
+            cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), configFile);
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
