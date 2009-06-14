@@ -24,6 +24,7 @@ import freenet.support.CPUInformation.IntelCPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
@@ -516,8 +517,11 @@ public class NativeBigInteger extends BigInteger {
      * 
      * <p>This is a pretty ugly hack, using the general technique illustrated by the
      * onion FEC libraries.  It works by pulling the resource, writing out the 
-     * byte stream to a temporary file, loading the native library from that file,
-     * then deleting the file.</p>
+     * byte stream to a temporary file, loading the native library from that file.
+     * We then attempt to copy the file from the temporary dir to the base install dir,
+     * so we don't have to do this next time - but we don't complain if it fails,
+     * so we transparently support read-only base dirs.
+     * </p>
      *
      * @return true if it was loaded successfully, else false
      *
@@ -538,9 +542,10 @@ public class NativeBigInteger extends BigInteger {
 
         File outFile = null;
         FileOutputStream fos = null;
+        String filename =  _libPrefix + "jbigi" + _libSuffix;
         try {
             InputStream libStream = resource.openStream();
-            outFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), _libPrefix + "jbigi" + _libSuffix);
+            outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
             // wtf this was 4096*1024 which is really excessive for a roughly 50KB file
             byte buf[] = new byte[4096];
@@ -552,7 +557,6 @@ public class NativeBigInteger extends BigInteger {
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
-            return true;
         } catch (UnsatisfiedLinkError ule) {
             if (_doLog) {
                 System.err.println("ERROR: The resource " + resourceName 
@@ -571,6 +575,10 @@ public class NativeBigInteger extends BigInteger {
                 try { fos.close(); } catch (IOException ioe) {}
             }
         }
+        // copy to install dir, ignore failure
+        File newFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), filename);
+        FileUtil.copy(outFile.getAbsolutePath(), newFile.getAbsolutePath(), false, true);
+        return true;
     }
     
     private static final String getResourceName(boolean optimized) {
