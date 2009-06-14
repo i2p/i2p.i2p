@@ -21,7 +21,6 @@ import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TransientSessionKeyManager;
-                                            import net.i2p.data.DataHelper;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
@@ -224,7 +223,6 @@ public class I2PAppContext {
         } else {
             _configDir = _baseDir;
         }
-        _configDir = new File(s);
         // router defaults to config
         s = getProperty("i2p.dir.router");
         if (s != null) {
