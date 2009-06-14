@@ -137,11 +137,16 @@ public class ReseedHandler {
          *  Fetch a directory listing and then up to 200 routerInfo files in the listing.
          *  The listing must contain (exactly) strings that match:
          *           href="routerInfo-{hash}.dat">
+         *  OR
+         *           HREF="routerInfo-{hash}.dat">
          * and then it fetches the files
          *           {seedURL}routerInfo-{hash}.dat
          * after appending a '/' to seedURL if it doesn't have one.
          * Essentially this means that the seedURL must be a directory, it
          * can't end with 'index.html', for example.
+         *
+         * Jetty directory listings are not compatible, as they look like
+         * HREF="/full/path/to/routerInfo-...
          **/
         private void reseedOne(String seedURL, boolean echoStatus) {
 
@@ -165,8 +170,11 @@ public class ReseedHandler {
                 int total = 0;
                 while (total++ < 1000) {
                     int start = content.indexOf("href=\"routerInfo-", cur);
-                    if (start < 0)
-                        break;
+                    if (start < 0) {
+                        start = content.indexOf("HREF=\"routerInfo-", cur);
+                        if (start < 0)
+                            break;
+                    }
 
                     int end = content.indexOf(".dat\">", start);
                     String name = content.substring(start+"href=\"routerInfo-".length(), end);
