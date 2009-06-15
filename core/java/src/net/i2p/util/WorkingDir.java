@@ -93,11 +93,6 @@ public class WorkingDir {
             System.err.println("Wanted to use " + rv + " for a working directory but it is not a directory");
             return cwd;
         }
-        if (!dirf.mkdir()) {
-            System.err.println("Wanted to use " + rv + " for a working directory but could not create it");
-            return cwd;
-        }
-
         // Check for a router.keys file or logs dir, if either exists it's an old install,
         // and only migrate the data files if told to do so
         // (router.keys could be deleted later by a killkeys())
@@ -111,6 +106,11 @@ public class WorkingDir {
         if (oldInstall && !migrateOldConfig)
             return cwd;
         boolean migrateOldData = false; // this is a terrible idea
+
+        if (!dirf.mkdir()) {
+            System.err.println("Wanted to use " + rv + " for a working directory but could not create it");
+            return cwd;
+        }
 
         // Do the copying
         if (migrateOldData)
