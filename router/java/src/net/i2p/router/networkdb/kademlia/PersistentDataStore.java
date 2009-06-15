@@ -26,6 +26,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -39,6 +40,8 @@ class PersistentDataStore extends TransientDataStore {
     private String _dbDir;
     private KademliaNetworkDatabaseFacade _facade;
     private Writer _writer;
+    private ReadJob _readJob;
+    private boolean _initialized;
     
     private final static int READ_DELAY = 60*1000;
     
@@ -47,7 +50,8 @@ class PersistentDataStore extends TransientDataStore {
         _log = ctx.logManager().getLog(PersistentDataStore.class);
         _dbDir = dbDir;
         _facade = facade;
-        _context.jobQueue().addJob(new ReadJob());
+        _readJob = new ReadJob();
+        _context.jobQueue().addJob(_readJob);
         ctx.statManager().createRateStat("netDb.writeClobber", "How often we clobber a pending netDb write", "NetworkDatabase", new long[] { 20*60*1000 });
         ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "NetworkDatabase", new long[] { 60*1000 });
         ctx.statManager().createRateStat("netDb.writeOut", "How many we wrote", "NetworkDatabase", new long[] { 20*60*1000 });
@@ -58,7 +62,10 @@ class PersistentDataStore extends TransientDataStore {
         //writer.setDaemon(true);
         writer.start();
     }
-    
+
+    public boolean isInitialized() { return _initialized; }
+
+    // this doesn't stop the read job or the writer, maybe it should?
     @Override
     public void stop() {
         super.stop();
@@ -71,6 +78,11 @@ class PersistentDataStore extends TransientDataStore {
         _dbDir = _facade.getDbDir();
     }
     
+    public void rescan() {
+        if (_initialized)
+            _readJob.wakeup();
+    }
+
     @Override
     public DataStructure get(Hash key) {
         return get(key, true);
@@ -317,6 +329,10 @@ class PersistentDataStore extends TransientDataStore {
             requeue(READ_DELAY);
         }
         
+        public void wakeup() {
+            requeue(0);
+        }
+        
         private void readFiles() {
             int routerCount = 0;
             try {
@@ -336,9 +352,10 @@ class PersistentDataStore extends TransientDataStore {
                 _log.error("Error reading files in the db dir", ioe);
             }
             
-            if ( (routerCount <= 5) && (!_alreadyWarned) ) {
-                _log.error("Very few routerInfo files remaining - please reseed");
+            if (!_alreadyWarned) {
+                ReseedChecker.checkReseed(_context, routerCount);
                 _alreadyWarned = true;
+                _initialized = true;
             }
         }
     }

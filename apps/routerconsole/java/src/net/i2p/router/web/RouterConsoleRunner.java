@@ -144,7 +144,8 @@ public class RouterConsoleRunner {
             storeWebAppProperties(props);
         try {
             _server.start();
-        } catch (Exception me) {
+        } catch (Throwable me) {
+            // NoClassFoundDefError from a webapp is a throwable, not an exception
             System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
                                "If your console is still accessible at http://127.0.0.1:7657/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
@@ -158,25 +159,6 @@ public class RouterConsoleRunner {
             t.printStackTrace();
         }
 
-        // we check the i2p installation directory (.) for a flag telling us not to reseed, 
-        // but also check the home directory for that flag too, since new users installing i2p
-        // don't have an installation directory that they can put the flag in yet.
-        File noReseedFile = new File(new File(System.getProperty("user.home")), ".i2pnoreseed");
-        File noReseedFileAlt1 = new File(new File(System.getProperty("user.home")), "noreseed.i2p");
-        File noReseedFileAlt2 = new File(I2PAppContext.getGlobalContext().getConfigDir(), ".i2pnoreseed");
-        File noReseedFileAlt3 = new File(I2PAppContext.getGlobalContext().getConfigDir(), "noreseed.i2p");
-        if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
-            File netDb = new File(I2PAppContext.getGlobalContext().getRouterDir(), "netDb");
-            // sure, some of them could be "my.info" or various leaseSet- files, but chances are, 
-            // if someone has those files, they've already been seeded (at least enough to let them
-            // get i2p started - they can reseed later in the web console)
-            String names[] = (netDb.exists() ? netDb.list() : null);
-            if ( (names == null) || (names.length < 15) ) {
-                ReseedHandler reseedHandler = new ReseedHandler();
-                reseedHandler.requestReseed();
-            }
-        }
-        
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
         I2PThread t = new I2PThread(fetcher, "NewsFetcher");
         t.setDaemon(true);

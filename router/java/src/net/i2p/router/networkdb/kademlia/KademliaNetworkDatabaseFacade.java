@@ -139,6 +139,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 10*60*1000 });
     }
     
+    @Override
+    public boolean isInitialized() {
+        return _initialized && _ds != null && _ds.isInitialized();
+    }
+
     protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
     public PeerSelector getPeerSelector() { return _peerSelector; }
     
@@ -177,7 +182,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void shutdown() {
         _initialized = false;
         _kb = null;
-        _ds.stop();
+        if (_ds != null)
+            _ds.stop();
         _ds = null;
         _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
         // _exploreKeys = null;
@@ -203,6 +209,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         publish(ri);
     }
     
+    @Override
+    public void rescan() {
+        if (isInitialized())
+           _ds.rescan();
+    }
+
     String getDbDir() { return _dbDir; }
     
     public void startup() {
