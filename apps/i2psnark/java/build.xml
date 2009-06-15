@@ -44,10 +44,16 @@
             </manifest>
         </jar>
     </target>    
-    <!-- only include the servlet, everything else is in the jar -->
+    <!-- Ideally we would include
+      -  only include the servlet, everything else is in the jar.
+      -  However, the wrapper.config classpath in existing installs
+      -  does not include i2psnark.jar.
+      -  So we must continue to duplicate everything in the war.
+          <classes dir="./build/obj" includes="**/I2PSnarkServlet*.class" />
+     -->
     <target name="war" depends="jar"> 
         <war destfile="../i2psnark.war" webxml="../web.xml">
-          <classes dir="./build/obj" includes="**/I2PSnarkServlet*.class" />
+          <classes dir="./build/obj" includes="**/*.class" excludes="**/RunStandalone.class" />
         </war>
     </target>
     
@@ -86,6 +92,7 @@
         <delete dir="./build" />
         <delete file="../i2psnark.war" />
         <delete file="./i2psnark-standalone.zip" />
+        <delete dir="./dist" />
     </target>
     <target name="cleandep" depends="clean">
         <ant dir="../../ministreaming/java/" target="distclean" />
