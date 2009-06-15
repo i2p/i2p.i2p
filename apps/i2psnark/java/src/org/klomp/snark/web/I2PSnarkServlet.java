@@ -876,10 +876,9 @@ public class I2PSnarkServlet extends HttpServlet {
     private static final String TABLE_FOOTER = "</table>\n";
     
     private static final String FOOTER = "</body></html>";
-}
 
-
-class FetchAndAdd implements Runnable {
+/** inner class, don't bother reindenting */
+private static class FetchAndAdd implements Runnable {
     private SnarkManager _manager;
     private String _url;
     public FetchAndAdd(SnarkManager mgr, String url) {
@@ -930,4 +929,6 @@ class FetchAndAdd implements Runnable {
             if (file != null) file.delete();
         }
     }
+}
+
 }

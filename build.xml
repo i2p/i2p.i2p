@@ -39,7 +39,10 @@
     </target>
     <target name="build" depends="build2">
         <!-- so we don't build standalone for the updater -->
+        <!-- This builds apps/i2psnark/java/i2psnark-standalone.zip,
+          -   which we don't distribute anywhere...
         <ant dir="apps/i2psnark/java/" target="standalone" />
+        -->
     </target>
     <target name="build2" depends="builddep, jar, buildWEB" />
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
@@ -240,7 +243,7 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <!-- <copy file="build/syndie.war" todir="pkg-temp/webapps/" /> -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="apps/i2psnark/java/build/launch-i2psnark.jar" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
