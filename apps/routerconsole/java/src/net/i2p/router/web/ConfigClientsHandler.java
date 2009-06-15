@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -111,7 +112,9 @@ public class ConfigClientsHandler extends FormHandler {
             for (int j = 0; j < hl.length; j++) {
                 if (hl[j].getPort() == 7657) {
                     try {
-                        s.addWebApplication("/"+ app, "./webapps/" + app + ".war").start();
+                        File path = new File(_context.getBaseDir(), "webapps");
+                        path = new File(path, app + ".war");
+                        s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
                         // no passwords... initialize(wac);
                         addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "<a> started");
                     } catch (Exception ioe) {
