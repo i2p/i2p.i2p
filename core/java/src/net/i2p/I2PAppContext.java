@@ -177,12 +177,12 @@ public class I2PAppContext {
     *  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
     *  Temp	i2p.dir.temp	getTempDir()	Temporary files
     *  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
-    *  PID	i2p.dir.pid	getPIDDir()	wrapper *.pid files, router.ping
+    *  PID	i2p.dir.pid	getPIDDir()	router.ping
     *
     *  (the following all default to the same as Config)
     *
     *  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
-    *  Log	i2p.dir.log	getLogDir()	wrapper.log*, logs/
+    *  Log	i2p.dir.log	getLogDir()	logs/
     *  App	i2p.dir.app	getAppDir()	eepsite/, ...
     *
     *  Note that we can't control where the wrapper puts its files.
@@ -254,7 +254,7 @@ public class I2PAppContext {
         } else {
             _appDir = _routerDir;
         }
-        // comment these out later, don't want user names in the wrapper logs
+        /******
         System.err.println("Base directory:   " + _baseDir.getAbsolutePath());
         System.err.println("Config directory: " + _configDir.getAbsolutePath());
         System.err.println("Router directory: " + _routerDir.getAbsolutePath());
@@ -262,6 +262,7 @@ public class I2PAppContext {
         System.err.println("Log directory:    " + _logDir.getAbsolutePath());
         System.err.println("PID directory:    " + _pidDir.getAbsolutePath());
         System.err.println("Temp directory:   " + getTempDir().getAbsolutePath());
+        ******/
     }
 
     public File getBaseDir() { return _baseDir; }
@@ -276,7 +277,7 @@ public class I2PAppContext {
             if (_tmpDir == null) {
                 String d = getProperty("i2p.dir.temp", System.getProperty("java.io.tmpdir"));
                 // our random() probably isn't warmed up yet
-                String f = "i2p-" + (new java.util.Random()).nextInt() + ".tmp";
+                String f = "i2p-" + Math.abs((new java.util.Random()).nextInt()) + ".tmp";
                 _tmpDir = new File(d, f);
                 if (_tmpDir.exists()) {
                     // good or bad ?
