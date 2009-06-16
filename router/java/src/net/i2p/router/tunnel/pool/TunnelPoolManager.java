@@ -29,6 +29,7 @@ import net.i2p.router.tunnel.HopConfig;
 import net.i2p.stat.RateStat;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.ObjectCounter;
 
 /**
  * 
@@ -588,15 +589,15 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     private void renderPeers(Writer out) throws IOException {
         // count up the peers in the local pools
-        HashCounter lc = new HashCounter();
+        ObjectCounter<Hash> lc = new ObjectCounter();
         int tunnelCount = countTunnelsPerPeer(lc);
 
         // count up the peers in the participating tunnels
-        HashCounter pc = new HashCounter();
+        ObjectCounter<Hash> pc = new ObjectCounter();
         int partCount = countParticipatingPerPeer(pc);
 
-        Set<Hash> peers = new HashSet(lc.hashes());
-        peers.addAll(pc.hashes());
+        Set<Hash> peers = new HashSet(lc.objects());
+        peers.addAll(pc.objects());
         List<Hash> peerList = new ArrayList(peers);
         Collections.sort(peerList, new HashComparator());
 
@@ -625,7 +626,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     /** @return total number of non-fallback expl. + client tunnels */
-    private int countTunnelsPerPeer(HashCounter lc) {
+    private int countTunnelsPerPeer(ObjectCounter<Hash> lc) {
         List<TunnelPool> pools = new ArrayList();
         listPools(pools);
         int tunnelCount = 0;
@@ -661,12 +662,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      *  @return Set of peers that should not be allowed in another tunnel
      */
     public Set<Hash> selectPeersInTooManyTunnels() {
-        HashCounter lc = new HashCounter();
+        ObjectCounter<Hash> lc = new ObjectCounter();
         int tunnelCount = countTunnelsPerPeer(lc);
         Set<Hash> rv = new HashSet();
         if (tunnelCount >= 4 && _context.router().getUptime() > 10*60*1000) {
             int max = _context.getProperty("router.maxTunnelPercentage", DEFAULT_MAX_PCT_TUNNELS);
-            for (Hash h : lc.hashes()) {
+            for (Hash h : lc.objects()) {
                  if (lc.count(h) > 0 && (lc.count(h) + 1) * 100 / (tunnelCount + 1) > max)
                      rv.add(h);
             }
@@ -675,7 +676,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     /** @return total number of part. tunnels */
-    private int countParticipatingPerPeer(HashCounter pc) {
+    private int countParticipatingPerPeer(ObjectCounter<Hash> pc) {
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
         for (HopConfig cfg : participating) {
             Hash from = cfg.getReceiveFrom();
@@ -691,27 +692,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     class HashComparator implements Comparator {
          public int compare(Object l, Object r) {
              return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
-        }
-    }
-
-    private static class HashCounter {
-        private ConcurrentHashMap<Hash, Integer> _map;
-        public HashCounter() {
-            _map = new ConcurrentHashMap();
-        }
-        public void increment(Hash h) {
-            Integer i = _map.putIfAbsent(h, Integer.valueOf(1));
-            if (i != null)
-                _map.put(h, Integer.valueOf(i.intValue() + 1));
-        }
-        public int count(Hash h) {
-            Integer i = _map.get(h);
-            if (i != null)
-                return i.intValue();
-            return 0;
-        }
-        public Set<Hash> hashes() {
-            return _map.keySet();
         }
     }
 
