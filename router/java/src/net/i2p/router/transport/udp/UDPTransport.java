@@ -1382,6 +1382,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
 
+    public boolean haveHighCapacity() {
+        synchronized (_peersByIdent) {
+            return _peersByIdent.size() < getMaxConnections() / 2;
+        }
+    }
+
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.

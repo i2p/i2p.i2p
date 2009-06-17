@@ -73,6 +73,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public boolean haveInboundCapacity() { return (_manager == null ? false : _manager.haveInboundCapacity()); } 
     @Override
     public boolean haveOutboundCapacity() { return (_manager == null ? false : _manager.haveOutboundCapacity()); } 
+    @Override
+    public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.

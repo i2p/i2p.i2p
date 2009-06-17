@@ -1,3 +1,14 @@
+2009-06-17 zzz
+    * PeerSelector:
+      - Limit exploratory tunnels to connected peers when over
+        half the connection limit (was 80%)
+      - Have the high capacity tier fall back to a new connected tier
+        before moving on to the not failing tier
+        so that tunnel build success doesn't collapse and drive
+        connections to the limit
+    * PeerTestJob:
+      - Limit to connected peers
+
 2009-06-12 zzz
     * Console:
       - Move the console css from default.css in the .war to docs/themes/console/console.css,

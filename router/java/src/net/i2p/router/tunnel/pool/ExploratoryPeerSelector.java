@@ -47,7 +47,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         //
         if (exploreHighCap) 
             ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
-        else if (ctx.commSystem().haveOutboundCapacity())
+        else if (ctx.commSystem().haveHighOutboundCapacity())
             ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);
         else // use only connected peers so we don't make more connections
             ctx.profileOrganizer().selectActiveNotFailingPeers(length, exclude, matches);
