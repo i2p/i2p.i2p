@@ -77,11 +77,13 @@
     <property name="build_lib" location="lib"/>
     <property name="build_i2pref" location="../../build"/>
     <property name="build_routerconsole" location="../routerconsole/java/build/"/>
+    <property name="build_i2ptunnel" location="../i2ptunnel/java/build/"/>
 	
     <path id="build_classpath">
         <fileset dir="${build_lib}" includes="**/*.jar"/>
         <fileset dir="${build_i2pref}" includes="**/*.jar"/>
         <fileset dir="${build_routerconsole}" includes="**/*.jar"/>
+        <fileset dir="${build_i2ptunnel}" includes="**/*.jar"/>
     </path>
     <target name="build_init">
         <!-- Create the time stamp -->

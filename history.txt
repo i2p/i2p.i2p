@@ -1,3 +1,8 @@
+2009-06-17 Mathiasdm
+    * desktopgui:
+      - Added client and server tunnel view
+        (saving does not work yet)
+
 2009-06-17 zzz
     * PeerSelector:
       - Limit exploratory tunnels to connected peers when over
