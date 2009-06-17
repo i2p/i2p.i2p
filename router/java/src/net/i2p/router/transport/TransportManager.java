@@ -216,6 +216,20 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
+      * Are all transports well below their outbound connection limit
+      * Use for throttling in the router.
+      */
+    public boolean haveHighOutboundCapacity() { 
+        if (_transports.size() <= 0)
+            return false;
+        for (int i = 0; i < _transports.size(); i++) {
+            if (!((Transport)_transports.get(i)).haveHighCapacity())
+                return false;
+        }
+        return true;
+    }
+    
+    /**
       * Is at least one transport below its inbound connection limit + some margin
       * Use for throttling in the router.
       */

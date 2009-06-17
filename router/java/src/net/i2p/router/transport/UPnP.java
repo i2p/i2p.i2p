@@ -47,9 +47,11 @@ import org.freenetproject.ForwardPortStatus;
  *
  * some code has been borrowed from Limewire : @see com.limegroup.gnutella.UPnPManager
  *
- * @see http://www.upnp.org/
- * @see http://en.wikipedia.org/wiki/Universal_Plug_and_Play
- * 
+ * @see "http://www.upnp.org/"
+ * @see "http://en.wikipedia.org/wiki/Universal_Plug_and_Play"
+ */
+
+/* 
  * TODO: Support multiple IGDs ?
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change

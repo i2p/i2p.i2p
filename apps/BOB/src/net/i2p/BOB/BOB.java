@@ -41,7 +41,6 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.RetransmissionTimer;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleStore;
 import net.i2p.util.SimpleTimer2;
 
 /**

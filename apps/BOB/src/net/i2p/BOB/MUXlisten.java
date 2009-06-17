@@ -43,7 +43,7 @@ import net.i2p.util.Log;
  */
 public class MUXlisten implements Runnable {
 
-	private NamedDB database,  info;
+	private NamedDB database, info;
 	private Log _log;
 	private I2PSocketManager socketManager;
 	private ByteArrayInputStream prikey;
@@ -269,27 +269,27 @@ public class MUXlisten implements Runnable {
 			// Wait around till all threads are collected.
 			if (tg != null) {
 				String boner = tg.getName();
-				System.out.println("BOB: MUXlisten: Starting thread collection for: " + boner);
+				// System.out.println("BOB: MUXlisten: Starting thread collection for: " + boner);
 				_log.warn("BOB: MUXlisten: Starting thread collection for: " + boner);
 				// tg.interrupt(); // give my stuff a small smack again.
 				if (tg.activeCount() + tg.activeGroupCount() != 0) {
-					visit(tg, 0, boner);
+					// visit(tg, 0, boner);
 					int foo = tg.activeCount() + tg.activeGroupCount();
 					// hopefully no longer needed!
-					int bar = foo;
-					System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
-					System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
-					visit(tg, 0, boner);
-					System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+					// int bar = foo;
+					// System.out.println("BOB: MUXlisten: Waiting on threads for " + boner);
+					// System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+					// visit(tg, 0, boner);
+					// System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
 					// Happily spin forever :-(
 					while (foo != 0) {
 						foo = tg.activeCount() + tg.activeGroupCount();
-						if (foo != bar && foo != 0) {
-							System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
-							visit(tg, 0, boner);
-							System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
-						}
-						bar = foo;
+						// if (foo != bar && foo != 0) {
+						// 	System.out.println("\nBOB: MUXlisten: ThreadGroup dump BEGIN " + boner);
+						// 	visit(tg, 0, boner);
+						// 	System.out.println("BOB: MUXlisten: ThreadGroup dump END " + boner + "\n");
+						// }
+						// bar = foo;
 						try {
 							Thread.sleep(100); //sleep for 100 ms (One tenth second)
 						} catch (InterruptedException ex) {
@@ -297,7 +297,7 @@ public class MUXlisten implements Runnable {
 						}
 					}
 				}
-				System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
+				// System.out.println("BOB: MUXlisten: Threads went away. Success: " + boner);
 				_log.warn("BOB: MUXlisten: Threads went away. Success: " + boner);
 				tg.destroy();
 				// Zap reference to the ThreadGroup so the JVM can GC it.
@@ -357,41 +357,4 @@ public class MUXlisten implements Runnable {
 		}
 	}
 
-	/*
-	private static void nuke(ThreadGroup group, int level) {
-	// Get threads in `group'
-	int numThreads = group.activeCount();
-	Thread[] threads = new Thread[numThreads * 2];
-	numThreads = group.enumerate(threads, false);
-	// Enumerate each thread in `group' and stop it.
-	for (int i = 0; i < numThreads; i++) {
-	// Get thread
-	Thread thread = threads[i];
-	try {
-	if (thread.isAlive()) {
-	thread.stop();
-	}
-	} catch (SecurityException se) {
-	//nop
-	}
-	}
-
-	// Get thread subgroups of `group'
-	int numGroups = group.activeGroupCount();
-	ThreadGroup[] groups = new ThreadGroup[numGroups * 2];
-	numGroups = group.enumerate(groups, false);
-
-	// Recursively visit each subgroup
-	for (int i = 0; i < numGroups; i++) {
-	nuke(groups[i], level + 1);
-	}
-	try {
-	group.destroy();
-	} catch (IllegalThreadStateException IE) {
-	//nop
-	} catch (SecurityException se) {
-	//nop
-	}
-	}
-	 */
 }

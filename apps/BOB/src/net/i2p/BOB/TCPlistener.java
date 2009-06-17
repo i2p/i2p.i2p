@@ -42,7 +42,6 @@ public class TCPlistener implements Runnable {
 
 	private NamedDB info,  database;
 	private Log _log;
-	private int tgwatch;
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
 	private ServerSocket listener;
@@ -60,7 +59,6 @@ public class TCPlistener implements Runnable {
 		this._log = _log;
 		this.socketManager = S;
 		this.listener = listener;
-		tgwatch = 1;
 	}
 
 	private void rlock() throws Exception {
@@ -84,28 +82,6 @@ public class TCPlistener implements Runnable {
 		try {
 			die:
 			{
-				try {
-					rlock();
-				} catch (Exception e) {
-					break die;
-				}
-				try {
-					if (info.exists("OUTPORT")) {
-						tgwatch = 2;
-					}
-				} catch (Exception e) {
-					try {
-						runlock();
-					} catch (Exception e2) {
-						break die;
-					}
-					break die;
-				}
-				try {
-					runlock();
-				} catch (Exception e) {
-					break die;
-				}
 				try {
 					Socket server = new Socket();
 					listener.setSoTimeout(50); // We don't block, we cycle and check.
@@ -134,7 +110,7 @@ public class TCPlistener implements Runnable {
 						if (g) {
 							conn++;
 							// toss the connection to a new thread.
-							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server);
+							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database);
 							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
 							t.start();
 							g = false;

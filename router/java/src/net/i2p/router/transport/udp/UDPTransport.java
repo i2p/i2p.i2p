@@ -386,8 +386,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Todo:
      *   - Much better tracking of troublemakers
      *   - Disable if we have good local address or UPnP
-     *
-     * @param ip publicly routable IPv4 only
+     * 
+     * @param from Hash of inbound destination
+     * @param ourIP publicly routable IPv4 only
      * @param ourPort >= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
@@ -1378,6 +1379,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public boolean haveCapacity() {
         synchronized (_peersByIdent) {
             return _peersByIdent.size() < getMaxConnections() * 4 / 5;
+        }
+    }
+
+    public boolean haveHighCapacity() {
+        synchronized (_peersByIdent) {
+            return _peersByIdent.size() < getMaxConnections() / 2;
         }
     }
 
