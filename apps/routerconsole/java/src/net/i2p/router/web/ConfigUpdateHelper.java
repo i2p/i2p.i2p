@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -12,8 +13,14 @@ public class ConfigUpdateHelper extends HelperBase {
     }
     
     public String getNewsURL() {
-        String url = _context.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
-        if (url != null)
+        return getNewsURL(_context);
+    }
+
+    /** hack to replace the old news location with the new one, even if they have saved
+        the update page at some point */
+    public static String getNewsURL(I2PAppContext ctx) {
+        String url = ctx.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
+        if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL))
             return url;
         else
             return ConfigUpdateHandler.DEFAULT_NEWS_URL;
@@ -26,18 +33,10 @@ public class ConfigUpdateHelper extends HelperBase {
             return ConfigUpdateHandler.DEFAULT_UPDATE_URL;
     }
     public String getProxyHost() {
-        String host = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST);
-        if (host != null)
-            return host;
-        else
-            return ConfigUpdateHandler.DEFAULT_PROXY_HOST;
+        return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
     }
     public String getProxyPort() {
-        String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT);
-        if (port != null)
-            return port;
-        else
-            return ConfigUpdateHandler.DEFAULT_PROXY_PORT;
+        return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
     }
     
     public String getUpdateThroughProxy() {
@@ -76,8 +75,7 @@ public class ConfigUpdateHelper extends HelperBase {
     }
     
     public String getUpdatePolicySelectBox() {
-        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
-        if (policy == null) policy = ConfigUpdateHandler.DEFAULT_UPDATE_POLICY;
+        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY, ConfigUpdateHandler.DEFAULT_UPDATE_POLICY);
         
         StringBuffer buf = new StringBuffer(256);
         buf.append("<select name=\"updatePolicy\">");
