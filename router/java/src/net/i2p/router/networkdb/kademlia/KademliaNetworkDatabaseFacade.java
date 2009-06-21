@@ -10,12 +10,15 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -42,6 +45,7 @@ import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
+import net.i2p.util.ObjectCounter;
 
 /**
  * Kademlia based version of the network database
@@ -999,8 +1003,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         out.write(buf.toString());
         buf.setLength(0);
         
-        /* coreVersion to Map of routerVersion to Integer */
-        Map versions = new TreeMap();
+        ObjectCounter<String> versions = new ObjectCounter();
+        ObjectCounter<String> countries = new ObjectCounter();
         
         Set routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(getRouters());
@@ -1012,40 +1016,47 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 renderRouterInfo(buf, ri, false, full);
                 out.write(buf.toString());
                 buf.setLength(0);
-                String coreVersion = ri.getOption("coreVersion");
                 String routerVersion = ri.getOption("router.version");
-                if ( (coreVersion != null) && (routerVersion != null) ) {
-                    Map routerVersions = (Map)versions.get(coreVersion);
-                    if (routerVersions == null) {
-                        routerVersions = new TreeMap();
-                        versions.put(coreVersion, routerVersions);
-                    }
-                    Integer val = (Integer)routerVersions.get(routerVersion);
-                    if (val == null)
-                        routerVersions.put(routerVersion, Integer.valueOf(1));
-                    else
-                        routerVersions.put(routerVersion, Integer.valueOf(val.intValue() + 1));
-                }
+                if (routerVersion != null)
+                    versions.increment(routerVersion);
+                String country = _context.commSystem().getCountry(key);
+                if(country != null)
+                    countries.increment(country);
             }
         }
             
-        if (versions.size() > 0) {
+        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td valign=\"top\">");
+        List<String> versionList = new ArrayList(versions.objects());
+        if (versionList.size() > 0) {
+            Collections.sort(versionList, Collections.reverseOrder());
             buf.append("<table border=\"1\">\n");
-            buf.append("<tr><td><b>Core version</b></td><td><b>Router version</b></td><td><b>Number</b></td></tr>\n");
-            for (Iterator iter = versions.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)iter.next();
-                String coreVersion = (String)entry.getKey();
-                Map routerVersions = (Map)entry.getValue();
-                for (Iterator routerIter = routerVersions.keySet().iterator(); routerIter.hasNext(); ) {
-                    String routerVersion = (String)routerIter.next();
-                    Integer num = (Integer)routerVersions.get(routerVersion);
-                    buf.append("<tr><td>").append(DataHelper.stripHTML(coreVersion));
-                    buf.append("</td><td>").append(DataHelper.stripHTML(routerVersion));
-                    buf.append("</td><td>").append(num.intValue()).append("</td></tr>\n");
-                }
+            buf.append("<tr><th>Version</th><th>Count</th></tr>\n");
+            for (String routerVersion : versionList) {
+                int num = versions.count(routerVersion);
+                buf.append("<tr><td>").append(DataHelper.stripHTML(routerVersion));
+                buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }
+        buf.append("</td><td valign=\"top\">");
+        out.write(buf.toString());
+        buf.setLength(0);
+            
+        List<String> countryList = new ArrayList(countries.objects());
+        if (countryList.size() > 0) {
+            Collections.sort(countryList);
+            buf.append("<table border=\"1\">\n");
+            buf.append("<tr><th>Country</th><th>Count</th></tr>\n");
+            for (String country : countryList) {
+                int num = countries.count(country);
+                buf.append("<tr><td><img alt=\"").append(country.toUpperCase()).append("\"");
+                buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
+                buf.append(_context.commSystem().getCountryName(country));
+                buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
+            }
+            buf.append("</table>\n");
+        }
+        buf.append("</td></tr></table>");
         out.write(buf.toString());
         out.flush();
     }
