@@ -12,9 +12,12 @@ package net.i2p.apps.systray;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.InetSocketAddress;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 
 import net.i2p.util.ShellCommand;
@@ -33,6 +36,56 @@ public class UrlLauncher {
 
     ShellCommand _shellCommand = new ShellCommand();
 
+    private static final int WAIT_TIME = 5*1000;
+    private static final int MAX_WAIT_TIME = 5*60*1000;
+    private static final int MAX_TRIES = 99;
+
+    /**
+     *  Prevent bad user experience by waiting for the server to be there
+     *  before launching the browser.
+     *  @return success
+     */
+    public boolean waitForServer(String urlString) {
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            return false;
+        }
+        String host = url.getHost();
+        int port = url.getPort();
+        if (port <= 0) {
+            port = url.getDefaultPort();
+            if (port <= 0)
+                return false;
+        }
+        SocketAddress sa;
+        try {
+            sa = new InetSocketAddress(host, port);
+        } catch (IllegalArgumentException iae) {
+            return false;
+        }
+        long done = System.currentTimeMillis() + MAX_WAIT_TIME;
+        for (int i = 0; i < MAX_TRIES; i++) {
+            try {
+                Socket test = new Socket();
+                // this will usually fail right away if it's going to fail since it's local
+                test.connect(sa, WAIT_TIME);
+                // it worked
+                try {
+                   test.close();
+                } catch (IOException ioe) {}
+                return true;
+            } catch (Exception e) {}
+            if (System.currentTimeMillis() > done)
+                break;
+            try {
+                Thread.sleep(WAIT_TIME);
+            } catch (InterruptedException ie) {}
+        }
+        return false;
+    }
+
     /**
      * Discovers the operating system the installer is running under and tries
      * to launch the given URL using the default browser for that platform; if
@@ -49,6 +102,7 @@ public class UrlLauncher {
 
         String osName = System.getProperty("os.name");
 
+        waitForServer(url);
         if (validateUrlFormat(url)) {
             if (osName.toLowerCase().indexOf("mac") > -1) {
                 if (osName.toLowerCase().startsWith("mac os x")) {
@@ -141,6 +195,7 @@ public class UrlLauncher {
      */
     public boolean openUrl(String url, String browser) throws Exception {
 
+        waitForServer(url);
         if (validateUrlFormat(url))
             if (_shellCommand.executeSilentAndWaitTimed(browser + " " + url, 5))
                 return true;
