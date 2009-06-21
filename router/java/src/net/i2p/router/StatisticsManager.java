@@ -87,14 +87,9 @@ public class StatisticsManager implements Service {
         
         if (_includePeerRankings) {
             long publishedUptime = _context.router().getUptime();
-            boolean commentOutIn074 = RouterVersion.VERSION.equals("0.7.3");
             // Don't publish these for first hour
-            if (publishedUptime > 62*60*1000) {
-                if (commentOutIn074)
-                    includeThroughput(stats);
-                else
-                    includeAverageThroughput(stats);
-            }
+            if (publishedUptime > 62*60*1000)
+                includeAverageThroughput(stats);
             //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             //includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             //includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
@@ -245,27 +240,6 @@ public class StatisticsManager implements Service {
         stats.setProperty("stat_bandwidthReceiveBps.60m", str);
     }
 
-    private void includeThroughput(Properties stats) {
-        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
-        if (sendRate != null) {
-            if (_context.router().getUptime() > 60*60*1000) { 
-                Rate r = sendRate.getRate(60*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthSendBps.60m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
-        }
-        
-        RateStat recvRate = _context.statManager().getRate("bw.recvRate");
-        if (recvRate != null) {
-            if (_context.router().getUptime() > 60*60*1000) {
-                Rate r = recvRate.getRate(60*60*1000);
-                if (r != null)
-                    stats.setProperty("stat_bandwidthReceiveBps.60m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
-            }
-        }
-    }
-
-    
     private String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
     private final String num(double num) { 
