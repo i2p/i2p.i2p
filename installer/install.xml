@@ -106,7 +106,7 @@
               http://www.javalobby.org/forums/thread.jspa?threadID=15967&tstart=0
               and the izpack docs for some guidance.
              -->
-            <parsable targetfile="$INSTALL_PATH/wrapper.config" type="javaprop" />
+            <parsable targetfile="$INSTALL_PATH/wrapper.config" type="plain" />
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
             
             <!-- postinstall stuff for windows -->
