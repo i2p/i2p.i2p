@@ -416,7 +416,7 @@ public class NTCPTransport extends TransportImpl {
     private static final int NUM_CONCURRENT_READERS = 3;
     private static final int NUM_CONCURRENT_WRITERS = 3;
 
-    public RouterAddress startListening() {
+    public synchronized RouterAddress startListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Starting ntcp transport listening");
         _finisher.start();
         _pumper.startPumping();
@@ -428,7 +428,7 @@ public class NTCPTransport extends TransportImpl {
         return bindAddress();
     }
 
-    public RouterAddress restartListening(RouterAddress addr) {
+    public synchronized RouterAddress restartListening(RouterAddress addr) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Restarting ntcp transport listening");
         _finisher.start();
         _pumper.startPumping();
@@ -602,7 +602,7 @@ public class NTCPTransport extends TransportImpl {
      *  This doesn't (completely) block, caller should check isAlive()
      *  before calling startListening() or restartListening()
      */
-    public void stopListening() {
+    public synchronized void stopListening() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Stopping ntcp transport");
         _pumper.stopPumping();
         _writer.stopWriting();
