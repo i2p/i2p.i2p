@@ -297,6 +297,9 @@
         <copy todir="pkg-temp/docs/themes/" >
           <fileset dir="installer/resources/themes/" />
         </copy>
+        <!-- CSS now in docs/, not in the .war -->
+        <copy file="apps/routerconsole/jsp/default.css" tofile="pkg-temp/docs/themes/console/console.css" />
+        <copy file="apps/routerconsole/jsp/default.css" tofile="pkg-temp/docs/themes/console/defCon1/console.css" />
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/logs" />
