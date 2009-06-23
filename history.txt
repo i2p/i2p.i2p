@@ -1,3 +1,12 @@
+2009-06-23 zzz
+    * Browser Launch: Add sensible-browser, x-www-browser, defaultbrowser, and
+      www-browser in an attempt to launch the user's preferred browser
+    * configupdate.jsp: Cleanup
+    * Installer: Include console.css!!!
+    * NTCP: Try again to prevent two Event Pumpers
+    * Update: Increase max retries
+    * UPnP: Catch AIOOBE reported by tuna
+
 2009-06-21 zzz
     * Browser Launch: Wait until the routerconsole is up before launching the browser
     * Installer: Fix wrapper.config parsing on windows
