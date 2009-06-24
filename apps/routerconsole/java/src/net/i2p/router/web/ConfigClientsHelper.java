@@ -15,7 +15,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm1() {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>Client</td><td>Run at Startup?</td><td>Start Now</td><td>Class and arguments</td></tr>\n");
+        buf.append("<tr><th>Client</th><th>Run at Startup?</th><th>Start Now</th><th>Class and arguments</th></tr>\n");
         
         List clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
@@ -31,7 +31,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm2() {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>WebApp</td><td>Run at Startup?</td><td>Start Now</td><td>Description</td></tr>\n");
+        buf.append("<tr><th>WebApp</th><th>Run at Startup?</th><th>Start Now</th><th>Description</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = new TreeSet(props.keySet());
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
