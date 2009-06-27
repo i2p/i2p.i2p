@@ -139,12 +139,18 @@ public class StatisticsManager implements Service {
             
             //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
             long rate = 60*60*1000;
-            includeRate("tunnel.buildClientExpire", stats, new long[] { rate });
-            includeRate("tunnel.buildClientReject", stats, new long[] { rate });
-            includeRate("tunnel.buildClientSuccess", stats, new long[] { rate });
-            includeRate("tunnel.buildExploratoryExpire", stats, new long[] { rate });
-            includeRate("tunnel.buildExploratoryReject", stats, new long[] { rate });
-            includeRate("tunnel.buildExploratorySuccess", stats, new long[] { rate });
+            boolean commentOutIn076 = RouterVersion.VERSION.equals("0.7.5");
+            if (commentOutIn076) {
+                includeRate("tunnel.buildClientExpire", stats, new long[] { rate });
+                includeRate("tunnel.buildClientReject", stats, new long[] { rate });
+                includeRate("tunnel.buildClientSuccess", stats, new long[] { rate });
+                includeRate("tunnel.buildExploratoryExpire", stats, new long[] { rate });
+                includeRate("tunnel.buildExploratoryReject", stats, new long[] { rate });
+                includeRate("tunnel.buildExploratorySuccess", stats, new long[] { rate });
+            } else {
+                includeTunnelRates("Client", stats, rate);
+                includeTunnelRates("Exploratory", stats, rate);
+            }
             //includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });
@@ -220,6 +226,49 @@ public class StatisticsManager implements Service {
                 buf.append(num((double)rate.getLifetimeEventCount())).append(';');
             }
         }
+        return buf.toString();
+    }
+
+    private static final String[] tunnelStats = { "Expire", "Reject", "Success" };
+
+    /**
+     *  Add tunnel build rates with some mods to hide absolute quantities
+     *  In particular, report counts normalized to 100 (i.e. a percentage)
+     */
+    private void includeTunnelRates(String tunnelType, Properties stats, long selectedPeriod) {
+        long totalEvents = 0;
+        for (String tunnelStat : tunnelStats) {
+            String rateName = "tunnel.build" + tunnelType + tunnelStat;
+            RateStat stat = _context.statManager().getRate(rateName);
+            if (stat == null) continue;
+            Rate curRate = stat.getRate(selectedPeriod);
+            if (curRate == null) continue;
+            totalEvents += curRate.getLastEventCount();
+        }
+        if (totalEvents <= 0)
+            return;
+        for (String tunnelStat : tunnelStats) {
+            String rateName = "tunnel.build" + tunnelType + tunnelStat;
+            RateStat stat = _context.statManager().getRate(rateName);
+            if (stat == null) continue;
+            Rate curRate = stat.getRate(selectedPeriod);
+            if (curRate == null) continue;
+            double fudgeQuantity = 100.0d * curRate.getLastEventCount() / totalEvents;
+            stats.setProperty("stat_" + rateName + '.' + getPeriod(curRate), renderRate(curRate, fudgeQuantity));
+        }
+    }
+    
+    private String renderRate(Rate rate, double fudgeQuantity) {
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(num(rate.getAverageValue())).append(';');
+        buf.append(num(rate.getExtremeAverageValue())).append(';');
+        buf.append(pct(rate.getPercentageOfLifetimeValue())).append(';');
+        if (rate.getLifetimeTotalEventTime() > 0) {
+            // bah saturation
+            buf.append("0;0;0;0;");
+        }
+        long numPeriods = rate.getLifetimePeriods();
+        buf.append(num(fudgeQuantity)).append(';');
         return buf.toString();
     }
 
