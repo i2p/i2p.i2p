@@ -202,6 +202,10 @@ public class LogManager {
         loadConfig();
     }
 
+    public String currentFile() {
+        return _writer.currentFile();
+    }
+
     /**
      * Used by Log to add records to the queue
      *

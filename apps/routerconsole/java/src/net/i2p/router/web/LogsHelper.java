@@ -9,7 +9,8 @@ public class LogsHelper extends HelperBase {
     public LogsHelper() {}
     
     public String getLogs() {
-        return formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
+        String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
+        return "Location: " + _context.logManager().currentFile() + "<br />" + str;
     }
     
     public String getCriticalLogs() {

@@ -93,7 +93,10 @@ class LogWriter implements Runnable {
         }
     }
     
-    
+    public String currentFile() {
+        return _currentFile != null ? _currentFile.getAbsolutePath() : "uninitialized";
+    }
+
     private void rereadConfig() {
         long now = Clock.getInstance().now();
         if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {
