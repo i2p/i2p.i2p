@@ -320,6 +320,13 @@
         <!-- CSS now in docs/, not in the .war -->
         <copy file="installer/resources/themes/console/console.css" todir="pkg-temp/docs/themes/console/" />
         <copy file="installer/resources/themes/console/defCon1/console.css" todir="pkg-temp/docs/themes/console/defCon1/" />
+        <!-- these files now in docs/, not in the .war -->
+        <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
+        <copy file="installer/resources/themes/console/images/i2plogo.png" todir="pkg-temp/docs/themes/console/images/" />
+        <!-- Since the logo moved, we have to update the error pages -->
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="installer/resources/" includes="*-header.ht" />
+        </copy>
         <!-- make a "classic" theme -->
         <copy todir="pkg-temp/docs/themes/console/classic/" >
             <fileset  dir="installer/resources/themes/console/classic/" />
