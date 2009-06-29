@@ -305,7 +305,7 @@
         <mkdir dir="pkg-temp/eepsite/docroot" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
-        <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
+        <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
     <target name="preplicenses">
