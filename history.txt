@@ -1,3 +1,49 @@
+2009-06-29 zzz
+    * Console: Convert table headers to <th> to prep for CSS changes
+    * Console CSS: Move css file, make a classic theme to prep for CSS changes
+    * Console: Move favicon.ico and i2plogo.png out of the .war
+      so that the HTTP proxy can use them directly;
+      proxy error pages must be updated next
+    * NetDb stats: Normalize tunnel build stats for increased anonymity,
+      effective in 0.7.6
+
+* 2009-06-29  0.7.5 released
+
+2009-06-29 Complication
+    * Update versions, package release
+    * Remove the last reference to my eepsite as a "news.xml" source,
+      and likewise stop my public key from being included
+      among valid release signing keys.
+
+2009-06-25 sponge
+    * Summary frame layout change so it makes sense.
+
+2009-06-23 zzz
+    * Browser Launch: Add sensible-browser, x-www-browser, defaultbrowser, and
+      www-browser in an attempt to launch the user's preferred browser
+    * configupdate.jsp: Cleanup
+    * Installer: Include console.css!!!
+    * NTCP: Try again to prevent two Event Pumpers
+    * Update: Increase max retries
+    * UPnP: Catch AIOOBE reported by tuna
+
+2009-06-21 zzz
+    * Browser Launch: Wait until the routerconsole is up before launching the browser
+    * Installer: Fix wrapper.config parsing on windows
+    * netdb.jsp: Add country chart at bottom, clean up version chart
+    * News Fetcher:
+      - Change default news URL, use it instead of the old one even if
+        the old one is saved in the configuration, to assist in the transition
+    * ReseedHandler:
+      - check for upper case HREF to be compatible with apache indexes
+    * Statistics Manager: post-0.7.4 cleanup
+    * Transport: Treat 5.0.0.0/8 (Hamachi) as local
+
+2009-06-17 Mathiasdm
+    * desktopgui:
+      - Added client and server tunnel view
+        (saving does not work yet)
+
 2009-06-17 zzz
     * PeerSelector:
       - Limit exploratory tunnels to connected peers when over

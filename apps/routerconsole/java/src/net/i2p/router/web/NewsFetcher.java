@@ -113,7 +113,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         }
     }
     public void fetchNews() {
-        String newsURL = _context.getProperty(ConfigUpdateHandler.PROP_NEWS_URL, ConfigUpdateHandler.DEFAULT_NEWS_URL);
+        String newsURL = ConfigUpdateHelper.getNewsURL(_context);
         boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);

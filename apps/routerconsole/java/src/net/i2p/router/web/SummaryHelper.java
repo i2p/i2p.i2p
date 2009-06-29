@@ -366,7 +366,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<i>No leases</i><br />\n");
             }
         }
-        buf.append("<hr />\n");
+        // buf.append("<hr />\n");
         return buf.toString();
     }
     

@@ -19,7 +19,8 @@ public class ConfigUpdateHandler extends FormHandler {
 
     public static final String PROP_NEWS_URL = "router.newsURL";
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
-    public static final String DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
+    public static final String OLD_DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
+    public static final String DEFAULT_NEWS_URL = "http://echelon.i2p/i2p/news.xml";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
     public static final String DEFAULT_REFRESH_FREQUENCY = 24*60*60*1000 + "";
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
@@ -57,7 +58,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
-            String oldURL = _context.router().getConfigSetting(PROP_NEWS_URL);
+            String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_NEWS_URL, _newsURL);
                 addFormNotice("Updating news URL to " + _newsURL);

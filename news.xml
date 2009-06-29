@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2009-06-12 00:00:00 $">
- <i2p.release version="0.7.4" date="2009/06/12" minVersion="0.6"
+<i2p.news date="$Date: 2009-06-29 00:00:00 $">
+ <i2p.release version="0.7.5" date="2009/06/29" minVersion="0.6"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
               anonannouncement="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/pipermail/i2p/2005-September/000878.html" 
@@ -11,22 +11,35 @@
             publiclogs="http://www.i2p.net/meeting141" />
 <p>
 &#149;
-2009-06-12: <b>0.7.4 <a href="http://www.i2p2.i2p/release-0.7.4.html">Released</a></b>
+2009-06-29: <b>0.7.5 <a href="http://www.i2p2.i2p/release-0.7.5.html">Released</a></b>
 </p><p>
-I2P version 0.7.4 introduces notable new features
-like GeoIP capability and UPnP support. While the former
-can become a basis for geographically aware tunnel-building,
-the latter should immediately enable more routers to accept
-inbound TCP connections, helping distribute workload more evenly.
+I2P version 0.7.5 foremost addresses network stability issues
+by adjusting how exploratory tunnels are built if a router nears
+its connection limit, and also by distinguishing between
+connected peers and other non-failing peers while picking them
+for inclusion in tunnels.
 </p><p>
-Inbound NTCP is now enabled automaticaly if the router
-does not appear firewalled, and default bandwidth limits
-for new installations are increased.
+This version also delivers fixes to installer behaviour on Windows,
+to the Router Console, NTCP transport and UPnP mechanism.
 </p><p>
-In addition, multiple bugfixes and updates are included,
-addressing issues with the NTCP transport, BOB protocol,
-connection limiting, behaviour of new I2PTunnel options
-and the SusiDNS user interface. Improvements to the Router Console
-are likewise included. Updating is recommended.
+Additionally, version 0.7.5 changes the "news.xml" file location
+where I2P routers check whether a new version is available.
+Instead of the old URL (http://complication.i2p/news.xml)
+a new location (http://echelon.i2p./news.xml) will be used.
+If your router uses default updater settings, it will start using
+the new URL automatically. If not, you will need to visit
+<a href="configupdate.jsp">configupdate.jsp</a>, and change it manually.
+For a while after this update, the old news.xml location will also
+redirect all HTTP requests to the new one.
+</p><p>
+Finally, since Complication is withdrawing from the I2P project,
+to make some far-reaching changes in his life, this update removes
+Complication's public key from the list of release signing keys.
+You should expect the next release to be signed by zzz instead.
+If you have non-default updater settings, you may want to remove
+Complication's public key manually, by visiting <a href="configupdate.jsp">configupdate.jsp</a>,
+and removing the key line starting with the characters "JHFA".
+If you wish to verify whether this information is correct,
+please check the GPG-signed release announcement.
 </p>
 </i2p.news>

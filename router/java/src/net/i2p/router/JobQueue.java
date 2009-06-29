@@ -669,9 +669,9 @@ public class JobQueue {
     /** render the HTML for the job stats */
     private void getJobStats(StringBuffer buf) { 
         buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td><b>Job</b></td><td><b>Runs</b></td>");
-        buf.append("<td><b>Time</b></td><td><b><i>Avg</i></b></td><td><b><i>Max</i></b></td><td><b><i>Min</i></b></td>");
-        buf.append("<td><b>Pending</b></td><td><b><i>Avg</i></b></td><td><b><i>Max</i></b></td><td><b><i>Min</i></b></td></tr>\n");
+        buf.append("<tr><th>Job</th><th>Runs</th>");
+        buf.append("<th>Time</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th>");
+        buf.append("<th>Pending</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th></tr>\n");
         long totRuns = 0;
         long totExecTime = 0;
         long avgExecTime = 0;

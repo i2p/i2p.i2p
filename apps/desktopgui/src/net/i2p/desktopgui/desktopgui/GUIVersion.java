@@ -10,5 +10,5 @@ package net.i2p.desktopgui.desktopgui;
  * @author mathias
  */
 public class GUIVersion {
-    public static final String VERSION = "0.0.1.3";
+    public static final String VERSION = "0.0.2";
 }

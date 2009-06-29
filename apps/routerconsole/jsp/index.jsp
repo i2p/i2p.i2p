@@ -6,7 +6,7 @@
 <title>I2P Router Console - home</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <%@include file="css.jsp" %>
-<link rel="shortcut icon" href="favicon.ico" />
+<link rel="shortcut icon" href="/themes/console/images/favicon.ico" />
 </head><body>
 <%
 if (System.getProperty("router.consoleNonce") == null) {

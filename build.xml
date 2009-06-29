@@ -318,6 +318,23 @@
         <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
+    <target name="prepthemeupdates">
+        <!-- CSS now in docs/, not in the .war -->
+        <copy file="installer/resources/themes/console/console.css" todir="pkg-temp/docs/themes/console/" />
+        <copy file="installer/resources/themes/console/defCon1/console.css" todir="pkg-temp/docs/themes/console/defCon1/" />
+        <!-- these files now in docs/, not in the .war -->
+        <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
+        <copy file="installer/resources/themes/console/images/i2plogo.png" todir="pkg-temp/docs/themes/console/images/" />
+        <!-- Since the logo moved, we have to update the error pages -->
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="installer/resources/" includes="*-header.ht" />
+        </copy>
+        <!-- make a "classic" theme -->
+        <copy todir="pkg-temp/docs/themes/console/classic/" >
+            <fileset  dir="installer/resources/themes/console/classic/" />
+        </copy>
+    </target>
+
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -363,7 +380,7 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />
     </target>
-    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter">
+    <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
@@ -373,9 +390,6 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- New readme_*.html files - For one release only -->
         <copy file="readme_zh.html" todir="pkg-temp/docs/" />
-        <!-- CSS now in docs/, not in the .war -->
-        <copy file="apps/routerconsole/jsp/default.css" tofile="pkg-temp/docs/themes/console/console.css" />
-        <copy file="apps/routerconsole/jsp/default.css" tofile="pkg-temp/docs/themes/console/defCon1/console.css" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />

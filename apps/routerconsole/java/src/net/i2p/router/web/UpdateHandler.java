@@ -139,7 +139,8 @@ public class UpdateHandler {
             try {
                 EepGet get = null;
                 if (shouldProxy)
-                    get = new EepGet(_context, proxyHost, proxyPort, 20, _updateFile, updateURL, false);
+                    // 40 retries!!
+                    get = new EepGet(_context, proxyHost, proxyPort, 40, SIGNED_UPDATE_FILE, updateURL, false);
                 else
                     get = new EepGet(_context, 1, _updateFile, updateURL, false);
                 get.addStatusListener(UpdateRunner.this);

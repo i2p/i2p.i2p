@@ -1,6 +1,6 @@
 <%@page import="java.io.File" %>
 <div class="logo">
- <a href="index.jsp"><img src="i2plogo.png" alt="Router Console" width="187" height="35" /></a><br />
+ <a href="index.jsp"><img src="/themes/console/images/i2plogo.png" alt="Router Console" width="187" height="35" /></a><br />
 </div>
 <div class="toolbar">
  <% File path = new File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");

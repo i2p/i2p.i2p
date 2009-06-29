@@ -43,7 +43,7 @@ public class ClientListenerRunner implements Runnable {
         _running = false;
         _listening = false;
         
-        String val = context.getProperty(BIND_ALL_INTERFACES, "False");
+        String val = context.getProperty(BIND_ALL_INTERFACES);
         _bindAllInterfaces = Boolean.valueOf(val).booleanValue();
     }
     

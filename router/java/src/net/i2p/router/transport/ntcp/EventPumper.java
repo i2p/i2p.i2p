@@ -31,7 +31,7 @@ import net.i2p.util.Log;
 public class EventPumper implements Runnable {
     private RouterContext _context;
     private Log _log;
-    private boolean _alive;
+    private volatile boolean _alive;
     private Selector _selector;
     private final List _bufCache;
     private final List _wantsRead = new ArrayList(16);
@@ -64,7 +64,7 @@ public class EventPumper implements Runnable {
         _expireIdleWriteTime = MAX_EXPIRE_IDLE_TIME;
     }
     
-    public void startPumping() {
+    public synchronized void startPumping() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting pumper");
 //        _wantsRead = new ArrayList(16);
@@ -83,7 +83,7 @@ public class EventPumper implements Runnable {
         }
     }
     
-    public void stopPumping() {
+    public synchronized void stopPumping() {
         _alive = false;
         if (_selector != null && _selector.isOpen())
             _selector.wakeup();

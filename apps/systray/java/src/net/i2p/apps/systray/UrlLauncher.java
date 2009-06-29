@@ -157,6 +157,20 @@ public class UrlLauncher {
                 // fall through
             }
 
+            // This debian script tries everything in $BROWSER, then gnome-www-browser and x-www-browser
+            // if X is running and www-browser otherwise. Those point to the user's preferred
+            // browser using the update-alternatives system.
+            if (_shellCommand.executeSilentAndWaitTimed("sensible-browser " + url, 5))
+                return true;
+
+            // Try x-www-browser directly
+            if (_shellCommand.executeSilentAndWaitTimed("x-www-browser " + url, 5))
+                return true;
+
+            // puppy linux
+            if (_shellCommand.executeSilentAndWaitTimed("defaultbrowser " + url, 5))
+                return true;
+
             if (_shellCommand.executeSilentAndWaitTimed("opera -newpage " + url, 5))
                 return true;
 
@@ -175,6 +189,10 @@ public class UrlLauncher {
             if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
                 return true;
             
+            // Text Mode Browsers only below here
+            if (_shellCommand.executeSilentAndWaitTimed("www-browser " + url, 5))
+                return true;
+
             if (_shellCommand.executeSilentAndWaitTimed("links " + url, 5))
                 return true;
 
