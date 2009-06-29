@@ -18,6 +18,7 @@ import net.i2p.router.web.ContextHelper;
 public class I2PAndroid extends Activity
 {
     static Context _context;
+    private static final String DIR = "/data/data/net.i2p.router/files";
 
     /** Called when the activity is first created. */
     @Override
@@ -80,6 +81,7 @@ public class I2PAndroid extends Activity
     }
 
     private void debugStuff() {
+        System.err.println("java.io.tmpdir" + ": " + System.getProperty("java.io.tmpdir"));
         System.err.println("java.vendor" + ": " + System.getProperty("java.vendor"));
         System.err.println("java.version" + ": " + System.getProperty("java.version"));
         System.err.println("os.arch" + ": " + System.getProperty("os.arch"));
@@ -99,6 +101,10 @@ public class I2PAndroid extends Activity
             copyResourceToFile(R.raw.logger_config, "logger.config");
             copyResourceToFile(R.raw.blocklist_txt, "blocklist.txt");
         // }
+
+        // Set up the locations so Router and WorkingDir can find them
+        System.setProperty("i2p.dir.base", DIR);
+        System.setProperty("i2p.dir.config", DIR);
     }
 
     private void copyResourceToFile(int resID, String f) {
