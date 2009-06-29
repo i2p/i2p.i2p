@@ -13,8 +13,7 @@ import java.io.IOException;
 
 import net.i2p.router.Router;
 import net.i2p.router.web.ContextHelper;
-import net.i2p.router.web.ReseedChecker;
-import net.i2p.util.I2PFile;
+// import net.i2p.util.NativeBigInteger;
 
 public class I2PAndroid extends Activity
 {
@@ -30,6 +29,9 @@ public class I2PAndroid extends Activity
         _context = this;  // Activity extends Context
         debugStuff();
         initialize();
+        // 300ms per run
+        // 5x slower than java on my server and 50x slower than native on my server
+        // NativeBigInteger.main(null);
     }
 
     public void onRestart()
@@ -44,8 +46,6 @@ public class I2PAndroid extends Activity
         super.onStart();
         Router.main(null);
         System.err.println("Router.main finished");
-
-        ReseedChecker.checkReseed();
     }
 
     public void onResume()

@@ -76,7 +76,7 @@ public class LoadRouterInfoJob extends JobImpl {
             }
             
             if (_keysExist) {
-                fis2 = FileStreamFactory.getFileInputStream(rkf);
+                fis2 = new FileInputStream(rkf);
                 PrivateKey privkey = new PrivateKey();
                 privkey.readBytes(fis2);
                 SigningPrivateKey signingPrivKey = new SigningPrivateKey();

@@ -155,17 +155,7 @@
     </target>
 
     <target name="buildrouter" depends="dirs" >
-        <!-- for now, we just need the ReseedHandler from routerconsole -->
-        <ant dir="../apps/routerconsole/java" target="compile" />
-        <jar destfile="${external-libs}/routerconsole.jar" >
-            <fileset dir="../apps/routerconsole/java/build/obj/" >
-                <include name="net/i2p/router/web/ContextHelper.class" />
-                <include name="net/i2p/router/web/ReseedHandler.class" />
-                <include name="net/i2p/router/web/ReseedHandler$ReseedRunner.class" />
-            </fileset>
-        </jar>
-
-        <!-- build router and core (actually the routerconsole builds these anyway) -->
+        <!-- build router and core -->
         <ant dir=".." target="buildrouter" />
 
         <!-- router -->
@@ -175,8 +165,6 @@
         <mkdir dir="tmp" />
         <unjar src="../build/i2p.jar" dest="tmp/" />
         <delete file="tmp/net/i2p/util/LogWriter.class" />
-        <delete file="tmp/net/i2p/util/FileStreamFactory.class" />
-        <delete file="tmp/net/i2p/util/I2PFile.class" />
         <!-- org.bouncycastle.crypto already in android
              but we need a little trickery because our HMac is incompatible...
              and the libs aren't in the SDK to compile against??? -->
@@ -206,7 +194,7 @@
 
         <!-- some resources -->
         <mkdir dir="res/drawable/" />
-        <copy file="../apps/routerconsole/jsp/i2plogo.png" todir="res/drawable/" />
+        <copy file="../installer/resources/themes/console/images/i2plogo.png" todir="res/drawable/" />
         <copy file="../installer/resources/blocklist.txt" tofile="res/raw/blocklist_txt" />
     </target>
 

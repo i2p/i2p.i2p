@@ -26,7 +26,6 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Clock;
-import net.i2p.util.FileStreamFactory;
 import net.i2p.util.Log;
 
 /**
@@ -204,12 +203,12 @@ public class KeyManager {
             FileInputStream in = null;
             try {
                 if (exists) {
-                    out = FileStreamFactory.getFileOutputStream(keyFile);
+                    out = new FileOutputStream(keyFile);
                     structure.writeBytes(out);
                     return structure;
                 } else {
                     if (keyFile.exists()) {
-                        in = FileStreamFactory.getFileInputStream(keyFile);
+                        in = new FileInputStream(keyFile);
                         structure.readBytes(in);
                         return structure;
                     } else {
