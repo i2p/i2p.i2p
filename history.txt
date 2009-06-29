@@ -1,3 +1,11 @@
+* 2009-06-29  0.7.5 released
+
+2009-06-29 Complication
+    * Update versions, package release
+    * Remove the last reference to my eepsite as a "news.xml" source,
+      and likewise stop my public key from being included
+      among valid release signing keys.
+
 2009-06-25 sponge
     * Summary frame layout change so it makes sense.
 

@@ -141,7 +141,6 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         } else {
             _trustedKeys.add(DEFAULT_TRUSTED_KEY);
             _trustedKeys.add(DEFAULT_TRUSTED_KEY2);
-            _trustedKeys.add(DEFAULT_TRUSTED_KEY3);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
