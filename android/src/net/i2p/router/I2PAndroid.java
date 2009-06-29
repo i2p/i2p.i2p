@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 import net.i2p.router.Router;
+import net.i2p.router.RouterLaunch;
 import net.i2p.router.web.ContextHelper;
 // import net.i2p.util.NativeBigInteger;
 
@@ -45,7 +46,7 @@ public class I2PAndroid extends Activity
     {
         System.err.println("onStart called");
         super.onStart();
-        Router.main(null);
+        RouterLaunch.main(null);
         System.err.println("Router.main finished");
     }
 
@@ -105,6 +106,7 @@ public class I2PAndroid extends Activity
         // Set up the locations so Router and WorkingDir can find them
         System.setProperty("i2p.dir.base", DIR);
         System.setProperty("i2p.dir.config", DIR);
+        System.setProperty("wrapper.logfile", DIR + "/wrapper.log");
     }
 
     private void copyResourceToFile(int resID, String f) {

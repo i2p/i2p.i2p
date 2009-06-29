@@ -74,7 +74,7 @@ public class HMACGenerator {
         if ((key == null) || (key.getData() == null) || (curData == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        Mac mac = acquire();
+        I2PHMac mac = acquire();
         mac.init(key.getData());
         mac.update(curData, curOffset, curLength);
         byte rv[] = acquireTmp();
