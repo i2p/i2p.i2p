@@ -1,3 +1,12 @@
+2009-06-29 zzz
+    * Console: Convert table headers to <th> to prep for CSS changes
+    * Console CSS: Move css file, make a classic theme to prep for CSS changes
+    * Console: Move favicon.ico and i2plogo.png out of the .war
+      so that the HTTP proxy can use them directly;
+      proxy error pages must be updated next
+    * NetDb stats: Normalize tunnel build stats for increased anonymity,
+      effective in 0.7.6
+
 * 2009-06-29  0.7.5 released
 
 2009-06-29 Complication
