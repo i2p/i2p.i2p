@@ -33,11 +33,9 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String DEFAULT_PROXY_PORT = "4444";
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
-//  public static final String DEFAULT_UPDATE_URL = "http://dev.i2p.net/i2p/i2pupdate.sud";
     public static final String DEFAULT_UPDATE_URL =
     "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://complication.i2p/i2p/i2pupdate.sud\r\n" +
     "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
     "http://update.postman.i2p/i2pupdate.sud" ;
     
