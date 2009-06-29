@@ -1,0 +1,9 @@
+# initial router.config
+# save memory
+router.prng.buffers=2
+router.decayingBloomFilterM=20
+stat.full=false
+# no I2CP
+i2p.dummyClientFacade=true
+# for now
+i2np.ntcp.enable=false
