@@ -18,7 +18,7 @@ public class MessageHandler implements I2PSessionListener {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;
-    private List _listeners;
+    private final List _listeners;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;

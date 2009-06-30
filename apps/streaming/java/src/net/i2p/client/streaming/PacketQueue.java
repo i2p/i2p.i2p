@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  * mode=bestEffort doesnt block in the SDK.
  *
  */
-class PacketQueue {
+public class PacketQueue {
     private I2PAppContext _context;
     private Log _log;
     private I2PSession _session;
