@@ -239,7 +239,7 @@ public class WorkingDir {
      * Recursive copy a file or dir to a dir
      * 
      * @param src file or directory, need not exist
-     * @param target the directory to copy to, will be created if it doesn't exist
+     * @param targetDir the directory to copy to, will be created if it doesn't exist
      * @return true for success OR if src does not exist
      */
     public static final boolean copy(File src, File targetDir) {
@@ -277,8 +277,8 @@ public class WorkingDir {
     
     /**
      * @param src not a directory, must exist
-     * @param dest not a directory, will be overwritten if existing
-     * @@reurn true if it was copied successfully
+     * @param dst not a directory, will be overwritten if existing
+     * @return true if it was copied successfully
      */
     public static boolean copyFile(File src, File dst) {
         if (!src.exists()) return false;
