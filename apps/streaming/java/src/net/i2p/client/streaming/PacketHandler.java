@@ -9,7 +9,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 
 /**
  * receive a packet and dispatch it correctly to the connection specified,

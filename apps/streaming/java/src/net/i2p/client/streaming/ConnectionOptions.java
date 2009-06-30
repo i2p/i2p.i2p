@@ -15,7 +15,6 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _rtt;
     private int _rttDev;
     private int _rto;
-    private int _trend[];
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
@@ -58,7 +57,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
     static final int MIN_WINDOW_SIZE = 1;
-    
+    // Syncronization fix, but doing it this way causes NPE...
+    // private final int _trend[] = new int[TREND_COUNT];
+    private int _trend[];
+
     /**
      *  OK, here is the calculation on the message size to fit in a single
      *  tunnel message without fragmentation.
@@ -203,7 +205,6 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     protected void init(Properties opts) {
         super.init(opts);
         _trend = new int[TREND_COUNT];
-        
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));

@@ -16,7 +16,7 @@ import net.i2p.util.SimpleTimer;
  *
  * @author zzz modded to use concurrent and bound queue size
  */
-class ConnectionHandler {
+public class ConnectionHandler {
     private I2PAppContext _context;
     private Log _log;
     private ConnectionManager _manager;
@@ -109,7 +109,7 @@ class ConnectionHandler {
                 // fail all the ones we had queued up
                 while(true) {
                     Packet packet = _synQueue.poll(); // fails immediately if empty
-                    if (packet == null || packet.getOptionalDelay() == PoisonPacket.MAX_DELAY_REQUEST)
+                    if (packet == null || packet.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
                         break;
                     sendReset(packet);
                 }
@@ -142,7 +142,7 @@ class ConnectionHandler {
             }
 
             if (syn != null) {
-                if (syn.getOptionalDelay() == PoisonPacket.MAX_DELAY_REQUEST)
+                if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
                     return null;
 
                 // deal with forged / invalid syn packets
@@ -226,14 +226,14 @@ class ConnectionHandler {
 
     /**
      * Simple end-of-queue marker.
-     * The standard class limits the delay to MAX_DELAY_REQUEST so
+     * The standard class limits the delay to POISON_MAX_DELAY_REQUEST so
      * an evil user can't use this to shut us down
      */
     private static class PoisonPacket extends Packet {
-        public static final int MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
+        public static final int POISON_MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
 
         public PoisonPacket() {
-            setOptionalDelay(MAX_DELAY_REQUEST);
+            setOptionalDelay(POISON_MAX_DELAY_REQUEST);
         }
     }
 }

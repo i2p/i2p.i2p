@@ -130,6 +130,12 @@
     * NetDb stats: Normalize tunnel build stats for increased anonymity,
       effective in 0.7.6
 
+2009-06-30 sponge
+    * General cleanup on streaming and ministreaming.
+      This fixes some compile warnings, and prepares for a larger fix.
+      There is no code-flow changes, just lint. One warning remains as I am
+      unsure exactly how to solve the problem yet.
+
 * 2009-06-29  0.7.5 released
 
 2009-06-29 Complication
