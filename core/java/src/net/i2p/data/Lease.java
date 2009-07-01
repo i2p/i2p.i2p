@@ -147,7 +147,7 @@ public class Lease extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[Lease: ");
         buf.append("\n\tEnd Date: ").append(getEndDate());
         buf.append("\n\tGateway: ").append(getGateway());

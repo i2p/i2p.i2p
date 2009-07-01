@@ -245,7 +245,7 @@ public class TunnelControllerGroup {
             map.putAll(cur);
         }
         
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
             String key = (String)iter.next();
             String val = (String)map.get(key);

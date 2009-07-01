@@ -144,7 +144,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         FileInputStream in = null;
         try {
             in = new FileInputStream(_newsFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf)) {
                 int index = buf.indexOf(VERSION_PREFIX);
                 if (index == -1) {

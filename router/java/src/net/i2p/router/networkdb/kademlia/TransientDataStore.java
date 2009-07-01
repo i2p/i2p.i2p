@@ -147,7 +147,7 @@ class TransientDataStore implements DataStore {
     }
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Transient DataStore: ").append(_data.size()).append("\nKeys: ");
         for (Map.Entry<Hash, DataStructure> e : _data.entrySet()) {
             Hash key = e.getKey();

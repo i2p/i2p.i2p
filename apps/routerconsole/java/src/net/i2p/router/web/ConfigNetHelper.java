@@ -190,7 +190,7 @@ public class ConfigNetHelper extends HelperBase {
     }
     
     private static String getBurstFactor(int numSeconds, String name) {
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"").append(name).append("\">\n");
         boolean found = false;
         for (int i = 10; i <= 70; i += 10) {
@@ -220,7 +220,7 @@ public class ConfigNetHelper extends HelperBase {
     
     public String getSharePercentageBox() {
         int pct = (int) (100 * _context.router().getSharePercentage());
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select style=\"text-align: right;\" name=\"sharePercentage\">\n");
         boolean found = false;
         for (int i = 30; i <= 110; i += 10) {

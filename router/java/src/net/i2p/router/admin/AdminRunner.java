@@ -73,7 +73,7 @@ class AdminRunner implements Runnable {
     }
     
     private void reply(OutputStream out, String content) throws IOException {
-        StringBuffer reply = new StringBuffer(10240);
+        StringBuilder reply = new StringBuilder(10240);
         reply.append("HTTP/1.1 200 OK\n");
         reply.append("Connection: close\n");
         reply.append("Cache-control: no-cache\n");
@@ -90,7 +90,7 @@ class AdminRunner implements Runnable {
     }
     
     private void replyText(OutputStream out, String content) throws IOException {
-        StringBuffer reply = new StringBuffer(10240);
+        StringBuilder reply = new StringBuilder(10240);
         reply.append("HTTP/1.1 200 OK\n");
         reply.append("Connection: close\n");
         reply.append("Cache-control: no-cache\n");

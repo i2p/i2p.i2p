@@ -143,7 +143,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[RequestLeaseMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());
         buf.append("\n\tTunnels:");

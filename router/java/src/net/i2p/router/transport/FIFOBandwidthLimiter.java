@@ -199,8 +199,8 @@ public class FIFOBandwidthLimiter {
     void setInboundBurstBytes(int bytes) { _maxInboundBurst = bytes; }
     void setOutboundBurstBytes(int bytes) { _maxOutboundBurst = bytes; }
     
-    StringBuffer getStatus() {
-        StringBuffer rv = new StringBuffer(64);
+    StringBuilder getStatus() {
+        StringBuilder rv = new StringBuilder(64);
         rv.append("Available: ").append(_availableInbound).append('/').append(_availableOutbound).append(' ');
         rv.append("Max: ").append(_maxInbound).append('/').append(_maxOutbound).append(' ');
         rv.append("Burst: ").append(_unavailableInboundBurst).append('/').append(_unavailableOutboundBurst).append(' ');
@@ -618,7 +618,7 @@ public class FIFOBandwidthLimiter {
     
     public void renderStatusHTML(Writer out) throws IOException {
         long now = now();
-        StringBuffer buf = new StringBuffer(4096);
+        StringBuilder buf = new StringBuilder(4096);
         buf.append("<p><b id=\"bwlim\">Limiter Status:</b><br />").append(getStatus().toString()).append("</p>\n");
         buf.append("<p><b>Pending bandwidth requests:</b><ul>");
         buf.append("<li>Inbound requests: <ol>");

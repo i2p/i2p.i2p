@@ -207,7 +207,7 @@ public class EepGet {
                                              "01234567890.,_=@#:";
     private static String sanitize(String name) {
         name = name.replace('/', '_');
-        StringBuffer buf = new StringBuffer(name);
+        StringBuilder buf = new StringBuilder(name);
         for (int i = 0; i < name.length(); i++)
             if (_safeChars.indexOf(buf.charAt(i)) == -1)
                 buf.setCharAt(i, '_');
@@ -292,7 +292,7 @@ public class EepGet {
                         long now = _context.clock().now();
                         long timeToSend = now - _lastComplete;
                         if (timeToSend > 0) {
-                            StringBuffer buf = new StringBuffer(50);
+                            StringBuilder buf = new StringBuilder(50);
                             buf.append(" ");
                             if ( bytesRemaining > 0 ) {
                                 double pct = ((double)_written + _previousWritten) /
@@ -353,7 +353,7 @@ public class EepGet {
             if (_etag != null)
                 System.out.println("== ETag: " + _etag);            
             if (transferred > 0) {
-                StringBuffer buf = new StringBuffer(50);
+                StringBuilder buf = new StringBuilder(50);
                 buf.append("== Transfer rate: ");
                 double kbps = (1000.0d*(double)(transferred)/((double)timeToSend*1024.0d));
                 synchronized (_kbps) {
@@ -381,7 +381,7 @@ public class EepGet {
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
             double kbps = (timeToSend > 0 ? (1000.0d*(double)(bytesTransferred)/((double)timeToSend*1024.0d)) : 0);
-            StringBuffer buf = new StringBuffer(50);
+            StringBuilder buf = new StringBuilder(50);
             buf.append("== Transfer rate: ");
             synchronized (_kbps) {
                 buf.append(_kbps.format(kbps));
@@ -627,7 +627,7 @@ public class EepGet {
 
     private void readHeaders() throws IOException {
         String key = null;
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
 
         boolean read = DataHelper.readLine(_proxyIn, buf);
         if (!read) throw new IOException("Unable to read the first line");
@@ -738,7 +738,7 @@ public class EepGet {
     }
     
     private long readChunkLength() throws IOException {
-        StringBuffer buf = new StringBuffer(8);
+        StringBuilder buf = new StringBuilder(8);
         int nl = 0;
         while (true) {
             int cur = _proxyIn.read();
@@ -893,7 +893,7 @@ public class EepGet {
     }
     
     private String getRequest() throws IOException {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         boolean post = false;
         if ( (_postData != null) && (_postData.length() > 0) )
             post = true;

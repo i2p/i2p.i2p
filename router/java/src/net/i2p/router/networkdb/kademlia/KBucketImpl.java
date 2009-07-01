@@ -330,7 +330,7 @@ class KBucketImpl implements KBucket {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("KBucketImpl: ");
         synchronized (_entries) {
             buf.append(_entries.toString()).append("\n");
@@ -380,7 +380,7 @@ class KBucketImpl implements KBucket {
     }
     
     private static void testRand() {
-        StringBuffer buf = new StringBuffer(2048);
+        StringBuilder buf = new StringBuilder(2048);
         int low = 1;
         int high = 3;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
@@ -416,7 +416,7 @@ class KBucketImpl implements KBucket {
     
     private static void testRand2() {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
-        StringBuffer buf = new StringBuffer(1024*1024*16);
+        StringBuilder buf = new StringBuilder(1024*1024*16);
         int low = 1;
         int high = 200;
         byte hash[] = new byte[Hash.HASH_LENGTH];
@@ -452,7 +452,7 @@ class KBucketImpl implements KBucket {
     
     private final static String toString(byte b[]) {
         if (true) return DataHelper.toHexString(b);
-        StringBuffer buf = new StringBuffer(b.length);
+        StringBuilder buf = new StringBuilder(b.length);
         for (int i = 0; i < b.length; i++) {
             buf.append(toString(b[i]));
             buf.append(" ");
@@ -461,7 +461,7 @@ class KBucketImpl implements KBucket {
     }
     
     private final static String toString(byte b) {
-        StringBuffer buf = new StringBuffer(8);
+        StringBuilder buf = new StringBuilder(8);
         for (int i = 7; i >= 0; i--) {
             boolean bb = (0 != (b & (1<<i)));
             if (bb)

@@ -260,7 +260,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseStoreMessage: ");
         buf.append("\n\tExpiration: ").append(getMessageExpiration());
         buf.append("\n\tUnique ID: ").append(getUniqueId());

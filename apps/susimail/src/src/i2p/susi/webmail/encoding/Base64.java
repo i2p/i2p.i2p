@@ -70,7 +70,7 @@ public class Base64 implements Encoding {
 	 */
 	private String encode( InputStream in ) throws IOException, EncodingException
 	{
-		StringBuffer strBuf = new StringBuffer();
+		StringBuilder strBuf = new StringBuilder();
 		
 		int buf[] = new int[3];
 		int out[] = new int[4];

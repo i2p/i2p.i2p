@@ -252,7 +252,7 @@ class TestJob extends JobImpl {
         
         @Override
         public String toString() {
-            StringBuffer rv = new StringBuffer(64);
+            StringBuilder rv = new StringBuilder(64);
             rv.append("Testing tunnel ").append(_cfg.toString()).append(" waiting for ");
             rv.append(_id).append(" found? ").append(_found);
             return rv.toString();
@@ -284,7 +284,7 @@ class TestJob extends JobImpl {
         
         @Override
         public String toString() {
-            StringBuffer rv = new StringBuffer(64);
+            StringBuilder rv = new StringBuilder(64);
             rv.append("Testing tunnel ").append(_cfg.toString());
             rv.append(" successful after ").append(_successTime);
             return rv.toString();
@@ -310,7 +310,7 @@ class TestJob extends JobImpl {
         
         @Override
         public String toString() {
-            StringBuffer rv = new StringBuffer(64);
+            StringBuilder rv = new StringBuilder(64);
             rv.append("Testing tunnel ").append(_cfg.toString());
             rv.append(" timed out");
             return rv.toString();

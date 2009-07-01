@@ -238,7 +238,7 @@ public class TunnelGateway {
         
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Message ").append(_messageId).append(" on ");
             buf.append(TunnelGateway.this.toString());
             if (_toRouter != null) {

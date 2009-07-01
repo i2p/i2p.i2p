@@ -108,7 +108,7 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[TunnelCreateStatusMessage: ");
         buf.append("\n\tTunnel ID: ").append(getReceiveTunnelId());
         buf.append("\n\tStatus: ").append(getStatus());

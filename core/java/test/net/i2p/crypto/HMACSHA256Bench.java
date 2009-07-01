@@ -70,12 +70,12 @@ public class HMACSHA256Bench {
 		long maxLong1 = 0;
         
 		byte[] smess = new String("abc").getBytes();
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int x = 0; x < 2*1024; x++) {
 			buf.append("a");
 		}
 		byte[] mmess = buf.toString().getBytes(); // new String("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq").getBytes();
-		buf = new StringBuffer();
+		buf = new StringBuilder();
 		for (int x = 0; x < 10000; x++) {
 			buf.append("a");
 		}

@@ -759,7 +759,7 @@ public class I2PSnarkServlet extends HttpServlet {
                   + _manager.util().getI2CPHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"i2cpPort\" value=\"" +
                   + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" /> <br />\n");
-        StringBuffer opts = new StringBuffer(64);
+        StringBuilder opts = new StringBuilder(64);
         Map options = new TreeMap(_manager.util().getI2CPOptions());
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();

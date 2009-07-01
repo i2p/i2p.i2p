@@ -363,7 +363,7 @@ public class Rate {
         return 0.0D;
     }
 
-    public void store(String prefix, StringBuffer buf) throws IOException {
+    public void store(String prefix, StringBuilder buf) throws IOException {
         PersistenceHelper.add(buf, prefix, ".period", "Number of milliseconds in the period", _period);
         PersistenceHelper.add(buf, prefix, ".creationDate",
                               "When was this rate created?  (milliseconds since the epoch, GMT)", _creationDate);
@@ -454,7 +454,7 @@ public class Rate {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(2048);
+        StringBuilder buf = new StringBuilder(2048);
         buf.append("\n\t total value: ").append(getLastTotalValue());
         buf.append("\n\t highest total value: ").append(getExtremeTotalValue());
         buf.append("\n\t lifetime total value: ").append(getLifetimeTotalValue());
@@ -494,7 +494,7 @@ public class Rate {
             rate.addData(i * 100, 20);
         }
         rate.coalesce();
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         try {
             rate.store("rate.test", buf);
             byte data[] = buf.toString().getBytes();

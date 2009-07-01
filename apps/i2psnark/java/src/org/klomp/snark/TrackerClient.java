@@ -373,7 +373,7 @@ public class TrackerClient extends I2PAppThread
    */
   public static String urlencode(byte[] bs)
   {
-    StringBuffer sb = new StringBuffer(bs.length*3);
+    StringBuilder sb = new StringBuilder(bs.length*3);
     for (int i = 0; i < bs.length; i++)
       {
         int c = bs[i] & 0xFF;

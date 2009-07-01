@@ -137,7 +137,7 @@ public class HopConfig {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         if (_receiveTunnelId != null) {
             buf.append("recv on ");
             buf.append(DataHelper.fromLong(_receiveTunnelId, 0, 4));

@@ -287,7 +287,7 @@ public class OutNetMessage {
     public void finalize() throws Throwable {
         if (_message != null) {
             if (_log.shouldLog(Log.WARN)) {
-                StringBuffer buf = new StringBuffer(1024);
+                StringBuilder buf = new StringBuilder(1024);
                 buf.append("Undiscarded ").append(_messageSize).append("byte ");
                 buf.append(_messageType).append(" message created ");
                 buf.append((_context.clock().now() - _created)).append("ms ago: ");
@@ -304,7 +304,7 @@ public class OutNetMessage {
     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[OutNetMessage contains ");
         if (_message == null) {
             buf.append("*no message*");
@@ -334,7 +334,7 @@ public class OutNetMessage {
         return buf.toString();
     }
     
-    private void renderTimestamps(StringBuffer buf) {
+    private void renderTimestamps(StringBuilder buf) {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 long lastWhen = -1;

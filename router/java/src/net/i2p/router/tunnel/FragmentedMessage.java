@@ -275,7 +275,7 @@ public class FragmentedMessage {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("Fragments for ").append(_messageId).append(": ");
         for (int i = 0; i <= _highFragmentNum; i++) {
             ByteArray ba = _fragments[i];

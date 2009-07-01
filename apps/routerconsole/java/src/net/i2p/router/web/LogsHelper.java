@@ -46,7 +46,7 @@ public class LogsHelper extends HelperBase {
 
     private String formatMessages(List msgs) {
         boolean colorize = Boolean.valueOf(_context.getProperty("routerconsole.logs.color")).booleanValue();
-        StringBuffer buf = new StringBuffer(16*1024); 
+        StringBuilder buf = new StringBuilder(16*1024); 
         buf.append("<ul>");
         buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 

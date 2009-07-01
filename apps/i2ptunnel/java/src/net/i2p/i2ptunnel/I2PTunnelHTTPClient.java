@@ -240,7 +240,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             out = s.getOutputStream();
             InputReader reader = new InputReader(s.getInputStream());
             String line, method = null, protocol = null, host = null, destination = null;
-            StringBuffer newRequest = new StringBuffer();
+            StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
             while ((line = reader.readLine(method)) != null) {
                 line = line.trim();

@@ -133,8 +133,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public void setResendPacketEvent(SimpleTimer2.TimedEvent evt) { _resendEvent = evt; }
     
 	@Override
-    public StringBuffer formatAsString() {
-        StringBuffer buf = super.formatAsString();
+    public StringBuilder formatAsString() {
+        StringBuilder buf = super.formatAsString();
         
         Connection con = _connection;
         if (con != null)

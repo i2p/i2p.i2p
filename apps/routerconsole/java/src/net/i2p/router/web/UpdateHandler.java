@@ -156,7 +156,7 @@ public class UpdateHandler {
             // ignored
         }
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("<b>Updating</b> ");
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
                          ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);

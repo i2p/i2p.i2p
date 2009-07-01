@@ -362,7 +362,7 @@ public class MetaInfo
    */
   private static String hexencode(byte[] bs)
   {
-    StringBuffer sb = new StringBuffer(bs.length*2);
+    StringBuilder sb = new StringBuilder(bs.length*2);
     for (int i = 0; i < bs.length; i++)
       {
         int c = bs[i] & 0xFF;
@@ -432,7 +432,7 @@ public class MetaInfo
   private byte[] calculateInfoHash()
   {
     Map info = createInfoMap();
-    StringBuffer buf = new StringBuffer(128);
+    StringBuilder buf = new StringBuilder(128);
     buf.append("info: ");
     for (Iterator iter = info.entrySet().iterator(); iter.hasNext(); ) {
         Map.Entry entry = (Map.Entry)iter.next();

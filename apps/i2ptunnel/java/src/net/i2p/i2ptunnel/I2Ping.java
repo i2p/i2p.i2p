@@ -211,7 +211,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 int fail = 0;
                 long totalTime = 0;
                 int cnt = countPing ? CPING_COUNT : PING_COUNT;
-                StringBuffer pingResults = new StringBuffer(2 * cnt + destination.length() + 3);
+                StringBuilder pingResults = new StringBuilder(2 * cnt + destination.length() + 3);
                 for (int i = 0; i < cnt; i++) {
                     boolean sent;
                     sent = ping(dest);

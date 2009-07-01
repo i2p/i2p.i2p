@@ -662,7 +662,7 @@ public class EstablishState {
     private String prefix() { return toString(); }
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("est").append(System.identityHashCode(this));
         if (_con.isInbound()) buf.append(" inbound");
         else buf.append(" outbound");

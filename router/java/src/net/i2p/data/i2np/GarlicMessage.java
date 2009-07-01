@@ -90,7 +90,7 @@ public class GarlicMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[GarlicMessage: ");
         buf.append("\n\tData length: ").append(getData().length).append(" bytes");
         buf.append("]");

@@ -44,7 +44,7 @@ public class CloveSet {
     
     @Override
     public String toString() { 
-	StringBuffer buf = new StringBuffer(128);
+	StringBuilder buf = new StringBuilder(128);
 	buf.append("{");
 	for (int i = 0; i < _cloves.size(); i++) {
 	    GarlicClove clove = (GarlicClove)_cloves.get(i);

@@ -13,7 +13,7 @@ public class ConfigClientsHelper extends HelperBase {
     public ConfigClientsHelper() {}
     
     public String getForm1() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<table border=\"1\">\n");
         buf.append("<tr><th>Client</th><th>Run at Startup?</th><th>Start Now</th><th>Class and arguments</th></tr>\n");
         
@@ -29,7 +29,7 @@ public class ConfigClientsHelper extends HelperBase {
     }
 
     public String getForm2() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<table border=\"1\">\n");
         buf.append("<tr><th>WebApp</th><th>Run at Startup?</th><th>Start Now</th><th>Description</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
@@ -46,7 +46,7 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
-    private void renderForm(StringBuffer buf, String index, String name, boolean urlify, boolean enabled, boolean ro, String desc) {
+    private void renderForm(StringBuilder buf, String index, String name, boolean urlify, boolean enabled, boolean ro, String desc) {
         buf.append("<tr><td>");
         if (urlify && enabled) {
             String link = "/";

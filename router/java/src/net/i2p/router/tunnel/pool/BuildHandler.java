@@ -206,7 +206,7 @@ class BuildHandler {
         long replyMessageId = state.msg.getUniqueId();
         PooledTunnelCreatorConfig cfg = null;
         List building = _exec.locked_getCurrentlyBuilding();
-        StringBuffer buf = null;
+        StringBuilder buf = null;
         synchronized (building) {
             for (int i = 0; i < building.size(); i++) {
                 PooledTunnelCreatorConfig cur = (PooledTunnelCreatorConfig)building.get(i);
@@ -217,7 +217,7 @@ class BuildHandler {
                 }
             }
             if ( (cfg == null) && (_log.shouldLog(Log.DEBUG)) )
-                buf = new StringBuffer(building.toString());
+                buf = new StringBuilder(building.toString());
         }
         
         if (cfg == null) {

@@ -377,7 +377,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[DeliveryInstructions: ");
         buf.append("\n\tDelivery mode: ");
         switch (getDeliveryMode()) {

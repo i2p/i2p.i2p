@@ -140,7 +140,7 @@ public class InboundMessageState {
         
         @Override
         public String toString() { 
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Partial ACK of ");
             buf.append(_bitfieldMessageId);
             buf.append(" with ACKs for: ");
@@ -165,7 +165,7 @@ public class InboundMessageState {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         buf.append("Message: ").append(_messageId);
         if (isComplete()) {
             buf.append(" completely received with ");

@@ -50,7 +50,7 @@ public class ServiceManager {
 
 //        InputStream  StdoutStream = _shellCommand.getInputStream();
 //        InputStream  StderrStream = _shellCommand.getErrorStream();
-        StringBuffer result       = null;
+        StringBuilder result       = null;
 
         if (_shellCommand.executeAndWait(command))
             return null;

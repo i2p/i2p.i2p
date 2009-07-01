@@ -168,7 +168,7 @@ class SearchState {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("Searching for ").append(_searchKey);
         buf.append(" ");
         if (_completed <= 0)

@@ -255,16 +255,16 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     private static final String sanitize(String versionString) {
-        StringBuffer versionStringBuffer = new StringBuffer(versionString);
+        StringBuilder versionStringBuilder = new StringBuilder(versionString);
 
-        for (int i = 0; i < versionStringBuffer.length(); i++) {
-            if (VALID_VERSION_CHARS.indexOf(versionStringBuffer.charAt(i)) == -1) {
-                versionStringBuffer.deleteCharAt(i);
+        for (int i = 0; i < versionStringBuilder.length(); i++) {
+            if (VALID_VERSION_CHARS.indexOf(versionStringBuilder.charAt(i)) == -1) {
+                versionStringBuilder.deleteCharAt(i);
                 i--;
             }
         }
 
-        return versionStringBuffer.toString();
+        return versionStringBuilder.toString();
     }
 
     private static final void showUsageCLI() {
@@ -328,7 +328,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * delimited by CR LF line breaks.
      */
     public String getTrustedKeysString() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         for (int i = 0; i < _trustedKeys.size(); i++) {
             // If something already buffered, first add line break.
             if (buf.length() > 0) buf.append("\r\n");

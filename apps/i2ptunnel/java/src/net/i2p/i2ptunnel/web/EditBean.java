@@ -223,7 +223,7 @@ public class EditBean extends IndexBean {
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts == null) return "";
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             int i = 0;
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();

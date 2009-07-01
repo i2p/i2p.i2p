@@ -61,10 +61,10 @@ public class PacketBuilder {
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List ackIdsRemaining, List partialACKsRemaining) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
 
-        StringBuffer msg = null;
+        StringBuilder msg = null;
         boolean acksIncluded = false;
         if (_log.shouldLog(Log.INFO)) {
-            msg = new StringBuffer(128);
+            msg = new StringBuilder(128);
             msg.append("Send to ").append(peer.getRemotePeer().toBase64());
             msg.append(" msg ").append(state.getMessageId()).append(":").append(fragment);
             if (fragment == state.getFragmentCount() - 1)
@@ -219,9 +219,9 @@ public class PacketBuilder {
     public UDPPacket buildACK(PeerState peer, List ackBitfields) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         
-        StringBuffer msg = null;
+        StringBuilder msg = null;
         if (_log.shouldLog(Log.DEBUG)) {
-            msg = new StringBuffer(128);
+            msg = new StringBuilder(128);
             msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
         }
 
@@ -379,7 +379,7 @@ public class PacketBuilder {
         off += 8;
         
         if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Sending sessionCreated:");
             buf.append(" AliceIP: ").append(Base64.encode(sentIP));
             buf.append(" AlicePort: ").append(state.getSentPort());

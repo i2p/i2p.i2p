@@ -70,7 +70,7 @@ public class DateMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DateMessage: ");
         buf.append("Now: ").append(_now);
         buf.append("]");

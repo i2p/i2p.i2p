@@ -448,7 +448,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /** Provide a consistent "look" for displaying router IDs in the console */
     public String renderPeerHTML(Hash peer) {
         String h = peer.toBase64().substring(0, 4);
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         String c = getCountry(peer);
         if (c != null) {
             buf.append("<img alt=\"").append(c.toUpperCase()).append("\" title=\"");

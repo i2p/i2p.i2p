@@ -643,7 +643,7 @@ public class NTCPTransport extends TransportImpl {
         long totalSend = 0;
         long totalRecv = 0;
 
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("<p><b id=\"ntcpcon\">NTCP connections: ").append(peers.size());
         buf.append(" limit: ").append(getMaxConnections());
         buf.append(" timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));

@@ -486,7 +486,7 @@ public class TransportManager implements TransportEventListener {
             Transport t= (Transport)iter.next();
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
-        StringBuffer buf = new StringBuffer(4*1024);
+        StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<p><b>Router Transport Addresses:</b><br /><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);

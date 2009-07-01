@@ -83,7 +83,7 @@ public class ConfigBean implements Serializable {
 	{
 		File file = new File( configFileName );
 		if( file != null && file.isFile() ) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader( new FileReader( file ) );

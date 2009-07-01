@@ -112,7 +112,7 @@ public class PacketHandler {
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
     void displayPacket(Packet packet, String prefix, String suffix) {
         if (!_log.shouldLog(Log.INFO)) return;
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         synchronized (_fmt) {
             buf.append(_fmt.format(new Date()));
         }
@@ -198,7 +198,7 @@ public class PacketHandler {
                         // someone is sending us a packet on the wrong stream 
                         if (_log.shouldLog(Log.ERROR)) {
                             Set cons = _manager.listConnections();
-                            StringBuffer buf = new StringBuffer(512);
+                            StringBuilder buf = new StringBuilder(512);
                             buf.append("Received a packet on the wrong stream: ");
                             buf.append(packet);
                             buf.append(" connection: ");
@@ -275,7 +275,7 @@ public class PacketHandler {
                     _log.warn("Packet belongs to no other cons, putting on the syn queue: " + packet);
                 }
                 if (_log.shouldLog(Log.DEBUG)) {
-                    StringBuffer buf = new StringBuffer(128);
+                    StringBuilder buf = new StringBuilder(128);
                     Set cons = _manager.listConnections();
                     for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
                         Connection con = (Connection)iter.next();

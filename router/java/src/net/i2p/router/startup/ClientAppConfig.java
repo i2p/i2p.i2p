@@ -99,7 +99,7 @@ public class ClientAppConfig {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(cfgFile);
-            StringBuffer buf = new StringBuffer(2048);
+            StringBuilder buf = new StringBuilder(2048);
             for(int i = 0; i < apps.size(); i++) {
                 ClientAppConfig app = (ClientAppConfig) apps.get(i);
                 buf.append(PREFIX).append(i).append(".main=").append(app.className).append("\n");
