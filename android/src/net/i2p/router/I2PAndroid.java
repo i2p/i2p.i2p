@@ -10,10 +10,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.List;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterLaunch;
-import net.i2p.router.web.ContextHelper;
 // import net.i2p.util.NativeBigInteger;
 
 public class I2PAndroid extends Activity
@@ -66,8 +66,15 @@ public class I2PAndroid extends Activity
     {
         System.err.println("onStop called");
         super.onStop();
+
+        // from routerconsole ContextHelper
+        List contexts = RouterContext.listContexts();
+        if ( (contexts == null) || (contexts.size() <= 0) ) 
+            throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
+        RouterContext ctx = (RouterContext)contexts.get(0);
+
         // shutdown() doesn't return so use shutdownGracefully()
-        ContextHelper.getContext(null).router().shutdownGracefully(Router.EXIT_HARD);
+        ctx.router().shutdownGracefully(Router.EXIT_HARD);
         System.err.println("shutdown complete");
     }
 
