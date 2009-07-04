@@ -34,7 +34,10 @@ public class Reseeder {
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 8 * 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL = "http://i2pdb.tin0.de/netDb/,http://netdb.i2p2.de/";
+    private static final String DEFAULT_SEED_URL = "http://netdb.i2p2.de/,http://b.netdb.i2p2.de/";
+    private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
+    private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
+    private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
 
     public Reseeder(RouterContext ctx) {
         _context = ctx;
@@ -48,7 +51,7 @@ public class Reseeder {
             if (_reseedRunner.isRunning()) {
                 return;
             } else {
-                System.setProperty("net.i2p.router.web.Reseeder.reseedInProgress", "true");
+                System.setProperty(PROP_INPROGRESS, "true");
                 I2PThread reseed = new I2PThread(_reseedRunner, "Reseed");
                 reseed.start();
             }
@@ -61,7 +64,7 @@ public class Reseeder {
 
         public ReseedRunner() {
             _isRunning = false; 
-            System.setProperty("net.i2p.router.web.Reseeder.statusMessage","Reseeding.");
+            System.setProperty(PROP_STATUS, "Reseeding.");
         }
         public boolean isRunning() { return _isRunning; }
         public void run() {
@@ -69,7 +72,7 @@ public class Reseeder {
             System.out.println("Reseed start");
             reseed(false);
             System.out.println("Reseed complete");
-            System.setProperty("net.i2p.router.web.Reseeder.reseedInProgress", "false");
+            System.setProperty(PROP_INPROGRESS, "false");
             _isRunning = false;
         }
 
@@ -126,13 +129,13 @@ public class Reseeder {
         private void reseedOne(String seedURL, boolean echoStatus) {
 
             try {
-                System.setProperty("net.i2p.router.web.Reseeder.errorMessage","");
-                System.setProperty("net.i2p.router.web.Reseeder.statusMessage","Reseeding: fetching seed URL.");
+                System.setProperty(PROP_ERROR, "");
+                System.setProperty(PROP_STATUS, "Reseeding: fetching seed URL.");
                 System.err.println("Reseed from " + seedURL);
                 URL dir = new URL(seedURL);
                 byte contentRaw[] = readURL(dir);
                 if (contentRaw == null) {
-                    System.setProperty("net.i2p.router.web.Reseeder.errorMessage",
+                    System.setProperty(PROP_ERROR,
                         "Last reseed failed fully (failed reading seed URL). " +
                         RESEED_TIPS);
                     // Logging deprecated here since attemptFailed() provides better info
@@ -158,7 +161,7 @@ public class Reseeder {
                 }
                 if (total <= 0) {
                     _log.error("Read " + contentRaw.length + " bytes from seed " + seedURL + ", but found no routerInfo URLs.");
-                    System.setProperty("net.i2p.router.web.Reseeder.errorMessage",
+                    System.setProperty(PROP_ERROR,
                         "Last reseed failed fully (no routerInfo URLs at seed URL). " +
                         RESEED_TIPS);
                     return;
@@ -171,7 +174,7 @@ public class Reseeder {
                 // 200 max from one URL
                 for (Iterator iter = urlList.iterator(); iter.hasNext() && fetched < 200; ) {
                     try {
-                        System.setProperty("net.i2p.router.web.Reseeder.statusMessage",
+                        System.setProperty(PROP_STATUS,
                             "Reseeding: fetching router info from seed URL (" +
                             fetched + " successful, " + errors + " errors, " + total + " total).");
 
@@ -193,12 +196,12 @@ public class Reseeder {
                 // Less than 10% of failures is considered success,
                 // because some routerInfos will always fail.
                 if ((failPercent >= 10) && (failPercent < 90)) {
-                    System.setProperty("net.i2p.router.web.Reseeder.errorMessage",
+                    System.setProperty(PROP_ERROR,
                         "Last reseed failed partly (" + failPercent + "% of " + total + "). " +
                         RESEED_TIPS);
                 }
                 if (failPercent >= 90) {
-                    System.setProperty("net.i2p.router.web.Reseeder.errorMessage",
+                    System.setProperty(PROP_ERROR,
                         "Last reseed failed (" + failPercent + "% of " + total + "). " +
                         RESEED_TIPS);
                 }
@@ -208,7 +211,7 @@ public class Reseeder {
                 if (fetched >= 100)
                     _isRunning = false;
             } catch (Throwable t) {
-                System.setProperty("net.i2p.router.web.Reseeder.errorMessage",
+                System.setProperty(PROP_ERROR,
                     "Last reseed failed fully (exception caught). " +
                     RESEED_TIPS);
                 _log.error("Error reseeding", t);
