@@ -13,6 +13,7 @@
 <title>Summary Bar</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <%
+    out.print("<center>\n");
     // try hard to avoid an error page in the iframe after shutdown
     String action = request.getParameter("action");
     String d = request.getParameter("refresh");
@@ -49,6 +50,7 @@
                 shutdownSoon = true;
         }
     }
+        out.print("</center>\n");
 %>
 <%@include file="css.jsp" %>
 </head>

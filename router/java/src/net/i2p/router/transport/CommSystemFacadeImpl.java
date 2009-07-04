@@ -447,7 +447,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 buf.append(c);
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
         }
-        buf.append("<tt><font size=\"+1\">");
+        buf.append("<tt>");
         boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
         if (found)
             buf.append("<a title=\"NetDb entry\" href=\"netdb.jsp?r=").append(h).append("\">");
