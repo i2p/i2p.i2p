@@ -89,7 +89,7 @@ public class HostsTxtNamingService extends NamingService {
             String hostsfile = (String)filenames.get(i);
             Properties hosts = new Properties();
             try {
-                File f = new File(hostsfile);
+                File f = new File(_context.getRouterDir(), hostsfile);
                 if ( (f.exists()) && (f.canRead()) ) {
                     DataHelper.loadProps(hosts, f, true);
                     
@@ -119,7 +119,7 @@ public class HostsTxtNamingService extends NamingService {
             String hostsfile = (String)filenames.get(i);
             Properties hosts = new Properties();
             try {
-                File f = new File(hostsfile);
+                File f = new File(_context.getRouterDir(), hostsfile);
                 if ( (f.exists()) && (f.canRead()) ) {
                     DataHelper.loadProps(hosts, f, true);
                     Set keyset = hosts.keySet();
@@ -145,7 +145,7 @@ public class HostsTxtNamingService extends NamingService {
             String hostsfile = (String)filenames.get(i);
             Properties hosts = new Properties();
             try {
-                File f = new File(hostsfile);
+                File f = new File(_context.getRouterDir(), hostsfile);
                 if ( (f.exists()) && (f.canRead()) ) {
                     DataHelper.loadProps(hosts, f, true);
                     Set keyset = hosts.keySet();

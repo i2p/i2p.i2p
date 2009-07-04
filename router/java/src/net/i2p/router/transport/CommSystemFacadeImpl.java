@@ -73,6 +73,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public boolean haveInboundCapacity() { return (_manager == null ? false : _manager.haveInboundCapacity()); } 
     @Override
     public boolean haveOutboundCapacity() { return (_manager == null ? false : _manager.haveOutboundCapacity()); } 
+    @Override
+    public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
     
     /**
      * Framed average clock skew of connected peers in seconds, or null if we cannot answer.
@@ -433,6 +435,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return props.getProperty("host");
     }
 
+    /** full name for a country code, or the code if we don't know the name */
+    public String getCountryName(String c) {
+        if (_geoIP == null)
+            return c;
+        String n = _geoIP.fullName(c);
+        if (n == null)
+            return c;
+        return n;
+    }
+
     /** Provide a consistent "look" for displaying router IDs in the console */
     public String renderPeerHTML(Hash peer) {
         String h = peer.toBase64().substring(0, 4);
@@ -440,11 +452,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         String c = getCountry(peer);
         if (c != null) {
             buf.append("<img alt=\"").append(c.toUpperCase()).append("\" title=\"");
-            String n = _geoIP.fullName(c);
-            if (n != null)
-                buf.append(n);
-            else
-                buf.append(c);
+            buf.append(getCountryName(c));
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
         }
         buf.append("<tt>");

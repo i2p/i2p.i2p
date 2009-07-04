@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.7.4</appversion>
+        <appversion>0.7.5</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -102,12 +102,14 @@
             <description>Base installation files</description>
             <fileset dir="pkg-temp" includes="**/*" targetdir="$INSTALL_PATH"/>
             <!--
-              Do variable substitution in the wrapper.config and i2prouter files. See:
+              Do variable substitution in these files. See:
               http://www.javalobby.org/forums/thread.jspa?threadID=15967&tstart=0
               and the izpack docs for some guidance.
              -->
-            <parsable targetfile="$INSTALL_PATH/wrapper.config" type="javaprop" />
+            <parsable targetfile="$INSTALL_PATH/wrapper.config" type="plain" />
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
             
             <!-- postinstall stuff for windows -->
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />

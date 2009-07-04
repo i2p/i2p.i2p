@@ -1,3 +1,189 @@
+2009-06-29 zzz
+    * Big directory rework:
+      Eliminate all uses of the current working directory, and
+      set up multiple directories specified by absolute paths for various uses.
+
+      Add a WorkingDir class to create a user config directory and
+      migrate certain files to it for new installs.
+      The directory will be $HOME/.i2p on linux and %APPDATA%\I2P on Windows,
+      or as specified in the system property -Di2p.dir.config=/path/to/i2pdir
+      All files except for the base install and temp files will be
+      in the config directory by default.
+      Temp files will be in a i2p-xxxxx subdirectory of the system temp directory
+      specified by the system property java.io.tmpdir.
+
+      Convert all file opens in the code to be relative to a specific directory,
+      as specified in the context. Code and applications should never open
+      files relative to the current working directory (e.g. new File("foo")).
+      All files should be accessed in the appropriate context directory,
+      e.g. new File(_context.getAppDir(), "foo").
+
+      The router.config file location may be specified as a system property on the
+      java command line with -Drouter.configLocation=/path/to/router.config
+      All directories may be specified as properties in the router.config file.
+
+      There will be no migration from an existing installation
+      unless the system property -Di2p.dir.migrate=true is set.
+      If there is no migration, it will continue to use $I2P for all files,
+      except for temporary and PID files.
+
+      The following linux scripts are now customized with the install path at,
+      installation, and may be moved to /usr/local/bin and run from any
+      working directory:
+          eepget, i2prouter, runplain.sh
+
+      For new installs, the i2p base directory ($I2P) may be read-only
+      if updates are disabled. The only time i2p should write to the base directory
+      is to unzip the update file. Updates are downloaded to the config dir. If, upon
+      restart, the base dir is not writable, it will log a message and continue.
+
+      Additional information, copied from I2PAppContext:
+
+          *  Directories. These are all set at instantiation and will not be changed by
+          *  subsequent property changes.
+          *  All properties, if set, should be absolute paths.
+          *
+          *  Name	Property 	Method		Files
+          *  -----	-------- 	-----		-----
+          *  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
+          *  Temp	i2p.dir.temp	getTempDir()	Temporary files
+          *  PID	i2p.dir.pid	getPIDDir()	router.ping
+          *  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
+          *
+          *  (the following all default to the same as Config)
+          *
+          *  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
+          *  Log	i2p.dir.log	getLogDir()	logs/
+          *  App	i2p.dir.app	getAppDir()	eepsite/, ...
+          *
+          *  Note that the router can't control where the wrapper actually puts its files.
+
+      All these will be set appropriately in a Router Context.
+      In an I2P App Context, all except Temp and PID will be the current working directory.
+
+      Related changes:
+      i2prouter:
+      - Don't cd to script location, no longer required
+      jbigi, cpuid:
+      - Extract files from jar to temp dir, load from that dir, then
+        copy to the base dir if we have permissions (and failing silently
+        if we don't), so we have optimized libs and no complaints
+        when we have a read-only base dir.
+      logs.jsp:
+      - Get wrapper log location from a property too
+      - Display log file locations
+      RouterLaunch:
+      - If no wrapper, put wrapper.log in system temp dir
+        unless specified with -Dwrapper.logfile=/path/to/wrapper.log
+        or it already exists in CWD (for backward compatibility)
+      - Append rather than replace wrapper.log
+      - Pass wrapper log location to router as a property, so that logs.jsp can find it
+      runplain.sh:
+      - Add path substitution to runplain.sh on install
+      - Pass I2P base dir to the router as a property
+      Systray:
+      - Fix NPE if no config file
+      wrapper.config:
+      - Put wrapper.log in system temp dir for new installs
+      - Pass I2P base dir to the router as a property
+
+2009-06-29 zzz
+    * HTTP Proxy:
+      - Add simple web server for "proxy.i2p" to serve
+        images and CSS for the error pages
+      - Take CSS out of the error pages; use internal server
+        for CSS, image, and favicon
+    * i2psnark build:
+      - Move FetchAndAdd to static inner class
+      - Fix standalone build to include i2psnark.jar since classes
+        aren't in the .war anymore
+      - Have standalone jetty use I2PAppContext temp directory
+      - Replace launch-i2psnark.jar with launch-i2psnark script,
+        since RunStandalone is in i2p.jar
+      - Clean up jetty-i2psnark.xml, turn off jetty logging
+      - Remove standalone build from the pkg target in the main build.xml
+    * Jbigi, CPUID:
+      - Reduce memory demand on startup from 4MB to 4KB each
+    * NetDb: Fix an NPE on early shutdown
+    * Reseeding / NetDb:
+      - Move reseeding from the routerconsole app to
+        the router, so that we can bootstrap an embedded router lacking a routerconsole
+        (iMule or android for example), without additional modifications.
+        This allows better integration between the reseeding function
+        and the netDb.
+      - Call reseed from PersistentDataStore, not from the
+        routerconsole init, and start seeding as soon as the netdb has read
+        the netDb/ directory, not when the console starts.
+      - Wake up the netdb reader as soon as reseeding is done,
+        rather than waiting up to 60s.
+      - Don't display the reseed button on the console until the
+        netdb initialization is done.
+    * RouterConsoleRunner:
+      - Catch a class not found error better
+
+2009-06-29 zzz
+    * Console: Convert table headers to <th> to prep for CSS changes
+    * Console CSS: Move css file, make a classic theme to prep for CSS changes
+    * Console: Move favicon.ico and i2plogo.png out of the .war
+      so that the HTTP proxy can use them directly;
+      proxy error pages must be updated next
+    * NetDb stats: Normalize tunnel build stats for increased anonymity,
+      effective in 0.7.6
+
+2009-06-30 sponge
+    * General cleanup on streaming and ministreaming.
+      This fixes some compile warnings, and prepares for a larger fix.
+      There is no code-flow changes, just lint. One warning remains as I am
+      unsure exactly how to solve the problem yet.
+
+* 2009-06-29  0.7.5 released
+
+2009-06-29 Complication
+    * Update versions, package release
+    * Remove the last reference to my eepsite as a "news.xml" source,
+      and likewise stop my public key from being included
+      among valid release signing keys.
+
+2009-06-25 sponge
+    * Summary frame layout change so it makes sense.
+
+2009-06-23 zzz
+    * Browser Launch: Add sensible-browser, x-www-browser, defaultbrowser, and
+      www-browser in an attempt to launch the user's preferred browser
+    * configupdate.jsp: Cleanup
+    * Installer: Include console.css!!!
+    * NTCP: Try again to prevent two Event Pumpers
+    * Update: Increase max retries
+    * UPnP: Catch AIOOBE reported by tuna
+
+2009-06-21 zzz
+    * Browser Launch: Wait until the routerconsole is up before launching the browser
+    * Installer: Fix wrapper.config parsing on windows
+    * netdb.jsp: Add country chart at bottom, clean up version chart
+    * News Fetcher:
+      - Change default news URL, use it instead of the old one even if
+        the old one is saved in the configuration, to assist in the transition
+    * ReseedHandler:
+      - check for upper case HREF to be compatible with apache indexes
+    * Statistics Manager: post-0.7.4 cleanup
+    * Transport: Treat 5.0.0.0/8 (Hamachi) as local
+
+2009-06-17 Mathiasdm
+    * desktopgui:
+      - Added client and server tunnel view
+        (saving does not work yet)
+
+2009-06-17 zzz
+    * PeerSelector:
+      - Limit exploratory tunnels to connected peers when over
+        half the connection limit (was 80%)
+      - Have the high capacity tier fall back to a new connected tier
+        before moving on to the not failing tier
+        so that tunnel build success doesn't collapse and drive
+        connections to the limit
+    * PeerTestJob:
+      - Limit to connected peers
+
 2009-06-12 zzz
     * Console:
       - Move the console css from default.css in the .war to docs/themes/console/console.css,

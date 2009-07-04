@@ -9,7 +9,7 @@ import net.i2p.desktopgui.router.RouterHelper;
 public class UpdateHelper {
 
     public static final String PROP_NEWS_URL = "router.newsURL";
-    public static final String DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
+    public static final String DEFAULT_NEWS_URL = "http://echelon.i2p/i2p/news.xml";
 
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
     public static final String DEFAULT_REFRESH_FREQUENCY = 24*60*60*1000 + "";
@@ -31,7 +31,6 @@ public class UpdateHelper {
     public static final String DEFAULT_UPDATE_URL =
     "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://complication.i2p/i2p/i2pupdate.sud\r\n" +
     "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
     "http://update.postman.i2p/i2pupdate.sud" ;
 

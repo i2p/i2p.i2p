@@ -24,6 +24,7 @@
 
 package i2p.susi.dns;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -110,9 +111,12 @@ public class AddressbookBean
 	{
 		loadConfig();
 		String filename = properties.getProperty( getBook() + "_addressbook" );
-		if (filename.startsWith("../"))
-			return filename.substring(3);
-		return ConfigBean.addressbookPrefix + filename;
+		// clean up the ../ with getCanonicalPath()
+		File path = new File(ConfigBean.addressbookPrefix, filename);
+		try {
+			return path.getCanonicalPath();
+		} catch (IOException ioe) {}
+		return filename;
 	}
 	private Object[] entries;
 	public Object[] getEntries()

@@ -36,6 +36,7 @@ public abstract class CommSystemFacade implements Service {
     public int countActiveSendPeers() { return 0; }
     public boolean haveInboundCapacity() { return true; }
     public boolean haveOutboundCapacity() { return true; }
+    public boolean haveHighOutboundCapacity() { return true; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
     /**
@@ -62,6 +63,7 @@ public abstract class CommSystemFacade implements Service {
     public byte[] getIP(Hash dest) { return null; }
     public void queueLookup(byte[] ip) {}
     public String getCountry(Hash peer) { return null; }
+    public String getCountryName(String code) { return code; }
     public String renderPeerHTML(Hash peer) { return null; }
     
     /** 

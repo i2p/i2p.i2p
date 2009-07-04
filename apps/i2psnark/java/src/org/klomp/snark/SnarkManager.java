@@ -31,7 +31,7 @@ public class SnarkManager implements Snark.CompleteListener {
     /** map of (canonical) filename to Snark instance (unsynchronized) */
     private Map _snarks;
     private Object _addSnarkLock;
-    private String _configFile = "i2psnark.config";
+    private File _configFile;
     private Properties _config;
     private I2PAppContext _context;
     private Log _log;
@@ -51,6 +51,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
 
+    private static final String CONFIG_FILE = "i2psnark.config";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
     public static final String DEFAULT_AUTO_START = "false";
     public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
@@ -66,6 +67,9 @@ public class SnarkManager implements Snark.CompleteListener {
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new ArrayList(16);
         _util = new I2PSnarkUtil(_context);
+        _configFile = new File(CONFIG_FILE);
+        if (!_configFile.isAbsolute())
+            _configFile = new File(_context.getConfigDir(), CONFIG_FILE);
         loadConfig(null);
     }
 
@@ -112,10 +116,11 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     private int getStartupDelayMinutes() { return 3; }
     public File getDataDir() { 
-        String dir = _config.getProperty(PROP_DIR);
-        if ( (dir == null) || (dir.trim().length() <= 0) )
-            dir = "i2psnark";
-        return new File(dir); 
+        String dir = _config.getProperty(PROP_DIR, "i2psnark");
+        File f = new File(dir);
+        if (!f.isAbsolute())
+            f = new File(_context.getAppDir(), dir);
+        return f; 
     }
     
     /** null to set initial defaults */
@@ -123,8 +128,10 @@ public class SnarkManager implements Snark.CompleteListener {
         if (_config == null)
             _config = new Properties();
         if (filename != null) {
-            _configFile = filename;
             File cfg = new File(filename);
+            if (!cfg.isAbsolute())
+                cfg = new File(_context.getConfigDir(), filename);
+            _configFile = cfg;
             if (cfg.exists()) {
                 try {
                     DataHelper.loadProps(_config, cfg);
@@ -352,10 +359,10 @@ public class SnarkManager implements Snark.CompleteListener {
     public void saveConfig() {
         try {
             synchronized (_configFile) {
-                DataHelper.storeProps(_config, new File(_configFile));
+                DataHelper.storeProps(_config, _configFile);
             }
         } catch (IOException ioe) {
-            addMessage("Unable to save the config to '" + _configFile + "'");
+            addMessage("Unable to save the config to '" + _configFile.getAbsolutePath() + "'");
         }
     }
     

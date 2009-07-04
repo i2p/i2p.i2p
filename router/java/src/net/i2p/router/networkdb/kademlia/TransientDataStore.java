@@ -35,6 +35,8 @@ class TransientDataStore implements DataStore {
             _log.info("Data Store initialized");
     }
     
+    public boolean isInitialized() { return true; }
+
     public void stop() {
         _data.clear();
     }
@@ -43,6 +45,8 @@ class TransientDataStore implements DataStore {
         stop();
     }
     
+    public void rescan() {}
+
     public Set getKeys() {
         return new HashSet(_data.keySet());
     }

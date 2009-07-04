@@ -316,8 +316,8 @@ public class ProfileOrganizer {
         } finally { releaseReadLock(); }
         if (matches.size() < howMany) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("selectHighCap("+howMany+"), not enough fast (" + matches.size() + ") going on to notFailing");
-            selectNotFailingPeers(howMany, exclude, matches, mask);
+                _log.info("selectHighCap("+howMany+"), not enough highcap (" + matches.size() + ") going on to ANFP2");
+            selectActiveNotFailingPeers2(howMany, exclude, matches, mask);
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
@@ -375,6 +375,7 @@ public class ProfileOrganizer {
             selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, mask);
         return;
     }
+
     /**
      * Return a set of Hashes for peers that are both not failing and we're actively
      * talking with.
@@ -400,6 +401,39 @@ public class ProfileOrganizer {
                 }
                 locked_selectPeers(_notFailingPeers, howMany, exclude, matches, 0);
             } finally { releaseReadLock(); }
+        }
+    }
+
+    /**
+     * Return a set of Hashes for peers that are both not failing and we're actively
+     * talking with.
+     *
+     * We use commSystem().isEstablished(), not profile.getIsActive(), as the
+     * NTCP idle time is now shorter than the 5 minute getIsActive() threshold,
+     * and we're using this to try and limit connections.
+     *
+     * This DOES cascade further to non-connected peers.
+     */
+    private void selectActiveNotFailingPeers2(int howMany, Set exclude, Set matches, int mask) {
+        if (matches.size() < howMany) {
+            Map<Hash, PeerProfile> activePeers = new HashMap();
+            getReadLock();
+            try {
+                for (Iterator<Map.Entry<Hash, PeerProfile>> iter = _notFailingPeers.entrySet().iterator(); iter.hasNext(); ) {
+                    Map.Entry<Hash, PeerProfile> e = iter.next();
+                    if (_context.commSystem().isEstablished(e.getKey()))
+                        activePeers.put(e.getKey(), e.getValue());
+                }
+                locked_selectPeers(activePeers, howMany, exclude, matches, mask);
+            } finally { releaseReadLock(); }
+        }
+        if (matches.size() < howMany) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectANFP2("+howMany+"), not enough ANFP (" + matches.size() + ") going on to notFailing");
+            selectNotFailingPeers(howMany, exclude, matches, mask);
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectANFP2("+howMany+"), found enough ANFP (" + matches.size() + ")");
         }
     }
 
@@ -520,8 +554,8 @@ public class ProfileOrganizer {
                 }
             }
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Unreachable: " + l);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Unreachable: " + l);
         return l;
     }
 

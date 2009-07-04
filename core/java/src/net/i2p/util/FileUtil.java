@@ -18,6 +18,12 @@ import java.util.zip.ZipFile;
 /**
  * General helper methods for messing with files
  *
+ * These are static methods that do NOT convert arguments
+ * to absolute paths for a particular context and directtory.
+ *
+ * Callers should ALWAYS provide absolute paths as arguments,
+ * and should NEVER assume files are in the current working directory.
+ *
  */
 public class FileUtil {
     /**
@@ -195,9 +201,18 @@ public class FileUtil {
         }
     }
 
-    
-    /** return true if it was copied successfully */
+    /**
+      * @return true if it was copied successfully
+      */
     public static boolean copy(String source, String dest, boolean overwriteExisting) {
+        return copy(source, dest, overwriteExisting, false);
+    }
+
+    /**
+      * @param quiet don't log fails to wrapper log if true
+      * @return true if it was copied successfully
+      */
+    public static boolean copy(String source, String dest, boolean overwriteExisting, boolean quiet) {
         File src = new File(source);
         File dst = new File(dest);
 
@@ -220,7 +235,8 @@ public class FileUtil {
             out.close();
             return true;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            if (!quiet)
+                ioe.printStackTrace();
             return false;
         }
     }

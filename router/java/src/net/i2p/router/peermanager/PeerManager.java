@@ -116,7 +116,14 @@ class PeerManager {
             case PeerSelectionCriteria.PURPOSE_TEST:
                 // for now, the peers we test will be the reliable ones
                 //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
-                _organizer.selectNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
+
+                // The PeerTestJob does only run every 5 minutes, but
+                // this was helping drive us to connection limits, let's leave the exploration
+                // to the ExploratoryPeerSelector, which will restrict to connected peers
+                // when we get close to the limit. So let's stick with connected peers here.
+                // Todo: what's the point of the PeerTestJob anyway?
+                //_organizer.selectNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
+                _organizer.selectActiveNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
                 break;
             case PeerSelectionCriteria.PURPOSE_TUNNEL:
                 // pull all of the fast ones, regardless of how many we 

@@ -1,6 +1,7 @@
 package net.i2p.crypto;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -141,7 +142,6 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         } else {
             _trustedKeys.add(DEFAULT_TRUSTED_KEY);
             _trustedKeys.add(DEFAULT_TRUSTED_KEY2);
-            _trustedKeys.add(DEFAULT_TRUSTED_KEY3);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
@@ -276,7 +276,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     private static final void showVersionCLI(String signedFile) {
-        String versionString = new TrustedUpdate().getVersionString(signedFile);
+        String versionString = new TrustedUpdate().getVersionString(new File(signedFile));
 
         if (versionString == "")
             System.out.println("No version string found in file '" + signedFile + "'");
@@ -294,7 +294,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     private static final void verifySigCLI(String signedFile) {
-        boolean isValidSignature = new TrustedUpdate().verify(signedFile);
+        boolean isValidSignature = new TrustedUpdate().verify(new File(signedFile));
 
         if (isValidSignature)
             System.out.println("Signature VALID");
@@ -303,7 +303,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     private static final void verifyUpdateCLI(String signedFile) {
-        boolean isUpdate = new TrustedUpdate().isUpdatedVersion(CoreVersion.VERSION, signedFile);
+        boolean isUpdate = new TrustedUpdate().isUpdatedVersion(CoreVersion.VERSION, new File(signedFile));
 
         if (isUpdate)
             System.out.println("File version is newer than current version.");
@@ -347,7 +347,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return The version string read, or an empty string if no version string
      *         is present.
      */
-    public String getVersionString(String signedFile) {
+    public String getVersionString(File signedFile) {
         FileInputStream fileInputStream = null;
 
         try {
@@ -396,9 +396,9 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return <code>true</code> if the signed update file's version is newer
      *         than the current version, otherwise <code>false</code>.
      */
-    public boolean isUpdatedVersion(String currentVersion, String signedFile) {
+    public boolean isUpdatedVersion(String currentVersion, File signedFile) {
         _newVersion = getVersionString(signedFile);
-        return needsUpdate(currentVersion, getVersionString(signedFile));
+        return needsUpdate(currentVersion, _newVersion);
     }
 
     /**
@@ -413,7 +413,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return <code>null</code> if the signature and version were valid and the
      *         data was moved, and an error <code>String</code> otherwise.
      */
-    public String migrateVerified(String currentVersion, String signedFile, String outputFile) {
+    public String migrateVerified(String currentVersion, File signedFile, File outputFile) {
         if (!isUpdatedVersion(currentVersion, signedFile))
             return "Downloaded version is not greater than current version";
 
@@ -606,7 +606,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return <code>true</code> if the file has a valid signature, otherwise
      *         <code>false</code>.
      */
-    public boolean verify(String signedFile) {
+    public boolean verify(File signedFile) {
         for (int i = 0; i < _trustedKeys.size(); i++) {
             SigningPublicKey signingPublicKey = new SigningPublicKey();
 
@@ -662,7 +662,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
                 }
         }
 
-        return verify(signedFile, signingPublicKey);
+        return verify(new File(signedFile), signingPublicKey);
     }
 
     /**
@@ -676,7 +676,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return <code>true</code> if the file has a valid signature, otherwise
      *         <code>false</code>.
      */
-    public boolean verify(String signedFile, SigningPublicKey signingPublicKey) {
+    public boolean verify(File signedFile, SigningPublicKey signingPublicKey) {
         FileInputStream fileInputStream = null;
 
         try {

@@ -7,6 +7,7 @@
 package net.i2p.desktopgui.gui;
 
 import java.awt.Desktop;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,6 +24,9 @@ import net.i2p.router.web.NewsFetcher;
 import net.i2p.desktopgui.router.configuration.UpdateHandler;
 import java.util.Date;
 import javax.swing.SwingWorker;
+import net.i2p.i2ptunnel.web.IndexBean;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionListener;
 
 /**
  *
@@ -43,6 +47,7 @@ public class GeneralConfiguration extends javax.swing.JFrame {
     private void extraInitComponents() {
         initSpeedTab();
         initUpdateTab();
+        initTunnelTab();
     }
 
     private void initSpeedTab() {
@@ -87,6 +92,48 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         }
     }
 
+    private void initTunnelTab() {
+        while(((DefaultTableModel) clientTable.getModel()).getRowCount() > 0) {
+            ((DefaultTableModel) clientTable.getModel()).removeRow(0);
+        }
+        while(((DefaultTableModel) serverTable.getModel()).getRowCount() > 0) {
+            ((DefaultTableModel) serverTable.getModel()).removeRow(0);
+        }
+        IndexBean bean = new IndexBean();
+        for(int i=0; i<bean.getTunnelCount(); i++) {
+            if(bean.isClient(i)) {
+                Object[] row = {bean.getTunnelName(i), bean.getTunnelType(i),
+                                bean.getClientInterface(i) + ":" + bean.getClientPort(i),
+                                getTunnelStatus(bean.getTunnelStatus(i))};
+                ((DefaultTableModel) clientTable.getModel()).addRow(row);
+            }
+            else {
+                Object[] row = {bean.getTunnelName(i),
+                                bean.getServerTarget(i),
+                                getTunnelStatus(bean.getTunnelStatus(i))};
+                ((DefaultTableModel) serverTable.getModel()).addRow(row);
+            }
+        }
+    }
+
+    public String getTunnelStatus(int status) {
+        if(status == IndexBean.NOT_RUNNING) {
+            return "Not running";
+        }
+        else if(status == IndexBean.RUNNING) {
+            return "Running";
+        }
+        else if(status == IndexBean.STANDBY) {
+            return "Standby";
+        }
+        else if(status == IndexBean.STARTING) {
+            return "Starting";
+        }
+        else {
+            return "Error: status not found";
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -125,7 +172,9 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         advancedUpdateConfig = new javax.swing.JToggleButton();
         tunnelPanel = new javax.swing.JPanel();
         clientFrame = new javax.swing.JScrollPane();
+        clientTable = new javax.swing.JTable();
         serverFrame = new javax.swing.JScrollPane();
+        serverTable = new javax.swing.JTable();
         tunnelsExplanation = new javax.swing.JLabel();
         clientTunnelLabel = new javax.swing.JLabel();
         serverTunnelLabel = new javax.swing.JLabel();
@@ -334,11 +383,11 @@ public class GeneralConfiguration extends javax.swing.JFrame {
                                 .addComponent(updateNow))))
                     .addGroup(updatesPanelLayout.createSequentialGroup()
                         .addGap(40, 40, 40)
-                        .addGroup(updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(updateDownload)
-                            .addComponent(updateInform)
-                            .addComponent(updateDownloadRestart))))
-                .addGap(9, 9, 9))
+                        .addGroup(updatesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(updateInform, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                            .addComponent(updateDownload, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(updateDownloadRestart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatesPanelLayout.createSequentialGroup()
                 .addContainerGap(339, Short.MAX_VALUE)
                 .addComponent(advancedUpdateConfig)
@@ -370,7 +419,49 @@ public class GeneralConfiguration extends javax.swing.JFrame {
 
         clientFrame.setName("clientFrame"); // NOI18N
 
+        clientTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Name", "Type", "Address", "Status"
+            }
+        ));
+        clientTable.setName("clientTable"); // NOI18N
+        clientTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                clientTableMouseClicked(evt);
+            }
+        });
+        clientFrame.setViewportView(clientTable);
+        clientTable.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("clientTable.columnModel.title0")); // NOI18N
+        clientTable.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("clientTable.columnModel.title1")); // NOI18N
+        clientTable.getColumnModel().getColumn(2).setHeaderValue(resourceMap.getString("clientTable.columnModel.title2")); // NOI18N
+        clientTable.getColumnModel().getColumn(3).setHeaderValue(resourceMap.getString("clientTable.columnModel.title3")); // NOI18N
+
         serverFrame.setName("serverFrame"); // NOI18N
+
+        serverTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Name", "Address", "Status"
+            }
+        ));
+        serverTable.setName("serverTable"); // NOI18N
+        serverTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                serverTableMouseClicked(evt);
+            }
+        });
+        serverFrame.setViewportView(serverTable);
+        serverTable.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("serverTable.columnModel.title0")); // NOI18N
+        serverTable.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("serverTable.columnModel.title1")); // NOI18N
+        serverTable.getColumnModel().getColumn(2).setHeaderValue(resourceMap.getString("serverTable.columnModel.title2")); // NOI18N
 
         tunnelsExplanation.setText(resourceMap.getString("tunnelsExplanation.text")); // NOI18N
         tunnelsExplanation.setName("tunnelsExplanation"); // NOI18N
@@ -385,14 +476,14 @@ public class GeneralConfiguration extends javax.swing.JFrame {
         tunnelPanel.setLayout(tunnelPanelLayout);
         tunnelPanelLayout.setHorizontalGroup(
             tunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tunnelPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tunnelPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(serverFrame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
-                    .addComponent(tunnelsExplanation, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
-                    .addComponent(clientTunnelLabel)
-                    .addComponent(clientFrame, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
-                    .addComponent(serverTunnelLabel))
+                .addGroup(tunnelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(tunnelsExplanation, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
+                    .addComponent(serverFrame, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
+                    .addComponent(clientTunnelLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(clientFrame, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
+                    .addComponent(serverTunnelLabel, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
         tunnelPanelLayout.setVerticalGroup(
@@ -407,8 +498,8 @@ public class GeneralConfiguration extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(serverFrame, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tunnelsExplanation, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(tunnelsExplanation, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32))
         );
 
         settingsPanel.addTab(resourceMap.getString("tunnelPanel.TabConstraints.tabTitle"), tunnelPanel); // NOI18N
@@ -584,6 +675,68 @@ private void advancedUpdateConfigActionPerformed(java.awt.event.ActionEvent evt)
     }
 }//GEN-LAST:event_advancedUpdateConfigActionPerformed
 
+private void clientTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clientTableMouseClicked
+    int row = clientTable.getSelectedRow();
+    if(row == -1) { //No selected row
+        return;
+    }
+    else {
+        IndexBean bean = new IndexBean();
+        /*
+         * TODO: This is not entirely good: if one adds/removes a tunnel without desktopgui, this number will be wrong
+         */
+        int clientNumber = 0;
+        int i = 0;
+        for(clientNumber=0; clientNumber<bean.getTunnelCount(); clientNumber++) {
+            if(bean.isClient(clientNumber)) {
+                if(i == row) {
+                    break;
+                }
+                i++;
+            }
+        }
+        new ClientTunnelWindow(clientNumber, new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    initTunnelTab();
+                }
+            
+        });
+    }
+}//GEN-LAST:event_clientTableMouseClicked
+
+private void serverTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_serverTableMouseClicked
+    int row = serverTable.getSelectedRow();
+    if(row == -1) { //No selected row
+        return;
+    }
+    else {
+        IndexBean bean = new IndexBean();
+        /*
+         * TODO: This is not entirely good: if one adds/removes a tunnel without desktopgui, this number will be wrong
+         */
+        int serverNumber = 0;
+        int i = 0;
+        for(serverNumber=0; serverNumber<bean.getTunnelCount(); serverNumber++) {
+            if(!bean.isClient(serverNumber)) {
+                if(i == row) {
+                    break;
+                }
+                i++;
+            }
+        }
+        new ServerTunnelWindow(serverNumber, new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    initTunnelTab();
+                }
+
+        });
+    }
+}//GEN-LAST:event_serverTableMouseClicked
+
     protected void initUsage(String upload, String download) {
         uploadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(upload)));
         downloadgb.setText("" + SpeedHelper.calculateMonthlyUsage(Integer.parseInt(download)));
@@ -646,6 +799,7 @@ private void advancedUpdateConfigActionPerformed(java.awt.event.ActionEvent evt)
     private javax.swing.JToggleButton cancel;
     private javax.swing.JToggleButton checkUpdates;
     private javax.swing.JScrollPane clientFrame;
+    private javax.swing.JTable clientTable;
     private javax.swing.JLabel clientTunnelLabel;
     private javax.swing.JLabel downloadSpeedLabel;
     private javax.swing.JLabel downloadUsageLabel;
@@ -657,6 +811,7 @@ private void advancedUpdateConfigActionPerformed(java.awt.event.ActionEvent evt)
     private javax.swing.JPanel networkPanel;
     private javax.swing.JToggleButton ok;
     private javax.swing.JScrollPane serverFrame;
+    private javax.swing.JTable serverTable;
     private javax.swing.JLabel serverTunnelLabel;
     private javax.swing.JTabbedPane settingsPanel;
     private javax.swing.JPanel speedPanel;

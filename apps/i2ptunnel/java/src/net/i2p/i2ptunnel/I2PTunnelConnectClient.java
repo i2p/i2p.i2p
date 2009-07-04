@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -105,6 +106,8 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
     
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
+
+    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
 
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -261,9 +264,9 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                 String str;
                 byte[] header;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else
-                    str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfh-header.ht")).getAbsolutePath(), 100, true);
                 if (str != null)
                     header = str.getBytes();
                 else
@@ -357,9 +360,9 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             String str;
             byte[] header;
             if (usingWWWProxy)
-                str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
             else
-                str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
             if (str != null)
                 header = str.getBytes();
             else

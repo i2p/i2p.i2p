@@ -94,20 +94,21 @@ public class AddressBook {
      * @param proxyPort port number of proxy
      */
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
+        File tmp = new File(I2PAppContext.getGlobalContext().getTempDir(), "addressbook.tmp");
         this.location = subscription.getLocation();
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, "addressbook.tmp", null,
+                proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, tmp.getAbsolutePath(), null,
                 subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified(), null);
         if (get.fetch()) {
             subscription.setEtag(get.getETag());
             subscription.setLastModified(get.getLastModified());
         }
         try {            
-            this.addresses = ConfigParser.parse(new File("addressbook.tmp"));
+            this.addresses = ConfigParser.parse(tmp);
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }
-        new File("addressbook.tmp").delete();
+        tmp.delete();
     }
 
     /**

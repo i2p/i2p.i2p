@@ -101,8 +101,6 @@
  <b>Used:</b> <jsp:getProperty name="helper" property="inboundTransferred" />/<jsp:getProperty name="helper" property="outboundTransferred" /><br />
  <hr />
  
- <jsp:getProperty name="helper" property="destinations" />
- 
  <u><b>Tunnels in/out</b></u><br />
  <b>Exploratory:</b> <jsp:getProperty name="helper" property="inboundTunnels" />/<jsp:getProperty name="helper" property="outboundTunnels" /><br />
  <b>Client:</b> <jsp:getProperty name="helper" property="inboundClientTunnels" />/<jsp:getProperty name="helper" property="outboundClientTunnels" /><br />
@@ -115,4 +113,6 @@
  <b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
  <b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
  <b><jsp:getProperty name="helper" property="tunnelStatus" /></b><br />
- 
+ <hr />
+  
+ <jsp:getProperty name="helper" property="destinations" />

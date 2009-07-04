@@ -49,18 +49,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
     
     public void startup() {
         _log.info("Starting up the client subsystem");
-        String portStr = _context.router().getConfigSetting(PROP_CLIENT_PORT);
-        if (portStr != null) {
-            try {
-                int port = Integer.parseInt(portStr);
-                _manager = new ClientManager(_context, port);
-            } catch (NumberFormatException nfe) {
-                _log.error("Error setting the port: " + portStr + " is not valid", nfe);
-                _manager = new ClientManager(_context, DEFAULT_PORT);
-            }
-        } else {
-            _manager = new ClientManager(_context, DEFAULT_PORT);
-        }
+        int port = _context.getProperty(PROP_CLIENT_PORT, DEFAULT_PORT);
+        _manager = new ClientManager(_context, port);
     }    
     
     public void shutdown() {

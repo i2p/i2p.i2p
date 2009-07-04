@@ -166,6 +166,8 @@ public class Blocklist {
     */
     private void readBlocklistFile(String file) {
         File BLFile = new File(file);
+        if (!BLFile.isAbsolute())
+            BLFile = new File(_context.getConfigDir(), file);
         if (BLFile == null || (!BLFile.exists()) || BLFile.length() <= 0) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Blocklist file not found: " + file);
@@ -701,6 +703,8 @@ public class Blocklist {
     private synchronized void shitlistForever(Hash peer) {
         String file = _context.getProperty(PROP_BLOCKLIST_FILE, BLOCKLIST_FILE_DEFAULT);
         File BLFile = new File(file);
+        if (!BLFile.isAbsolute())
+            BLFile = new File(_context.getConfigDir(), file);
         if (BLFile == null || (!BLFile.exists()) || BLFile.length() <= 0) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Blocklist file not found: " + file);

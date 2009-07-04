@@ -85,8 +85,9 @@ public class SummaryHelper extends HelperBase {
     }
     
     public boolean allowReseed() {
-        return (_context.netDb().getKnownRouters() < 30) ||
-                Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed", "false")).booleanValue();
+        return _context.netDb().isInitialized() &&
+               ((_context.netDb().getKnownRouters() < 30) ||
+                Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed")).booleanValue());
     }
     
     public int getAllPeers() { return _context.netDb().getKnownRouters(); }
@@ -365,7 +366,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<i>No leases</i><br />\n");
             }
         }
-        buf.append("<hr />\n");
+        // buf.append("<hr />\n");
         return buf.toString();
     }
     

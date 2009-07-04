@@ -8,6 +8,7 @@ package net.i2p.router.startup;
  *
  */
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
@@ -76,16 +77,14 @@ public class CreateRouterInfoJob extends JobImpl {
             
             info.sign(signingPrivKey);
             
-            String infoFilename = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
-            if (infoFilename == null)
-                infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
-            fos1 = new FileOutputStream(infoFilename);
+            String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
+            File ifile = new File(getContext().getRouterDir(), infoFilename);
+            fos1 = new FileOutputStream(ifile);
             info.writeBytes(fos1);
             
-            String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
-            if (keyFilename == null)
-                keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
-            fos2 = new FileOutputStream(keyFilename);
+            String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
+            File kfile = new File(getContext().getRouterDir(), keyFilename);
+            fos2 = new FileOutputStream(kfile);
             privkey.writeBytes(fos2);
             signingPrivKey.writeBytes(fos2);
             pubkey.writeBytes(fos2);
@@ -96,7 +95,7 @@ public class CreateRouterInfoJob extends JobImpl {
             getContext().keyManager().setPrivateKey(privkey);
             getContext().keyManager().setPublicKey(pubkey);
             
-            _log.info("Router info created and stored at " + infoFilename + " with private keys stored at " + keyFilename + " [" + info + "]");
+            _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
         } catch (DataFormatException dfe) {
             _log.error("Error building the new router information", dfe);
         } catch (IOException ioe) {

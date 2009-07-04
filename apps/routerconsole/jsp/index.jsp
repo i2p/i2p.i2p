@@ -6,7 +6,7 @@
 <title>I2P Router Console - home</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <%@include file="css.jsp" %>
-<link rel="shortcut icon" href="favicon.ico" />
+<link rel="shortcut icon" href="/themes/console/images/favicon.ico" />
 </head><body>
 <%
 if (System.getProperty("router.consoleNonce") == null) {
@@ -19,7 +19,8 @@ if (System.getProperty("router.consoleNonce") == null) {
 
 <div class="news" id="news">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="newshelper" scope="request" />
- <jsp:setProperty name="newshelper" property="page" value="docs/news.xml" />
+ <% File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml"); %>
+ <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
 
@@ -30,7 +31,8 @@ if (System.getProperty("router.consoleNonce") == null) {
 
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
- <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />
+ <% fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/readme.html"); %>
+ <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
  <jsp:setProperty name="contenthelper" property="lang" value="<%=request.getParameter("lang")%>" />
  <jsp:getProperty name="contenthelper" property="content" />

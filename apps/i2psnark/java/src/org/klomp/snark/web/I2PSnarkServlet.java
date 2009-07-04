@@ -173,6 +173,7 @@ public class I2PSnarkServlet extends HttpServlet {
         } else if ("Add torrent".equals(action)) {
             String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
+            // NOTE - newFile currently disabled in HTML form - see below
             File f = null;
             if ( (newFile != null) && (newFile.trim().length() > 0) )
                 f = new File(newFile.trim());
@@ -875,10 +876,9 @@ public class I2PSnarkServlet extends HttpServlet {
     private static final String TABLE_FOOTER = "</table>\n";
     
     private static final String FOOTER = "</body></html>";
-}
 
-
-class FetchAndAdd implements Runnable {
+/** inner class, don't bother reindenting */
+private static class FetchAndAdd implements Runnable {
     private SnarkManager _manager;
     private String _url;
     public FetchAndAdd(SnarkManager mgr, String url) {
@@ -929,4 +929,6 @@ class FetchAndAdd implements Runnable {
             if (file != null) file.delete();
         }
     }
+}
+
 }

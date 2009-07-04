@@ -14,6 +14,7 @@ import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 
 public interface DataStore {
+    public boolean isInitialized();
     public boolean isKnown(Hash key);
     public DataStructure get(Hash key);
     public DataStructure get(Hash key, boolean persist);
@@ -24,6 +25,7 @@ public interface DataStore {
     public Set getKeys();
     public void stop();
     public void restart();
+    public void rescan();
     public int countLeaseSets();
 
 }

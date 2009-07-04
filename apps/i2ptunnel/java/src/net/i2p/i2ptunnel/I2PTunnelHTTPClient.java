@@ -4,6 +4,7 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -135,6 +136,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
+
+    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
+
 
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -372,7 +376,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             {
                                 String str;
                                 byte[] header;
-                                str = FileUtil.readTextFile("docs/ahelper-conflict-header.ht", 100, true);
+                                str = FileUtil.readTextFile((new File(_errorDir, "ahelper-conflict-header.ht")).getAbsolutePath(), 100, true);
                                 if (str != null) header = str.getBytes();
                                   else header = ERR_AHELPER_CONFLICT;
 
@@ -549,6 +553,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix(requestId) + "Destination: " + destination);
             
+            // Serve local proxy files (images, css linked from error pages)
+            // Ignore all the headers
+            if (destination.equals("proxy.i2p")) {
+                serveLocalFile(out, method, targetRequest);
+                s.close();
+                return;
+            }
+
             Destination dest = I2PTunnel.destFromName(destination);
             if (dest == null) {
                 //l.log("Could not resolve " + destination + ".");
@@ -558,13 +570,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 byte[] header;
                 boolean showAddrHelper = false;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else if(ahelper != 0)
-                    str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfb-header.ht")).getAbsolutePath(), 100, true);
                 else if (destination.length() == 60 && destination.endsWith(".b32.i2p"))
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
                 else {
-                    str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfh-header.ht")).getAbsolutePath(), 100, true);
                     showAddrHelper = true;
                 }
                 if (str != null)
@@ -733,9 +745,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 String str;
                 byte[] header;
                 if (usingWWWProxy)
-                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnfp-header.ht")).getAbsolutePath(), 100, true);
                 else
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile((new File(_errorDir, "dnf-header.ht")).getAbsolutePath(), 100, true);
                 if (str != null)
                     header = str.getBytes();
                 else
@@ -773,5 +785,71 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
 
         return protocol.equalsIgnoreCase("http://");
+    }
+
+    private final static byte[] ERR_404 =
+        ("HTTP/1.1 404 Not Found\r\n"+
+         "Content-Type: text/plain\r\n"+
+         "\r\n"+
+         "HTTP Proxy local file not found")
+        .getBytes();
+
+    /**
+     *  Very simple web server.
+     *
+     *  Serve local files in the docs/ directory, for CSS and images in
+     *  error pages, using the reserved address proxy.i2p
+     *  (similar to p.p in privoxy).
+     *  This solves the problems with including links to the router console,
+     *  as assuming the router console is at 127.0.0.1 leads to broken
+     *  links if it isn't.
+     *
+     *  Ignore all request headers (If-Modified-Since, etc.)
+     *
+     *  There is basic protection here -
+     *  FileUtil.readFile() prevents traversal above the base directory -
+     *  but inproxy/gateway ops would be wise to block proxy.i2p to prevent
+     *  exposing the docs/ directory or perhaps other issues through
+     *  uncaught vulnerabilities.
+     *
+     *  @param targetRequest "proxy.i2p/foo.png HTTP/1.1"
+     */
+    private static void serveLocalFile(OutputStream out, String method, String targetRequest) {
+        if (method.equals("GET") || method.equals("HEAD")) {
+            int space = targetRequest.indexOf(' ');
+            String filename = null;
+            try {
+                filename = targetRequest.substring(10, space);
+            } catch (IndexOutOfBoundsException ioobe) {}
+            if (filename == null || filename.length() <= 0) {
+                try {
+                    out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes());
+                    out.flush();
+                } catch (IOException ioe) {}
+                return;
+            }
+            File file = new File(_errorDir, filename);
+            if (file.exists() && !file.isDirectory()) {
+                String type;
+                if (filename.endsWith(".css"))
+                    type = "text/css";
+                else if (filename.endsWith(".png"))
+                    type = "image/png";
+                else if (filename.endsWith(".jpg"))
+                    type = "image/jpeg";
+                else type = "text/html";
+                try {
+                    out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes());
+                    out.write(type.getBytes());
+                    out.write("\r\nCache-Control: max-age=86400\r\n\r\n".getBytes());
+                    FileUtil.readFile(filename, _errorDir.getAbsolutePath(), out);
+                    return;
+                } catch (IOException ioe) {}
+            }
+        }
+        try {
+            out.write(ERR_404);
+            out.flush();
+        } catch (IOException ioe) {}
     }
 }

@@ -6,33 +6,12 @@ Proxy-Connection: close
 
 <html><head>
 <title>Destination key conflict</title>
-<link rel="shortcut icon" href="http://127.0.0.1:7657/favicon.ico" />
-<style type='text/css'>
-div.warning {
-	margin: 0em 1em 1em 224px;
-	padding: .5em 1em;
-	background-color: #ffefef;
-	border: medium solid #ffafaf;
-	text-align: left;
-	color: inherit;
-}
-div.logo {
-	float: left;
-	width: 200px;
-	left: 1em;
-	top: 1em;
-	margin: 0em;
-	padding: .5em;
-	text-align: left;
-	border: medium solid #efefff;
-	background-color: #fafaff;
-	color: inherit;
-}
-</style>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" />
+<link href="http://proxy.i2p/themes/console/console.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://127.0.0.1:7657/i2plogo.png" alt="Router Console" width="187" height="35" border="0"/></a><br />
+ <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Router Console" width="187" height="35" border="0"/></a><br />
  [<a href="http://127.0.0.1:7657/config.jsp">configuration</a> | <a href="http://127.0.0.1:7657/help.jsp">help</a>]
 </div>
 <div class=warning id=warning>
