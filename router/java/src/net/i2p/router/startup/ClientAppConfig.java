@@ -47,13 +47,15 @@ public class ClientAppConfig {
             cfgFile = new File(ctx.getConfigDir(), clientConfigFile);
         
         // fall back to use router.config's clientApp.* lines
-        if (!cfgFile.exists()) 
+        if (!cfgFile.exists()) {
+            System.out.println("Warning - No client config file " + cfgFile.getAbsolutePath());
             return ctx.router().getConfigMap();
+        }
         
         try {
             DataHelper.loadProps(rv, cfgFile);
         } catch (IOException ioe) {
-            // _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
+            System.out.println("Error loading the client app properties from " + cfgFile.getAbsolutePath() + ' ' + ioe);
         }
         
         return rv;

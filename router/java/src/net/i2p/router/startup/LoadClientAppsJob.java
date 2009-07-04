@@ -29,6 +29,11 @@ public class LoadClientAppsJob extends JobImpl {
             _loaded = true;
         }
         List apps = ClientAppConfig.getClientApps(getContext());
+        if (apps.size() <= 0) {
+            _log.error("Warning - No client apps or router console configured - we are just a router");
+            System.err.println("Warning - No client apps or router console configured - we are just a router");
+            return;
+        }
         for(int i = 0; i < apps.size(); i++) {
             ClientAppConfig app = (ClientAppConfig) apps.get(i);
             if (app.disabled)
