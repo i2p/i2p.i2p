@@ -398,7 +398,7 @@ public class I2PSnarkServlet extends HttpServlet {
         return rv;
     }
 
-    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 60;
+    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 44;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 40;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
