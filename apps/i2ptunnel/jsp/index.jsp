@@ -10,7 +10,7 @@
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
     
     <% if (indexBean.allowCSS()) {
-  %><link href="images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
@@ -76,7 +76,7 @@
       %>
         <div class="nameField rowItem">
             <label>Name:</label>
-            <span class="text"><a href="edit.jsp?tunnel=<%=curClient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curClient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%> (Edit)</a></span>
         </div>
         <div class="portField rowItem">
             <label>Port:</label>
@@ -192,7 +192,7 @@
       %>
         <div class="nameField rowItem">
             <label>Name:</label>
-            <span class="text"><a href="edit.jsp?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%> (Edit)</a></span>
         </div>
         <div class="previewField rowItem">
             <label>Points at:</label>
