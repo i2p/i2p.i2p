@@ -437,12 +437,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Change address? status = " + _reachabilityStatus +
+                                  " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
+                                  " old = " + _externalListenHost + ':' + _externalListenPort);
                     if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
                          (_externalListenHost == null) || (_externalListenPort <= 0) ||
                          (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Trying to change our external address...");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Trying to change our external address...");
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
                             // fixed port defaults to true so we never do this
@@ -455,15 +459,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             }
                         } catch (UnknownHostException uhe) {
                             _externalListenHost = null;
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info("Error trying to change our external address", uhe);
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Error trying to change our external address", uhe);
                         }
                     } else {
                         // they told us something different, but our tests are recent and positive,
                         // so lets test again
                         fireTest = true;
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Different address, but we're fine.. (" + _reachabilityStatus + ")");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Different address, but we're fine.. (" + _reachabilityStatus + ")");
                     }
                 } else {
                     // matched what we expect
