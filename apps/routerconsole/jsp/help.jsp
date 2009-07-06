@@ -1,4 +1,4 @@
-<%@page contentType="text/html"%>
+ah.,<%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
@@ -14,15 +14,14 @@
 If you'd like to help improve or translate the documentation or other aspects 
 of the project, please see the documentation for
 <a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a> 
-In addition to the information here, further information is available here:
-the information available at the following sites:<br><br>
+<br><br>Further assistance is available here:
+<br><br>
 <li><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
 <li><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.
 <br><br>
 You may also try the
 <a href="http://forum.i2p/">I2P forum</a>
-or IRC [irc://127.0.0.1:6668/i2p].
-<br />
+or IRC.<br />
 
 <h2>Summary Bar Information</h2>
 Many of the stats on the summary bar may be
