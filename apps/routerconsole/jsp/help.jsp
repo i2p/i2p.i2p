@@ -16,8 +16,10 @@ of the project, please see the documentation for
 <a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a> 
 <br><br>Further assistance is available here:
 <br><br>
+<ul>
 <li><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
 <li><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.
+</ul>
 <br><br>
 You may also try the
 <a href="http://forum.i2p/">I2P forum</a>
