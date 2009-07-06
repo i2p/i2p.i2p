@@ -11,7 +11,7 @@
 
 <jsp:useBean class="net.i2p.router.web.ConfigNetHelper" id="nethelper" scope="request" />
 <jsp:setProperty name="nethelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
+<h1>I2P Network Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
  

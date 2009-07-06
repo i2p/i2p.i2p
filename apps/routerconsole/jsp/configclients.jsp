@@ -17,7 +17,7 @@ button span.hide{
 
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
+<h1>I2P Client Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
   

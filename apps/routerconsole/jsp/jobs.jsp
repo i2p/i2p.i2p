@@ -9,7 +9,7 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
+ <h1>I2P Router Job Queue</h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.JobQueueHelper" id="jobQueueHelper" scope="request" />
  <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

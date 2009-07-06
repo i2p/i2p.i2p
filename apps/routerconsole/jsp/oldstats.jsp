@@ -13,7 +13,7 @@
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="oldhelper" scope="request" />
 <jsp:setProperty name="oldhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <jsp:setProperty name="oldhelper" property="writer" value="<%=out%>" />
-
+ <h1>I2P Router Statistics</h1>
 <div class="main" id="main">
  <jsp:getProperty name="oldhelper" property="stats" />
 </div>

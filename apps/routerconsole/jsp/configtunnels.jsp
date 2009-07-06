@@ -12,7 +12,7 @@
 
 <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
 <jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
+<h1>I2P Tunnel Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
   

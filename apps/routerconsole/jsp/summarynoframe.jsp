@@ -10,7 +10,7 @@
 <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
 <jsp:setProperty name="uhelper" property="*" />
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <centre><a href="index.jsp" target="_top"><img src="i2plogo.png" alt="Router Console" title="I2P Router Console"/></a></centre><hr />
+ <centre><a href="index.jsp" target="_top"><img src="/themes/i2plogo.png" alt="Router Console" title="I2P Router Console"/></a></centre><hr />
  <centre>
  <u><b>I2P Internals</b></u><br />
  <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 
@@ -26,7 +26,7 @@
  <a href="help.jsp" target="_top">Help</a></b><hr />
  <u><b>I2P Services</b></u><br />
  <a href="susimail/susimail" target="blank">Susimail</a> 
- <a href="susidns/index.jsp" target="_blaank">SusiDNS</a> 
+ <a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
  <a href="i2psnark/" target="_blank">I2PSnark</a> 
  <a href="http://127.0.0.1:7658/" target="_blank">Eepsite</a> 
  </center>
