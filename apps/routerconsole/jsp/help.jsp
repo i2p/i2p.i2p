@@ -11,16 +11,17 @@
 <%@include file="summary.jsp" %>
 <h1>I2P Router Help & Support</h1>
 <div class="main" id="main">
-If you'd like to help improve the documentation, please 
-<a href="http://www.i2p2.i2p/getinvolved.html"get in touch</a> 
-with the project. For now, please see the following sites to augment
-the information available at the following sites:<br>
+If you'd like to help improve or translate the documentation or other aspects 
+of the project, please see the documentation for
+<a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a> 
+In addition to the information here, further information is available here:
+the information available at the following sites:<br><br>
 <li><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
 <li><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.
 <br><br>
 You may also try the
-<a href="http://forum.i2p/">forum</a>
-or IRC.
+<a href="http://forum.i2p/">I2P forum</a>
+or IRC [irc://127.0.0.1:6668/i2p].
 <br />
 
 <h2>Summary Bar Information</h2>
