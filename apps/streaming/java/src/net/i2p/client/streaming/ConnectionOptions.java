@@ -475,7 +475,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     
 	@Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("conDelay=").append(_connectDelay);
         buf.append(" maxSize=").append(_maxMessageSize);
         buf.append(" rtt=").append(_rtt);

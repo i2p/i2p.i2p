@@ -187,7 +187,7 @@ public class TunnelPoolSettings {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Properties p = new Properties();
         writeToProperties("", p);
         buf.append("Tunnel pool settings:\n");

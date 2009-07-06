@@ -14,13 +14,13 @@ public class SimpleStatDumper {
     public static void dumpStats(I2PAppContext context, int logLevel) {
         if (!_log.shouldLog(logLevel)) return;
 
-        StringBuffer buf = new StringBuffer(4 * 1024);
+        StringBuilder buf = new StringBuilder(4 * 1024);
         dumpFrequencies(context, buf);
         dumpRates(context, buf);
         _log.log(logLevel, buf.toString());
     }
 
-    private static void dumpFrequencies(I2PAppContext ctx, StringBuffer buf) {
+    private static void dumpFrequencies(I2PAppContext ctx, StringBuilder buf) {
         Set frequencies = new TreeSet(ctx.statManager().getFrequencyNames());
         for (Iterator iter = frequencies.iterator(); iter.hasNext();) {
             String name = (String) iter.next();
@@ -40,7 +40,7 @@ public class SimpleStatDumper {
         }
     }
 
-    private static void dumpRates(I2PAppContext ctx, StringBuffer buf) {
+    private static void dumpRates(I2PAppContext ctx, StringBuilder buf) {
         Set rates = new TreeSet(ctx.statManager().getRateNames());
         for (Iterator iter = rates.iterator(); iter.hasNext();) {
             String name = (String) iter.next();
@@ -59,7 +59,7 @@ public class SimpleStatDumper {
         }
     }
 
-    static void dumpRate(Rate curRate, StringBuffer buf) {
+    static void dumpRate(Rate curRate, StringBuilder buf) {
         buf.append(curRate.toString());
     }
 }

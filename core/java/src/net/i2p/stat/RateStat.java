@@ -93,7 +93,7 @@ public class RateStat {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(4096);
+        StringBuilder buf = new StringBuilder(4096);
         buf.append(getGroupName()).append('.').append(getName()).append(": ").append(getDescription()).append('\n');
         long periods[] = getPeriods();
         Arrays.sort(periods);
@@ -121,7 +121,7 @@ public class RateStat {
     }
 
     public void store(OutputStream out, String prefix) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append(NL);
         buf.append("################################################################################").append(NL);
         buf.append("# Rate: ").append(_groupName).append(": ").append(_statName).append(NL);

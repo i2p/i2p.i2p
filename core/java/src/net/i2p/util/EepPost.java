@@ -184,7 +184,7 @@ public class EepPost {
     }
     
     private String getHeader(boolean isProxy, String path, String host, int port, String separator, long length) {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("POST ");
         if (isProxy) {
             buf.append("http://").append(host);
@@ -212,7 +212,7 @@ public class EepPost {
             return "------------------------" + new java.util.Random().nextLong();
         byte separator[] = new byte[32];  // 2^-128 chance of this being a problem
         I2PAppContext.getGlobalContext().random().nextBytes(separator);
-        StringBuffer sep = new StringBuffer(48);
+        StringBuilder sep = new StringBuilder(48);
         for (int i = 0; i < separator.length; i++)
             sep.append((char)((int)'a' + (int)(separator[i]&0x0F))).append((char)((int)'a' + (int)((separator[i] >>> 4) & 0x0F)));
         return sep.toString();

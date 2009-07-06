@@ -149,7 +149,7 @@ class StoreState {
 
     @Override
     public String toString() { 
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("Storing ").append(_key);
         buf.append(" ");
         if (_completed <= 0)

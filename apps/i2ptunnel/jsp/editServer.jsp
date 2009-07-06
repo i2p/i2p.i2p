@@ -18,7 +18,7 @@
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 
     <% if (editBean.allowCSS()) {
-  %><link href="images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     <link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
@@ -148,7 +148,7 @@
                 <label for="localDestination" accesskey="L">
                     <span class="accessKey">L</span>ocal destination:
                 </label>
-                <textarea rows="1" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
+                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
          <% if (!"".equals(editBean.getDestinationBase64(curTunnel))) { %>    
             <a href="/susidns/addressbook.jsp?book=private&hostname=<%=editBean.getTunnelName(curTunnel)%>&destination=<%=editBean.getDestinationBase64(curTunnel)%>#add">Add to local addressbook</a>    
          <% } %>
@@ -270,7 +270,7 @@
                 <label for="encrypt" accesskey="e">
                     Encryption Key:
                 </label>
-                <textarea rows="1" cols="44" id="portField" name="encryptKey" title="Encrypt Key" wrap="off"><%=editBean.getEncryptKey(curTunnel)%></textarea>               
+                <textarea rows="1" style="height: 3em;" cols="44" id="portField" name="encryptKey" title="Encrypt Key" wrap="off"><%=editBean.getEncryptKey(curTunnel)%></textarea>               
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
@@ -299,7 +299,7 @@
                 <label for="accessList" accesskey="s">
                     Access List:
                 </label>
-                <textarea rows="2" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <textarea rows="2" style="height: 4em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
                 <span class="comment">(Restrict to these clients only)</span>
             </div>
                  

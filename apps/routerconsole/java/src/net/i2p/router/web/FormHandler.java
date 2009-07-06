@@ -87,7 +87,7 @@ public class FormHandler {
         process();
         if (_errors.size() <= 0 && _notices.size() <= 0)
             return "";
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("<div class=\"messages\" id=\"messages\"><p>");
         if (_errors.size() > 0) {
             buf.append("<span class=\"error\">");
@@ -178,7 +178,7 @@ public class FormHandler {
         if (source.size() <= 0) {
             return "";
         } else {
-            StringBuffer buf = new StringBuffer(512);
+            StringBuilder buf = new StringBuilder(512);
             buf.append("<ul>\n");
             for (int i = 0; i < source.size(); i++) {
                 buf.append("<li>");

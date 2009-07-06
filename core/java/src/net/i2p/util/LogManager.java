@@ -546,7 +546,7 @@ public class LogManager {
     }
     
     private String createConfig() {
-        StringBuffer buf = new StringBuffer(8*1024);
+        StringBuilder buf = new StringBuilder(8*1024);
         buf.append(PROP_FORMAT).append('=').append(new String(_format)).append('\n');
         buf.append(PROP_DATEFORMAT).append('=').append(_dateFormatPattern).append('\n');
         buf.append(PROP_DISPLAYONSCREEN).append('=').append((_displayOnScreen ? "TRUE" : "FALSE")).append('\n');

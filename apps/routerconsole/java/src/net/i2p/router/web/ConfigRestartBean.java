@@ -71,7 +71,7 @@ public class ConfigRestartBean {
     
     /** @param s value,label,... pairs */
     private static String buttons(String url, String nonce, String s) {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         StringTokenizer tok = new StringTokenizer(s, ",");
         buf.append("<form action=\"").append(url).append("\" method=\"GET\">\n");
         buf.append("<input type=\"hidden\" name=\"consoleNonce\" value=\"").append(nonce).append("\" >\n");

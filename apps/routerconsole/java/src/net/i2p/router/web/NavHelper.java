@@ -27,7 +27,7 @@ public class NavHelper extends HelperBase {
     }
     
     public String getClientAppLinks() {
-        StringBuffer buf = new StringBuffer(1024); 
+        StringBuilder buf = new StringBuilder(1024); 
         for (Iterator iter = _apps.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             String path = (String)_apps.get(name);

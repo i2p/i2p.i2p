@@ -131,7 +131,7 @@ public class TunnelHistory {
     private final static String NL = System.getProperty("line.separator");
     
     public void store(OutputStream out) throws IOException {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append(NL);
         buf.append("#################").append(NL);
         buf.append("# Tunnel history").append(NL);
@@ -150,7 +150,7 @@ public class TunnelHistory {
         _failRate.store(out, "tunnelHistory.failRate");
     }
     
-    private void add(StringBuffer buf, String name, long val, String description) {
+    private void add(StringBuilder buf, String name, long val, String description) {
         buf.append("# ").append(name.toUpperCase()).append(NL).append("# ").append(description).append(NL);
         buf.append("tunnels.").append(name).append('=').append(val).append(NL).append(NL);
     }

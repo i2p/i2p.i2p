@@ -899,7 +899,7 @@ public class Connection {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Closing connection due to inactivity");
                     if (_log.shouldLog(Log.DEBUG)) {
-                        StringBuffer buf = new StringBuffer(128);
+                        StringBuilder buf = new StringBuilder(128);
                         buf.append("last sent was: ").append(_context.clock().now() - _lastSendTime);
                         buf.append("ms ago, last received was: ").append(_context.clock().now()-_lastReceivedOn);
                         buf.append("ms ago, inactivity timeout is: ").append(_options.getInactivityTimeout());
@@ -934,7 +934,7 @@ public class Connection {
     
 	@Override
     public String toString() { 
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[Connection ");
         if (_receiveStreamId > 0)
             buf.append(Packet.toId(_receiveStreamId));

@@ -181,7 +181,7 @@ public class InboundEstablishState {
         _sentSignature = _context.dsa().sign(signed, _context.keyManager().getSigningPrivateKey());
         
         if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Signing sessionCreated:");
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
             buf.append(" SentY: ").append(Base64.encode(_sentY));
@@ -333,7 +333,7 @@ public class InboundEstablishState {
     
     @Override
     public String toString() {            
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(super.toString());
         if (_receivedX != null)
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));

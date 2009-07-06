@@ -88,7 +88,7 @@ public class I2PRequestLog extends NCSARequestLog
             if (_fileOut==null)
                 return;
 
-            StringBuffer buf = new StringBuffer(160);
+            StringBuilder buf = new StringBuilder(160);
             
             String addr = request.getField("X-I2P-DestHash");
             if(addr != null)

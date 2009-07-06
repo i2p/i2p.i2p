@@ -364,7 +364,7 @@ public abstract class TransportImpl implements Transport {
         if (msToReceive > 5000)
             level = Log.WARN;
         if (_log.shouldLog(level)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Message received: ").append(inMsg.getClass().getName());
             buf.append(" / ").append(inMsg.getUniqueId());
             buf.append(" in ").append(msToReceive).append("ms containing ");

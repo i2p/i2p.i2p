@@ -69,7 +69,7 @@ public class QuotedPrintable implements Encoding {
 	 */
 	private static int BUFSIZE = 2;
 	private String encode( InputStream in ) throws EncodingException, IOException {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		int l = 0;
 		int read = 0, buffered = 0, tmp[] = new int[BUFSIZE];
 		while( true ) {

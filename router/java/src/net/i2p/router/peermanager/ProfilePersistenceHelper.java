@@ -89,7 +89,7 @@ class ProfilePersistenceHelper {
                 groups = groups + ", well integrated";
         }
         
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("########################################################################").append(NL);
         buf.append("# profile for ").append(profile.getPeer().toBase64()).append(NL);
         if (_us != null)

@@ -218,7 +218,7 @@ public class BufferedRandomSource extends RandomSource {
         System.out.println("Data: " + data.length + "/" + compressed.length + ": " + toString(data));
     }
     private static final String toString(byte data[]) {
-        StringBuffer buf = new StringBuffer(data.length * 9);
+        StringBuilder buf = new StringBuilder(data.length * 9);
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < 8; j++) {
                 if ((data[i] & (1 << j)) != 0)

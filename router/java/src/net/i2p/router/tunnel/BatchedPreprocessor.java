@@ -65,10 +65,10 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
     
     @Override
     public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
-        StringBuffer timingBuf = null;
+        StringBuilder timingBuf = null;
         if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("Preprocess queue with " + pending.size() + " to send");
-            timingBuf = new StringBuffer(128);
+            timingBuf = new StringBuilder(128);
             timingBuf.append("Preprocess with " + pending.size() + " to send. ");
         }
         if (DISABLE_BATCHING) {
@@ -246,7 +246,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
     private void display(long allocated, List pending, String title) {
         if (_log.shouldLog(Log.INFO)) {
             long highestDelay = 0;
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(_name).append(": ");
             buf.append(title);
             buf.append(" allocated: ").append(allocated);
@@ -286,7 +286,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         // generate the final preprocessed data
         
         if (offset <= 0) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("wtf, written offset is ").append(offset);
             buf.append(" for ").append(startAt).append(" through ").append(sendThrough);
             for (int i = startAt; i <= sendThrough; i++) {

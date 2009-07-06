@@ -93,7 +93,7 @@ public class PacketHandler {
     }
 
     String getHandlerStatus() {
-        StringBuffer rv = new StringBuffer();
+        StringBuilder rv = new StringBuilder();
         int size = _handlers.size();
         rv.append("Handlers: ").append(size);
         for (int i = 0; i < size; i++) {
@@ -324,7 +324,7 @@ public class PacketHandler {
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state, boolean allowFallback) {
             _state = 31;
             if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("Attempting to receive a packet on a known inbound state: ");
                 buf.append(state);
                 buf.append(" MAC key: ").append(state.getMACKey());
@@ -362,7 +362,7 @@ public class PacketHandler {
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, OutboundEstablishState state) {
             _state = 35;
             if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("Attempting to receive a packet on a known outbound state: ");
                 buf.append(state);
                 buf.append(" MAC key: ").append(state.getMACKey());
@@ -470,7 +470,7 @@ public class PacketHandler {
                     if (state != null) {
                         UDPPacketReader.DataReader dr = reader.getDataReader();
                         if (_log.shouldLog(Log.INFO)) {
-                            StringBuffer msg = new StringBuffer();
+                            StringBuilder msg = new StringBuilder();
                             msg.append("Receive ").append(System.identityHashCode(packet));
                             msg.append(" from ").append(state.getRemotePeer().toBase64()).append(" ").append(state.getRemoteHostId());
                             for (int i = 0; i < dr.readFragmentCount(); i++) {

@@ -240,7 +240,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             out = s.getOutputStream();
             InputReader reader = new InputReader(s.getInputStream());
             String line, method = null, protocol = null, host = null, destination = null;
-            StringBuffer newRequest = new StringBuffer();
+            StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
             while ((line = reader.readLine(method)) != null) {
                 line = line.trim();
@@ -811,11 +811,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
      *  but inproxy/gateway ops would be wise to block proxy.i2p to prevent
      *  exposing the docs/ directory or perhaps other issues through
      *  uncaught vulnerabilities.
+     *  Restrict to the /themes/ directory for now.
      *
-     *  @param targetRequest "proxy.i2p/foo.png HTTP/1.1"
+     *  @param targetRequest "proxy.i2p/themes/foo.png HTTP/1.1"
      */
     private static void serveLocalFile(OutputStream out, String method, String targetRequest) {
-        if (method.equals("GET") || method.equals("HEAD")) {
+        if ((method.equals("GET") || method.equals("HEAD")) &&
+            targetRequest.startsWith("proxy.i2p/themes/") &&
+            !targetRequest.contains("..")) {
             int space = targetRequest.indexOf(' ');
             String filename = null;
             try {

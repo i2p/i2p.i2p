@@ -197,7 +197,7 @@ public class Timestamper implements Runnable {
             } else {
                 if (Math.abs(delta - expectedDelta) > MAX_VARIANCE) {
                     if (_log.shouldLog(Log.ERROR)) {
-                        StringBuffer err = new StringBuffer(96);
+                        StringBuilder err = new StringBuilder(96);
                         err.append("SNTP client variance exceeded at query ").append(i);
                         err.append(".  expected = ");
                         err.append(expectedDelta);
@@ -214,7 +214,7 @@ public class Timestamper implements Runnable {
         }
         stampTime(now);
         if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Deltas: ");
             for (int i = 0; i < found.length; i++)
                 buf.append(found[i]).append(' ');

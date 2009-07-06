@@ -74,7 +74,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             InputStream in = socket.getInputStream();
 
-            StringBuffer command = new StringBuffer(128);
+            StringBuilder command = new StringBuilder(128);
             Properties headers = readHeaders(in, command);
             headers.setProperty(HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
             headers.setProperty(DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p" );
@@ -309,8 +309,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
-    private String formatHeaders(Properties headers, StringBuffer command) {
-        StringBuffer buf = new StringBuffer(command.length() + headers.size() * 64);
+    private String formatHeaders(Properties headers, StringBuilder command) {
+        StringBuilder buf = new StringBuilder(command.length() + headers.size() * 64);
         buf.append(command.toString().trim()).append("\r\n");
         for (Iterator iter = headers.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -321,9 +321,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         return buf.toString();
     }
     
-    private Properties readHeaders(InputStream in, StringBuffer command) throws IOException {
+    private Properties readHeaders(InputStream in, StringBuilder command) throws IOException {
         Properties headers = new Properties();
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         
         boolean ok = DataHelper.readLine(in, command);
         if (!ok) throw new IOException("EOF reached while reading the HTTP command [" + command.toString() + "]");

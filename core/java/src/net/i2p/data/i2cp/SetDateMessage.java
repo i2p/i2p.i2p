@@ -79,7 +79,7 @@ public class SetDateMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[SetDateMessage");
         buf.append("\n\tDate: ").append(getDate());
         buf.append("]");

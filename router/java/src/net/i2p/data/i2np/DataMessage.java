@@ -106,7 +106,7 @@ public class DataMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DataMessage: ");
         buf.append("\n\tData: ").append(DataHelper.toString(getData(), 64));
         buf.append("]");

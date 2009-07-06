@@ -252,7 +252,7 @@ public class Shitlist {
     }
 
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<h2>Shitlist</h2>");
         Map<Hash, Entry> entries = new TreeMap(new HashComparator());
         

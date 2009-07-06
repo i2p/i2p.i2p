@@ -140,7 +140,7 @@ public class GeoIP {
         FileInputStream in = null;
         try {
             in = new FileInputStream(GeoFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf)) {
                 try {
                     if (buf.charAt(0) == '#') {
@@ -202,7 +202,7 @@ public class GeoIP {
         FileInputStream in = null;
         try {
             in = new FileInputStream(GeoFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf) && idx < search.length) {
                 try {
                     if (buf.charAt(0) == '#') {

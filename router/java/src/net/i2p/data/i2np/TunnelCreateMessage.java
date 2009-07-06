@@ -263,7 +263,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[TunnelCreateMessage: ");
         buf.append("\n\tNext Router: ").append(getNextRouter());
         buf.append("\n\tNext Tunnel: ").append(getNextTunnelId());

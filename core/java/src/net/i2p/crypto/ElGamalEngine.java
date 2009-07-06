@@ -130,7 +130,7 @@ public class ElGamalEngine {
         System.arraycopy(dbytes, 0, out, (dbytes.length < 257 ? 514 - dbytes.length : 257),
                          (dbytes.length > 257 ? 257 : dbytes.length));
         /*
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("Timing\n");
         buf.append("0-1: ").append(t1 - t0).append('\n');
         buf.append("1-2: ").append(t2 - t1).append('\n');

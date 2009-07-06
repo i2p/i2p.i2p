@@ -43,7 +43,7 @@
  <p>
  <table>
  <tr><td>Dest. name, hash, or full key:
- <td><textarea name="peer" cols="44" rows="1" wrap="off"></textarea>
+ <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea>
  <tr><td align="right">Session Key:
  <td><input type="text" size="55" name="key" />
  <tr><td><td><input type="submit" name="action" value="Add key" />

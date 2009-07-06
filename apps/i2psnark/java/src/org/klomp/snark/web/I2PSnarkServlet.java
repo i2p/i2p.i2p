@@ -398,7 +398,7 @@ public class I2PSnarkServlet extends HttpServlet {
         return rv;
     }
 
-    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 60;
+    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 44;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 40;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
@@ -506,7 +506,7 @@ public class I2PSnarkServlet extends HttpServlet {
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = snark.meta.getAnnounce();
         if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
-            announce.startsWith("http://lnQ6yoBT")) {
+            announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/")) {
             Map trackers = _manager.getTrackers();
             for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry entry = (Map.Entry)iter.next();
@@ -759,7 +759,7 @@ public class I2PSnarkServlet extends HttpServlet {
                   + _manager.util().getI2CPHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"i2cpPort\" value=\"" +
                   + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" /> <br />\n");
-        StringBuffer opts = new StringBuffer(64);
+        StringBuilder opts = new StringBuilder(64);
         Map options = new TreeMap(_manager.util().getI2CPOptions());
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();

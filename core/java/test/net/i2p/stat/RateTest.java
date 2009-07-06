@@ -13,7 +13,7 @@ public class RateTest extends TestCase {
             rate.addData(i * 100, 20);
         }
         rate.coalesce();
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         
         rate.store("rate.test", buf);
         byte data[] = buf.toString().getBytes();

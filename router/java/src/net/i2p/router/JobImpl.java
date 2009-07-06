@@ -35,7 +35,7 @@ public abstract class JobImpl implements Job {
     
     @Override
     public String toString() { 
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(super.toString());
         buf.append(": Job ").append(_id).append(": ").append(getName());
         return buf.toString();

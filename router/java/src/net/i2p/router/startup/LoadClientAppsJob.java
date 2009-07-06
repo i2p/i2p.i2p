@@ -29,6 +29,11 @@ public class LoadClientAppsJob extends JobImpl {
             _loaded = true;
         }
         List apps = ClientAppConfig.getClientApps(getContext());
+        if (apps.size() <= 0) {
+            _log.error("Warning - No client apps or router console configured - we are just a router");
+            System.err.println("Warning - No client apps or router console configured - we are just a router");
+            return;
+        }
         for(int i = 0; i < apps.size(); i++) {
             ClientAppConfig app = (ClientAppConfig) apps.get(i);
             if (app.disabled)
@@ -64,7 +69,7 @@ public class LoadClientAppsJob extends JobImpl {
         List argList = new ArrayList(4);
         if (args != null) {
             char data[] = args.toCharArray();
-            StringBuffer buf = new StringBuffer(32);
+            StringBuilder buf = new StringBuilder(32);
             boolean isQuoted = false;
             for (int i = 0; i < data.length; i++) {
                 switch (data[i]) {
@@ -74,7 +79,7 @@ public class LoadClientAppsJob extends JobImpl {
                             String str = buf.toString().trim();
                             if (str.length() > 0)
                                 argList.add(str);
-                            buf = new StringBuffer(32);
+                            buf = new StringBuilder(32);
                         } else {
                             isQuoted = true;
                         }
@@ -89,7 +94,7 @@ public class LoadClientAppsJob extends JobImpl {
                             String str = buf.toString().trim();
                             if (str.length() > 0)
                                 argList.add(str);
-                            buf = new StringBuffer(32);
+                            buf = new StringBuilder(32);
                         }
                         break;
                     default:

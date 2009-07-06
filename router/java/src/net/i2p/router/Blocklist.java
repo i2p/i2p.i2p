@@ -188,7 +188,7 @@ public class Blocklist {
         FileInputStream in = null;
         try {
             in = new FileInputStream(BLFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf) && count < maxSize) {
                 Entry e = parse(buf, true);
                 buf.setLength(0);
@@ -267,7 +267,7 @@ public class Blocklist {
         }
     }
 
-    private Entry parse(StringBuffer buf, boolean bitch) {
+    private Entry parse(StringBuilder buf, boolean bitch) {
         byte[] ip1;
         byte[] ip2;
         int start1 = 0;
@@ -378,7 +378,7 @@ public class Blocklist {
         FileInputStream in = null;
         try {
             in = new FileInputStream(BLFile);
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             while (DataHelper.readLine(in, buf)) {
                 lines++;
                 buf.setLength(0);
@@ -628,7 +628,7 @@ public class Blocklist {
     }
 
     private static String toStr(long entry) {
-        StringBuffer buf = new StringBuffer(32);
+        StringBuilder buf = new StringBuilder(32);
         for (int i = 7; i >= 0; i--) {
             buf.append((entry >> (8*i)) & 0xff);
             if (i == 4)
@@ -640,7 +640,7 @@ public class Blocklist {
     }
 
     private static String toStr(int ip) {
-        StringBuffer buf = new StringBuffer(16);
+        StringBuilder buf = new StringBuilder(16);
         for (int i = 3; i >= 0; i--) {
             buf.append((ip >> (8*i)) & 0xff);
             if (i > 0)
@@ -719,7 +719,7 @@ public class Blocklist {
             FileInputStream in = null;
             try {
                 in = new FileInputStream(BLFile);
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 // assume the file is unsorted, so go through the whole thing
                 while (DataHelper.readLine(in, buf)) {
                     Entry e = parse(buf, false);

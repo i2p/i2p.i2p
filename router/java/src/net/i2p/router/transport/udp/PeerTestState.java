@@ -98,7 +98,7 @@ class PeerTestState {
     
     @Override
     public synchronized String toString() {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("Role: ");
         if (_ourRole == ALICE) buf.append("Alice");
         else if (_ourRole == BOB) buf.append("Bob");

@@ -131,7 +131,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseSearchReplyMessage: ");
         buf.append("\n\tSearch Key: ").append(getSearchKey());
         buf.append("\n\tReplies: # = ").append(getNumReplies());
