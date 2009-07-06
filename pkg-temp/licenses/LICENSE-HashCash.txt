@@ -1,0 +1,2 @@
+   Copyright 2006 Gregory Rubin grrubin@gmail.com
+   Permission is given to use, modify, and or distribute this code so long as this message remains attached
