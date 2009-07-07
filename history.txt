@@ -1,3 +1,8 @@
+2009-07-07 z3d
+		* Introducing 2 new console themes (light & dark), in addition
+			to changes to the console navigation; navbar now resides in
+			the sidepanel).
+
 2009-07-06 zzz
     * Console: Fix small textareas on Opera
     * EepGet: Don't send X-Accept-Encoding for non-proxied fetches

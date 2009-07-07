@@ -333,6 +333,14 @@
         <copy todir="pkg-temp/docs/themes/console/classic/" >
             <fileset  dir="installer/resources/themes/console/classic/" />
         </copy>
+        <!-- Add dark theme -->
+        <copy todir="pkg-temp/docs/themes/console/dark/" >
+            <fileset  dir="installer/resources/themes/console/dark/" />
+        </copy>
+        <!-- Add light theme -->
+        <copy todir="pkg-temp/docs/themes/console/light/" >
+            <fileset  dir="installer/resources/themes/console/light/" />
+        </copy>
     </target>
 
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
