@@ -167,6 +167,7 @@ div.confignav {
 	-webkit-border-radius: 4px;
 	border: 1px solid #99f;
 	background: url(images/darkbluetile.png);
+	font-size: 8pt !important;
 }
 
 div.configure {
@@ -199,8 +200,9 @@ div.messages	li {
 	text-align: justify;
 	font-weight: bold;
   list-style-image: url(images/warning_dark.png);
-	margin: 0 10px 0 30px;
+	margin: 0 0 0 30px !important;
 	padding: 5px;
+	border: 0px !important;
 	}
 
 
@@ -221,7 +223,7 @@ table {
 	font-size: 8pt;
 	background-color: #004;
 	background-image:url('images/tabletitledark.png');
-	/*background-repeat:repeat-x;*/
+	background-repeat:repeat-x;
 	}
 	
 	tr:nth-child(even)
@@ -246,11 +248,21 @@ table {
 	padding: 10px;
 	}
 	
-	li {
+	div.main li {
 	text-align: left;
 	list-style-type:square;
-	margin: 2px 20px 0px 30px;
+	margin: 4px 0px 4px 30px;
 	padding: 1px 20px 1px 0px;
+	padding: 1px 20px 1px 0px;
+	border-right: 4px solid #339;	
+	}
+
+	div.main li:nth-child(even){
+	text-align: left;
+	list-style-type:square;
+	margin: 4px 0px 4px 30px;
+	padding: 1px 20px 1px 0px;
+	border-right: 4px solid #339;
 	}
 	
 	ol {
@@ -273,7 +285,7 @@ code {
 }
 
 a:link{color:#99f}
-a:visited{color:#606}
+a:visited{color:#7bb}
 a:hover{color:#ff6600}
 a:active{color:#900}
 
@@ -291,8 +303,10 @@ h1 {
 	text-align: left;
 	color: #bbf;
 	padding: 10px;
+	margin-left: 240px;
 	margin-bottom: 20px;
 	margin-top: 0px;
+	margin-right: 15px;
 	font-size: 16pt;
 	font-weight: bold;
 	font-style: normal;
@@ -306,7 +320,7 @@ h1 {
 	border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;	
-	background-image:url('images/h1bg.png');
+	background-image:url('images/darkbluebg.png');
 	background-repeat:repeat-x;
 }
 
@@ -332,7 +346,7 @@ h2 a:hover {
 
 button { 
 border: 1px outset #ddddc0;
-padding: 0px 2px 1px 2px;
+padding: 0px 3px 1px 3px;
 /*line-height: 250%;*/
 background-color: #bbf;
 text-decoration: none;
@@ -341,7 +355,7 @@ text-decoration: none;
 	-webkit-border-radius: 4px;	
 font-size: 8pt;
 font-weight: bold;
-margin: 5px 5px 5px 0;
+margin: 2px 3px;
 text-align: center;
 }
 
@@ -431,11 +445,12 @@ select {
 textarea {
  background-color: #001;
  color: #eef;
-	padding: 5px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
-	font-family: "Lucida Console", Courier, mono;
+ padding: 5px;
+ margin: 5px 0;
+ border-radius: 4px;
+ -moz-border-radius: 4px;
+ -webkit-border-radius: 4px;	
+ font-family: "Lucida Console", Courier, mono;
 }
 
 form {
