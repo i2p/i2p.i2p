@@ -249,8 +249,18 @@ table {
 	li {
 	text-align: left;
 	list-style-type:square;
-	margin: 2px 20px 0px 30px;
+	margin: 4px 0px 4px 30px;
 	padding: 1px 20px 1px 0px;
+	border-right: 4px solid #117;
+	-moz-border-radius: 10px;
+	}
+
+	li:nth-child(even){
+	text-align: left;
+	list-style-type:square;
+	margin: 4px 0px 4px 30px;
+	padding: 1px 20px 1px 0px;
+	border-right: 4px solid #339;
 	}
 	
 	ol {
@@ -433,11 +443,12 @@ select {
 textarea {
  background-color: #001;
  color: #eef;
-	padding: 5px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
-	font-family: "Lucida Console", Courier, mono;
+ padding: 5px;
+ margin: 5px 0;
+ border-radius: 4px;
+ -moz-border-radius: 4px;
+ -webkit-border-radius: 4px;	
+ font-family: "Lucida Console", Courier, mono;
 }
 
 form {
