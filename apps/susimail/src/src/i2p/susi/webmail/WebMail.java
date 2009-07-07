@@ -444,7 +444,7 @@ public class WebMail extends HttpServlet
 			boolean showBody = false;
 			boolean prepareAttachment = false;
 			String reason = "";
-			StringBuffer body = null;
+			StringBuilder body = null;
 			
 			String ident = quoteHTML(
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
@@ -485,7 +485,7 @@ public class WebMail extends HttpServlet
 					try {
 						ReadBuffer decoded = e.decode( mailPart.buffer.content, mailPart.beginBody, mailPart.end - mailPart.beginBody );
 						BufferedReader reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( decoded.content, decoded.offset, decoded.length ), charset ) );
-						body = new StringBuffer();
+						body = new StringBuilder();
 						String line;
 						while( ( line = reader.readLine() ) != null ) {
 							body.append( quoteHTML( line ) );
@@ -782,7 +782,7 @@ public class WebMail extends HttpServlet
 							/*
 							 * extract additional recipients
 							 */
-							StringBuffer buf = new StringBuffer();
+							StringBuilder buf = new StringBuilder();
 							String pad = "";
 							if( mail.to != null ) {
 								for( int i = 0; i < mail.to.length; i++ ) {
@@ -1429,7 +1429,7 @@ public class WebMail extends HttpServlet
 		}
 
 		if( ok ) {
-			StringBuffer body = new StringBuffer();
+			StringBuilder body = new StringBuilder();
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
 			Mail.appendRecipients( body, ccList, "To: " );

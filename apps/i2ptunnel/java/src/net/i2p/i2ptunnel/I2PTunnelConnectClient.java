@@ -179,7 +179,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             out = s.getOutputStream();
             in = s.getInputStream();
             String line, method = null, host = null, destination = null, restofline = null;
-            StringBuffer newRequest = new StringBuffer();
+            StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
             while (true) {
                 // Use this rather than BufferedReader because we can't have readahead,

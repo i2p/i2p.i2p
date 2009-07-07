@@ -297,7 +297,7 @@ public class PeerProfile {
             }
             
             if (_log.shouldLog(Log.DEBUG) ) {
-                StringBuffer buf = new StringBuffer(128);
+                StringBuilder buf = new StringBuilder(128);
                 buf.append("Updating 1m throughput after ").append(size).append(" to ");
                 for (int i = 0; i < THROUGHPUT_COUNT; i++)
                     buf.append(_peakTunnel1mThroughput[i]).append(',');
@@ -509,7 +509,7 @@ public class PeerProfile {
         fmt.setPositivePrefix("+");
         ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
         try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         for (int i = 0; i < args.length; i++) {
             PeerProfile profile = helper.readProfile(new File(args[i]));
             if (profile == null) {

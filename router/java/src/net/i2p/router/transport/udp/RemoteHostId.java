@@ -60,7 +60,7 @@ final class RemoteHostId {
         }
     }
     public static String toString(byte ip[]) {
-        StringBuffer buf = new StringBuffer(ip.length+5);
+        StringBuilder buf = new StringBuilder(ip.length+5);
         for (int i = 0; i < ip.length; i++) {
             buf.append(ip[i]&0xFF);
             if (i + 1 < ip.length)

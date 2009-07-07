@@ -123,7 +123,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[ReportAbuseMessage: ");
         buf.append("\n\tSessionID: ").append(getSessionId());
         buf.append("\n\tSeverity: ").append(getSeverity());

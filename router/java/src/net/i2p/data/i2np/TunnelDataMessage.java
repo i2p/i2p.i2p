@@ -139,7 +139,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[TunnelDataMessage:");
         buf.append(" MessageId: ").append(getUniqueId());
         buf.append(" Tunnel ID: ").append(getTunnelId());

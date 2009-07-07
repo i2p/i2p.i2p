@@ -155,7 +155,7 @@ public class SAMUtils {
         String token, param;
         Properties props = new Properties();
         
-        StringBuffer value = new StringBuffer();
+        StringBuilder value = new StringBuilder();
         for (int i = 0; i < ntoks; ++i) {
             token = tok.nextToken();
 

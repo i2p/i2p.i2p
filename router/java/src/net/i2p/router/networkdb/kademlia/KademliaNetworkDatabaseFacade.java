@@ -910,7 +910,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     @Override
     public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
-        StringBuffer buf = new StringBuffer(4*1024);
+        StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
@@ -938,7 +938,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     @Override
     public void renderLeaseSetHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(4*1024);
+        StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>Network Database Contents</h2>\n");
         buf.append("<a href=\"netdb.jsp\">View RouterInfo</a>");
         buf.append("<h3>LeaseSets</h3>\n");
@@ -992,7 +992,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         int size = getKnownRouters() * 512;
         if (full)
             size *= 4;
-        StringBuffer buf = new StringBuffer(size);
+        StringBuilder buf = new StringBuilder(size);
         out.write("<h2>Network Database Contents</h2>\n");
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
@@ -1073,7 +1073,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         out.flush();
     }
     
-    private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs, boolean full) {
+    private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
         if (isUs) {

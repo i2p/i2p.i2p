@@ -13,7 +13,7 @@ public class ConfigTunnelsHelper extends HelperBase {
     
     
     public String getForm() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<table border=\"1\">\n");
         TunnelPoolSettings exploratoryIn = _context.tunnelManager().getInboundSettings();
         TunnelPoolSettings exploratoryOut = _context.tunnelManager().getOutboundSettings();
@@ -54,7 +54,7 @@ public class ConfigTunnelsHelper extends HelperBase {
     private static final int MAX_BACKUP_QUANTITY = 3;
     private static final int MAX_VARIANCE = 2;
     private static final int MIN_NEG_VARIANCE = -1;
-    private void renderForm(StringBuffer buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
+    private void renderForm(StringBuilder buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
 
         buf.append("<tr><th colspan=\"3\"><a name=\"").append(prefix).append("\">");
         buf.append(name).append("</a></th></tr>\n");
@@ -179,7 +179,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("<tr><td colspan=\"3\"><hr /></td></tr>\n");
     }
 
-    private void renderOptions(StringBuffer buf, int min, int max, int now, String prefix, String name) {
+    private void renderOptions(StringBuilder buf, int min, int max, int now, String prefix, String name) {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)

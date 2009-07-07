@@ -45,7 +45,7 @@ public class ContentHelper extends HelperBase {
         if (str == null) 
             return "";
         else {
-            StringBuffer sb = new StringBuffer(str.length()+11);
+            StringBuilder sb = new StringBuilder(str.length()+11);
             sb.append("<pre>");
             for (int i=0; i < str.length(); i++) {
                 char c = str.charAt(i);

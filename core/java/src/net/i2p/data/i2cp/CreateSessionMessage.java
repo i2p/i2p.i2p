@@ -84,7 +84,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[CreateSessionMessage: ");
         buf.append("\n\tConfig: ").append(getSessionConfig());
         buf.append("]");

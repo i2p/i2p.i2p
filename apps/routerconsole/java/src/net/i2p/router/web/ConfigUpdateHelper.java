@@ -58,7 +58,7 @@ public class ConfigUpdateHelper extends HelperBase {
             ms = Long.parseLong(freq);
         } catch (NumberFormatException nfe) {}
 
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"refreshFrequency\">");
         for (int i = 0; i < PERIODS.length; i++) {
             buf.append("<option value=\"").append(PERIODS[i]);
@@ -77,7 +77,7 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getUpdatePolicySelectBox() {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY, ConfigUpdateHandler.DEFAULT_UPDATE_POLICY);
         
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"updatePolicy\">");
         
         if ("notify".equals(policy))

@@ -302,7 +302,7 @@ public class IndexBean {
         if (_group == null)
             return "";
         
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         if (_action != null) {
             try {
                 buf.append(processAction()).append("\n");
@@ -927,11 +927,11 @@ public class IndexBean {
     }
     
     private String getMessages(List msgs) {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         getMessages(msgs, buf);
         return buf.toString();
     }
-    private void getMessages(List msgs, StringBuffer buf) {
+    private void getMessages(List msgs, StringBuilder buf) {
         if (msgs == null) return;
         for (int i = 0; i < msgs.size(); i++) {
             buf.append((String)msgs.get(i)).append("\n");

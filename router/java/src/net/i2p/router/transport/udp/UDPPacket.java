@@ -168,7 +168,7 @@ public class UDPPacket {
             Hash hmac = _context.hmac().calculate(macKey, buf.getData(), 0, off);
 
             if (_log.shouldLog(Log.DEBUG)) {
-                StringBuffer str = new StringBuffer(128);
+                StringBuilder str = new StringBuilder(128);
                 str.append(_packet.getLength()).append(" byte packet received, payload length ");
                 str.append(payloadLength);
                 str.append("\nIV: ").append(Base64.encode(buf.getData(), payloadLength, IV_SIZE));
@@ -237,7 +237,7 @@ public class UDPPacket {
     @Override
     public String toString() {
         verifyNotReleased(); 
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append(_packet.getLength());
         buf.append(" byte packet with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");

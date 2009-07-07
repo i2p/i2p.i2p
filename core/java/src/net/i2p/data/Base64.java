@@ -330,7 +330,7 @@ public class Base64 {
         } // end switch
     } // end encode3to4
 
-    private static void encode3to4(byte[] source, int srcOffset, int numSigBytes, StringBuffer buf, byte alpha[]) {
+    private static void encode3to4(byte[] source, int srcOffset, int numSigBytes, StringBuilder buf, byte alpha[]) {
         //           1         2         3  
         // 01234567890123456789012345678901 Bit position
         // --------000000001111111122222222 Array position from threeBytes
@@ -394,7 +394,7 @@ public class Base64 {
     private static String safeEncode(byte[] source, int off, int len, boolean useStandardAlphabet) {
         if (len + off > source.length)
             throw new ArrayIndexOutOfBoundsException("Trying to encode too much!  source.len=" + source.length + " off=" + off + " len=" + len);
-        StringBuffer buf = new StringBuffer(len * 4 / 3);
+        StringBuilder buf = new StringBuilder(len * 4 / 3);
         if (useStandardAlphabet)
             encodeBytes(source, off, len, false, buf, ALPHABET);
         else
@@ -446,7 +446,7 @@ public class Base64 {
 ******/
 
     private static String encodeBytes(byte[] source, int off, int len, boolean breakLines) {
-        StringBuffer buf = new StringBuffer( (len*4)/3 );
+        StringBuilder buf = new StringBuilder( (len*4)/3 );
         encodeBytes(source, off, len, breakLines, buf, ALPHABET);
         return buf.toString();
     }
@@ -460,7 +460,7 @@ public class Base64 {
      * @param breakLines Break lines at 80 characters or less.
      * @since 1.4
      */
-    private static void encodeBytes(byte[] source, int off, int len, boolean breakLines, StringBuffer out, byte alpha[]) {
+    private static void encodeBytes(byte[] source, int off, int len, boolean breakLines, StringBuilder out, byte alpha[]) {
         //int len43 = len * 4 / 3;
         //byte[] outBuff = new byte[(len43) // Main 4:3
         //                          + ((len % 3) > 0 ? 4 : 0) // Account for padding

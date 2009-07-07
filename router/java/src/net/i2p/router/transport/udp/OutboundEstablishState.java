@@ -291,7 +291,7 @@ public class OutboundEstablishState {
         DataHelper.toLong(signed, off, 4, _receivedSignedOnTime);
         boolean valid = _context.dsa().verifySignature(_receivedSignature, signed, _remotePeer.getSigningPublicKey());
         if (!valid || _log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("Signed sessionCreated:");
             buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
             buf.append(" AlicePort: ").append(_alicePort);

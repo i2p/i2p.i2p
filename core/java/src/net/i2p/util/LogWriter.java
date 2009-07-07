@@ -238,7 +238,7 @@ class LogWriter implements Runnable {
 
     private static final String replace(String pattern, int num) {
         char c[] = pattern.toCharArray();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < c.length; i++) {
             if ( (c[i] != '#') && (c[i] != '@') )
                 buf.append(c[i]);

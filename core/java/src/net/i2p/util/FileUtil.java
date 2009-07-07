@@ -160,7 +160,7 @@ public class FileUtil {
                         lines.remove(0);
                 }
             }
-            StringBuffer buf = new StringBuffer(lines.size() * 80);
+            StringBuilder buf = new StringBuilder(lines.size() * 80);
             for (int i = 0; i < lines.size(); i++)
                 buf.append((String)lines.get(i)).append('\n');
             return buf.toString();

@@ -82,7 +82,7 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[DeliveryStatusMessage: ");
         buf.append("\n\tMessage ID: ").append(getMessageId());
         buf.append("\n\tArrival: ").append(_context.clock().now() - _arrival);

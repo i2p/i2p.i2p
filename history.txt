@@ -1,3 +1,30 @@
+2009-07-06 zzz
+    * Console: Fix small textareas on Opera
+    * EepGet: Don't send X-Accept-Encoding for non-proxied fetches
+    * HTTP Proxy: Limit proxy.i2p to /themes/ directory
+    * I2PSnark:
+      - Change postman2 announce URL to use hostname rather than B64
+      - Shorten torrent name to fit better on one line
+    * I2PTunnel:
+      - Add edit text
+      - Fix broken favicon
+    * Move almost all uses of StringBuffer to StringBuilder,
+      for efficiency (thanks Arsene for the suggestion)
+    * Reseed:
+      - Fix console status messages broken by global replace
+      - Remove tino, add b.netdb.i2p2.de
+    * SSUDemo: Move to the router/java/test directory
+    * Startup: Log clients.config problems
+    * Transport: Implement NTCP auto-transition from an
+      address to no address, so that inbound NTCP is disabled
+      after SSU detects a firewall. When UPnP was apparently successful
+      but the router is still firewalled (due to an additional
+      software firewall or a bad UPnP indication, for example)
+      the router will now remove the NTCP address.
+
+2009-07-05 sponge
+    * Added X-I2P-DestB64 and X-I2P-DestB32 http headers
+
 2009-06-29 zzz
     * Big directory rework:
       Eliminate all uses of the current working directory, and

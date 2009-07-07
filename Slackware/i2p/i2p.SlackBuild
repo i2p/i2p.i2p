@@ -65,7 +65,7 @@ cd $CWD/../../
 
 ant distclean
 ant dist
-
+ant tarball
 
 tar xjvf i2p.tar.bz2 -C $TMP
 

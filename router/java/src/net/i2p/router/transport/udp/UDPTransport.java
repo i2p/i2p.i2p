@@ -437,12 +437,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Change address? status = " + _reachabilityStatus +
+                                  " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
+                                  " old = " + _externalListenHost + ':' + _externalListenPort);
                     if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
                          (_externalListenHost == null) || (_externalListenPort <= 0) ||
                          (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Trying to change our external address...");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Trying to change our external address...");
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
                             // fixed port defaults to true so we never do this
@@ -455,15 +459,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             }
                         } catch (UnknownHostException uhe) {
                             _externalListenHost = null;
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info("Error trying to change our external address", uhe);
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Error trying to change our external address", uhe);
                         }
                     } else {
                         // they told us something different, but our tests are recent and positive,
                         // so lets test again
                         fireTest = true;
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Different address, but we're fine.. (" + _reachabilityStatus + ")");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Different address, but we're fine.. (" + _reachabilityStatus + ")");
                     }
                 } else {
                     // matched what we expect
@@ -760,7 +764,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private void dropPeer(PeerState peer, boolean shouldShitlist, String why) {
         if (_log.shouldLog(Log.WARN)) {
             long now = _context.clock().now();
-            StringBuffer buf = new StringBuffer(4096);
+            StringBuilder buf = new StringBuilder(4096);
             long timeSinceSend = now - peer.getLastSendTime();
             long timeSinceRecv = now - peer.getLastReceiveTime();
             long timeSinceAck  = now - peer.getLastACKSend();
@@ -1282,7 +1286,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      
         OutNetMessage m = msg.getMessage();
         PeerState p = msg.getPeer();
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append(" lifetime: ").append(msg.getLifetime());
         buf.append(" sends: ").append(sends);
         buf.append(" pushes: ").append(pushCount);
@@ -1727,7 +1731,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    private void appendSortLinks(StringBuffer buf, String urlBase, int sortFlags, String descr, int ascending) {
+    private void appendSortLinks(StringBuilder buf, String urlBase, int sortFlags, String descr, int ascending) {
         if (sortFlags == ascending) {
             buf.append(" <a href=\"").append(urlBase).append("?sort=").append(0-ascending);
             buf.append("\" title=\"").append(descr).append("\">V</a><b>^</b> ");
@@ -1763,7 +1767,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         long dupRecvTotal = 0;
         int numPeers = 0;
         
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("<p><b id=\"udpcon\">UDP connections: ").append(peers.size());
         buf.append(" limit: ").append(getMaxConnections());
         buf.append(" timeout: ").append(DataHelper.formatDuration(_expireTimeout));

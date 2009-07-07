@@ -55,7 +55,7 @@ public class HeaderLine implements Encoding {
 	private static final int BUFSIZE = 2;
 	private String encode(InputStream in) throws IOException
 	{
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		int l = 0, buffered = 0, tmp[] = new int[BUFSIZE];
 		boolean quoting = false;
 		boolean quote = false;

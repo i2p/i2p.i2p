@@ -129,7 +129,7 @@ public abstract class TunnelPeerSelector {
             rv.remove(0);
         
         if (log.shouldLog(Log.INFO)) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             if (settings.getDestinationNickname() != null)
                 buf.append("peers for ").append(settings.getDestinationNickname());
             else if (settings.getDestination() != null)

@@ -57,12 +57,12 @@ public class SHA256Bench {
 		long maxLong1 = 0;
         
 		byte[] smess = new String("abc").getBytes();
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int x = 0; x < 10*1024; x++) {
 			buf.append("a");
 		}
 		byte[] mmess = buf.toString().getBytes(); // new String("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq").getBytes();
-		buf = new StringBuffer();
+		buf = new StringBuilder();
 		for (int x = 0; x < 1000000; x++) {
 			buf.append("a");
 		}

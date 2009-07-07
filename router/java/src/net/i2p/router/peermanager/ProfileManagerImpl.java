@@ -304,7 +304,7 @@ public class ProfileManagerImpl implements ProfileManager {
             PeerProfile prof = getProfile(peer);
             if (prof == null) continue;
             
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             
             buf.append("status: ");
             if (_context.profileOrganizer().isFast(peer)) {

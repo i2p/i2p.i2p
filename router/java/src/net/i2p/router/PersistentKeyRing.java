@@ -66,7 +66,7 @@ public class PersistentKeyRing extends KeyRing {
 
     @Override
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("\n<table border=\"1\"><tr><th align=\"left\">Destination Hash<th align=\"left\">Name or Dest.<th align=\"left\">Session Key</tr>");
         for (Entry<Hash, SessionKey> e : entrySet()) {
             buf.append("\n<tr><td>");

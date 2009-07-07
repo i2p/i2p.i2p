@@ -86,7 +86,7 @@ public class SubscriptionsBean
 	{
 		File file = new File( getFileName() );
 		if( file != null && file.isFile() ) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader( new FileReader( file ) );

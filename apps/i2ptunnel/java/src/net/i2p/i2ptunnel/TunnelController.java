@@ -385,7 +385,7 @@ public class TunnelController implements Logging {
     public String getI2CPHost() { return _config.getProperty("i2cpHost"); }
     public String getI2CPPort() { return _config.getProperty("i2cpPort"); }
     public String getClientOptions() {
-        StringBuffer opts = new StringBuffer(64);
+        StringBuilder opts = new StringBuilder(64);
         for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
             String key = (String)iter.next();
             String val = _config.getProperty(key);
@@ -447,7 +447,7 @@ public class TunnelController implements Logging {
         return true;
     }
     
-    public void getSummary(StringBuffer buf) {
+    public void getSummary(StringBuilder buf) {
         String type = getType();
         if ("httpclient".equals(type))
             getHttpClientSummary(buf);
@@ -461,7 +461,7 @@ public class TunnelController implements Logging {
             buf.append("Unknown type ").append(type);
     }
     
-    private void getHttpClientSummary(StringBuffer buf) {
+    private void getHttpClientSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
             buf.append("<i>").append(description).append("</i><br />\n");
@@ -482,7 +482,7 @@ public class TunnelController implements Logging {
         getOptionSummary(buf);
     }
     
-    private void getClientSummary(StringBuffer buf) {
+    private void getClientSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
             buf.append("<i>").append(description).append("</i><br />\n");
@@ -499,7 +499,7 @@ public class TunnelController implements Logging {
         getOptionSummary(buf);
     }
     
-    private void getServerSummary(StringBuffer buf) {
+    private void getServerSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
             buf.append("<i>").append(description).append("</i><br />\n");
@@ -510,7 +510,7 @@ public class TunnelController implements Logging {
         getOptionSummary(buf);
     }
     
-    private void getHttpServerSummary(StringBuffer buf) {
+    private void getHttpServerSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
             buf.append("<i>").append(description).append("</i><br />\n");
@@ -522,7 +522,7 @@ public class TunnelController implements Logging {
         getOptionSummary(buf);
     }
     
-    private void getOptionSummary(StringBuffer buf) {
+    private void getOptionSummary(StringBuilder buf) {
         String opts = getClientOptions();
         if ( (opts != null) && (opts.length() > 0) )
             buf.append("Network options: ").append(opts).append("<br />\n");

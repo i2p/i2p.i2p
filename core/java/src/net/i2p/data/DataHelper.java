@@ -196,7 +196,7 @@ public class DataHelper {
      *
      */
     public static String toString(Properties options) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (options != null) {
             for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
                 String key = (String) iter.next();
@@ -273,7 +273,7 @@ public class DataHelper {
      *
      */
     public static String toString(Collection col) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (col != null) {
             for (Iterator iter = col.iterator(); iter.hasNext();) {
                 Object o = iter.next();
@@ -296,17 +296,17 @@ public class DataHelper {
     
     public static String toString(byte buf[], int len) {
         if (buf == null) buf = EMPTY_BUFFER;
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         if (len > buf.length) {
             for (int i = 0; i < len - buf.length; i++)
                 out.append("00");
         }
         for (int i = 0; i < buf.length && i < len; i++) {
-            StringBuffer temp = new StringBuffer(Integer.toHexString(buf[i]));
+            StringBuilder temp = new StringBuilder(Integer.toHexString(buf[i]));
             while (temp.length() < 2) {
                 temp.insert(0, '0');
             }
-            temp = new StringBuffer(temp.substring(temp.length() - 2));
+            temp = new StringBuilder(temp.substring(temp.length() - 2));
             out.append(temp.toString());
         }
         return out.toString();
@@ -775,19 +775,27 @@ public class DataHelper {
     /**
      * Read a newline delimited line from the stream, returning the line (without
      * the newline), or null if EOF reached before the newline was found
+     * Warning - strips \n but not \r
      */
     public static String readLine(InputStream in) throws IOException { return readLine(in, (Sha256Standalone)null); }
-    /** update the hash along the way */
+
+    /**
+     * update the hash along the way
+     * Warning - strips \n but not \r
+     */
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         boolean ok = readLine(in, buf, hash);
         if (ok)
             return buf.toString();
         else
             return null;
     }
+
     /**
      * Read in a line, placing it into the buffer (excluding the newline).
+     * Warning - strips \n but not \r
+     * @deprecated use StringBuilder version
      *
      * @return true if the line was read, false if eof was reached before a 
      *              newline was found
@@ -795,7 +803,12 @@ public class DataHelper {
     public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
         return readLine(in, buf, null);
     }
-    /** update the hash along the way */
+
+    /**
+     * update the hash along the way
+     * Warning - strips \n but not \r
+     * @deprecated use StringBuilder version
+     */
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
         int c = -1;
         while ( (c = in.read()) != -1) {
@@ -808,6 +821,32 @@ public class DataHelper {
             return false;
         else
             return true;
+    }
+    
+    /**
+     * Read in a line, placing it into the buffer (excluding the newline).
+     * Warning - strips \n but not \r
+     *
+     * @return true if the line was read, false if eof was reached before a 
+     *              newline was found
+     */
+    public static boolean readLine(InputStream in, StringBuilder buf) throws IOException {
+        return readLine(in, buf, null);
+    }
+
+    /**
+     * update the hash along the way
+     * Warning - strips \n but not \r
+     */
+    public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
+        int c = -1;
+        while ( (c = in.read()) != -1) {
+            if (hash != null) hash.update((byte)c);
+            if (c == '\n')
+                break;
+            buf.append((char)c);
+        }
+        return c != -1; 
     }
     
     public static void write(OutputStream out, byte data[], Sha256Standalone hash) throws IOException {

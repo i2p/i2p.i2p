@@ -123,7 +123,7 @@ public class SOCKS4aServer extends SOCKSServer {
     }
 
     private String readString(DataInputStream in) throws IOException {
-        StringBuffer sb = new StringBuffer(16);
+        StringBuilder sb = new StringBuilder(16);
         char c;
         while ((c = (char) (in.readByte() & 0xff)) != 0)
             sb.append(c);

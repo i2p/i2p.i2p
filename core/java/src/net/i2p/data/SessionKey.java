@@ -84,7 +84,7 @@ public class SessionKey extends DataStructureImpl {
     @Override
     public String toString() { 
         if (true) return super.toString(); 
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append("[SessionKey: ");
         if (_data == null) {
             buf.append("null key");

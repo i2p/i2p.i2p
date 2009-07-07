@@ -82,7 +82,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         try {
             i2ps = createI2PSocket(dest);
             i2ps.setReadTimeout(readTimeout);
-            StringBuffer expectedPong = new StringBuffer();
+            StringBuilder expectedPong = new StringBuilder();
             Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in");
             in.start();
             Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " out");
@@ -121,9 +121,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         
         private Socket local;
         private I2PSocket remote;
-        private StringBuffer expectedPong;
+        private StringBuilder expectedPong;
                 
-        IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
+        IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuilder pong) {
             local=_local;
             remote=_remote;
             expectedPong=pong;
@@ -195,9 +195,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                     
             private Socket local;
             private I2PSocket remote;
-            private StringBuffer expectedPong;
+            private StringBuilder expectedPong;
                 
-            IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
+            IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuilder pong) {
                 local=_local;
                 remote=_remote;
                 expectedPong=pong;
@@ -266,7 +266,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
      *
      */
     
-    public String inboundFilter(String s, StringBuffer expectedPong) {
+    public String inboundFilter(String s, StringBuilder expectedPong) {
         
         String field[]=s.split(" ",4);
         String command;
@@ -353,7 +353,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         return null;
     }
     
-    public String outboundFilter(String s, StringBuffer expectedPong) {
+    public String outboundFilter(String s, StringBuilder expectedPong) {
         
         String field[]=s.split(" ",3);
         String command;

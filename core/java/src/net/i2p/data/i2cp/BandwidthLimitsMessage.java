@@ -91,7 +91,7 @@ public class BandwidthLimitsMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[BandwidthLimitsMessage");
         buf.append("\n\tIn: ").append(data[0]);
         buf.append("\n\tOut: ").append(data[1]);

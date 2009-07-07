@@ -344,7 +344,7 @@ public class SummaryHelper extends HelperBase {
         List clients = new ArrayList(_context.clientManager().listClients());
         Collections.sort(clients, new AlphaComparator());
         
-        StringBuffer buf = new StringBuffer(512);
+        StringBuilder buf = new StringBuilder(512);
         buf.append("<u><b>Local destinations</b></u><br />");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {

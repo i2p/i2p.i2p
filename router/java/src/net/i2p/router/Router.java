@@ -589,7 +589,7 @@ public class Router {
                    "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
                    "<hr />\n");
 
-        StringBuffer buf = new StringBuffer(32*1024);
+        StringBuilder buf = new StringBuilder(32*1024);
         
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
             buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br />\n");
@@ -762,7 +762,7 @@ public class Router {
     }
     
     private static int MAX_MSG_LENGTH = 120;
-    private static final void appendLogMessage(StringBuffer buf, String msg) {
+    private static final void appendLogMessage(StringBuilder buf, String msg) {
         // disable this code for the moment because i think it
         // looks ugly (on the router console)
         if (true) {
@@ -804,7 +804,7 @@ public class Router {
     
     /** main-ish method for testing appendLogMessage */
     private static final void testAppendLog() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         Router.appendLogMessage(buf, "hi\nhow are you\nh0h0h0");
         System.out.println("line: [" + buf.toString() + "]");
         buf.setLength(0);
@@ -1005,7 +1005,7 @@ public class Router {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_configFilename);
-            StringBuffer buf = new StringBuffer(8*1024);
+            StringBuilder buf = new StringBuilder(8*1024);
             synchronized (_config) {
                 TreeSet ordered = new TreeSet(_config.keySet());
                 for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {

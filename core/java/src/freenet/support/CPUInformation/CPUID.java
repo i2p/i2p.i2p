@@ -74,7 +74,7 @@ public class CPUID {
     private static String getCPUVendorID()
     {
         CPUIDResult c = doCPUID(0);
-        StringBuffer sb= new StringBuffer(13);
+        StringBuilder sb= new StringBuilder(13);
         sb.append((char)( c.EBX        & 0xFF));
         sb.append((char)((c.EBX >> 8)  & 0xFF));
         sb.append((char)((c.EBX >> 16) & 0xFF));

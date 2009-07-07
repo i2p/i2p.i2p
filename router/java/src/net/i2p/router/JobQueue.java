@@ -245,7 +245,7 @@ public class JobQueue {
             _jobLock.notifyAll();
         }
         if (_log.shouldLog(Log.WARN)) {
-            StringBuffer buf = new StringBuffer(1024);
+            StringBuilder buf = new StringBuilder(1024);
             buf.append("current jobs: \n");
             for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
                 JobQueueRunner runner = (JobQueueRunner)iter.next();
@@ -587,7 +587,7 @@ public class JobQueue {
             numRunners = _queueRunners.size();
         }
         
-        StringBuffer str = new StringBuffer(128);
+        StringBuilder str = new StringBuilder(128);
         str.append("<!-- after queueRunner sync: states: ");
         for (int i = 0; states != null && i < states.length; i++)
             str.append(states[i]).append(" ");
@@ -606,7 +606,7 @@ public class JobQueue {
         out.write("<!-- jobQueue rendering: after jobLock sync -->\n");
         out.flush();
         
-        StringBuffer buf = new StringBuffer(32*1024);
+        StringBuilder buf = new StringBuilder(32*1024);
         buf.append("<h2>JobQueue</h2>");
         buf.append("# runners: ").append(numRunners).append(" [states=");
         if (states != null) 
@@ -667,7 +667,7 @@ public class JobQueue {
     }
     
     /** render the HTML for the job stats */
-    private void getJobStats(StringBuffer buf) { 
+    private void getJobStats(StringBuilder buf) { 
         buf.append("<table border=\"1\">\n");
         buf.append("<tr><th>Job</th><th>Runs</th>");
         buf.append("<th>Time</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th>");

@@ -206,14 +206,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
     
     /**
+     * This only creates an address if the hostname AND port are set in router.config,
+     * which should be rare.
+     * Otherwise, notifyReplaceAddress() below takes care of it.
+     * Note this is called both from above and from NTCPTransport.startListening()
+     *
      * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
     public static RouterAddress createNTCPAddress(RouterContext ctx) {
         if (!TransportManager.enableNTCP(ctx)) return null;
-        RouterAddress addr = new RouterAddress();
-        addr.setCost(10);
-        addr.setExpiration(null);
-        Properties props = new Properties();
         String name = ctx.router().getConfigSetting(PROP_I2NP_NTCP_HOSTNAME);
         String port = ctx.router().getConfigSetting(PROP_I2NP_NTCP_PORT);
         /*
@@ -236,12 +237,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         } catch (NumberFormatException nfe) {
             return null;
         }
+        Properties props = new Properties();
         props.setProperty(NTCPAddress.PROP_HOST, name);
         props.setProperty(NTCPAddress.PROP_PORT, port);
+        RouterAddress addr = new RouterAddress();
+        addr.setCost(10);
+        addr.setExpiration(null);
         addr.setOptions(props);
         addr.setTransportStyle(NTCPTransport.STYLE);
         //if (isNew) {
-            if (false) return null;
+            // why save the same thing?
             ctx.router().setConfigSetting(PROP_I2NP_NTCP_HOSTNAME, name);
             ctx.router().setConfigSetting(PROP_I2NP_NTCP_PORT, port);
             ctx.router().saveConfig();
@@ -334,6 +339,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             }
         } else if (ohost == null || ohost.length() <= 0) {
             return;
+        } else if (enabled.equalsIgnoreCase("true") && status != STATUS_OK) {
+            // UDP transitioned to not-OK, turn off NTCP address
+            // This will commonly happen at startup if we were initially OK
+            // because UPnP was successful, but a subsequent SSU Peer Test determines
+            // we are still firewalled (SW firewall, bad UPnP indication, etc.)
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: null");
+            newAddr = null;
+            changed = true;
         }
 
         if (!changed) {
@@ -346,10 +360,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //
         // really need to fix this so that we can change or create an inbound address
         // without tearing down everything
+        // Especially on disabling the address, we shouldn't tear everything down.
         //
         _log.warn("Halting NTCP to change address");
         t.stopListening();
-        newAddr.setOptions(newProps);
+        if (newAddr != null)
+            newAddr.setOptions(newProps);
         // Wait for NTCP Pumper to stop so we don't end up with two...
         while (t.isAlive()) {
             try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
@@ -448,7 +464,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /** Provide a consistent "look" for displaying router IDs in the console */
     public String renderPeerHTML(Hash peer) {
         String h = peer.toBase64().substring(0, 4);
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         String c = getCountry(peer);
         if (c != null) {
             buf.append("<img alt=\"").append(c.toUpperCase()).append("\" title=\"");

@@ -382,7 +382,7 @@ public class RouterInfo extends DataStructureImpl {
             } else if ((idx = caps.indexOf(cap)) == -1) {
                 return;
 	    } else {
-                StringBuffer buf = new StringBuffer(caps);
+                StringBuilder buf = new StringBuilder(caps);
 		while ( (idx = buf.indexOf(""+cap)) != -1)
                     buf.deleteCharAt(idx);
                 _options.setProperty(PROP_CAPABILITIES, buf.toString());
@@ -555,7 +555,7 @@ public class RouterInfo extends DataStructureImpl {
     @Override
     public String toString() {
         if (_stringified != null) return _stringified;
-        StringBuffer buf = new StringBuffer(5*1024);
+        StringBuilder buf = new StringBuilder(5*1024);
         buf.append("[RouterInfo: ");
         buf.append("\n\tIdentity: ").append(getIdentity());
         buf.append("\n\tSignature: ").append(getSignature());

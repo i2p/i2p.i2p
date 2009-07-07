@@ -212,7 +212,7 @@ public class BloomSHA1 {
     }
     // DEBUG METHODS
     public static String keyToString(byte[] key) {
-        StringBuffer sb = new StringBuffer().append(key[0]);
+        StringBuilder sb = new StringBuilder().append(key[0]);
         for (int i = 1; i < key.length; i++) {
             sb.append(".").append(Integer.toString(key[i], 16));
         }
@@ -220,14 +220,14 @@ public class BloomSHA1 {
     }
     /** convert 64-bit integer to hex String */
     public static String ltoh (long i) {
-        StringBuffer sb = new StringBuffer().append("#")
+        StringBuilder sb = new StringBuilder().append("#")
                                 .append(Long.toString(i, 16));
         return sb.toString();
     }
 
     /** convert 32-bit integer to String */
     public static String itoh (int i) {
-        StringBuffer sb = new StringBuffer().append("#")
+        StringBuilder sb = new StringBuilder().append("#")
                                 .append(Integer.toString(i, 16));
         return sb.toString();
     }

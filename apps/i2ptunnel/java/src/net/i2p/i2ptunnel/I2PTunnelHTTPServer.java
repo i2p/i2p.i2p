@@ -19,6 +19,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.data.Base32;
 
 /**
  * Simple extension to the I2PTunnelServer that filters the HTTP
@@ -33,6 +34,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     /** what Host: should we seem to be to the webserver? */
     private String _spoofHost;
     private static final String HASH_HEADER = "X-I2P-DestHash";
+    private static final String DEST64_HEADER = "X-I2P-DestB64";
+    private static final String DEST32_HEADER = "X-I2P-DestB32";
 
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
@@ -71,9 +74,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             InputStream in = socket.getInputStream();
 
-            StringBuffer command = new StringBuffer(128);
+            StringBuilder command = new StringBuilder(128);
             Properties headers = readHeaders(in, command);
             headers.setProperty(HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
+            headers.setProperty(DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p" );
+            headers.setProperty(DEST64_HEADER, socket.getPeerDestination().toBase64());
+
             if ( (_spoofHost != null) && (_spoofHost.trim().length() > 0) )
                 headers.setProperty("Host", _spoofHost);
             headers.setProperty("Connection", "close");
@@ -303,8 +309,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
-    private String formatHeaders(Properties headers, StringBuffer command) {
-        StringBuffer buf = new StringBuffer(command.length() + headers.size() * 64);
+    private String formatHeaders(Properties headers, StringBuilder command) {
+        StringBuilder buf = new StringBuilder(command.length() + headers.size() * 64);
         buf.append(command.toString().trim()).append("\r\n");
         for (Iterator iter = headers.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -315,9 +321,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         return buf.toString();
     }
     
-    private Properties readHeaders(InputStream in, StringBuffer command) throws IOException {
+    private Properties readHeaders(InputStream in, StringBuilder command) throws IOException {
         Properties headers = new Properties();
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         
         boolean ok = DataHelper.readLine(in, command);
         if (!ok) throw new IOException("EOF reached while reading the HTTP command [" + command.toString() + "]");
@@ -360,6 +366,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 else if ("X-Accept-encoding".equalsIgnoreCase(name))
                     name = "X-Accept-encoding";
                 else if (HASH_HEADER.equalsIgnoreCase(name))
+                    continue;     // Prevent spoofing
+                else if (DEST64_HEADER.equalsIgnoreCase(name))
+                    continue;     // Prevent spoofing
+                else if (DEST32_HEADER.equalsIgnoreCase(name))
                     continue;     // Prevent spoofing
                 headers.setProperty(name, value);
                 if (_log.shouldLog(Log.DEBUG))

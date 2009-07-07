@@ -137,7 +137,7 @@ public class Base32 {
     }
 
     public static String encode(byte[] source) {
-        StringBuffer buf = new StringBuffer((source.length + 7) * 8 / 5);
+        StringBuilder buf = new StringBuilder((source.length + 7) * 8 / 5);
         encodeBytes(source, buf);
         return buf.toString();
     }
@@ -149,7 +149,7 @@ public class Base32 {
      *
      * @param source The data to convert
      */
-    private static void encodeBytes(byte[] source, StringBuffer out) {
+    private static void encodeBytes(byte[] source, StringBuilder out) {
         int usedbits = 0;
         for (int i = 0; i < source.length; ) {
              int fivebits;

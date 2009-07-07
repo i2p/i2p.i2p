@@ -124,7 +124,7 @@ public class PetName {
     
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         if (_name != null) buf.append(_name.trim());
         buf.append(':');
         if (_network != null) buf.append(_network.trim());

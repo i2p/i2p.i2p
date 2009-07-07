@@ -200,7 +200,7 @@ public class StatisticsManager implements Service {
     }
     
     private String renderRate(Rate rate, boolean fudgeQuantity) {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
         buf.append(pct(rate.getPercentageOfLifetimeValue())).append(';');
@@ -259,7 +259,7 @@ public class StatisticsManager implements Service {
     }
     
     private String renderRate(Rate rate, double fudgeQuantity) {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuilder buf = new StringBuilder(128);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
         buf.append(pct(rate.getPercentageOfLifetimeValue())).append(';');

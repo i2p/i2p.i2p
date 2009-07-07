@@ -892,7 +892,7 @@ public class TunnelPool {
             else
                 return "Outbound exploratory pool";
         } else {
-            StringBuffer rv = new StringBuffer(32);
+            StringBuilder rv = new StringBuilder(32);
             if (_settings.isInbound())
                 rv.append("Inbound client pool for ");
             else

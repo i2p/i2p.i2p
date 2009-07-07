@@ -224,7 +224,7 @@ public class PeerTestJob extends JobImpl {
         public boolean matchFound() { return _matchFound; }
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer(64);
+            StringBuilder buf = new StringBuilder(64);
             buf.append("Test peer ").append(_peer.toBase64().substring(0,4));
             buf.append(" with nonce ").append(_nonce);
             return buf.toString();

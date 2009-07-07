@@ -28,7 +28,7 @@ public class StatsGenerator {
     }
     
     public void generateStatsPage(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(16*1024);
+        StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<form action=\"/oldstats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
@@ -93,7 +93,7 @@ public class StatsGenerator {
         out.flush();
     }
     
-    private void renderFrequency(String name, StringBuffer buf) {
+    private void renderFrequency(String name, StringBuilder buf) {
         FrequencyStat freq = _context.statManager().getFrequency(name);
         buf.append("<i>");
         buf.append(freq.getDescription());
@@ -129,7 +129,7 @@ public class StatsGenerator {
         buf.append("<br />");
     }
     
-    private void renderRate(String name, StringBuffer buf) {
+    private void renderRate(String name, StringBuilder buf) {
         RateStat rate = _context.statManager().getRate(name);
         String d = rate.getDescription();
         if (! "".equals(d)) {
@@ -222,7 +222,7 @@ public class StatsGenerator {
         buf.append("<br />");
     }
     
-    private static void renderPeriod(StringBuffer buf, long period, String name) {
+    private static void renderPeriod(StringBuilder buf, long period, String name) {
         buf.append("<b>");
         buf.append(DataHelper.formatDuration(period));
         buf.append(" ");

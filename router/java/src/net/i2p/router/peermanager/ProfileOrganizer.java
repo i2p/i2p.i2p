@@ -676,7 +676,7 @@ public class ProfileOrganizer {
                        + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
             /*****
             if (_log.shouldLog(Log.DEBUG)) {
-                StringBuffer buf = new StringBuffer(512);
+                StringBuilder buf = new StringBuilder(512);
                 for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                     PeerProfile prof = (PeerProfile)iter.next();
                     buf.append('[').append(prof.toString()).append('=').append(prof.getCapacityValue()).append("] ");

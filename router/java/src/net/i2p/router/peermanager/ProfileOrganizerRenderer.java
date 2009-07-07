@@ -56,7 +56,7 @@ class ProfileOrganizerRenderer {
         int reliable = 0;
         int integrated = 0;
         int failing = 0;
-        StringBuffer buf = new StringBuffer(16*1024);
+        StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>Peer Profiles</h2>\n");
         buf.append("<p>Showing ").append(order.size()).append(" recent profiles, hiding ").append(peers.size()-order.size()).append(" older profiles</p>");
         buf.append("<table border=\"1\">");

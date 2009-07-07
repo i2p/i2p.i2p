@@ -452,12 +452,12 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         int removed = 0;
         int remaining = 0;
         long now = _context.clock().now();
-        StringBuffer buf = null;
-        StringBuffer bufSummary = null;
+        StringBuilder buf = null;
+        StringBuilder bufSummary = null;
         if (_log.shouldLog(Log.DEBUG)) {
-            buf = new StringBuffer(128);
+            buf = new StringBuilder(128);
             buf.append("Expiring inbound: ");
-            bufSummary = new StringBuffer(1024);
+            bufSummary = new StringBuilder(1024);
         }
         synchronized (_inboundTagSets) {
             for (Iterator<SessionTag> iter = _inboundTagSets.keySet().iterator(); iter.hasNext();) {
@@ -500,7 +500,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     }
 
     public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer(1024);
+        StringBuilder buf = new StringBuilder(1024);
         buf.append("<h2>Inbound sessions</h2>");
         buf.append("<table border=\"1\">");
         Set<TagSet> inbound = getInboundTagSets();

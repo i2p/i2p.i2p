@@ -387,7 +387,7 @@ public class ClientManager {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(8*1024);
+        StringBuilder buf = new StringBuilder(8*1024);
         buf.append("<u><b>Local destinations</b></u><br />");
         
         Map runners = null;
