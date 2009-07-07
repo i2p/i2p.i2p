@@ -10,7 +10,7 @@
 <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
 <jsp:setProperty name="uhelper" property="*" />
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <centre><a href="index.jsp" target="_top"><img src="/themes/i2plogo.png" alt="Router Console" title="I2P Router Console"/></a></centre><hr />
+ <centre><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></centre><hr />
  <centre>
  <u><b>I2P Internals</b></u><br />
  <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 
