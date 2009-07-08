@@ -168,6 +168,7 @@ div.messages {
 	padding: 0 10px 0 15px;
 	margin: 10px 0 20px 0;	
 	background-color: #ddf;
+	background: url(images/tabletile_alt.png);
 	-moz-border-radius: 4px;
 	border: 1px solid #000033;
 	text-size: 9pt;

@@ -181,6 +181,7 @@ color:#ff6600
 	  text-align : left;
     font-size : 0.8em;
 	  background-color : #fff;
+	  background: url(images/tabletile.png);
 	  -moz-border-radius: 4px 4px 4px 4px;
 	  border: 1px solid #002;
 	  padding: 10px 20px;
