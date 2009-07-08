@@ -3,7 +3,7 @@ body {
 	padding : 0px;
 	text-align : center;
 	font-family : "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
-	background-color : #eeeeff;
+	background-color : #001;
 	color :  #000000;
     font-size : 11pt;
     
@@ -24,10 +24,10 @@ div {
 
 h4, label {
     margin :   0px;
-    padding :  2px 2px 2px 0px;
+    padding :  4px 2px 2px 0px;
     float :   left;
     width :  150px;
-    height :  24px;
+/*    height :  24px; */
     font-weight :  bold;
     text-align :  right;
     font-size :   1.0em;
@@ -138,8 +138,13 @@ hr {
 
 .freetext {
     width : 150px;
-    height : 22px;
+/*    height : 22px; */
     border : 1px solid #9999ff;
+		padding: 2px;
+		margin: 4px 0 2px 4px;
+		background-color: #fff;
+		font-family: "Lucida Console", Courier, mono;
+		font-weight: bold;
 }
 
 .control {
@@ -159,12 +164,12 @@ hr {
 		font-weight: bold;
 }
 
+.control:link {
+    color: #001;
+}
+
 .control:hover {
-/*
-		color: #fff;
-    background-color : #3333ff;
-		border 0px none #000022;
-*/
+
 border: 1px solid #eeeeff;
 background-color: #003;
 color:#ff6600
@@ -180,9 +185,11 @@ color:#ff6600
     overflow : hidden;
 	  text-align : left;
     font-size : 0.8em;
-	  background-color : #fff;
+		color: white;
+	  background-color : #002;
+	  background: url(images/darkbluebg.png);
 	  -moz-border-radius: 4px 4px 4px 4px;
-	  border: 1px solid #002;
+	  border: 1px solid #99f;
 	  padding: 10px 20px;
 }
 
@@ -208,7 +215,7 @@ color:#ff6600
 .text {
     height : 24px;
     width : 150px;
-    padding : 2px 0 0 2px;
+    padding : 4px 0 0 2px;
     float : left;
     margin : 0;
 }
@@ -218,8 +225,9 @@ color:#ff6600
 }
 
 #globalOperationsPanel {
-    background-color : #ddddff;
-	border : 1px solid #f22;
+    background-color : #003;
+  	border : 1px solid #f22;
+	  background: url(images/lightbluetile.png);
 }
 
 #globalOperationsPanel .control {
@@ -230,3 +238,8 @@ color:#ff6600
 	  -moz-border-radius: 4px 4px 4px 4px;
 		border 1px solid #ff0000;
 }
+
+a:link{color:#99f}
+a:visited{color:#7bb}
+a:hover{color:#ff6600}
+a:active{color:#900}
