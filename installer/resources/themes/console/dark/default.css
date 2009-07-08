@@ -179,6 +179,10 @@ color:#ff6600
     border : 2px inset;
 }
 
+.control:visited {
+    color: #001;
+}
+
 .panel {
     width : 760px;
     margin : 16px auto 16px auto;
