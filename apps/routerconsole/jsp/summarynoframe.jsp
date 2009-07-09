@@ -31,13 +31,12 @@
  <a href="help.jsp" target="_top">Help</a></b>
  </center>
  <hr />
- <center>
  <u><b>General</b></u><br />
  <b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=." target="_top">view</a>)<br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a></center>
+ <b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a>
  <%
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
