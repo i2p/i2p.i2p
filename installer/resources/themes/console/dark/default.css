@@ -142,16 +142,16 @@ hr {
     border : 1px solid #9999ff;
 		padding: 2px;
 		margin: 4px 0 2px 4px;
-		background-color: #fff;
+		background-color: #002;
 		font-family: "Lucida Console", Courier, mono;
 		font-weight: bold;
 }
 
 .control {
     margin :  0 4px 0 0;
-    padding : 2px 0 2px 0;
+    padding : 0 0 2px 0;
     overflow : hidden;
-    height : 22px;
+    height : 20px; 
     width :  60px;
     font-weight : normal;
     background-color :  #bbbbff;
@@ -247,3 +247,38 @@ a:link{color:#99f}
 a:visited{color:#7bb}
 a:hover{color:#ff6600}
 a:active{color:#900}
+
+input {
+background-color: #002;
+color: #eef;
+margin: 0 2px 0 2px;
+font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+font-weight: bold;
+border: 1px solid #99f;
+padding: 0px 2px 1px 2px;
+background-color: #001;
+text-decoration: none;
+}
+
+input hover {
+background-color: #f00;
+color: #eef;
+margin: 0 2px 0 2px;
+font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+font-weight: bold;
+border: 1px solid #99f;
+padding: 0px 2px 1px 2px;
+background-color: #001;
+text-decoration: none;
+}
+
+select {
+ background-color: #001;
+ color: #eef;
+margin: 0 2px 0 2px;
+ font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+ border: 1px solid #99f;
+}
+
+form {
+}
