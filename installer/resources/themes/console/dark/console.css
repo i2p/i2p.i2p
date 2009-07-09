@@ -152,7 +152,7 @@ div.news {
 	background: url(images/darkbluetile.png);
 }
 
-div.news li\ {
+div.news li {
 	text-align: left;
 	list-style-type:square;
 	margin: 2px 20px 0px 30px;
@@ -301,7 +301,7 @@ text-align: justify;
 
 h1 {
 	text-align: left;
-	color: #bbf;
+	color: #ddf;
 	padding: 10px;
 	margin-left: 240px;
 	margin-bottom: 20px;
@@ -312,10 +312,10 @@ h1 {
 	font-style: normal;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
-	text-shadow: 0px 0px 1px rgba(0, 0, 120, 0.9);
+	text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
   white-space: normal; 
 	background-color: #004;
- /* -moz-box-shadow: 0 2px 2px 1px #ccccff; */
+  -moz-box-shadow: inset 0px 0px 16px 0px #009; 
 	border: 1px solid #99f;
 	border-radius: 4px;
 	-moz-border-radius: 4px;
