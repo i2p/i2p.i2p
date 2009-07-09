@@ -12,6 +12,11 @@
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <centre><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></centre><hr />
  <centre>
+ <u><b>I2P Services</b></u><br />
+ <a href="susimail/susimail" target="blank">Susimail</a> 
+ <a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
+ <a href="i2psnark/" target="_blank">I2PSnark</a> 
+ <a href="http://127.0.0.1:7658/" target="_blank">Eepsite</a><hr /> 
  <u><b>I2P Internals</b></u><br />
  <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 
  <a href="tunnels.jsp" target="_top">Tunnels</a> 
@@ -23,12 +28,7 @@
  <a href="oldstats.jsp" target="_top">Stats</a> <!-- 
  <a href="oldconsole.jsp" target="_top">Internals</a> -->
  <a href="config.jsp" target="_top">Configuration</a> 
- <a href="help.jsp" target="_top">Help</a></b><hr />
- <u><b>I2P Services</b></u><br />
- <a href="susimail/susimail" target="blank">Susimail</a> 
- <a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
- <a href="i2psnark/" target="_blank">I2PSnark</a> 
- <a href="http://127.0.0.1:7658/" target="_blank">Eepsite</a> 
+ <a href="help.jsp" target="_top">Help</a></b>
  </center>
  <hr />
  <center>
