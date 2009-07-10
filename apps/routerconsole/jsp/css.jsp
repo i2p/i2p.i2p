@@ -17,4 +17,4 @@
 %>
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="cssHelper" scope="request" />
 <jsp:setProperty name="cssHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<link href="<%=cssHelper.getTheme()%>console.css" rel="stylesheet" type="text/css" /> 
+<link href="<%=cssHelper.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css" /> 
