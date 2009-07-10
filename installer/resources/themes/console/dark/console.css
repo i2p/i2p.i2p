@@ -56,8 +56,9 @@ line-height: 250%;
 background-color: #bbf;
 text-decoration: none;
 	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;        
 color: #002;
 }
 
@@ -86,19 +87,18 @@ div.routersummaryouter {
 }
 
 div.routersummary {
-/*	margin: 0px 20px 20px 0px; */
 	width: 175px;
 	padding: 10px;
 	text-align: center;
 	border: 1px solid #9999ff;
-/*	border-left: 0px; */
 	background-color: #000033;
 	background: url(images/darkbluebg.png);
 	color: #eeeeff;
 	font-size: 8pt;
 	clear: left; /* fixes a bug in Opera */
-	-moz-border-radius: 4px 4px 4px 4px;
-	-webkit-border-radius: 4px 4px 4px 4px; 
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;        
 	float: left;
   -moz-box-shadow: inset 0px 0px 16px 0px #009; 
 }
@@ -301,7 +301,7 @@ text-align: justify;
 
 h1 {
 	text-align: left;
-	color: #ddf;
+	color: #bbf;
 	padding: 10px;
 	margin-left: 240px;
 	margin-bottom: 20px;
