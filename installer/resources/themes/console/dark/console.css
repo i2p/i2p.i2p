@@ -301,7 +301,7 @@ text-align: justify;
 
 h1 {
 	text-align: left;
-	color: #bbf;
+	color: #fff;
 	padding: 10px;
 	margin-left: 240px;
 	margin-bottom: 20px;
@@ -325,15 +325,29 @@ h1 {
 }
 
 h2{
-  color: #99f;
+	font-size: 12pt;
+  color: #fff;
 	text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
+  background-color: #003;
+	background-image: url('images/tabletile.png');
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
 	border-bottom-color: #99f;
-	padding-bottom: 5px;
+	padding: 2px 10px 5px 10px;
 	wordwrap: none;
+	border: 1px solid #99f;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;	
 } 
 
+h2 a:link {
+	color: #99f;
+	}
+
+h2 a:visited {
+	color: #44f;
+	}
 h2 a:hover {
   color: #ff6600;
 	text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
