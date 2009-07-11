@@ -206,15 +206,18 @@ public class TransportManager implements TransportEventListener {
     /**
       * Is at least one transport below its outbound connection limit + some margin
       * Use for throttling in the router.
+      *
+      * @param pct percent of limit 0-100
       */
-    public boolean haveOutboundCapacity() { 
+    public boolean haveOutboundCapacity(int pct) { 
         for (int i = 0; i < _transports.size(); i++) {
-            if (((Transport)_transports.get(i)).haveCapacity())
+            if (((Transport)_transports.get(i)).haveCapacity(pct))
                 return true;
         }
         return false;
     }
     
+    private static final int HIGH_CAPACITY_PCT = 50;
     /**
       * Are all transports well below their outbound connection limit
       * Use for throttling in the router.
@@ -223,7 +226,7 @@ public class TransportManager implements TransportEventListener {
         if (_transports.size() <= 0)
             return false;
         for (int i = 0; i < _transports.size(); i++) {
-            if (!((Transport)_transports.get(i)).haveHighCapacity())
+            if (!((Transport)_transports.get(i)).haveCapacity(HIGH_CAPACITY_PCT))
                 return false;
         }
         return true;
@@ -232,10 +235,12 @@ public class TransportManager implements TransportEventListener {
     /**
       * Is at least one transport below its inbound connection limit + some margin
       * Use for throttling in the router.
+      *
+      * @param pct percent of limit 0-100
       */
-    public boolean haveInboundCapacity() { 
+    public boolean haveInboundCapacity(int pct) { 
         for (int i = 0; i < _transports.size(); i++) {
-            if (_transports.get(i).getCurrentAddress() != null && _transports.get(i).haveCapacity())
+            if (_transports.get(i).getCurrentAddress() != null && _transports.get(i).haveCapacity(pct))
                 return true;
         }
         return false;

@@ -15,8 +15,7 @@ import net.i2p.util.Log;
  *
  *  Also, as this is now called from PersistentDataStore, not from the
  *  routerconsole, we can get started as soon as the netdb has read
- *  the netDb/ directory, not when the console starts,
-router/java/src/net/i2p/router/networkdb/eseed/ReseedChecker.java
+ *  the netDb/ directory, not when the console starts.
  */
 public class ReseedChecker {
     

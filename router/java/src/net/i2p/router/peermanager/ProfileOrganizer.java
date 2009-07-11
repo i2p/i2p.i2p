@@ -541,9 +541,11 @@ public class ProfileOrganizer {
                         l.add(peer);
                     else {
                         RouterAddress ra = info.getTargetAddress("SSU");
-                        // Definitely don't want peers with no SSU address at all
+                        // peers with no SSU address at all are fine.
+                        // as long as they have NTCP
                         if (ra == null) {
-                            l.add(peer);
+                            if (info.getTargetAddress("NTCP") == null)
+                                l.add(peer);
                             continue;
                         }
                         // This is the quick way of doing UDPAddress.getIntroducerCount() > 0

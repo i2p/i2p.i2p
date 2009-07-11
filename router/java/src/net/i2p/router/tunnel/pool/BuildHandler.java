@@ -65,6 +65,7 @@ class BuildHandler {
 
         _context.statManager().createRateStat("tunnel.rejectOverloaded", "How long we had to wait before processing the request (when it was rejected)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.acceptLoad", "Delay before processing the accepted request", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropConnLimits", "Drop instead of reject due to conn limits", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoad", "How long we had to wait before finally giving up on an inbound request (period is queue count)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadDelay", "How long we had to wait before finally giving up on an inbound request?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.dropLoadBacklog", "How many requests were pending when they were so lagged that we had to drop a new inbound request??", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -466,7 +467,6 @@ class BuildHandler {
         return 0;
     }
     
-    private static final String PROP_REJECT_NONPARTICIPANT = "router.participantOnly";
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
         long nextId = req.readNextTunnelId();
@@ -510,8 +510,8 @@ class BuildHandler {
          * reject this request.
          */
         if (response == 0 &&
-            ((isInGW && ! _context.commSystem().haveInboundCapacity()) ||
-             (isOutEnd && ! _context.commSystem().haveOutboundCapacity()))) {
+            ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
+             (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
                 _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
@@ -567,6 +567,17 @@ class BuildHandler {
                                                      state.msg.getUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
                                                      recvDelay + " as " +
                                                      (isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
+        }
+
+        // Connection congestion control:
+        // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
+        // just drop it.
+        if (response != 0 &&
+            (! _context.routerHash().equals(nextPeer)) &&
+            (! _context.commSystem().haveOutboundCapacity(75)) &&
+            (! _context.commSystem().isEstablished(nextPeer))) {
+            _context.statManager().addRateData("tunnel.dropConnLimits", 1, 0);
+            return;
         }
 
         BuildResponseRecord resp = new BuildResponseRecord();

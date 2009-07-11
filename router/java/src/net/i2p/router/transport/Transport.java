@@ -44,10 +44,11 @@ public interface Transport {
     public void setListener(TransportEventListener listener);
     public String getStyle();
     
+    public int countPeers();    
     public int countActivePeers();    
     public int countActiveSendPeers();
     public boolean haveCapacity();
-    public boolean haveHighCapacity();
+    public boolean haveCapacity(int pct);
     public Vector getClockSkews();
     public List getMostRecentErrorMessages();
     

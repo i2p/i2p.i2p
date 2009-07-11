@@ -321,15 +321,6 @@ public class NTCPTransport extends TransportImpl {
         return countActivePeers() < getMaxConnections();
     }
 
-    @Override
-    public boolean haveCapacity() {
-        return countActivePeers() < getMaxConnections() * 4 / 5;
-    }
-
-    public boolean haveHighCapacity() {
-        return countActivePeers() < getMaxConnections() / 2;
-    }
-
     /** queue up afterSend call, which can take some time w/ jobs, etc */
     void sendComplete(OutNetMessage msg) { _finisher.add(msg); }
 

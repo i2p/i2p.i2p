@@ -70,9 +70,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Override
     public int countActiveSendPeers() { return (_manager == null ? 0 : _manager.countActiveSendPeers()); } 
     @Override
-    public boolean haveInboundCapacity() { return (_manager == null ? false : _manager.haveInboundCapacity()); } 
+    public boolean haveInboundCapacity(int pct) { return (_manager == null ? false : _manager.haveInboundCapacity(pct)); } 
     @Override
-    public boolean haveOutboundCapacity() { return (_manager == null ? false : _manager.haveOutboundCapacity()); } 
+    public boolean haveOutboundCapacity(int pct) { return (_manager == null ? false : _manager.haveOutboundCapacity(pct)); } 
     @Override
     public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
     

@@ -253,6 +253,12 @@ public class TunnelDispatcher implements Service {
         return _participatingConfig.size();
     }
     
+    /*******  may be used for congestion control later...
+    public int getParticipatingInboundGatewayCount() {
+        return _inboundGateways.size();
+    }
+    *******/
+    
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     public long getLastParticipatingExpiration() { return _lastParticipatingExpiration; }
     
