@@ -5,7 +5,7 @@ body {
 	font-family : "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
 	background-color : #eeeeff;
 	color :  #000000;
-    font-size : 11pt;
+  font-size : 11pt;
     
     /* we've avoided Tantek Hacks so far,
     ** but we can't avoid using the non-w3c method of 
@@ -24,10 +24,10 @@ div {
 
 h4, label {
     margin :   0px;
-    padding :  2px 2px 2px 0px;
+    padding :  6px 2px 2px 0px;
     float :   left;
     width :  150px;
-    height :  24px;
+    height :  28px;
     font-weight :  bold;
     text-align :  right;
     font-size :   1.0em;
@@ -97,27 +97,31 @@ div.statusNotRunning {
     width : 78px;
     height : 24px;
     overflow : hidden;
-	color : #dd0000;
-    padding-top: 24px;
+	  color : #dd0000;
     background: url('images/console_status_stopped.png') 0 0 no-repeat;
+    padding-top: 24px;
+    margin-top: 8px;
 }
 div.statusRunning {
     float : left;
     width : 78px;
     height : 24px;
     overflow : hidden;
-	color : #00dd00;
-    padding-top: 24px;
+	  color : #00dd00;
     background: url('images/console_status_running.png') 0 0 no-repeat;
+    padding-top: 24px;
+    margin-top: 8px;
 }
+
 div.statusStarting {
     float : left;
     width : 78px;
     height : 24px;
     overflow : hidden;
-	color : #339933;
-    padding-top: 24px;
+  	color : #339933;
     background: url('images/console_status_starting.png') 0 0 no-repeat;
+    padding-top: 24px;
+    margin-top: 8px;
 }
 
 hr {
@@ -128,11 +132,11 @@ hr {
     clear : both;
     height : 1px;
     margin : 3px 0px 3px 0px;
-    border-bottom : 1px solid #9999ff;
+    border-bottom : 1px solid #225;
 }
 
 .subdivider {
-    border-bottom : 1px solid #9999ff;
+    border-bottom : 1px solid #225;
     padding: 5px 0px 0px 0px;
 }
 
@@ -140,10 +144,12 @@ hr {
     width : 150px;
     height : 22px;
     border : 1px solid #9999ff;
+		padding: 2px;
+		margin: 4px 0 2px 4px;
 }
 
 .control {
-    margin :  0 4px 0 0;
+    margin :  6px 0 0 4px;
     padding : 2px 0 2px 0;
     overflow : hidden;
     height : 22px;
@@ -157,6 +163,7 @@ hr {
     -moz-border-radius: 4px 4px 4px 4px;
 		border 1px solid #000022;
 		font-weight: bold;
+    margin-top: 8px;
 }
 
 .control:hover {
@@ -175,7 +182,7 @@ color:#ff6600
 }
 
 .panel {
-    width : 760px;
+    width : 800px;
     margin : 16px auto 16px auto;
     overflow : hidden;
 	  text-align : left;
@@ -209,7 +216,7 @@ color:#ff6600
 .text {
     height : 24px;
     width : 150px;
-    padding : 2px 0 0 2px;
+    padding : 6px 0 0 2px;
     float : left;
     margin : 0;
 }

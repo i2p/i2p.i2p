@@ -107,6 +107,7 @@
 
 #tunnelListPage select {
     width : 150px;
+		margin: 9px 0 0 4px;
 }
 
 #tunnelListPage textarea {
@@ -129,7 +130,8 @@
     height : 24px;
     width : 360px;
     float : left;
-
+    margin-top: 6px;
+    margin-right: 5px;	
 }
 
 /* Use Leary and Langridge content replacement methods (LIR)
@@ -153,8 +155,9 @@
 #tunnelListPage .statusHeaderField label {
     text-align : left;
     width : 150px;
-    height : 24px;
+    height : 28px;
     float : left;
+		padding-top: 4px;
 }
 
 #tunnelListPage .targetField,
@@ -171,13 +174,13 @@
 
 #tunnelListPage .descriptionField .text,
 #tunnelListPage .destinationField input {
-    width : 450px;
+    width : 590px;
 }
 
 #tunnelListPage .descriptionField label,
 #tunnelListPage .destinationField label {
     text-align : right;
     width : 150px;
-    height : 24px;
+    height : 28px;
     float : left;
 }
