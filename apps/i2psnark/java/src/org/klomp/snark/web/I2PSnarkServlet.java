@@ -512,7 +512,8 @@ public class I2PSnarkServlet extends HttpServlet {
                 Map.Entry entry = (Map.Entry)iter.next();
                 String name = (String)entry.getKey();
                 String baseURL = (String)entry.getValue();
-                if (!baseURL.startsWith(announce))
+                if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
+                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
                     continue;
                 int e = baseURL.indexOf('=');
                 if (e < 0)
