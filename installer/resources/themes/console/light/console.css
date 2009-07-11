@@ -306,7 +306,7 @@ h2{
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
 	border-bottom-color: #000022;
-	padding: 5px;
+	padding: 5px 10px;
 	wordwrap: none;
 	border: 1px solid #002;
 	border-radius: 4px;
@@ -323,12 +323,18 @@ h2 a:hover {
 	padding-bottom: 5px;
 } 
 
-
+h3 {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #000022;
+	padding-bottom: 5px;
+}	
+	
 button { 
 border: 1px outset #ddddc0;
 padding: 0px 3px 1px 3px;
 line-height: 250%;
-background-color: #bbf;
+background-color: #bbf !important;
 text-decoration: none;
 	border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -354,19 +360,19 @@ color:#ff6600
 	 }
 	 
 .langbox {
-	  margin: 12px 0px 15px 5px;
+	  margin: 4px 2px 15px 5px;
 	  padding: 7px 5px 5px 5px;
-	  border: 1px solid #002;
-	  background-color: #e4e4ff;
+/*	  border: 1px solid #002;
+	  background-color: #e4e4ff; */
 	  color: black;
-	  font-size: 8pt;
+	  font-size: 7pt;
 	  -moz-border-radius: 4px 4px 4px 4px;
 	  -webkit-border-radius: 4px 4px 4px 4px;		
 	  border-radius: 4px 4px 4px 4px;
 	  width:120px;
 	  text-align: center;
 		float: right;
-	  background-image:url('images/lightbluetile.png');
+/*	  background-image:url('images/lightbluetile.png');*/
 }
 
 hr {
