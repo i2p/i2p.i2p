@@ -333,7 +333,7 @@ h2{
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
 	border-bottom-color: #99f;
-	padding: 2px 10px 5px 10px;
+	padding: 5px 10px;
 	wordwrap: none;
 	border: 1px solid #99f;
 	border-radius: 4px;
@@ -357,6 +357,12 @@ h2 a:hover {
 	padding-bottom: 5px;
 } 
 
+h3 {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #99f;
+	padding-bottom: 5px;
+}	
 
 button { 
 border: 1px outset #ddddc0;
@@ -388,17 +394,12 @@ color:#ff6600
 }
 	 
 .langbox {
-	  margin: 12px 0px 15px 5px;
+	  margin: 4px 2px 4px 5px;
 	  padding: 7px 5px 5px 5px;
-	  border: 1px solid #99f;
-	  background-color: #005;
-	  color: black;
-	  font-size: 8pt;
-	  -moz-border-radius: 4px 4px 4px 4px;
-	  -webkit-border-radius: 4px 4px 4px 4px;		
-	  border-radius: 4px 4px 4px 4px;
-	  width:120px;
-	  text-align: center;
+	  color: #eef;
+	  font-size: 7pt;
+	  width: 140px;
+	  text-align: right;
 		float: right;
 }
 
@@ -407,7 +408,7 @@ color: #99f;
 background-color: #99f;
 height: 1px;
 border: 0px solid #99f;
-margin: 10px 5px;
+margin: 10px 0;
 }
 
 sidebarlogo {
