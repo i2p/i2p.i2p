@@ -1,11 +1,12 @@
+2009-07-11 zzz
+    * netdb.jsp: Fix bad tag causing orange mouseovers
+
 2009-07-11 dr|z3d
     * More enhancements to the router console, consolidation of the
       light and dark themes.     
       - Apply new themes with routerconsole.theme=light/dark/classic
-				added to advanced config.
-				      
-2009-07-07 dr|z3d
-2009-07-07  dr|z3d
+        added to advanced config.
+
 2009-07-11 zzz
     * Build Handler: Drop rather than reject requests when near
       conn limits and the next hop is not connected, to reduce
