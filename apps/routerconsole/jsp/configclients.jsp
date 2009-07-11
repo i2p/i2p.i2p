@@ -39,11 +39,11 @@ button span.hide{
  </p><p>
  <jsp:getProperty name="clientshelper" property="form1" />
  </p><p>
- <input type="submit" name="action" value="Save Client Configuration" />
- </p><p>
  <i>All changes require restart to take effect. To change other client options, edit the clients.config file.</i>
+ </p> <hr /><p>
+ <input type="submit" name="action" value="Save Client Configuration" />
  </p>
- <hr />
+<hr />
  <h3>WebApp Configuration</h3>
  <p>
  The Java web applications listed below are started by the webConsole client and run in the same JVM as the router.

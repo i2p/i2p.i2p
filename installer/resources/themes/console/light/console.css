@@ -362,17 +362,11 @@ color:#ff6600
 .langbox {
 	  margin: 4px 2px 15px 5px;
 	  padding: 7px 5px 5px 5px;
-/*	  border: 1px solid #002;
-	  background-color: #e4e4ff; */
-	  color: black;
+	  color: #001;
 	  font-size: 7pt;
-	  -moz-border-radius: 4px 4px 4px 4px;
-	  -webkit-border-radius: 4px 4px 4px 4px;		
-	  border-radius: 4px 4px 4px 4px;
-	  width:120px;
+	  width: 120px;
 	  text-align: center;
 		float: right;
-/*	  background-image:url('images/lightbluetile.png');*/
 }
 
 hr {
@@ -380,7 +374,7 @@ color: #003;
 background-color: #003;
 height: 1px;
 border: 0px solid #003;
-margin: 10px 5px;
+margin: 10px 0;
 }
 
 input {
