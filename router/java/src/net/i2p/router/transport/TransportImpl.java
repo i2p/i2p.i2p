@@ -78,8 +78,13 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
-     * How many peers can we talk to right now?
-     *
+     * How many peers are we connected to?
+     * For NTCP, this is the same as active,
+     * but SSU actually looks at idle time for countActivePeers()
+     */
+    public int countPeers() { return countActivePeers(); }
+    /**
+     * How many peers active in the last few minutes?
      */
     public int countActivePeers() { return 0; }
     /**
@@ -112,10 +117,18 @@ public abstract class TransportImpl implements Transport {
         return _context.getProperty("i2np." + style + ".maxConnections", def);
     }
 
+    private static final int DEFAULT_CAPACITY_PCT = 75;
     /**
      * Can we initiate or accept a connection to another peer, saving some margin
      */
-    public boolean haveCapacity() { return true; }
+    public boolean haveCapacity() {
+        return haveCapacity(DEFAULT_CAPACITY_PCT);
+    }
+
+    /** @param pct are we under x% 0-100 */
+    public boolean haveCapacity(int pct) {
+        return countPeers() < getMaxConnections() * pct / 100;
+    }
 
     /**
      * Return our peer clock skews on a transport.

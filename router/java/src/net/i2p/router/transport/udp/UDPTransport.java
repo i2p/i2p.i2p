@@ -1335,6 +1335,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     @Override
+    public int countPeers() {
+        synchronized (_peersByIdent) {
+            return _peersByIdent.size();
+        }
+    }
+
+    @Override
     public int countActivePeers() {
         long now = _context.clock().now();
         int active = 0;
@@ -1376,19 +1383,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public boolean allowConnection() {
         synchronized (_peersByIdent) {
             return _peersByIdent.size() < getMaxConnections();
-        }
-    }
-
-    @Override
-    public boolean haveCapacity() {
-        synchronized (_peersByIdent) {
-            return _peersByIdent.size() < getMaxConnections() * 4 / 5;
-        }
-    }
-
-    public boolean haveHighCapacity() {
-        synchronized (_peersByIdent) {
-            return _peersByIdent.size() < getMaxConnections() / 2;
         }
     }
 

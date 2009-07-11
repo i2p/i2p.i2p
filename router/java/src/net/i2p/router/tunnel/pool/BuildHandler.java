@@ -510,8 +510,8 @@ class BuildHandler {
          * reject this request.
          */
         if (response == 0 &&
-            ((isInGW && ! _context.commSystem().haveInboundCapacity()) ||
-             (isOutEnd && ! _context.commSystem().haveOutboundCapacity()))) {
+            ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
+             (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
                 _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
@@ -574,7 +574,7 @@ class BuildHandler {
         // just drop it.
         if (response != 0 &&
             (! _context.routerHash().equals(nextPeer)) &&
-            (! _context.commSystem().haveOutboundCapacity()) &&
+            (! _context.commSystem().haveOutboundCapacity(75)) &&
             (! _context.commSystem().isEstablished(nextPeer))) {
             _context.statManager().addRateData("tunnel.dropConnLimits", 1, 0);
             return;

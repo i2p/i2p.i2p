@@ -34,8 +34,8 @@ public abstract class CommSystemFacade implements Service {
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }
-    public boolean haveInboundCapacity() { return true; }
-    public boolean haveOutboundCapacity() { return true; }
+    public boolean haveInboundCapacity(int pct) { return true; }
+    public boolean haveOutboundCapacity(int pct) { return true; }
     public boolean haveHighOutboundCapacity() { return true; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     
