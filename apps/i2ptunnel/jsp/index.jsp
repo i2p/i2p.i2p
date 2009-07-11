@@ -6,7 +6,8 @@
 <head>
     <title>I2PTunnel Webmanager - List</title>
     
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta htt
+p-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
     
     <% if (indexBean.allowCSS()) {
@@ -17,7 +18,7 @@
   %>
 </head>
 <body id="tunnelListPage">
-    <div id="pageHeader">
+	    <div id="pageHeader">
     </div>
     
     <div id="statusMessagePanel" class="panel">

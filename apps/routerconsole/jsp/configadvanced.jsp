@@ -13,7 +13,9 @@
 <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHelper" id="advancedhelper" scope="request" />
 <jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
+<h1>I2P Advanced Configuration</h1>
 <div class="main" id="main">
+
  <%@include file="confignav.jsp" %>
  
  <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHandler" id="formhandler" scope="request" />

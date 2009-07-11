@@ -1,5 +1,6 @@
 <% // put width here too to prevent bad layout at startup %>
-<div class="routersummaryouter" style="width: 215px;">
+
+<div class="routersummaryouter" style="width: 200px;">
 <%
     // skip the iframe if refresh disabled
     String d = request.getParameter("refresh");
@@ -21,10 +22,10 @@
     } else {
         // since we don't have an iframe this will reload the base page, and
         // the new delay will be passed to the iframe above
-        out.print("<hr /><p><form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
+        out.print("<hr /><p><center><form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
         out.print("<b>Refresh (s):</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
         out.print("<button type=\"submit\">Enable</button>\n");
-        out.print("</form></p></div>\n");
+        out.print("</form></center></p></div>\n");
     }
 %>
 </div>

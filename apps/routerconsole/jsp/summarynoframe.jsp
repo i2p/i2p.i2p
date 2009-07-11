@@ -10,16 +10,34 @@
 <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
 <jsp:setProperty name="uhelper" property="*" />
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
- <center><b><a href="config.jsp" target="_top">Configuration</a>&nbsp;&nbsp;<a href="help.jsp" target="_top">Help</a></b></center>
+ <centre><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></centre><hr />
+ <centre>
+ <u><b>I2P Services</b></u><br />
+ <a href="susimail/susimail" target="blank">Susimail</a> 
+ <a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
+ <a href="i2psnark/" target="_blank">I2PSnark</a> 
+ <a href="http://127.0.0.1:7658/" target="_blank">Eepsite</a><hr /> 
+ <u><b>I2P Internals</b></u><br />
+ <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 
+ <a href="tunnels.jsp" target="_top">Tunnels</a> 
+ <a href="profiles.jsp" target="_top">Profiles</a> 
+ <a href="netdb.jsp" target="_top">NetDB</a> 
+ <a href="logs.jsp" target="_top">Logs</a> 
+ <a href="jobs.jsp" target="_top">Jobs</a> 
+ <a href="graphs.jsp" target="_top">Graphs</a> 
+ <a href="oldstats.jsp" target="_top">Stats</a> <!-- 
+ <a href="oldconsole.jsp" target="_top">Internals</a> -->
+ <a href="config.jsp" target="_top">Configuration</a> 
+ <a href="help.jsp" target="_top">Help</a></b>
+ </center>
  <hr />
-
  <u><b>General</b></u><br />
  <b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=." target="_top">view</a>)<br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a><%
+ <b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a>
+ <%
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
         out.print("<br />" + update.getStatus());
@@ -30,17 +48,16 @@
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<p><center><form action=\"" + uri + "\" method=\"GET\">\n");
             out.print("<input type=\"hidden\" name=\"updateNonce\" value=\"" + nonce + "\" />\n");
-            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" /></form></p>\n");
+            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" /></form></center></p>\n");
         }
     }
  %>
- <p>
+ <p><center>
  <%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
- </p>
+ </center></p>
  <hr />
- 
  <u><b><a href="peers.jsp" target="_top">Peers</a></b></u><br />
  <b>Active:</b> <jsp:getProperty name="helper" property="activePeers" />/<jsp:getProperty name="helper" property="activeProfiles" /><br />
  <b>Fast:</b> <jsp:getProperty name="helper" property="fastPeers" /><br />

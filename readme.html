@@ -1,13 +1,18 @@
-<p align=right><font size="-1">English | <a href="/index.jsp?lang=zh">Chinese</a> | <a href="/index.jsp?lang=de">Deutsch</a> | <a href="/index.jsp?lang=fr">Fran&ccedil;ais</a> | <a href="/index.jsp?lang=nl">Nederlands</a> | <a href="/index.jsp?lang=sv">Svenska</a></font></p>
+<div align="right">
+<div class="langbox" align="right"><img src="/flags.jsp?c=us" title="English" alt="English"> <a href="/index.jsp?lang=zh"><img src="/flags.jsp?c=cn" title="Chinese" alt="Chinese"></a> <a href="/index.jsp?lang=de"><img src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> <a href="/index.jsp?lang=fr" title="Fran&ccedil;ais" alt="Fran&ccedil;ais"><img src="/flags.jsp?c=fr"></a> <a href="/index.jsp?lang=nl"><img src="/flags.jsp?c=nl" title="Nederlands" alt="Nederlands"></a> <a href="/index.jsp?lang=sv"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a></div>
+</div>
+<div align=justify>
+<h2>Welcome to I2P!</h2>
 <p>If you've just started I2P, the Active: numbers on the left should start to
 grow over the next few minutes and you'll see a "shared clients" local destination listed
 on the left (if not, <a href="#trouble">see below</a>).  Once those show up,
 you can:</p>
+
 <ul>
  <li><b>browse "eepsites"</b> - on I2P there are anonymously hosted websites - 
      tell your browser to use the <b>HTTP proxy at localhost port 4444</b>, then
      browse to an eepsite - 
-     <ul>
+     <ul class="links">
          <li><a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p</a> and
              <a href="http://perv.i2p/stats.cgi">perv.i2p</a>: sites tracking active eepsites</li>
          <li><a href="http://forum.i2p/">forum.i2p</a>: a secure and anonymous connection to <a href="http://forum.i2p2.de/">forum.i2p2.de</a></li>
@@ -18,6 +23,7 @@ you can:</p>
          <li><a href="http://fproxy.tino.i2p">fproxy.tino.i2p</a>: Freenet proxy</li>
 	 <li><a href="http://echelon.i2p">echelon.i2p</a>: software archive and information for I2P</li>
      </ul>
+<p>
      There are many more eepsites - just follow the links from the ones you see,
      bookmark your favorites, and visit them often!</li>
  <li><b>browse the web</b> - there is currently an HTTP "outproxy" in I2P hooked
@@ -38,7 +44,7 @@ you can:</p>
  <li><b>blog anonymously</b> - check out <a href="http://syndie.i2p2.de/">Syndie</a></li>
  <li>and lots more</li>
 </ul>
-
+</p>
 <h2>Want your own eepsite?</h2>
 
 <p>We've bundled some software to let you run your own eepsite - a 
@@ -51,6 +57,12 @@ will be visible to others.
 Detailed instructions for starting your eepsite are on
 <a href="http://localhost:7658/">your temporary eepsite page</a>.
 </p>
+<!-- 
+<p>
+If you wish to register your eepsite with a unique top level domain (eg. http://bobsplace.i2p) making it visible on the network, you 
+can do so here: <a href="http://stats.i2p/i2p/addkey.html">http://stats.i2p/i2p/addkey.html</a>
+</p>
+-->
 
 <h2><a name="trouble">Troubleshooting</a></h2>
 
@@ -65,3 +77,4 @@ You may also want to review the information on the
 #i2p-chat on IRC at <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, irc.postman.i2p or irc.freshcoffee.i2p (they're linked together).</p>
 
 <p><b>As a note, you can change this page by editing the file "docs/readme.html"</b></p>
+</div>

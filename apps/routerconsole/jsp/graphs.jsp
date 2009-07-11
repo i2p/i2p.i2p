@@ -9,7 +9,7 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
+<h1>I2P Performance Graphs</h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.GraphHelper" id="graphHelper" scope="request" />
  <jsp:setProperty name="graphHelper" property="*" />

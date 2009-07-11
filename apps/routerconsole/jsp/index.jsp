@@ -17,6 +17,7 @@ if (System.getProperty("router.consoleNonce") == null) {
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
+<h1>I2P Router Console</h1>
 <div class="news" id="news">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="newshelper" scope="request" />
  <% File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml"); %>

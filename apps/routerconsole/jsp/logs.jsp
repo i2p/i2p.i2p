@@ -9,7 +9,7 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
+ <h1>I2P Router Logs</h1>
 <div class="main" id="main">
  <h4>Version:</h4><a name="version"> </a>
  Please include this information in bug reports.

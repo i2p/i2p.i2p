@@ -1,0 +1,233 @@
+body {
+	margin :  0px;
+	padding : 0px;
+	text-align : center;
+	font-family : "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+	background-color : #eeeeff;
+	color :  #000000;
+    font-size : 11pt;
+    
+    /* we've avoided Tantek Hacks so far,
+    ** but we can't avoid using the non-w3c method of 
+    ** box rendering. (and therefore one of mozilla's
+    ** proprietry -moz properties (which hopefully they'll
+    ** drop soon).
+    */
+    -moz-box-sizing : border-box;
+    box-sizing :      border-box;
+}
+
+div {
+    -moz-box-sizing : border-box;
+    box-sizing :      border-box;
+}
+
+h4, label {
+    margin :   0px;
+    padding :  2px 2px 2px 0px;
+    float :   left;
+    width :  150px;
+    height :  24px;
+    font-weight :  bold;
+    text-align :  right;
+    font-size :   1.0em;
+    -moz-box-sizing: border-box;
+    box-sizing :     border-box;
+}
+
+h4 {
+    font-size : 1.2em;
+    text-align : center;
+    width : 750px;
+}
+
+a {
+    text-decoration : none;
+}
+
+form {
+	margin : 0px;
+}
+
+textarea, input, select, button, a {
+    font-family : "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+    -moz-box-sizing : border-box;
+    box-sizing :      border-box;
+    font-size : 1.0em;
+    float : left;
+}
+
+button {
+    float : none;
+}
+
+textarea {
+    border : 1px solid #9999ff;
+}
+
+br {
+    clear : left;
+}
+
+/*
+div.statusNotRunning {
+    float : left;
+    width : 82px;
+    height : 24px;
+	color : #dd0000;
+		font-weight: bold;
+}
+div.statusRunning {
+    float : left;
+    width : 82px;
+    height : 24px;
+	  color : #00dd00;
+		font-weight: bold;	
+}
+div.statusStarting {
+    float : left;
+    width : 82px;
+    height : 24px;
+	  color : #339933;
+}
+*/
+
+div.statusNotRunning {
+    float : left;
+    width : 78px;
+    height : 24px;
+    overflow : hidden;
+	color : #dd0000;
+    padding-top: 24px;
+    background: url('images/console_status_stopped.png') 0 0 no-repeat;
+}
+div.statusRunning {
+    float : left;
+    width : 78px;
+    height : 24px;
+    overflow : hidden;
+	color : #00dd00;
+    padding-top: 24px;
+    background: url('images/console_status_running.png') 0 0 no-repeat;
+}
+div.statusStarting {
+    float : left;
+    width : 78px;
+    height : 24px;
+    overflow : hidden;
+	color : #339933;
+    padding-top: 24px;
+    background: url('images/console_status_starting.png') 0 0 no-repeat;
+}
+
+hr {
+    display : none;
+}
+
+.separator, .subdivider {
+    clear : both;
+    height : 1px;
+    margin : 3px 0px 3px 0px;
+    border-bottom : 1px solid #9999ff;
+}
+
+.subdivider {
+    border-bottom : 1px solid #9999ff;
+    padding: 5px 0px 0px 0px;
+}
+
+.freetext {
+    width : 150px;
+    height : 22px;
+    border : 1px solid #9999ff;
+}
+
+.control {
+    margin :  0 4px 0 0;
+    padding : 2px 0 2px 0;
+    overflow : hidden;
+    height : 22px;
+    width :  60px;
+    font-weight : normal;
+    background-color :  #bbbbff;
+    color : black;
+    border : 1px outset #ddddc0;
+    text-align :  center;
+    white-space : nowrap;
+    -moz-border-radius: 4px 4px 4px 4px;
+		border 1px solid #000022;
+		font-weight: bold;
+}
+
+.control:hover {
+/*
+		color: #fff;
+    background-color : #3333ff;
+		border 0px none #000022;
+*/
+border: 1px solid #eeeeff;
+background-color: #003;
+color:#ff6600
+}
+
+.control:active {
+    border : 2px inset;
+}
+
+.panel {
+    width : 760px;
+    margin : 16px auto 16px auto;
+    overflow : hidden;
+	  text-align : left;
+    font-size : 0.8em;
+	  background-color : #fff;
+	  background: url(images/tabletile.png);
+	  -moz-border-radius: 4px 4px 4px 4px;
+	  border: 1px solid #002;
+	  padding: 10px 20px;
+}
+
+.panel .footer {
+    float : right;
+    padding : 4px;
+}
+
+.toolbox {
+    float : right;
+}
+
+.rowItem {
+    width : 750px;
+    float :  left;
+    margin :  0px;
+}
+
+.comment {
+    font-style : italic;
+}
+
+.text {
+    height : 24px;
+    width : 150px;
+    padding : 2px 0 0 2px;
+    float : left;
+    margin : 0;
+}
+
+.accessKey {
+    text-decoration : underline;
+}
+
+#globalOperationsPanel {
+    background-color : #ddddff;
+	border : 1px solid #f22;
+}
+
+#globalOperationsPanel .control {
+    width : 100px;
+}
+
+.header {
+	  -moz-border-radius: 4px 4px 4px 4px;
+		border 1px solid #ff0000;
+}

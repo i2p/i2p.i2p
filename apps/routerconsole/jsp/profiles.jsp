@@ -9,7 +9,7 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-
+ <h1>I2P Network Peer Profiles</h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

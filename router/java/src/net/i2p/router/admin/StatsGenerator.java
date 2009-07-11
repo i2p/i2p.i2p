@@ -29,7 +29,6 @@ public class StatsGenerator {
     
     public void generateStatsPage(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<h1>Router statistics</h1><hr />");
         buf.append("<form action=\"/oldstats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
