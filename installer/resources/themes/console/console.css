@@ -29,16 +29,18 @@ div.logo {
 	margin: 0em;
 	padding: .5em;
 	text-align: center;
+	display: none !important;
 }
 
 div.toolbar {
 	margin: 0em 0em 2em 0em;
 	font-weight: bold;
+	display: none !important;
 }
 
 div.routersummaryouter {
 	float: left;
-	width: 215px;
+	width: 200px;
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -48,7 +50,7 @@ div.routersummaryouter {
 
 div.routersummary {
 	background-color: #fafaff;
-	width: 195px;
+	width: 175px;
 	color: inherit;
 	margin: 0em;
 	padding: 5px;
@@ -109,4 +111,8 @@ div.messages span.error {
 
 div.messages span.notice {
 	font-style: italic;
+}
+
+h1 {
+font-size: 16pt;
 }

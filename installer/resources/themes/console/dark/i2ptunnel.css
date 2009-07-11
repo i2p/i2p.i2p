@@ -129,7 +129,8 @@
     height : 24px;
     width : 360px;
     float : left;
-
+    margin-top: 6px;
+    margin-right: 5px;	
 }
 
 /* Use Leary and Langridge content replacement methods (LIR)
@@ -171,7 +172,7 @@
 
 #tunnelListPage .descriptionField .text,
 #tunnelListPage .destinationField input {
-    width : 450px;
+    width : 590px;
 }
 
 #tunnelListPage .descriptionField label,
