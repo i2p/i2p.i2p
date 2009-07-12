@@ -1003,7 +1003,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         
         out.write("<a href=\"netdb.jsp?l=1\">View LeaseSets</a>");
         Hash us = _context.routerHash();
-        out.write("<a name=\"routers\" /><h3>Routers (<a href=\"netdb.jsp");
+        out.write("<a name=\"routers\" ></a><h3>Routers (<a href=\"netdb.jsp");
         if (full)
             out.write("#routers\" >view without");
         else
@@ -1075,9 +1075,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
+        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" /><b>Our info: ").append(hash).append("</b><br />\n");
+            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b><br />\n");
         } else {
             buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");
         }

@@ -4,6 +4,8 @@
 <b>
 <% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network<% }
+ else if (request.getRequestURI().indexOf("configui.jsp") != -1) {
+ %>UI<% }
  else if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
  %>Service<% }
  else if (request.getRequestURI().indexOf("configupdate.jsp") != -1) {
@@ -26,6 +28,8 @@ Configuration</b>
 -->
 <h4><% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
+ if (request.getRequestURI().indexOf("configui.jsp") != -1) {
+ %>UI | <% } else { %><a href="configui.jsp">UI</a> | <% }
  if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
  %>Service | <% } else { %><a href="configservice.jsp">Service</a> | <% }
  if (request.getRequestURI().indexOf("configupdate.jsp") != -1) {

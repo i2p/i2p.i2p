@@ -1,3 +1,7 @@
+2009-07-12 zzz
+    * Add configui.jsp
+    * orange flash remove take 2
+
 2009-07-11 zzz
     * netdb.jsp: Fix bad tag causing orange mouseovers
 

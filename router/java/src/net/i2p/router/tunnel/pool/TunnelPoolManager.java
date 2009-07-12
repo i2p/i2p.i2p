@@ -405,7 +405,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h2><a name=\"exploratory\">Exploratory tunnels</a> (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
+        out.write("<h2><a name=\"exploratory\" ></a>Exploratory tunnels (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
         renderPool(out, _inboundExploratory, _outboundExploratory);
         
         List destinations = null;
@@ -428,7 +428,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             if (name == null)
                 name = client.toBase64().substring(0,4);
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
-                      + "\">Client tunnels</a> for " + name);
+                      + "\" ></a>Client tunnels for " + name);
             if (_context.clientManager().isLocal(client))
                 out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">config</a>):</h2>\n");
             else
@@ -438,7 +438,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         
         List participating = _context.tunnelDispatcher().listParticipatingTunnels();
         Collections.sort(participating, new TunnelComparator());
-        out.write("<h2><a name=\"participating\">Participating tunnels</a>:</h2><table border=\"1\">\n");
+        out.write("<h2><a name=\"participating\"></a>Participating tunnels:</h2><table border=\"1\">\n");
         out.write("<tr><th>Receive on</th><th>From</th><th>"
                   + "Send on</th><th>To</th><th>Expiration</th>"
                   + "<th>Usage</th><th>Rate</th><th>Role</th></tr>\n");
@@ -601,7 +601,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         List<Hash> peerList = new ArrayList(peers);
         Collections.sort(peerList, new HashComparator());
 
-        out.write("<h2><a name=\"peers\">Tunnel Counts By Peer</a>:</h2>\n");
+        out.write("<h2><a name=\"peers\"></a>Tunnel Counts By Peer:</h2>\n");
         out.write("<table border=\"1\"><tr><th>Peer</th><th>Expl. + Client</th><th>% of total</th><th>Part. from + to</th><th>% of total</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr><td align=\"right\">");
