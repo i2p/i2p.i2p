@@ -1,255 +1,229 @@
 body {
-	margin :  0px;
-	padding : 0px;
-	text-align : center;
-	font-family : "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
-	background-color : #eeeeff;
-	color :  #000000;
-  font-size : 11pt;
-    
-    /* we've avoided Tantek Hacks so far,
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     background-color: #eeeeff;
+     color: #000000;
+     font-size: 11pt;
+/* we've avoided Tantek Hacks so far,
     ** but we can't avoid using the non-w3c method of 
     ** box rendering. (and therefore one of mozilla's
     ** proprietry -moz properties (which hopefully they'll
     ** drop soon).
     */
-    -moz-box-sizing : border-box;
-    box-sizing :      border-box;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 div {
-    -moz-box-sizing : border-box;
-    box-sizing :      border-box;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 h4, label {
-    margin :   0px;
-    padding :  6px 2px 2px 0px;
-    float :   left;
-    width :  150px;
-    height :  28px;
-    font-weight :  bold;
-    text-align :  right;
-    font-size :   1.0em;
-    -moz-box-sizing: border-box;
-    box-sizing :     border-box;
-		padding: 5px 0 !important;
+     margin: 0px;
+     padding: 6px 2px 2px 0px;
+     float: left;
+     width: 150px;
+     height: 28px;
+     font-weight: bold;
+     text-align: right;
+     font-size: 1.0em;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 h4 {
-    font-size : 14px;
- 		color: #001;
-    text-align : center;
-    width : 100%;
-		border: 1px solid #225;
-		margin: 5px 0 15px 0;
-	  background: url(images/tabletitlelight.png);
-	  background-color: #002;
-		text-transform: uppercase;
-	  text-shadow: 0px 0px 2px rgba(64, 64, 255, 0.9);
-		letter-spacing: 0.08em;
-    -moz-box-shadow: inset 0px 0px 4px 0px #bbf; 
-	  border-radius: 4px;
-	  -moz-border-radius: 4px;
-	  -webkit-border-radius: 4px;	
+     font-size: 14px;
+     color: #001;
+     text-align: center;
+     width: 100%;
+     border: 1px solid #225;
+     margin: 5px 0 15px 0;
+     background: url(images/tabletitlelight.png);
+     background-color: #002;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 2px rgba(64, 64, 255, 0.9);
+     letter-spacing: 0.08em;
+     -moz-box-shadow: inset 0px 0px 4px 0px #bbf;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
 }
 
 a {
-    text-decoration : none;
+     text-decoration: none;
 }
 
 form {
-	margin : 0px;
+     margin: 0px;
 }
 
 textarea, input, select, button, a {
-    font-family : "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
-    -moz-box-sizing : border-box;
-    box-sizing :      border-box;
-    font-size : 1.0em;
-    float : left;
+     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     font-size: 1.0em;
+     float: left;
 }
 
 button {
-    float : none;
+     float: none;
 }
 
 textarea {
-    border : 1px solid #9999ff;
+     border: 1px solid #9999ff;
 }
 
 br {
-    clear : left;
+     clear: left;
 }
 
-/*
 div.statusNotRunning {
-    float : left;
-    width : 82px;
-    height : 24px;
-	color : #dd0000;
-		font-weight: bold;
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #dd0000;
+     background: url('images/console_status_stopped.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 8px;
 }
-div.statusRunning {
-    float : left;
-    width : 82px;
-    height : 24px;
-	  color : #00dd00;
-		font-weight: bold;	
-}
-div.statusStarting {
-    float : left;
-    width : 82px;
-    height : 24px;
-	  color : #339933;
-}
-*/
 
-div.statusNotRunning {
-    float : left;
-    width : 78px;
-    height : 24px;
-    overflow : hidden;
-	  color : #dd0000;
-    background: url('images/console_status_stopped.png') 0 0 no-repeat;
-    padding-top: 24px;
-    margin-top: 8px;
-}
 div.statusRunning {
-    float : left;
-    width : 78px;
-    height : 24px;
-    overflow : hidden;
-	  color : #00dd00;
-    background: url('images/console_status_running.png') 0 0 no-repeat;
-    padding-top: 24px;
-    margin-top: 8px;
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #00dd00;
+     background: url('images/console_status_running.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 8px;
 }
 
 div.statusStarting {
-    float : left;
-    width : 78px;
-    height : 24px;
-    overflow : hidden;
-  	color : #339933;
-    background: url('images/console_status_starting.png') 0 0 no-repeat;
-    padding-top: 24px;
-    margin-top: 8px;
+     float: left;
+     width: 78px;
+     height: 24px;
+     overflow: hidden;
+     color: #339933;
+     background: url('images/console_status_starting.png') 0 0 no-repeat;
+     padding-top: 24px;
+     margin-top: 8px;
 }
 
 hr {
-    display : none;
+     display: none;
 }
 
 .separator, .subdivider {
-    clear : both;
-    height : 1px;
-    margin : 3px 0px 3px 0px;
-    border-bottom : 1px solid #225;
+     clear: both;
+     height: 1px;
+     margin: 3px 0px 3px 0px;
+     border-bottom: 1px solid #225;
 }
 
 .subdivider {
-    border-bottom : 1px solid #225;
-    padding: 5px 0px 0px 0px;
+     border-bottom: 1px solid #225;
+     padding: 5px 0px 0px 0px;
 }
 
 .freetext {
-    width : 150px;
-    height : 22px;
-    border : 1px solid #9999ff;
-		padding: 2px;
-		margin: 4px 0 2px 4px;
+     width: 150px;
+     height: 22px;
+     border: 1px solid #9999ff;
+     padding: 2px;
+     margin: 4px 0 2px 4px;
 }
 
 .control {
-    margin :  6px 0 0 4px;
-    padding : 2px 0 2px 0;
-    overflow : hidden;
-    height : 22px;
-    width :  60px;
-    font-weight : normal;
-    background-color :  #bbbbff;
-    color : black;
-    border : 1px outset #ddddc0;
-    text-align :  center;
-    white-space : nowrap;
-    -moz-border-radius: 4px 4px 4px 4px;
-		border 1px solid #000022;
-		font-weight: bold;
-    margin-top: 8px;
+     margin: 6px 0 0 4px;
+     padding: 2px 0 2px 0;
+     overflow: hidden;
+     height: 22px;
+     width: 60px;
+     font-weight: normal;
+     background-color: #bbbbff;
+     color: black;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     margin-top: 8px;
 }
 
 .control:hover {
 /*
-		color: #fff;
+        color: #fff;
     background-color : #3333ff;
-		border 0px none #000022;
+        border 0px none #000022;
 */
-border: 1px solid #eeeeff;
-background-color: #003;
-color:#ff6600
+     border: 1px solid #eeeeff;
+     background-color: #003;
+     color: #ff6600;
 }
 
 .control:active {
-    border : 2px inset;
+     border: 2px inset;
 }
 
 .panel {
-    width : 800px;
-    margin : 16px auto 16px auto;
-    overflow : hidden;
-	  text-align : left;
-    font-size : 0.8em;
-	  background-color : #fff;
-	  background: url(images/lightbluetile.png);
-	  -moz-border-radius: 4px 4px 4px 4px;
-	  border: 1px solid #002;
-	  padding: 10px 20px;
+     width: 800px;
+     margin: 16px auto 16px auto;
+     overflow: hidden;
+     text-align: left;
+     font-size: 0.8em;
+     background-color: #fff;
+     background: url(images/lightbluetile.png);
+     -moz-border-radius: 4px 4px 4px 4px;
+     border: 1px solid #002;
+     padding: 10px 20px;
 }
 
 .panel .footer {
-    float : right;
-    padding : 4px;
+     float: right;
+     padding: 4px;
 }
 
 .toolbox {
-    float : right;
+     float: right;
 }
 
 .rowItem {
-    width : 750px;
-    float :  left;
-    margin :  0px;
+     width: 750px;
+     float: left;
+     margin: 0px;
 }
 
 .comment {
-    font-style : italic;
+     font-style: italic;
 }
 
 .text {
-    height : 24px;
-    width : 150px;
-    padding : 6px 0 0 2px;
-    float : left;
-    margin : 0;
+     height: 24px;
+     width: 150px;
+     padding: 6px 0 0 2px;
+     float: left;
+     margin: 0;
 }
 
 .accessKey {
-    text-decoration : underline;
+     text-decoration: underline;
 }
 
 #globalOperationsPanel {
-    background-color : #ddddff;
-	  border : 1px solid #f22;
-		-moz-box-shadow: inset 0px 0px 4px 0px #f00; 
-		padding: 5px 20px 11px 10px !important;
+     background-color: #ddddff;
+     border: 1px solid #f22;
+     -moz-box-shadow: inset 0px 0px 4px 0px #f00;
+     padding: 5px 20px 11px 10px !important;
 }
 
 #globalOperationsPanel .control {
-    width : 100px;
+     width: 100px;
 }
 
 .header {
-	  -moz-border-radius: 4px 4px 4px 4px;
-		border 1px solid #ff0000;
+     -moz-border-radius: 4px;
+     border: 1px solid #ff0000;
 }
