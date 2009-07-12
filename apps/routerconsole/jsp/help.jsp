@@ -12,7 +12,7 @@
 <h1>I2P Router Help & Support</h1>
 <div class="main" id="main">
 If you'd like to help improve or translate the documentation, or 
-other help with other aspects of the project, please see the documentation for
+help with other aspects of the project, please see the documentation for
 <a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a> 
 <br><br>Further assistance is available here:
 <br>
