@@ -1,472 +1,475 @@
 body {
-	font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
-	margin: 25px 10px 0 5px;
-	padding: 0;
-	text-align: center;
-	background-color: #000022;
-	color: white;
-	font-size: 9pt;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     margin: 25px 10px 0 5px;
+     padding: 0;
+     text-align: center;
+     background-color: #000022;
+     color: white;
+     font-size: 9pt;
 }
 
 .hide {
-	display: none;
+     display: none;
 }
 
 img {
-	border: none;
+     border: none;
 }
 
 pre {
-	width: 98%;
-	overflow-x: scroll;
-  text-align: left;
-	font-size: 8pt;
-	font-family: "Lucida Console", Courier, mono;
-	color: #99d;
+     width: 98%;
+     overflow-x: scroll;
+     text-align: left;
+     font-size: 9pt;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #fff;
 }
 
 div.logo {
-	float: left;
-	left: 10px;
-	top: 0px;
-  padding: 10px 10px 10px 14px;
-	text-align: left;
-  font-color: #fff;
-	border: 0px solid #f00;
-	float: none;
-	margin: 0px;
-	background-color: #003;
-	display: none;
-	border-bottom: 1px solid #eef;
+     float: left;
+     left: 10px;
+     top: 0px;
+     padding: 10px 10px 10px 14px;
+     text-align: left;
+     font-color: #fff;
+     border: 0px solid #f00;
+     margin: 0px;
+     background-color: #003;
+     display: none;
+     border-bottom: 1px solid #eef;
 }
 
 div.toolbar {
-	margin: 0;
-	padding: 10px;
-	font-weight: bold;
-	background-color: #eeeeff
-	border: 1px solid #002;
-	display: none;
+     margin: 0;
+     padding: 10px;
+     font-weight: bold;
+     background-color: #eeeeff;
+     border: 1px solid #002;
+     display: none;
 }
 
 div.toolbar a:link {
-border: 1px outset #ddddc0;
-padding: 0px 5px 1px 5px;
-line-height: 250%;
-background-color: #bbf;
-text-decoration: none;
-	border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;        
-color: #002;
+     border: 1px outset #ddddc0;
+     padding: 0px 5px 1px 5px;
+     line-height: 250%;
+     background-color: #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     color: #002;
 }
 
 div.toolbar a:visited {
-line-height: 250%;
-background-color: #ddf;
+     line-height: 250%;
+     background-color: #ddf;
 }
 
 div.toolbar a:hover{
-border: 1px solid #eeeeff;
-line-height: 250%;
-background-color: #003;
-color:#ff6600
+     border: 1px solid #eeeeff;
+     line-height: 250%;
+     background-color: #003;
+     color: #ff6600;
 }
-a:active{color:#900}	
+
+a:active{
+     color: #900;
+}
 
 div.routersummaryouter {
-	float: left;
-	width: 200px;
-	margin: 0 0 10px 20px;
-	padding: 0;
-	border: 0;
-	clear: left; /* fixes a bug in Opera */
-	text-align: center;
-	display: block;
+     float: left;
+     width: 200px;
+     margin: 0 0 10px 20px;
+     padding: 0;
+     border: 0;
+     clear: left;/* fixes a bug in Opera */
+     text-align: center;
+     display: block;
 }
 
 div.routersummary {
-	width: 175px;
-	padding: 10px;
-	text-align: center;
-	border: 1px solid #9999ff;
-	background-color: #000033;
-	background: url(images/darkbluebg.png);
-	color: #eeeeff;
-	font-size: 8pt;
-	clear: left; /* fixes a bug in Opera */
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;        
-	float: left;
-  -moz-box-shadow: inset 0px 0px 16px 0px #009; 
+     width: 175px;
+     padding: 10px;
+     text-align: center;
+     border: 1px solid #9999ff;
+     background-color: #000033;
+     background: url(images/darkbluebg.png);
+     color: #eeeeff;
+     font-size: 8pt;
+     clear: left;/* fixes a bug in Opera */
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     border-radius: 4px;
+     float: left;
+     -moz-box-shadow: inset 0px 0px 16px 0px #009;
 }
 
 div.warning {
-	margin: 0em 1em 1em 224px;
-	padding: .5em 1em;
-	background-color: #ffefef;
-	border: medium solid #ffafaf;
-	text-align: left;
-	color: inherit;
+     margin: 0em 1em 1em 224px;
+     padding: .5em 1em;
+     background-color: #ffefef;
+     border: medium solid #ffafaf;
+     text-align: left;
+     color: inherit;
 }
 
 div.main {
-	margin: 0px 0px 20px 215px;
-	padding: 0 15px 15px 25px;
-	background-color: #002;
-	text-align: left;
-	color: #eeeeff;
+     margin: 0px 0px 20px 215px;
+     padding: 0 15px 15px 25px;
+     background-color: #002;
+     text-align: left;
+     color: #eeeeff;
 /*  border-top: 1px solid #eeeeff; */
-/*	border-right: 25px solid  #fff; */
-/*	border-radius: 0px 0 0 4px; 
-	-moz-border-radius: 4px 0 0 4px;
-	-webkit-border-radius: 4px 0 0 4px;	
+/*  border-right: 25px solid  #fff; */
+/*  border-radius: 0px 0 0 4px; 
+    -moz-border-radius: 4px 0 0 4px;
+    -webkit-border-radius: 4px 0 0 4px; 
   -moz-box-shadow: 0 2px 2px 1px #bbbbff;
-	-webkit-box-shadow: 0 2px 2px 1px #bbbbff;
-	 box-shadow: 0 2px 2px 0px #bbbbff; */
-	width: auto;
-/*	overflow-x: scroll; */
+    -webkit-box-shadow: 0 2px 2px 1px #bbbbff;
+     box-shadow: 0 2px 2px 0px #bbbbff; */
+     width: auto;
+/*  overflow-x: scroll; */
 }
 
-
 div.main textarea {
-	width: 100% !important;
-	background-color: #002;
-	color: #fff;
-	font-size: 8pt;
-	font-family: "Lucida Console", Courier, mono;
+     width: 100% !important;
+     background-color: #002;
+     color: #fff;
+     font-size: 8pt;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
 div.news {
-	margin: 0px 15px 20px 240px;
-	padding: 20px 30px 20px 30px;
-	border: 1px solid #99f;
-  background-color: #004;
-	color: #eeeeff;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
-	text-align: justify;
-	background: url(images/darkbluetile.png);
+     margin: 0px 15px 20px 240px;
+     padding: 20px 30px 20px 30px;
+     border: 1px solid #99f;
+     background-color: #004;
+     color: #eeeeff;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     text-align: justify;
+     background: url(images/darkbluetile.png);
 }
 
 div.news li {
-	text-align: left;
-	list-style-type:square;
-	margin: 2px 20px 0px 30px;
-	padding: 10px 20px 1px 0px;
-	}
+     text-align: left;
+     list-style-type: square;
+     margin: 2px 20px 0px 30px;
+     padding: 10px 20px 1px 0px;
+}
 
 div.confignav {
-	padding: 10px;
-	margin: 0 0px 20px 0;
-  background-color: #004;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border: 1px solid #99f;
-	background: url(images/darkbluetile.png);
-	font-size: 8pt !important;
+     padding: 10px;
+     margin: 0 0px 20px 0;
+     background-color: #004;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     border: 1px solid #99f;
+     background: url(images/darkbluetile.png);
+     font-size: 8pt !important;
 }
 
 div.configure {
-	padding: 15px;
-	margin: 10px 0px;
-	background-color: #005;
-	-moz-border-radius: 4px;
-	border: 1px solid #99f;
+     padding: 15px;
+     margin: 10px 0px;
+     background-color: #005;
+     -moz-border-radius: 4px;
+     border: 1px solid #99f;
 }
 
 div.messages {
-	padding: 10px;
-	margin: 10px 0 20px 0;
-	background-color: #005;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-  border: 1px solid #99f;
-	background: url(images/lightbluetile.png);
+     padding: 10px;
+     margin: 10px 0 20px 0;
+     background-color: #005;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     border: 1px solid #99f;
+     background: url(images/lightbluetile.png);
 }
 
 div.messages span.error {
-	color: #dddd00;
+     color: #dddd00;
 }
 
 div.messages span.notice {
-	font-style: italic;
+     font-style: italic;
 }
 
-div.messages	li {
-	text-align: justify;
-	font-weight: bold;
-  list-style-image: url(images/warning_dark.png);
-	margin: 0 0 0 30px !important;
-	padding: 5px;
-	border: 0px !important;
-	}
-
+div.messages li {
+     text-align: justify;
+     font-weight: bold;
+     list-style-image: url(images/warning_dark.png);
+     margin: 0 0 0 30px !important;
+     padding: 5px;
+     border: 0px !important;
+}
 
 table {
-	border-collapse: collapse;
-	width: 100%;
-  border: 1px solid #99f;
-	margin: 5px 0px 5px 0px;
-	cell-padding: 1px;
-	font-size: 7pt;
-	background-image:url('images/darkbluetile.png');
-	}
-
-	th {
-	padding: 4px;
-	color: #eef;
-	text-align: center;
-	font-size: 8pt;
-	background-color: #004;
-	background-image:url('images/tabletitledark.png');
-	background-repeat:repeat-x;
-	}
-	
-	tr:nth-child(even)
-{
-  background-image:url('images/darkerbluetile.png');
-}	
-
-	
-	td {
-	padding: 5px 10px;
-	color: #eef;
-/*	background-color: #004; */
-	text-align: left;
-	}
-	
-	tt {
-	font-size: 8pt;
-	font-family: "Lucida Console", Courier, mono;
-	font-weight: bold;
-	color: yellow;
-	/*background: black;*/
-	padding: 10px;
-	}
-	
-	div.main li {
-	text-align: left;
-	list-style-type:square;
-	margin: 4px 0px 4px 30px;
-	padding: 1px 20px 1px 0px;
-	padding: 1px 20px 1px 0px;
-	border-right: 4px solid #339;	
-	}
-
-	div.main li:nth-child(even){
-	text-align: left;
-	list-style-type:square;
-	margin: 4px 0px 4px 30px;
-	padding: 1px 20px 1px 0px;
-	border-right: 4px solid #339;
-	}
-	
-	ol {
-	white-space: pre-wrap;
-	display: inline;
-	margin: 2px 0 0 0;
-	padding 10px 0 0 20px;
-	display: inline;
-	}
-	
-	ul {
-	display: inline;
-	margin: 5px 0 0 0;
-	}
-
-code {
-  text-align: left;
-	font-size: 8pt;
-	font-family: "Lucida Console", Courier, mono;
+     border-collapse: collapse;
+     width: 100%;
+     border: 1px solid #99f;
+     margin: 5px 0px 5px 0px;
+     cell-padding: 1px;
+     font-size: 7pt;
+     background-image: url('images/darkbluetile.png');
 }
 
-a:link{color:#99f}
-a:visited{color:#7bb}
-a:hover{color:#ff6600}
-a:active{color:#900}
+th {
+     padding: 4px;
+     color: #eef;
+     text-align: center;
+     font-size: 8pt;
+     background-color: #004;
+     background-image: url('images/tabletitledark.png');
+     background-repeat: repeat-x;
+}
+
+tr:nth-child ( even ) {
+     background-image: url('images/darkerbluetile.png');
+}
+
+td {
+     padding: 5px 10px;
+     color: #eef;
+/*  background-color: #004; */
+     text-align: left;
+}
+
+tt {
+     font-size: 9pt;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-weight: bold;
+     color: yellow;
+     padding: 10px;
+}
+
+div.main li {
+     text-align: left;
+     list-style-type: square;
+     margin: 4px 0px 4px 30px;
+     padding: 1px 20px 1px 0px;
+     border-right: 4px solid #339;
+}
+
+div.main li:nth-child ( even ){
+     text-align: left;
+     list-style-type: square;
+     margin: 4px 0px 4px 30px;
+     padding: 1px 20px 1px 0px;
+     border-right: 4px solid #339;
+}
+
+ol {
+     white-space: pre-wrap;
+     display: inline;
+     margin: 2px 0 0 0;
+     padding: 10px 0 0 20px;
+}
+
+ul {
+     display: inline;
+     margin: 5px 0 0 0;
+}
+
+code {
+     text-align: left;
+     font-size: 8pt;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+
+a:link{
+     color: #99f;
+}
+
+a:visited{
+     color: #7bb;
+}
+
+a:hover{
+     color: #ff6600;
+}
+
+a:active{
+     color: #900;
+}
 
 .links {
-list-style-image: url(images/link_dark.png);
-margin: 0 5px 0 0px;
-padding: 0px 5px;
+     list-style-image: url(images/link_dark.png);
+     margin: 0 5px 0 0px;
+     padding: 0px 5px;
 }
 
 p {
-text-align: justify;
+     text-align: justify;
 }
 
 h1 {
-	text-align: left;
-	color: #fff;
-	padding: 10px;
-	margin-left: 240px;
-	margin-bottom: 20px;
-	margin-top: 0px;
-	margin-right: 15px;
-	font-size: 16pt;
-	font-weight: bold;
-	font-style: normal;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
-  white-space: normal; 
-	background-color: #004;
-  -moz-box-shadow: inset 0px 0px 16px 0px #009; 
-	border: 1px solid #99f;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
-	background-image:url('images/darkbluebg.png');
-	background-repeat:repeat-x;
+     text-align: left;
+     color: #fff;
+     padding: 10px;
+     margin-left: 240px;
+     margin-bottom: 20px;
+     margin-top: 0px;
+     margin-right: 15px;
+     font-size: 16pt;
+     font-weight: bold;
+     font-style: normal;
+     text-transform: uppercase;
+     letter-spacing: 0.06em;
+     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
+     white-space: normal;
+     background-color: #004;
+     -moz-box-shadow: inset 0px 0px 16px 0px #009;
+     border: 1px solid #99f;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     background-image: url('images/darkbluebg.png');
+     background-repeat: repeat-x;
 }
 
 h2{
-	font-size: 12pt;
-  color: #fff;
-	text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
-  background-color: #003;
-	background-image: url('images/tabletile.png');
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #99f;
-	padding: 5px 10px;
-	wordwrap: none;
-	border: 1px solid #99f;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
-} 
+     font-size: 12pt;
+     color: #fff;
+     text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
+     background-color: #003;
+     background-image: url('images/tabletile.png');
+     border-bottom-width: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #99f;
+     padding: 5px 10px;
+     wordwrap: none;
+     border: 1px solid #99f;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+}
 
 h2 a:link {
-	color: #99f;
-	}
+     color: #99f;
+}
 
 h2 a:visited {
-	color: #44f;
-	}
+     color: #44f;
+}
+
 h2 a:hover {
-  color: #ff6600;
-	text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #99f;
-	padding-bottom: 5px;
-} 
+     color: #ff6600;
+     text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
+     border-bottom-width: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #99f;
+     padding-bottom: 5px;
+}
 
 h3 {
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #99f;
-	padding-bottom: 5px;
-}	
+     border-bottom-width: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #99f;
+     padding-bottom: 5px;
+}
 
-button { 
-border: 1px outset #ddddc0;
-padding: 0px 3px 1px 3px;
+button {
+     border: 1px outset #ddddc0;
+     padding: 0px 3px 1px 3px;
 /*line-height: 250%;*/
-background-color: #bbf;
-text-decoration: none;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
-font-size: 8pt;
-font-weight: bold;
-margin: 2px 3px;
-text-align: center;
+     background-color: #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     font-size: 8pt;
+     font-weight: bold;
+     margin: 2px 3px;
+     text-align: center;
 }
 
 button:hover{
-border: 1px solid #eeeeff;
-line-height: 250%;
-background-color: #003;
-color:#ff6600
+     border: 1px solid #eeeeff;
+     line-height: 250%;
+     background-color: #003;
+     color: #ff6600;
 }
 
-	.underline {
-	 border-bottom: 1px solid #eeeeff;
-	 padding: 5px 0px 5px 0px;
-	 margin: 0px 0px 10px 0px;
-	 -moz-border-radius: 4px 4px 4px 4px;
+.underline {
+     border-bottom: 1px solid #eeeeff;
+     padding: 5px 0px 5px 0px;
+     margin: 0px 0px 10px 0px;
+     -moz-border-radius: 4px;
 }
-	 
+
 .langbox {
-	  margin: 4px 2px 4px 5px;
-	  padding: 7px 5px 5px 5px;
-	  color: #eef;
-	  font-size: 7pt;
-	  width: 140px;
-	  text-align: right;
-		float: right;
+     margin: 4px 2px 4px 5px;
+     padding: 7px 10px 5px 10px;
+     color: #eef;
+     font-size: 7pt;
+     width: 140px;
+     text-align: right;
+     float: right;
 }
 
 hr {
-color: #99f;
-background-color: #99f;
-height: 1px;
-border: 0px solid #99f;
-margin: 10px 0;
+     color: #99f;
+     background-color: #99f;
+     height: 1px;
+     border: 0px solid #99f;
+     margin: 10px 0;
 }
 
 sidebarlogo {
-text-align: center;
+     text-align: center;
 }
 
 input {
-background-color: #002;
-color: #eef;
-margin: 10px 2px 10px 0;
-font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
-font-weight: bold;
-border: 1px solid #99f;
+     background-color: #002;
+     color: #eef;
+     margin: 10px 2px 10px 0;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #99f;
 /*border: 1px outset #ddddc0;*/
-padding: 0px 2px 1px 2px;
+     padding: 0px 2px 1px 2px;
 /*line-height: 250%;*/
-background-color: #001;
-text-decoration: none;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
 }
 
 input hover {
-background-color: #f00;
-color: #eef;
-margin: 10px 2px 10px 0;
-font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
-font-weight: bold;
-border: 1px solid #99f;
+     background-color: #f00;
+     color: #eef;
+     margin: 10px 2px 10px 0;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
+     border: 1px solid #99f;
 /*border: 1px outset #ddddc0;*/
-padding: 0px 2px 1px 2px;
+     padding: 0px 2px 1px 2px;
 /*line-height: 250%;*/
-background-color: #001;
-text-decoration: none;
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;	
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
 }
 
 select {
- background-color: #001;
- color: #eef;
- margin: 10px 2px 10px 0;
- font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
- border: 1px solid #99f;
+     background-color: #001;
+     color: #eef;
+     margin: 10px 2px 10px 0;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #99f;
 }
 
 textarea {
- background-color: #001;
- color: #eef;
- padding: 5px;
- margin: 5px 0;
- border-radius: 4px;
- -moz-border-radius: 4px;
- -webkit-border-radius: 4px;	
- font-family: "Lucida Console", Courier, mono;
+     background-color: #001;
+     color: #eef;
+     padding: 5px;
+     margin: 5px 0;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
-form {
-}
+form {}
