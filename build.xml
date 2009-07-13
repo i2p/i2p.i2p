@@ -341,6 +341,9 @@
         <copy todir="pkg-temp/docs/themes/console/light/" >
             <fileset  dir="installer/resources/themes/console/light/" />
         </copy>
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="." includes="readme*.html" />
+        </copy>
     </target>
 
     <!-- this is no longer required, izpack 4.3.0 supports headless installs with java -jar i2pinstall.exe -console -->
