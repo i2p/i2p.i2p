@@ -508,8 +508,15 @@ class BuildHandler {
          * Being a IBGW or OBEP generally leads to more connections, so if we are
          * approaching our connection limit (i.e. !haveCapacity()),
          * reject this request.
+         *
+         * Don't do this for class O, under the assumption that they are already talking
+         * to most of the routers, so there's no reason to reject. This may drive them
+         * to their conn. limits, but it's hopefully a temporary solution to the
+         * tunnel build congestion. As the net grows this will have to be revisited.
          */
+        RouterInfo ri = _context.router().getRouterInfo();
         if (response == 0 &&
+            (ri == null || ri.getBandwidthTier().charAt(0) != 'O') &&
             ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
              (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
                 _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
