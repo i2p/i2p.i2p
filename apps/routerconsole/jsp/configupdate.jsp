@@ -27,13 +27,13 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUpdateHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigUpdateHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce")%>" />
-<table border="0" cellspacing="5"><tr><td><b>News:</b><td>
+<table border="0" cellspacing="5"><tr><td colspan="2"><td><b>News:</b><td>
  <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %>
  <i>Update In Progress</i><br /><br />
  <% } else { %>
- <input type="submit" name="action" value="Check for update now" /><hr />
+ <input type="submit" name="action" value="Check for update now" />
  <% } %>
-<tr><td><td>
+<tr><td colspan="2"><hr /><tr> 
 <tr><td><b>News URL:</b>
 <td><input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />">
 <tr><td><b>Refresh frequency:</b>
@@ -47,14 +47,13 @@
 <tr><td><b>eepProxy port:</b>
 <td><input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" />
 <tr><td><b>Update URLs:</b>
-<td><textarea name="updateURL" cols="80" rows="8" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea>
+<td><textarea name="updateURL" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea>
 <tr><td><b>Trusted keys:</b>
-<td><textarea name="trustedKeys" cols="80" rows="8" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
-<tr><td><td>
-<tr><td><td><hr /><input type="submit" name="action" value="Save" /> <input type="reset" value="Cancel" />
+<td><textarea name="trustedKeys" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
+<tr><tr><td colspan="2"><hr /><tr> 
+<tr><td><td><input type="submit" name="action" value="Save" /> <input type="reset" value="Cancel" />
 </table>
  </form>
 </div>
-
 </body>
 </html>

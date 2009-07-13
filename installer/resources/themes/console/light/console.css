@@ -129,7 +129,10 @@ div.main hr {
 }
 
 div.main textarea {
-     width: 100% !important;
+     background-color: #eef;
+     color: #001;
+     font-size: 8pt;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
 div.news {
@@ -462,7 +465,7 @@ select {
 
 textarea {
      padding: 5px;
-     margin: 0 10px 5px 10px;
+     margin: 0 5px 5px 0px;
      background-color: #eef;
      color: #003;
      border-radius: 4px;
@@ -470,7 +473,8 @@ textarea {
      -webkit-border-radius: 4px;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-size: 8pt;
-     min-height: 128px;
+     min-height: 100px;
+     min-width: 100%;
      border: 1px solid #001;     
 }
 

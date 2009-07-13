@@ -130,7 +130,6 @@ div.main {
 }
 
 div.main textarea {
-     width: 100% !important;
      background-color: #002;
      color: #fff;
      font-size: 8pt;
@@ -477,13 +476,15 @@ textarea {
      background-color: #001;
      color: #eef;
      padding: 5px;
-     margin: 0 0 5px 0;
+     margin: 0 5px 5px 0px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-size: 9pt;
      min-height: 100px;
+     min-width: 100%;
+     text-align: left;
      border: 1px solid #99f;
 }
 
