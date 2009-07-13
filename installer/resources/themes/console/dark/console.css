@@ -378,7 +378,7 @@ h3 {
   
 button {
      border: 1px outset #ddddc0;
-     padding: 0px 3px 1px 3px;
+     padding: 1px 3px;
      background-color: #bbf;
      text-decoration: none;
      border-radius: 4px;

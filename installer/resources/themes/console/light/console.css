@@ -322,7 +322,7 @@ h1 {
      line-height: 120%;
 }
 
-h2{
+h2 {
      font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      color: #000011;
      letter-spacing: 0.05em;
@@ -358,7 +358,7 @@ h3 {
 
 button {
      border: 1px outset #ddddc0;
-     padding: 0px 3px 1px 3px;
+     padding: 1px 3px;
      background-color: #bbf !important;
      text-decoration: none;
      border-radius: 4px;
