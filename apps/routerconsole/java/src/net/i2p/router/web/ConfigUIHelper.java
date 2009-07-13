@@ -4,7 +4,7 @@ public class ConfigUIHelper extends HelperBase {
     public ConfigUIHelper() {}
     
     public static final String PROP_THEME = "routerconsole.theme";
-    private static final String themes[] = {"default", "classic", "dark", "defCon1", "light"};
+    private static final String themes[] = {"classic", "dark", "light"};
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);

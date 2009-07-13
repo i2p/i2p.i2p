@@ -23,7 +23,7 @@ div {
 
 h4, label {
      margin: 0;
-     padding: 4px 2px 2px 0px;
+     padding: 4px;
      float: left;
      width: 150px;
 /*    height :  24px; */
@@ -41,6 +41,7 @@ h4 {
      border: 1px solid #99f;
      margin: 5px 0 15px 0;
      background: url(images/tabletitledark.png);
+     background-repeat: x;
      background-color: #002;
      text-transform: uppercase;
      text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
@@ -162,12 +163,12 @@ hr {
 }
 
 .control {
-     margin: 0 0 0 4px;
+     margin: 0 2px 0 2px;
      padding: 0 0 2px 0;
      overflow: hidden;
      height: 20px;
-     width: 60px;
-     font-weight: normal;
+     min-width: 60px;
+     font-weight: bold;
      background-color: #bbbbff;
      color: black;
      border: 1px outset #ddddc0;
@@ -175,6 +176,8 @@ hr {
      white-space: nowrap;
      -moz-border-radius: 4px;
      margin-top: 8px;
+     background: url(images/tabletitlelight.png);
+     background-repeat: x;
 }
 
 .control:link {
@@ -185,6 +188,7 @@ hr {
      border: 1px solid #eeeeff;
      background-color: #003;
      color: #ff6600;
+     background: none;
 }
 
 .control:active {
@@ -254,7 +258,7 @@ hr {
 
 .header {
      -moz-border-radius: 4px 4px 4px 4px;
-     border: 1px solid #ff0000;
+     border: 0;
 }
 
 a:link{

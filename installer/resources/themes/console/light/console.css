@@ -145,6 +145,15 @@ div.news {
      line-height: 140%;
 }
 
+div.news li {
+     text-align: justify;
+     font-weight: bold;
+     list-style-image: url(images/info.png);
+     margin: 0 10px 0 30px;
+     padding: 5px;
+     vertical-align: middle;
+}
+
 div.confignav {
      padding: 10px;
      margin: 0 0px 25px 0;
@@ -207,6 +216,10 @@ th {
      background-image: url('images/tabletitlelight.png');
      background-repeat: repeat-x;
      font-size: 8pt;
+}
+
+tr {
+     vertical-align: middle !important;
 }
 
 tr:nth-child ( even ) {
@@ -355,8 +368,9 @@ button {
      -webkit-border-radius: 4px;
      font-size: 8pt;
      font-weight: bold;
-     margin: 2px 3px;
+     margin: 0 1px;
      text-align: center;
+     min-width: 80px;
 }
 
 button:hover{
@@ -404,6 +418,7 @@ input {
      border: 1px solid #001;
      padding: 0px 2px 1px 2px;
      text-decoration: none;
+     min-width: 110px;
 }
 
 input:hover {
@@ -426,9 +441,6 @@ submit {
      border: 1px solid #001;
      padding: 0px 2px 1px 2px;
      text-decoration: none;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
 }
 
 select {
@@ -437,11 +449,12 @@ select {
      margin: 5px 10px 5px 10px;
      font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      border: 1px solid #001;
+     min-width: 110px;
 }
 
 textarea {
      padding: 5px;
-     margin: 5px 0;
+     margin: 5px -20px;
      background-color: #eef;
      color: #003;
      border-radius: 4px;
