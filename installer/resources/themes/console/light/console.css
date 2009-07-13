@@ -1,11 +1,12 @@
 body {
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      margin: 25px 10px 0 5px;
      padding: 0em;
      text-align: center;
      background-color: #fff;
      color: black;
      font-size: 9pt;
+     line-height: 130%;
 }
 
 .hide {
@@ -141,6 +142,7 @@ div.news {
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      text-align: justify;
+     line-height: 140%;
 }
 
 div.confignav {
@@ -194,6 +196,7 @@ table {
      margin: 5px 0px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
+     background-color: #ddf;
 }
 
 th {
@@ -208,10 +211,12 @@ th {
 
 tr:nth-child ( even ) {
      background-image: url('images/tabletile.png');
+     background-color: #99f;
 }
 
 tr:nth-child ( odd ) {
      background-image: url('images/tabletile_alt.png');
+     background-color: #bbf;
 }
 
 td {
@@ -279,9 +284,11 @@ a:active{
 
 p {
      text-align: justify;
+     line-height: 160%;
 }
 
 h1 {
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      text-align: left;
      color: #000022;
      padding: 10px;
@@ -292,7 +299,7 @@ h1 {
      font-size: 16pt;
      font-weight: bold;
      font-style: normal;
-     letter-spacing: 0.06em;
+     letter-spacing: 0.15em;
      text-transform: uppercase;
      text-shadow: 0px 0px 1px rgba(0, 0, 176, 0.9);
      white-space: normal;
@@ -305,14 +312,16 @@ h1 {
 }
 
 h2{
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      color: #000011;
+     letter-spacing: 0.05em;
      background-color: #ddf;
      background-image: url('images/tabletile.png');
      text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
      border-bottom-width: 1px;
      border-bottom-style: solid;
      border-bottom-color: #000022;
-     padding: 5px 10px;
+     padding: 7px 10px 7px 10px;
      wordwrap: none;
      border: 1px solid #002;
      border-radius: 4px;
@@ -339,7 +348,6 @@ h3 {
 button {
      border: 1px outset #ddddc0;
      padding: 0px 3px 1px 3px;
-     line-height: 250%;
      background-color: #bbf !important;
      text-decoration: none;
      border-radius: 4px;
@@ -352,12 +360,16 @@ button {
 }
 
 button:hover{
-     border: 1px solid #001;
-     line-height: 250%;
-     background-color: #003;
-     color: #ff6600;
+     border: 1px solid #f60;
+     background-color: #f60 !important;
+     color: #fff;
 }
 
+button:active{
+     border: 1px solid #f60;
+     background-color: #001 !important;
+     color: #f60;
+}
 .underline {
      border-bottom: 1px solid #000022;
      padding: 5px 0px 5px 0px;
@@ -366,7 +378,7 @@ button:hover{
 
 .langbox {
      margin: 4px 2px 4px 5px;
-     padding: 7px 10px 5px 10px;
+     padding: 5px 5px;
      color: #001;
      font-size: 7pt;
      width: 120px;
@@ -387,28 +399,32 @@ input {
      background-color: #eef;
      color: #003;
      margin: 5px 10px 5px 10px;
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      font-weight: bold;
      border: 1px solid #001;
-/*border: 1px outset #ddddc0;*/
      padding: 0px 2px 1px 2px;
-/*line-height: 250%;*/
      text-decoration: none;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
 }
 
+input:hover {
+     background-color: #f60;
+     color: #fff;
+     border: 1px solid #f60;
+}
+
+input:active {
+     background-color: #002;
+     color: #f60;
+     border: 1px solid #f60;
+}
 submit {
      background-color: #f00;
      color: #eef;
      margin: 10px 2px 10px 0;
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      font-weight: bold;
      border: 1px solid #001;
-/*border: 1px outset #ddddc0;*/
      padding: 0px 2px 1px 2px;
-/*line-height: 250%;*/
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -419,7 +435,7 @@ select {
      background-color: #eef;
      color: #003;
      margin: 5px 10px 5px 10px;
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
      border: 1px solid #001;
 }
 

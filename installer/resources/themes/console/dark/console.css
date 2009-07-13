@@ -1,11 +1,12 @@
 body {
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      margin: 25px 10px 0 5px;
      padding: 0;
      text-align: center;
      background-color: #000022;
      color: white;
      font-size: 9pt;
+     line-height: 130%;
 }
 
 .hide {
@@ -51,7 +52,6 @@ div.toolbar {
 div.toolbar a:link {
      border: 1px outset #ddddc0;
      padding: 0px 5px 1px 5px;
-     line-height: 250%;
      background-color: #bbf;
      text-decoration: none;
      border-radius: 4px;
@@ -61,13 +61,11 @@ div.toolbar a:link {
 }
 
 div.toolbar a:visited {
-     line-height: 250%;
      background-color: #ddf;
 }
 
 div.toolbar a:hover{
      border: 1px solid #eeeeff;
-     line-height: 250%;
      background-color: #003;
      color: #ff6600;
 }
@@ -249,7 +247,7 @@ div.main li {
      list-style-type: square;
      margin: 4px 0px 4px 30px;
      padding: 1px 20px 1px 0px;
-     border-right: 4px solid #339;
+     line-height: 150%;
 }
 
 div.main li:nth-child ( even ){
@@ -302,6 +300,7 @@ a:active{
 
 p {
      text-align: justify;
+     line-height: 160%;
 }
 
 h1 {
@@ -329,7 +328,7 @@ h1 {
      background-repeat: repeat-x;
 }
 
-h2{
+h2 {
      font-size: 12pt;
      color: #fff;
      text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
@@ -338,12 +337,13 @@ h2{
      border-bottom-width: 1px;
      border-bottom-style: solid;
      border-bottom-color: #99f;
-     padding: 5px 10px;
+     padding: 5px 10px 8px 10px;
      wordwrap: none;
      border: 1px solid #99f;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
+     vertical-align: middle;
 }
 
 h2 a:link {
@@ -369,11 +369,10 @@ h3 {
      border-bottom-color: #99f;
      padding-bottom: 5px;
 }
-
+  
 button {
      border: 1px outset #ddddc0;
      padding: 0px 3px 1px 3px;
-/*line-height: 250%;*/
      background-color: #bbf;
      text-decoration: none;
      border-radius: 4px;
@@ -387,7 +386,6 @@ button {
 
 button:hover{
      border: 1px solid #eeeeff;
-     line-height: 250%;
      background-color: #003;
      color: #ff6600;
 }
@@ -400,13 +398,14 @@ button:hover{
 }
 
 .langbox {
-     margin: 4px 2px 4px 5px;
+     margin: 2px 2px 2px 5px;
      padding: 7px 10px 5px 10px;
      color: #eef;
      font-size: 7pt;
      width: 140px;
      text-align: right;
      float: right;
+     vertical-align: middle;
 }
 
 hr {
@@ -422,43 +421,41 @@ sidebarlogo {
 }
 
 input {
-     background-color: #002;
-     color: #eef;
-     margin: 10px 2px 10px 0;
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     background-color: #bbf;
+     color: #002;
+     margin: 5px;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
      border: 1px solid #99f;
-/*border: 1px outset #ddddc0;*/
-     padding: 0px 2px 1px 2px;
-/*line-height: 250%;*/
+     padding: 3px;
      text-decoration: none;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     font-size: 9pt;
+     min-width: 72px;
+     border: 1px solid #99f;
 }
 
-input hover {
-     background-color: #f00;
-     color: #eef;
-     margin: 10px 2px 10px 0;
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
-     font-weight: bold;
-     border: 1px solid #99f;
-/*border: 1px outset #ddddc0;*/
-     padding: 0px 2px 1px 2px;
-/*line-height: 250%;*/
-     text-decoration: none;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+input:hover {
+     background-color: #eef;
+     color: #001;
+     border: 1px solid #f60;
+}
+
+input:btn {
+     background-color: #f00 !important;
 }
 
 select {
-     background-color: #001;
+     background-color: #002;
      color: #eef;
-     margin: 10px 2px 10px 0;
-     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     margin: 5px; 
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px solid #99f;
+     border-radius: 0;
+     -moz-border-radius: 0;
+     -webkit-border-radius: 0;
+     min-width: 72px;
+     font-size: 9pt;
+     padding: 2px;
 }
 
 textarea {
@@ -470,6 +467,7 @@ textarea {
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-size: 9pt;
 }
 
 form {}
