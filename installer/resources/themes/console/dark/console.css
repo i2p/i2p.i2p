@@ -160,8 +160,8 @@ div.news li {
 }
 
 div.confignav {
-     padding: 10px;
-     margin: 0 0px 20px 0;
+     padding: 0 15px;
+     margin: 0 0px 25px 0;
      background-color: #004;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
@@ -309,11 +309,8 @@ p {
 h1 {
      text-align: left;
      color: #fff;
-     padding: 10px;
-     margin-left: 240px;
-     margin-bottom: 20px;
-     margin-top: 0px;
-     margin-right: 15px;
+     padding: 10px 15px;
+     margin: 0 15px 25px 240px;
      font-size: 16pt;
      font-weight: bold;
      font-style: normal;
@@ -329,6 +326,7 @@ h1 {
      -webkit-border-radius: 4px;
      background-image: url('images/darkbluebg.png');
      background-repeat: repeat-x;
+     line-height: 120%;
 }
 
 h2 {
