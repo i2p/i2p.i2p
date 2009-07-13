@@ -31,7 +31,7 @@
  <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %>
  <i>Update In Progress</i><br /><br />
  <% } else { %>
- <input type="submit" name="action" value="Check for update now" /><br /><br />
+ <input type="submit" name="action" value="Check for update now" /><hr />
  <% } %>
 <tr><td><td>
 <tr><td><b>News URL:</b>
@@ -47,11 +47,11 @@
 <tr><td><b>eepProxy port:</b>
 <td><input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" />
 <tr><td><b>Update URLs:</b>
-<td><textarea name="updateURL" cols="90" rows="4" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea>
+<td><textarea name="updateURL" cols="80" rows="8" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea>
 <tr><td><b>Trusted keys:</b>
-<td><textarea name="trustedKeys" cols="90" rows="4" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
+<td><textarea name="trustedKeys" cols="80" rows="8" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>
 <tr><td><td>
-<tr><td><td><input type="submit" name="action" value="Save" /> <input type="reset" value="Cancel" />
+<tr><td><td><hr /><input type="submit" name="action" value="Save" /> <input type="reset" value="Cancel" />
 </table>
  </form>
 </div>

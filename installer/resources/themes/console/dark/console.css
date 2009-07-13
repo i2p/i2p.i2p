@@ -477,13 +477,14 @@ textarea {
      background-color: #001;
      color: #eef;
      padding: 5px;
-     margin: 5px -10px;
+     margin: 0 0 5px 0;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-size: 9pt;
      min-height: 100px;
+     border: 1px solid #99f;
 }
 
 form {}
