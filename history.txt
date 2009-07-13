@@ -1,3 +1,22 @@
+2009-07-13 zzz
+    * Build: Add readme*.html files to the udpater
+    * Build Handler: Don't reject for conn limits if class O,
+      under the assumption that they are already talking
+      to most of the routers, so there's no reason to reject. This may drive them
+      to their conn. limits, but it's hopefully a temporary solution to the
+      tunnel build congestion. As the net grows this will have to be revisited.
+    * Throttle: Increase default max tunnels to 3000,
+      to give us more capacity during congestion
+    * Tunnels: Change the default variance from 1 to 0.
+      Under the one-packet-enough theory, and the fact that most
+      tunnels in a x+1 pool are of length x, variable lengths
+      don't really help that much. Also, a default of 1 led
+      to all sorts of problems with iMule/SAM, who was not
+      setting the variance properties.
+      This will affect exploratory tunnels for new users,
+      and those that have never saved a change on configtunnels.jsp,
+      and iMule users 1.4.5 and earlier.
+
 2009-07-12 zzz
     * Add configui.jsp
     * orange flash remove take 2
