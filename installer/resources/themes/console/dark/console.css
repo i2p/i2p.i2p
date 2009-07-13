@@ -226,6 +226,10 @@ th {
      background-repeat: repeat-x;
 }
 
+tr {
+     vertical-align: middle;
+}
+
 tr:nth-child ( even ) {
      background-image: url('images/darkerbluetile.png');
 }
@@ -233,8 +237,8 @@ tr:nth-child ( even ) {
 td {
      padding: 5px 10px;
      color: #eef;
-/*  background-color: #004; */
      text-align: left;
+     vertical-align: middle;
 }
 
 tt {
@@ -315,7 +319,7 @@ h1 {
      font-weight: bold;
      font-style: normal;
      text-transform: uppercase;
-     letter-spacing: 0.06em;
+     letter-spacing: 0.15em;
      text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
      white-space: normal;
      background-color: #004;
@@ -333,6 +337,7 @@ h2 {
      font-size: 12pt;
      color: #fff;
      text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
+     letter-spacing: 0.05em;
      background-color: #003;
      background-image: url('images/tabletile.png');
      border-bottom-width: 1px;
@@ -383,6 +388,7 @@ button {
      font-weight: bold;
      margin: 2px 3px;
      text-align: center;
+     vertical-align: middle;
      min-width: 76px;
 }
 
@@ -434,10 +440,10 @@ input {
      font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
      border: 1px solid #99f;
-     padding: 3px;
+     padding: 1px 2px;
      text-decoration: none;
      font-size: 9pt;
-     min-width: 72px;
+     min-width: 110px;
      border: 1px solid #99f;
 }
 
@@ -462,7 +468,7 @@ select {
      border-radius: 0;
      -moz-border-radius: 0;
      -webkit-border-radius: 0;
-     min-width: 72px;
+     min-width: 110px;
      font-size: 9pt;
      padding: 2px;
 }
@@ -471,12 +477,13 @@ textarea {
      background-color: #001;
      color: #eef;
      padding: 5px;
-     margin: 5px 0;
+     margin: 5px -10px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-size: 9pt;
+     min-height: 100px;
 }
 
 form {}
