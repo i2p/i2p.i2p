@@ -27,15 +27,12 @@ pre {
 
 div.logo {
      float: left;
-     left: 10px;
-     top: 0px;
      padding: 10px 10px 10px 14px;
      text-align: left;
      font-color: #fff;
      border: 0px solid #f00;
-     margin: 0px;
-     background-color: #003;
-     display: block;
+     margin: 0 20px 0 14px;
+     display: none !important;
 }
 
 div.toolbar {
@@ -44,7 +41,7 @@ div.toolbar {
      font-weight: bold;
      background-color: #eeeeff;
      border: 1px solid #002;
-     display: none;
+     display: none !important;
 }
 
 div.toolbar a:link {
@@ -56,6 +53,7 @@ div.toolbar a:link {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
+     display: none !important;
 }
 
 div.toolbar a:visited {
@@ -367,13 +365,14 @@ button:hover{
 }
 
 .langbox {
-     margin: 4px 2px 15px 5px;
+     margin: 4px 2px 4px 5px;
      padding: 7px 10px 5px 10px;
      color: #001;
      font-size: 7pt;
      width: 120px;
      text-align: center;
      float: right;
+     valign: middle;
 }
 
 hr {
