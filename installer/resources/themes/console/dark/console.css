@@ -251,15 +251,19 @@ tt {
 div.main li {
      text-align: left;
      list-style-type: square;
-     margin: 4px 0px 4px 30px;
+     margin: 2px 0px 2px 30px;
      padding: 1px 20px 1px 0px;
      line-height: 150%;
+}
+
+.tidylist {
+     text-align: justify !important;
 }
 
 div.main li:nth-child ( even ){
      text-align: left;
      list-style-type: square;
-     margin: 4px 0px 4px 30px;
+     margin: 2px 0px 2px 30px;
      padding: 1px 20px 1px 0px;
      border-right: 4px solid #339;
 }
@@ -267,13 +271,14 @@ div.main li:nth-child ( even ){
 ol {
      white-space: pre-wrap;
      display: inline;
-     margin: 2px 0 0 0;
-     padding: 10px 0 0 20px;
+     margin: 1px 0 0 0;
+     padding: 1px 0 0 20px;
 }
 
 ul {
      display: inline;
-     margin: 5px 0 0 0;
+     margin: 0;
+     padding: 0;
 }
 
 code {
