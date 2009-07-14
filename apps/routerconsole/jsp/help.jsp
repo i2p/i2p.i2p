@@ -15,7 +15,7 @@ If you'd like to help improve or translate the documentation, or
 help with other aspects of the project, please see the documentation for
 <a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a> 
 <br><br>Further assistance is available here:
-<br><br></div>
+<br></div>
 <ul class="links">
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.
@@ -24,11 +24,11 @@ help with other aspects of the project, please see the documentation for
 You may also try the <a href="http://forum.i2p/">I2P forum</a>
 or IRC.<br />
 
-<h2>Summary Bar Information</h2>
+<h2>Summary Bar Information</h2><div align="justify">
 Many of the stats on the summary bar may be
 <a href="configstats.jsp">configured</a> to be
 <a href="graphs.jsp">graphed</a> for further analysis.
-
+</div>
 <h3>General</h3>
 <ul>
 <li class="tidylist"><b>Ident:</b>
@@ -54,16 +54,16 @@ This may range from 8-10 to several hundred, depending on your total bandwidth,
 shared bandwidth, and locally-generated traffic.
 The second number is the number of peers seen in the last hour or so.
 Do not be concerned if these numbers vary widely.
-<a href="configstats.jsp#router.activePeers">Enable graphing</a>
+<a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.
 <li class="tidylist"><b>Fast:</b>
 This is the number of peers you use for building client tunnels. It is generally in the
 range 8-15. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.fastPeers">Enable graphing</a>
+<a href="configstats.jsp#router.fastPeers">[Enable graphing]</a>.
 <li class="tidylist"><b>High Capacity:</b>
 This is the number of peers you use for building some of your exploratory tunnels. It is generally in the
 range 8-25. The fast peers are included in the high capacity tier.
 Your high capacity peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.highCapacityPeers">Enable graphing</a>
+<a href="configstats.jsp#router.highCapacityPeers">[Enable graphing]</a>.
 <li class="tidylist"><b>Well Integrated:</b>
 This is the number of peers you use for network database inquiries.
 These are usually the "floodfill" peers.
@@ -78,22 +78,22 @@ shared bandwidth, and locally-generated traffic.
 I2P does not require a router to know every other router.
 </ul>
 
-<h3>Bandwidth in/out</h3>
+<h3>Bandwidth in/out</h3><div align="justify">
 Should be self-explanatory. All values are in bytes per second, not bits per second.
 Change your bandwidth limits on the <a href="config.jsp#help">configuration page</a>.
 Bandwidth is <a href="graphs.jsp">graphed</a> by default.
-
-<h3>Local destinations</h3>
+</div>
+<h3>Local destinations</h3><div align="justify">
 The local applications connecting through your router.
 These may be clients started through <a href="i2ptunnel/index.jsp">I2PTunnel</a>
 or external programs connecting through SAM, BOB, or directly to I2CP.
-
-<h3>Tunnels in/out</h3>
-The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.
+</div>
+<h3>Tunnels in/out</h3><div align="justify">
+The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div>
 <ul>
-<li class="tidylist"><b>Exploratory:</b>
+<li class="tidylist"><b>Exploratory:</b><div align="justify">
 Tunnels built by your router and used for communication with the floodfill peers,
-building new tunnels, and testing existing tunnels.
+building new tunnels, and testing existing tunnels.</div>
 <li class="tidylist"><b>Client:</b>
 Tunnels built by your router for each client's use.
 <li class="tidylist"><b>Participating:</b>
@@ -103,7 +103,7 @@ shared bandwidth, and amount of locally-generated traffic.
 The recommended method for limiting participating tunnels is
 to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
 You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
-the <a href="configadvanced.jsp">advanced configuration page</a>. [<a href="configstats.jsp#tunnel.participatingTunnels">Enable graphing</a>].
+the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.
 </ul>
 
 <h3>Congestion</h3>
@@ -116,21 +116,21 @@ and their status is not available in the router console.
 The job lag should generally be zero.
 If it is consistently higher than 500ms, your computer is very slow, or the
 router has serious problems.
-<a href="configstats.jsp#jobQueue.jobLag">Enable graphing</a>
+<a href="configstats.jsp#jobQueue.jobLag">[Enable graphing]</a>.
 <li class="tidylist"><b>Message delay:</b>
 How long an outbound message waits in the queue.
 This should generally be a few hundred milliseconds or less.
 If it is consistently higher than 1000ms, your computer is very slow,
 or you should adjust your bandwidth limits, or your (bittorrent?) clients
 may be sending too much data and should have their transmit bandwidth limit reduced.
-<a href="configstats.jsp#transport.sendProcessingTime">Enable graphing</a> (transport.sendProcessingTime)
+<a href="configstats.jsp#transport.sendProcessingTime">[Enable graphing]</a> (transport.sendProcessingTime).
 <li class="tidylist"><b>Tunnel lag:</b>
 This is the round trip time for a tunnel test, which sends a single message
 out a client tunnel and in an exploratory tunnel, or vice versa.
 It should usually be less than 5 seconds.
 If it is consistently higher than that, your computer is very slow,
 or you should adjust your bandwidth limits, or there are network problems.
-<a href="configstats.jsp#tunnel.testSuccessTime">Enable graphing</a> (tunnel.testSuccessTime)
+<a href="configstats.jsp#tunnel.testSuccessTime">[Enable graphing]</a> (tunnel.testSuccessTime).
 <li class="tidylist"><b>Handle backlog:</b>
 This is the number of pending requests from other routers to build a
 participating tunnel through your router.
@@ -147,9 +147,9 @@ the bandwidth and CPU demands and maintain capacity for
 local clients.
 </ul>
 
-<h2>Legal stuff</h2>
+<h2>Legal stuff</h2><div align="justify">
 The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with 
-a few notable exceptions:<br /><ul>
+a few notable exceptions:</div><br /><ul>
 <li class="tidylist">ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
 <li class="tidylist">SHA256 and HMAC-SHA256, under the MIT license, written by the Legion of the Bouncycastle</li>
 <li class="tidylist">AES code, under the Cryptix (MIT) license, written by the Cryptix team</li>

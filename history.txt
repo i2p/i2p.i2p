@@ -1,3 +1,9 @@
+2009-07-14 dr|z3d
+    * Increment to 0.7.5-10
+    * Tidy up layout of readme.* files.
+    * Work on console css to make it more Opera/webkit friendly.
+    * Other cosmetic tweaks.
+
 2009-07-13 zzz
     * Build: Add readme*.html files to the udpater
     * Build Handler: Don't reject for conn limits if class O,
