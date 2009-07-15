@@ -91,7 +91,7 @@ or external programs connecting through SAM, BOB, or directly to I2CP.
 <h3>Tunnels in/out</h3><div align="justify">
 The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><br>
 <ul>
-<li class="tidylist"><b>Exploratory:</b><div align="justify">
+<li class="tidylist"><div align="justify"><b>Exploratory:</b>
 Tunnels built by your router and used for communication with the floodfill peers,
 building new tunnels, and testing existing tunnels.</div>
 <li class="tidylist"><b>Client:</b>

@@ -154,6 +154,7 @@
  </p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
 <h3><a name="chelp">Configuration Help:</a></h3>
+ <div align="justify">
  <p>
  While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
  if the I2P port (generally 8887) is forwarded for both UDP and TCP.
@@ -246,6 +247,7 @@
      Stop the conflicting program and restart I2P.
  </ul>
  </p>
+</div>
  <hr />
 <!--
  <b>Dynamic Router Keys: </b>
