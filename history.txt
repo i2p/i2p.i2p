@@ -1,3 +1,6 @@
+2009-07-15 sponge
+    * Slackware SlackBuild fixes.
+
 2009-07-14 dr|z3d
     * Increment to 0.7.5-10
     * Tidy up layout of readme.* files.
