@@ -1,3 +1,7 @@
+2009-07-15 zzz
+    * Installer: Don't launch the router from the postinstall.sh script
+      on linux anymore; add a panel to the installer to provide launch instructions.
+
 2009-07-15 sponge
     * Slackware SlackBuild fixes.
 
