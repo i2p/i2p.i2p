@@ -88,6 +88,7 @@ div.routersummary {
      text-align: center;
      border: 1px solid #9999ff;
      background: #003;
+     background: url(images/darkbluebg.png);
      color: #eef;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
@@ -128,6 +129,7 @@ div.news {
      padding: 20px 30px 20px 30px;
      border: 1px solid #99f;
      background: #004;
+     background: url("images/darkbluetile.png");
      color: #eef;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -138,7 +140,7 @@ div.news {
 div.news li {
      text-align: justify;
      font-weight: bold;
-     list-style: url(images/info_dark.png);
+     list-style: url('images/info_dark.png');
      margin: 0 10px 0 30px;
      padding: 5px;
      vertical-align: middle;
@@ -147,7 +149,7 @@ div.news li {
 div.confignav {
      padding: 0 15px;
      margin: 0 0px 25px 0;
-     background: #004;
+     background: #004 url('images/darkbluebg.png');
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      border: 1px solid #99f;
@@ -163,12 +165,12 @@ div.configure {
 }
 
 div.messages {
-     padding: 10px;
+     padding: 0 10px;
      margin: 10px 0 20px 0;
-     background: #005;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      border: 1px solid #99f;
+     background: #008 url('images/lightbluetile.png');
 }
 
 div.messages span.error {
@@ -180,11 +182,11 @@ div.messages span.notice {
 }
 
 div.messages li {
-     text-align: justify;
+     text-align: justify !important;
      font-weight: bold;
-     list-style: url(images/warning_dark.png);
-     margin: 0 0 0 30px !important;
-     padding: 5px;
+     list-style: url(images/warning_dark.png) !important;
+     margin: 0 10px 0 35px !important;
+     padding: 5px 10px !important;
      border: 0px !important;
 }
 
@@ -195,7 +197,7 @@ table {
      margin: 5px 0px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
-     background: url('images/darkbluetile.png');
+     background: #003;
 }
 
 th {
@@ -210,8 +212,14 @@ tr {
      vertical-align: middle;
 }
 
-tr:nth-child ( even ) {
-     background: url('images/darkerbluetile.png');
+tr:nth-child(even) {
+     background: #002 url('images/darkerbluetile.png') !important;
+     vertical-align: middle;
+}
+
+tr:nth-child(odd) {
+     background: #003 url('images/darkbluetile.png') !important;
+     vertical-align: middle;
 }
 
 td {
@@ -239,16 +247,7 @@ div.main li {
      text-align: justify !important;
 }
 
-div.main li:nth-child ( even ){
-     text-align: left;
-     list-style: square;
-     margin: 2px 0px 2px 30px;
-     padding: 1px 20px 1px 0px;
-     border-right: 4px solid #339;
-}
-
 ol {
-/*     white-space: pre-wrap; screwy layout removals. */
      display: inline;
      margin: 1px 0 0 0;
      padding: 1px 0 0 20px;
@@ -278,9 +277,10 @@ a:hover{
 }
 
 .links {
-     list-style: url(images/link_dark.png);
+     list-style-image: url("images/link_dark.png");
      margin: 0 5px 0 0px;
      padding: 0px 5px;
+     text-align: justify;
 }
 
 p {
@@ -300,7 +300,7 @@ h1 {
      letter-spacing: 0.15em;
      text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.8);
      white-space: normal;
-     background: #004 url('images/darkbluebg.png') repeat-x;
+     background: #004 url('images/darkbluebg.png');
      -moz-box-shadow: inset 0px 0px 16px 0px #009;
      border: 1px solid #99f;
      border-radius: 4px;

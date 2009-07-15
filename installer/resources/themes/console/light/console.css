@@ -2,7 +2,7 @@ body {
      margin: 25px 10px 0 5px;
      padding: 0em;
      text-align: center;
-     background: #fff;
+     background: #eef;
      color: #000;
      font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
@@ -109,7 +109,7 @@ div.warning {
 div.main {
      margin: 0px 0px 20px 220px;
      padding: 0 15px 15px 25px;
-     background: #fff;
+     background: #eef;
      text-align: left;
      color: #001;
      width: auto;
@@ -139,7 +139,7 @@ div.news {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
-     text-align: justify;
+     text-align: justify !important;
      line-height: 140%;
 }
 
@@ -170,14 +170,23 @@ div.configure {
 }
 
 div.messages {
-     padding: 0 10px 0 15px;
+     padding: 0 10px;
      margin: 10px 0 20px 0;
      background: #ddf;
      -moz-border-radius: 4px;
      border: 1px solid #000033;
-     text-size: 9pt;
+     background: #008 url('images/lightbluetile.png');
 }
-
+/*
+div.messages {
+     padding: 0 10px;
+     margin: 10px 0 20px 0;
+     -moz-border-radius: 4px;
+     -webkit-border-radius: 4px;
+     border: 1px solid #99f;
+     background: #008 url('images/lightbluetile.png');
+}
+*/
 div.messages span.error {
      color: #d00000;
 }
@@ -187,9 +196,12 @@ div.messages span.notice {
 }
 
 div.messages li {
-     text-align: justify;
+     text-align: justify !important;
      font-weight: bold;
-     list-style: url(images/warning.png);
+     list-style: url(images/warning.png) !important;
+     margin: 0 10px 0 35px !important;
+     padding: 5px 10px !important;
+     border: 0px !important;
 }
 
 table {
@@ -214,12 +226,12 @@ tr {
      vertical-align: middle !important;
 }
 
-tr:nth-child ( even ) {
-     background: #99f url('images/tabletile.png');
+tr:nth-child(even) {
+     background: #99f url('images/tabletile.png') !important;
 }
 
-tr:nth-child ( odd ) {
-     background: #bbf url('images/tabletile_alt.png');
+tr:nth-child(odd) {
+     background: #bbf url('images/tabletile_alt.png') !important;
 }
 
 td {

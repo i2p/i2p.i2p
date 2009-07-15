@@ -138,7 +138,7 @@ It should usually be close to zero.
 If it is consistently high, your computer is too slow,
 and you should reduce your share bandwidth limits.
 <li class="tidylist"><b>Accepting/Rejecting:</b>
-Your routers' status on accepting or rejecting
+Your router's status on accepting or rejecting
 requests from other routers to build a
 participating tunnel through your router.
 Your router may accept all requests, accept or reject a percentage of requests,
