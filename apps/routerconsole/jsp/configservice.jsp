@@ -31,7 +31,7 @@
  <input type="submit" name="action" value="Shutdown gracefully" />
  <input type="submit" name="action" value="Shutdown immediately" />
  <input type="submit" name="action" value="Cancel graceful shutdown" />
- 
+ <hr>
  <% if (System.getProperty("wrapper.version") != null) { %>
  <p>If you want the router to restart itself after shutting down, you can choose one of 
  the following.  This is useful in some situations - for example, if you changed
@@ -43,7 +43,7 @@
  <input type="submit" name="action" value="Graceful restart" />
  <input type="submit" name="action" value="Hard restart" />
  <% } %>
- 
+ <hr>
  <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
  <h4>Systray integration</h4>
  <p>On the windows platform, there is a small application to sit in the system 
@@ -52,6 +52,7 @@
  If you are on windows, you can either enable or disable that icon here.</p>
  <input type="submit" name="action" value="Show systray icon" />
  <input type="submit" name="action" value="Hide systray icon" />
+ <hr>
  <h4>Run on startup</h4>
  <p>You can control whether I2P is run on startup or not by selecting one of the 
  following options - I2P will install (or remove) a service accordingly.  You can
@@ -61,7 +62,7 @@
  <input type="submit" name="action" value="Don't run I2P on startup" /><br />
  <p><b>Note:</b> If you are running I2P as service right now, removing it will shut 
  down your router immediately.  You may want to consider shutting down gracefully, as
- above, then running uninstall_i2p_service_winnt.bat.</p>
+ above, then running uninstall_i2p_service_winnt.bat.</p><hr>
  <% } %>
 
  <% if (System.getProperty("wrapper.version") != null) { %>
@@ -70,7 +71,7 @@
  please select the following option and review the thread dumped to 
  <a href="logs.jsp#servicelogs">wrapper.log</a>.</p>
  <input type="submit" name="action" value="Dump threads" />
- <% } %>
+ <% } %><hr>
  
  <h4>Launch browser on router startup?</h4>
  <p>I2P's main configuration interface is this web console, so for your convenience
@@ -79,7 +80,7 @@
  the router starts up.</p>
  <input type="submit" name="action" value="View console on startup" />
  <input type="submit" name="action" value="Do not view console on startup" />
- </form>
+ </form><hr>
 </div>
 
 </body>

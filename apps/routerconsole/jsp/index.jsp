@@ -27,7 +27,7 @@ if (System.getProperty("router.consoleNonce") == null) {
 
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <br /><i><font size="-1"><jsp:getProperty name="updatehelper" property="newsStatus" /></font></i><br />
+ <hr /><i><jsp:getProperty name="updatehelper" property="newsStatus" /></i><br />
 </div>
 
 <div class="main" id="main">

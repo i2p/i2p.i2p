@@ -179,7 +179,7 @@
  <li>Bugs in the device's UPnP implementation
  <li>Multiple firewall/routers in the internet connection path
  <li>UPnP device change, reset, or address change
- </ul>
+ </ul><br>
  Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
  UPnP may be enabled or disabled above, but a change requires a router restart to take effect.
  </p><p>Hostnames entered above will be published in the network database.
