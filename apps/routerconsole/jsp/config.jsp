@@ -26,12 +26,12 @@
     System.setProperty("net.i2p.router.web.ConfigNetHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
-
-<div class="configure" id="configure">
  <h3>Bandwidth limiter</h3>
  <p>
  <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
- </p><p>
+ </p>
+<div class="configure" id="configure">
+<p>
     <table>
     <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
     In <td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)<br />
@@ -153,8 +153,7 @@
  </p><p><b>Note: Changing these settings will restart your router.</b>
  </p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
- <hr />
- <b><a name="chelp">Configuration Help:</a></b>
+<h3><a name="chelp">Configuration Help:</a></h3>
  <p>
  While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
  if the I2P port (generally 8887) is forwarded for both UDP and TCP.
@@ -189,8 +188,7 @@
     hostname, or do not properly configure your NAT or firewall, your network performance will degrade
     substantially.  When in doubt, leave the settings at the defaults.</p>
  </p>
- <hr />
- <b><a name="help">Reachability Help:</a></b>
+<h3><a name="help">Reachability Help:</a></h3>
  <p>
  While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
  if the I2P port (generally 8887) to both UDP and TCP.

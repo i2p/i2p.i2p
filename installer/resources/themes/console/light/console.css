@@ -322,7 +322,8 @@ h1 {
      font-style: normal;
      letter-spacing: 0.15em;
      text-transform: uppercase;
-     text-shadow: 0px 0px 1px rgba(0, 0, 176, 0.9);
+     text-shadow: 0px 0px 1px rgba(0, 0, 148, 0.9);
+     -moz-box-shadow: inset 0px 0px 16px 1px #eef;
      white-space: normal;
      background-color: #ddddff;
      border: 1px solid #002;
@@ -360,7 +361,8 @@ h2 a:hover {
 
 h3 {
      border: 1px solid #002;
-     padding: 3px 4px 3px 4px	;
+     border-left: 5px solid #002;
+     padding: 3px 5px 3px 5px	;
      margin: 20px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
