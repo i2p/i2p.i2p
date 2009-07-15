@@ -8,6 +8,7 @@ public class CSSHelper extends HelperBase {
     public CSSHelper() {}
     
     public static final String PROP_THEME_NAME = "routerconsole.theme";
+    public static final String DEFAULT_THEME = "light";
     private static final String BASE = "/themes/console/";
     private static final String FORCE = "classic";
 
@@ -16,9 +17,8 @@ public class CSSHelper extends HelperBase {
         if (userAgent != null && userAgent.contains("MSIE")) {
             url += FORCE + "/";
         } else {
-            String theme = _context.getProperty(PROP_THEME_NAME);
-            if (theme != null)
-                url += theme + "/";
+            String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+            url += theme + "/";
         }
         return url;
     }
