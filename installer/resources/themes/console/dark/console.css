@@ -1,12 +1,10 @@
 body {
-     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      margin: 25px 10px 0 5px;
      padding: 0;
      text-align: center;
-     background-color: #000022;
-     color: white;
-     font-size: 9pt;
-     line-height: 130%;
+     background: #002;
+     color: #FFF;
+     font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
@@ -21,8 +19,7 @@ pre {
      width: 98%;
      overflow-x: scroll;
      text-align: left;
-     font-size: 9pt;
-     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #fff;
 }
 
@@ -35,7 +32,7 @@ div.logo {
      font-color: #fff;
      border: 0px solid #f00;
      margin: 0px;
-     background-color: #003;
+     background: #003;
      display: none;
      border-bottom: 1px solid #eef;
 }
@@ -44,7 +41,7 @@ div.toolbar {
      margin: 0;
      padding: 10px;
      font-weight: bold;
-     background-color: #eeeeff;
+     background: #eef;
      border: 1px solid #002;
      display: none;
 }
@@ -52,7 +49,7 @@ div.toolbar {
 div.toolbar a:link {
      border: 1px outset #ddddc0;
      padding: 0px 5px 1px 5px;
-     background-color: #bbf;
+     background: #bbf;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -61,13 +58,13 @@ div.toolbar a:link {
 }
 
 div.toolbar a:visited {
-     background-color: #ddf;
+     background: #ddf;
 }
 
-div.toolbar a:hover{
+div.toolbar a:hover, button:hover{
      border: 1px solid #eeeeff;
-     background-color: #003;
-     color: #ff6600;
+     background: #003;
+     color: #f60;
 }
 
 a:active{
@@ -90,9 +87,8 @@ div.routersummary {
      padding: 10px;
      text-align: center;
      border: 1px solid #9999ff;
-     background-color: #000033;
-     background: url(images/darkbluebg.png);
-     color: #eeeeff;
+     background: #003;
+     color: #eef;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
@@ -105,7 +101,7 @@ div.routersummary {
 div.warning {
      margin: 0em 1em 1em 224px;
      padding: .5em 1em;
-     background-color: #ffefef;
+     background: #ffefef;
      border: medium solid #ffafaf;
      text-align: left;
      color: inherit;
@@ -114,45 +110,35 @@ div.warning {
 div.main {
      margin: 0px 0px 20px 215px;
      padding: 0 15px 15px 25px;
-     background-color: #002;
+     background: #002;
      text-align: left;
-     color: #eeeeff;
-/*  border-top: 1px solid #eeeeff; */
-/*  border-right: 25px solid  #fff; */
-/*  border-radius: 0px 0 0 4px; 
-    -moz-border-radius: 4px 0 0 4px;
-    -webkit-border-radius: 4px 0 0 4px; 
-  -moz-box-shadow: 0 2px 2px 1px #bbbbff;
-    -webkit-box-shadow: 0 2px 2px 1px #bbbbff;
-     box-shadow: 0 2px 2px 0px #bbbbff; */
+     color: #eef;
      width: auto;
 /*  overflow-x: scroll; */
 }
 
 div.main textarea {
-     background-color: #002;
+     background: #002;
      color: #fff;
-     font-size: 8pt;
-     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
 div.news {
      margin: 0px 15px 20px 240px;
      padding: 20px 30px 20px 30px;
      border: 1px solid #99f;
-     background-color: #004;
-     color: #eeeeff;
+     background: #004;
+     color: #eef;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      text-align: justify;
-     background: url(images/darkbluetile.png);
 }
 
 div.news li {
      text-align: justify;
      font-weight: bold;
-     list-style-image: url(images/info_dark.png);
+     list-style: url(images/info_dark.png);
      margin: 0 10px 0 30px;
      padding: 5px;
      vertical-align: middle;
@@ -161,18 +147,17 @@ div.news li {
 div.confignav {
      padding: 0 15px;
      margin: 0 0px 25px 0;
-     background-color: #004;
+     background: #004;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      border: 1px solid #99f;
-     background: url(images/darkbluetile.png);
      font-size: 8pt !important;
 }
 
 div.configure {
      padding: 15px;
      margin: 10px 0px;
-     background-color: #005;
+     background: #005;
      -moz-border-radius: 4px;
      border: 1px solid #99f;
 }
@@ -180,15 +165,14 @@ div.configure {
 div.messages {
      padding: 10px;
      margin: 10px 0 20px 0;
-     background-color: #005;
+     background: #005;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      border: 1px solid #99f;
-     background: url(images/lightbluetile.png);
 }
 
 div.messages span.error {
-     color: #dddd00;
+     color: #dd0;
 }
 
 div.messages span.notice {
@@ -198,11 +182,10 @@ div.messages span.notice {
 div.messages li {
      text-align: justify;
      font-weight: bold;
-     list-style-image: url(images/warning_dark.png);
+     list-style: url(images/warning_dark.png);
      margin: 0 0 0 30px !important;
      padding: 5px;
      border: 0px !important;
-     text-align: justify !important;
 }
 
 table {
@@ -212,7 +195,7 @@ table {
      margin: 5px 0px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
-     background-image: url('images/darkbluetile.png');
+     background: url('images/darkbluetile.png');
 }
 
 th {
@@ -220,9 +203,7 @@ th {
      color: #eef;
      text-align: center;
      font-size: 8pt;
-     background-color: #004;
-     background-image: url('images/tabletitledark.png');
-     background-repeat: repeat-x;
+     background: #004 url('images/tabletitledark.png') repeat-x;
 }
 
 tr {
@@ -230,7 +211,7 @@ tr {
 }
 
 tr:nth-child ( even ) {
-     background-image: url('images/darkerbluetile.png');
+     background: url('images/darkerbluetile.png');
 }
 
 td {
@@ -241,16 +222,14 @@ td {
 }
 
 tt {
-     font-size: 9pt;
-     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     font-weight: bold;
-     color: yellow;
+     font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #FF0;
      padding: 10px;
 }
 
 div.main li {
      text-align: left;
-     list-style-type: square;
+     list-style: square;
      margin: 2px 0px 2px 30px;
      padding: 1px 20px 1px 0px;
      line-height: 150%;
@@ -262,7 +241,7 @@ div.main li {
 
 div.main li:nth-child ( even ){
      text-align: left;
-     list-style-type: square;
+     list-style: square;
      margin: 2px 0px 2px 30px;
      padding: 1px 20px 1px 0px;
      border-right: 4px solid #339;
@@ -283,11 +262,10 @@ ul {
 
 code {
      text-align: left;
-     font-size: 8pt;
-     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
-a:link{
+a:link, h2 a:link{
      color: #99f;
 }
 
@@ -296,15 +274,11 @@ a:visited{
 }
 
 a:hover{
-     color: #ff6600;
-}
-
-a:active{
-     color: #900;
+     color: #f60;
 }
 
 .links {
-     list-style-image: url(images/link_dark.png);
+     list-style: url(images/link_dark.png);
      margin: 0 5px 0 0px;
      padding: 0px 5px;
 }
@@ -326,14 +300,12 @@ h1 {
      letter-spacing: 0.15em;
      text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.8);
      white-space: normal;
-     background-color: #004;
+     background: #004 url('images/darkbluebg.png') repeat-x;
      -moz-box-shadow: inset 0px 0px 16px 0px #009;
      border: 1px solid #99f;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
-     background-image: url('images/darkbluebg.png');
-     background-repeat: repeat-x;
      line-height: 120%;
 }
 
@@ -342,8 +314,7 @@ h2 {
      color: #fff;
      text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.5);
      letter-spacing: 0.05em;
-     background-color: #003;
-     background-image: url('images/darkbluebg.png');
+     background: #003 url('images/darkbluebg.png');
      padding: 5px 10px 8px 10px;
      wordwrap: none;
      border: 1px solid #99f;
@@ -354,30 +325,26 @@ h2 {
      margin: 25px 0 20px 0 !important;
 }
 
-h2 a:link {
-     color: #99f;
-}
-
 h2 a:visited {
      color: #44f;
 }
 
 h2 a:hover {
-     color: #ff6600;
+     color: #f60;
      text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
 }
 
 h3 {
-     border-bottom-width: 1px;
+     border-bottom: 1px;
      border-bottom-style: solid;
      border-bottom-color: #99f;
      padding: 5px 0;
 }
-  
+
 button {
      border: 1px outset #ddddc0;
      padding: 1px 3px;
-     background-color: #bbf;
+     background: #bbf;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -390,17 +357,12 @@ button {
      min-width: 76px;
 }
 
-button:hover{
-     border: 1px solid #eeeeff;
-     background-color: #003;
-     color: #ff6600;
-}
-
 button:active {
      border: 1px inset #f60;
-     background-color: #f60;
+     background: #f60;
      color: #fff;
 }
+
 .underline {
      border-bottom: 1px solid #eeeeff;
      padding: 5px 0px 5px 0px;
@@ -421,7 +383,7 @@ button:active {
 
 hr {
      color: #99f;
-     background-color: #99f;
+     background: #99f;
      height: 1px;
      border: 0px solid #99f;
      margin: 10px 0;
@@ -432,55 +394,50 @@ sidebarlogo {
 }
 
 input {
-     background-color: #bbf;
+     background: #bbf;
      color: #002;
      margin: 5px;
-     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     font-weight: bold;
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px solid #99f;
      padding: 1px 2px;
      text-decoration: none;
-     font-size: 9pt;
      min-width: 110px;
-     border: 1px solid #99f;
 }
 
 input:hover {
-     background-color: #eef;
+     background: #eef;
      color: #001;
      border: 1px solid #f60;
 }
 
 input:active {
-     background-color: #002;
+     background: #002;
      color: #fff;
      border: 1px solid #f60;
 }
 
 select {
-     background-color: #002;
+     background: #002;
      color: #eef;
-     margin: 5px; 
-     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     margin: 5px;
      border: 1px solid #99f;
      border-radius: 0;
      -moz-border-radius: 0;
      -webkit-border-radius: 0;
      min-width: 110px;
-     font-size: 9pt;
+     font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 2px;
 }
 
 textarea {
-     background-color: #001;
+     background: #001;
      color: #eef;
      padding: 5px;
      margin: 0 5px 5px 0px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
-     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     font-size: 9pt;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
      min-width: 100%;
      text-align: left;

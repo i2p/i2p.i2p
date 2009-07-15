@@ -60,7 +60,7 @@
         out.print("Please enable sharing (participating in tunnels) by configuring more bandwidth. ");
         out.print("It improves your anonymity by creating cover traffic, and helps the network.<br />");
     } else {
-        out.print("You have configured I2P to share " + share + "KBps. ");
+        out.print("You have configured I2P to share<b> " + share + "KBps</b>. ");
         out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<br />");
     }
  %>

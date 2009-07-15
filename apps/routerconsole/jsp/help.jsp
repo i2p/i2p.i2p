@@ -106,8 +106,8 @@ You may also limit the total number by setting <tt>router.maxParticipatingTunnel
 the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.
 </ul>
 
-<h3>Congestion</h3>
-Some basic indications of router overload:<br>
+<h3>Congestion</h3><div align="justify">
+Some basic indications of router overload:</div><br>
 <ul>
 <li class="tidylist"><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
