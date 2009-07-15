@@ -89,7 +89,7 @@ These may be clients started through <a href="i2ptunnel/index.jsp">I2PTunnel</a>
 or external programs connecting through SAM, BOB, or directly to I2CP.
 </div>
 <h3>Tunnels in/out</h3><div align="justify">
-The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div>
+The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><br>
 <ul>
 <li class="tidylist"><b>Exploratory:</b><div align="justify">
 Tunnels built by your router and used for communication with the floodfill peers,
@@ -107,7 +107,7 @@ the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="confi
 </ul>
 
 <h3>Congestion</h3>
-Some basic indications of router overload:
+Some basic indications of router overload:<br>
 <ul>
 <li class="tidylist"><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
@@ -188,12 +188,11 @@ client applications can be found on our <a href="http://www.i2p2.i2p/download">d
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
- <jsp:setProperty name="contenthelper" property="maxLines" value="500" />
+ <jsp:setProperty name="contenthelper" property="maxLines" value="256" />
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
  
- <p>
- A more complete list of changes can be found 
+ <p>A more complete list of changes can be found 
  in the history.txt file in your i2p directory.
  </p><hr />
 </div>

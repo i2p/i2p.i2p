@@ -152,7 +152,7 @@ div.news li {
      text-align: justify;
      font-weight: bold;
      list-style-image: url(images/info.png);
-     margin: 0 10px 0 25px;
+     margin: 0 10px 0 25px !important;
      padding: 5px 0;
      vertical-align: bottom;
 }
@@ -197,8 +197,8 @@ div.messages li {
      text-align: justify;
      font-weight: bold;
      list-style-image: url(images/warning.png);
-     margin: 0 10px 0 30px;
-     padding: 5px;
+/*     margin: 0 10px 0 20px;
+     padding: 5px;*/
 }
 
 table {
@@ -254,8 +254,8 @@ tt {
 div.main li {
      text-align: left;
      list-style-type: square;
-     margin: 2px 5px 0px 30px;
-     padding: 1px 20px 1px 0px;
+     margin: 2px 5px 0px 5px;
+     padding: 1px 20px 1px 10px;
      line-height: 150%;
 }
 
@@ -264,15 +264,17 @@ div.main li {
 }
 
 ol {
+/* 
      white-space: pre-wrap;
+* 
      display: inline;
-     margin: 2px 0 0 0;
-     padding: 10px 0 0 20px;
+     margin: 1px 0 0 0;
+     padding: 1px 0 0 20px;
 }
 
 ul {
-     display: inline;
-     margin: 0;
+/*     display: inline; */
+     margin: 5px 0;
      padding: 0;
 }
 
@@ -300,8 +302,8 @@ a:active{
 
 .links {
      list-style-image: url(images/link.png);
-     margin: 0 5px 0 0px;
-     padding: 0px 5px;
+     margin: 10px 5px 0 0px;
+     padding: 10px 20px 10px 30px;
 }
 
 p {
@@ -332,21 +334,19 @@ h1 {
 }
 
 h2 {
-     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana,  Tahoma, Helvetica, sans-serif;
+     font-size: 12pt;
      color: #000011;
      letter-spacing: 0.05em;
      background-color: #ddf;
      background-image: url('images/tabletile.png');
-     text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
-     border-bottom-width: 1px;
-     border-bottom-style: solid;
-     border-bottom-color: #000022;
-     padding: 7px 10px 7px 10px;
+     text-shadow: 0px 0px 2px rgba(0, 0, 64, 0.5);
+     padding: 7px 10px;
      wordwrap: none;
      border: 1px solid #002;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
+     margin: 25px 0 20px 0 !important;
 }
 
 h2 a:hover {
@@ -359,10 +359,13 @@ h2 a:hover {
 }
 
 h3 {
-     border-bottom-width: 1px;
-     border-bottom-style: solid;
-     border-bottom-color: #000022;
-     padding-bottom: 5px;
+     border: 1px solid #002;
+     padding: 3px 4px 3px 4px	;
+     margin: 20px 0 15px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -webkit-border-radius: 0 4px 4px 0;
+     background-color: #eef;
 }
 
 button {

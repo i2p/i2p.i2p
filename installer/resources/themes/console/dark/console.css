@@ -269,7 +269,7 @@ div.main li:nth-child ( even ){
 }
 
 ol {
-     white-space: pre-wrap;
+/*     white-space: pre-wrap; screwy layout removals. */
      display: inline;
      margin: 1px 0 0 0;
      padding: 1px 0 0 20px;
@@ -324,7 +324,7 @@ h1 {
      font-style: normal;
      text-transform: uppercase;
      letter-spacing: 0.15em;
-     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
+     text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.8);
      white-space: normal;
      background-color: #004;
      -moz-box-shadow: inset 0px 0px 16px 0px #009;
@@ -340,13 +340,10 @@ h1 {
 h2 {
      font-size: 12pt;
      color: #fff;
-     text-shadow: 0px 0px 1px rgba(0, 0, 128, 0.9);
+     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.5);
      letter-spacing: 0.05em;
      background-color: #003;
-     background-image: url('images/tabletile.png');
-     border-bottom-width: 1px;
-     border-bottom-style: solid;
-     border-bottom-color: #99f;
+     background-image: url('images/darkbluebg.png');
      padding: 5px 10px 8px 10px;
      wordwrap: none;
      border: 1px solid #99f;
@@ -354,6 +351,7 @@ h2 {
      -moz-border-radius: 4px;
      -webkit-border-radius: 4px;
      vertical-align: middle;
+     margin: 25px 0 20px 0 !important;
 }
 
 h2 a:link {
@@ -367,17 +365,13 @@ h2 a:visited {
 h2 a:hover {
      color: #ff6600;
      text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
-     border-bottom-width: 1px;
-     border-bottom-style: solid;
-     border-bottom-color: #99f;
-     padding-bottom: 5px;
 }
 
 h3 {
      border-bottom-width: 1px;
      border-bottom-style: solid;
      border-bottom-color: #99f;
-     padding-bottom: 5px;
+     padding: 5px 0;
 }
   
 button {
