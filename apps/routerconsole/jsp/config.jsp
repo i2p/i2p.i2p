@@ -164,7 +164,7 @@
     with "SSU introductions" to relay traffic. Most of the options above are for special situations,
     for example where UPnP does not work correctly, or a firewall not under your control is doing
     harm. Certain firewalls such as symmetric NATs may not work well with I2P.
- </p>
+ </p></div>
 <!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
 -->
@@ -173,12 +173,12 @@
  and forward ports.
  UPnP support is beta, and may not work for any number of reasons:
  <ul>
- <li>No UPnP-compatible device present
- <li>UPnP disabled on the device
- <li>Software firewall interference with UPnP
- <li>Bugs in the device's UPnP implementation
- <li>Multiple firewall/routers in the internet connection path
- <li>UPnP device change, reset, or address change
+<li class="tidylist">No UPnP-compatible device present
+<li class="tidylist">UPnP disabled on the device
+<li class="tidylist">Software firewall interference with UPnP
+<li class="tidylist">Bugs in the device's UPnP implementation
+<li class="tidylist">Multiple firewall/routers in the internet connection path
+<li class="tidylist">UPnP device change, reset, or address change
  </ul><br>
  Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
  UPnP may be enabled or disabled above, but a change requires a router restart to take effect.
@@ -197,8 +197,8 @@
  that you may have multiple firewalls, for example both software packages and external hardware routers.
  If there is an error, the <a href="logs.jsp">logs</a> may also help diagnose the problem.
  <ul>
- <li><b>OK</b> - Your UDP port does not appear to be firewalled.
- <li><b>Firewalled</b> - Your UDP port appears to be firewalled.
+<li class="tidylist"><b>OK</b> - Your UDP port does not appear to be firewalled.
+<li class="tidylist"><b>Firewalled</b> - Your UDP port appears to be firewalled.
      As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error.
      However, if it appears consistently, you should check whether both your external and internal
      firewalls are open on port 8887. I2P will work fine when firewalled, there is no reason for concern.
@@ -208,41 +208,41 @@
      and a software firewall, or be behind an additional, institutional firewall you cannot control.
      Also, some routers cannot correctly forward both TCP and UDP on a single port, or may have other
      limitations or bugs that prevent them from passing traffic through to I2P.
- <li><b>Testing</b> - The router is currently testing whether your UDP port is firewalled.
- <li><b>Hidden</b> - The router is not configured to publish its address,
+<li class="tidylist"><b>Testing</b> - The router is currently testing whether your UDP port is firewalled.
+<li class="tidylist"><b>Hidden</b> - The router is not configured to publish its address,
      therefore it does not expect incoming connections.
- <li><b>WARN - Firewalled and Fast</b> - You have configured I2P to share more than 128KBps of bandwidth,
+<li class="tidylist"><b>WARN - Firewalled and Fast</b> - You have configured I2P to share more than 128KBps of bandwidth,
      but you are firewalled. While I2P will work fine in this configuration, if you really have
      over 128KBps of bandwidth to share, it will be much more helpful to the network if
      you open your firewall.
- <li><b>WARN - Firewalled and Floodfill</b> - You have configured I2P to be a floodfill router, but
+<li class="tidylist"><b>WARN - Firewalled and Floodfill</b> - You have configured I2P to be a floodfill router, but
      you are firewalled. For best participation as a floodfill router, you should open your firewall.
- <li><b>WARN - Firewalled with Inbound TCP Enabled</b> - You have configured inbound TCP, however
+<li class="tidylist"><b>WARN - Firewalled with Inbound TCP Enabled</b> - You have configured inbound TCP, however
      your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well.
      If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact
      you via TCP, which will hurt the network. Please open your firewall or disable inbound TCP above.
- <li><b>WARN - Firewalled with UDP Disabled</b> -
+<li class="tidylist"><b>WARN - Firewalled with UDP Disabled</b> -
      You have configured inbound TCP, however
      you have disabled UDP. You appear to be firewalled on TCP, therefore your router cannot
      accept inbound connections.
      Please open your firewall or enable UDP.
- <li><b>ERR - Clock Skew</b> - Your system's clock is skewed, which will make it difficult
+<li class="tidylist"><b>ERR - Clock Skew</b> - Your system's clock is skewed, which will make it difficult
      to participate in the network. Correct your clock setting if this error persists.
- <li><b>ERR - Private TCP Address</b> - You must never advertise an unroutable IP address such as
+<li class="tidylist"><b>ERR - Private TCP Address</b> - You must never advertise an unroutable IP address such as
      127.0.0.1 or 192.168.1.1 as your external address. Correct the address or disable inbound TCP above.
- <li><b>ERR - SymmetricNAT</b> - I2P detected that you are firewalled by a Symmetric NAT.
+<li class="tidylist"><b>ERR - SymmetricNAT</b> - I2P detected that you are firewalled by a Symmetric NAT.
      I2P does not work well behind this type of firewall. You will probably not be able to
      accept inbound connections, which will limit your participation in the network.
- <li><b>ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart</b> -
+<li class="tidylist"><b>ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart</b> -
      I2P was unable to bind to port 8887 or other configured port.
      Check to see if another program is using port 8887. If so, stop that program or configure
      I2P to use a different port. This may be a transient error, if the other program is no longer
      using the port. However, a restart is always required after this error.
- <li><b>ERR - UDP Disabled and Inbound TCP host/port not set</b> -
+<li class="tidylist"><b>ERR - UDP Disabled and Inbound TCP host/port not set</b> -
      You have not configured inbound TCP with a hostname and port above, however
      you have disabled UDP. Therefore your router cannot accept inbound connections.
      Please configure a TCP host and port above or enable UDP.
- <li><b>ERR - Client Manager I2CP Error - check logs</b> -
+<li class="tidylist"><b>ERR - Client Manager I2CP Error - check logs</b> -
      This is usually due to a port 7654 conflict. Check the logs to verify. Do you have another I2P instance running?
      Stop the conflicting program and restart I2P.
  </ul>
