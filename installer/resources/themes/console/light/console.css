@@ -442,7 +442,7 @@ select {
      padding: 4px;
      border: 1px solid #001;
      min-width: 110px;
-     font: 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 textarea {
