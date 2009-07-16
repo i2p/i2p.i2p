@@ -360,6 +360,15 @@ h3 {
      background: #eef;
 }
 
+h4 {
+     border-bottom: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #001;
+     padding: 0 0 10px 0;
+     margin: 5px 0 10px 0;
+     font-size: 11pt;
+}
+
 button {
      border: 1px outset #ddddc0;
      padding: 1px 3px;
