@@ -147,14 +147,16 @@ div.news li {
 }
 
 div.confignav {
-     padding: 0 15px;
-     margin: 0 0px 25px 0;
+     padding: 15px 10px !important;
+     margin: 0 0 25px 0;
      background: #004 url('images/darkbluebg.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
+     border-radius: 4px;
      border: 1px solid #99f;
-     font-size: 8pt !important;
-     line-spacing: 150% !important;
+     font-size: 10pt !important;
+     font-weight: bold !important;
+     line-height: 160% !important;
 }
 
 div.configure {
@@ -162,6 +164,8 @@ div.configure {
      margin: 10px 0px;
      background: #005;
      -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
      border: 1px solid #99f;
 }
 
@@ -170,6 +174,7 @@ div.messages {
      margin: 10px 0 20px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
+     border-radius: 4px;
      border: 1px solid #99f;
      background: #008 url('images/lightbluetile.png');
 }
@@ -368,7 +373,6 @@ button:active {
      border-bottom: 1px solid #eeeeff;
      padding: 5px 0px 5px 0px;
      margin: 0px 0px 10px 0px;
-     -moz-border-radius: 4px;
 }
 
 .langbox {
