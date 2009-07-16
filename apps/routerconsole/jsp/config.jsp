@@ -82,6 +82,7 @@
  <p>
  <b>The default settings will work for most people. There is <a href="#chelp">help below</a>.</b>
  </p><p>
+ <div class="configure">
  <b>UPnP Configuration:</b><br />
     <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     Enable UPnP to open firewall ports - <a href="peers.jsp#upnp">UPnP status</a>
@@ -152,7 +153,9 @@
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
  </p><p><b>Note: Changing these settings will restart your router.</b>
  </p>
- <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
+ <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" />
+</div>
+<br />
 <h3><a name="chelp">Configuration Help:</a></h3>
  <div align="justify">
  <p>
