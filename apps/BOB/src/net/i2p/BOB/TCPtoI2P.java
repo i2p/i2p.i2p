@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -49,6 +50,7 @@ public class TCPtoI2P implements Runnable {
 	private NamedDB info,  database;
 	private Socket sock;
 	private I2PSocketManager socketManager;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor
@@ -57,11 +59,12 @@ public class TCPtoI2P implements Runnable {
 	 * param info
 	 * param database
 	 */
-	TCPtoI2P(I2PSocketManager i2p, Socket socket , NamedDB info, NamedDB database) {
+	TCPtoI2P(I2PSocketManager i2p, Socket socket, NamedDB info, NamedDB database, AtomicBoolean lives) {
 		this.sock = socket;
 		this.info = info;
 		this.database = database;
 		this.socketManager = i2p;
+		this.lives = lives;
 	}
 
 	/**
@@ -157,19 +160,15 @@ public class TCPtoI2P implements Runnable {
 					Iin = I2P.getInputStream();
 					Iout = I2P.getOutputStream();
 					// setup to cross the streams
-					TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
-					TCPio conn_a = new TCPio(Iin, out /*, info, database */); // I2P -> app
+					TCPio conn_c = new TCPio(in, Iout, lives); // app -> I2P
+					TCPio conn_a = new TCPio(Iin, out, lives); // I2P -> app
 					t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
 					q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
 					// Fire!
 					t.start();
 					q.start();
-					boolean spin = true;
-					while (t.isAlive() && q.isAlive()) { // AND is used here to kill off the other thread
+					while (t.isAlive() && q.isAlive() && lives.get()) { // AND is used here to kill off the other thread
 						Thread.sleep(10); //sleep for 10 ms
-						rlock();
-						spin = info.get("RUNNING").equals(Boolean.TRUE);
-						runlock();
 					}
 				} catch (I2PException e) {
 					Emsg(e.toString(), out);

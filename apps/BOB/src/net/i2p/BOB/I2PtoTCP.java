@@ -26,6 +26,7 @@ package net.i2p.BOB;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.client.streaming.I2PSocket;
 
 /**
@@ -38,6 +39,7 @@ public class I2PtoTCP implements Runnable {
 	private I2PSocket I2P;
 	private NamedDB info,  database;
 	private Socket sock;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor
@@ -46,10 +48,11 @@ public class I2PtoTCP implements Runnable {
 	 * @param info
 	 * @param database
 	 */
-	I2PtoTCP(I2PSocket I2Psock, NamedDB info, NamedDB database) {
+	I2PtoTCP(I2PSocket I2Psock, NamedDB info, NamedDB database, AtomicBoolean lives) {
 		this.I2P = I2Psock;
 		this.info = info;
 		this.database = database;
+		this.lives = lives;
 	}
 
 	private void rlock() {
@@ -113,35 +116,19 @@ public class I2PtoTCP implements Runnable {
 						out.flush(); // not really needed, but...
 					}
 					// setup to cross the streams
-					TCPio conn_c = new TCPio(in, Iout /*, info, database */); // app -> I2P
-					TCPio conn_a = new TCPio(Iin, out /* , info, database */); // I2P -> app
+					TCPio conn_c = new TCPio(in, Iout, lives); // app -> I2P
+					TCPio conn_a = new TCPio(Iin, out, lives); // I2P -> app
 					t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
 					q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
 					// Fire!
 					t.start();
 					q.start();
-					boolean spin = true;
-					while (t.isAlive() && q.isAlive() && spin) { // AND is used here to kill off the other thread
+					while (t.isAlive() && q.isAlive() && lives.get()) { // AND is used here to kill off the other thread
 						try {
 							Thread.sleep(10); //sleep for 10 ms
 						} catch (InterruptedException e) {
 							break die;
 						}
-							try {
-								rlock();
-							} catch (Exception e) {
-								break die;
-							}
-							try {
-								spin = info.get("RUNNING").equals(Boolean.TRUE);
-							} catch (Exception e) {
-								try {
-									runlock();
-								} catch (Exception e2) {
-									break die;
-								}
-								break die;
-							}
 					}
 				// System.out.println("I2PtoTCP: Going away...");
 				} catch (Exception e) {
@@ -150,14 +137,6 @@ public class I2PtoTCP implements Runnable {
 				}
 			} // die
 		} finally {
-			try {
-				t.interrupt();
-			} catch (Exception e) {
-			}
-			try {
-				q.interrupt();
-			} catch (Exception e) {
-			}
 			try {
 				in.close();
 			} catch (Exception ex) {
@@ -173,6 +152,14 @@ public class I2PtoTCP implements Runnable {
 			try {
 				Iout.close();
 			} catch (Exception ex) {
+			}
+			try {
+				t.interrupt();
+			} catch (Exception e) {
+			}
+			try {
+				q.interrupt();
+			} catch (Exception e) {
 			}
 			try {
 				// System.out.println("I2PtoTCP: Close I2P");

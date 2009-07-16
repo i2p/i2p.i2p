@@ -43,10 +43,10 @@ public class NamedDB {
 	}
 
 	synchronized public void getReadLock() {
-		while((writersWaiting != 0)) {
+		while ((writersWaiting != 0)) {
 			try {
 				wait();
-			} catch(InterruptedException ie) {
+			} catch (InterruptedException ie) {
 			}
 		}
 		readers++;
@@ -59,10 +59,10 @@ public class NamedDB {
 
 	synchronized public void getWriteLock() {
 		writersWaiting++;
-		while(readers != 0 && writersWaiting != 1 ) {
+		while (readers != 0 && writersWaiting != 1) {
 			try {
 				wait();
-			} catch(InterruptedException ie) {
+			} catch (InterruptedException ie) {
 			}
 		}
 	}
@@ -79,8 +79,8 @@ public class NamedDB {
 	 * @throws ArrayIndexOutOfBoundsException when key does not exist
 	 */
 	public int idx(Object key) throws ArrayIndexOutOfBoundsException {
-		for(int i = 0; i < index; i++) {
-			if(key.equals(data[i][0])) {
+		for (int i = 0; i < index; i++) {
+			if (key.equals(data[i][0])) {
 				return i;
 			}
 		}
@@ -100,17 +100,17 @@ public class NamedDB {
 
 		try {
 			k = idx(key);
-		} catch(ArrayIndexOutOfBoundsException b) {
+		} catch (ArrayIndexOutOfBoundsException b) {
 			return;
 		}
 		olddata = new Object[index + 2][2];
 		// copy to olddata, skipping 'k'
-		for(i = 0            , l = 0; l < index; i++, l++) {
-			if(i == k) {
+		for (i = 0, l = 0; l < index; i++, l++) {
+			if (i == k) {
 				l++;
 				didsomething++;
 			}
-			for(j = 0; j < 2; j++) {
+			for (j = 0; j < 2; j++) {
 				olddata[i][j] = data[l][j];
 			}
 		}
@@ -132,13 +132,13 @@ public class NamedDB {
 
 		olddata = new Object[index + 2][2];
 		// copy to olddata
-		for(i = 0; i < index; i++) {
-			for(j = 0; j < 2; j++) {
+		for (i = 0; i < index; i++) {
+			for (j = 0; j < 2; j++) {
 				olddata[i][j] = data[i][j];
 			}
 		}
 		data = olddata;
-		data[index++] = new Object[] {key, val};
+		data[index++] = new Object[]{key, val};
 	}
 
 	/**
@@ -149,8 +149,8 @@ public class NamedDB {
 	 * @throws java.lang.RuntimeException
 	 */
 	public Object get(Object key) throws RuntimeException {
-		for(int i = 0; i < index; i++) {
-			if(key.equals(data[i][0])) {
+		for (int i = 0; i < index; i++) {
+			if (key.equals(data[i][0])) {
 				return data[i][1];
 			}
 		}
@@ -164,8 +164,8 @@ public class NamedDB {
 	 * @return true if an object exists, else returns false
 	 */
 	public boolean exists(Object key) {
-		for(int i = 0; i < index; i++) {
-			if(key.equals(data[i][0])) {
+		for (int i = 0; i < index; i++) {
+			if (key.equals(data[i][0])) {
 				return true;
 			}
 		}
@@ -180,7 +180,7 @@ public class NamedDB {
 	 * @throws java.lang.RuntimeException
 	 */
 	public Object getnext(int i) throws RuntimeException {
-		if(i < index && i > -1) {
+		if (i < index && i > -1) {
 			return data[i][1];
 		}
 		throw new RuntimeException("No more data");

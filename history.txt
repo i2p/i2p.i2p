@@ -1,3 +1,15 @@
+2009-07-16 sponge
+    * ministreaming:
+      - small pedantic fix
+    * streaming:
+      - Fix a deadly race condition.
+      - Some small pedantic fixes.
+    * core:
+      - Fix a deadly race condition.
+    * BOB:
+      - Fixed some races that occured from fixing races in streaming and core.
+      - Some badly needed code refactoring to depend less on the database.
+
 2009-07-15 zzz
     * Console:
       - Make light the default theme

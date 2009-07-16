@@ -26,6 +26,7 @@ package net.i2p.BOB;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Shove data from one stream to the other.
@@ -36,7 +37,7 @@ public class TCPio implements Runnable {
 
 	private InputStream Ain;
 	private OutputStream Aout;
-	// private NamedDB info,  database;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor
@@ -46,11 +47,10 @@ public class TCPio implements Runnable {
 	 *
 	 * param database
 	 */
-	TCPio(InputStream Ain, OutputStream Aout /*, NamedDB info , NamedDB database */) {
+	TCPio(InputStream Ain, OutputStream Aout, AtomicBoolean lives) {
 		this.Ain = Ain;
 		this.Aout = Aout;
-	// this.info = info;
-	// this.database = database;
+		this.lives = lives;
 	}
 
 	/**
@@ -84,10 +84,9 @@ public class TCPio implements Runnable {
 
 		int b;
 		byte a[] = new byte[1];
-		boolean spin = true;
 		try {
 			try {
-				while (spin) {
+				while (lives.get()) {
 					b = Ain.read(a, 0, 1);
 					if (b > 0) {
 						Aout.write(a, 0, b);
@@ -105,9 +104,6 @@ public class TCPio implements Runnable {
 						 *
 						 */
 						// System.out.println("TCPio: End Of Stream");
-						// Ain.close();
-						// Aout.close();
-						//return;
 						break;
 					}
 				}

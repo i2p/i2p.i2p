@@ -166,6 +166,7 @@ public class BOB {
 	public static void stop() {
 		spin.set(false);
 	}
+
 	/**
 	 * Listen for incoming connections and handle them
 	 *
@@ -188,9 +189,10 @@ public class BOB {
 		i = Y2.hashCode();
 		try {
 			{
-    				File cfg = new File(configLocation);
-				if (!cfg.isAbsolute())
+				File cfg = new File(configLocation);
+				if (!cfg.isAbsolute()) {
 					cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
+				}
 				try {
 					FileInputStream fi = new FileInputStream(cfg);
 					props.load(fi);
@@ -233,9 +235,10 @@ public class BOB {
 				props.setProperty(PROP_BOB_HOST, "localhost");
 			}
 			if (save) {
-    				File cfg = new File(configLocation);
-				if (!cfg.isAbsolute())
+				File cfg = new File(configLocation);
+				if (!cfg.isAbsolute()) {
 					cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), configLocation);
+				}
 				try {
 					warn("Writing new defaults file " + cfg.getAbsolutePath());
 					FileOutputStream fo = new FileOutputStream(cfg);

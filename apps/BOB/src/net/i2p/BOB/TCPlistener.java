@@ -29,6 +29,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 // import net.i2p.client.I2PSession;
 // import net.i2p.client.I2PSessionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.util.Log;
@@ -45,6 +46,7 @@ public class TCPlistener implements Runnable {
 	public I2PSocketManager socketManager;
 	public I2PServerSocket serverSocket;
 	private ServerSocket listener;
+	private AtomicBoolean lives;
 
 	/**
 	 * Constructor
@@ -53,12 +55,13 @@ public class TCPlistener implements Runnable {
 	 * @param database
 	 * @param _log
 	 */
-	TCPlistener(ServerSocket listener, I2PSocketManager S, NamedDB info, NamedDB database, Log _log) {
+	TCPlistener(ServerSocket listener, I2PSocketManager S, NamedDB info, NamedDB database, Log _log, AtomicBoolean lives) {
 		this.database = database;
 		this.info = info;
 		this._log = _log;
 		this.socketManager = S;
 		this.listener = listener;
+		this.lives = lives;
 	}
 
 	private void rlock() throws Exception {
@@ -77,7 +80,6 @@ public class TCPlistener implements Runnable {
 	 */
 	public void run() {
 		boolean g = false;
-		boolean spin = true;
 		int conn = 0;
 		try {
 			die:
@@ -85,22 +87,7 @@ public class TCPlistener implements Runnable {
 				try {
 					Socket server = new Socket();
 					listener.setSoTimeout(50); // We don't block, we cycle and check.
-					while (spin) {
-						try {
-							rlock();
-						} catch (Exception e) {
-							break die;
-						}
-						try {
-							spin = info.get("RUNNING").equals(Boolean.TRUE);
-						} catch (Exception e) {
-							try {
-								runlock();
-							} catch (Exception e2) {
-								break die;
-							}
-							break die;
-						}
+					while (lives.get()) {
 						try {
 							server = listener.accept();
 							g = true;
@@ -110,7 +97,7 @@ public class TCPlistener implements Runnable {
 						if (g) {
 							conn++;
 							// toss the connection to a new thread.
-							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database);
+							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database, lives);
 							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
 							t.start();
 							g = false;
