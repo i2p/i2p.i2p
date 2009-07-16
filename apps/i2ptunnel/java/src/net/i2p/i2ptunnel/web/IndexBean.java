@@ -84,6 +84,7 @@ public class IndexBean {
     static final String CLIENT_NICKNAME = "shared clients";
     
     public static final String PROP_THEME_NAME = "routerconsole.theme";
+    public static final String DEFAULT_THEME = "light";
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
     public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     
@@ -319,11 +320,8 @@ public class IndexBean {
     ////
     
     public String getTheme() {
-    	String theme = _context.getProperty(PROP_THEME_NAME);
-    	if (theme != null)
-    		return "/themes/console/" + theme + "/";
-    	else
-    		return "/themes/console/";
+    	String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
+	return "/themes/console/" + theme + "/";
     }
 
     public boolean allowCSS() {

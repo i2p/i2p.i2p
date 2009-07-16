@@ -74,6 +74,7 @@ rm -f ./lib/*.dll
 rm -f ./*.bat
 rm -f ./*.exe
 rm -rf ./installer
-./i2prouter start
+# no, let's not start the router from the install script any more
+# ./i2prouter start
 exit 0
 

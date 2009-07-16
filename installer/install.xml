@@ -85,6 +85,7 @@
         <res id="InfoPanel.info" src="installer/resources/readme.license.txt"/>
         <!-- <res id="ProcessPanel.Spec.xml" src="installer/resources/ProcessPanel.Spec.xml"/> -->
 	<res id="shortcutSpec.xml" src="installer/resources/shortcutSpec.xml" />
+	<res id="XInfoPanel.info" src="installer/resources/start-i2p.txt" />
     </resources>
 
     <panels>
@@ -94,6 +95,7 @@
         <panel classname="InstallPanel"/>
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
         <!-- <panel classname="ProcessPanel"><os family="windows" /></panel> -->
+        <panel classname="XInfoPanel" ><os family="unix|mac" /></panel>
         <panel classname="SimpleFinishPanel"/>
     </panels>
 
