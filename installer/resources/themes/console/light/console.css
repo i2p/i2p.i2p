@@ -50,7 +50,7 @@ div.toolbar a:link {
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      display: none !important;
 }
 
@@ -92,7 +92,7 @@ div.routersummary {
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      float: left;
      -moz-box-shadow: inset 0px 0px 16px 1px #eef;
 }
@@ -138,7 +138,7 @@ div.news {
      color: #001;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      text-align: justify !important;
      line-height: 140%;
 }
@@ -157,7 +157,7 @@ div.confignav {
      margin: 0 0px 25px 0;
      background: #ddddff url('images/tabletile.png');
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border: 1px solid #000022;
 }
 
@@ -182,7 +182,7 @@ div.messages {
      padding: 0 10px;
      margin: 10px 0 20px 0;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border: 1px solid #99f;
      background: #008 url('images/lightbluetile.png');
 }
@@ -316,7 +316,7 @@ h1 {
      border: 1px solid #002;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
 }
 
 h2 {
@@ -324,13 +324,13 @@ h2 {
      color: #001;
      letter-spacing: 0.05em;
      background: #ddf url('images/tabletile.png');
-     text-shadow: 0px 0px 2px rgba(0, 0, 64, 0.5);
+     text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
      padding: 7px 10px;
      wordwrap: none;
      border: 1px solid #002;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      margin: 25px 0 20px 0 !important;
 }
 
@@ -349,7 +349,7 @@ h3 {
      margin: 20px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
-     -webkit-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
      background: #eef;
 }
 
@@ -360,7 +360,7 @@ button {
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      font-size: 8pt;
      font-weight: bold;
      margin: 0 1px;
@@ -452,7 +452,7 @@ textarea {
      color: #003;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
      min-width: 100%;

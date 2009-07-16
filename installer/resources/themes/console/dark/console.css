@@ -53,7 +53,7 @@ div.toolbar a:link {
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      color: #002;
 }
 
@@ -93,7 +93,7 @@ div.routersummary {
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border-radius: 4px;
      float: left;
      -moz-box-shadow: inset 0px 0px 16px 0px #009;
@@ -133,7 +133,7 @@ div.news {
      color: #eef;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      text-align: justify;
 }
 
@@ -151,9 +151,10 @@ div.confignav {
      margin: 0 0px 25px 0;
      background: #004 url('images/darkbluebg.png');
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border: 1px solid #99f;
      font-size: 8pt !important;
+     line-spacing: 150% !important;
 }
 
 div.configure {
@@ -168,7 +169,7 @@ div.messages {
      padding: 0 10px;
      margin: 10px 0 20px 0;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border: 1px solid #99f;
      background: #008 url('images/lightbluetile.png');
 }
@@ -305,14 +306,14 @@ h1 {
      border: 1px solid #99f;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      line-height: 120%;
 }
 
 h2 {
      font-size: 12pt;
      color: #fff;
-     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.5);
+     text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.5);
      letter-spacing: 0.05em;
      background: #003 url('images/darkbluebg.png');
      padding: 5px 10px 8px 10px;
@@ -320,7 +321,7 @@ h2 {
      border: 1px solid #99f;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      vertical-align: middle;
      margin: 25px 0 20px 0 !important;
 }
@@ -348,7 +349,7 @@ button {
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      font-size: 8pt;
      font-weight: bold;
      margin: 2px 3px;
@@ -423,7 +424,7 @@ select {
      border: 1px solid #99f;
      border-radius: 0;
      -moz-border-radius: 0;
-     -webkit-border-radius: 0;
+     -khtml-border-radius: 0;
      min-width: 110px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 2px;
@@ -436,7 +437,7 @@ textarea {
      margin: 0 5px 5px 0px;
      border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
      min-width: 100%;
