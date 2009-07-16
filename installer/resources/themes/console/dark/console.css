@@ -139,7 +139,6 @@ div.news {
 
 div.news li {
      text-align: justify;
-     font-weight: bold;
      list-style: url('images/info_dark.png');
      margin: 0 10px 0 30px;
      padding: 5px;
@@ -347,6 +346,14 @@ h3 {
      padding: 5px 0;
 }
 
+h4 {
+     border-bottom: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #99f;
+     padding: 0 0 10px 0;
+     margin: 5px 0 10px 0;
+     font-size: 11pt;
+}
 button {
      border: 1px outset #ddddc0;
      padding: 1px 3px;

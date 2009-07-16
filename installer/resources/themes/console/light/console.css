@@ -144,7 +144,6 @@ div.news {
 
 div.news li {
      text-align: justify;
-     font-weight: bold;
      list-style: url(images/info.png);
      margin: 0 10px 0 25px !important;
      padding: 5px 0;

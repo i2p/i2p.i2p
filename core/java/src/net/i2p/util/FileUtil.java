@@ -148,7 +148,7 @@ public class FileUtil {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(f);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             List lines = new ArrayList(maxNumLines > 0 ? maxNumLines : 64);
             String line = null;
             while ( (line = in.readLine()) != null) {
