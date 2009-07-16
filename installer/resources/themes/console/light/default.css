@@ -229,3 +229,13 @@ hr {
      -khtml-border-radius: 4px;
      border-radius: 4px;
 }
+
+select {
+     background-color: #fff;
+     color: #001;
+     margin: 6px 2px 0 2px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #99f;
+     padding: 2px;
+     height: 22px;
+}
