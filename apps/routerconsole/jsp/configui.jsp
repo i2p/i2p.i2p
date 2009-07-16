@@ -33,10 +33,8 @@
  <input type="hidden" name="action" value="blah" />
  <jsp:getProperty name="uihelper" property="settings" />
 <hr> 	
-<p>
- <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
-</p>
- </form>
+<input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
+</form>
 </div>
 </div>
 </body>
