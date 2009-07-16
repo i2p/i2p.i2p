@@ -24,7 +24,7 @@ public class ConfigUIHandler extends FormHandler {
         else
             _context.router().setConfigSetting(CSSHelper.PROP_THEME_NAME, _config);
         if (_context.router().saveConfig()) 
-            addFormNotice("Configuration saved successfully");
+            addFormNotice("Theme change successfully saved (refresh page to view)");
         else
             addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
     }
