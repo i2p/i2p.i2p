@@ -155,7 +155,6 @@
  </p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" />
 </div>
-<br />
 <h3><a name="chelp">Configuration Help:</a></h3>
  <div align="justify">
  <p>
