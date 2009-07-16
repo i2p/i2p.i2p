@@ -20,9 +20,9 @@ public class ConfigUIHandler extends FormHandler {
         if (_config == null)
             return;
         if (_config.equals("default"))
-            _context.router().removeConfigSetting(ConfigUIHelper.PROP_THEME);
+            _context.router().removeConfigSetting(CSSHelper.PROP_THEME_NAME);
         else
-            _context.router().setConfigSetting(ConfigUIHelper.PROP_THEME, _config);
+            _context.router().setConfigSetting(CSSHelper.PROP_THEME_NAME, _config);
         if (_context.router().saveConfig()) 
             addFormNotice("Configuration saved successfully");
         else
