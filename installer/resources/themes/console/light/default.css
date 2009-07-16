@@ -152,6 +152,7 @@ hr {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
+     background: url(images/tabletitlelight.png) 0 0 repeat: x !important;
 }
 
 .control:hover {
@@ -162,6 +163,8 @@ hr {
 
 .control:active {
      border: 2px inset;
+     background-color: #f60;
+     color: #fff !important;
 }
 
 .panel {

@@ -165,12 +165,13 @@ hr {
 .control:hover {
      border: 1px solid #eeeeff;
      background-color: #003;
-     color: #ff6600;
-     background: none;
+     color: #ff6600 !important;
 }
 
 .control:active {
      border: 2px inset;
+     background-color: #f60;
+     color: #fff !important;
 }
 
 .control:visited {
