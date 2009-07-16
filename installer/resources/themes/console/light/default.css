@@ -5,7 +5,7 @@ body {
      font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
      background-color: #eeeeff;
      color: #000000;
-     font-size: 11pt;
+     font-size: 9pt;
 /* we've avoided Tantek Hacks so far,
     ** but we can't avoid using the non-w3c method of 
     ** box rendering. (and therefore one of mozilla's
@@ -41,15 +41,14 @@ h4 {
      width: 100%;
      border: 1px solid #225;
      margin: 5px 0 15px 0;
-     background: url(images/tabletitlelight.png);
-     background-color: #002;
+     background: #b4c8ff url(images/tabletitlelight.png) repeat-x;
      text-transform: uppercase;
      text-shadow: 0px 0px 2px rgba(64, 64, 255, 0.9);
      letter-spacing: 0.08em;
      -moz-box-shadow: inset 0px 0px 4px 0px #bbf;
-     border-radius: 4px;
      -moz-border-radius: 4px;
-     -webkit-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
 }
 
 a {
@@ -61,10 +60,9 @@ form {
 }
 
 textarea, input, select, button, a {
-     font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
-     font-size: 1.0em;
+     font-size: 9pt;
      float: left;
 }
 
@@ -135,6 +133,7 @@ hr {
      border: 1px solid #003;
      padding: 2px;
      margin: 4px 0 2px 4px;
+     font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
 .control {
@@ -156,11 +155,6 @@ hr {
 }
 
 .control:hover {
-/*
-        color: #fff;
-    background-color : #3333ff;
-        border 0px none #000022;
-*/
      border: 1px solid #eeeeff;
      background-color: #003;
      color: #ff6600;
@@ -175,7 +169,7 @@ hr {
      margin: 16px auto 16px auto;
      overflow: hidden;
      text-align: left;
-     font-size: 0.8em;
+     font-size: 9pt;
      background-color: #fff;
      background: url(images/lightbluetile.png);
      -moz-border-radius: 4px;
