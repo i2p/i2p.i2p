@@ -11,7 +11,7 @@
 <%@include file="summary.jsp" %>
  <h1>I2P Router Logs</h1>
 <div class="main" id="main">
- <h4>Version:</h4><a name="version"> </a>
+ <h3>Version:</h3><a name="version"> </a>
  Please include this information in bug reports.
  <p>
 I2P <jsp:getProperty name="helper" property="version" /><br />
@@ -23,13 +23,13 @@ jbigi <%=net.i2p.util.NativeBigInteger.loadStatus()%><br />
  <hr />
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <h4>Critical logs:</h4><a name="criticallogs"> </a>
+ <h3>Critical logs:</h3><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
  <hr />
- <h4>Router logs (<a href="configlogging.jsp">configure</a>):</h4>
+ <h3>Router logs (<a href="configlogging.jsp">configure</a>):</h3>
  <jsp:getProperty name="logsHelper" property="logs" />
  <hr />
- <h4>Service (Wrapper) logs:</h4><a name="servicelogs"> </a>
+ <h3>Service (Wrapper) logs:</h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div>
 
