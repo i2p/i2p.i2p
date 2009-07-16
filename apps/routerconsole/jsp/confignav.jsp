@@ -26,7 +26,7 @@
  %>Advanced<% }%>
 Configuration</b>
 -->
-<h4><% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
+<% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
  if (request.getRequestURI().indexOf("configui.jsp") != -1) {
  %>UI | <% } else { %><a href="configui.jsp">UI</a> | <% }
@@ -47,6 +47,6 @@ Configuration</b>
  if (request.getRequestURI().indexOf("configstats.jsp") != -1) {
  %>Stats | <% } else { %><a href="configstats.jsp">Stats</a> | <% }
  if (request.getRequestURI().indexOf("configadvanced.jsp") != -1) {
- %>Advanced<% } else { %><a href="configadvanced.jsp">Advanced</a><% } %></h4>
+ %>Advanced<% } else { %><a href="configadvanced.jsp">Advanced</a><% } %>
 </center>
 </div>
