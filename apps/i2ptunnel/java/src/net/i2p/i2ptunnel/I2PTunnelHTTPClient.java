@@ -831,6 +831,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 } catch (IOException ioe) {}
                 return;
             }
+            // theme hack
+            if (filename.startsWith("themes/console/default/"))
+                filename = filename.replaceFirst("default", I2PAppContext.getGlobalContext().getProperty("routerconsole.theme", "light"));
             File file = new File(_errorDir, filename);
             if (file.exists() && !file.isDirectory()) {
                 String type;
