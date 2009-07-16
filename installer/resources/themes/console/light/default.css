@@ -150,6 +150,8 @@ hr {
      text-align: center;
      white-space: nowrap;
      -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
      margin-top: 8px;
 }
 
@@ -176,7 +178,9 @@ hr {
      font-size: 0.8em;
      background-color: #fff;
      background: url(images/lightbluetile.png);
-     -moz-border-radius: 4px 4px 4px 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
      border: 1px solid #002;
      padding: 10px 20px;
 }
@@ -225,4 +229,6 @@ hr {
 
 .header {
      -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
 }
