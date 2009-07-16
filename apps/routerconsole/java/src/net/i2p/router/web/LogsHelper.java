@@ -34,7 +34,7 @@ public class LogsHelper extends HelperBase {
             return "";
         else {
             str = str.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-            return "Location: " + f.getAbsolutePath() + "<pre>" + str + "</pre>";
+            return "Location:<code> " + f.getAbsolutePath() + "</code> <pre>" + str + "</pre>";
         }
     }
     
