@@ -74,7 +74,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
         <div class="statusHeaderField rowItem">
             <label>Status:</label>
-<hr />        </div>
+       </div>
         
         <%
         for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
@@ -118,7 +118,8 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <%
             switch (indexBean.getTunnelStatus(curServer)) {
                 case IndexBean.STARTING:
-          %><div class="statusStarting text">Starting...</div>    
+          %><div class="separator"></div>
+		  <div class="statusStarting text">Starting...</div>    
             <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
         <%
                 break;
@@ -194,7 +195,6 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
 
         <div class="separator">
-            <hr />
         </div>
         <%
         for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
@@ -221,7 +221,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <%
             switch (indexBean.getTunnelStatus(curClient)) {
                 case IndexBean.STARTING:
-          %><div class="statusStarting text">Starting...</div>
+          %><div class="statusStarting text">Starting...</div> <div class="separator></div>
             <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
         <%
                 break;
@@ -291,5 +291,6 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </div>
     <div id="pageFooter">
     </div>
+	</div>
 </body>
 </html>

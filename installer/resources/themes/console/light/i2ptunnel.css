@@ -83,10 +83,14 @@
      height: 100px;
      padding: 0 0 0 4px;
      margin: 1px 0 4px 0;
-     background-color: #000088;
+     background-color: #005;
      color: #fff;
-     font-family: "Lucida Console", "Andale Mono", "Courier New", Courier, mono;
-     border: 1px inset #002;
+     font-family: "Lucida Console", "DejaVu Sans Mono", "Andale Mono", "Courier New", Courier, mono;
+     border: 2px inset #002;
+     font-size: 10pt !important;
+     font-weight: bold;
+     text-align: justify !important;
+     background: url(images/darkbluetile.png);
 }
 
 #tunnelListPage .footer .control {
