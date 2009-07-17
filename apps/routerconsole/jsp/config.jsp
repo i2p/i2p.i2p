@@ -19,7 +19,7 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
-
+<div class="configure">
  <form action="config.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigNetHandler.noncePrev", prev);
@@ -249,9 +249,8 @@
      Stop the conflicting program and restart I2P.
  </ul>
  </p>
-</div>
  <hr />
-<!--
+      <!--
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
  <p>
@@ -270,8 +269,8 @@
  </p>
  <hr />
 -->
- </form>
+    </form>
 </div>
-
+</div>
 </body>
 </html>
