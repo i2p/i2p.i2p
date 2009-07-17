@@ -17,7 +17,7 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- 
+ <div class="configure">
  <form action="configservice.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigServiceHandler.noncePrev", prev);
@@ -82,6 +82,6 @@
  <input type="submit" name="action" value="Do not view console on startup" />
  </form><hr>
 </div>
-
+</div>
 </body>
 </html>

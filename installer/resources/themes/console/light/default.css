@@ -29,7 +29,7 @@ label {
      height: 28px;
      font-weight: normal;
      text-align: right;
-     font-size: 7pt;
+     font-size: 8pt;
      font-style: italic;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
@@ -122,8 +122,11 @@ hr {
 .separator, .subdivider {
      clear: both;
      height: 1px;
-     margin: 3px 0px 3px 0px;
+     margin: 1px 0px 1px 0px;
      border-bottom: 1px solid #225;
+/*
+     display: none;
+*/
 }
 
 .subdivider {
@@ -150,7 +153,7 @@ hr {
 }
 
 .control {
-     margin: 4px 0 0 0 !important;
+     margin: 4px 0 0 4px !important;
      padding: 2px;
      overflow: hidden;
 /*
@@ -171,7 +174,7 @@ hr {
 }
 
 .control:active {
-     border: 2px inset;
+     border: 1px inset;
      background-color: #003;
      color: #ff6600;
 }

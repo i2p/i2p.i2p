@@ -23,7 +23,7 @@
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- 
+ <div class="configure">
  <p><i>
  NOTE: The default settings work for most people.
  There is a fundamental tradeoff between anonymity and performance.
@@ -46,6 +46,6 @@
  <hr /> <input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" />
  </form>
 </div>
-
+</div>
 </body>
 </html>
