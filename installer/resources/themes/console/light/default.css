@@ -11,9 +11,9 @@ body {
     ** box rendering. (and therefore one of mozilla's
     ** proprietry -moz properties (which hopefully they'll
     ** drop soon).
-    */
+ */  
      -moz-box-sizing: border-box;
-     box-sizing: border-box;
+     box-sizing: border-box; 
 }
 
 div {
@@ -22,20 +22,18 @@ div {
 }
 
 label {
-     margin: 0px;
-     padding: 8px 5px 2px 0px;
+     margin: 0px 4px;
+     padding: 1px 10px 2px 0px;
      float: left;
      width: 120px;
      height: 28px;
      font-weight: normal;
      text-align: right;
-     font-size: 9pt;
+     font-size: 7pt;
      font-style: italic;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
-/*
-     border: 1px solid #001;
-*/
+     line-height: 120%;
 }
 
 h4 {
@@ -69,6 +67,7 @@ textarea, input, select, button, a {
      box-sizing: border-box;
      font-size: 9pt;
      float: left;
+     vertical-align: middle;
 }
 
 button {
@@ -85,35 +84,35 @@ br {
 
 div.statusNotRunning {
      float: left;
-     width: 78px;
+     width: 72px;
      height: 24px;
      overflow: hidden;
-     color: #dd0000;
+     color: #d00;
      background: url('images/console_status_stopped.png') 0 0 no-repeat;
      padding-top: 24px;
-     margin-top: 8px;
+     margin-top: 4px;
 }
 
 div.statusRunning {
-     float: left;
-     width: 78px;
+   float: left;
+     width: 72px;
      height: 24px;
      overflow: hidden;
-     color: #00dd00;
+     color: #0b0;
      background: url('images/console_status_running.png') 0 0 no-repeat;
      padding-top: 24px;
-     margin-top: 8px;
+     margin-top: 4px;
 }
 
 div.statusStarting {
      float: left;
-     width: 78px;
+     width: 72px;
      height: 24px;
      overflow: hidden;
      color: #339933;
      background: url('images/console_status_starting.png') 0 0 no-repeat;
      padding-top: 24px;
-     margin-top: 8px;
+     margin-top: 4px;
 }
 
 hr {
@@ -137,7 +136,7 @@ hr {
      height: 24px;
      border: 1px solid #eef;
      padding: 2px;
-     margin: 4px 0 2px 4px;
+     margin: 4px 0 2px 0px;
      font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-weight: bold;
      background: #001;
@@ -151,10 +150,12 @@ hr {
 }
 
 .control {
-     margin: 10px 0 0 4px !important;
+     margin: 4px 0 0 0 !important;
      padding: 2px;
      overflow: hidden;
+/*
      height: 22px;
+*/
      min-width: 60px;
      font-weight: bold;
      background-color: #bbbbff;
@@ -169,14 +170,14 @@ hr {
      background: url(images/tabletitlelight.png) 0 0 repeat: x !important;
 }
 
-.control:hover {
-     border: 1px solid #eeeeff;
+.control:active {
+     border: 2px inset;
      background-color: #003;
      color: #ff6600;
 }
 
-.control:active {
-     border: 2px inset;
+.control:hover {
+     border: 1px solid #eeeeff;
      background-color: #f60;
      color: #fff !important;
 }
@@ -185,8 +186,8 @@ hr {
      width: 800px;
      margin: 16px auto 16px auto;
      overflow: hidden;
-     text-align: left;
-     font-size: 9pt;
+     text-align: left !important;
+     font-size: 7pt;
      background-color: #fff;
      background: url(images/lightbluetile.png);
      -moz-border-radius: 4px;
@@ -212,13 +213,16 @@ hr {
 }
 
 .comment {
-     font-style: italic;
+     font-weight: bold;
+     display: block; 
+     padding: 2px 10px 0 20px;
+     text-align: left;
 }
 
 .text {
      height: 24px;
      width: 150px;
-     padding: 8px 0 0 2px;
+     padding: 0 0 0 2px;
      float: left;
      margin: 0;
      font-size: 9pt !important;
@@ -233,11 +237,11 @@ hr {
      background-color: #ddddff;
      border: 1px solid #f22;
      -moz-box-shadow: inset 0px 0px 4px 0px #f00;
-     padding: 5px 20px 11px 10px !important;
+     padding: 5px 20px 11px 10px;
 }
 
 #globalOperationsPanel .control {
-     width: 100px;
+     min-width: 120px;
 }
 
 .header {
@@ -254,5 +258,7 @@ select {
      font-weight: bold;
      border: 1px solid #99f;
      padding: 2px;
-     height: 26px;
+     min-width: 270px;
+     font-size: 8pt;
+     max-height: 24px;
 }

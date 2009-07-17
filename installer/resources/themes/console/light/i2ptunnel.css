@@ -2,11 +2,11 @@
 */
 
 #tunnelEditPage input {
-     width: 458px;
+     width: 560px;
 }
 
 #tunnelEditPage select {
-     width: 308px;
+     width: 300px;
 }
 
 #tunnelEditPage option [ selected ] {
@@ -46,7 +46,7 @@
 }
 
 #tunnelEditPage #reachableByOther, #tunnelEditPage #tunnelDepth, #tunnelEditPage #tunnelQuantity, #tunnelEditPage #targetHost, #tunnelEditPage #clientHost {
-     width: 306px;
+     width: 300px;
 }
 
 #tunnelEditPage #port {
@@ -75,8 +75,7 @@
 }
 
 #tunnelListPage select {
-     width: 150px;
-     margin: 9px 0 0 4px;
+     min-width: 120px;
 }
 
 #tunnelListPage textarea {
@@ -127,11 +126,11 @@
 }
 
 #tunnelListPage .descriptionField, #tunnelListPage .destinationField {
-     width: 750px;
+     width: 800px;
 }
 
 #tunnelListPage .descriptionField .text, #tunnelListPage .destinationField input {
-     width: 590px;
+     width: 580px;
 }
 
 #tunnelListPage .descriptionField label, #tunnelListPage .destinationField label {
