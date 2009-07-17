@@ -28,6 +28,7 @@
     System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
+ <h3>Advanced I2P Configuration</h3>
  <textarea rows="32" cols="60" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br /><hr>
       <p align="right"> 
         <input type="submit" name="shouldsave" value="Apply" />

@@ -25,6 +25,7 @@
     System.setProperty("net.i2p.router.web.ConfigLoggingHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
+ <h3>Configure I2P Logging Options</h3>
       <table border="0" cellspacing="5">
         <tr> 
           <td valign="top"><b>Logging filename:</b> 
