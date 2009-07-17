@@ -166,6 +166,7 @@ div.configure {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #99f;
+     background: url(images/darkbluebg.png);
 }
 
 div.messages {
@@ -340,10 +341,15 @@ h2 a:hover {
 }
 
 h3 {
-     border-bottom: 1px;
-     border-bottom-style: solid;
-     border-bottom-color: #99f;
-     padding: 5px 0;
+     border: 1px solid #99f;
+     border-left: 5px solid #99f;
+     padding: 3px 5px 3px 5px;
+     margin: 20px 0 15px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: #004;
+     background: url(images/darkbluebg.png);
 }
 
 h4 {

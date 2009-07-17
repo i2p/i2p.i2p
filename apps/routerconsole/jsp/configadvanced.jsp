@@ -21,20 +21,23 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- 
+ <div class="configure">
  <form action="configadvanced.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
- <textarea rows="32" cols="100" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br />
-<p>
- <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
-</p><p>
+ <textarea rows="32" cols="60" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br /><hr>
+      <p align="right"> 
+        <input type="submit" name="shouldsave" value="Apply" />
+        <input type="reset" value="Cancel" />
+      </p>
+      <p>
  NOTE: Some changes may require a restart to take effect.
 </p>
  </form>
+</div>
 </div>
 </body>
 </html>

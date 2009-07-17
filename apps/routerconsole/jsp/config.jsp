@@ -18,7 +18,7 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
-
+<div class="configure">
  <form action="config.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigNetHandler.noncePrev", prev);
@@ -29,7 +29,6 @@
  <p>
  <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
  </p>
-<div class="configure" id="configure">
 <p>
     <table>
     <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
@@ -66,7 +65,6 @@
  </p><p>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  </p>
-</div>
 <!--
  <b>Enable load testing: </b>
 <input type="checkbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
@@ -81,7 +79,6 @@
  <p>
  <b>The default settings will work for most people. There is <a href="#chelp">help below</a>.</b>
  </p><p>
- <div class="configure">
  <b>UPnP Configuration:</b><br />
     <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     Enable UPnP to open firewall ports - <a href="peers.jsp#upnp">UPnP status</a>
@@ -165,7 +162,7 @@
     with "SSU introductions" to relay traffic. Most of the options above are for special situations,
     for example where UPnP does not work correctly, or a firewall not under your control is doing
     harm. Certain firewalls such as symmetric NATs may not work well with I2P.
- </p></div>
+ </p>
 <!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
 -->
@@ -248,9 +245,8 @@
      Stop the conflicting program and restart I2P.
  </ul>
  </p>
-</div>
  <hr />
-<!--
+      <!--
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
  <p>
@@ -269,8 +265,8 @@
  </p>
  <hr />
 -->
- </form>
+    </form>
 </div>
-
+</div>
 </body>
 </html>

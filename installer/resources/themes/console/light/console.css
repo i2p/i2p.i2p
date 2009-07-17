@@ -166,7 +166,7 @@ div.confignav {
 div.configure {
      padding: 15px 10px !important;
      margin: 10px 0px 25px 0;
-     background: #ddf;
+     background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;

@@ -26,7 +26,7 @@ button span.hide{
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- 
+ <div class="configure">
  <form action="configclients.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
@@ -56,13 +56,13 @@ button span.hide{
  so disabling the web app here is the preferred method.
  </p><p>
  <jsp:getProperty name="clientshelper" property="form2" />
- </p><p>
+ </p><p><hr>
  <input type="submit" name="action" value="Save WebApp Configuration" />
- </p><p>
+ </p><hr><p>
  <i>All changes require restart to take effect. To change other webapp options, edit the webapps.config file.</i>
  </p>
  </form>
 </div>
-
+</div>
 </body>
 </html>

@@ -64,7 +64,7 @@ function toggleAll(category)
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHelper" id="statshelper" scope="request" />
  <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- 
+ <div class="configure">
  <form id="statsForm" name="statsForm" action="configstats.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigStatsHandler.noncePrev", prev);
@@ -76,7 +76,7 @@ function toggleAll(category)
  if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
  (change requires restart to take effect)<br />
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
- Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br />
+ Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<hr />
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
@@ -102,10 +102,9 @@ function toggleAll(category)
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
  <tr><td colspan="3"><hr /></td></tr>
  <tr><td><input type="submit" name="shouldsave" value="Save changes" /> </td>
-     <td><input type="reset" value="Cancel" /></td></tr>
- </form>
+     <td><input type="reset" value="Cancel" /></td><td></td></tr></form>
  </table>
 </div>
-
+</div>
 </body>
 </html>

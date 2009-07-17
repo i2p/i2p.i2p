@@ -26,14 +26,13 @@
     if (request.getParameter("peer") != null)     
         peer = request.getParameter("peer");
  %>
- 
+ <div class="configure">
  <form action="configpeer.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigPeerHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigPeerHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce")%>" />
- <hr />
- <p>
+<p>
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
@@ -41,20 +40,21 @@
  Router Hash:
  <input type="text" size="55" name="peer" value="<%=peer%>" />
  <h3>Manually Shitlist / Unshitlist a Router</h3>
- Shitlisting will prevent the participation of this peer in tunnels you create.
- <p>
- <input type="submit" name="action" value="Shitlist peer until restart" />
- <input type="submit" name="action" value="Unshitlist peer" />
- <% if (! "".equals(peer)) { %>
-    <font color="blue">&lt;---- click to verify action</font>
- <% } %>
- </p>
-
+ Shitlisting will prevent the participation of this peer in tunnels you create. 
+      <p> 
+        <input type="submit" name="action" value="Shitlist peer until restart" />
+        <input type="submit" name="action" value="Unshitlist peer" />
+        <% if (! "".equals(peer)) { %>
+        <font color="blue">&lt;---- click to verify action</font> 
+        <% } %>
+      </p>
+      <hr />
  <h3>Adjust Profile Bonuses</h3>
- Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers.
- Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels.
- Current bonuses are displayed on the <a href="profiles.jsp">profiles page</a>.
- <p>
+ Bonuses may be positive or negative, and affect the peer's inclusion in Fast 
+      and High Capacity tiers. Fast peers are used for client tunnels, and High 
+      Capacity peers are used for some exploratory tunnels. Current bonuses are 
+      displayed on the <a href="profiles.jsp">profiles page</a>. 
+      <p>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?
@@ -78,6 +78,6 @@
 
 
 </div>
-
+</div>
 </body>
 </html>

@@ -21,9 +21,8 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- 
-<h3>Router Console Theme</h3>
 <div class="configure">
+<h3>Router Console Theme</h3>
  <form action="configui.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUIHandler.noncePrev", prev);
