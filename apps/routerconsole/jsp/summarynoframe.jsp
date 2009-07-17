@@ -12,6 +12,14 @@
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <centre><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></centre><hr />
  <centre>
+ <% java.io.File lpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");
+    // you better have target="_top" for the links in there...
+    if (lpath.exists()) { %>
+   <jsp:useBean class="net.i2p.router.web.ContentHelper" id="linkhelper" scope="request" />
+   <jsp:setProperty name="linkhelper" property="page" value="<%=lpath.getAbsolutePath()%>" />
+   <jsp:setProperty name="linkhelper" property="maxLines" value="100" />
+   <jsp:getProperty name="linkhelper" property="content" />
+<% } else { %>
  <u><b>I2P Services</b></u><br />
  <a href="susimail/susimail" target="blank">Susimail</a> 
  <a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
@@ -29,6 +37,7 @@
  <a href="oldconsole.jsp" target="_top">Internals</a> -->
  <a href="config.jsp" target="_top">Configuration</a> 
  <a href="help.jsp" target="_top">Help</a></b>
+<% } %>
  </center>
  <hr />
  <u><b>General</b></u><br />
