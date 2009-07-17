@@ -138,11 +138,11 @@ hr {
 }
 
 .control {
-     margin: 2px 2px;
+     margin: 6px 0 0 2px !important;
      padding: 2px 0;
      overflow: hidden;
      min-width: 60px;
-     height: 22px;
+     max-height: 24px;
      font-size: 9pt;
      font-weight: bold;
      background-color: #b4c8ff;
@@ -291,7 +291,7 @@ select {
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px solid #99f;
      padding: 2px 2px 2px 4px;
-     height: 24px;
+     max-height: 24px;
 }
 
 form {}
