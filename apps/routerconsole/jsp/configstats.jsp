@@ -77,7 +77,7 @@ function toggleAll(category)
  if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
  (change requires restart to take effect)<br />
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
- Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br />
+ Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<hr />
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
