@@ -3,9 +3,9 @@ body {
      padding: 0px;
      text-align: center;
      font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
-     background-color: #eeeeff;
-     color: #000000;
-     font-size: 9pt;
+     background-color: #eef;
+     color: #001;
+     font-size: 10pt;
 /* we've avoided Tantek Hacks so far,
     ** but we can't avoid using the non-w3c method of 
     ** box rendering. (and therefore one of mozilla's
@@ -21,26 +21,31 @@ div {
      box-sizing: border-box;
 }
 
-h4, label {
+label {
      margin: 0px;
-     padding: 6px 2px 2px 0px;
+     padding: 8px 5px 2px 0px;
      float: left;
-     width: 150px;
+     width: 120px;
      height: 28px;
-     font-weight: bold;
+     font-weight: normal;
      text-align: right;
-     font-size: 1.0em;
+     font-size: 9pt;
+     font-style: italic;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
+/*
+     border: 1px solid #001;
+*/
 }
 
 h4 {
-     font-size: 14px;
+     font-size: 13pt;
+     font-weight: bold !important;
      color: #001;
      text-align: center;
-     width: 100%;
      border: 1px solid #225;
      margin: 5px 0 15px 0;
+     padding: 5px 10px;
      background: #b4c8ff url(images/tabletitlelight.png) repeat-x;
      text-transform: uppercase;
      text-shadow: 0px 0px 2px rgba(64, 64, 255, 0.9);
@@ -129,19 +134,28 @@ hr {
 
 .freetext {
      width: 150px;
-     height: 22px;
-     border: 1px solid #003;
+     height: 24px;
+     border: 1px solid #eef;
      padding: 2px;
      margin: 4px 0 2px 4px;
-     font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-weight: bold;
+     background: #001;
+     color: #fff;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     border-radius: 0 4px 4px 0;
+/*
+     -moz-box-shadow: inset 0px -1px 1px 0px #fff;
+*/
 }
 
 .control {
-     margin: 6px 0 0 4px;
-     padding: 2px 0 2px 0;
+     margin: 10px 0 0 4px !important;
+     padding: 2px;
      overflow: hidden;
      height: 22px;
-     width: 60px;
+     min-width: 60px;
      font-weight: bold;
      background-color: #bbbbff;
      color: black;
@@ -204,9 +218,11 @@ hr {
 .text {
      height: 24px;
      width: 150px;
-     padding: 6px 0 0 2px;
+     padding: 8px 0 0 2px;
      float: left;
      margin: 0;
+     font-size: 9pt !important;
+     font-weight: bold;
 }
 
 .accessKey {
@@ -231,11 +247,12 @@ hr {
 }
 
 select {
-     background-color: #fff;
-     color: #001;
-     margin: 6px 2px 0 2px;
+     background-color: #001;
+     color: #eef;
+     margin: 4px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
      border: 1px solid #99f;
      padding: 2px;
-     height: 22px;
+     height: 26px;
 }
