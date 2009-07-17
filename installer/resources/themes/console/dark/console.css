@@ -159,7 +159,7 @@ div.confignav {
 }
 
 div.configure {
-     padding: 15px;
+     padding: 0 15px;
      margin: 10px 0px;
      background: #005;
      -moz-border-radius: 4px;
@@ -226,6 +226,12 @@ tr:nth-child(even) {
 tr:nth-child(odd) {
      background: #003 url('images/darkbluetile.png') !important;
      vertical-align: middle;
+}
+
+tr:last-child {
+     background: #bbf url('images/lightbluetile.png') !important;
+     font-weight: bold;
+     font-size: 8pt;
 }
 
 td {
@@ -452,7 +458,7 @@ textarea {
      background: #001;
      color: #eef;
      padding: 5px;
-     margin: 0 5px 5px 0px;
+     margin: 15px 15px 5px 0px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
