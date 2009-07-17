@@ -38,7 +38,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
         <div class="footer">
             <div class="toolbox">
-                <a class="control" href="file:///d|/temp/guitone-boss/index.jsp">Refresh</a>
+                <a class="control" href="index.jsp">Refresh</a>
             </div>
         </div>    
     </div>
@@ -47,7 +47,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <div class="header"></div>
         <div class="footer">
             <div class="toolbox">
-                <a class="control" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop%20all">Stop All</a> <a class="control" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start%20all">Start All</a> <a class="control" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=restart%20all">Restart All</a> <a class="control" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=reload%20configuration">Reload Config</a>
+                <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop%20all">Stop All</a> <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start%20all">Start All</a> <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=restart%20all">Restart All</a> <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=reload%20configuration">Reload Config</a>
             </div>
         </div> 
     </div>
@@ -83,7 +83,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
       %>
         <div class="nameField rowItem">
             <label>Name:</label>
-            <span class="text"><a href="file:///d|/temp/guitone-boss/edit.jsp?tunnel=<%=curserver%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curserver%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
         </div>
         <div class="previewField rowItem">
             <label>Points at:</label>
@@ -120,17 +120,17 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
                 case IndexBean.STARTING:
           %><div class="separator"></div>
 		  <div class="statusStarting text">Starting...</div>    
-            <a class="control" title="Stop this Tunnel" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curserver%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curserver%>">Stop</a>
         <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text">Running</div>    
-            <a class="control" title="Stop this Tunnel" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curserver%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curserver%>">Stop</a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text">Stopped</div>    
-            <a class="control" title="Start this Tunnel" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start&tunnel=<%=curserver%>">Start</a>
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start&tunnel=<%=curserver%>">Start</a>
         <%
                 break;
             }
@@ -152,7 +152,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
            
         <div class="footer">
-            <form id="addNewServerTunnelForm" action="file:///D|/Temp/guitone-Boss/edit.jsp"> 
+            <form id="addNewServerTunnelForm" action="edit.jsp"> 
             <div class="toolbox">
                     
         <label>New server tunnel:</label>
@@ -202,7 +202,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
       %>
         <div class="nameField rowItem">
             <label>Name:</label>
-            <span class="text"><a href="file:///d|/temp/guitone-boss/edit.jsp?tunnel=<%=curclient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curclient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
         </div>
         <div class="portField rowItem">
             <label>Port:</label>
@@ -227,17 +227,17 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
                 break;
                 case IndexBean.STANDBY:
           %><div class="statusStarting text">Standby</div>
-            <a class="control" title="Stop this Tunnel" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curclient%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curclient%>">Stop</a>
         <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text">Running</div>
-            <a class="control" title="Stop this Tunnel" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curclient%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curclient%>">Stop</a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text">Stopped</div>
-            <a class="control" title="Start this Tunnel" href="file:///d|/temp/guitone-boss/index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start&tunnel=<%=curclient%>">Start</a>
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start&tunnel=<%=curclient%>">Start</a>
         <%
                 break;
             }
@@ -272,7 +272,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
     
         <div class="footer">
-            <form id="addNewClientTunnelForm" action="file:///D|/Temp/guitone-Boss/edit.jsp">
+            <form id="addNewClientTunnelForm" action="edit.jsp">
                 <div class="toolbox">
                     
         <label>New client tunnel:</label>
