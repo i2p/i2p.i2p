@@ -7,7 +7,6 @@
 <%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
  <h1>I2P Network Database Summary</h1>
 <div class="main" id="main">

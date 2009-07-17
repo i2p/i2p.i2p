@@ -7,7 +7,6 @@
 <%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 <h1>I2P Router Help & Support</h1>
 <div class="main" id="main"><div align="justify">
@@ -186,7 +185,7 @@ client applications can be found on our <a href="http://www.i2p2.i2p/download">d
 
 <h2>Release history</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
- <% File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
+ <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="256" />
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />

@@ -9,7 +9,6 @@
 <jsp:useBean class="net.i2p.router.web.ConfigLoggingHelper" id="logginghelper" scope="request" />
 <jsp:setProperty name="logginghelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 <h1>I2P Logging Configuration</h1>
 <div class="main" id="main">

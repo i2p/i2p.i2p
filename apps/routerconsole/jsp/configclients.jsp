@@ -12,7 +12,6 @@ button span.hide{
 </style>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />

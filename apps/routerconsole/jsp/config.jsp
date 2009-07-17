@@ -6,7 +6,6 @@
 <%@include file="css.jsp" %>
 </head><body>
 
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigNetHelper" id="nethelper" scope="request" />

@@ -52,7 +52,6 @@ function toggleAll(category)
 }
 </script>
 </head><body onLoad="init();">
-<%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 <h1>I2P Stats Configuration</h1>
 <div class="main" id="main">
