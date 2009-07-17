@@ -65,7 +65,7 @@ function toggleAll(category)
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHelper" id="statshelper" scope="request" />
  <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <div class="caonfigure">
+ <div class="configure">
  <form id="statsForm" name="statsForm" action="configstats.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigStatsHandler.noncePrev", prev);

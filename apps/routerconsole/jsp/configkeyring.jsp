@@ -22,7 +22,7 @@
 
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHelper" id="keyringhelper" scope="request" />
  <jsp:setProperty name="keyringhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-
+<div class="configure">
  <p>
  <h2>Keyring</h2>
  The router keyring is used to decrypt encrypted leaseSets.
@@ -41,17 +41,23 @@
  Enter keys for encrypted remote destinations here.
  Keys for local destinations must be entered on the <a href="i2ptunnel/index.jsp">I2PTunnel page</a>.
  <p>
- <table>
- <tr><td>Dest. name, hash, or full key:
- <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea>
- <tr><td align="right">Session Key:
- <td><input type="text" size="55" name="key" />
- <tr><td><td><input type="submit" name="action" value="Add key" />
- </table>
+      <table>
+        <tr>
+          <td>Dest. name, hash, or full key: 
+          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea> 
+        <tr>
+          <td align="right">Session Key: 
+          <td><input type="text" size="55" name="key" /> 
+        <tr>
+          <td>
+          <td><div align="right"> 
+              <input type="submit" name="action" value="Add key" />
+            </div>
+      </table>
  </form>
 
 
 </div>
-
+</div>
 </body>
 </html>
