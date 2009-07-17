@@ -15,8 +15,9 @@
  <jsp:setProperty name="graphHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="graphHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="graphHelper" property="images" />
+ <div class="configure">
  <jsp:getProperty name="graphHelper" property="form" />
 </div>
-
+</div>
 </body>
 </html>
