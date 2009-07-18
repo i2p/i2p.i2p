@@ -26,11 +26,14 @@ pre {
 div.logo {
      float: left;
      padding: 10px 10px 10px 14px;
-     text-align: left;
+     text-align: center;
      font-color: #fff;
-     border: 0px solid #f00;
      margin: 0 20px 0 14px;
-     display: none !important;
+     border: 1px solid #002;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #ddddff url('images/lightbluetile.png');
 }
 
 div.toolbar {
@@ -97,12 +100,19 @@ div.routersummary {
 }
 
 div.warning {
-     margin: 0em 1em 1em 224px;
-     padding: .5em 1em;
-     background: #ffefef;
-     border: medium solid #ffafaf;
+     margin: 0 20px 10px 224px;
+     padding: 20px 25px 20px 75px;
+     background: #fff;
+     border: 1px solid #d00;
      text-align: left;
      color: inherit;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image:url("images/errortriangle.png");
+     background-position:15px center;
+     background-repeat:no-repeat;
 }
 
 div.main {
@@ -209,7 +219,7 @@ table {
      margin: 5px 0px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
-     background: #ddf;
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
 }
 
 th {
@@ -235,7 +245,6 @@ tr:nth-child(odd) {
 tr:last-child {
      background: #bbf url('images/tabletilelighter.png') !important;
      font-weight: bold;
-     font-size: 8pt;
      border: 1px solid #002 !important;
 }
 
@@ -474,3 +483,15 @@ textarea {
 }
 
 form {}
+
+.proxyfooter {
+     margin: 0 20px 10px 224px;
+     padding: 20px 25px 20px 75px;
+     font-color: #f00;
+     font-size: 7pt;
+     text-align: right !important;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 1px solid #001;
+}    

@@ -100,12 +100,19 @@ div.routersummary {
 }
 
 div.warning {
-     margin: 0em 1em 1em 224px;
-     padding: .5em 1em;
-     background: #ffefef;
-     border: medium solid #ffafaf;
+     margin: 0 20px 10px 224px;
+     padding: 20px 25px 20px 75px;
+     background: #fff;
+     border: 1px solid #d00;
      text-align: left;
      color: inherit;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image:url("images/errortriangle.png");
+     background-position:15px center;
+     background-repeat:no-repeat;
 }
 
 div.main {
@@ -229,9 +236,9 @@ tr:nth-child(odd) {
 }
 
 tr:last-child {
-     background: #bbf url('images/lightbluetile.png') !important;
+     background: #004 url('images/lightbluetile.png') !important;
      font-weight: bold;
-     font-size: 8pt;
+     border: 1px solid #99f !important;
 }
 
 td {
@@ -470,3 +477,8 @@ textarea {
 }
 
 form {}
+
+.proxyfooter {
+     font-color: #f00;
+     font-size: 7pt;
+}    

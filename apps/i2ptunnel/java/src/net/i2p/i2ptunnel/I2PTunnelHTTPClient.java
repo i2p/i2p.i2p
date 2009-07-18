@@ -386,9 +386,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                     String conflictURL = protocol + alias + ".i2p/?" + initialFragments;
                                     out.write(header);
                                     out.write(("To visit the destination in your host database, click <a href=\"" + trustedURL + "\">here</a>. To visit the conflicting addresshelper link by temporarily giving it a random alias, click <a href=\"" + conflictURL + "\">here</a>.<P/>").getBytes());
-                                    out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
+                                    out.write("</div><div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
                                     out.write(new Date().toString().getBytes());
-                                    out.write("</i></body></html>\n".getBytes());
+                                    out.write("</i></div></body></html>\n".getBytes());
                                     out.flush();
                                 }
                                 s.close();
@@ -727,9 +727,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     }
                 }
             }
-            out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
+            out.write("</div><div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
             out.write(new Date().toString().getBytes());
-            out.write("</i></body></html>\n".getBytes());
+            out.write("</i></div></body></html>\n".getBytes());
             out.flush();
         }
     }
