@@ -25,16 +25,17 @@ pre {
 
 div.logo {
      float: left;
-     left: 10px;
-     top: 0px;
-     padding: 10px 10px 10px 14px;
-     text-align: left;
+     padding: 10px;
+     text-align: center;
      font-color: #fff;
-     border: 0px solid #f00;
-     margin: 0px;
-     background: #003;
-     display: none;
-     border-bottom: 1px solid #eef;
+     margin: 0 20px 0 20px;
+     border: 1px solid #99f;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #003 url('images/darkbluebg.png');
+     width: 175px;
+     -moz-box-shadow: inset 0px 0px 16px 0px #009;
 }
 
 div.toolbar {
@@ -100,12 +101,12 @@ div.routersummary {
 }
 
 div.warning {
-     margin: 0 20px 10px 224px;
-     padding: 20px 25px 20px 75px;
-     background: #fff;
+     margin: 5px 20px 10px 240px;
+     padding: 0px 25px 20px 75px;
+     background: #005;
      border: 1px solid #d00;
      text-align: left;
-     color: inherit;
+     color: #fff;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -173,7 +174,7 @@ div.configure {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #99f;
-     background: url(images/darkbluebg.png);
+     background: #003 url(images/darkbluebg.png);
 }
 
 div.messages {
@@ -479,6 +480,14 @@ textarea {
 form {}
 
 .proxyfooter {
+     margin: 0 20px 10px 240px;
+     padding: 20px 25px 20px 75px;
      font-color: #f00;
      font-size: 7pt;
-}    
+     text-align: right !important;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 1px solid #001;
+     display: none;
+}        
