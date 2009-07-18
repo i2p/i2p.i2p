@@ -47,7 +47,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <div class="header"></div>
         <div class="footer">
             <div class="toolbox">
-                <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop%20all">Stop All</a> <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start%20all">Start All</a> <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=restart%20all">Restart All</a> <a class="control" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=reload%20configuration">Reload Config</a>
+                <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all">Stop All</a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all">Start All</a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all">Restart All</a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration">Reload Config</a>
             </div>
         </div> 
     </div>
@@ -74,7 +74,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
         <div class="statusHeaderField rowItem">
             <label>Status:</label>
-       </div>
+<hr />        </div>
         
         <%
         for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
@@ -83,7 +83,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
       %>
         <div class="nameField rowItem">
             <label>Name:</label>
-            <span class="text"><a href="edit.jsp?tunnel=<%=curserver%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
         </div>
         <div class="previewField rowItem">
             <label>Points at:</label>
@@ -118,19 +118,18 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <%
             switch (indexBean.getTunnelStatus(curServer)) {
                 case IndexBean.STARTING:
-          %><div class="separator"></div>
-		  <div class="statusStarting text">Starting...</div>    
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curserver%>">Stop</a>
+          %><div class="statusStarting text">Starting...</div>    
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
         <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text">Running</div>    
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curserver%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text">Stopped</div>    
-            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start&tunnel=<%=curserver%>">Start</a>
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curServer%>">Start</a>
         <%
                 break;
             }
@@ -195,6 +194,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
 
         <div class="separator">
+            <hr />
         </div>
         <%
         for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
@@ -202,7 +202,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
       %>
         <div class="nameField rowItem">
             <label>Name:</label>
-            <span class="text"><a href="edit.jsp?tunnel=<%=curclient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curClient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
         </div>
         <div class="portField rowItem">
             <label>Port:</label>
@@ -221,23 +221,23 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <%
             switch (indexBean.getTunnelStatus(curClient)) {
                 case IndexBean.STARTING:
-          %><div class="statusStarting text">Starting...</div> <div class="separator></div>
+          %><div class="statusStarting text">Starting...</div>
             <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
         <%
                 break;
                 case IndexBean.STANDBY:
           %><div class="statusStarting text">Standby</div>
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curclient%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
         <%
                 break;
                 case IndexBean.RUNNING:
           %><div class="statusRunning text">Running</div>
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=stop&tunnel=<%=curclient%>">Stop</a>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
           %><div class="statusNotRunning text">Stopped</div>
-            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexbean.getnextnonce()%>&action=start&tunnel=<%=curclient%>">Start</a>
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curClient%>">Start</a>
         <%
                 break;
             }
@@ -291,6 +291,5 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </div>
     <div id="pageFooter">
     </div>
-	</div>
 </body>
 </html>
