@@ -1,35 +1,12 @@
 <div class="confignav" id="confignav">
 <center>
-<!--
-<b>
-<% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
- %>Network<% }
- else if (request.getRequestURI().indexOf("configui.jsp") != -1) {
- %>UI<% }
- else if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
- %>Service<% }
- else if (request.getRequestURI().indexOf("configupdate.jsp") != -1) {
- %>Update<% }
- else if (request.getRequestURI().indexOf("configtunnels.jsp") != -1) {
- %>Tunnels<% }
- else if (request.getRequestURI().indexOf("configclients.jsp") != -1) {
- %>Clients<% }
- else if (request.getRequestURI().indexOf("configpeer.jsp") != -1) {
- %>Peers<% }
- else if (request.getRequestURI().indexOf("configkeyring.jsp") != -1) {
- %>Keyring<% }
- else if (request.getRequestURI().indexOf("configlogging.jsp") != -1) {
- %>Logging<% }
- else if (request.getRequestURI().indexOf("configstats.jsp") != -1) {
- %>Stats<% }
- else if (request.getRequestURI().indexOf("configadvanced.jsp") != -1) {
- %>Advanced<% }%>
-Configuration</b>
--->
 <% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
- if (request.getRequestURI().indexOf("configui.jsp") != -1) {
- %>UI | <% } else { %><a href="configui.jsp">UI</a> | <% }
+ String userAgent = request.getHeader("User-Agent");
+ if (userAgent == null || !userAgent.contains("MSIE")) {
+     if (request.getRequestURI().indexOf("configui.jsp") != -1) {
+     %>UI | <% } else { %><a href="configui.jsp">UI</a> | <% }
+ }
  if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
  %>Service | <% } else { %><a href="configservice.jsp">Service</a> | <% }
  if (request.getRequestURI().indexOf("configupdate.jsp") != -1) {
