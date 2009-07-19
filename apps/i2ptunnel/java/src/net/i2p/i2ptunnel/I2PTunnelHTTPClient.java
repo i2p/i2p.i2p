@@ -816,6 +816,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
      *  @param targetRequest "proxy.i2p/themes/foo.png HTTP/1.1"
      */
     private static void serveLocalFile(OutputStream out, String method, String targetRequest) {
+        // a home page message for the curious...
+        if (targetRequest.startsWith("proxy.i2p/ ")) {
+            try {
+                out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes());
+                out.flush();
+            } catch (IOException ioe) {}
+            return;
+        }
         if ((method.equals("GET") || method.equals("HEAD")) &&
             targetRequest.startsWith("proxy.i2p/themes/") &&
             !targetRequest.contains("..")) {
@@ -824,13 +832,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             try {
                 filename = targetRequest.substring(10, space);
             } catch (IndexOutOfBoundsException ioobe) {}
-            if (filename == null || filename.length() <= 0) {
-                try {
-                    out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes());
-                    out.flush();
-                } catch (IOException ioe) {}
-                return;
-            }
             // theme hack
             if (filename.startsWith("themes/console/default/"))
                 filename = filename.replaceFirst("default", I2PAppContext.getGlobalContext().getProperty("routerconsole.theme", "light"));
