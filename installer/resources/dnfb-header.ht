@@ -22,4 +22,4 @@ wrong BASE64 string or the link you are following is
 bad. The I2P host could also 
 be offline.  You may want to 
 <a href="javascript: window.location.reload()">retry</a>. 
-<BR><BR>Could not find the following destination:<BR><BR>
+<hr><b>Could not find the following destination:</b><BR><BR>

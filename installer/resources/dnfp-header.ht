@@ -26,4 +26,4 @@ as this will randomly reselect an outproxy from the pool you have defined
 (if you have more than one configured). 
 If you continue to have trouble you may want to edit your outproxy list 
 <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">here</a>. 
-<BR><BR>Could not find the following destination:<BR><BR>
+<hr><b>Could not find the following destination:</b><BR><BR>
