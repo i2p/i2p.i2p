@@ -95,7 +95,8 @@ public class GraphHelper extends HelperBase {
                            + "\" title=\"" + title + "\" /></a>\n");
             }
             if (_refreshDelaySeconds > 0)
-                _out.write("<meta http-equiv=\"refresh\" content=\"" + _refreshDelaySeconds + "\" />\n");
+                // shorten the refresh by 3 seconds so we beat the iframe
+                _out.write("<meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + "\" />\n");
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
