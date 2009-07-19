@@ -23,6 +23,10 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure">
 <h3>Router Console Theme</h3>
+<%
+ // userAgent defined in confignav
+ if (userAgent == null || !userAgent.contains("MSIE")) {
+%>
  <form action="configui.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUIHandler.noncePrev", prev);
@@ -33,6 +37,9 @@
 <hr> 	
 <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
 </form>
+<% } else { %>
+Theme selection disabled for Internet Explorer, sorry.
+<% } %>
 </div>
 </div>
 </body>
