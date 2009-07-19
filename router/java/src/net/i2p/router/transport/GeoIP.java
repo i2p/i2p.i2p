@@ -212,10 +212,10 @@ public class GeoIP {
                     String[] s = buf.toString().split(",");
                     long ip1 = Long.parseLong(s[0]);
                     long ip2 = Long.parseLong(s[1]);
-                    while (search[idx].longValue() < ip1 && idx < search.length) {
+                    while (idx < search.length && search[idx].longValue() < ip1) {
                         idx++;
                     }
-                    while (search[idx].longValue() >= ip1 && search[idx].longValue() <= ip2 && idx < search.length) {
+                    while (idx < search.length && search[idx].longValue() >= ip1 && search[idx].longValue() <= ip2) {
                         rv[idx++] = s[2].toLowerCase();
                     }
                 } catch (IndexOutOfBoundsException ioobe) {
