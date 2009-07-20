@@ -1,114 +1,117 @@
 body {
-	font-family: Verdana, Tahoma, Helvetica, sans-serif;
-	margin: 1em 0em;
-	padding: 0em;
-	text-align: center;
-	background-color: white;
-	color: black;
-	font-size: 100%;
+     margin: 1em 0em;
+     padding: 0em;
+     text-align: center;
+     background: #FFF;
+     color: #000;
+     font: 100% Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
-	display: none;
+     display: none;
 }
 
 img {
-	border: none;
+     border: none;
 }
 
 pre {
-	width: 100%;
-	overflow-x: scroll;
+     width: 100%;
+     overflow-x: scroll;
 }
 
 div.logo {
-	float: left;
-	width: 200px;
-	left: 1em;
-	top: 1em;
-	margin: 0em;
-	padding: .5em;
-	text-align: center;
-	display: none !important;
+     float: left;
+     width: 200px;
+     left: 1em;
+     top: 1em;
+     margin: 0em;
+     padding: .5em;
+     text-align: center;
+     display: none !important;
 }
 
 div.toolbar {
-	margin: 0em 0em 2em 0em;
-	font-weight: bold;
-	display: none !important;
+     margin: 0em 0em 2em 0em;
+     font-weight: bold;
+     display: none !important;
 }
 
 div.routersummaryouter {
-	float: left;
-	width: 200px;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	clear: left; /* fixes a bug in Opera */
-	overflow: auto;
+     float: left;
+     width: 200px;
+     margin: 0;
+     padding: 0;
+     border: 0;
+     clear: left;/* fixes a bug in Opera */
+     overflow: auto;
 }
 
 div.routersummary {
-	background-color: #fafaff;
-	width: 200px;
-	color: inherit;
-	margin: 0em;
-	padding: 5px;
-	text-align: left;
-	border: medium solid #efefff;
-	font-size: 0.82em;
+     background: #fafaff;
+     width: 200px;
+     color: inherit;
+     margin: 0em;
+     padding: 5px;
+     text-align: left;
+     border: medium solid #efefff;
+     font-size: 0.82em;
 }
 
 div.warning {
-	margin: 0em 1em 1em 224px;
-	padding: .5em 1em;
-	background-color: #ffefef;
-	border: medium solid #ffafaf;
-	text-align: left;
-	color: inherit;
+     margin: 0em 1em 1em 224px;
+     padding: .5em 1em;
+     background: #ffefef;
+     border: medium solid #ffafaf;
+     text-align: left;
+     color: inherit;
 }
 
 div.main {
-	margin: 0em 1em 1em 224px;
-	padding: .5em 1em;
-	background-color: #ffffef;
-	border: medium solid #ffffd0;
-	text-align: left;
-	color: inherit;
+     margin: 0em 1em 1em 224px;
+     padding: .5em 1em;
+     background: #ffffef;
+     border: medium solid #ffffd0;
+     text-align: left;
+     color: inherit;
 }
 
 div.main textarea {
-	width: 100% !important;
+     width: 100% !important;
 }
 
 div.news {
-	margin: 0em 1em 1em 224px;
-	padding: .5em 1em;
-	background-color: #ffffc0;
-	border: medium solid #ffffa0;
-	text-align: left;
-	color: inherit;
+     margin: 0em 1em 1em 224px;
+     padding: .5em 1em;
+     background: #ffffc0;
+     border: medium solid #ffffa0;
+     text-align: left;
+     color: inherit;
 }
 
 div.confignav {
-	padding: 1em;
-	background-color: #efefff;
+     padding: 1em;
+     background: #efefff;
 }
 
 div.configure {
-	padding: 1em;
-	background-color: #ffffc0;
+     padding: 1em;
+     background: #ffffc0;
 }
 
 div.messages {
-	padding: 1em;
-	background-color: #fafaff;
+     padding: 1em;
+     background: #fafaff;
 }
 
 div.messages span.error {
-	color: #d00000;
+     color: #d00000;
 }
 
 div.messages span.notice {
-	font-style: italic;
+     font-style: italic;
+}
+
+h1 {
+     font-size: 18pt;
 }
