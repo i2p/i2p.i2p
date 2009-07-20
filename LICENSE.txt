@@ -177,7 +177,11 @@ Applications:
 
    Router console:
    Public domain.
-   Flag icons public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
+       Flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
+
+       GeoIP Data:
+       Copyright (c) 2003 Direct Information Pvt. Ltd. All Rights Reserved.
+       See licenses/LICENSE-GeoIP.txt
 
    SAM:
    Public domain.
