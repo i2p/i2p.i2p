@@ -116,7 +116,7 @@ public class ConfigClientsHandler extends FormHandler {
                         path = new File(path, app + ".war");
                         s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
                         // no passwords... initialize(wac);
-                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "<a> started");
+                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "</a> started");
                     } catch (Exception ioe) {
                         addFormError("Failed to start " + app + " " + ioe);
                     }
