@@ -61,7 +61,7 @@ class PeerManager {
             _peersByCapability[i] = new ArrayList(64);
         loadProfiles();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 30*1000);
+        SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 45*1000);
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
     

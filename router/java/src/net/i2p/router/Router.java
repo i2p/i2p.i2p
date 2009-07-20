@@ -75,6 +75,9 @@ public class Router {
     /** used to differentiate routerInfo files on different networks */
     public static final int NETWORK_ID = 2;
     
+    /** coalesce stats this often - should be a little less than one minute, so the graphs get updated */
+    private static final int COALESCE_TIME = 50*1000;
+
     /** this puts an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN = "router.hiddenMode";
     /** this does not put an 'H' in your routerInfo **/
@@ -312,7 +315,7 @@ public class Router {
         _context.inNetMessagePool().startup();
         startupQueue();
         //_context.jobQueue().addJob(new CoalesceStatsJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), 20*1000);
+        SimpleScheduler.getInstance().addPeriodicEvent(new CoalesceStatsEvent(_context), COALESCE_TIME);
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob(_context));
         warmupCrypto();
         //_sessionKeyPersistenceHelper.startup();
@@ -1348,7 +1351,7 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         getContext().statManager().addRateData("router.memoryUsed", used, 0);
 
-        getContext().tunnelDispatcher().updateParticipatingStats();
+        getContext().tunnelDispatcher().updateParticipatingStats(COALESCE_TIME);
 
         getContext().statManager().coalesceStats();
 
