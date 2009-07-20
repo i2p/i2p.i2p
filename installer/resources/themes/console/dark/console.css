@@ -35,7 +35,7 @@ div.logo {
      border-radius: 4px;
      background: #003 url('images/darkbluebg.png');
      width: 175px;
-     -moz-box-shadow: inset 0px 0px 16px 0px #009;
+     -moz-box-shadow: inset 0px 0px 1px 0px #009;
 }
 
 div.toolbar {
@@ -97,7 +97,7 @@ div.routersummary {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      float: left;
-     -moz-box-shadow: inset 0px 0px 16px 0px #009;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
 }
 
 div.warning {
@@ -143,6 +143,7 @@ div.news {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: justify;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
 }
 
 div.news li {
@@ -164,6 +165,7 @@ div.confignav {
      font-size: 10pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
 }
 
 div.configure {
@@ -175,6 +177,7 @@ div.configure {
      border-radius: 4px;
      border: 1px solid #99f;
      background: #003 url(images/darkbluebg.png);
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
 }
 
 div.messages {
@@ -185,6 +188,7 @@ div.messages {
      border-radius: 4px;
      border: 1px solid #99f;
      background: #008 url('images/lightbluetile.png');
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
 }
 
 div.messages span.error {
@@ -321,7 +325,7 @@ h1 {
      text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.8);
      white-space: normal;
      background: #004 url('images/darkbluebg.png');
-     -moz-box-shadow: inset 0px 0px 16px 0px #009;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      border: 1px solid #99f;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -343,6 +347,7 @@ h2 {
      -khtml-border-radius: 4px;
      vertical-align: middle;
      margin: 25px 0 20px 0 !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
 }
 
 h2 a:visited {
@@ -362,8 +367,8 @@ h3 {
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #004;
-     background: url(images/darkbluebg.png);
+     background: #007;
+/*     background: url(images/lightbluebg.png);*/
 }
 
 h4 {
