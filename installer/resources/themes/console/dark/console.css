@@ -104,7 +104,7 @@ div.warning {
      margin: 5px 20px 10px 240px;
      padding: 0px 25px 20px 75px;
      background: #005;
-     border: 1px solid #d00;
+     border: 1px solid #99f;
      text-align: left;
      color: #fff;
      -moz-border-radius: 4px;
@@ -114,6 +114,7 @@ div.warning {
      background-image:url("images/errortriangle.png");
      background-position:15px center;
      background-repeat:no-repeat;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
 }
 
 div.main {

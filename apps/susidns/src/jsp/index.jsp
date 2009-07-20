@@ -33,11 +33,11 @@
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
-
+<div class="page">
 <div id="logo">
 <img src="images/logo.png" alt="susidns logo" border="0"/>
 </div>
-
+<hr>
 <div id="navi">
 <p>addressbooks
 <a href="addressbook.jsp?book=master">master</a> |
@@ -49,7 +49,7 @@
 overview
 </p>
 </div>
-
+<hr>
 <div id="content">
 <h3>Huh? what addressbook?</h3>
 <p>
@@ -74,11 +74,12 @@ The router also uses a private addressbook (privatehosts.txt, not shown in the p
 Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others.
 The private addressbook can also be used for aliases of hosts in your other addressbooks.
 </p>
-<p><img src="images/how.png" border="0" alt="addressbook working scheme"/></p>
-</div>
-
+<p><center><img src="images/how.png" border="0" alt="addressbook working scheme" title="How the addressbook works" class="illustrate" /></center></p>
+</div>	
+<hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+</div>
 </div>
 </body>
 </html>

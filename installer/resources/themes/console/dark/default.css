@@ -21,25 +21,27 @@ div {
      box-sizing: border-box;
 }
 
-h4, label {
+label {
      margin: 0;
-     padding: 4px;
+     padding: 5px 4px 4px 4px;
      float: left;
-     width: 150px;
+     width: 120px;
 /*    height :  24px; */
-     font-weight: bold;
+     font-weight: normal;
      text-align: right;
-     font-size: 1.0em;
+     font-size: 8pt;
+     font-style: italic;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
 }
 
 h4 {
      font-size: 14px;
+     font-weight: bold !important;
      text-align: center;
-     width: 100%;
      border: 1px solid #99f;
      margin: 5px 0 15px 0;
+     padding: 5px 10px;
      background: #004 url(images/tabletitledark.png) repeat-x;
      text-transform: uppercase;
      text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
@@ -214,11 +216,13 @@ hr {
 }
 
 .text {
-     height: 24px;
+/*     height: 24px;*/
      width: 150px;
      padding: 4px 0 0 2px;
      float: left;
      margin: 0;
+     font-size: 9pt !important;
+     font-weight: bold;
 }
 
 .accessKey {
