@@ -579,9 +579,10 @@ class BuildHandler {
         // Connection congestion control:
         // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
         // just drop it.
+        // 81% = between 75% control measures in Transports and 87% rejection above
         if (response != 0 &&
             (! _context.routerHash().equals(nextPeer)) &&
-            (! _context.commSystem().haveOutboundCapacity(75)) &&
+            (! _context.commSystem().haveOutboundCapacity(81)) &&
             (! _context.commSystem().isEstablished(nextPeer))) {
             _context.statManager().addRateData("tunnel.dropConnLimits", 1, 0);
             return;
