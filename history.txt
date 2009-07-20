@@ -1,3 +1,23 @@
+2009-07-20 zzz
+    * BuildHandler: Increase threshold for dropping instead
+      of rejecting to 81% (was 75%)
+    * Console: Hide configui.jsp from IE, disable selection
+    * GeoIP: Fix minor bugs (thanks Arsene)
+    * graphs.jsp: Reduce refresh time to eliminate double iframe load
+    * HTTP Proxy: Fix proxy.i2p "home page" (thanks dr|z3d)
+    * I2PSnark: Remove Postman tracker
+    * Peer Profiles:
+      - Reduce max age for display to 2h (was 3h)
+      - Drop unused Persist classes
+      - Dynamically adjust expire time to control memory use
+      - Increase reorganize time to 45s (was 30s) to reduce CPU use
+        and lock contention
+      - Remove some stat rates
+      - Delay start of PeerTestJob
+    * Stats: Increase coalesce time to 50s (was 20s) to reduce CPU use
+    * summarynoframe.jsp: Cleanup
+    * Transports: Reduce the number of Rates
+
 2009-07-16 zzz
     * HTTP Proxy: Themes for error pages
 
