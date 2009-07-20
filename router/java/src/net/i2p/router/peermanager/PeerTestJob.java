@@ -53,6 +53,7 @@ public class PeerTestJob extends JobImpl {
     public void startTesting(PeerManager manager) { // LINT -- Exporting non-public type through public API
         _manager = manager;
         _keepTesting = true;
+        this.getTiming().setStartAfter(getContext().clock().now() + DEFAULT_PEER_TEST_DELAY);
         getContext().jobQueue().addJob(this); 
         if (_log.shouldLog(Log.INFO))
             _log.info("Start testing peers");
