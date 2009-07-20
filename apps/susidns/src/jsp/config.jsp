@@ -35,9 +35,10 @@
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
+<div class="page">
 <div id="logo">
 <img src="images/logo.png" alt="susidns logo" border="0"/>
-</div>
+</div><hr>
 <div id="navi">
 <p>
 addressbooks
@@ -49,7 +50,7 @@ addressbooks
 configuration *
 <a href="index.jsp">overview</a>
 </p>
-</div>
+</div><hr>
 <div id="headline">
 <h3>${cfg.fileName}</h3>
 </div>
@@ -90,9 +91,10 @@ Use the private addressbook for private destinations, these are not published.
 <li><b>last_modified</b> - file containing the modification timestamp for each fetched subscription URL (no need to change)</li>
 <li><b>log</b> - file to log activity to (change to /dev/null if you like)</li>
 </ul>
-</div>
+</div><hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005 </p>
+</div>
 </div>
 </body>
 </html>

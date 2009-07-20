@@ -39,11 +39,11 @@
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
-
+<div class="page">
 <div id="logo">
 <img src="images/logo.png" alt="susidns logo" border="0"/>
 </div>
-
+<hr>
 <div id="navi">
 <p>addressbooks
 <a href="addressbook.jsp?book=master&filter=none&begin=0&end=99">master</a> |
@@ -55,7 +55,7 @@
 <a href="index.jsp">overview</a>
 </p>
 </div>
-
+<hr>
 <div id="headline">
 <h3>${book.book} addressbook at ${book.fileName}</h3>
 </div>
@@ -175,9 +175,10 @@
 </div>
 
 </form>
-
+<hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
+</div>
 </div>
 </body>
 </html>
