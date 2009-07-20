@@ -24,7 +24,7 @@ public class OutboundRefiller implements Runnable {
         _fragments = fragments;
         _messages = messages;
         _refillLock = this;
-        _context.statManager().createRateStat("udp.timeToActive", "Message lifetime until it reaches the outbound fragment queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.timeToActive", "Message lifetime until it reaches the outbound fragment queue", "udp", UDPTransport.RATES);
     }
     
     public void startup() {

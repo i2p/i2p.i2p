@@ -154,6 +154,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
     private static final int TEST_FREQUENCY = 13*60*1000;
+    public static final long[] RATES = { 10*60*1000 };
     
     public UDPTransport(RouterContext ctx) {
         super(ctx);
@@ -188,18 +189,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _lastInboundReceivedOn = -1;
         _needsRebuild = true;
         
-        _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", new long[] { 60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", new long[] { 1*60*1000, 20*60*1000 });
-        _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", new long[] { 1*60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", RATES);
+        _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", RATES);
+        _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", RATES);
+        _context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", RATES);
+        _context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", RATES);
+        _context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", RATES);
+        _context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", RATES);
+        _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", RATES);
+        _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", RATES);
+        _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", RATES);
+        _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
+        _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
         __instance = this;
     }
     
@@ -2130,6 +2131,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     private static final long STATUS_GRACE_PERIOD = 5*60*1000;
+    private long _statusLastCalled;
+    private short _lastStatus = CommSystemFacade.STATUS_UNKNOWN;
     
     void setReachabilityStatus(short status) { 
         short old = _reachabilityStatus;
@@ -2147,6 +2150,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 _context.statManager().addRateData("udp.statusReject", 1, 0);
+// if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
+//
                 // fall through...
             case CommSystemFacade.STATUS_HOSED:
                 _reachabilityStatus = status; 
@@ -2164,6 +2169,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 //}
                 break;
         }
+        _statusLastCalled = now;
+        _lastStatus = status;
         if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
