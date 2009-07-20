@@ -597,6 +597,12 @@ public class ProfileOrganizer {
         } finally { releaseReadLock(); }
     }
     
+    private static final long MIN_EXPIRE_TIME = 3*60*60*1000;
+    private static final long MAX_EXPIRE_TIME = 6*60*60*1000;
+    private static final long ADJUST_EXPIRE_TIME = 60*1000;
+    private static final int ENOUGH_PROFILES = 600;
+    private long _currentExpireTime = MAX_EXPIRE_TIME;
+
     /**
      * Place peers into the correct tier, as well as expand/contract and even drop profiles
      * according to whatever limits are in place.  Peer profiles are not coalesced during
@@ -614,8 +620,13 @@ public class ProfileOrganizer {
         long uptime = _context.router().getUptime();
         long expireOlderThan = -1;
         if (uptime > 60*60*1000) {
-            // drop profiles that we haven't spoken with in 6 hours
-            expireOlderThan = _context.clock().now() - 6*60*60*1000;
+            // dynamically adjust expire time to control memory usage
+            if (countNotFailingPeers() > ENOUGH_PROFILES)
+                _currentExpireTime = Math.max(_currentExpireTime - ADJUST_EXPIRE_TIME, MIN_EXPIRE_TIME);
+            else
+                _currentExpireTime = Math.min(_currentExpireTime + ADJUST_EXPIRE_TIME, MAX_EXPIRE_TIME);
+            // drop profiles that we haven't spoken to in a while
+            expireOlderThan = _context.clock().now() - _currentExpireTime;
         }
             
         if (!getWriteLock())

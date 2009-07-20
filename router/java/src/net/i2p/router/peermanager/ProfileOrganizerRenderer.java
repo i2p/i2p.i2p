@@ -33,7 +33,7 @@ class ProfileOrganizerRenderer {
         Set peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
-        long hideBefore = now - 3*60*60*1000;
+        long hideBefore = now - 2*60*60*1000;
         
         TreeSet order = new TreeSet(_comparator);
         TreeSet integratedPeers = new TreeSet(_comparator);
@@ -222,9 +222,6 @@ class ProfileOrganizerRenderer {
         buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
         buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
         buf.append("</ul></i>");
-        buf.append("Red peers prefixed with '--' means the peer is failing, and blue peers prefixed ");
-        buf.append("with '++' means we've sent or received a message from them ");
-        buf.append("in the last five minutes.</i><br />");
         buf.append("<p><b>Thresholds:</b><br />");
         buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
         buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
