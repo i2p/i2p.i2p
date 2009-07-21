@@ -305,6 +305,7 @@
         <mkdir dir="pkg-temp/eepsite/docroot" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
+        <copy file="installer/resources/robots.txt" todir="pkg-temp/eepsite/docroot/" />
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
@@ -319,8 +320,7 @@
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
     <target name="prepthemeupdates">
-        <!-- CSS now in docs/, not in the .war -->
-        <copy file="installer/resources/themes/console/console.css" todir="pkg-temp/docs/themes/console/" />
+        <!-- CSS now in docs/, not in the .war; just in case anybody is using defCon1 -->
         <copy file="installer/resources/themes/console/defCon1/console.css" todir="pkg-temp/docs/themes/console/defCon1/" />
         <!-- these files now in docs/, not in the .war -->
         <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
