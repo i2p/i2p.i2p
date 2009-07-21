@@ -83,12 +83,9 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         
-        out.write("<table border=\"0\" width=\"100%\">\n");
-        out.write("<tr><td width=\"20%\" class=\"snarkTitle\" valign=\"top\" align=\"left\">");
-        out.write("I2PSnark<br />\n");
-        out.write("<table border=\"0\" width=\"100%\">\n");
-        out.write("<tr><td><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>\n");
-        out.write("<td><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
+out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" valign=\"top\" class=\"snarkTitle\">I2PSnark<br>Anonymous BitTorrent Client for I2P<hr /></hr></td></tr>");
+        out.write("<tr><td align=\"center\"><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>");
+        out.write(" | <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
         int count = 0;
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
@@ -100,19 +97,19 @@ public class I2PSnarkServlet extends HttpServlet {
                 continue;
             baseURL = baseURL.substring(e + 1);
             if (count++ % 2 == 0)
-                out.write("<tr>");
-            out.write("<td><a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>\n");
+                out.write("");
+            out.write(" | <a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>");
         }
         if (count % 2 == 1)
-            out.write("<td>&nbsp;\n");
+            out.write("");
         out.write("</table>\n");
-        out.write("</td><td width=\"80%\" class=\"snarkMessages\" valign=\"top\" align=\"left\"><pre>");
+        out.write("<div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
             out.write(msg + "\n");
         }
-        out.write("</pre></td></tr></table>\n");
+        out.write("</pre></td></tr></table></div>\n");
 
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
@@ -791,72 +788,8 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "<head>\n" +
                                                "<title>I2PSnark - anonymous bittorrent</title>\n";
                                          
-    private static final String HEADER = "<style>\n" +
-                                         "body {\n" +
-                                         "	background-color: #C7CFB4;\n" +
-                                         "}\n" +
-                                         ".snarkTitle {\n" +
-                                         "	text-align: left;\n" +
-                                         "	float: left;\n" +
-                                         "	margin: 0px 0px 5px 5px;\n" +
-                                         "	display: inline;\n" +
-                                         "	font-size: 16pt;\n" +
-                                         "	font-weight: bold;\n" +
-                                         "}\n" +
-                                         ".snarkRefresh {\n" +
-                                         "                  font-size: 10pt;\n" +
-                                         "}\n" +
-                                         ".snarkMessages {\n" +
-                                         "	border: none;\n" +
-                                         "                  background-color: #CECFC6;\n" +
-                                         "                  font-family: monospace;\n" +
-                                         "                  font-size: 10pt;\n" +
-                                         "                  font-weight: 100;\n" +
-                                         "                  width: 100%;\n" +
-                                         "                  text-align: left;\n" +
-                                         "                  margin: 0px 0px 0px 0px;\n" +
-                                         "                  border: 0px;\n" +
-                                         "                  padding: 5px;\n" +
-                                         "                  border-width: 0px;\n" +
-                                         "                  border-spacing: 0px;\n" +
-                                         "}\n" +
-                                         "table {\n" +
-                                         "	margin: 0px 0px 0px 0px;\n" +
-                                         "	border: 0px;\n" +
-                                         "	padding: 0px;\n" +
-                                         "	border-width: 0px;\n" +
-                                         "	border-spacing: 0px;\n" +
-                                         "}\n" +
-                                         "th {\n" +
-                                         "	background-color: #C7D5D5;\n" +
-                                         "	padding: 0px 7px 0px 3px;\n" +
-                                         "}\n" +
-                                         "td {\n" +
-                                         "	padding: 0px 7px 0px 3px;\n" +
-                                         "}\n" +
-                                         ".snarkTorrentEven {\n" +
-                                         "	background-color: #E7E7E7;\n" +
-                                         "}\n" +
-                                         ".snarkTorrentOdd {\n" +
-                                         "	background-color: #DDDDCC;\n" +
-                                         "}\n" +
-                                         ".snarkNewTorrent {\n" +
-                                         "	font-size: 10pt;\n" +
-                                         "}\n" +
-                                         ".snarkAddInfo {\n" +
-                                         "	font-size: 10pt;\n" +
-                                         "}\n" +
-                                         ".snarkConfigTitle {\n" +
-                                         "	font-size: 12pt;\n" +
-                                         "                  font-weight: bold;\n" +
-                                         "}\n" +
-                                         ".snarkConfig {\n" +
-                                         "                  font-size: 10pt;\n" +
-                                         "}\n" +
-                                         "</style>\n" +
-                                         "</head>\n" +
-                                         "<body>\n";
-
+    private static final String HEADER = "<link href=\"../themes/console/snark.css\" rel=\"stylesheet\" type=\"text/css\" />";
+                                       
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
                                                "<thead>\n" +
@@ -871,12 +804,12 @@ public class I2PSnarkServlet extends HttpServlet {
                                                "    <th align=\"right\" valign=\"top\">Up Rate</th>\n";
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
-                                              "<td class=\"snarkTorrentEven\" align=\"left\"" +
-                                              "    valign=\"top\" colspan=\"8\">No torrents</td></tr>\n";
+                                              "<td class=\"snarkTorrentEven\" align=\"center\"" +
+                                              "    valign=\"top\" colspan=\"8\"><i>No torrents</i></td></tr>\n";
 
     private static final String TABLE_FOOTER = "</table>\n";
     
-    private static final String FOOTER = "</body></html>";
+    private static final String FOOTER = "</div></div></body></html>";
 
 /** inner class, don't bother reindenting */
 private static class FetchAndAdd implements Runnable {

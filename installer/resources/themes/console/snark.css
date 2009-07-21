@@ -1,0 +1,114 @@
+body {
+	background-color: #eef;
+	color:#001;
+	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+  font-size: 9pt;
+}
+
+/*
+.snarkTitle {
+	text-align: left;
+	float: left;
+	margin: 0px 0px 5px 5px;
+	display: inline;
+	font-size: 16pt;
+	font-weight: bold;
+}
+*/
+
+.snarkTitle {
+	font-size: 16pt;
+	font-weight: bold;
+	text-align: center;
+}
+
+.snarkRefresh {
+  font-size: 9pt;
+}
+
+.snarkMessages {
+	border: none;
+  background-color: #9f9;
+  font-family: monospace;
+  font-size: 10pt;
+  font-weight: bold;
+/*  width: 100%; */
+  text-align: left;
+  margin: 0 0 15px 0;
+  border: 0px;
+  padding: 5px;
+  border-width: 0px;
+  border-spacing: 0px;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  border: 2px inset #770;
+  overflow-x: scroll;
+}
+
+table {
+	margin: 0px 0px 20px 0px;
+	border: 0px;
+	padding: 0px;
+	border-width: 0px;
+	border-spacing: 0px;
+}
+th {
+	background-color: #C7D5D5;
+	padding: 5px;
+  font-size: 9pt;
+}
+td {
+	padding: 5px;
+}
+.snarkTorrentEven {
+	background-color: #bbf;
+  font-size: 8pt;
+}
+.snarkTorrentOdd {
+	background-color: #ddf;
+  font-size: 8pt;
+}
+.snarkNewTorrent {
+	font-size: 10pt;
+}
+.snarkAddInfo {
+	font-size: 10pt;
+  line-height: 130% !important;
+}
+.snarkConfigTitle {
+	font-size: 11pt;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.snarkConfig {
+ font-size: 10pt;
+}
+
+.page {
+	background-color: #fff;
+	color:#001;
+  margin: 20px;
+  padding: 20px 20px 0 20px;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #001;
+  font-size: 9pt !important;
+  line-height: 160% !important;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  text-align: center;
+}
+
+form {
+  line-height: 300%
+}
+
+p { 
+  line-height: 150%
+}
+
+a:link {
+  padding 5px;
+}
