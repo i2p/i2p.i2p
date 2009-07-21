@@ -830,12 +830,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             int space = targetRequest.indexOf(' ');
             String filename = null;
             try {
-                filename = targetRequest.substring(10, space);
+                filename = targetRequest.substring(17, space); // "proxy.i2p/themes/".length
             } catch (IndexOutOfBoundsException ioobe) {}
             // theme hack
-            if (filename.startsWith("themes/console/default/"))
+            if (filename.startsWith("console/default/"))
                 filename = filename.replaceFirst("default", I2PAppContext.getGlobalContext().getProperty("routerconsole.theme", "light"));
-            File file = new File(_errorDir, filename);
+            File themesDir = new File(_errorDir, "themes");
+            File file = new File(themesDir, filename);
             if (file.exists() && !file.isDirectory()) {
                 String type;
                 if (filename.endsWith(".css"))
@@ -849,7 +850,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     out.write("HTTP/1.1 200 OK\r\nContent-Type: ".getBytes());
                     out.write(type.getBytes());
                     out.write("\r\nCache-Control: max-age=86400\r\n\r\n".getBytes());
-                    FileUtil.readFile(filename, _errorDir.getAbsolutePath(), out);
+                    FileUtil.readFile(filename, themesDir.getAbsolutePath(), out);
                     return;
                 } catch (IOException ioe) {}
             }
