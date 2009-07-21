@@ -86,7 +86,6 @@ public class I2PSnarkServlet extends HttpServlet {
 out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" valign=\"top\" class=\"snarkTitle\">I2PSnark<br>Anonymous BitTorrent Client for I2P<hr /></hr></td></tr>");
         out.write("<tr><td align=\"center\"><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>");
         out.write(" | <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
-        int count = 0;
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -96,12 +95,8 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
             if (e < 0)
                 continue;
             baseURL = baseURL.substring(e + 1);
-            if (count++ % 2 == 0)
-                out.write("");
             out.write(" | <a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>");
         }
-        if (count % 2 == 1)
-            out.write("");
         out.write("</table>\n");
         out.write("<div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
