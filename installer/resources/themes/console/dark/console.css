@@ -300,10 +300,16 @@ a:link, h2 a:link{
 
 a:visited{
      color: #7bb;
+     text-decoration: none;
+     font-weight: bold;     
+     word-wrap: break-word;
 }
 
 a:hover{
      color: #f60;
+     text-decoration: underline;
+     font-weight: bold;     
+     word-wrap: break-word;
 }
 
 .links {
