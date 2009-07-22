@@ -115,6 +115,7 @@ div.warning {
      background-position:15px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
+     word-wrap: break-word;
 }
 
 div.main {
@@ -153,6 +154,7 @@ div.news li {
      margin: 0 10px 0 30px;
      padding: 5px;
      vertical-align: middle;
+     word-wrap: break-word;
 }
 
 div.confignav {
@@ -170,7 +172,7 @@ div.confignav {
 }
 
 div.configure {
-     padding: 0 15px;
+     padding: 0 15px 15px 15px;
      margin: 10px 0px;
      background: #005;
      -moz-border-radius: 4px;
@@ -220,7 +222,7 @@ table {
 }
 
 th {
-     padding: 4px;
+     padding: 8px;
      color: #eef;
      text-align: center;
      font-size: 8pt;
@@ -240,17 +242,16 @@ tr:nth-child(odd) {
      background: #003 url('images/darkbluetile.png') !important;
      vertical-align: middle;
 }
-
+/*
 tr:last-child {
      background: #004 url('images/lightbluetile.png') !important;
      font-weight: bold;
      border: 1px solid #99f !important;
 }
-
+*/
 td {
      padding: 5px 10px;
      color: #eef;
-     text-align: left;
      vertical-align: middle;
 }
 
@@ -266,6 +267,7 @@ div.main li {
      margin: 2px 0px 2px 30px;
      padding: 1px 20px 1px 0px;
      line-height: 150%;
+     word-wrap: break-word;
 }
 
 .tidylist {
@@ -291,6 +293,9 @@ code {
 
 a:link, h2 a:link{
      color: #99f;
+     text-decoration: none;
+     font-weight: bold;     
+     word-wrap: break-word;
 }
 
 a:visited{
@@ -349,6 +354,7 @@ h2 {
      vertical-align: middle;
      margin: 25px 0 20px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+     word-wrap: break-word;
 }
 
 h2 a:visited {
@@ -441,6 +447,7 @@ input {
      padding: 1px 2px;
      text-decoration: none;
      min-width: 110px;
+     opacity: 0.8;
 }
 
 input:hover {

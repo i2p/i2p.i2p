@@ -35,7 +35,7 @@ div.logo {
      border-radius: 4px;
      background: #ddddff url('images/lightbluetile.png');
      width: 175px;
-     -moz-box-shadow: inset 0px 0px 16px 1px #eef;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }
 
 div.toolbar {
@@ -86,18 +86,20 @@ div.routersummaryouter {
 
 div.routersummary {
 /*  margin: 0px 20px 20px 0px; */
-     width: auto;
+     width: 175px;
      padding: 10px;
      text-align: center;
      border: 1px solid #000033;
-     background: #ddddff url('images/lightbluetile.png');
+     background: #ddf url('images/lightbluetile.png');
      color: #000;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
+/* 
      float: left;
+*/     
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }
 
@@ -116,6 +118,7 @@ div.warning {
      background-position:15px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 1px 0px #d00;
+     word-wrap: break-word;
 }
 
 div.main {
@@ -214,7 +217,7 @@ div.confignav {
 }
 
 div.configure {
-     padding: 0 15px !important;
+     padding: 0 15px 15px 15px !important;
      margin: 10px 0px 25px 0;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
@@ -265,11 +268,11 @@ table {
 }
 
 th {
-     padding: 4px;
+     padding: 8px;
      color: #000;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      text-align: center;
-     font-size: 8pt;
+     font-size: 9pt;
 }
 
 tr {
@@ -293,7 +296,7 @@ tr:last-child {
 td {
      padding: 5px;
      color: #000;
-     text-align: left;
+     vertical-align: middle;
 }
 
 tt {
@@ -308,6 +311,7 @@ div.main li {
      margin: 2px 5px 0px 20px;
      padding: 1px 20px 1px 10px;
      line-height: 150%;
+     word-wrap: break-word;
 }
 
 .tidylist {
@@ -338,6 +342,7 @@ a:link{
      color: #007;
      text-decoration: none;
      font-weight: bold;
+     word-wrap: break-word;
 }
 
 a:visited{
@@ -395,6 +400,7 @@ h2 {
      -khtml-border-radius: 4px;
      margin: 25px 0 20px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     word-wrap: break-word;
 }
 
 h2 a:hover {
@@ -471,25 +477,28 @@ button:active{
 
 input {
      background: #eef;
-     color: #003;
+     color: #001;
      margin: 5px 10px 5px 10px;
      padding: 4px 2px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px solid #001;
      text-decoration: none;
      min-width: 110px;
+     opacity: 0.8;
 }
 
 input:hover {
      background: #f60;
      color: #fff;
      border: 1px solid #f60;
+     opacity: 0.9;
 }
 
 input:active {
      background: #002;
      color: #f60;
      border: 1px solid #f60;
+     opacity: 1.0;
 }
 
 submit {

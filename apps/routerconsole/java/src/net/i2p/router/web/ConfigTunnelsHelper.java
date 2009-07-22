@@ -75,19 +75,20 @@ public class ConfigTunnelsHelper extends HelperBase {
             out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include high tunnel quantities</font></th></tr>");
 
+buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\"/>&nbsp;&nbsp;Inbound</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\"/>&nbsp;&nbsp;Outbound</th></tr>\n");
 
-        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
+//        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
         // tunnel depth
-        buf.append("<tr><td>Depth</td>\n");
-        buf.append("<td><select name=\"").append(index).append(".depthInbound\">\n");
+        buf.append("<tr><td align=\"right\">Depth</td>\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthInbound\">\n");
         int now = in.getLength();
         renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
         if (now > MAX_LENGTH)
             renderOptions(buf, now, now, now, "", "hop");
         buf.append("</select></td>\n");
 
-        buf.append("<td><select name=\"").append(index).append(".depthOutbound\">\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthOutbound\">\n");
         now = out.getLength();
         renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
         if (now > MAX_LENGTH)
@@ -96,8 +97,8 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("</tr>\n");
 
         // tunnel depth variance
-        buf.append("<tr><td>Randomization</td>\n");
-        buf.append("<td><select name=\"").append(index).append(".varianceInbound\">\n");
+        buf.append("<tr><td align=\"right\">Randomization</td>\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".varianceInbound\">\n");
         now = in.getLengthVariance();
         renderOptions(buf, 0, 0, now, "", "hop");
         renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", "hop");
@@ -108,7 +109,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             renderOptions(buf, now, now, now, "+/- 0", "hop");
         buf.append("</select></td>\n");
 
-        buf.append("<td><select name=\"").append(index).append(".varianceOutbound\">\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".varianceOutbound\">\n");
         now = out.getLengthVariance();
         renderOptions(buf, 0, 0, now, "", "hop");
         renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", "hop");
@@ -120,15 +121,15 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("</select></td>\n");
 
         // tunnel quantity
-        buf.append("<tr><td>Quantity</td>\n");
-        buf.append("<td><select name=\"").append(index).append(".quantityInbound\">\n");
+        buf.append("<tr><td align=\"right\">Quantity</td>\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityInbound\">\n");
         now = in.getQuantity();
         renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</select></td>\n");
 
-        buf.append("<td><select name=\"").append(index).append(".quantityOutbound\">\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityOutbound\">\n");
         now = out.getQuantity();
         renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
         if (now > MAX_QUANTITY)
@@ -137,15 +138,15 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("</tr>\n");
 
         // tunnel backup quantity
-        buf.append("<tr><td>Backup quantity</td>\n");
-        buf.append("<td><select name=\"").append(index).append(".backupInbound\">\n");
+        buf.append("<tr><td align=\"right\">Backup quantity</td>\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupInbound\">\n");
         now = in.getBackupQuantity();
         renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", "tunnel");
         if (now > MAX_BACKUP_QUANTITY)
             renderOptions(buf, now, now, now, "", "tunnel");
         buf.append("</select></td>\n");
 
-        buf.append("<td><select name=\"").append(index).append(".backupOutbound\">\n");
+        buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupOutbound\">\n");
         now = out.getBackupQuantity();
         renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", "tunnel");
         if (now > MAX_BACKUP_QUANTITY)
@@ -154,9 +155,9 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("</tr>\n");
 
         // custom options
-        buf.append("<tr><td>Inbound options:</td>\n");
-        buf.append("<td colspan=\"2\"><input name=\"").append(index);
-        buf.append(".inboundOptions\" type=\"text\" size=\"40\" ");
+        buf.append("<tr><td align=\"right\">Inbound options:</td>\n");
+        buf.append("<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
+        buf.append(".inboundOptions\" type=\"text\" size=\"32\" ");
         buf.append("value=\"");
         Properties props = in.getUnknownOptions();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
@@ -165,9 +166,9 @@ public class ConfigTunnelsHelper extends HelperBase {
             buf.append(prop).append("=").append(val).append(" ");
         }
         buf.append("\"/></td></tr>\n");
-        buf.append("<tr><td>Outbound options:</td>\n");
-        buf.append("<td colspan=\"2\"><input name=\"").append(index);
-        buf.append(".outboundOptions\" type=\"text\" size=\"40\" ");
+        buf.append("<tr><td align=\"right\">Outbound options:</td>\n");
+        buf.append("<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
+        buf.append(".outboundOptions\" type=\"text\" size=\"32\" ");
         buf.append("value=\"");
         props = in.getUnknownOptions();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
@@ -176,7 +177,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             buf.append(prop).append("=").append(val).append(" ");
         }
         buf.append("\"/></td></tr>\n");
-        buf.append("<tr><td colspan=\"3\"><hr /></td></tr>\n");
+//        buf.append("<tr><td colspan=\"3\"><hr /></td></tr>\n");
     }
 
     private void renderOptions(StringBuilder buf, int min, int max, int now, String prefix, String name) {

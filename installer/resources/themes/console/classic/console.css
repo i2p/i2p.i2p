@@ -49,13 +49,14 @@ div.routersummaryouter {
 
 div.routersummary {
      background: #fafaff;
-     width: 200px;
+     width: 175px;
      color: inherit;
      margin: 0em;
      padding: 5px;
      text-align: left;
      border: medium solid #efefff;
      font-size: 0.82em;
+     word-wrap: break-word;
 }
 
 div.warning {

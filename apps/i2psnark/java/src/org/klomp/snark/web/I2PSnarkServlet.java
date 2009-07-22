@@ -82,8 +82,8 @@ public class I2PSnarkServlet extends HttpServlet {
         // we want it to go to the base URI so we don't refresh with some funky action= value
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
-        
-out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" valign=\"top\" class=\"snarkTitle\">I2PSnark<br>Anonymous BitTorrent Client for I2P<hr /></hr></td></tr>");
+        out.write("</head><body>");
+        out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" valign=\"top\" class=\"snarkTitle\">I2PSnark<br>Anonymous BitTorrent Client for I2P<hr /></hr></td></tr>");
         out.write("<tr><td align=\"center\"><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>");
         out.write(" | <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
@@ -98,13 +98,13 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
             out.write(" | <a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>");
         }
         out.write("</table>\n");
-        out.write("<div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
+        out.write("<div class=\"section\"><div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
             out.write(msg + "\n");
         }
-        out.write("</pre></td></tr></table></div>\n");
+        out.write("</pre></td></tr></table></div>");
 
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
@@ -653,14 +653,14 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("<span class=\"snarkConfigTitle\">Add Torrent:</span><br />\n");
+        out.write("<div class=\"section\"><span class=\"snarkConfigTitle\">Add Torrent:</span><br />\n");
         out.write("From URL&nbsp;: <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" /> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
         out.write("<input type=\"submit\" value=\"Add torrent\" name=\"action\" /><br />\n");
         out.write("<span class=\"snarkAddInfo\">Alternately, you can copy .torrent files to " + _manager.getDataDir().getAbsolutePath() + "<br />\n");
         out.write("Removing that .torrent file will cause the torrent to stop.<br /></span>\n");
-        out.write("</form>\n</span>\n");  
+        out.write("</form>\n</span></div>");  
     }
     
     private void writeSeedForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -669,7 +669,7 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
         if (baseFile == null)
             baseFile = "";
         
-        out.write("<span class=\"snarkNewTorrent\"><hr />\n");
+        out.write("<div class=\"section\"><span class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
@@ -693,7 +693,7 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
         out.write("or <input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
                   "title=\"Custom tracker URL\" /> ");
         out.write("<input type=\"submit\" value=\"Create torrent\" name=\"action\" />\n");
-        out.write("</form>\n</span>\n");        
+        out.write("</form>\n</span></div>");        
     }
     
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -705,7 +705,7 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
         //int seedPct = 0;
        
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
-        out.write("<span class=\"snarkConfig\"><hr />\n");
+        out.write("<div class=\"section\"><span class=\"snarkConfig\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
         out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
         out.write("Data directory: <input type=\"text\" size=\"40\" name=\"dataDir\" value=\"" + dataDir + "\" ");
@@ -743,7 +743,7 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
         out.write("Announce URLs: <input type=\"text\" name=\"openTrackers\" value=\""
                   + openTrackers + "\" size=\"50\" /><br />\n");
 
-        //out.write("<hr />\n");
+        //out.write("\n");
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
                   + _manager.util().getEepProxyHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
@@ -764,7 +764,7 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
                   + opts.toString() + "\" /><br />\n");
         out.write("<input type=\"submit\" value=\"Save configuration\" name=\"action\" />\n");
         out.write("</span>\n");
-        out.write("</form>\n");
+        out.write("</form></div>");
     }
     
     // rounding makes us look faster :)
@@ -781,7 +781,7 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
     
     private static final String HEADER_BEGIN = "<html>\n" +
                                                "<head>\n" +
-                                               "<title>I2PSnark - anonymous bittorrent</title>\n";
+                                               "<title>I2PSnark - Anonymous BitTorrent Client</title>\n";
                                          
     private static final String HEADER = "<link href=\"../themes/console/snark.css\" rel=\"stylesheet\" type=\"text/css\" />";
                                        
@@ -800,11 +800,11 @@ out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
                                               "<td class=\"snarkTorrentEven\" align=\"center\"" +
-                                              "    valign=\"top\" colspan=\"8\"><i>No torrents</i></td></tr>\n";
+                                              "    valign=\"top\" colspan=\"8\"><i>No torrents loaded.</i></td></tr>\n";
 
-    private static final String TABLE_FOOTER = "</table>\n";
+    private static final String TABLE_FOOTER = "</table></div>\n";
     
-    private static final String FOOTER = "</div></div></body></html>";
+    private static final String FOOTER = "</div></div></div></body></html>";
 
 /** inner class, don't bother reindenting */
 private static class FetchAndAdd implements Runnable {
