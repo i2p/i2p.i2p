@@ -1,3 +1,8 @@
+2009-07-22 dr|z3d
+    * More work on the I2PSnark UI.
+    * Start of improvements to tunnel table data.
+    * Ongoing theme enhancements.
+
 2009-07-21 dr|z3d
     * First stage of overhaul of webapps ui. 
       susidns, susimail & i2psnark now lightly themed.
@@ -115,7 +120,7 @@
       - Add limit methods with a threshold argument
       - Increase default SSU conn limits a little more
 
-2009-07-07  dr|z3d
+2009-07-07 dr|z3d
     * Introducing 2 new console themes (light & dark), in addition
       to changes to the console navigation; navbar now resides in 
       the sidepanel and other stuff besides. More to follow!
@@ -188,24 +193,24 @@
 
       Additional information, copied from I2PAppContext:
 
-          *  Directories. These are all set at instantiation and will not be changed by
-          *  subsequent property changes.
-          *  All properties, if set, should be absolute paths.
-          *
-          *  Name	Property 	Method		Files
-          *  -----	-------- 	-----		-----
-          *  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
-          *  Temp	i2p.dir.temp	getTempDir()	Temporary files
-          *  PID	i2p.dir.pid	getPIDDir()	router.ping
-          *  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
-          *
-          *  (the following all default to the same as Config)
-          *
-          *  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
-          *  Log	i2p.dir.log	getLogDir()	logs/
-          *  App	i2p.dir.app	getAppDir()	eepsite/, ...
-          *
-          *  Note that the router can't control where the wrapper actually puts its files.
+      #  Directories. These are all set at instantiation and will not be changed by
+      #  subsequent property changes.
+      #  All properties, if set, should be absolute paths.
+      #
+      #  Name	Property 	Method		Files
+      #  -----	-------- 	-----		-----
+      #  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
+      #  Temp	i2p.dir.temp	getTempDir()	Temporary files
+      #  PID	i2p.dir.pid	getPIDDir()	router.ping
+      #  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
+      #
+      #  (the following all default to the same as Config)
+      #
+      #  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
+      #  Log	i2p.dir.log	getLogDir()	logs/
+      #  App	i2p.dir.app	getAppDir()	eepsite/, ...
+      
+      *  Note that the router can't control where the wrapper actually puts its files.
 
       All these will be set appropriately in a Router Context.
       In an I2P App Context, all except Temp and PID will be the current working directory.
