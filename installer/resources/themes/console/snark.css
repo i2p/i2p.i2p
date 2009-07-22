@@ -121,7 +121,7 @@ hr {
 }
 
 div.section {
-  margin: 20px 0 0 0;
+  margin: 0 0 20px 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
