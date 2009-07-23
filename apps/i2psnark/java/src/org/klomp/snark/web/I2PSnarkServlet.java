@@ -734,7 +734,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
                   + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" /> peers<br />\n");
         out.write("Up bandwidth limit: <input type=\"text\" name=\"upBW\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Router Up BW / 2 recommended)</i><br />\n");
+                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Half <a href=\"http://127.0.0.1:7657/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br />\n");
         
         out.write("Use open trackers also: <input type=\"checkbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
