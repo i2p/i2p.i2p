@@ -199,6 +199,13 @@ select {
 img {
   border: none;
   margin: 5px 5px 10px 5px;
+  opacity: 0.6;
+}
+
+img:hover{
+  border: none;
+  margin: 5px 5px 10px 5px;
+  opacity: 0.7;
 }
 
 
@@ -272,7 +279,7 @@ div.configsection {
   background: #ffe;
   border: 1px solid #001;
   text-align: center;
-  color: #fff;
+  color: #ffb;
   -moz-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
@@ -280,4 +287,5 @@ div.configsection {
   word-wrap: break-word;
   text-align: center;
   background: #ffe url('../console/images/redtile.png');
+  font-weight: bold; /* red tile needs bold text! */
 }
