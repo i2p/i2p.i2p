@@ -319,11 +319,8 @@ div.main li {
 }
 
 ol {
-/* 
-     white-space: pre-wrap;
-*/
-     display: inline;
-     margin: 1px 0 0 0;
+
+     margin: 1px 0 0 5px;
      padding: 1px 0 0 20px;
 }
 
