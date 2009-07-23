@@ -92,15 +92,16 @@ body {
   border: 0px;
   padding: 0px;
   border-spacing: 0px;
-  -moz-border-radius: 4px;
+  -moz-border-radius: 4px 0 4px 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
-  border: 2px inset #770;
+  border: 1px solid #001;
   text-align: center; 
   overflow-x: scroll;            
   background: #ddf url('../console/images/orangetile.png');
   color: #531;
   height: 64px;
+  border-bottom: 5px solid #001;
 }
 
 pre {
@@ -113,7 +114,7 @@ pre {
 }
 
 table {
-	margin: 0px 0px 15px 0px;
+	margin: 0px 0px 10px 0px;
 	border: 0px;
 	padding: 0px;
 	border-width: 0px;
@@ -177,6 +178,7 @@ td {
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
   text-align: center;
   background: #ddf url('../console/light/images/lightbluetile.png');
+  opacity: 1.0;
 }
 
 form {
@@ -236,14 +238,14 @@ select {
 
 img {
   border: none;
-  margin: 5px 5px 15px 5px;
-  opacity: 0.6;
+  margin: 0px 5px 10px 5px;
+  opacity: 0.7;
 }
 
 img:hover{
   border: none;
-  margin: 5px 5px 15px 5px;
-  opacity: 0.7;
+  margin: 5px 5px 10px 5px;
+  opacity: 1;
 }
 
 
@@ -261,6 +263,7 @@ div.section {
   word-wrap: break-word;
   text-align: center;
   background: #ffe url('../console/light/images/tabletile.png');
+  opacity: 1.0;
 }
 
 div.mainsection {
@@ -277,6 +280,7 @@ div.mainsection {
   word-wrap: break-word;
   text-align: center;
   background: #ffe url('../console/light/images/tabletile.png');
+  opacity: 1.0;
 }
 
 div.newtorrentsection {
@@ -293,6 +297,7 @@ div.newtorrentsection {
   word-wrap: break-word;
   text-align: center;
   background: #ffe url('../console/images/yellowtile.png');
+  opacity: 1.0;
 }
 
 div.addtorrentsection {
@@ -309,6 +314,7 @@ div.addtorrentsection {
   word-wrap: break-word;
   text-align: center;
   background: #ffe url('../console/images/greentile.png');
+  opacity: 1.0;
 }
 
 div.configsection {
@@ -326,4 +332,5 @@ div.configsection {
   text-align: center;
   background: #ffe url('../console/images/redtile.png');
   font-weight: bold; /* red tile needs bold text! */
+  opacity: 0.95;
 }
