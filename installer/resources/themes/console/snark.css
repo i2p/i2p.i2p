@@ -2,7 +2,7 @@ body {
 	background-color: #eef;
 	color:#001;
 	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-  font-size: 9pt;
+  font-size: 8pt;
 }
 
 .snarkTitle {
@@ -13,6 +13,22 @@ body {
 
 .snarkRefresh {
   font-size: 9pt;
+}
+
+.snarkRefresh {
+     border: 1px outset #001;
+     padding: 1px 10px;
+     background: #ffb;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font-size: 9pt;
+     font-weight: bold;
+     margin: -10px 3px 0 3px;
+     text-align: center;
+     vertical-align: middle;
+     text-transform: uppercase;
 }
 
 .snarkMessages {
@@ -30,6 +46,8 @@ body {
   border-radius: 4px;
   border: 2px inset #770;
   text-align: center; 
+  overflow-x: scroll;            
+  background: #ddf url('../console/light/images/lightbluetile.png');
 }
 
 pre {
@@ -50,6 +68,8 @@ th {
 	background-color: #f91;
 	padding: 5px;
   font-size: 9pt;
+  border-top: 1px outset #001;
+  border-bottom: 1px inset #001;  
 }
 
 .SnarkTorrents {
@@ -89,7 +109,7 @@ td {
 	background-color: #fff;
 	color:#001;
   margin: 20px;
-  padding: 0 20px 5px 20px;
+  padding: 10px 20px 5px 20px;
   -moz-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
@@ -98,6 +118,7 @@ td {
   line-height: 160% !important;
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
   text-align: center;
+  background: #ddf url('../console/light/images/sandtile.png');
 }
 
 form {
@@ -133,4 +154,38 @@ div.section {
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
   word-wrap: break-word;
   text-align: center;
+}
+
+a:link{
+     color: #830;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited{
+     color: #606;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover{
+     color: #f60;
+     font-weight: bold;
+}
+
+input {
+/*  font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;*/
+  font-size: 9pt;
+  font-weight: bold;
+  text-align: left;
+  padding: 2px;
+}     
+
+select {
+	font-family:"Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+  background-color: #ffe;
+  color: #310;
+  font-size: 9pt;
+}
 }

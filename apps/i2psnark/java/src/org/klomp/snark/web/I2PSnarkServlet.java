@@ -80,12 +80,11 @@ public class I2PSnarkServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         out.write(HEADER_BEGIN);
         // we want it to go to the base URI so we don't refresh with some funky action= value
-        out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
+        out.write("<meta http-equiv=\"refresh\" content=\"300;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
-        out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" valign=\"top\" class=\"snarkTitle\">I2PSnark<br>Anonymous BitTorrent Client for I2P<hr /></hr></td></tr>");
-        out.write("<tr><td align=\"center\"><a href=\"" + req.getRequestURI() + peerString + "\" class=\"snarkRefresh\">Refresh</a>");
-        out.write(" | <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
+        out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\"></a><hr>");
+        out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -95,7 +94,7 @@ public class I2PSnarkServlet extends HttpServlet {
             if (e < 0)
                 continue;
             baseURL = baseURL.substring(e + 1);
-            out.write(" | <a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>");
+            out.write("<a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>");
         }
         out.write("</table>\n");
         out.write("<div class=\"section\"><div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
@@ -491,7 +490,7 @@ public class I2PSnarkServlet extends HttpServlet {
         
         if (remaining == 0)
             out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
-                      + "\" title=\"Download the completed file\">");
+                      + "\" title=\"Click to access completed downloaded..\">");
         out.write(filename);
         if (remaining == 0)
             out.write("</a>");
