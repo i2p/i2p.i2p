@@ -125,7 +125,7 @@ public class MUXlisten implements Runnable {
 			this.info.add("STARTING", new Boolean(false));
 			this.info.releaseWriteLock();
 			this.database.releaseWriteLock();
-			throw new IOException(e);
+			throw new IOException(e.toString());
 		} catch (RuntimeException e) {
 			// Something went bad.
 			this.database.getWriteLock();
