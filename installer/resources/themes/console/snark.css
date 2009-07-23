@@ -12,13 +12,9 @@ body {
 }
 
 .snarkRefresh {
-  font-size: 9pt;
-}
-
-.snarkRefresh {
      border: 1px outset #001;
      padding: 1px 10px;
-     background: #ffb;
+     background: #eef;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -31,15 +27,32 @@ body {
      text-transform: uppercase;
 }
 
+.snarkRefresh a:hover{
+     border: 1px inset #001;
+     padding: 1px 10px;
+     background: #003;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     font-size: 9pt;
+     font-weight: bold;
+     margin: -10px 3px 0 3px;
+     text-align: center;
+     vertical-align: middle;
+     text-transform: uppercase;
+     color: #f60;
+}
+
 .snarkMessages {
-  background-color: #fe9;
+  background-color: #f83;
   font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
   font-size: 9pt;
   font-weight: bold;
   text-align: left;
   margin: 0 0 15px 0;
   border: 0px;
-  padding: 5px;
+  padding: 0px;
   border-spacing: 0px;
   -moz-border-radius: 4px;
   -khtml-border-radius: 4px;
@@ -47,7 +60,9 @@ body {
   border: 2px inset #770;
   text-align: center; 
   overflow-x: scroll;            
-  background: #ddf url('../console/light/images/lightbluetile.png');
+  background: #ddf url('../console/images/orangetile.png');
+  color: #531;
+  height: 64px;
 }
 
 pre {
@@ -55,6 +70,8 @@ pre {
   width: 100%;
   font-size: 8pt;
   padding: 0;
+  text-align: left !important;
+  height: 8px;
 }
 
 table {
@@ -64,12 +81,14 @@ table {
 	border-width: 0px;
 	border-spacing: 0px;
 }
+
 th {
-	background-color: #f91;
 	padding: 5px;
-  font-size: 9pt;
+  font-size: 8pt;
   border-top: 1px outset #001;
   border-bottom: 1px inset #001;  
+  background: #f91 url('.../console/images/tabletitleorangealt.png') repeat-x;
+  text-align: center;
 }
 
 .SnarkTorrents {
@@ -79,20 +98,21 @@ th {
 
 td {
 	padding: 5px;
+  text-align: center;
 }
 .snarkTorrentEven {
 	background-color: #fb1;
-  font-size: 8pt;
+  font-size: 7pt;
 }
 .snarkTorrentOdd {
 	background-color: #fa1;
-  font-size: 8pt;
+  font-size: 7pt;
 }
 .snarkNewTorrent {
-	font-size: 10pt;
+	font-size: 9pt;
 }
 .snarkAddInfo {
-	font-size: 10pt;
+	font-size: 9pt;
   line-height: 130% !important;
 }
 .snarkConfigTitle {
@@ -107,7 +127,7 @@ td {
 
 .page {
 	background-color: #fff;
-	color:#001;
+	color:#310;
   margin: 20px;
   padding: 10px 20px 5px 20px;
   -moz-border-radius: 4px;
@@ -118,7 +138,7 @@ td {
   line-height: 160% !important;
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
   text-align: center;
-  background: #ddf url('../console/light/images/sandtile.png');
+  background: #ddf url('../console/light/images/lightbluetile.png');
 }
 
 form {
@@ -138,40 +158,27 @@ hr {
   background: #003;
   height: 1px;
   border: 0px solid #003;
-  margin: 5px 0;
-}
-
-div.section {
-  margin: 0 0 20px 0;
-  padding: 10px;
-  background: #ffe;
-  border: 1px solid #001;
-  text-align: left;
-  color: #001;
-  -moz-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
-  -moz-box-shadow: inset 0px 0px 1px 0px #002;
-  word-wrap: break-word;
+  width: 100%;
+  margin: 10px 0 7px 0;
   text-align: center;
 }
 
 a:link{
-     color: #830;
-     text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
+  color: #830;
+  text-decoration: none;
+  font-weight: bold;
+  word-wrap: break-word;
 }
 
 a:visited{
-     color: #606;
-     text-decoration: none;
-     font-weight: bold;
+  color: #606;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 a:hover{
-     color: #f60;
-     font-weight: bold;
+  color: #f60;
+  font-weight: bold;
 }
 
 input {
@@ -188,4 +195,89 @@ select {
   color: #310;
   font-size: 9pt;
 }
+
+img {
+  border: none;
+  margin: 5px 5px 10px 5px;
+}
+
+
+div.section {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/light/images/tabletile.png');
+}
+
+div.mainsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/light/images/tabletile.png');
+}
+
+div.newtorrentsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/images/yellowtile.png');
+}
+
+div.addtorrentsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #001;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/images/greentile.png');
+}
+
+div.configsection {
+  margin: 0 0 20px 0;
+  padding: 10px;
+  background: #ffe;
+  border: 1px solid #001;
+  text-align: center;
+  color: #fff;
+  -moz-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0px 0px 1px 0px #002;
+  word-wrap: break-word;
+  text-align: center;
+  background: #ffe url('../console/images/redtile.png');
 }

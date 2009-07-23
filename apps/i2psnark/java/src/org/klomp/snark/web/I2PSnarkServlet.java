@@ -83,8 +83,8 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<meta http-equiv=\"refresh\" content=\"300;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
-        out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\"></a><hr>");
-        out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\">Forum</a>\n");
+        out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\" class=\"snarklogo\"></a><br>");
+        out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -94,10 +94,10 @@ public class I2PSnarkServlet extends HttpServlet {
             if (e < 0)
                 continue;
             baseURL = baseURL.substring(e + 1);
-            out.write("<a href=\"" + baseURL + "\" class=\"snarkRefresh\">" + name + "</a>");
+            out.write("<a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
         }
         out.write("</table>\n");
-        out.write("<div class=\"section\"><div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
+        out.write("<div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
@@ -353,7 +353,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 }
             }
         } else if ("StopAll".equals(action)) {
-            _manager.addMessage("Stopping all torrents and closing the I2P tunnel");
+            _manager.addMessage("Stopping all torrents and closing the I2P tunnel.");
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
@@ -362,10 +362,10 @@ public class I2PSnarkServlet extends HttpServlet {
             }
             if (_manager.util().connected()) {
                 _manager.util().disconnect();
-                _manager.addMessage("I2P tunnel closed");
+                _manager.addMessage("I2P tunnel closed.");
             }
         } else if ("StartAll".equals(action)) {
-            _manager.addMessage("Opening the I2P tunnel and starting all torrents");
+            _manager.addMessage("Opening the I2P tunnel and starting all torrents.");
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
@@ -510,9 +510,9 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (e < 0)
                     continue;
                 baseURL = baseURL.substring(e + 1);
-                out.write("&nbsp;&nbsp;&nbsp;(<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
+                out.write("&nbsp;&nbsp;&nbsp;[<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
-                out.write("\" title=\"" + name + " Tracker\">Details</a>)");
+                out.write("\" title=\"" + name + " Tracker\">Details</a>]");
                 break;
             }
         }
@@ -652,7 +652,7 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("<div class=\"section\"><span class=\"snarkConfigTitle\">Add Torrent:</span><br />\n");
+        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">Add Torrent:</span><br />\n");
         out.write("From URL&nbsp;: <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" /> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
@@ -668,7 +668,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if (baseFile == null)
             baseFile = "";
         
-        out.write("<div class=\"section\"><span class=\"snarkNewTorrent\">\n");
+        out.write("<div class=\"newtorrentsection\"><span class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
@@ -704,7 +704,7 @@ public class I2PSnarkServlet extends HttpServlet {
         //int seedPct = 0;
        
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
-        out.write("<div class=\"section\"><span class=\"snarkConfig\">\n");
+        out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
         out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
         out.write("Data directory: <input type=\"text\" size=\"40\" name=\"dataDir\" value=\"" + dataDir + "\" ");

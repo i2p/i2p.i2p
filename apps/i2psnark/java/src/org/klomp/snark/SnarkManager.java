@@ -339,20 +339,20 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
             _config.setProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS, useOpenTrackers + "");
-            addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect");
+            addMessage((useOpenTrackers ? "En" : "Dis") + "abled open trackers - torrent restart required to take effect.");
             changed = true;
         }
         if (openTrackers != null) {
             if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
                 _config.setProperty(I2PSnarkUtil.PROP_OPENTRACKERS, openTrackers.trim());
-                addMessage("Open Tracker list changed - torrent restart required to take effect");
+                addMessage("Open Tracker list changed - torrent restart required to take effect.");
                 changed = true;
             }
         }
         if (changed) {
             saveConfig();
         } else {
-            addMessage("Configuration unchanged");
+            addMessage("Configuration unchanged.");
         }
     }
     
@@ -362,7 +362,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 DataHelper.storeProps(_config, _configFile);
             }
         } catch (IOException ioe) {
-            addMessage("Unable to save the config to '" + _configFile.getAbsolutePath() + "'");
+            addMessage("Unable to save the config to '" + _configFile.getAbsolutePath() + "'.");
         }
     }
     
@@ -383,7 +383,7 @@ public class SnarkManager implements Snark.CompleteListener {
             addMessage("Connecting to I2P");
             boolean ok = _util.connect();
             if (!ok) {
-                addMessage("Error connecting to I2P - check your I2CP settings");
+                addMessage("Error connecting to I2P - check your I2CP settings!");
                 return;
             }
         }
@@ -446,9 +446,9 @@ public class SnarkManager implements Snark.CompleteListener {
         File f = new File(filename);
         if (!dontAutoStart && shouldAutoStart()) {
             torrent.startTorrent();
-            addMessage("Torrent added and started: '" + f.getName() + "'");
+            addMessage("Torrent added and started: '" + f.getName() + "'.");
         } else {
-            addMessage("Torrent added: '" + f.getName() + "'");
+            addMessage("Torrent added: '" + f.getName() + "'.");
         }
     }
     
@@ -544,24 +544,24 @@ public class SnarkManager implements Snark.CompleteListener {
         // basic validation of url
         if ((!announce.startsWith("http://")) ||
             (announce.indexOf(".i2p/") < 0)) // need to do better than this
-            return "Non-i2p tracker in " + info.getName() + ", deleting it";
+            return "Non-i2p tracker in " + info.getName() + ", removing it from our list of trackers!";
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
-            return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it";
+            return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it!";
         } else if (info.getPieces() <= 0) {
-            return "No pieces in " + info.getName() + "?  deleting it";
+            return "No pieces in " + info.getName() + "?  deleting it!";
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
             return "Pieces are too large in " + info.getName() + " (" + DataHelper.formatSize(info.getPieceLength(0)) +
-                   "B), deleting it";
+                   "B), deleting it.";
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
             if (lengths != null)
                 for (int i = 0; i < lengths.size(); i++)
-                    System.out.println("File " + i + " is " + lengths.get(i) + " long");
+                    System.out.println("File " + i + " is " + lengths.get(i) + " long.");
             
             return "Torrents larger than " + DataHelper.formatSize(Storage.MAX_TOTAL_SIZE) +
-                   "B are not supported yet (because we're paranoid): " + info.getName() + ", deleting it";
+                   "B are not supported yet (because we're paranoid): " + info.getName() + ", deleting it!";
         } else {
             // ok
             return null;
@@ -598,7 +598,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 ////_util.
             }
             if (!wasStopped)
-                addMessage("Torrent stopped: '" + sfile.getName() + "'");
+                addMessage("Torrent stopped: '" + sfile.getName() + "'.");
         }
         return torrent;
     }
@@ -613,7 +613,7 @@ public class SnarkManager implements Snark.CompleteListener {
             torrentFile.delete();
             if (torrent.storage != null)
                 removeTorrentStatus(torrent.storage.getMetaInfo());
-            addMessage("Torrent removed: '" + torrentFile.getName() + "'");
+            addMessage("Torrent removed: '" + torrentFile.getName() + "'.");
         }
     }
     
@@ -646,7 +646,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void torrentComplete(Snark snark) {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
-        addMessage("Download complete of " + f.getName() + " (size: " + DataHelper.formatSize(len) + "B)");
+        addMessage("Download finished: " + f.getName() + " (size: " + DataHelper.formatSize(len) + "B)");
         updateStatus(snark);
     }
     
@@ -674,7 +674,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 // already known.  noop
             } else {
                 if (shouldAutoStart() && !_util.connect())
-                    addMessage("Unable to connect to I2P");
+                    addMessage("Unable to connect to I2P!");
                 addTorrent((String)foundNames.get(i), !shouldAutoStart());
             }
         }

@@ -26,7 +26,7 @@ label {
      padding: 1px 10px 2px 0px;
      float: left;
      width: 120px;
-     height: 28px;
+     height: 24px;
      font-weight: normal;
      text-align: right;
      font-size: 8pt;
@@ -34,6 +34,7 @@ label {
      -moz-box-sizing: border-box;
      box-sizing: border-box;
      line-height: 120%;
+     color: #427;
 }
 
 h4 {
@@ -84,7 +85,7 @@ br {
 
 div.statusNotRunning {
      float: left;
-     width: 72px;
+     width: 68px;
      height: 24px;
      overflow: hidden;
      color: #d00;
@@ -95,7 +96,7 @@ div.statusNotRunning {
 
 div.statusRunning {
    float: left;
-     width: 72px;
+     width: 68px;
      height: 24px;
      overflow: hidden;
      color: #0b0;
@@ -106,7 +107,7 @@ div.statusRunning {
 
 div.statusStarting {
      float: left;
-     width: 72px;
+     width: 68px;
      height: 24px;
      overflow: hidden;
      color: #339933;
