@@ -574,13 +574,13 @@ form {}
      padding: 20px 40px 20px 40px !important;
      border: 1px solid #003;
      background-color: #004;
-     background: url("/themes/console/images/olivegreentile.png");
+     background: #ddf url('images/lightbluetile.png');
      color: #001;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+     -moz-box-shadow: inset 0px 0px 0px 1px #9f9;
      overflow-x: scroll;
  }
  
