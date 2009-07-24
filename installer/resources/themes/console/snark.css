@@ -46,7 +46,7 @@ body {
      opacity: 0.7;
      color: #003;
 }
-.snarkRefresh:hover{
+.snarkRefresh:hover, .snarkRefresh:hover:visited{
      border: 1px solid #eef;
      padding: 2px 10px;
      background: #003;
@@ -65,21 +65,10 @@ body {
 }
 
 .snarkRefresh:visited {
-     border: 2px outset #eef;
-     padding: 1px 10px;
-     background: #eef;
-     text-decoration: none;
-     border-radius: 3px;
-     -moz-border-radius: 3px;
-     -khtml-border-radius: 3px;
-     font-size: 9pt;
-     font-weight: bold;
-     margin: 0px 3px 0px 3px !important;
-     text-align: center;
-     vertical-align: middle;
-     text-transform: uppercase;
+     border: 1px outset #eef;
      opacity: 0.7;
      color: #003;
+     background: #eef;
 }
 
 .snarkMessages {
@@ -117,7 +106,6 @@ table {
 	padding: 0px;
 	border-width: 0px;
 	border-spacing: 0px;
-  background-color: #f9f;
 }
 
 th {
@@ -132,6 +120,7 @@ th {
 .SnarkTorrents {
 	margin: 0;
 	border: 1px solid #001;
+  background-color: #f9f;
 }
 
 td {
