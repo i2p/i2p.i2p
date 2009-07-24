@@ -137,7 +137,7 @@ public class Router {
         // Do we copy all the data files to the new directory? default false
         String migrate = System.getProperty("i2p.dir.migrate");
         boolean migrateFiles = Boolean.valueOf(migrate).booleanValue();
-        String userDir = WorkingDir.getWorkingDir(migrateFiles);
+        String userDir = WorkingDir.getWorkingDir(envProps, migrateFiles);
 
         // Use the router.config file specified in the router.configLocation property
         // (default "router.config"),

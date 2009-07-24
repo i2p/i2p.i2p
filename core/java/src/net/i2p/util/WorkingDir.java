@@ -52,8 +52,12 @@ public class WorkingDir {
      * Only call this once on router invocation.
      * Caller should store the return value for future reference.
      */
-    public static String getWorkingDir(boolean migrateOldConfig) {
-        String dir = System.getProperty(PROP_WORKING_DIR);
+    public static String getWorkingDir(Properties envProps, boolean migrateOldConfig) {
+        String dir = null;
+        if (envProps != null)
+            dir = envProps.getProperty(PROP_WORKING_DIR);
+        if (dir == null)
+            dir = System.getProperty(PROP_WORKING_DIR);
         boolean isWindows = System.getProperty("os.name").startsWith("Win");
         File dirf = null;
         if (dir != null) {
@@ -69,10 +73,16 @@ public class WorkingDir {
                 dirf = new File(home, WORKING_DIR_DEFAULT);
             }
         }
+
         // where we are now
-        String cwd = System.getProperty(PROP_BASE_DIR);
-        if (cwd == null)
-            cwd = System.getProperty("user.dir");
+        String cwd = null;
+        if (envProps != null)
+            cwd = envProps.getProperty(PROP_BASE_DIR);
+        if (cwd == null) {
+            cwd = System.getProperty(PROP_BASE_DIR);
+            if (cwd == null)
+                cwd = System.getProperty("user.dir");
+        }
 
         // Check for a hosts.txt file, if it exists then I2P is there
         File oldDirf = new File(cwd);
