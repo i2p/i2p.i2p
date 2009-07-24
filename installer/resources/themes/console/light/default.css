@@ -154,17 +154,14 @@ hr {
 */
 }
 
-.control {
+.control, control:link, control:visited {
      margin: 4px 0 0 4px !important;
      padding: 2px;
      overflow: hidden;
-/*
-     height: 22px;
-*/
      min-width: 60px;
      font-weight: bold;
      background-color: #bbbbff;
-     color: black;
+     color: #001;
      border: 1px outset #ddddc0;
      text-align: center;
      white-space: nowrap;
@@ -172,21 +169,39 @@ hr {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: url(images/tabletitlelight.png) 0 0 repeat: x !important;
      text-decoration: none;
 }
 
+/*
 .control:active {
      border: 1px inset;
      background-color: #003;
-     color: #ff6600;
+     color: #f60;
+     text-decoration: none;
+}
+*/
+.control:hover, control:visited:hover {
+     border: 1px solid #eef;
+     background-color: #f60;
+     color: #fff !important;
      text-decoration: none;
 }
 
-.control:hover {
-     border: 1px solid #eeeeff;
-     background-color: #f60;
-     color: #fff !important;
+.control:link, control:visited {
+     margin: 4px 0 0 4px !important;
+     padding: 2px;
+     overflow: hidden;
+     min-width: 60px;
+     font-weight: bold;
+     color: #001;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     white-space: nowrap;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     margin-top: 8px;
+     background: #bbf url(images/tabletitlelight.png) 0 0 repeat: x !important;
      text-decoration: none;
 }
 
@@ -243,11 +258,11 @@ hr {
 }
 
 #globalOperationsPanel {
-     background-color: #ddddff;
+     background-color: #ddf;
      border: 1px solid #003;
      padding: 5px 20px 11px 10px;
-     background: url("/themes/console/images/yellowtile.png") !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #fff;
+     background: url(images/lightbluetile.png);
+     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
 }
 
 #globalOperationsPanel .control {
