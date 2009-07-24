@@ -608,29 +608,29 @@ public class JobQueue {
         
         StringBuilder buf = new StringBuilder(32*1024);
         buf.append("<h2>JobQueue</h2>");
-        buf.append("# runners: ").append(numRunners).append(" [states=");
+        buf.append("<b><div class=\"joblog\"># runners: ").append(numRunners).append(" [states=");
         if (states != null) 
             for (int i = 0; i < states.length; i++) 
                 buf.append(states[i]).append(" ");
-        buf.append("]<br />\n");
+        buf.append("]</b><br />\n");
 
         long now = _context.clock().now();
 
-        buf.append("# active jobs: ").append(activeJobs.size()).append("<ol>\n");
+        buf.append("<hr><b># active jobs: ").append(activeJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
             Job j = (Job)activeJobs.get(i);
             buf.append("<li> [started ").append(now-j.getTiming().getStartAfter()).append("ms ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append("# just finished jobs: ").append(justFinishedJobs.size()).append("<ol>\n");
+        buf.append("<hr><b># just finished jobs: ").append(justFinishedJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = (Job)justFinishedJobs.get(i);
             buf.append("<li> [finished ").append(now-j.getTiming().getActualEnd()).append("ms ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append("# ready/waiting jobs: ").append(readyJobs.size()).append(" <i>(lots of these mean there's likely a big problem)</i><ol>\n");
+        buf.append("<hr><b># ready/waiting jobs: ").append(readyJobs.size()).append(" </b><i>(lots of these mean there's likely a big problem)</i><ol>\n");
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = (Job)readyJobs.get(i);
             buf.append("<li> [waiting ");
@@ -641,7 +641,7 @@ public class JobQueue {
         buf.append("</ol>\n");
         out.flush();
 
-        buf.append("# timed jobs: ").append(timedJobs.size()).append("<ol>\n");
+        buf.append("<hr><b># timed jobs: ").append(timedJobs.size()).append("</b><ol>\n");
         TreeMap ordered = new TreeMap();
         for (int i = 0; i < timedJobs.size(); i++) {
             Job j = (Job)timedJobs.get(i);
@@ -653,7 +653,7 @@ public class JobQueue {
             buf.append("<li>").append(j.getName()).append(" in ");
             buf.append(DataHelper.formatDuration(time)).append("</li>\n");
         }
-        buf.append("</ol>\n");
+        buf.append("</ol></div>\n");
         
         out.write("<!-- jobQueue rendering: after main buffer, before stats -->\n");
         out.flush();

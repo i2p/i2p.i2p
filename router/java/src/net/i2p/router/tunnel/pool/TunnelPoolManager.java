@@ -494,8 +494,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             processed += cfg.getProcessedMessagesCount();
         }
         out.write("</table>\n");
-        out.write("<center>Inactive participating tunnels: " + inactive + "<br />\n");
-        out.write("Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B</center><br />\n");
+        out.write("<div class=\"statusnotes\"><center><b>Inactive participating tunnels: " + inactive + "</b></div>\n");
+        out.write("<div class=\"statusnotes\"><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B</b></center></div>\n");
         renderPeers(out);
     }
     
@@ -524,7 +524,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             if (info.getLength() > maxLength)
                 maxLength = info.getLength();
         }
-        out.write("<table border=\"1\"><tr><th>Direction</th><th>Expiration</th><th>Usage</th><th>Gateway</th>");
+        out.write("<table border=\"1\"><tr><th>In/Out</th><th>Expiry</th><th>Usage</th><th>Gateway</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
             out.write("\">Participants</th>");
@@ -573,19 +573,19 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (in != null) {
             List pending = in.listPending();
             if (pending.size() > 0)
-                out.write("<center>Build in progress: " + pending.size() + " inbound</center><br />\n");
+                out.write("<div class=\"statusnotes\"><center><b>Build in progress: " + pending.size() + " inbound</b></center></div>\n");
             live += pending.size();
         }
         if (outPool != null) {
             List pending = outPool.listPending();
             if (pending.size() > 0)
-                out.write("<center>Build in progress: " + pending.size() + " outbound</center><br />\n");
+                out.write("<div class=\"statusnotes\"><center><b>Build in progress: " + pending.size() + " outbound</b></center></div>\n");
             live += pending.size();
         }
         if (live <= 0)
-            out.write("<b><center>No tunnels, waiting for the grace period to end.</center></b><br />\n");
-        out.write("<center>Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "B in, " +
-                  DataHelper.formatSize(processedOut*1024) + "B out</center><br />");
+            out.write("<div class=\"statusnotes\"><center>N<b>No tunnels; waiting for the grace period to end.</center></b></div>\n");
+        out.write("<div class=\"statusnotes\"><center><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "<B in, " +
+                  DataHelper.formatSize(processedOut*1024) + "B out</b></center></div>");
     }
     
     private void renderPeers(Writer out) throws IOException {

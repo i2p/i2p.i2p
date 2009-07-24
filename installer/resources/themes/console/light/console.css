@@ -268,7 +268,7 @@ table {
 }
 
 th {
-     padding: 8px;
+     padding: 6px 2px;
      color: #000;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      text-align: center;
@@ -350,6 +350,12 @@ a:visited{
 
 a:hover{
      color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active{
+     color: #f93;
      text-decoration: underline;
      font-weight: bold;
 }
@@ -551,3 +557,37 @@ form {}
      border: 1px solid #001;
      display: none;
 }    
+
+.statusnotes {
+     font-style: italic;
+     font-size: 8pt;
+     font-color: #700 !important;
+     text-align: center;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 0;
+}
+
+.joblog {
+     margin: 25px 0 25px 0;
+     padding: 20px 40px 20px 40px !important;
+     border: 1px solid #003;
+     background-color: #004;
+     background: url("/themes/console/images/olivegreentile.png");
+     color: #001;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: justify;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+     overflow-x: scroll;
+ }
+ 
+ div.joblog:li {
+     word-wrap: break-word !important;
+}
+
+ .joblog:ul {
+     word-wrap: break-word !important;
+}

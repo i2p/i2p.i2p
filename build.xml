@@ -325,8 +325,10 @@
         <!-- Add extricated I2PSnark css here, for now -->
         <copy file="installer/resources/themes/console/snark.css" todir="pkg-temp/docs/themes/console/" />
         <!-- these files now in docs/, not in the .war -->
+        <!-- No need to copy these individually, we're copying the whole dir below.. 
         <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
         <copy file="installer/resources/themes/console/images/i2plogo.png" todir="pkg-temp/docs/themes/console/images/" />
+        -->
         <!-- Since the logo moved, we have to update the error pages -->
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/" includes="*-header.ht" />
@@ -342,7 +344,11 @@
         <!-- Add light theme -->
         <copy todir="pkg-temp/docs/themes/console/light/" >
             <fileset  dir="installer/resources/themes/console/light/" />
-        </copy> 
+        </copy>
+        <!-- Add shared images.. these are subject to flux and change! -->
+        <copy todir="pkg-temp/docs/themes/console/images/" >
+            <fileset  dir="installer/resources/themes/console/images/" />
+        </copy>          
         <copy todir="pkg-temp/docs/" >
           <fileset dir="." includes="readme*.html" />
         </copy>
