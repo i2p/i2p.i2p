@@ -80,7 +80,7 @@ public class I2PSnarkServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         out.write(HEADER_BEGIN);
         // we want it to go to the base URI so we don't refresh with some funky action= value
-        out.write("<meta http-equiv=\"refresh\" content=\"300;" + req.getRequestURI() + peerString + "\">\n");
+        out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
         out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\" class=\"snarklogo\"></a><br>");
@@ -734,7 +734,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
                   + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" /> peers<br />\n");
         out.write("Up bandwidth limit: <input type=\"text\" name=\"upBW\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Half <a href=\"http://127.0.0.1:7657/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br />\n");
+                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Half <a href=\"/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br />\n");
         
         out.write("Use open trackers also: <input type=\"checkbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 

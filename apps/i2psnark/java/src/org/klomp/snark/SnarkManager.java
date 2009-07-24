@@ -544,7 +544,7 @@ public class SnarkManager implements Snark.CompleteListener {
         // basic validation of url
         if ((!announce.startsWith("http://")) ||
             (announce.indexOf(".i2p/") < 0)) // need to do better than this
-            return "Non-i2p tracker in " + info.getName() + ", removing it from our list of trackers!";
+            return "Non-i2p tracker in " + info.getName() + ", deleting it from our list of trackers!";
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
             return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it!";
