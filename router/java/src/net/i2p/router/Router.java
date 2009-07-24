@@ -125,7 +125,14 @@ public class Router {
         // we need the user directory figured out by now, so figure it out here rather than
         // in the RouterContext() constructor.
         //
-        // Fixme read config file before migration? or before? or both?
+        // We have not read the config file yet. Therefore the base and config locations
+        // are determined solely by properties (first envProps then System), for the purposes
+        // of initializing the user's config directory if it did not exist.
+        // If the base dir and/or config dir are set in the config file,
+        // they wil be used after the initialization of the (possibly different) dirs
+        // determined by WorkingDir.
+        // So for now, it doesn't make much sense to set the base or config dirs in the config file -
+        // use properties instead. If for some reason, distros need this, we can revisit it.
         //
         // Then add it to envProps (but not _config, we don't want it in the router.config file)
         // where it will then be available to all via _context.dir()

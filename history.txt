@@ -1,3 +1,8 @@
+2009-07-24 zzz
+    * Eepsite: Add Deutsch index page and css (thanks sperrbezirk!)
+    * Router: Support i2p.dir.base and i2p.dir.config passed in via properties
+    * Throttle: Decrease default max tunnels to 2500
+
 2009-07-23 dr|z3d
     * Include additional tile graphics and I2PSnark header logo in /console/images/
     * Tidy up some layout irks; add some last minute 0.7.6 pre-release sparkle!
