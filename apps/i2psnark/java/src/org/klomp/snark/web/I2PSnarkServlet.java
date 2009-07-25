@@ -83,7 +83,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
-        out.write("<div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\" class=\"snarklogo\"></a></table>");
+        out.write("<center><div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\" class=\"snarklogo\"></a></table>");
         out.write("<div class=\"snarknavbar\"><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
@@ -803,7 +803,7 @@ public class I2PSnarkServlet extends HttpServlet {
 
     private static final String TABLE_FOOTER = "</table></div>\n";
     
-    private static final String FOOTER = "</div></div></div></body></html>";
+    private static final String FOOTER = "</div></div></div></center></body></html>";
 
 /** inner class, don't bother reindenting */
 private static class FetchAndAdd implements Runnable {

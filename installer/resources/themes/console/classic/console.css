@@ -28,7 +28,6 @@ div.logo {
      margin: 0em;
      padding: .5em;
      text-align: center;
-     display: none !important;
 }
 
 div.toolbar {
@@ -115,4 +114,9 @@ div.messages span.notice {
 
 h1 {
      font-size: 18pt;
+}
+
+.proxyfooter{
+     font-size: 7pt;
+     display: none !important;
 }

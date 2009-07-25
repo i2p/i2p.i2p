@@ -523,7 +523,7 @@ form {}
      margin: -5px 0 5px 0; 
      padding: 7px;
      background: #004;
-     -moz-box-shadow: inset 0px 0px 2px 0px #99f;
+     -moz-box-shadow: inset 0px 0px 0px 1px #009;
 }
 
 .joblog {
