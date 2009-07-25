@@ -229,6 +229,38 @@ div.configure {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }
 
+div.graphspanel {
+     padding: 12px;
+     margin: 10px 0px 25px 0;
+     background: #ddf url('images/lightbluetile.png');
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #000022;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+
+div.graphspanel img {
+     border: 1px solid #003;
+     padding: 2px;
+     margin: 6px;
+     text-align: center !important;
+     background: #001;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+     opacity: 0.9;
+}
+
+div.graphspanel img:hover {
+     border: 1px solid #003;
+     padding: 2px;
+     margin: 6px;
+     text-align: center !important;
+     background: #001;
+     -moz-box-shadow: inset 0px 0px 2px 1px #f60;
+     opacity: 1;
+}
+
 div.messages {
      padding: 10px;
      margin: 10px 0 20px 0;

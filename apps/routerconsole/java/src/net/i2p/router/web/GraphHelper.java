@@ -57,7 +57,7 @@ public class GraphHelper extends HelperBase {
             }
 
             if (hasTx && hasRx && !_showEvents) {
-                _out.write("<a href=\"viewstat.jsp?stat=bw.combined"
+                _out.write("<div class=\"graphspanel\"><a href=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + (3 * _periodCount )
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
@@ -83,7 +83,7 @@ public class GraphHelper extends HelperBase {
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
                            + "\" />");
-                _out.write("<img border=\"0\" width=\""
+                _out.write("<img class=\"statimage\" border=\"0\" width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
@@ -105,7 +105,8 @@ public class GraphHelper extends HelperBase {
     }
     public String getForm() { 
         try {
-            _out.write("<p /><a href=\"configstats.jsp\">Select Stats to Graph</a><p />");
+            _out.write("<hr /><h3>Configure Graph Display</h3>");
+            _out.write("<p />[<a href=\"configstats.jsp\">Select Stats to Graph</a>]<p />");
             _out.write("<form action=\"graphs.jsp\" method=\"GET\">");
             _out.write("Periods: <input size=\"3\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\" /><br />\n");
             _out.write("Plot averages: <input type=\"radio\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + " /> ");
@@ -113,8 +114,8 @@ public class GraphHelper extends HelperBase {
             _out.write("Image sizes: width: <input size=\"4\" type=\"text\" name=\"width\" value=\"" + _width 
                        + "\" /> pixels, height: <input size=\"4\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\" /><br />\n");
-            _out.write("Refresh delay: <select name=\"refreshDelay\"><option value=\"60\">1 minute</option><option value=\"120\">2 minutes</option><option value=\"300\">5 minutes</option><option value=\"600\">10 minutes</option><option value=\"-1\">Never</option></select><br />\n");
-            _out.write("<input type=\"submit\" value=\"Redraw\" />");
+            _out.write("Refresh delay: <select name=\"refreshDelay\"><option value=\"60\">1 minute</option><option value=\"120\">2 minutes</option><option value=\"300\">5 minutes</option><option value=\"600\">10 minutes</option><option value=\"1800\">30 minutes</option><option value=\"3600\">1 hour</option><option value=\"-1\">Never</option></select><br />\n");
+            _out.write("<hr /><input type=\"submit\" value=\"Redraw\" /></div>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

@@ -213,6 +213,37 @@ div.messages li {
      border: 0px !important;
 }
 
+div.graphspanel {
+     padding: 15px 15px 15px 15px;
+     margin: 10px 0px;
+     background: #005;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #99f;
+     background: #003 url(images/darkbluebg.png);
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+}
+
+div.graphspanel img {
+     border: 1px solid #001;
+     padding: 3px;
+     margin: 5px;
+     text-align: center !important;
+     background: #002;
+     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+     opacity: 0.9;
+}
+
+div.graphspanel img:hover {
+     border: 1px solid #001;
+     padding: 3px;
+     margin: 5px;
+     text-align: center !important;
+     background: #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #f60;
+     opacity: 1;
+}
 table {
      border-collapse: collapse;
      width: 100%;
