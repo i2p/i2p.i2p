@@ -57,12 +57,12 @@ public class GraphHelper extends HelperBase {
             }
 
             if (hasTx && hasRx && !_showEvents) {
-                _out.write("<div class=\"graphspanel\"><a href=\"viewstat.jsp?stat=bw.combined"
+                _out.write("<a href=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + (3 * _periodCount )
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
-                           + "\" />");
-                _out.write("<img width=\""
+                           + "\" / target=\"_blank\">");
+                _out.write("<img class=\"statimage\" width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
@@ -82,7 +82,7 @@ public class GraphHelper extends HelperBase {
                            + "&amp;periodCount=" + (3 * _periodCount)
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
-                           + "\" />");
+                           + "\" target=\"_blank\" />");
                 _out.write("<img class=\"statimage\" border=\"0\" width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat="

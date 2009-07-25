@@ -10,6 +10,7 @@
 <%@include file="summary.jsp" %>
 <h1>I2P Performance Graphs</h1>
 <div class="main" id="main">
+ <div class="graphspanel">
  <jsp:useBean class="net.i2p.router.web.GraphHelper" id="graphHelper" scope="request" />
  <jsp:setProperty name="graphHelper" property="*" />
  <jsp:setProperty name="graphHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
