@@ -1,3 +1,5 @@
+/* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
+
 body {
      margin: 25px 10px 0 5px;
      padding: 0em;
@@ -561,12 +563,14 @@ form {}
 .statusnotes {
      font-style: italic;
      font-size: 8pt;
-     font-color: #700 !important;
+     font-color: #001 !important;
      text-align: center;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border: 0;
+     border: 1px solid #001 !important;
+     border-top: 0 !important;
+     margin: -5px 0 5px 0; 
+     padding: 7px;
+     background: #bcf;
+     -moz-box-shadow: inset 0px 0px 2px 1px #eef;
 }
 
 .joblog {
