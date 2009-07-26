@@ -95,6 +95,12 @@ public class WorkingDir {
             return cwd;
         }
 
+        // apparently configured for "portable" ?
+        try {
+            if (oldDirf.getCanonicalPath().equals(dirf.getCanonicalPath()))
+                return cwd;
+        } catch (IOException ioe) {}
+
         // where we want to go
         String rv = dirf.getAbsolutePath();
         if (dirf.exists()) {

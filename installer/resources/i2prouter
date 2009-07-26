@@ -18,6 +18,9 @@
 # If you did not run the installer, replace them with the appropriate path.
 I2P="%INSTALL_PATH"
 I2PTEMP="%SYSTEM_java_io_tmpdir"
+# PORTABLE installation:
+# Use the following instead.
+#I2PTEMP="%INSTALL_PATH"
 
 # Application
 APP_NAME="i2p"
