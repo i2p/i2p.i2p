@@ -1061,7 +1061,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             buf.append("<tr><th>Country</th><th>Count</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
-                buf.append("<tr><td><img alt=\"").append(country.toUpperCase()).append("\"");
+                buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
                 buf.append(_context.commSystem().getCountryName(country));
                 buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
@@ -1092,7 +1092,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         buf.append("Address(es): <i>");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
-            buf.append("<img alt=\"").append(country.toUpperCase()).append("\"");
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
             buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {

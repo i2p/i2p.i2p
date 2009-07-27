@@ -467,7 +467,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         StringBuilder buf = new StringBuilder(128);
         String c = getCountry(peer);
         if (c != null) {
-            buf.append("<img alt=\"").append(c.toUpperCase()).append("\" title=\"");
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase()).append("\" title=\"");
             buf.append(getCountryName(c));
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
         }

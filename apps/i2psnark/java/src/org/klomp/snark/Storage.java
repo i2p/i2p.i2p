@@ -190,6 +190,9 @@ public class Storage
   }
 */
 
+  /** FIXME we can run out of fd's doing this,
+   *  maybe some sort of global close-RAF-right-away flag
+   *  would do the trick */
   private void fast_digestCreate() throws IOException {
     // Calculate piece_hashes
     SHA1 digest = new SHA1();

@@ -318,7 +318,7 @@ public class I2PSnarkServlet extends HttpServlet {
             _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
         } else if ("Create torrent".equals(action)) {
             String baseData = req.getParameter("baseFile");
-            if (baseData != null) {
+            if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(_manager.getDataDir(), baseData);
                 String announceURL = req.getParameter("announceURL");
                 String announceURLOther = req.getParameter("announceURLOther");
@@ -351,6 +351,8 @@ public class I2PSnarkServlet extends HttpServlet {
                 } else {
                     _manager.addMessage("Cannot create a torrent for the nonexistent data: " + baseFile.getAbsolutePath());
                 }
+            } else {
+                _manager.addMessage("Error creating torrent - you must enter a file or directory");
             }
         } else if ("StopAll".equals(action)) {
             _manager.addMessage("Stopping all torrents and closing the I2P tunnel.");
