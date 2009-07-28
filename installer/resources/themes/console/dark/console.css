@@ -260,6 +260,8 @@ th {
      text-align: center;
      font-size: 8pt;
      background: #004 url('images/tabletitledark.png') repeat-x;
+     border-top: 1px solid #99f;
+     border-bottom: 1px solid #99f;     
 }
 
 tr {
@@ -283,15 +285,21 @@ tr:last-child {
 }
 */
 td {
-     padding: 6px 3px 5px 3px;
+     padding: 6px 4px;
      color: #eef;
      vertical-align: middle;
+     border-top: 1px inset #006;
+     border-bottom: 1px outset #006;   
+}
+
+td img {
+     padding: 0 1px 0 2px;
 }
 
 tt {
-     font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #FF0;
-     padding: 10px;
+     padding: 0 5px 2px 0;
 }
 
 div.main li {
@@ -559,23 +567,33 @@ form {}
 
 .joblog {
      margin: 25px 0 25px 0;
-     padding: 20px 40px 20px 40px !important;
+     padding: 20px 30px 20px 30px !important;
      border: 1px solid #99f;
      background-color: #004;
-     background: url("images/lightbluetile.png");
+     background: url("images/darkbluebg.png");
      color: #dfd;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: justify;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     overflow-x: scroll;
+     overflow-x: scroll; /* Opera fix */
  }
  
  div.joblog:li {
      word-wrap: break-word !important;
+     text-align: justify;
 }
 
  .joblog:ul {
      word-wrap: break-word !important;
+     text-align: justify;
+}
+
+.smallhead {
+     font-size: 8pt
+}
+
+.mediumtags {
+     font-size: 9pt;
 }

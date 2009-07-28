@@ -59,7 +59,7 @@ class ProfileOrganizerRenderer {
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>Peer Profiles</h2>\n");
         buf.append("<p>Showing ").append(order.size()).append(" recent profiles, hiding ").append(peers.size()-order.size()).append(" older profiles</p>");
-        buf.append("<table border=\"1\">");
+        buf.append("<table>");
         buf.append("<tr>");
         buf.append("<th>Peer</th>");
         buf.append("<th>Groups (Caps)</th>");
@@ -98,9 +98,9 @@ class ProfileOrganizerRenderer {
                 buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
             prevTier = tier;
             
-            buf.append("<tr><td align=\"right\" nowrap>");
+            buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
-            buf.append("</td><td>");
+            buf.append("</td><td align=\"center\">");
             
             switch (tier) {
                 case 1: buf.append("Fast, High Capacity"); break;
@@ -137,7 +137,7 @@ class ProfileOrganizerRenderer {
                 buf.append(bonus).append(')');
             }
             buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
-            buf.append("</td><td>");
+            buf.append("</td><td align=\"center\">");
             if (_context.shitlist().isShitlisted(peer)) buf.append("Shitlist");
             if (prof.getIsFailing()) buf.append(" Failing");
             if (_context.commSystem().wasUnreachable(peer)) buf.append(" Unreachable");
@@ -150,37 +150,41 @@ class ProfileOrganizerRenderer {
                     buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
             }
             buf.append("&nbsp</td>");
-            buf.append("<td nowrap><a href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
-            buf.append("/<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
+            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
         }
         buf.append("</table>");
 
         buf.append("<h2>Floodfill and Integrated Peers</h2>\n");
-        buf.append("<table border=\"1\">");
+        buf.append("<table>");
         buf.append("<tr>");
-        buf.append("<th>Peer</th>");
-        buf.append("<th>Caps</th>");
-        buf.append("<th>Integ. Value</th>");
-        buf.append("<th>Last Heard About</th>");
-        buf.append("<th>Last Heard From</th>");
-        buf.append("<th>Last Successful Send</th>");
-        buf.append("<th>Last Failed Send</th>");
-        buf.append("<th>10m Resp. Time</th>");
-        buf.append("<th>1h Resp. Time</th>");
-        buf.append("<th>1d Resp. Time</th>");
-        buf.append("<th>Successful Lookups</th>");
-        buf.append("<th>Failed Lookups</th>");
-        buf.append("<th>New Stores</th>");
-        buf.append("<th>Old Stores</th>");
-        buf.append("<th>1h Fail Rate</th>");
-        buf.append("<th>1d Fail Rate</th>");
+        buf.append("<th class=\"smallhead\">Peer</th>");
+        buf.append("<th class=\"smallhead\">Caps</th>");
+        buf.append("<th class=\"smallhead\">Integ. Value</th>");
+        buf.append("<th class=\"smallhead\">Last Heard About</th>");
+        buf.append("<th class=\"smallhead\">Last Heard From</th>");
+//        buf.append("<th class=\"smallhead\">Last Successful Send</th>");
+        buf.append("<th class=\"smallhead\">Last Good Send</th>");        
+//        buf.append("<th class=\"smallhead\">Last Failed Send</th>");
+        buf.append("<th class=\"smallhead\">Last Bad Send</th>");
+        buf.append("<th class=\"smallhead\">10m Resp. Time</th>");
+        buf.append("<th class=\"smallhead\">1h Resp. Time</th>");
+        buf.append("<th class=\"smallhead\">1d Resp. Time</th>");
+//        buf.append("<th class=\"smallhead\">Successful Lookups</th>"); 
+        buf.append("<th class=\"smallhead\">Good Lookups</th>"); 
+//        buf.append("<th>Failed Lookups</th>");
+        buf.append("<th class=\"smallhead\">Bad Lookups</th>");        
+        buf.append("<th class=\"smallhead\">New Stores</th>");
+        buf.append("<th class=\"smallhead\">Old Stores</th>");
+        buf.append("<th class=\"smallhead\">1h Fail Rate</th>");
+        buf.append("<th class=\"smallhead\">1d Fail Rate</th>");
         buf.append("</tr>");
         for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
 
-            buf.append("<tr><td align=\"right\" nowrap>");
+            buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             buf.append("</td>");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);

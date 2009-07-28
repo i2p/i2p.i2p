@@ -14,7 +14,7 @@ public class ConfigTunnelsHelper extends HelperBase {
     
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table border=\"1\">\n");
+        buf.append("<table>\n");
         TunnelPoolSettings exploratoryIn = _context.tunnelManager().getInboundSettings();
         TunnelPoolSettings exploratoryOut = _context.tunnelManager().getOutboundSettings();
         
@@ -80,7 +80,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
 //        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
         // tunnel depth
-        buf.append("<tr><td align=\"right\">Depth</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Depth:</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthInbound\">\n");
         int now = in.getLength();
         renderOptions(buf, 0, MAX_LENGTH, now, "", "hop");
@@ -97,7 +97,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("</tr>\n");
 
         // tunnel depth variance
-        buf.append("<tr><td align=\"right\">Randomization</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Randomization:</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".varianceInbound\">\n");
         now = in.getLengthVariance();
         renderOptions(buf, 0, 0, now, "", "hop");
@@ -121,7 +121,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("</select></td>\n");
 
         // tunnel quantity
-        buf.append("<tr><td align=\"right\">Quantity</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Quantity:</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityInbound\">\n");
         now = in.getQuantity();
         renderOptions(buf, 1, MAX_QUANTITY, now, "", "tunnel");
@@ -138,7 +138,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("</tr>\n");
 
         // tunnel backup quantity
-        buf.append("<tr><td align=\"right\">Backup quantity</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Backup quantity:</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupInbound\">\n");
         now = in.getBackupQuantity();
         renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", "tunnel");
@@ -155,7 +155,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("</tr>\n");
 
         // custom options
-        buf.append("<tr><td align=\"right\">Inbound options:</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Inbound options:</td>\n");
         buf.append("<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
         buf.append(".inboundOptions\" type=\"text\" size=\"32\" ");
         buf.append("value=\"");
@@ -166,7 +166,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
             buf.append(prop).append("=").append(val).append(" ");
         }
         buf.append("\"/></td></tr>\n");
-        buf.append("<tr><td align=\"right\">Outbound options:</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Outbound options:</td>\n");
         buf.append("<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
         buf.append(".outboundOptions\" type=\"text\" size=\"32\" ");
         buf.append("value=\"");

@@ -10,6 +10,7 @@
 <%@include file="summary.jsp" %>
  <h1>I2P Router Logs</h1>
 <div class="main" id="main">
+ <div class="joblog">
  <h3>Version:</h3><a name="version"> </a>
  Please include this information in bug reports.
  <p>
@@ -31,6 +32,6 @@ jbigi <%=net.i2p.util.NativeBigInteger.loadStatus()%><br />
  <h3>Service (Wrapper) logs:</h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div>
-
+</div>
 </body>
 </html>

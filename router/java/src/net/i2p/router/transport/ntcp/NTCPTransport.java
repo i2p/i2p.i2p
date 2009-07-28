@@ -643,7 +643,7 @@ public class NTCPTransport extends TransportImpl {
         buf.append(" limit: ").append(getMaxConnections());
         buf.append(" timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
         buf.append("</b><br />\n");
-        buf.append("<table border=\"1\">\n");
+        buf.append("<table>\n");
         buf.append("<tr><th><a href=\"#def.peer\">Peer</a></th>");
         buf.append("<th>Dir</th>");
         buf.append("<th align=\"right\"><a href=\"#def.idle\">Idle</a></th>");

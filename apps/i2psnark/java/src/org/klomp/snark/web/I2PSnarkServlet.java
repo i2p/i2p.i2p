@@ -97,7 +97,7 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
         }
         out.write("</div>\n");
-        out.write("<div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td valign=\"top\" align=\"left\"><pre>");
+        out.write("<div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
@@ -115,7 +115,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("(<a href=\"" + req.getRequestURI() + "?p=1" + "\">Show Peers</a>)<br />\n");
         }
         out.write(TABLE_HEADER2);
-        out.write("<th align=\"left\" valign=\"top\">");
+        out.write("<th align=\"left\">");
         if (_manager.util().connected())
             out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
                       "\" title=\"Stop all torrents and the i2p tunnel\">Stop All</a>");
@@ -135,12 +135,12 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write(TABLE_EMPTY);
         } else if (snarks.size() > 1) {
             out.write("<tfoot><tr>\n" +
-                      "    <th align=\"left\" valign=\"top\" colspan=\"2\">Totals (" + snarks.size() + " torrents, " + stats[4] + " connected peers)</th>\n" +
+                      "    <th align=\"left\" colspan=\"2\">Totals (" + snarks.size() + " torrents, " + stats[4] + " connected peers)</th>\n" +
                       "    <th>&nbsp;</th>\n" +
-                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[0]) + "</th>\n" +
-                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[1]) + "</th>\n" +
-                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[2]) + "ps</th>\n" +
-                      "    <th align=\"right\" valign=\"top\">" + formatSize(stats[3]) + "ps</th>\n" +
+                      "    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
+                      "    <th align=\"right\">" + formatSize(stats[1]) + "</th>\n" +
+                      "    <th align=\"right\">" + formatSize(stats[2]) + "ps</th>\n" +
+                      "    <th align=\"right\">" + formatSize(stats[3]) + "ps</th>\n" +
                       "    <th>&nbsp;</th></tr>\n" +
                       "</tfoot>\n");
         }
@@ -486,9 +486,9 @@ public class I2PSnarkServlet extends HttpServlet {
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         out.write("<tr class=\"" + rowClass + "\">");
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
+        out.write("<td align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
         out.write(statusString + "</td>\n\t");
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
+        out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
         if (remaining == 0)
             out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
@@ -520,27 +520,27 @@ public class I2PSnarkServlet extends HttpServlet {
         }
         out.write("</td>\n\t");
         
-        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
+        out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
         if(isRunning && remainingSeconds > 0)
             out.write(DataHelper.formatDuration(remainingSeconds*1000)); // (eta 6h)
         out.write("</td>\n\t");
-        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
+        out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
             out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
         else
             out.write(formatSize(total)); // 3GB
         out.write("</td>\n\t");
-        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentUploaded " + rowClass 
+        out.write("<td align=\"right\" class=\"snarkTorrentUploaded " + rowClass 
                   + "\">" + formatSize(uploaded) + "</td>\n\t");
-        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentRate\">");
+        out.write("<td align=\"right\" class=\"snarkTorrentRate\">");
         if(isRunning && remaining > 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
-        out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentRate\">");
+        out.write("<td align=\"right\" class=\"snarkTorrentRate\">");
         if(isRunning)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
-        out.write("<td valign=\"top\" align=\"left\" class=\"snarkTorrentAction " + rowClass + "\">");
+        out.write("<td align=\"left\" class=\"snarkTorrentAction " + rowClass + "\">");
         String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.meta.getInfoHash());
         if (showPeers)
             parameters = parameters + "&p=1";
@@ -567,7 +567,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("<tr class=\"" + rowClass + "\">");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 String ch = peer.toString().substring(0, 4);
                 String client;
                 if ("AwMD".equals(ch))
@@ -592,7 +592,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 float pct = (float) (100.0 * (float) peer.completed() / snark.meta.getPieces());
                 if (pct == 100.0)
                     out.write("<font size=-1>Seed</font>");
@@ -605,7 +605,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (remaining > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
                         out.write("<font color=#008000>");
@@ -620,7 +620,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     }
                 }
                 out.write("</td>\n\t");
-                out.write("<td valign=\"top\" align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (pct != 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
                         out.write("<font color=#008000>");
@@ -789,19 +789,19 @@ public class I2PSnarkServlet extends HttpServlet {
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
                                                "<thead>\n" +
-                                               "<tr><th align=\"left\" valign=\"top\">Status \n";
+                                               "<tr><th align=\"left\">Status \n";
 
     private static final String TABLE_HEADER2 = "</th>\n" +
-                                               "    <th align=\"left\" valign=\"top\">Torrent</th>\n" +
-                                               "    <th align=\"right\" valign=\"top\">ETA</th>\n" +
-                                               "    <th align=\"right\" valign=\"top\">Downloaded</th>\n" +
-                                               "    <th align=\"right\" valign=\"top\">Uploaded</th>\n" +
-                                               "    <th align=\"right\" valign=\"top\">Down Rate</th>\n" +
-                                               "    <th align=\"right\" valign=\"top\">Up Rate</th>\n";
+                                               "    <th align=\"left\">Torrent</th>\n" +
+                                               "    <th align=\"right\">ETA</th>\n" +
+                                               "    <th align=\"right\">Downloaded</th>\n" +
+                                               "    <th align=\"right\">Uploaded</th>\n" +
+                                               "    <th align=\"right\">Down Rate</th>\n" +
+                                               "    <th align=\"right\">Up Rate</th>\n";
     
    private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
                                               "<td class=\"snarkTorrentEven\" align=\"center\"" +
-                                              "    valign=\"top\" colspan=\"8\"><i>No torrents loaded.</i></td></tr>\n";
+                                              "    colspan=\"8\"><i>No torrents loaded.</i></td></tr>\n";
 
     private static final String TABLE_FOOTER = "</table></div>\n";
     

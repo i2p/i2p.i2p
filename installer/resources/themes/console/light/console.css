@@ -307,10 +307,13 @@ th {
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      text-align: center;
      font-size: 9pt;
+     border-bottom: 1px solid #001;
+     border-top: 1px solid #001;
 }
 
 tr {
      vertical-align: middle !important;
+     align: center;
 }
 
 tr:nth-child(even) {
@@ -331,6 +334,8 @@ td {
      padding: 5px;
      color: #000;
      vertical-align: middle;
+     border-top: 1px inset #001;
+     border-bottom: 1px outset #99f;     
 }
 
 tt {
@@ -626,4 +631,14 @@ form {}
 
  .joblog:ul {
      word-wrap: break-word !important;
+}
+
+.smallhead {
+     font-size: 7pt
+}
+
+.mediumtags {
+     font-size: 8pt;
+     font-style: italic;
+     font-weight: bold;
 }

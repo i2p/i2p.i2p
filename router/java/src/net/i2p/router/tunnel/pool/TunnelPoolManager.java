@@ -438,7 +438,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         
         List participating = _context.tunnelDispatcher().listParticipatingTunnels();
         Collections.sort(participating, new TunnelComparator());
-        out.write("<h2><a name=\"participating\"></a>Participating tunnels:</h2><table border=\"1\">\n");
+        out.write("<h2><a name=\"participating\"></a>Participating tunnels:</h2><table>\n");
         out.write("<tr><th>Receive on</th><th>From</th><th>"
                   + "Send on</th><th>To</th><th>Expiration</th>"
                   + "<th>Usage</th><th>Rate</th><th>Role</th></tr>\n");
@@ -524,7 +524,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             if (info.getLength() > maxLength)
                 maxLength = info.getLength();
         }
-        out.write("<table border=\"1\"><tr><th>In/Out</th><th>Expiry</th><th>Usage</th><th>Gateway</th>");
+        out.write("<table><tr><th>In/Out</th><th>Expiry</th><th>Usage</th><th>Gateway</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
             out.write("\">Participants</th>");
@@ -603,7 +603,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         Collections.sort(peerList, new HashComparator());
 
         out.write("<h2><a name=\"peers\"></a>Tunnel Counts By Peer:</h2>\n");
-        out.write("<table border=\"1\"><tr><th>Peer</th><th>Expl. + Client</th><th>% of total</th><th>Part. from + to</th><th>% of total</th></tr>\n");
+        out.write("<table><tr><th>Peer</th><th>Expl. + Client</th><th>% of total</th><th>Part. from + to</th><th>% of total</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr><td align=\"center\">");
              out.write(netDbLink(h));

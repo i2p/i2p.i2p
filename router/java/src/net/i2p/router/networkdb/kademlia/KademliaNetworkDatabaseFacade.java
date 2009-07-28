@@ -1037,11 +1037,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
         }
             
-        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td valign=\"top\">");
+        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td>");
         List<String> versionList = new ArrayList(versions.objects());
         if (versionList.size() > 0) {
             Collections.sort(versionList, Collections.reverseOrder());
-            buf.append("<table border=\"1\">\n");
+            buf.append("<table>\n");
             buf.append("<tr><th>Version</th><th>Count</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
@@ -1050,14 +1050,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
             buf.append("</table>\n");
         }
-        buf.append("</td><td valign=\"top\">");
+        buf.append("</td><td>");
         out.write(buf.toString());
         buf.setLength(0);
             
         List<String> countryList = new ArrayList(countries.objects());
         if (countryList.size() > 0) {
             Collections.sort(countryList);
-            buf.append("<table border=\"1\">\n");
+            buf.append("<table>\n");
             buf.append("<tr><th>Country</th><th>Count</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);

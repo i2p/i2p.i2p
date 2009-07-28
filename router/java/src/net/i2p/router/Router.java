@@ -762,7 +762,7 @@ public class Router {
         buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
         for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {
             String msg = (String)iter.next();
-            buf.append("<tr><td valign=\"top\" align=\"left\"><pre>");
+            buf.append("<tr><td align=\"left\"><pre>");
             appendLogMessage(buf, msg);
             buf.append("</pre></td></tr>\n");
         }
