@@ -16,6 +16,6 @@
 <div class="main" id="main">
  <jsp:getProperty name="oldhelper" property="stats" />
 </div>
-
+</div>
 </body>
 </html>

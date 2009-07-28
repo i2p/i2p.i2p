@@ -621,7 +621,7 @@ form {}
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: justify;
-     -moz-box-shadow: inset 0px 0px 0px 1px #9f9;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
      overflow-x: scroll;
  }
  

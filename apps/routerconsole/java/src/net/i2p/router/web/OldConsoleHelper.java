@@ -22,7 +22,7 @@ public class OldConsoleHelper extends HelperBase {
                 return baos.toString();
             }
         } catch (IOException ioe) {
-            return "<b>Error rending the console</b>";
+            return "<b>Error displaying the console.</b>";
         }
     }
     
@@ -38,7 +38,7 @@ public class OldConsoleHelper extends HelperBase {
                 return baos.toString();
             }
         } catch (IOException ioe) {
-            return "<b>Error rending the console</b>";
+            return "<b>Error displaying the console.</b>";
         }
     }
 }

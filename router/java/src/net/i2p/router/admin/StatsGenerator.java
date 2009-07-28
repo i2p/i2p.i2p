@@ -29,7 +29,7 @@ public class StatsGenerator {
     
     public void generateStatsPage(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<form action=\"/oldstats.jsp\">");
+        buf.append("<div class=\"joblog\"><form action=\"/oldstats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
         buf.setLength(0);
@@ -66,11 +66,11 @@ public class StatsGenerator {
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
             String group = (String)iter.next();
             Set stats = (Set)groups.get(group);
-            buf.append("<h2><a name=\"");
+            buf.append("<h3><a name=\"");
             buf.append(group);
             buf.append("\">");
             buf.append(group);
-            buf.append("</a></h2>");
+            buf.append("</a></h3>");
             buf.append("<ul>");
             out.write(buf.toString());
             buf.setLength(0);
