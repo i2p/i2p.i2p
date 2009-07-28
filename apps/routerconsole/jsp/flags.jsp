@@ -23,7 +23,7 @@ if (c != null && c.length() > 0) {
         rendered = true;
     } catch (java.io.IOException ioe) {}
     if (rendered)
-        cout.close();;
+        cout.close();
 }
 if (!rendered)
     response.sendError(404, "Not found");
