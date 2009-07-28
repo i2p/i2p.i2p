@@ -34,7 +34,7 @@ public class Reseeder {
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 8 * 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL = "http://netdb.i2p2.de/,http://b.netdb.i2p2.de/";
+    private static final String DEFAULT_SEED_URL = "http://netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://reseed.i2p-projekt.de/";
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
     private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
