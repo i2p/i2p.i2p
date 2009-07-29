@@ -4,7 +4,7 @@ body {
      text-align: center;
      background: #FFF;
      color: #000;
-     font: 100% Verdana, Tahoma, Helvetica, sans-serif;
+     font: 10pt/120% Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
@@ -54,10 +54,17 @@ div.routersummary {
      padding: 5px;
      text-align: left;
      border: medium solid #efefff;
-     font-size: 0.82em;
+     font-size: 9pt;
      word-wrap: break-word;
 }
 
+div.routersummary hr {
+     color: #ccf;
+     background: #ccf;
+     height: 2px;
+     border: 0px solid #ccf;
+     margin: 10px 0;
+}
 div.warning {
      margin: 0em 1em 1em 224px;
      padding: .5em 1em;
@@ -85,7 +92,7 @@ div.news {
      padding: .5em 1em;
      background: #ffffc0;
      border: medium solid #ffffa0;
-     text-align: left;
+     text-align: justify;
      color: inherit;
 }
 
@@ -119,4 +126,43 @@ h1 {
 .proxyfooter{
      font-size: 7pt;
      display: none !important;
+}
+
+table {
+     border-collapse: collapse;
+     width: 100%;
+     border: 5px solid #dfd;
+     margin: 5px 0px;
+     cell-padding: 1px;
+     font-size: 7pt;
+     background: #fff;
+}
+
+th {
+     background-color: #ccf;
+     padding: 5px 2px;
+}
+
+tt {
+     font-size: 8pt;
+}
+
+td {
+     padding: 2px;
+}
+
+tr:nth-child(even) {
+     background-color: #eef;
+}
+
+tr:nth-child(odd) {
+     background-color: #ddf;
+}
+
+hr {
+     color: #ff9;
+     background: #ff9;
+     height: 2px;
+     border: 0px solid #ff9;
+     margin: 10px 0;
 }
