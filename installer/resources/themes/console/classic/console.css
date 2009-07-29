@@ -121,6 +121,7 @@ div.messages span.notice {
 
 h1 {
      font-size: 18pt;
+     text-align: center;
 }
 
 h2 {
@@ -180,7 +181,6 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -5px 0 5px 0; 
-     padding: 7px;
+     margin: -3px 0 0 0; 
      background: #fff;
  }
