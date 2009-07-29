@@ -1,7 +1,7 @@
 body {
      margin: 1em 0em;
      padding: 0em;
-     text-align: center;
+     text-align: left;
      background: #FFF;
      color: #000;
      font: 10pt/120% Verdana, Tahoma, Helvetica, sans-serif;
@@ -123,6 +123,13 @@ h1 {
      font-size: 18pt;
 }
 
+h2 {
+     font-size: 12pt;
+}
+
+h3 {
+     font-size: 10pt;
+}
 .proxyfooter{
      font-size: 7pt;
      display: none !important;
@@ -131,7 +138,6 @@ h1 {
 
 table {
 /*     border-collapse: collapse; */
-     width: 700px;
      border: 5px solid #dfd;
      margin: 5px 0px;
      cell-padding: 1px;
@@ -174,10 +180,7 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     border: 5px solid #dfd !important;
-     border-top: 0px !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
      background: #fff;
-     width: 700px;
  }
