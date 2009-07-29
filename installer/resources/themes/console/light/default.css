@@ -335,12 +335,12 @@ globalOperationsPanel .control:hover {
 }
 
 select {
-     background-color: #001;
-     color: #eef;
+     background-color: #eef;
+     color: #001;
      margin: 4px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
-     border: 1px solid #99f;
+     border: 1px solid #001;
      padding: 2px;
      min-width: 270px;
      font-size: 8pt;

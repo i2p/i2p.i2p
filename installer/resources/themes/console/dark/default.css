@@ -158,26 +158,31 @@ hr {
      margin-top: 8px;
      background: url(images/tabletitlelight.png) repeat: x;
      vertical-align: middle;
+     text-decoration: none;
 }
 
 .control:link {
      color: #001;
+     text-decoration: none;
 }
 
 .control:hover {
      border: 1px solid #eeeeff;
      background-color: #003;
      color: #ff6600 !important;
+     text-decoration: none;
 }
 
 .control:active {
-     border: 2px inset;
+     border: 1px inset;
      background-color: #f60;
      color: #fff !important;
+     text-decoration: none;
 }
 
 .control:visited {
      color: #001;
+     text-decoration: none;
 }
 
 .panel {
