@@ -38,7 +38,7 @@ label {
 }
 
 h4 {
-     font-size: 11pt;
+     font-size: 14px;
      font-weight: bold !important;
      color: #001;
      text-align: center;
@@ -139,13 +139,13 @@ hr {
 .freetext {
      width: 150px;
      height: 24px;
-     border: 1px solid #eef;
+     border: 1px solid #44d;
      padding: 2px;
      margin: 4px 0 2px 0px;
      font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-weight: bold;
-     background: #001;
-     color: #fff;
+     background: #ddf;
+     color: #001;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      border-radius: 0 4px 4px 0;

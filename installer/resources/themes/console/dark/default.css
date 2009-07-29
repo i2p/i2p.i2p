@@ -250,18 +250,22 @@ hr {
 
 a:link{
      color: #99f;
+     text-decoration: none;
 }
 
 a:visited{
      color: #7bb;
+     text-decoration: none;
 }
 
 a:hover{
      color: #ff6600;
+     text-decoration: underline;
 }
 
 a:active{
      color: #900;
+     text-decoration: underline;
 }
 
 input {
