@@ -128,15 +128,17 @@ h1 {
      display: none !important;
 }
 
+
 table {
-     border-collapse: collapse;
-     width: 100%;
+/*     border-collapse: collapse; */
+     width: 700px;
      border: 5px solid #dfd;
      margin: 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
      background: #fff;
 }
+
 
 th {
      background-color: #ccf;
@@ -166,3 +168,16 @@ hr {
      border: 0px solid #ff9;
      margin: 10px 0;
 }
+
+.statusnotes {
+     font-style: italic;
+     font-size: 8pt;
+     color: #001;
+     text-align: center;
+     border: 5px solid #dfd !important;
+     border-top: 0px !important;
+     margin: -5px 0 5px 0; 
+     padding: 7px;
+     background: #fff;
+     width: 700px;
+ }
