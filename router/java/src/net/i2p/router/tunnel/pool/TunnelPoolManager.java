@@ -622,8 +622,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
              out.write('\n');
         }
         out.write("<tr><td align=\"center\"><b>Tunnels</b><td align=\"center\"><b>" + tunnelCount);
-        out.write("</b><td align=\"center\">&nbsp;<td align=\"center\"><b>" + partCount);
-        out.write("<td align=\"center\">&nbsp;</b></table>\n");
+        out.write("</b><td>&nbsp;</td><td align=\"center\"><b>" + partCount);
+        out.write("</b><td>&nbsp;</td></tr></table>\n");
     }
 
     /** @return total number of non-fallback expl. + client tunnels */
