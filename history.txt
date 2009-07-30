@@ -1,3 +1,13 @@
+* 2009-07-31  0.7.6 released
+
+2009-07-31 zzz
+    * Update versions, package release
+    * Fix snark.css link
+    * Revert graph antialias enable
+    * Remove <center> from iframe head
+    * Fix tunnels.jsp HTML
+    * Prevent linux-only installer screen from displaying on windows
+
 2009-07-28 zzz
     * Add new reseed URL (thanks eche|on!)
 
