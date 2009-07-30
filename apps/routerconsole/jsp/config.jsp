@@ -59,7 +59,7 @@
         out.print("It improves your anonymity by creating cover traffic, and helps the network.<br />");
     } else {
         out.print("You have configured I2P to share<b> " + share + "KBps</b>. ");
-        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<br />");
+        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr />");
     }
  %>
  </p><p>
@@ -67,7 +67,7 @@
  </p>
 <!--
  <b>Enable load testing: </b>
-<input type="checkbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
+<input type="checkbox" class="optbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
  <p>If enabled, your router will periodically anonymously probe some of your peers
  to see what sort of throughput they can handle.  This improves your router's ability
  to pick faster peers, but can cost substantial bandwidth.  Relevant data from the
@@ -80,20 +80,20 @@
  <b>The default settings will work for most people. There is <a href="#chelp">help below</a>.</b>
  </p><p>
  <b>UPnP Configuration:</b><br />
-    <input type="checkbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
+    <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     Enable UPnP to open firewall ports - <a href="peers.jsp#upnp">UPnP status</a>
  </p><p>
  <b>IP Configuration:</b><br />
  Externally reachable hostname or IP address:<br />
-    <input type="radio" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> />
+    <input type="radio" class="optbox" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> />
     Use all auto-detect methods<br />
-    <input type="radio" name="udpAutoIP" value="local,ssu" <%=nethelper.getUdpAutoIPChecked(4) %> />
+    <input type="radio" class="optbox" name="udpAutoIP" value="local,ssu" <%=nethelper.getUdpAutoIPChecked(4) %> />
     Disable UPnP IP address detection<br />
-    <input type="radio" name="udpAutoIP" value="upnp,ssu" <%=nethelper.getUdpAutoIPChecked(5) %> />
+    <input type="radio" class="optbox" name="udpAutoIP" value="upnp,ssu" <%=nethelper.getUdpAutoIPChecked(5) %> />
     Ignore local interface IP address<br />
-    <input type="radio" name="udpAutoIP" value="ssu" <%=nethelper.getUdpAutoIPChecked(0) %> />
+    <input type="radio" class="optbox" name="udpAutoIP" value="ssu" <%=nethelper.getUdpAutoIPChecked(0) %> />
     Use SSU IP address detection only<br />
-    <input type="radio" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> />
+    <input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> />
     Specify hostname or IP:
     <input name ="udpHost1" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" />
     <% String[] ips = nethelper.getAddresses();
@@ -110,14 +110,14 @@
        }
     %>
     <br />
-    <input type="radio" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
+    <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
     Hidden mode - do not publish IP <i>(prevents participating traffic)</i><br />
  </p><p>
  <b>UDP Configuration:</b><br />
  UDP port:
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
 <!-- let's keep this simple...
-<input type="checkbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
+<input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
  Require SSU introductions
  <i>(Enable if you cannot open your firewall)</i>
  </p><p>
@@ -126,29 +126,29 @@
  </p><p>
  <b>TCP Configuration:</b><br />
  Externally reachable hostname or IP address:<br />
-    <input type="radio" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> />
+    <input type="radio" class="optbox" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> />
     Use auto-detected IP address
     <i>(currently <jsp:getProperty name="nethelper" property="udpIP" />)</i>
     if we are not firewalled<br />
-    <input type="radio" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> />
+    <input type="radio" class="optbox" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> />
     Always use auto-detected IP address (Not firewalled)<br />
-    <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> />
+    <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> />
     Specify hostname or IP:
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" /><br />
-    <input type="radio" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
+    <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
     Disable inbound (Firewalled)<br />
-    <input type="radio" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
+    <input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
     Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP)</i><br />
  </p><p>
  Externally reachable TCP port:<br />
-    <input type="radio" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
+    <input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
     Use the same port configured for UDP
     <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br />
-    <input type="radio" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
+    <input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
     Specify Port:
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
  </p><p><b>Note: Changing these settings will restart your router.</b>
- </p>
+ </p><hr>
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" />
 </div>
 <h3><a name="chelp">Configuration Help:</a></h3>
@@ -248,7 +248,7 @@
  <hr />
       <!--
  <b>Dynamic Router Keys: </b>
- <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
+ <input type="checkbox" class="optbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
  <p>
  This setting causes your router identity to be regenerated every time your IP address
  changes. If you have a dynamic IP this option can speed up your reintegration into

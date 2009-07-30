@@ -14,7 +14,7 @@ public class ConfigClientsHelper extends HelperBase {
     
     public String getForm1() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table border=\"1\">\n");
+        buf.append("<table>\n");
         buf.append("<tr><th>Client</th><th>Run at Startup?</th><th>Start Now</th><th>Class and arguments</th></tr>\n");
         
         List clients = ClientAppConfig.getClientApps(_context);
@@ -30,7 +30,7 @@ public class ConfigClientsHelper extends HelperBase {
 
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table border=\"1\">\n");
+        buf.append("<table>\n");
         buf.append("<tr><th>WebApp</th><th>Run at Startup?</th><th>Start Now</th><th>Description</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = new TreeSet(props.keySet());
@@ -56,7 +56,7 @@ public class ConfigClientsHelper extends HelperBase {
         } else {
             buf.append(name);
         }
-        buf.append("</td><td align=\"center\"><input type=\"checkbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
+        buf.append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {
             buf.append("checked=\"true\" ");
             if (ro)

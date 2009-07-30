@@ -73,7 +73,7 @@ function toggleAll(category)
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
  <h3>Configure I2P Stat Collection</h3>
  Enable full stats?
- <input type="checkbox" name="isFull" value="true" <% 
+ <input type="checkbox" class="optbox" name="isFull" value="true" <% 
  if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
  (change requires restart to take effect)<br />
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
@@ -81,24 +81,24 @@ function toggleAll(category)
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
- <tr><td valign="top" align="left" colspan="3">
+ <tr><td align="left" colspan="3">
      <b><%=statshelper.getCurrentGroupName()%></b>
      (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)
-     </td></tr><tr><td>Log</td><td>Graph</td><td></td></tr><%
+     </td></tr><tr><td><b>Log</b></td><td><b>Graph</b></td><td></td></tr><%
      } // end iterating over required groups for the current stat %>
- <tr><td valign="top" align="left">
+ <tr><td align="left">
      <a name="<%=statshelper.getCurrentStatName()%>"></a>
-     <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
+     <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
      if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
-     <td valign="top" align="left">
+     <td align="left">
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
-       <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <% 
+       <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <% 
        if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %>/><% } %></td>
-     <td valign="top" align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br />
+     <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br />
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats %>
  <tr><td colspan="3"><hr /></td></tr>
- <tr><td><input type="checkbox" name="explicitFilter" /></td>
+ <tr><td><input type="checkbox" class="optbox" name="explicitFilter" /></td>
      <td colspan="2">Advanced filter: 
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
  <tr><td colspan="3"><hr /></td></tr>

@@ -1545,7 +1545,7 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">Cc:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + cc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">Bcc:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + bcc + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">Subject:</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + subject + "\"></td></tr>\n" +
-				"<tr><td>&nbsp;</td><td align=\"left\"><input type=\"checkbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( bccToSelf.compareToIgnoreCase( "false" ) != 0 ? "checked" : "" )+ ">Bcc to self</td></tr>\n" +
+				"<tr><td>&nbsp;</td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\"" + ( bccToSelf.compareToIgnoreCase( "false" ) != 0 ? "checked" : "" )+ ">Bcc to self</td></tr>\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr><td align=\"right\">New Attachment:</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"Upload File\"></td></tr>" );
@@ -1558,7 +1558,7 @@ public class WebMail extends HttpServlet
 					wroteHeader = true;
 				}
 				Attachment attachment = (Attachment)it.next();
-				out.println( "<tr><td colspan=\"2\" align=\"center\"><input type=\"checkbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
+				out.println( "<tr><td colspan=\"2\" align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + attachment.getFileName() + "</td></tr>");
 			}
 		}
 		out.println( "</table>" );
@@ -1632,7 +1632,7 @@ public class WebMail extends HttpServlet
 					", markAll=" + sessionObject.markAll +
 					", invert=" + sessionObject.invert +
 					", clear=" + sessionObject.clear );
-			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" name=\"check" + i + "\" value=\"1\"" + 
+			out.println( "<tr class=\"list" + bg + "\"><td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
 					( idChecked ? "checked" : "" ) + ">" + ( RELEASE ? "" : "" + i ) + "</td><td>" + link + mail.shortSender + "</a></td><td>&nbsp;</td><td>" + link + mail.shortSubject + "</a></td><td>&nbsp;</td><td>" + mail.formattedDate + "</a></td><td>&nbsp;</td><td>" + mail.size + " Bytes</a></td></tr>" );
 			bg = 1 - bg;
 			i++;

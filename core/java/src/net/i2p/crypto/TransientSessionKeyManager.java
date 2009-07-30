@@ -502,7 +502,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     public String renderStatusHTML() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h2>Inbound sessions</h2>");
-        buf.append("<table border=\"1\">");
+        buf.append("<table>");
         Set<TagSet> inbound = getInboundTagSets();
         Map<SessionKey, Set<TagSet>> inboundSets = new HashMap(inbound.size());
         for (Iterator<TagSet> iter = inbound.iterator(); iter.hasNext();) {
@@ -528,7 +528,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
 
         buf.append("<h2><b>Outbound sessions</b></h2>");
 
-        buf.append("<table border=\"1\">");
+        buf.append("<table>");
         Set<OutboundSession> outbound = getOutboundSessions();
         for (Iterator<OutboundSession> iter = outbound.iterator(); iter.hasNext();) {
             OutboundSession sess = iter.next();

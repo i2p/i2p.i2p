@@ -492,7 +492,7 @@ public class TransportManager implements TransportEventListener {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<p><b>Router Transport Addresses:</b><br /><pre>\n");
+        buf.append("<h3>Router Transport Addresses:</h3><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             if (t.getCurrentAddress() != null)
