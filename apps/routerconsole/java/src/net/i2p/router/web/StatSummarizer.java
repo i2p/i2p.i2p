@@ -183,8 +183,7 @@ public class StatSummarizer implements Runnable {
                 def.setGridY(false);
             }
             //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
-            // Let's set anti-aliasing on and see what happens..
-            def.setAntiAliasing(true);
+            def.setAntiAliasing(false);
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             RrdGraph graph = new RrdGraph(def);

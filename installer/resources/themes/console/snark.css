@@ -92,7 +92,7 @@ th {
   font-size: 8pt;
   border-top: 1px outset #001;
   border-bottom: 1px inset #001;  
-  background: #f91 url('.../console/images/tabletitleorangealt.png') repeat-x;
+  background: #f91 url('/themes/console/images/tabletitleorange.png') repeat-x;
   text-align: left;
 }
 
