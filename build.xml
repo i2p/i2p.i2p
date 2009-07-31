@@ -205,7 +205,7 @@
             <fileset dir="." includes="**/*.java~" />
         </delete>
     </target>
-    <target name="pkg" depends="distclean, updaterWithJettyFixes, preppkg, installer" />
+    <target name="pkg" depends="distclean, updater, preppkg, installer" />
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
