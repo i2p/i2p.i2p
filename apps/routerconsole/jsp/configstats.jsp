@@ -81,28 +81,28 @@ function toggleAll(category)
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
- <tr><td align="left" colspan="3">
+ <tr class="tablefooter"><td align="left" colspan="3">
      <b><%=statshelper.getCurrentGroupName()%></b>
      (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)
-     </td></tr><tr><td><b>Log</b></td><td><b>Graph</b></td><td></td></tr><%
+     </td></tr><tr class="tablefooter"><td align="center"><b>Log</b></td><td align="center"><b>Graph</b></td><td></td></tr><%
      } // end iterating over required groups for the current stat %>
- <tr><td align="left">
+ <tr><td align="center">
      <a name="<%=statshelper.getCurrentStatName()%>"></a>
      <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
      if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
-     <td align="left">
+     <td align="center">
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
        <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <% 
        if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %>/><% } %></td>
      <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br />
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats %>
- <tr><td colspan="3"><hr /></td></tr>
- <tr><td><input type="checkbox" class="optbox" name="explicitFilter" /></td>
+ <tr><td colspan="3"></td></tr>
+ <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" /></td>
      <td colspan="2">Advanced filter: 
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
- <tr><td colspan="3"><hr /></td></tr>
- <tr><td><input type="submit" name="shouldsave" value="Save changes" /> </td>
+ <tr><td colspan="3"></td></tr>
+ <tr class="tablefooter"><td><input type="submit" name="shouldsave" value="Save changes" /> </td>
      <td><input type="reset" value="Cancel" /></td><td></td></tr></form>
  </table>
 </div>

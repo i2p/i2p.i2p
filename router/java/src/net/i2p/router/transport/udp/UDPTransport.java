@@ -1771,7 +1771,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">Peer</a>");
         if (sortFlags != FLAG_ALPHA)
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dir\">Dir/Intro</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">Idle</a><br>");
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dir\" title=\"Direction/Introduction\">Dir</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">Idle</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle inbound", FLAG_IDLE_IN);
         buf.append("/");
         appendSortLinks(buf, urlBase, sortFlags, "Sort by idle outbound", FLAG_IDLE_OUT);
@@ -1819,12 +1819,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (now-peer.getLastReceiveTime() > 60*60*1000)
                 continue; // don't include old peers
             
-            buf.append("<tr><td align=\"right\" nowrap>");
+            buf.append("<tr> <td class=\"cells\" align=\"left\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer.getRemotePeer()));
             //byte ip[] = peer.getRemoteIP();
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
-            buf.append("</td><td nowrap>");
+            buf.append("</td> <td class=\"cells\" nowrap align=\"left\">");
             if (peer.isInbound())
                 buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"/> ");
             else
@@ -1862,7 +1862,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (idleIn < 0) idleIn = 0;
             if (idleOut < 0) idleOut = 0;
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"right\" >");
             buf.append(idleIn);
             buf.append("s/");
             buf.append(idleOut);
@@ -1871,7 +1871,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int recvBps = (idleIn > 2 ? 0 : peer.getReceiveBps());
             int sendBps = (idleOut > 2 ? 0 : peer.getSendBps());
             
-            buf.append("<td align=\"right\" nowrap>");
+            buf.append(" <td class=\"cells\" align=\"right\" nowrap>");
             buf.append(formatKBps(recvBps));
             buf.append("/");
             buf.append(formatKBps(sendBps));
@@ -1884,18 +1884,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             long uptime = now - peer.getKeyEstablishedTime();
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             buf.append(DataHelper.formatDuration(uptime));
             buf.append("</td>");
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             buf.append(peer.getClockSkew());
             buf.append("s</td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
             long sendWindow = peer.getSendWindowBytes();
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"right\" >");
             buf.append(sendWindow/1024);
             buf.append("K");
             buf.append("/").append(peer.getConcurrentSends());
@@ -1903,26 +1903,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("/").append(peer.getConsecutiveSendRejections());
             buf.append("</td>");
 
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             buf.append(peer.getSlowStartThreshold()/1024);
             buf.append("K</td>");
 
             int rtt = peer.getRTT();
             int rto = peer.getRTO();
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"right\" >");
             buf.append(rtt);
             buf.append("</td>");
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"right\" >");
             buf.append(peer.getRTTDeviation());
             buf.append("</td>");
 
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"right\" >");
             buf.append(rto);
             buf.append("</td>");
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"right\" >");
             buf.append(peer.getMTU()).append("/").append(peer.getReceiveMTU());
             
             //.append('/');
@@ -1933,11 +1933,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long sent = peer.getPacketsTransmitted();
             long recv = peer.getPacketsReceived();
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             buf.append(sent);
             buf.append("</td>");
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             buf.append(recv);
             buf.append("</td>");
             
@@ -1949,14 +1949,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long resent = peer.getPacketsRetransmitted();
             long dupRecv = peer.getPacketsReceivedDuplicate();
             
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             //buf.append(formatPct(sendLostPct));
             buf.append(resent); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
             //buf.append(peer.getPacketRetransmissionRate());
             buf.append("</td>");
             
             double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
-            buf.append("<td align=\"right\" >");
+            buf.append(" <td class=\"cells\" align=\"center\" >");
             buf.append(dupRecv); //formatPct(recvDupPct));
             buf.append("</td>");
 
@@ -1980,24 +1980,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             numPeers++;
         }
         
-        buf.append("<tr><td colspan=\"16\"><hr /></td></tr>\n");
-        buf.append(" <tr><td colspan=\"3\"><b>Total</b></td>");
-        buf.append("     <td align=\"right\" nowrap><b>");
+//        buf.append("<tr><td colspan=\"16\"><hr /></td></tr>\n");
+        buf.append(" <tr class=\"tablefooter\"> <td colspan=\"3\" align=\"right\"><b>Total</b></td>");
+        buf.append("      <td align=\"center\" nowrap><b>");
         buf.append(formatKBps(bpsIn)).append("/").append(formatKBps(bpsOut));
         buf.append("K/s</b></td>");
-        buf.append("     <td align=\"right\"><b>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
-        buf.append("</b></td><td align=\"right\"><b>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal*1000/numPeers) : "0ms").append("</b></td>\n");
-        buf.append("     <td align=\"right\"><b>");
+        buf.append("      <td align=\"center\"><b>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
+        buf.append("</b></td> <td align=\"center\"><b>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal*1000/numPeers) : "0ms").append("</b></td>\n");
+        buf.append("      <td align=\"center\"><b>");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
-        buf.append("</b></td><td>&nbsp;</td>\n");
-        buf.append("     <td align=\"right\"><b>");
+        buf.append("</b></td> <td>&nbsp;</td>\n");
+        buf.append("      <td align=\"center\"><b>");
         buf.append(numPeers > 0 ? rttTotal/numPeers : 0);
-        buf.append("</b></td><td align=\"right\">&nbsp;</td><td align=\"right\"><b>");
+        buf.append("</b></td> <td>&nbsp;</td> <td align=\"center\"><b>");
         buf.append(numPeers > 0 ? rtoTotal/numPeers : 0);
-        buf.append("</b></td>\n     <td>&nbsp;</td><td align=\"right\"><b>");
-        buf.append(sendTotal).append("</td></b><td align=\"right\"><b>").append(recvTotal).append("</b></td>\n");
-        buf.append("     <td align=\"right\"><b>").append(resentTotal);
-        buf.append("</b></td><td align=\"right\"><b>").append(dupRecvTotal).append("</b></td>\n");
+        buf.append("</b></td>\n      <td>&nbsp;</td> <td align=\"center\"><b>");
+        buf.append(sendTotal).append("</td></b> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n");
+        buf.append("      <td align=\"center\"><b>").append(resentTotal);
+        buf.append("</b></td> <td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n");
         buf.append(" </tr></table></p><p>\n");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         // NPE here early
@@ -2026,7 +2026,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    private static final String KEY = "<h3>Explanation of abbreviated terms used.</h3><div class=\"configure\">" +
+    private static final String KEY = "<h3>Definitions:</h3><div class=\"configure\">" +
         "<br><b id=\"def.peer\">Peer</b>: the remote peer.<br />\n" +
         "<b id=\"def.dir\">Dir</b>: v means they offer to introduce us, ^ means we offer to introduce them.<br />\n" +
         "<b id=\"def.idle\">Idle</b>: the idle time is how long since a packet has been received or sent.<br />\n" +
@@ -2034,9 +2034,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.up\">Up</b>: the uptime is how long ago this session was established.<br />\n" +
         "<b id=\"def.skew\">Skew</b>: the skew says how far off the other user's clock is, relative to your own.<br />\n" +
         "<b id=\"def.cwnd\">Cwnd</b>: the congestion window is how many bytes in 'in flight' you can send w/out an acknowledgement, / <br />\n" +
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent, /<br />\n" +
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the maximum number of concurrent messages to send, /<br />\n"+ 
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of consecutive sends which were blocked due to throws message window size.<br />\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent, /<br />\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the maximum number of concurrent messages to send, /<br />\n"+ 
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of consecutive sends which were blocked due to throws message window size.<br />\n" +
         "<b id=\"def.ssthresh\">Sst</b>: the slow start threshold helps make sure the cwnd doesn't grow too fast.<br />\n" +
         "<b id=\"def.rtt\">Rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet.<br />\n" +
         "<b id=\"def.dev\">Dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout.<br />\n" +

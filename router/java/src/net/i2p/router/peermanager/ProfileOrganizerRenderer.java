@@ -218,7 +218,11 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<p><i>Definitions:<ul>");
+        buf.append("<h3>Thresholds:</h3>");
+        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
+        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
+        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)");
+        buf.append("<h3>Definitions:</h3><ul>");
         buf.append("<li><b>groups</b>: as determined by the profile organizer</li>");
         buf.append("<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>");
         buf.append("<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>");
@@ -226,10 +230,6 @@ class ProfileOrganizerRenderer {
         buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
         buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
         buf.append("</ul></i>");
-        buf.append("<p><b>Thresholds:</b><br />");
-        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
-        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
-        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)<br />");
         out.write(buf.toString());
         out.flush();
     }

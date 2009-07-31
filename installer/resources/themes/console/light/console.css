@@ -299,6 +299,7 @@ table {
      cell-padding: 1px;
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     font: 7pt/130% "Lucida Sans Unicode", Verdana, Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
 }
 
 th {
@@ -307,8 +308,9 @@ th {
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      text-align: center;
      font-size: 9pt;
-     border-bottom: 1px solid #001;
-     border-top: 1px solid #001;
+     line-height: 110%;
+     border-bottom: 1px solid #001 !important;
+     border-top: 1px solid #001 !important;
 }
 
 tr {
@@ -331,7 +333,7 @@ tr:last-child {
 }
 */
 td {
-     padding: 5px;
+     padding: 5px 3px;
      color: #000;
      vertical-align: middle;
      border-top: 1px inset #001;
@@ -473,7 +475,8 @@ h4 {
      font-size: 11pt;
 }
 
-button {
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #ddddc0;
      padding: 1px 3px;
      background: #bbf !important;
@@ -526,8 +529,22 @@ input {
      border: 1px solid #001;
      text-decoration: none;
      min-width: 110px;
-     opacity: 0.8;
 }
+
+input, input:visited {
+     border: 1px outset #bbf;
+     background: #bbf;
+     color: #001;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+}
+
 
 input:hover {
      background: #f60;
@@ -541,6 +558,16 @@ input:active {
      color: #f60;
      border: 1px solid #f60;
      opacity: 1.0;
+}
+
+input[type=text] {
+     background: #eef;
+     color: #001;
+     margin: 5px 10px 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #001;
+     text-decoration: none;
 }
 
 submit {
@@ -566,11 +593,14 @@ select {
      border: 1px solid #001;
      min-width: 110px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
 }
 
 textarea {
      padding: 5px;
-     margin: 15px 15px 5px 0px;
+     margin: 5px 15px 5px 10px;
      background: #eef;
      color: #003;
      border-radius: 4px;
@@ -578,7 +608,7 @@ textarea {
      -khtml-border-radius: 4px;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
-     min-width: 100%;
+     min-width: 97%;
      border: 1px solid #001;
 }
 
@@ -663,4 +693,23 @@ form {}
      height: 16px;
      opacity: 1.0;
      border: 0;
+}
+
+.cells {
+     border-left: 1px outset #bbf;
+     border-top: 1px inset #99f !important;
+     border-bottom: 1px inset #99f !important;
+}
+
+.tablefooter {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     border-top: 1px solid #001;
+     border-bottom: 1px solid #001 !important;     
+     padding: 8px 2px !important;
+     font-size: 8pt;
+     line-height: 110%;
 }

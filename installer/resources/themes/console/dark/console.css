@@ -65,7 +65,7 @@ div.toolbar a:visited {
 }
 
 div.toolbar a:hover, button:hover{
-     border: 1px solid #eeeeff;
+     border: 1px solid #f60;
      background: #003;
      color: #f60;
 }
@@ -255,13 +255,14 @@ table {
 }
 
 th {
-     padding: 6px 3px;
+     padding: 6px 2px;
      color: #eef;
      text-align: center;
-     font-size: 8pt;
+     font-size: 9pt;
      background: #004 url('images/tabletitledark.png') repeat-x;
      border-top: 1px solid #99f;
-     border-bottom: 1px solid #99f;     
+     border-bottom: 1px solid #99f !important;     
+     line-height: 110%;
 }
 
 tr {
@@ -285,7 +286,7 @@ tr:last-child {
 }
 */
 td {
-     padding: 6px 4px;
+     padding: 6px 3px;
      color: #eef;
      vertical-align: middle;
      border-top: 1px inset #006;
@@ -435,6 +436,7 @@ h4 {
 }
 
 button {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #ddddc0;
      padding: 1px 3px;
      background: #bbf;
@@ -486,37 +488,62 @@ sidebarlogo {
 }
 
 input {
+     border: 1px outset #bbf;
      background: #bbf;
      color: #002;
      margin: 5px;
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #99f;
      padding: 1px 2px;
      text-decoration: none;
      min-width: 110px;
-     opacity: 0.8;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
 }
 
 input:hover {
-     background: #eef;
-     color: #001;
+     background: #003;
+     color: #f60;
      border: 1px solid #f60;
 }
 
 input:active {
      background: #002;
+     color: #f30;
+     border: 1px solid #f30;
+}
+
+input:active {
+     border: 1px inset #f60;
+     background: #f60;
      color: #fff;
-     border: 1px solid #f60;
+}
+
+input[type=text] {
+     background: #002;
+     color: #eef;
+     margin: 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+}
+
+input[type=text]:active, input[type=text]:hover {
+     background: #001;
 }
 
 select {
      background: #002;
      color: #eef;
-     margin: 5px;
-     border: 1px solid #99f;
-     border-radius: 0;
-     -moz-border-radius: 0;
-     -khtml-border-radius: 0;
+     margin: 5px 10px;
+     border: 1px solid #bbf;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
      min-width: 110px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 2px;
@@ -526,13 +553,13 @@ textarea {
      background: #001;
      color: #eef;
      padding: 5px;
-     margin: 15px 15px 5px 0px;
+     margin: 10px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
-     min-width: 100%;
+     min-width: 97%;
      text-align: left;
      border: 1px solid #99f;
 }
@@ -596,4 +623,41 @@ form {}
 
 .mediumtags {
      font-size: 9pt;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 0 0 0 10px;
+}
+
+.optbox:hover {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 0 0 0 10px;
+}
+
+.cells {
+     border: 1px inset #005;
+     border-left: 1px outset #002;     
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #004 url('images/tabletitledark.png') repeat-x !important;
+     border-top: 1px solid #99f;
+     border-bottom: 1px solid #99f !important;     
+     font-size: 8pt;
+     line-height: 110%;
 }
