@@ -682,6 +682,8 @@ form {}
      height: 16px;
      opacity: 1.0;
      border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
 }
 
 .optbox:hover {
@@ -693,6 +695,8 @@ form {}
      height: 16px;
      opacity: 1.0;
      border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
 }
 
 .cells {
@@ -710,6 +714,6 @@ form {}
      border-top: 1px solid #001;
      border-bottom: 1px solid #001 !important;     
      padding: 8px 2px !important;
-     font-size: 8pt;
+     font-size: 7pt;
      line-height: 110%;
 }
