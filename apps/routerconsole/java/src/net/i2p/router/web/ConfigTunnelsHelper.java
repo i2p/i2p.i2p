@@ -62,18 +62,18 @@ public class ConfigTunnelsHelper extends HelperBase {
             in.getLength() + in.getLengthVariance() <= 0 ||
             out.getLength() <= 0 ||
             out.getLength() + out.getLengthVariance() <= 0)
-            buf.append("<tr><th colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 0-hop tunnels</font></th></tr>");
+            buf.append("<tr><th colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 0-hop tunnels.</font></th></tr>");
         else if (in.getLength() <= 1 ||
             in.getLength() + in.getLengthVariance() <= 1 ||
             out.getLength() <= 1 ||
             out.getLength() + out.getLengthVariance() <= 1)
-            buf.append("<tr><th colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 1-hop tunnels</font></th></tr>");
+            buf.append("<tr><th colspan=\"3\"><font color=\"red\">ANONYMITY WARNING - Settings include 1-hop tunnels.</font></th></tr>");
         if (in.getLength() + Math.abs(in.getLengthVariance()) >= WARN_LENGTH ||
             out.getLength() + Math.abs(out.getLengthVariance()) >= WARN_LENGTH)
-            buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include very long tunnels</font></th></tr>");
+            buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include very long tunnels.</font></th></tr>");
         if (in.getQuantity() + in.getBackupQuantity() >= WARN_QUANTITY ||
             out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
-            buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include high tunnel quantities</font></th></tr>");
+            buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include high tunnel quantities.</font></th></tr>");
 
 buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\"/>&nbsp;&nbsp;Inbound</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\"/>&nbsp;&nbsp;Outbound</th></tr>\n");
 
