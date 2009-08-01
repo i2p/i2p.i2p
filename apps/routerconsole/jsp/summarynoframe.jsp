@@ -54,8 +54,11 @@
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
         out.print("<br />" + update.getStatus());
-        if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
-        } else if(!update.isDone()) {
+        if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress"))) {
+        } else if((!update.isDone()) &&
+                  request.getParameter("action") == null &&
+                  request.getParameter("updateNonce") == null &&
+                  net.i2p.router.web.ConfigRestartBean.getRestartTimeRemaining() > 12*60*1000) {
             long nonce = new java.util.Random().nextLong();
             String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
