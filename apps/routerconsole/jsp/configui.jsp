@@ -34,7 +34,7 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <jsp:getProperty name="uihelper" property="settings" />
-<hr><div class="formaction> 	
+<hr><div class="formaction"> 	
 <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
 </form></div>
 <% } else { %>
