@@ -37,7 +37,7 @@
  <a name="unsh"> </a>
  <a name="bonus"> </a>
  <h2>Manual Peer Controls</h2>
- Router Hash:
+ <div class="mediumtags">Router Hash:</div>
  <input type="text" size="55" name="peer" value="<%=peer%>" />
  <h3>Manually Shitlist / Unshitlist a Router</h3>
  Shitlisting will prevent the participation of this peer in tunnels you create. 
@@ -62,9 +62,9 @@
     }
  %> 
  <hr />
- Speed:
+ <div class="mediumtags">Speed:</div>
  <input type="text" size="8" name="speed" value="<%=speed%>" />
- Capacity:
+ <div class="mediumtags">Capacity:</div>
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
  <input type="submit" name="action" value="Adjust peer bonuses" />
  </p>

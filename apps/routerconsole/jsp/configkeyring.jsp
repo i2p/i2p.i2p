@@ -42,16 +42,15 @@
  <p>
       <table>
         <tr>
-          <td>Dest. name, hash, or full key: 
-          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea> 
+          <td class="mediumtags" align="right">Dest. name, hash, or full key:</td> 
+          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea></td> 
         <tr>
-          <td align="right">Session Key: 
-          <td><input type="text" size="55" name="key" /> 
+          <td class="mediumtags" align="right">Session Key:</td> 
+          <td><input type="text" size="55" name="key" /></td> 
         <tr>
           <td>
-          <td><div align="right"> 
-              <input type="submit" name="action" value="Add key" />
-            </div>
+          <td align="right"> 
+            <input type="submit" name="action" value="Add key" /></td>
       </table>
  </form>
 

@@ -55,7 +55,7 @@ public class ConfigClientsHandler extends FormHandler {
             else
                 startWebApp(app);
         } else {
-            addFormError("Unsupported " + _action);
+            addFormError("Unsupported " + _action + ".");
         }
     }
     
@@ -70,18 +70,18 @@ public class ConfigClientsHandler extends FormHandler {
                 ca.disabled = val == null;
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);
-        addFormNotice("Client configuration saved successfully - restart required to take effect");
+        addFormNotice("Client configuration saved successfully - restart required to take effect.");
     }
 
     private void startClient(int i) {
         List clients = ClientAppConfig.getClientApps(_context);
         if (i >= clients.size()) {
-            addFormError("Bad client index");
+            addFormError("Bad client index.");
             return;
         }
         ClientAppConfig ca = (ClientAppConfig) clients.get(i);
         LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
-        addFormNotice("Client " + ca.clientName + " started");
+        addFormNotice("Client " + ca.clientName + " started.");
     }
 
     private void saveWebAppChanges() {
@@ -98,7 +98,7 @@ public class ConfigClientsHandler extends FormHandler {
                 props.setProperty(name, "" + (val != null));
         }
         RouterConsoleRunner.storeWebAppProperties(props);
-        addFormNotice("WebApp configuration saved successfully - restart required to take effect");
+        addFormNotice("WebApp configuration saved successfully - restart required to take effect.");
     }
 
     // Big hack for the moment, not using properties for directory and port
@@ -116,14 +116,14 @@ public class ConfigClientsHandler extends FormHandler {
                         path = new File(path, app + ".war");
                         s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
                         // no passwords... initialize(wac);
-                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "</a> started");
+                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "</a> started.");
                     } catch (Exception ioe) {
-                        addFormError("Failed to start " + app + " " + ioe);
+                        addFormError("Failed to start " + app + " " + ioe + ".");
                     }
                     return;
                 }
             }
         }
-        addFormError("Failed to find server");
+        addFormError("Failed to find server.");
     }
 }
