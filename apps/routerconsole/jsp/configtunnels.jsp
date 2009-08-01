@@ -42,7 +42,7 @@
  <i>Note - Exploratory tunnel setting changes are stored in the router.config file.</i></br>
  <i>Client tunnel changes are temporary and are not saved.</i><br>
  <i>To make permanent client tunnel changes see the </i><a href="i2ptunnel/index.jsp">i2ptunnel page</a>.<br>
- <hr /> <input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" />
+ <hr /><div class="formaction><input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" /></div>
  </form>
 </div>
 </div>

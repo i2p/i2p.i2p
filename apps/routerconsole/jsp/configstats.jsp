@@ -101,9 +101,7 @@ function toggleAll(category)
  <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" /></td>
      <td colspan="2">Advanced filter: 
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
- <tr><td colspan="3"></td></tr>
- <tr class="tablefooter"><td><input type="submit" name="shouldsave" value="Save changes" /> </td>
-     <td><input type="reset" value="Cancel" /></td><td></td></tr></form>
+     <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="Save changes" /><input type="reset" value="Cancel" /></td></tr></form>
  </table>
 </div>
 </div>

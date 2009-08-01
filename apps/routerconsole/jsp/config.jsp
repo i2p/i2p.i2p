@@ -62,10 +62,9 @@
         out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr />");
     }
  %>
- </p><p>
- <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
- </p>
-<!--
+ </p><div class="formaction">
+<input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /></div>
+ <!--
  <b>Enable load testing: </b>
 <input type="checkbox" class="optbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
  <p>If enabled, your router will periodically anonymously probe some of your peers
@@ -148,8 +147,9 @@
     Specify Port:
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
  </p><p><b>Note: Changing these settings will restart your router.</b>
- </p><hr>
+ </p><hr><div class="formaction">
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" />
+</div>
 </div>
 <h3><a name="chelp">Configuration Help:</a></h3>
  <div align="justify">

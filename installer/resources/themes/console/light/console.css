@@ -717,3 +717,7 @@ form {}
      font-size: 7pt;
      line-height: 110%;
 }
+
+.formaction {
+     text-align: right;
+}

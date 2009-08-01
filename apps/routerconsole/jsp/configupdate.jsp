@@ -32,44 +32,40 @@
         <tr>
           <td colspan="2"></tr>
         <tr>
-          <td><b>News:</b></td>
+          <td class= "mediumtags" align="right"><b>News:</b></td>
           <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i>Update In Progress</i><br /> <% } else { %> <input type="submit" name="action" value="Check for update now" /> 
             <% } %></tr>
         <tr>
           <td colspan="2"><hr /></td>
         </tr>
         <tr>
-          <td><b>News URL:</b></td>
+          <td class= "mediumtags" align="right"><b>News URL:</b></td>
           <td><input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
         </tr>
         <tr>
-          <td><b>Refresh frequency:</b> 
+          <td class= "mediumtags" align="right"><b>Refresh frequency:</b> 
           <td><jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /> 
         <tr>
-          <td><b>Update policy:</b> 
+          <td class= "mediumtags" align="right"><b>Update policy:</b> 
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /> 
         <tr>
-          <td><b>Update through the eepProxy?</b> 
+          <td class= "mediumtags" align="right"><b>Update through the eepProxy?</b> 
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /> 
         <tr>
-          <td><b>eepProxy host:</b> 
+          <td class= "mediumtags" align="right"><b>eepProxy host:</b> 
           <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /> 
         <tr>
-          <td><b>eepProxy port:</b> 
+          <td class= "mediumtags" align="right"><b>eepProxy port:</b> 
           <td><input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /> 
         <tr>
-          <td><b>Update URLs:</b> 
+          <td class= "mediumtags" align="right"><b>Update URLs:</b> 
           <td><textarea name="updateURL" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea> 
         <tr>
-          <td><b>Trusted keys:</b> 
+          <td class= "mediumtags" align="right"><b>Trusted keys:</b> 
           <td><textarea name="trustedKeys" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea> 
         <tr>
-        <tr>
-          <td colspan="2"><hr />
-        <tr> 
-        <tr>
           <td>
-          <td><div align="right"> 
+          <td><div class="formaction"> 
               <input type="submit" name="action" value="Save" />
               <input type="reset" value="Cancel" />
             </div>

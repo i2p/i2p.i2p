@@ -34,9 +34,9 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <jsp:getProperty name="uihelper" property="settings" />
-<hr> 	
+<hr><div class="formaction> 	
 <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
-</form>
+</form></div>
 <% } else { %>
 Theme selection disabled for Internet Explorer, sorry.<hr>If you're not using IE, it's likely that 
 your browser is pretending to be IE; please configure your browser (or proxy) to use a different User Agent string if you'd like to access the console themes.

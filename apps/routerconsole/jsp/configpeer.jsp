@@ -41,14 +41,15 @@
  <input type="text" size="55" name="peer" value="<%=peer%>" />
  <h3>Manually Shitlist / Unshitlist a Router</h3>
  Shitlisting will prevent the participation of this peer in tunnels you create. 
-      <p> 
+      <hr />      
+      <div class="formaction"> 
         <input type="submit" name="action" value="Shitlist peer until restart" />
         <input type="submit" name="action" value="Unshitlist peer" />
         <% if (! "".equals(peer)) { %>
-        <font color="blue">&lt;---- click to verify action</font> 
+        <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
-      </p>
-      <hr />
+      </div>
+
  <h3>Adjust Profile Bonuses</h3>
  Bonuses may be positive or negative, and affect the peer's inclusion in Fast 
       and High Capacity tiers. Fast peers are used for client tunnels, and High 
@@ -59,7 +60,8 @@
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
- %>
+ %> 
+ <hr />
  Speed:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
  Capacity:
@@ -68,7 +70,6 @@
  </p>
  </form>
 
- <hr />
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

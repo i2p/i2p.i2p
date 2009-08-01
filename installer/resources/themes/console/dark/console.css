@@ -536,6 +536,11 @@ input[type=text]:active, input[type=text]:hover {
      background: #001;
 }
 
+fieldset {
+overflow: hidden;
+position: relative;
+}
+
 select {
      background: #002;
      color: #eef;
@@ -636,6 +641,8 @@ form {}
      border: 0;
      margin: 5px 5px 5px 10px;
      padding: 2px;
+overflow: hidden;
+position: relative;
 }
 
 .optbox:hover {
@@ -662,4 +669,8 @@ form {}
      border-bottom: 1px solid #99f !important;     
      font-size: 7pt;
      line-height: 110%;
+}
+
+.formaction {
+     text-align: right;
 }
