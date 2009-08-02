@@ -583,8 +583,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             live += pending.size();
         }
         if (live <= 0)
-            out.write("<div class=\"statusnotes\"><center>N<b>No tunnels; waiting for the grace period to end.</center></b></div>\n");
-        out.write("<div class=\"statusnotes\"><center><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "<B in, " +
+            out.write("<div class=\"statusnotes\"><center><b>No tunnels; waiting for the grace period to end.</center></b></div>\n");
+        out.write("<div class=\"statusnotes\"><center><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "B in, " +
                   DataHelper.formatSize(processedOut*1024) + "B out</b></center></div>");
     }
     

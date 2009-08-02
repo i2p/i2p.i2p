@@ -63,11 +63,12 @@ body {
   -khtml-border-radius: 4px;
   border-radius: 4px;
   border: 2px solid #930;
-  text-align: center; 
-  overflow-x: scroll;            
-  background: #ddf url('../console/images/orangetile.png');
+  text-align: left; 
+  overflow: auto;            
+  background: #f40 url('../console/images/orangetile.png');
   color: #531;
   height: 64px;
+  width: 100%;
 }
 
 pre {
@@ -85,6 +86,7 @@ table {
 	padding: 0px;
 	border-width: 0px;
 	border-spacing: 0px;
+  border-collapse: collapse;
 }
 
 th {
@@ -92,8 +94,9 @@ th {
   font-size: 8pt;
   border-top: 1px outset #001;
   border-bottom: 1px inset #001;  
-  background: #f91 url('/themes/console/images/tabletitleorange.png') repeat-x;
+  background: #f60 url('/themes/console/images/tabletitleorange.png') repeat-x;
   text-align: left;
+  whitespace: nowrap;
 }
 
 .SnarkTorrents {
@@ -134,7 +137,7 @@ td {
 .page {
 	background-color: #fff;
 	color:#310;
-  min-width: 700px !important;
+  min-width: 800px !important;
 /*  max-width: 800px !important; */
   margin: 20px;
   padding: 10px 20px 5px 20px;
@@ -186,7 +189,7 @@ a:visited{
 }
 
 a:hover{
-  color: #f60;
+  color: #f40;
   font-weight: bold;
 }
 

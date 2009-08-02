@@ -26,12 +26,11 @@ pre {
 
 div.logo {
      float: left;
-     width: 200px;
-     left: 1em;
-     top: 1em;
-     margin: 0em;
-     padding: .5em;
+     width: 175px;
+     margin: 0 0 0 20px;
+     padding: 10px;
      text-align: center;
+     border: 5px solid #dedeff;
 }
 
 div.toolbar {
@@ -75,12 +74,15 @@ div.routersummary p {
 }     
 
 div.warning {
-     margin: 0 10px 10px 205px;
-     padding: 5px 10px;
+     margin: 20px 20px 10px 240px;
+     padding: 10px 20px 20px 75px;
      background: #ffefef;
-     border: medium solid #ffafaf;
+     border: 5px solid #ffafaf;
      text-align: left;
      color: inherit;
+     background-image:url("../images/errortriangle.png");
+     background-position:15px center;
+     background-repeat:no-repeat;
 }
 
 div.main {
