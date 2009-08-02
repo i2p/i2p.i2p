@@ -1,0 +1,6 @@
+/* Welcome to the wonderful world of kludgey IE fixes */
+
+.wideload {
+     overflow: auto;
+     width: 100%;
+}

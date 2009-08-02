@@ -19,7 +19,7 @@ img {
 
 pre {
      width: 98%;
-     overflow-x: scroll;
+     overflow: auto;
      text-align: left;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #333;
@@ -130,7 +130,6 @@ div.main {
      text-align: left;
      color: #001;
      width: auto;
-/*  overflow-x: scroll; */
 }
 
 div.main hr, hr {
@@ -652,7 +651,7 @@ form {}
      -khtml-border-radius: 4px;
      text-align: justify;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
-     overflow-x: scroll;
+     overflow: auto;
  }
  
  div.joblog:li {

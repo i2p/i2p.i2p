@@ -35,13 +35,13 @@ button span.hide{
  <h3>Client Configuration</h3>
  <p>
  The Java clients listed below are started by the router and run in the same JVM.
- </p><p>
+ </p><p> <div class="wideload">
  <jsp:getProperty name="clientshelper" property="form1" />
  </p><p>
  <i>All changes require restart to take effect. To change other client options, edit the clients.config file.</i>
  </p> <hr /><div class="formaction">
  <input type="submit" name="action" value="Save Client Configuration" />
-</div>
+</div></div>
  <h3>WebApp Configuration</h3>
  <p>
  The Java web applications listed below are started by the webConsole client and run in the same JVM as the router.
@@ -53,7 +53,7 @@ button span.hide{
  A web app may also be disabled by removing the .war file from the webapps directory;
  however the .war file and web app will reappear when you update your router to a newer version,
  so disabling the web app here is the preferred method.
- </p><p>
+ </p><p><div class="wideload">
  <jsp:getProperty name="clientshelper" property="form2" />
  </p>
  <p>
@@ -63,6 +63,7 @@ button span.hide{
  <input type="submit" name="action" value="Save WebApp Configuration" />
  </div>
  </form>
+</div>
 </div>
 </div>
 </body>

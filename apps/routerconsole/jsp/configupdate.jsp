@@ -28,7 +28,7 @@
     System.setProperty("net.i2p.router.web.ConfigUpdateHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce")%>" />
       <h3>Check for I2P and news updates</h3>
-      <table border="0" cellspacing="5">
+      <div class="wideload"><table border="0" cellspacing="5">
         <tr>
           <td colspan="2"></tr>
         <tr>
@@ -70,6 +70,7 @@
               <input type="reset" value="Cancel" />
             </div>
       </table>
+    </div>
  </form>
 </div>
 </div>

@@ -1,10 +1,13 @@
 body {
-     margin: 1em 0em;
-     padding: 0em;
+     margin: 15px 0;
+     padding: 0;
      text-align: left;
      background: #FFF;
      color: #000;
-     font: 10pt/120% Verdana, Tahoma, Helvetica, sans-serif;
+/*
+     font: 10pt/140% Verdana, Tahoma, Helvetica, sans-serif;
+*/
+     font: 10pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
@@ -16,8 +19,9 @@ img {
 }
 
 pre {
+     overflow: auto;
+     font-size: 8pt !important;
      width: 100%;
-     overflow-x: scroll;
 }
 
 div.logo {
@@ -37,25 +41,25 @@ div.toolbar {
 }
 
 div.routersummaryouter {
-     float: left;
+     float: left; 
      width: 200px;
      margin: 0;
      padding: 0;
      border: 0;
-     clear: left;/* fixes a bug in Opera */
-     overflow: auto;
+     clear: left; /*  fixes a bug in Opera */
 }
 
 div.routersummary {
      background: #fafaff;
-     width: 175px;
+     width: 180px;
      color: inherit;
-     margin: 0em;
-     padding: 5px;
-     text-align: left;
-     border: medium solid #efefff;
+     margin: 0;
+     padding: 5px 0 0 10px;
+     text-align: left !important;
+     border: 5px solid #efefff;
      font-size: 9pt;
      word-wrap: break-word;
+     font: 9pt/125%;
 }
 
 div.routersummary hr {
@@ -63,11 +67,16 @@ div.routersummary hr {
      background: #ccf;
      height: 2px;
      border: 0px solid #ccf;
-     margin: 10px 0;
+     margin: 4px 0;
 }
+
+div.routersummary p {
+     padding: 0;
+}     
+
 div.warning {
-     margin: 0em 1em 1em 224px;
-     padding: .5em 1em;
+     margin: 0 10px 10px 205px;
+     padding: 5px 10px;
      background: #ffefef;
      border: medium solid #ffafaf;
      text-align: left;
@@ -75,40 +84,63 @@ div.warning {
 }
 
 div.main {
-     margin: 0em 1em 1em 224px;
-     padding: .5em 1em;
+     margin: 0 20px 10px 205px;
+     padding: 5px 15px 15px 15px;
      background: #ffffef;
-     border: medium solid #ffffd0;
+     border: 5px solid #ffffd0;
      text-align: left;
      color: inherit;
 }
 
+
 div.main textarea {
-     width: 100% !important;
+/*     width: 100% !important; breaks IE */
+     width: 600px;
 }
 
 div.news {
-     margin: 0em 1em 1em 224px;
-     padding: .5em 1em;
+     margin: 0 20px 0 205px;
+     padding: -10px 15px 5px 15px;
      background: #ffffc0;
-     border: medium solid #ffffa0;
+     border: 5px solid #ffffa0;
      text-align: justify;
      color: inherit;
 }
 
+div.news li {
+     text-align: justify;
+     list-style: none;
+     margin: -10px 20px -20px -20px;
+     padding: 8px 0;
+     border: 1px solid #330;
+     border-left: 5px solid #330;
+     padding: 3px 5px 3px 5px;
+     background: #fe7;
+     font-size: 12pt;
+}
+
+div.news a:link {
+
+}
+
 div.confignav {
-     padding: 1em;
-     background: #efefff;
+     padding: 12px 0 15px 0;
+     background: #cfc;
+     margin: -10px -20px 0 -10px;
+     border: 5px solid #9f9;
 }
 
 div.configure {
-     padding: 1em;
+     margin: 0 -20px 0 -10px;
+     padding: 10px 20px 5px 20px;
      background: #ffffc0;
 }
 
 div.messages {
-     padding: 1em;
+     padding: 10px;
      background: #fafaff;
+     border: 5px solid #fdd;
+     margin: 0px -20px 0px -10px;
 }
 
 div.messages span.error {
@@ -122,20 +154,36 @@ div.messages span.notice {
 h1 {
      font-size: 18pt;
      text-align: center;
+     border: 5px solid #efefff;
+     border-bottom: 5px solid #efefff;
+     padding: 10px;
+     margin: 0 20px 0 205px;
+     line-height: 93%;
+     text-transform: uppercase;
+     letter-spacing: 0.3em;
+     background: #fff;
 }
 
 h2 {
-     font-size: 12pt;
+     font-size: 14pt;
+     padding: 10px;
+     border-bottom: 2px solid #001;
+     border-top: 2px solid #001;
+     letter-spacing: 0.04em;
 }
 
 h3 {
-     font-size: 10pt;
+     font-size: 12pt;
+     padding: 10px;
+     border-bottom: 2px solid #001;
+     border-top: 2px solid #001;
+     letter-spacing: 0.04em;
 }
+
 .proxyfooter{
      font-size: 7pt;
      display: none !important;
 }
-
 
 table {
 /*     border-collapse: collapse; */
@@ -144,12 +192,13 @@ table {
      cell-padding: 1px;
      font-size: 7pt;
      background: #fff;
+     width: 100%;
 }
-
 
 th {
      background-color: #ccf;
      padding: 5px 2px;
+     text-align: center;
 }
 
 tt {
@@ -169,11 +218,11 @@ tr:nth-child(odd) {
 }
 
 hr {
-     color: #ff9;
-     background: #ff9;
+     color: #dd9;
+     background: #dd9;
      height: 2px;
-     border: 0px solid #ff9;
-     margin: 10px 0;
+     border: 0px solid #dd5;
+     margin: 5px 0;
 }
 
 .statusnotes {
@@ -184,3 +233,87 @@ hr {
      margin: -3px 0 0 0; 
      background: #fff;
  }
+ 
+input {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+select {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+submit {
+     padding 0 2px;
+}
+
+p {
+     padding: 5px 20px 0px 20px;
+     text-align: justify;
+}
+
+.formaction {
+     text-align: right;
+}
+
+.langbox {
+     margin: 30px 0 0px 5px;
+     color: #001;
+     font-size: 7pt;
+     width: 180px;
+     text-align: center;
+     float: right;
+     valign: middle;
+}
+
+.langbox img {
+     padding: 0 2px; /* Ignored by IE8 */
+}
+
+a:link{
+     color: #006;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited{
+     color: #448;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover{
+     color: #f60;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+a:active{
+     color: #f93;
+     text-decoration: underline;
+     font-weight: bold;
+}
+
+pre {
+     font-size: 9pt;
+     margin: 0px 20px;
+}
+
+tt {
+     font-size: 9pt;
+     font-weight: bold;
+     color: darkgreen;
+}
+
+.tablefooter {
+     border: 1px solid #f00;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #aaf;
+     font-size: 8pt;
+     font-weight: bold;
+     line-height: 150%;
+}

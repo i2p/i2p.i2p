@@ -3,7 +3,7 @@ package net.i2p.router.web;
 public class ConfigUIHelper extends HelperBase {
     public ConfigUIHelper() {}
     
-    private static final String themes[] = {"Classic", "Dark", "Light"};
+    private static final String themes[] = {"classic", "dark", "light"};
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);

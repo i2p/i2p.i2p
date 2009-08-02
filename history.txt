@@ -1,8 +1,12 @@
+2009-08-02
+    * Better support for Internet Explorer/classic theme.
+    * Incremental improvements to classic theme.
+    * More UI tweaks and fiddles. 
+
 2009-07-31 dr|z3d
     * Resolve anomalous buttons and text fields in console ui. 
     * Enhance presentation of data in /peers.jsp.
     * Fix themes issue with horizontal width of radio/checkbox icons.
-      (Radioboxes currently non-functional in Opera).
     * Other cosmetic UI enhancements.
 
 * 2009-07-31  0.7.6 released

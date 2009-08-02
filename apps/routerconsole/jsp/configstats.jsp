@@ -56,7 +56,7 @@ function toggleAll(category)
 <h1>I2P Stats Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
- 
+
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="formhandler" property="*" />
@@ -78,6 +78,7 @@ function toggleAll(category)
  (change requires restart to take effect)<br />
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
  Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<hr />
+ <div class="wideload">
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
@@ -103,6 +104,7 @@ function toggleAll(category)
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
      <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="Save changes" /><input type="reset" value="Cancel" /></td></tr></form>
  </table>
+</div>
 </div>
 </div>
 </body>

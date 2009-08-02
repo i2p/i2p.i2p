@@ -69,15 +69,15 @@
  <input type="submit" name="action" value="Adjust peer bonuses" /></div>
  </p>
  </form>
-
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
  <hr />
+ <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 
-
+</div>
 </div>
 </div>
 </body>

@@ -1767,7 +1767,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(". Limit: ").append(getMaxConnections());
         buf.append(". Timeout: ").append(DataHelper.formatDuration(_expireTimeout));
         buf.append(".</b></h3>\n");
-        buf.append("<table>\n");
+        buf.append("<div class=\"wideload\"><table>\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">Peer</a>");
         if (sortFlags != FLAG_ALPHA)
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");
@@ -1998,7 +1998,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(sendTotal).append("</td></b> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n");
         buf.append("      <td align=\"center\"><b>").append(resentTotal);
         buf.append("</b></td> <td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n");
-        buf.append(" </tr></table></p><p>\n");
+        buf.append(" </tr></table></div></p><p>\n");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         // NPE here early
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();

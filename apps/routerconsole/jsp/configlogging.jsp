@@ -13,7 +13,7 @@
 <h1>I2P Logging Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
- 
+
  <jsp:useBean class="net.i2p.router.web.ConfigLoggingHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
@@ -26,6 +26,7 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <h3>Configure I2P Logging Options</h3>
+ <div class="wideload">
       <table border="0" cellspacing="5">
         <tr> 
           <td class="mediumtags" align="right"><b>Logging filename:</b> 
@@ -62,6 +63,7 @@
             </div> 
       </table>
  </form>
+</div>
 </div>
 </div>
 </body>

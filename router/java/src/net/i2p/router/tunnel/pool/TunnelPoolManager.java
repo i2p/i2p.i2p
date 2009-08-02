@@ -405,7 +405,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h2><a name=\"exploratory\" ></a>Exploratory tunnels (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
+        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>Exploratory tunnels (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
         renderPool(out, _inboundExploratory, _outboundExploratory);
         
         List destinations = null;
@@ -623,7 +623,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>Tunnels</b> <td align=\"center\"><b>" + tunnelCount);
         out.write("</b> <td>&nbsp;</td> <td align=\"center\"><b>" + partCount);
-        out.write("</b> <td>&nbsp;</td></tr></table>\n");
+        out.write("</b> <td>&nbsp;</td></tr></table></div>\n");
     }
 
     /** @return total number of non-fallback expl. + client tunnels */
