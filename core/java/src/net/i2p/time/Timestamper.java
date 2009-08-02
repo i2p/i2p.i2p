@@ -52,6 +52,15 @@ public class Timestamper implements Runnable {
         this(ctx, lsnr, true);
     }
     public Timestamper(I2PAppContext ctx, UpdateListener lsnr, boolean daemon) {
+        // Don't bother starting a thread if we are disabled.
+        // This means we no longer check every 5 minutes to see if we got enabled,
+        // so the property must be set at startup.
+        // We still need to be instantiated since the router calls clock().getTimestamper().waitForInitialization()
+        String disabled = ctx.getProperty(PROP_DISABLED, DEFAULT_DISABLED);
+        if (Boolean.valueOf(disabled).booleanValue()) {
+            _initialized = true;
+            return;
+        }
         _context = ctx;
         _daemon = daemon;
         _initialized = false;
