@@ -284,6 +284,8 @@ public class ConnectionManager {
     // exporting non-public type through public API, this is a potential bug.
     public ConnectionHandler getConnectionHandler() { return _connectionHandler; }
     public PacketQueue getPacketQueue() { return _outboundQueue; }
+    /** do we respond to pings that aren't on an existing connection? */
+    public boolean answerPings() { return _defaultOptions.getAnswerPings(); }
     
     /**
      * Something b0rked hard, so kill all of our connections without mercy.
