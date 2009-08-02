@@ -135,7 +135,7 @@ td {
 	background-color: #fff;
 	color:#310;
   min-width: 700px !important;
-  max-width: 800px !important;
+/*  max-width: 800px !important; */
   margin: 20px;
   padding: 10px 20px 5px 20px;
   -moz-border-radius: 4px;

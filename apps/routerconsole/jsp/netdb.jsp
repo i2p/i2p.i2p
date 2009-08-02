@@ -10,6 +10,7 @@
 <%@include file="summary.jsp" %>
  <h1>I2P Network Database Summary</h1>
 <div class="main" id="main">
+ <div class="wideload">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />
  <jsp:setProperty name="netdbHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="netdbHelper" property="writer" value="<%=out%>" />
@@ -18,6 +19,6 @@
  <jsp:setProperty name="netdbHelper" property="lease" value="<%=request.getParameter("l")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div>
-
+</div>
 </body>
 </html>

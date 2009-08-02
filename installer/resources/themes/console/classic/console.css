@@ -94,8 +94,8 @@ div.main {
 
 
 div.main textarea {
-/*     width: 100% !important; breaks IE */
-     width: 600px;
+     width: 100% !important; 
+
 }
 
 div.news {
@@ -316,4 +316,8 @@ tt {
      font-size: 8pt;
      font-weight: bold;
      line-height: 150%;
+}
+
+.tidylist {
+     text-align: justify;
 }
