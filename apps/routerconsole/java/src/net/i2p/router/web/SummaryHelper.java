@@ -90,7 +90,8 @@ public class SummaryHelper extends HelperBase {
                 Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed")).booleanValue());
     }
     
-    public int getAllPeers() { return _context.netDb().getKnownRouters(); }
+    /** subtract one for ourselves, so if we know no other peers it displays zero */
+    public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
     
     public String getReachability() {
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
