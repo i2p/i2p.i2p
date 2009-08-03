@@ -105,3 +105,8 @@ div.routersummary, div.routersummary hr {
 text {
      padding-left: 5px;
 }
+
+div.news li {
+     margin-top: 0 !important;
+     margin-bottom: -23px !important;
+}

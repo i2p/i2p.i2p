@@ -118,22 +118,34 @@ div.news {
      min-width: 600px;
 }
 
+/* convert the list entry to our title */
+
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: -10px 20px -20px -20px;
-     padding: 8px 0;
-     border: 1px solid #330;
-     border-left: 5px solid #330;
-     padding: 3px 5px 3px 5px;
-     background: #fe7;
+     margin: -15px 20px -20px -20px;
+     padding: 0px 0 15px 0;
+     border-bottom: 2px solid #cc7;
+     border-top: 2px solid #cc7;     
+     padding: 3px 5px 5px 5px;
      font-size: 12pt;
+     color: #661;
 }
 
+div.news p {
+     color: #330;
+}
 div.news a:link {
-
+     color: #883;
 }
 
+div.news hr {
+     color: #cc7;
+     background: #cc7;
+     height: 2px;
+     border: 0px solid #cc7;
+     margin: 5px 0;
+}
 div.confignav {
      padding: 12px 0 15px 0;
      background: #cfc;
