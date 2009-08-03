@@ -147,6 +147,9 @@ div.configure {
 /*     background: #eeffee;*/
 }
 
+div.configure table {
+}
+
 div.messages {
      padding: 10px;
      background: #fafaff;
