@@ -28,12 +28,57 @@ pre {
 
 div.logo {
      float: left;
-     width: 175px;
+     position-relative: top 20px ;
+     width: 200px;
      margin: 0 0 0 20px;
-     padding: 10px;
+     padding: 10px 5px;
      text-align: center;
-     border: 5px solid #dedeff;
+     border: 5px solid #ddf;
      background-color: #eef;
+     -moz-border-radius: 15px;
+     -moz-box-shadow: inset 0px 0px 0px 2px #99f;
+     -khtml-border-radius: 15px;
+     -khtml-box-shadow: inset 0px 0px 0px 2px #99f;
+}
+
+div.logo hr {
+     color: #ddf;
+     background: #ddf;
+     height: 5px;
+     border: 0px solid #ddf;
+     margin: 8px -3px;
+}
+
+div.logo a:link, div.logo a:visited {
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
+}
+
+div.logo a:active {
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     color: #f60;
+}
+
+div.logo a:hover {
+     text-shadow: 0px 0px 1px rgba(128, 0, 0, 0.7);
+     color: #900;
+}
+
+div.warning a:link {
+     color: #f60;
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.5);
+}
+
+div.warning a:visited{
+     color: #f90;
+}
+
+div.warning a:hover{
+     color: #d30;
+  text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+}
+
+div.warning a:active{
+     color: #900;
 }
 
 div.toolbar {
@@ -48,7 +93,7 @@ div.routersummaryouter {
      margin: 0;
      padding: 0;
      border: 0;
-     clear: left; /*  fixes a bug in Opera */
+     clear: left; /* fixes a bug in Opera */
 }
 
 div.routersummary {
@@ -77,15 +122,33 @@ div.routersummary p {
 }     
 
 div.warning {
-     margin: 20px 20px 10px 240px;
-     padding: 10px 20px 20px 75px;
-     background: #ffefef;
-     border: 5px solid #ffafaf;
+     margin: 20px 20px 10px 260px;
+     padding: 0px 20px 20px 75px;
+     background: #ffd;
+     border: 5px solid #fb7;
      text-align: left;
      color: inherit;
      background-image:url("../images/errortriangle.png");
-     background-position:15px center;
+     background-position: 20px center;
      background-repeat:no-repeat;
+     -moz-border-radius: 15px;
+     -moz-box-shadow: inset 0px 0px 0px 2px #f60;
+     -kthml-border-radius: 15px;
+     -khtml-box-shadow: inset 0px 0px 0px 2px #f60;
+}
+
+div.warning hr {
+     color: #fb7;
+     background: #fb7;
+     height: 5px;
+     border: 0px solid #fb7;
+     margin: 5px 0;
+     margin: 20px 0;
+}
+
+div.warning h3 {
+     border-bottom: 5px solid #fb7;
+     padding-bottom: 10px;
 }
 
 div.main {
@@ -103,6 +166,10 @@ div.main li {
      padding-bottom: 10px;
 }
 
+div.main li:first-child {
+     padding-top: 20px;
+}
+
 div.main textarea {
      width: 100% !important; 
 
@@ -110,12 +177,15 @@ div.main textarea {
 
 div.news {
      margin: -5px 0px 0 195px;
-     padding: -10px 15px 15px 15px;
+     padding: -10px 15px 8px 15px;
      background: #ffffc0;
      border: 5px solid #bbf;
      text-align: justify;
      color: inherit;
      min-width: 600px;
+     padding-bottom: 8px;
+     padding-left: 10px;
+     padding-right: 10px;
 }
 
 /* convert the list entry to our title */
@@ -123,7 +193,7 @@ div.news {
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: -15px 20px -20px -20px;
+     margin: -15px 15px -20px -20px;
      padding: 0px 0 15px 0;
      border-bottom: 2px solid #cc7;
      border-top: 2px solid #cc7;     
@@ -146,6 +216,7 @@ div.news hr {
      border: 0px solid #cc7;
      margin: 5px 0;
 }
+
 div.confignav {
      padding: 12px 0 15px 0;
      background: #cfc;
@@ -298,7 +369,7 @@ p {
 }
 
 .langbox {
-     margin: 30px 0 0px 5px;
+     margin: 29px -15px 0px 5px;
      color: #001;
      font-size: 7pt;
      width: 180px;
@@ -362,4 +433,5 @@ tt {
 
 .tidylist {
      text-align: justify;
+     padding-right: 30px;
 }

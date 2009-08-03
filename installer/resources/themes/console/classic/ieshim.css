@@ -70,7 +70,7 @@ div.main, div.news {
 }
 
 div.main hr, div.news hr {
-     margin: 5px 0px;
+     margin: 0;
 }
 
 div.main {
@@ -82,7 +82,16 @@ div.news {
      border-right: 0px solid #ffffc0; 
      margin-right: 0px;
      margin: -5px 0px 0 185px;
+     padding-bottom: 8px;
 }
+
+div.news hr {
+     color: #bbf;
+     background: #bbf;
+     height: 3px;
+     border: 0px solid #bbf;
+     margin: 0px 0px 0 -13px;
+}     
 
 div.routersummary {
      color: #001;
@@ -106,4 +115,18 @@ text {
 div.news li {
      padding-top: 0px	0px !important;
      margin-bottom: -23px !important;
+}
+
+div.logo {
+     float: left;
+     margin: 20px 0 0 20px !important;
+     border: 0;
+}
+
+div.warning {
+     padding: 0px 20px 20px 80px;
+}
+
+.langbox {
+     margin: 22px -20px 0px 5px;
 }
