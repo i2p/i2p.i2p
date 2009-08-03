@@ -355,7 +355,11 @@ public class SummaryHelper extends HelperBase {
             buf.append("<b>*</b> ");
             buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
-            buf.append(name).append("</a><br />\n");
+            if (name.length() < 16)
+                buf.append(name);
+            else
+                buf.append(name.substring(0,15)).append("&hellip;");
+            buf.append("</a><br />\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
