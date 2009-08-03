@@ -26,14 +26,18 @@ div.configure textarea {
      width: 450px !important;
 }
 
+div.configure input {
+     margin-left: 5px;
+}
+
 div.configure table {
-     width: 350px !important;
+     width: 550px !important;
      text-align: center;
 }
 
 h1 {
      padding: 15px 10px 16px 10px !important;
-     border-right: 0;
+     margin: 0 0px 0 175px !important;
 }
 
 h2 {
@@ -48,29 +52,25 @@ h3 {
 
 div.confignav {
      padding: 15px 0 15px 0;
-     border-left: 0px solid #bbf;
+     border-left: 0px;
      margin-left: -15px;
-     border-right: 0;
      border-top: 5px solid #bbf;
      margin-bottom: 10px !important;
 }
 
 div.messages {
-     border-left: 0px solid #bbf;
-     border-right: 0px solid #ddf;     
-     margin: 0px -15px 0px -15px;
+     border-left: 0;
+     border-right: 0;     
+     margin: -10px -15px 0px -15px;
 }
 
 div.main, div.news {
      margin: -5px 0px 10px 185px;
-     border: 0px solid #bbf;
-     border-top: 5px solid #bbf;
-     border-left: 5px solid #bbf;
-     border-bottom: 5px solid #bbf;     
+     border: 5px solid #bbf;
 }
 
 div.main hr, div.news hr {
-     margin: 0;
+     margin: 0;	
 }
 
 div.main {
@@ -79,8 +79,6 @@ div.main {
 
 div.news {
      border-left: 5px solid #bbf;
-     border-right: 0px solid #ffffc0; 
-     margin-right: 0px;
      margin: -5px 0px 0 185px;
      padding-bottom: 8px;
 }
@@ -89,8 +87,8 @@ div.news hr {
      color: #bbf;
      background: #bbf;
      height: 3px;
-     border: 0px solid #bbf;
-     margin: 0px 0px 0 -13px;
+     border: 0px;
+     margin: 0 -10px 0 -13px !important;
 }     
 
 div.routersummary {
@@ -99,32 +97,18 @@ div.routersummary {
      border-left: 5px solid #bbf;
 }
 
-/*
-div.routersummary, div.routersummary hr {
-     background: #ddf;
-     height: 5px;
-     border: 0px solid #ddf;
-     margin: 4px 0;
-}
-*/
-
-text {
-     padding-left: 5px;
-}
-
 div.news li {
      padding-top: 0px	0px !important;
      margin-bottom: -23px !important;
 }
 
 div.logo {
-     float: left;
-     margin: 20px 0 0 20px !important;
-     border: 0;
 }
 
 div.warning {
      padding: 0px 20px 20px 80px;
+     margin-top: -20px;
+     margin-left: -10px !important;
 }
 
 .langbox {
