@@ -33,6 +33,7 @@ div.logo {
      padding: 10px;
      text-align: center;
      border: 5px solid #dedeff;
+     background-color: #eef;
 }
 
 div.toolbar {
@@ -56,7 +57,7 @@ div.routersummary {
      color: inherit;
      margin: 0;
      padding: 7px 0 0 0px;
-     text-align: left !important;
+     text-align: center !important;
      border: 5px solid #bbf;
      font-size: 9pt;
      word-wrap: break-word;
@@ -89,7 +90,7 @@ div.warning {
 
 div.main {
      margin: 0px 0px 10px 195px;
-     padding: 5px 15px 15px 15px;
+     padding: 15px 15px 15px 15px;
      background: #eef;
      border: 5px solid #bbf;
      border-top: 0;
@@ -98,6 +99,9 @@ div.main {
      min-width: 570px;
 }
 
+div.main li {
+     padding-bottom: 10px;
+}
 
 div.main textarea {
      width: 100% !important; 
@@ -133,7 +137,7 @@ div.news a:link {
 div.confignav {
      padding: 12px 0 15px 0;
      background: #cfc;
-     margin: -10px -20px 0 -23px;
+     margin: -20px -20px 0 -23px;
      border: 5px solid #bbf;
 }
 
@@ -179,8 +183,8 @@ h1 {
 h2 {
      font-size: 14pt;
      padding: 10px;
-     border-bottom: 2px solid #003;
-     border-top: 0px solid #003;
+     border-bottom: 5px solid #bbf;
+     border-top: 0px solid #bbf;
      letter-spacing: 0.04em;
 }
 
@@ -208,12 +212,12 @@ table {
 }
 
 table hr {
-     display: none
+     padding: 1px 0;
 }
 
 th {
      background-color: #def;
-     padding: 5px 2px;
+     padding: 8px 2px;
      text-align: center;
      border-bottom: 1px solid #88f;
 }
@@ -247,9 +251,12 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -3px 0 0 0; 
-     background: #fff;
- }
+     margin: -7px 0 7px 0; 
+     background: #bbf;
+     border: 5px solid #bbf;
+     border-top: 0;
+     padding: 4px 0 2px 0;
+}
  
 input {
      margin: 3px 5px 3px 0;

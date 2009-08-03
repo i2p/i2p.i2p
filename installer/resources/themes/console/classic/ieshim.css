@@ -7,14 +7,43 @@
 
 .formaction {
      text-align: left !important;
+     margin: -10px 0 10px 0;
 }
+
+div.configure {
+     text-align: center;
+}
+
+div.configure p {
+     text-align: justify;
+}
+
+div.main ul {
+     margin-right: 20px;
+}
+
 div.configure textarea {
      width: 450px !important;
+}
+
+div.configure table {
+     width: 350px !important;
+     text-align: center;
 }
 
 h1 {
      padding: 15px 10px 16px 10px !important;
      border-right: 0;
+}
+
+h2 {
+     padding-top: 0;
+     text-align: left !important;
+}
+
+h3 {
+     margin-top: 10px;
+     text-align: left !important
 }
 
 div.confignav {
@@ -23,10 +52,12 @@ div.confignav {
      margin-left: -15px;
      border-right: 0;
      border-top: 0;
+     margin-bottom: 10px !important;
 }
 
 div.main {
      border-left: 5px solid #bbf !important;
+     border-bottom: 5px solid #bbf !important;     
      margin-top: 0;
 }
 
