@@ -4,7 +4,7 @@ body {
      margin: 0;
      padding: 0;
      text-align: left;
-     background: #FFF;
+     background: #bbf;
      color: #000;
 /*
      font: 10pt/140% Verdana, Tahoma, Helvetica, sans-serif;
@@ -140,7 +140,7 @@ div.warning {
      text-align: left;
      color: inherit;
      background-image:url("../images/errortriangle.png");
-     background-position: 20px center;
+     background-position: 17px center;
      background-repeat:no-repeat;
      -moz-border-radius: 15px;
      -moz-box-shadow: inset 0px 0px 0px 2px #f60;
@@ -163,7 +163,7 @@ div.warning h3 {
 }
 
 div.main {
-     margin: 0px 0px 10px 195px;
+     margin: 0px 0px 0px 195px;
      padding: 15px 15px 15px 15px;
      background: #eef;
      border: 5px solid #bbf;
@@ -234,31 +234,46 @@ div.news hr {
 div.confignav {
      padding: 12px 0 15px 0;
      background: #cfc;
-     margin: -20px -20px 0 -23px;
+     margin: -20px -20px 0 -20px;
      border: 5px solid #bbf;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
 }
 
 div.configure {
-     margin: 0 -20px 0 -20px;
+     margin: 1px -20px 0 -20px;
      padding: 0px 20px 0px 20px;
-/*     background: #eeffee;*/
 }
 
 div.configure table {
      font-size: 9pt;
      font-weight: bold;
+     -moz-box-shadow: inset 0px 0px 1px 1px #001;
+}
+
+div.configure tr, div.configure td {
+     padding: 10px 2px;
+}
+
+div.configure tr {
+     -moz-box-shadow: inset 0px 0px 1px 0px #bbf;
 }
 
 div.messages {
-     padding: 10px;
+     padding: 0px 10px;
      background: #fff;
-     border: 5px solid #feb;
+     border: 5px solid #bbf;
      border-right: 0;
-     margin: 0px -15px 0px -20px;
+     margin: -5px -15px 10px -20px;
      text-align: center;
      font-size: 9pt;
      font-weight: bold;
      color: #474;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+}
+
+div.messages li, div.messages ul {
+     padding: 15px 0 5px 5px;
+     margin: -15px 0 0 0;
 }
 
 div.messages span.error {
@@ -472,10 +487,10 @@ div.graphspanel {
 }
 
 div.graphspanel img {
-     border: 1px solid #003;
+     border: 1px solid #99f;
      padding: 2px;
      margin: 6px;
-     background: #001;
+     background: #ddf;
      -moz-box-shadow: inset 0px 0px 1px 1px #99f;
 }
 
