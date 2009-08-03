@@ -51,14 +51,8 @@ div.confignav {
      border-left: 0px solid #bbf;
      margin-left: -15px;
      border-right: 0;
-     border-top: 0;
+     border-top: 5px solid #bbf;
      margin-bottom: 10px !important;
-}
-
-div.main {
-     border-left: 5px solid #bbf !important;
-     border-bottom: 5px solid #bbf !important;     
-     margin-top: 0;
 }
 
 div.messages {
@@ -68,8 +62,11 @@ div.messages {
 }
 
 div.main, div.news {
-     margin: 0px 0px 10px 185px;
+     margin: -5px 0px 10px 185px;
      border: 0px solid #bbf;
+     border-top: 5px solid #bbf;
+     border-left: 5px solid #bbf;
+     border-bottom: 5px solid #bbf;     
 }
 
 div.main hr, div.news hr {
@@ -77,14 +74,14 @@ div.main hr, div.news hr {
 }
 
 div.main {
-     border-top: 5px solid #eef;
+     border-top: 5px solid #bbf;
 }
 
 div.news {
      border-left: 5px solid #bbf;
      border-right: 0px solid #ffffc0; 
      margin-right: 0px;
-     margin: -20px 0px 0 185px;
+     margin: -5px 0px 0 185px;
 }
 
 div.routersummary {
@@ -107,6 +104,6 @@ text {
 }
 
 div.news li {
-     margin-top: 0 !important;
+     padding-top: 0px	0px !important;
      margin-bottom: -23px !important;
 }
