@@ -1,4 +1,7 @@
-2009-08-02
+2009-08-03 dr|z3d
+    * Extensive update to the Classic theme; custom css hacks for IE.
+
+2009-08-02 dr|z3d
     * Better support for Internet Explorer/classic theme.
     * Incremental improvements to classic theme.
     * More UI tweaks and fiddles. 

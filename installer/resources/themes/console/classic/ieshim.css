@@ -4,3 +4,73 @@
      overflow: auto;
      width: 100%;
 }
+
+.formaction {
+     text-align: left !important;
+}
+div.configure textarea {
+     width: 450px !important;
+}
+
+h1 {
+     padding: 15px 10px 16px 10px !important;
+     border-right: 0;
+}
+
+div.confignav {
+     padding: 15px 0 15px 0;
+     border-left: 0px solid #bbf;
+     margin-left: -15px;
+     border-right: 0;
+     border-top: 0;
+}
+
+div.main {
+     border-left: 5px solid #bbf !important;
+     margin-top: 0;
+}
+
+div.messages {
+     border-left: 0px solid #bbf;
+     border-right: 0px solid #ddf;     
+     margin: 0px -15px 0px -15px;
+}
+
+div.main, div.news {
+     margin: 0px 0px 10px 185px;
+     border: 0px solid #bbf;
+}
+
+div.main hr, div.news hr {
+     margin: 5px 0px;
+}
+
+div.main {
+     border-top: 5px solid #eef;
+}
+
+div.news {
+     border-left: 5px solid #bbf;
+     border-right: 0px solid #ffffc0; 
+     margin-right: 0px;
+     margin: -20px 0px 0 185px;
+}
+
+div.routersummary {
+     color: #001;
+     padding-left: 0px;
+     border-left: 5px solid #bbf;
+}
+
+/*
+div.routersummary, div.routersummary hr {
+     background: #ddf;
+     height: 5px;
+     border: 0px solid #ddf;
+     margin: 4px 0;
+}
+*/
+
+text {
+     padding-left: 5px;
+}

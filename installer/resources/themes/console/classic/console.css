@@ -1,5 +1,7 @@
+/* Optimised for less capable browers and system specifications */
+
 body {
-     margin: 15px 0;
+     margin: 0;
      padding: 0;
      text-align: left;
      background: #FFF;
@@ -7,7 +9,7 @@ body {
 /*
      font: 10pt/140% Verdana, Tahoma, Helvetica, sans-serif;
 */
-     font: 10pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
@@ -49,23 +51,23 @@ div.routersummaryouter {
 }
 
 div.routersummary {
-     background: #fafaff;
-     width: 180px;
+     background: #ddf;
+     width: 190px;
      color: inherit;
      margin: 0;
-     padding: 5px 0 0 10px;
+     padding: 7px 0 0 0px;
      text-align: left !important;
-     border: 5px solid #efefff;
+     border: 5px solid #bbf;
      font-size: 9pt;
      word-wrap: break-word;
      font: 9pt/125%;
 }
 
 div.routersummary hr {
-     color: #ccf;
-     background: #ccf;
-     height: 2px;
-     border: 0px solid #ccf;
+     color: #bbf;
+     background: #bbf;
+     height: 5px;
+     border: 0px solid #bbf;
      margin: 4px 0;
 }
 
@@ -86,12 +88,14 @@ div.warning {
 }
 
 div.main {
-     margin: 0 20px 10px 205px;
+     margin: 0px 0px 10px 195px;
      padding: 5px 15px 15px 15px;
-     background: #ffffef;
-     border: 5px solid #ffffd0;
+     background: #eef;
+     border: 5px solid #bbf;
+     border-top: 0;
      text-align: left;
-     color: inherit;
+     color: #001;
+     min-width: 570px;
 }
 
 
@@ -101,12 +105,13 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0 20px 0 205px;
-     padding: -10px 15px 5px 15px;
+     margin: -5px 0px 0 195px;
+     padding: -10px 15px 15px 15px;
      background: #ffffc0;
-     border: 5px solid #ffffa0;
+     border: 5px solid #bbf;
      text-align: justify;
      color: inherit;
+     min-width: 600px;
 }
 
 div.news li {
@@ -128,21 +133,26 @@ div.news a:link {
 div.confignav {
      padding: 12px 0 15px 0;
      background: #cfc;
-     margin: -10px -20px 0 -10px;
-     border: 5px solid #9f9;
+     margin: -10px -20px 0 -23px;
+     border: 5px solid #bbf;
 }
 
 div.configure {
-     margin: 0 -20px 0 -10px;
-     padding: 10px 20px 5px 20px;
-     background: #ffffc0;
+     margin: 0 -20px 0 -20px;
+     padding: 0px 20px 0px 20px;
+/*     background: #eeffee;*/
 }
 
 div.messages {
      padding: 10px;
      background: #fafaff;
      border: 5px solid #fdd;
-     margin: 0px -20px 0px -10px;
+     border-right: 0;
+     margin: 0px -15px 0px -20px;
+     text-align: center;
+     font-size: 9pt;
+     font-weight: bold;
+     color: #444455;
 }
 
 div.messages span.error {
@@ -156,29 +166,29 @@ div.messages span.notice {
 h1 {
      font-size: 18pt;
      text-align: center;
-     border: 5px solid #efefff;
-     border-bottom: 5px solid #efefff;
-     padding: 10px;
-     margin: 0 20px 0 205px;
+     border: 5px solid #bbf;
+     padding: 13px 10px 12px 10px;
+     margin: 0 0px 0 175px;
      line-height: 93%;
      text-transform: uppercase;
      letter-spacing: 0.3em;
      background: #fff;
+     min-width: 600px;
 }
 
 h2 {
      font-size: 14pt;
      padding: 10px;
-     border-bottom: 2px solid #001;
-     border-top: 2px solid #001;
+     border-bottom: 2px solid #003;
+     border-top: 0px solid #003;
      letter-spacing: 0.04em;
 }
 
 h3 {
      font-size: 12pt;
-     padding: 10px;
-     border-bottom: 2px solid #001;
-     border-top: 2px solid #001;
+     padding: 0 10px 10px 10px;
+     border-bottom: 5px solid #bbf;
+     border-top: 0px solid #bbf;
      letter-spacing: 0.04em;
 }
 
@@ -188,8 +198,8 @@ h3 {
 }
 
 table {
-/*     border-collapse: collapse; */
-     border: 5px solid #dfd;
+     border-collapse: collapse; 
+     border: 5px solid #bbf;
      margin: 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
@@ -197,10 +207,15 @@ table {
      width: 100%;
 }
 
+table hr {
+     display: none
+}
+
 th {
-     background-color: #ccf;
+     background-color: #def;
      padding: 5px 2px;
      text-align: center;
+     border-bottom: 1px solid #88f;
 }
 
 tt {
@@ -208,7 +223,7 @@ tt {
 }
 
 td {
-     padding: 2px;
+     padding: 4px;
 }
 
 tr:nth-child(even) {
@@ -220,10 +235,10 @@ tr:nth-child(odd) {
 }
 
 hr {
-     color: #dd9;
-     background: #dd9;
-     height: 2px;
-     border: 0px solid #dd5;
+     color: #bbf;
+     background: #bbf;
+     height: 5px;
+     border: 0px solid #bbf;
      margin: 5px 0;
 }
 
@@ -242,11 +257,12 @@ input {
 }
 
 select {
-     margin: 3px 5px 3px 0;
+     margin: 3px 5px 3px 5px;
      vertical-align: middle;
 }
 
 submit {
+     margin: 3px 5px 3px 5px;
      padding 0 2px;
 }
 
@@ -310,14 +326,16 @@ tt {
 }
 
 .tablefooter {
-     border: 1px solid #f00;
+     border: 1px solid #88f;
 }
 
 .tablefooter tr, .tablefooter td {
-     background: #aaf;
+     background: #bbf;
      font-size: 8pt;
      font-weight: bold;
      line-height: 150%;
+     word-wrap: nowrap;
+     padding: 8px 1px;
 }
 
 .tidylist {
