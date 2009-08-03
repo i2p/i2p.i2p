@@ -356,7 +356,7 @@ select {
 
 submit {
      margin: 3px 5px 3px 5px;
-     padding 0 2px;
+     padding 2px 0;
 }
 
 p {

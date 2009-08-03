@@ -14,7 +14,7 @@ div.configure {
      text-align: center;
 }
 
-div.configure p {
+div.configure p, div.configure table  {
      text-align: justify;
 }
 
@@ -129,4 +129,18 @@ div.warning {
 
 .langbox {
      margin: 22px -20px 0px 5px;
+}
+
+td {
+     text-align: left;
+}
+
+th {
+     text-align: left;
+     padding-left: 3px; 
+     padding-right: 1px;
+}
+
+div.configure hr{
+     margin: 10px 0 15px 0;
 }
