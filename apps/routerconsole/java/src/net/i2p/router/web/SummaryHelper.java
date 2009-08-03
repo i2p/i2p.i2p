@@ -64,24 +64,15 @@ public class SummaryHelper extends HelperBase {
             return DataHelper.formatDuration(router.getUptime());
     }
     
-    private static final DateFormat _fmt = new java.text.SimpleDateFormat("HH:mm:ss", Locale.UK);
-    public String getTime() {
+    private String timeSkew() {
         if (_context == null) return "";
-        
-        String now = null;
-        synchronized (_fmt) {
-            now = _fmt.format(new Date(_context.clock().now()));
-        }
-        
-        if (!_context.clock().getUpdatedSuccessfully())
-            return now + " (Unknown skew)";
-        
+        //if (!_context.clock().getUpdatedSuccessfully())
+        //    return " (Unknown skew)";
         long ms = _context.clock().getOffset();
-        
         long diff = Math.abs(ms);
-        if (diff < 100)
-            return now;
-        return now + " (" + DataHelper.formatDuration(diff) + " skew)";
+        if (diff < 3000)
+            return "";
+        return " (" + DataHelper.formatDuration(diff) + " skew)";
     }
     
     public boolean allowReseed() {
@@ -94,6 +85,10 @@ public class SummaryHelper extends HelperBase {
     public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
     
     public String getReachability() {
+        return reachability() + timeSkew();
+    }
+
+    private String reachability() {
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
             return "ERR-Client Manager I2CP Error - check logs";  // not a router problem but the user should know
