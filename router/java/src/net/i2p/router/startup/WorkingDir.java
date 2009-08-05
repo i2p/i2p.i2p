@@ -1,4 +1,4 @@
-package net.i2p.util;
+package net.i2p.router.startup;
 
 import java.io.BufferedWriter;
 import java.io.File;

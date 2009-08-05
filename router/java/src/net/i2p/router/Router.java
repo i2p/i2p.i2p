@@ -35,6 +35,7 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
+import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -44,7 +45,6 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
-import net.i2p.util.WorkingDir;
 
 /**
  * Main driver for the router.
