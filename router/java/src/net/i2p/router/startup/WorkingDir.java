@@ -195,8 +195,10 @@ public class WorkingDir {
             out.println("# Modified by I2P User dir migration script");
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
-                if (s.endsWith("=eepsite/jetty.xml")) {
-                    s = s.replace("=eepsite", '=' + todir.getAbsolutePath() + File.separatorChar + "eepsite");
+                if (s.endsWith("=\"eepsite/jetty.xml\"")) {
+                    s = s.replace("=\"eepsite/jetty.xml\"", "=\"" + todir.getAbsolutePath() +
+                                                            File.separatorChar + "eepsite" +
+                                                            File.separatorChar + "jetty.xml\"");
                 }
                 out.println(s);
             }
