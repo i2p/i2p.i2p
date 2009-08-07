@@ -53,7 +53,7 @@ public class PersistentKeyRing extends KeyRing {
             if (key == null || key.length() != 44)
                 continue;
             String hb = prop.substring(PROP_PFX.length());
-            hb.replace("$", "=");
+            hb = hb.replace("$", "=");
             Hash dest = new Hash();
             SessionKey sk = new SessionKey();
             try {
