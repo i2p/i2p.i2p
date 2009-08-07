@@ -105,6 +105,19 @@ div.routersummary {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }
 
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #eef;
+     background: #eef;
+     height: 2px;
+     border-bottom: 1px solid #eef;
+     margin: 8px -10px 7px -10px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #001;
+}
+
 div.warning {
      margin: 5px 20px 10px 240px;
      padding: 0px 25px 20px 75px;
@@ -226,6 +239,7 @@ div.configure {
      border-radius: 4px;
      border: 1px solid #000022;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     min-width: 400px;
 }
 
 div.graphspanel {
@@ -237,8 +251,8 @@ div.graphspanel {
      border-radius: 4px;
      border: 1px solid #000022;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center !important; 
 }
-
 
 div.graphspanel img {
      border: 1px solid #003;
@@ -247,7 +261,7 @@ div.graphspanel img {
      text-align: center !important;
      background: #001;
      -moz-box-shadow: inset 0px 0px 1px 1px #99f;
-     opacity: 0.9;
+     opacity: 0.8;
 }
 
 div.graphspanel img:hover {
@@ -258,6 +272,10 @@ div.graphspanel img:hover {
      background: #001;
      -moz-box-shadow: inset 0px 0px 2px 1px #f60;
      opacity: 1;
+}
+
+div.graphspanel form {
+     text-align: left;
 }
 
 div.messages {
@@ -299,6 +317,16 @@ table {
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      font: 7pt/130% "Lucida Sans Unicode", Verdana, Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+table hr {
+     padding: 0px 0;
+     color: #99f;
+     background: #99f;
+     border: 0px solid #99f;
+     margin: 0px 0px;
+     height: 1px;
+     display: none;
 }
 
 th {
@@ -433,7 +461,7 @@ h2 {
      font-size: 12pt;
      color: #001;
      letter-spacing: 0.05em;
-     background: #ddf url('images/lightbluetile.png');
+     background: #ddf url('images/titletile.png');
      text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
      padding: 7px 10px;
      wordwrap: none;
@@ -476,9 +504,9 @@ h4 {
 
 button, button:visited {
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px outset #ddddc0;
+     border: 1px outset #999;
      padding: 1px 3px;
-     background: #bbf !important;
+     background: #ddf !important;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -488,18 +516,22 @@ button, button:visited {
      margin: 0 1px;
      text-align: center;
      min-width: 80px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
 }
 
 button:hover{
      border: 1px solid #f60;
      background: #f60 !important;
      color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
 }
 
 button:active{
      border: 1px solid #f60;
      background: #001 !important;
      color: #f60;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .underline {
@@ -531,8 +563,8 @@ input {
 }
 
 input, input:visited {
-     border: 1px outset #bbf;
-     background: #bbf;
+     border: 1px outset #999;
+     background: #ddf;
      color: #001;
      margin: 5px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
@@ -542,6 +574,9 @@ input, input:visited {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+     opacity: 0.9;
 }
 
 
@@ -549,7 +584,9 @@ input:hover {
      background: #f60;
      color: #fff;
      border: 1px solid #f60;
-     opacity: 0.9;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+
 }
 
 input:active {
@@ -557,6 +594,7 @@ input:active {
      color: #f60;
      border: 1px solid #f60;
      opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 input[type=text] {
@@ -595,6 +633,7 @@ select {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
+     text-align: left !important;
 }
 
 textarea {

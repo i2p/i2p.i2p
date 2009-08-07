@@ -36,8 +36,10 @@ div.configure table {
 }
 
 h1 {
-     padding: 15px 10px 16px 10px !important;
+     padding: 15px 10px 16px -10px !important;
      margin: 0 0px 0 175px !important;
+     background-color: #bbf !important;
+     color: #001;
 }
 
 h2 {
@@ -97,6 +99,11 @@ div.routersummary {
      border-left: 5px solid #bbf;
 }
 
+div.routersummary submit {
+     padding: 0;
+     margin-bottom: 5px;
+}
+
 div.news li {
      padding-top: 0px	0px !important;
      margin-bottom: -23px !important;
@@ -131,4 +138,15 @@ div.configure hr{
 
 input {
      padding: 0;
+}
+
+div.graphspanel img {
+     border: 1px solid #99f;
+     margin: 6px 0 !important;
+     background: #ddf;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+}
+
+div.graphspanel hr {
+     margin: 20px 0;
 }

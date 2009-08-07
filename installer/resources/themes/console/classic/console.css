@@ -132,6 +132,10 @@ div.routersummary a:hover {
      color: #f60;
 }
 
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
 div.warning {
      margin: 20px 20px 10px 260px;
      padding: 0px 20px 20px 75px;
@@ -176,6 +180,7 @@ div.main {
 
 div.main li {
      padding-bottom: 10px;
+     list-style: square;
 }
 
 div.main li:first-child {
@@ -220,6 +225,11 @@ div.news p {
 }
 div.news a:link {
      color: #773;
+     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+}
+
+div.news a:visited {
+     color: #f00 !important;
      text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
 }
 
@@ -331,11 +341,20 @@ table {
 }
 
 table hr {
-     padding: 1px 0;
+     padding: 0px 0;
+     color: #bbf;
+     background: #bbf;
+     border: 0px solid #bbf;
+     margin: 0px -5px;
+     height: 1px;
+}
+
+table tt {
+     font-size: 7.5pt;
 }
 
 th {
-     background-color: #def;
+     background-color: #fff;
      padding: 8px 2px;
      text-align: center;
      border-bottom: 1px solid #88f;
@@ -345,6 +364,10 @@ tt {
      font-size: 8pt;
 }
 
+tt, pre {
+     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+     
 td {
      padding: 4px;
 }
