@@ -1,0 +1,152 @@
+/* Welcome to the wonderful world of kludgey IE fixes */
+
+.wideload {
+     overflow: auto;
+     width: 100%;
+}
+
+.formaction {
+     text-align: left !important;
+     margin: -10px 0 10px 0;
+}
+
+div.configure {
+     text-align: center;
+}
+
+div.configure p, div.configure table  {
+     text-align: justify;
+}
+
+div.main ul {
+     margin-right: 20px;
+}
+
+div.configure textarea {
+     width: 450px !important;
+}
+
+div.configure input {
+     margin-left: 5px;
+}
+
+div.configure table {
+     width: 550px !important;
+     text-align: center;
+}
+
+h1 {
+     padding: 15px 10px 16px -10px !important;
+     margin: 0 0px 0 175px !important;
+     background-color: #bbf !important;
+     color: #001;
+}
+
+h2 {
+     padding-top: 0;
+     text-align: left !important;
+}
+
+h3 {
+     margin-top: 10px;
+     text-align: left !important
+}
+
+div.confignav {
+     padding: 15px 0 15px 0;
+     border-left: 0px;
+     margin-left: -15px;
+     border-top: 5px solid #bbf;
+     margin-bottom: 10px !important;
+}
+
+div.messages {
+     border-left: 0;
+     border-right: 0;     
+     margin: -10px -15px 0px -15px;
+}
+
+div.main, div.news {
+     margin: -5px 0px 10px 185px;
+     border: 5px solid #bbf;
+}
+
+div.main hr, div.news hr {
+     margin: 0;	
+}
+
+div.main {
+     border-top: 5px solid #bbf;
+}
+
+div.news {
+     border-left: 5px solid #bbf;
+     margin: -5px 0px 0 185px;
+     padding-bottom: 8px;
+}
+
+div.news hr {
+     color: #bbf;
+     background: #bbf;
+     height: 3px;
+     border: 0px;
+     margin: 0 -10px 0 -13px !important;
+}     
+
+div.routersummary {
+     color: #001;
+     padding-left: 0px;
+     border-left: 5px solid #bbf;
+}
+
+div.routersummary submit {
+     padding: 0;
+     margin-bottom: 5px;
+}
+
+div.news li {
+     padding-top: 0px	0px !important;
+     margin-bottom: -23px !important;
+}
+
+div.logo {
+}
+
+div.warning {
+     padding: 0px 20px 20px 80px;
+     margin-top: -20px;
+     margin-left: -10px !important;
+}
+
+.langbox {
+     margin: 22px -20px 0px 5px;
+}
+
+td {
+     text-align: left;
+}
+
+th {
+     text-align: left;
+     padding-left: 3px; 
+     padding-right: 1px;
+}
+
+div.configure hr{
+     margin: 10px 0 15px 0;
+}
+
+input {
+     padding: 0;
+}
+
+div.graphspanel img {
+     border: 1px solid #99f;
+     margin: 6px 0 !important;
+     background: #ddf;
+     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+}
+
+div.graphspanel hr {
+     margin: 20px 0;
+}

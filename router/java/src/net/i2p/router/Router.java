@@ -759,7 +759,7 @@ public class Router {
         buf.setLength(0);
         buf.append("\n<hr /><a name=\"logs\"> </a>\n");	
         List msgs = _context.logManager().getBuffer().getMostRecentMessages();
-        buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
+        buf.append("\n<h2>Most recent console messages:</h2><table>\n");
         for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {
             String msg = (String)iter.next();
             buf.append("<tr><td align=\"left\"><pre>");

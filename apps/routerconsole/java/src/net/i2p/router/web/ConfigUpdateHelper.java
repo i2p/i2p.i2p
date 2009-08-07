@@ -42,10 +42,10 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getUpdateThroughProxy() {
         String proxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
         if (Boolean.valueOf(proxy).booleanValue()) 
-            return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
         else
             
-            return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
     }
     
     private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l, 48*60*60*1000l, -1l };

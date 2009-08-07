@@ -13,7 +13,7 @@
 <h1>I2P Logging Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
- 
+
  <jsp:useBean class="net.i2p.router.web.ConfigLoggingHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
@@ -26,34 +26,35 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <h3>Configure I2P Logging Options</h3>
+ <div class="wideload">
       <table border="0" cellspacing="5">
         <tr> 
-          <td valign="top"><b>Logging filename:</b> 
+          <td class="mediumtags" align="right"><b>Logging filename:</b> 
           <td><input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" /> 
             <br /> <i>(the symbol '@' will be replaced during log rotation)</i> 
         <tr> 
-          <td valign="top"><b>Log record format:</b> 
+          <td class="mediumtags" align="right"><b>Log record format:</b> 
           <td><input type="text" name="logformat" size="20" value="<jsp:getProperty name="logginghelper" property="recordPattern" />" /> 
             <br /> <i>(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 
             'm' = message)</i> 
         <tr> 
-          <td valign="top"><b>Log date format:</b> 
+          <td class="mediumtags" align="right"><b>Log date format:</b> 
           <td><input type="text" name="logdateformat" size="20" value="<jsp:getProperty name="logginghelper" property="datePattern" />" /> 
             <br /> <i>('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' 
             = second, 'SSS' = millisecond)</i> 
         <tr> 
-          <td valign="top"><b>Max log file size:</b> 
+          <td class="mediumtags" align="right"><b>Max log file size:</b> 
           <td><input type="text" name="logfilesize" size="4" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" /> 
             <br /> 
         <tr> 
-          <td valign="top"><b>Default log level:</b> 
+          <td class="mediumtags" align="right"><b>Default log level:</b> 
           <td><jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /> <br /> <i>(DEBUG and INFO are not recommended defaults, 
             as they will drastically slow down your router)</i> 
         <tr> 
-          <td valign="top"><b>Log level overrides:</b> 
+          <td class="mediumtags" align="right"><b>Log level overrides:</b> 
           <td><jsp:getProperty name="logginghelper" property="logLevelTable" /> 
         <tr> 
-          <td colspan="2" valign="top"><hr> 
+          <td colspan="2"><hr> 
         <tr> 
           <td>
           <td> <div align="right"> 
@@ -62,6 +63,7 @@
             </div> 
       </table>
  </form>
+</div>
 </div>
 </div>
 </body>

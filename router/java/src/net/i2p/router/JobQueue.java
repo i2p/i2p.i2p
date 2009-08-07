@@ -607,7 +607,7 @@ public class JobQueue {
         out.flush();
         
         StringBuilder buf = new StringBuilder(32*1024);
-        buf.append("<b><div class=\"joblog\"><h3>I2P JobQueue</h3># runners: ").append(numRunners).append(" [states=");
+        buf.append("<b><div class=\"joblog\"><h3>I2P JobQueue</h3><div class=\"wideload\"># runners: ").append(numRunners).append(" [states=");
         if (states != null) 
             for (int i = 0; i < states.length; i++) 
                 buf.append(states[i]).append(" ");
@@ -667,7 +667,7 @@ public class JobQueue {
     
     /** render the HTML for the job stats */
     private void getJobStats(StringBuilder buf) { 
-        buf.append("<table border=\"1\">\n");
+        buf.append("<table>\n");
         buf.append("<tr><th>Job</th><th>Runs</th>");
         buf.append("<th>Time</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th>");
         buf.append("<th>Pending</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th></tr>\n");
@@ -734,6 +734,6 @@ public class JobQueue {
         buf.append("<td><i>").append(minPendingTime).append("</i></td>");
         buf.append("</tr>\n");
 	
-        buf.append("</table>\n");
+        buf.append("</table></div>\n");
     }
 }

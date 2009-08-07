@@ -26,9 +26,9 @@
 <jsp:getProperty name="linkhelper" property="content" />
 <% } else { %>
 <u><b>I2P Services</b></u><br />
-<a href="susimail/susimail" target="blank">Susimail</a> 
-<a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
-<a href="i2psnark/" target="_blank">Torrents</a> 
+<a href="susidns/index.jsp" target="_blank">Addressbook</a> 
+<a href="i2psnark/" target="_blank">Torrents</a>
+<a href="susimail/susimail" target="blank">Webmail</a>  
 <a href="http://127.0.0.1:7658/" target="_blank">Webserver</a><hr /> 
 <u><b>I2P Internals</b></u><br />
 <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 

@@ -65,7 +65,7 @@ div.toolbar a:visited {
 }
 
 div.toolbar a:hover, button:hover{
-     border: 1px solid #eeeeff;
+     border: 1px solid #f60;
      background: #003;
      color: #f60;
 }
@@ -89,7 +89,7 @@ div.routersummary {
      width: 175px;
      padding: 10px;
      text-align: center;
-     border: 1px solid #9999ff;
+     border: 1px solid #99f;
      background: #003;
      background: url(images/darkbluebg.png);
      color: #eef;
@@ -100,6 +100,28 @@ div.routersummary {
      border-radius: 4px;
      float: left;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+     -moz-box-shadow: inset 1px 1px 1px 0px #000;
+}
+
+div.routersummary hr {
+     color: #99f;
+     background: #99f;
+     height: 1px;
+     border-bottom: 1px outset #bbf;
+     margin: 5px -10px 4px -10px;
+}
+
+div.routersummary hr {
+     color: #bbf;
+     background: #bbf;
+     height: 2px;
+     border-bottom: 1px outset #bbf;
+     margin: 8px -10px 7px -10px;
+     -moz-box-shadow: inset 0px -4px 2px 1px #001;
 }
 
 div.warning {
@@ -254,14 +276,25 @@ table {
      background: #003;
 }
 
+table hr {
+     padding: 0px 0;
+     color: #99f;
+     background: #99f;
+     border: 0px solid #99f;
+     margin: 0px 0px;
+     height: 1px;
+     display: none;
+}
+
 th {
-     padding: 6px 3px;
+     padding: 6px 2px;
      color: #eef;
      text-align: center;
-     font-size: 8pt;
+     font-size: 9pt;
      background: #004 url('images/tabletitledark.png') repeat-x;
      border-top: 1px solid #99f;
-     border-bottom: 1px solid #99f;     
+     border-bottom: 1px solid #99f !important;     
+     line-height: 110%;
 }
 
 tr {
@@ -285,7 +318,7 @@ tr:last-child {
 }
 */
 td {
-     padding: 6px 4px;
+     padding: 6px 3px;
      color: #eef;
      vertical-align: middle;
      border-top: 1px inset #006;
@@ -391,7 +424,7 @@ h2 {
      color: #fff;
      text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.5);
      letter-spacing: 0.05em;
-     background: #003 url('images/darkbluebg.png');
+     background: #003 url('images/titletile.png');
      padding: 5px 10px 8px 10px;
      wordwrap: none;
      border: 1px solid #99f;
@@ -434,8 +467,9 @@ h4 {
      font-size: 11pt;
 }
 
-button {
-     border: 1px outset #ddddc0;
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px outset #77f;
      padding: 1px 3px;
      background: #bbf;
      text-decoration: none;
@@ -448,12 +482,23 @@ button {
      text-align: center;
      vertical-align: middle;
      min-width: 76px;
+     -moz-box-shadow: inset 0px 1px 1px 0px #55f;
+     background: #003;
+     color: #99f;
 }
 
+button:hover {
+     border: 1px solid #f60;
+     -moz-box-shadow: inset 0px 1px 1px 0px #eef;
+     background: #001;
+     color: #f60;
+}     
+          
 button:active {
      border: 1px inset #f60;
      background: #f60;
      color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 0px #f60;
 }
 
 .underline {
@@ -486,37 +531,70 @@ sidebarlogo {
 }
 
 input {
-     background: #bbf;
-     color: #002;
+     border: 1px outset #55f;
+     -moz-box-shadow: inset 0px 1px 1px 0px #55f;
+     background: #003;
+     color: #99f;
      margin: 5px;
-     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #99f;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
      text-decoration: none;
      min-width: 110px;
-     opacity: 0.8;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
 }
 
 input:hover {
-     background: #eef;
-     color: #001;
+     background: #001;
+     color: #f60;
      border: 1px solid #f60;
+     -moz-box-shadow: inset 0px 1px 1px 0px #eef;
 }
 
 input:active {
      background: #002;
+     color: #f30;
+     border: 1px solid #f30;
+}
+
+input:active {
+     border: 1px inset #f60;
+     background: #f60;
      color: #fff;
-     border: 1px solid #f60;
+}
+
+input[type=text] {
+     background: #002;
+     color: #eef;
+     margin: 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #bbf;
+     text-decoration: none;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 1px 1px 1px 0px #000;
+}
+
+input[type=text]:active, input[type=text]:hover {
+     background: #001;
+}
+
+fieldset {
+overflow: hidden;
+position: relative;
 }
 
 select {
      background: #002;
      color: #eef;
-     margin: 5px;
-     border: 1px solid #99f;
-     border-radius: 0;
-     -moz-border-radius: 0;
-     -khtml-border-radius: 0;
+     margin: 5px 10px;
+     border: 1px solid #bbf;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
      min-width: 110px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 2px;
@@ -526,13 +604,13 @@ textarea {
      background: #001;
      color: #eef;
      padding: 5px;
-     margin: 15px 15px 5px 0px;
+     margin: 10px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
-     min-width: 100%;
+     min-width: 97%;
      text-align: left;
      border: 1px solid #99f;
 }
@@ -596,4 +674,49 @@ form {}
 
 .mediumtags {
      font-size: 9pt;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+overflow: hidden;
+position: relative;
+}
+
+.optbox:hover {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.cells {
+     border: 1px inset #005;
+     border-left: 1px outset #002;     
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #004 url('images/tabletitledark.png') repeat-x !important;
+     border-top: 1px solid #99f;
+     border-bottom: 1px solid #99f !important;     
+     font-size: 7pt;
+     line-height: 110%;
+}
+
+.formaction {
+     text-align: right;
 }

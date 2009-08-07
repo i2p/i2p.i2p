@@ -19,7 +19,7 @@ img {
 
 pre {
      width: 98%;
-     overflow-x: scroll;
+     overflow: auto;
      text-align: left;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #333;
@@ -105,6 +105,19 @@ div.routersummary {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }
 
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
+div.routersummary hr {
+     color: #eef;
+     background: #eef;
+     height: 2px;
+     border-bottom: 1px solid #eef;
+     margin: 8px -10px 7px -10px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #001;
+}
+
 div.warning {
      margin: 5px 20px 10px 240px;
      padding: 0px 25px 20px 75px;
@@ -130,7 +143,6 @@ div.main {
      text-align: left;
      color: #001;
      width: auto;
-/*  overflow-x: scroll; */
 }
 
 div.main hr, hr {
@@ -227,6 +239,7 @@ div.configure {
      border-radius: 4px;
      border: 1px solid #000022;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     min-width: 400px;
 }
 
 div.graphspanel {
@@ -238,8 +251,8 @@ div.graphspanel {
      border-radius: 4px;
      border: 1px solid #000022;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center !important; 
 }
-
 
 div.graphspanel img {
      border: 1px solid #003;
@@ -248,7 +261,7 @@ div.graphspanel img {
      text-align: center !important;
      background: #001;
      -moz-box-shadow: inset 0px 0px 1px 1px #99f;
-     opacity: 0.9;
+     opacity: 0.8;
 }
 
 div.graphspanel img:hover {
@@ -259,6 +272,10 @@ div.graphspanel img:hover {
      background: #001;
      -moz-box-shadow: inset 0px 0px 2px 1px #f60;
      opacity: 1;
+}
+
+div.graphspanel form {
+     text-align: left;
 }
 
 div.messages {
@@ -299,6 +316,17 @@ table {
      cell-padding: 1px;
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     font: 7pt/130% "Lucida Sans Unicode", Verdana, Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+table hr {
+     padding: 0px 0;
+     color: #99f;
+     background: #99f;
+     border: 0px solid #99f;
+     margin: 0px 0px;
+     height: 1px;
+     display: none;
 }
 
 th {
@@ -307,8 +335,9 @@ th {
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      text-align: center;
      font-size: 9pt;
-     border-bottom: 1px solid #001;
-     border-top: 1px solid #001;
+     line-height: 110%;
+     border-bottom: 1px solid #001 !important;
+     border-top: 1px solid #001 !important;
 }
 
 tr {
@@ -331,7 +360,7 @@ tr:last-child {
 }
 */
 td {
-     padding: 5px;
+     padding: 5px 3px;
      color: #000;
      vertical-align: middle;
      border-top: 1px inset #001;
@@ -432,7 +461,7 @@ h2 {
      font-size: 12pt;
      color: #001;
      letter-spacing: 0.05em;
-     background: #ddf url('images/lightbluetile.png');
+     background: #ddf url('images/titletile.png');
      text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
      padding: 7px 10px;
      wordwrap: none;
@@ -473,10 +502,11 @@ h4 {
      font-size: 11pt;
 }
 
-button {
-     border: 1px outset #ddddc0;
+button, button:visited {
+     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px outset #999;
      padding: 1px 3px;
-     background: #bbf !important;
+     background: #ddf !important;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -486,18 +516,22 @@ button {
      margin: 0 1px;
      text-align: center;
      min-width: 80px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
 }
 
 button:hover{
      border: 1px solid #f60;
      background: #f60 !important;
      color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
 }
 
 button:active{
      border: 1px solid #f60;
      background: #001 !important;
      color: #f60;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .underline {
@@ -526,14 +560,33 @@ input {
      border: 1px solid #001;
      text-decoration: none;
      min-width: 110px;
-     opacity: 0.8;
 }
+
+input, input:visited {
+     border: 1px outset #999;
+     background: #ddf;
+     color: #001;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+     opacity: 0.9;
+}
+
 
 input:hover {
      background: #f60;
      color: #fff;
      border: 1px solid #f60;
-     opacity: 0.9;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+
 }
 
 input:active {
@@ -541,6 +594,17 @@ input:active {
      color: #f60;
      border: 1px solid #f60;
      opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+input[type=text] {
+     background: #eef;
+     color: #001;
+     margin: 5px 10px 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #001;
+     text-decoration: none;
 }
 
 submit {
@@ -566,11 +630,15 @@ select {
      border: 1px solid #001;
      min-width: 110px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: left !important;
 }
 
 textarea {
      padding: 5px;
-     margin: 15px 15px 5px 0px;
+     margin: 5px 15px 5px 10px;
      background: #eef;
      color: #003;
      border-radius: 4px;
@@ -578,7 +646,7 @@ textarea {
      -khtml-border-radius: 4px;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
-     min-width: 100%;
+     min-width: 97%;
      border: 1px solid #001;
 }
 
@@ -622,7 +690,7 @@ form {}
      -khtml-border-radius: 4px;
      text-align: justify;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
-     overflow-x: scroll;
+     overflow: auto;
  }
  
  div.joblog:li {
@@ -641,4 +709,53 @@ form {}
      font-size: 8pt;
      font-style: italic;
      font-weight: bold;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.optbox:hover {
+     min-width: 16px !important;
+     max-width: 16px !important;     
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;     
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 5px 5px 5px 10px;
+     padding: 2px;
+}
+
+.cells {
+     border-left: 1px outset #bbf;
+     border-top: 1px inset #99f !important;
+     border-bottom: 1px inset #99f !important;
+}
+
+.tablefooter {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     border-top: 1px solid #001;
+     border-bottom: 1px solid #001 !important;     
+     padding: 8px 2px !important;
+     font-size: 7pt;
+     line-height: 110%;
+}
+
+.formaction {
+     text-align: right;
 }

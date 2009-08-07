@@ -1,3 +1,18 @@
+2009-08-03 dr|z3d
+    * Extensive update to the Classic theme; custom css hacks for IE.
+
+2009-08-02 dr|z3d
+    * Better support for Internet Explorer/classic theme.
+    * Incremental improvements to classic theme.
+    * More UI tweaks and fiddles. 
+    * Fixes for I2PSnark UI; more to come.
+    
+2009-07-31 dr|z3d
+    * Resolve anomalous buttons and text fields in console ui. 
+    * Enhance presentation of data in /peers.jsp.
+    * Fix themes issue with horizontal width of radio/checkbox icons.
+    * Other cosmetic UI enhancements.
+
 * 2009-07-31  0.7.6 released
 
 2009-07-31 zzz

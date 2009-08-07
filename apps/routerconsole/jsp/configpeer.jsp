@@ -37,18 +37,19 @@
  <a name="unsh"> </a>
  <a name="bonus"> </a>
  <h2>Manual Peer Controls</h2>
- Router Hash:
- <input type="text" size="55" name="peer" value="<%=peer%>" />
+ <div class="mediumtags">Router Hash:
+ <input type="text" size="55" name="peer" value="<%=peer%>" /></div>
  <h3>Manually Shitlist / Unshitlist a Router</h3>
  Shitlisting will prevent the participation of this peer in tunnels you create. 
-      <p> 
+      <hr />      
+      <div class="formaction"> 
         <input type="submit" name="action" value="Shitlist peer until restart" />
         <input type="submit" name="action" value="Unshitlist peer" />
         <% if (! "".equals(peer)) { %>
-        <font color="blue">&lt;---- click to verify action</font> 
+        <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
-      </p>
-      <hr />
+      </div>
+
  <h3>Adjust Profile Bonuses</h3>
  Bonuses may be positive or negative, and affect the peer's inclusion in Fast 
       and High Capacity tiers. Fast peers are used for client tunnels, and High 
@@ -59,24 +60,24 @@
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
- %>
- Speed:
+ %> 
+ <hr />
+ <div class="mediumtags">Speed:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
  Capacity:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
- <input type="submit" name="action" value="Adjust peer bonuses" />
+ <input type="submit" name="action" value="Adjust peer bonuses" /></div>
  </p>
  </form>
-
- <hr />
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
  <hr />
+ <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 
-
+</div>
 </div>
 </div>
 </body>

@@ -711,7 +711,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
         out.write("Data directory: <input type=\"text\" size=\"40\" name=\"dataDir\" value=\"" + dataDir + "\" ");
         out.write("title=\"Directory to store torrents and data\" disabled=\"true\" /> <i>(Edit i2psnark.config and restart to change)</i><br />\n");
-        out.write("Auto start: <input type=\"checkbox\" name=\"autoStart\" value=\"true\" " 
+        out.write("Auto start: <input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
                   + "title=\"If true, automatically start torrents that are added\" />");
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
@@ -738,7 +738,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("Up bandwidth limit: <input type=\"text\" name=\"upBW\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Half <a href=\"/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br />\n");
         
-        out.write("Use open trackers also: <input type=\"checkbox\" name=\"useOpenTrackers\" value=\"true\" " 
+        out.write("Use open trackers also: <input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
                   + "title=\"If true, uses open trackers in addition\" /> ");
         out.write("Announce URLs: <input type=\"text\" name=\"openTrackers\" value=\""

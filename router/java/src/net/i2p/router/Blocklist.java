@@ -767,10 +767,10 @@ public class Blocklist {
             out.write("</table>");
         }
         if (_blocklistSize > 0) {
-            out.write("<table><tr><td align=center colspan=2><b>IPs from Blocklist File</b></td></tr><tr><td align=center><b>From</b></td><td align=center><b>To</b></td></tr>");
+            out.write("<table><tr><th align=center colspan=2><b>IPs from Blocklist File</b></th></tr><tr><td align=center width=50%><b>From:</b></td><td align=center width=50%><b>To:</b></td></tr>");
             for (int i = 0; i < _blocklistSize; i++) {
                  int from = getFrom(_blocklist[i]);
-                 out.write("<tr><td align=right>"); out.write(toStr(from)); out.write("</td><td align=right>");
+                 out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
                  int to = getTo(_blocklist[i]);
                  if (to != from) {
                      out.write(toStr(to)); out.write("</td></tr>\n");
@@ -779,7 +779,7 @@ public class Blocklist {
             }
             out.write("</table>");
         } else {
-            out.write("<br>No blocklist file entries");
+            out.write("<br><i>No blocklist file entries.</i>");
         }
         out.flush();
     }

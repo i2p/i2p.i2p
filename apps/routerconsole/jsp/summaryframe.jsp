@@ -62,7 +62,7 @@
     if (!shutdownSoon) {
         out.print("<hr /><p><form action=\"summaryframe.jsp\" method=\"GET\">\n");
         if ("0".equals(d)) {
-            out.print("<b>Refresh (s):<b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
+            out.print("<b>Refresh (s):<b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" align=\"right\" />\n");
             out.print("<button type=\"submit\">Enable</button>\n");
         } else {
             // this will load in the iframe but subsequent pages will not have the iframe
