@@ -1,15 +1,14 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <%
 /*
  * All links in the summary bar must have target="_top"
  * so they don't load in the iframe
  */
 %>
-
 <html><head>
+<%@include file="css.jsp" %>
 <title>Summary Bar</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <%
@@ -50,7 +49,6 @@
         }
     }
 %>
-<%@include file="css.jsp" %>
 </head>
 
 <body style="margin: 0;">
