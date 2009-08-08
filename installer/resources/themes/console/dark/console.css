@@ -89,7 +89,7 @@ div.routersummary {
      width: 175px;
      padding: 10px;
      text-align: center;
-     border: 1px solid #9999ff;
+     border: 1px solid #99f;
      background: #003;
      background: url(images/darkbluebg.png);
      color: #eef;
@@ -100,6 +100,28 @@ div.routersummary {
      border-radius: 4px;
      float: left;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
+}
+
+div.routersummary input[type=text] {
+     text-align: right !important;
+     -moz-box-shadow: inset 1px 1px 1px 0px #000;
+}
+
+div.routersummary hr {
+     color: #99f;
+     background: #99f;
+     height: 1px;
+     border-bottom: 1px outset #bbf;
+     margin: 5px -10px 4px -10px;
+}
+
+div.routersummary hr {
+     color: #bbf;
+     background: #bbf;
+     height: 2px;
+     border-bottom: 1px outset #bbf;
+     margin: 8px -10px 7px -10px;
+     -moz-box-shadow: inset 0px -4px 2px 1px #001;
 }
 
 div.warning {
@@ -254,6 +276,16 @@ table {
      background: #003;
 }
 
+table hr {
+     padding: 0px 0;
+     color: #99f;
+     background: #99f;
+     border: 0px solid #99f;
+     margin: 0px 0px;
+     height: 1px;
+     display: none;
+}
+
 th {
      padding: 6px 2px;
      color: #eef;
@@ -392,7 +424,7 @@ h2 {
      color: #fff;
      text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.5);
      letter-spacing: 0.05em;
-     background: #003 url('images/darkbluebg.png');
+     background: #003 url('images/titletile.png');
      padding: 5px 10px 8px 10px;
      wordwrap: none;
      border: 1px solid #99f;
@@ -435,9 +467,9 @@ h4 {
      font-size: 11pt;
 }
 
-button {
+button, button:visited {
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px outset #ddddc0;
+     border: 1px outset #77f;
      padding: 1px 3px;
      background: #bbf;
      text-decoration: none;
@@ -450,12 +482,23 @@ button {
      text-align: center;
      vertical-align: middle;
      min-width: 76px;
+     -moz-box-shadow: inset 0px 1px 1px 0px #55f;
+     background: #003;
+     color: #99f;
 }
 
+button:hover {
+     border: 1px solid #f60;
+     -moz-box-shadow: inset 0px 1px 1px 0px #eef;
+     background: #001;
+     color: #f60;
+}     
+          
 button:active {
      border: 1px inset #f60;
      background: #f60;
      color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 0px #f60;
 }
 
 .underline {
@@ -488,9 +531,10 @@ sidebarlogo {
 }
 
 input {
-     border: 1px outset #bbf;
-     background: #bbf;
-     color: #002;
+     border: 1px outset #55f;
+     -moz-box-shadow: inset 0px 1px 1px 0px #55f;
+     background: #003;
+     color: #99f;
      margin: 5px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
@@ -502,9 +546,10 @@ input {
 }
 
 input:hover {
-     background: #003;
+     background: #001;
      color: #f60;
      border: 1px solid #f60;
+     -moz-box-shadow: inset 0px 1px 1px 0px #eef;
 }
 
 input:active {
@@ -530,6 +575,7 @@ input[type=text] {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 1px 1px 1px 0px #000;
 }
 
 input[type=text]:active, input[type=text]:hover {

@@ -139,18 +139,8 @@ public class StatisticsManager implements Service {
             
             //includeRate("tunnel.buildRequestTime", stats, new long[] { 10*60*1000 });
             long rate = 60*60*1000;
-            boolean commentOutIn076 = RouterVersion.VERSION.equals("0.7.5");
-            if (commentOutIn076) {
-                includeRate("tunnel.buildClientExpire", stats, new long[] { rate });
-                includeRate("tunnel.buildClientReject", stats, new long[] { rate });
-                includeRate("tunnel.buildClientSuccess", stats, new long[] { rate });
-                includeRate("tunnel.buildExploratoryExpire", stats, new long[] { rate });
-                includeRate("tunnel.buildExploratoryReject", stats, new long[] { rate });
-                includeRate("tunnel.buildExploratorySuccess", stats, new long[] { rate });
-            } else {
-                includeTunnelRates("Client", stats, rate);
-                includeTunnelRates("Exploratory", stats, rate);
-            }
+            includeTunnelRates("Client", stats, rate);
+            includeTunnelRates("Exploratory", stats, rate);
             //includeRate("tunnel.rejectTimeout", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.rejectOverloaded", stats, new long[] { 10*60*1000 });
             //includeRate("tunnel.acceptLoad", stats, new long[] { 10*60*1000 });

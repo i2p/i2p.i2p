@@ -1,3 +1,41 @@
+2009-08-07 zzz
+    * build.xml:
+      - Try to automate the release process
+      - Take jetty back out of the updater after 4 releases
+    * Console:
+      - Add a custom error page
+      - Don't count ourselves in known peers
+      - Hide update button when shutting down
+      - Increase skew warning threshold to 3s (was 100ms)
+      - Remove UTC time from summary bar
+      - Truncate long dest names
+      - Try to reduce servlet problems on index page
+    * Core:
+      - Catch unzip fd leaks on error
+      - Move 2 test classes out of the lib
+    * Eepsite:
+      - Quote the jetty.xml path in clients.config,
+        and adjust the migration function, to fix the
+        eepsite-won't-start bug on windows
+    * HTTP Proxy:
+      - Restore the localhost error message
+      - Catch 127.0.0.1:xxxx addresses too
+    * I2PTunnel:
+      - Move the privkey files from the app dir to the
+        config dir, in preparation for splitting the two
+        dirs by default
+    * Ministreaming:
+      - Make getInt() static
+      - Move the big TestSwarm class out of the lib
+    * NetDb stats: Post-release cleanup
+    * PersistentKeyRing: Fix broken storage of keys in config file
+    * Router: Move the WorkingDir class from i2p.jar to router.jar
+    * Streaming: New option i2p.streaming.answerPings (default true)
+    * Timestamper: Don't start thread if not enabled
+    * Wrapper:
+      - Extend timeout to 20s (was 5s)
+      - Shorten ping interval to 5m (was 10m)
+
 2009-08-03 dr|z3d
     * Extensive update to the Classic theme; custom css hacks for IE.
 

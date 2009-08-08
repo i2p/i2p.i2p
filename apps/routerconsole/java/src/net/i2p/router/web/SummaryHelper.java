@@ -64,24 +64,15 @@ public class SummaryHelper extends HelperBase {
             return DataHelper.formatDuration(router.getUptime());
     }
     
-    private static final DateFormat _fmt = new java.text.SimpleDateFormat("HH:mm:ss", Locale.UK);
-    public String getTime() {
+    private String timeSkew() {
         if (_context == null) return "";
-        
-        String now = null;
-        synchronized (_fmt) {
-            now = _fmt.format(new Date(_context.clock().now()));
-        }
-        
-        if (!_context.clock().getUpdatedSuccessfully())
-            return now + " (Unknown skew)";
-        
+        //if (!_context.clock().getUpdatedSuccessfully())
+        //    return " (Unknown skew)";
         long ms = _context.clock().getOffset();
-        
         long diff = Math.abs(ms);
-        if (diff < 100)
-            return now;
-        return now + " (" + DataHelper.formatDuration(diff) + " skew)";
+        if (diff < 3000)
+            return "";
+        return " (" + DataHelper.formatDuration(diff) + " skew)";
     }
     
     public boolean allowReseed() {
@@ -90,9 +81,14 @@ public class SummaryHelper extends HelperBase {
                 Boolean.valueOf(_context.getProperty("i2p.alwaysAllowReseed")).booleanValue());
     }
     
-    public int getAllPeers() { return _context.netDb().getKnownRouters(); }
+    /** subtract one for ourselves, so if we know no other peers it displays zero */
+    public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
     
     public String getReachability() {
+        return reachability() + timeSkew();
+    }
+
+    private String reachability() {
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
             return "ERR-Client Manager I2CP Error - check logs";  // not a router problem but the user should know
@@ -354,7 +350,11 @@ public class SummaryHelper extends HelperBase {
             buf.append("<b>*</b> ");
             buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
-            buf.append(name).append("</a><br />\n");
+            if (name.length() < 16)
+                buf.append(name);
+            else
+                buf.append(name.substring(0,15)).append("&hellip;");
+            buf.append("</a><br />\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();

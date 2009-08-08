@@ -3,9 +3,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
+<%@include file="css.jsp" %>
 <title>I2P Router Console - home</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<%@include file="css.jsp" %>
 <link rel="shortcut icon" href="/themes/console/images/favicon.ico" />
 </head><body>
 <%

@@ -73,7 +73,7 @@ public class TunnelController implements Logging {
         
         File keyFile = new File(getPrivKeyFile());
         if (!keyFile.isAbsolute())
-            keyFile = new File(I2PAppContext.getGlobalContext().getAppDir(), getPrivKeyFile());
+            keyFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), getPrivKeyFile());
         if (keyFile.exists()) {
             //log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
             return;

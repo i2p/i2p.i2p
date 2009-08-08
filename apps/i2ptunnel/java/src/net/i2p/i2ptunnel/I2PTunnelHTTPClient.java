@@ -404,6 +404,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                         
                         line = method + " " + request.substring(pos);
+                    } else if (host.toLowerCase().equals("localhost") || host.equals("127.0.0.1")) {
+                        if (out != null) {
+                            out.write(ERR_LOCALHOST);
+                            out.write("<p /><i>Generated on: ".getBytes());
+                            out.write(new Date().toString().getBytes());
+                            out.write("</i></body></html>\n".getBytes());
+                            out.flush();
+                        }
+                        s.close();
+                        return;
                     } else if (host.indexOf(".") != -1) {
                         // rebuild host
                         host = host + ":" + port;
@@ -431,16 +441,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         usingWWWProxy = true;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(getPrefix(requestId) + "Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
-                    } else if (host.toLowerCase().startsWith("localhost:")) {
-                        if (out != null) {
-                            out.write(ERR_LOCALHOST);
-                            out.write("<p /><i>Generated on: ".getBytes());
-                            out.write(new Date().toString().getBytes());
-                            out.write("</i></body></html>\n".getBytes());
-                            out.flush();
-                        }
-                        s.close();
-                        return;
                     } else {
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");

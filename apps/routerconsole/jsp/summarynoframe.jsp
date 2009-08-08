@@ -26,9 +26,9 @@
 <jsp:getProperty name="linkhelper" property="content" />
 <% } else { %>
 <u><b>I2P Services</b></u><br />
-<a href="susimail/susimail" target="blank">Susimail</a> 
-<a href="susidns/index.jsp" target="_blank">SusiDNS</a> 
-<a href="i2psnark/" target="_blank">Torrents</a> 
+<a href="susidns/index.jsp" target="_blank">Addressbook</a> 
+<a href="i2psnark/" target="_blank">Torrents</a>
+<a href="susimail/susimail" target="blank">Webmail</a>  
 <a href="http://127.0.0.1:7658/" target="_blank">Webserver</a><hr /> 
 <u><b>I2P Internals</b></u><br />
 <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 
@@ -48,14 +48,16 @@
 <b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=." target="_top">view</a>)<br />
 <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
 <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
-<b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
 <b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a>
 <%
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
         out.print("<br />" + update.getStatus());
-        if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
-        } else if(!update.isDone()) {
+        if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress"))) {
+        } else if((!update.isDone()) &&
+                  request.getParameter("action") == null &&
+                  request.getParameter("updateNonce") == null &&
+                  net.i2p.router.web.ConfigRestartBean.getRestartTimeRemaining() > 12*60*1000) {
             long nonce = new java.util.Random().nextLong();
             String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);

@@ -401,7 +401,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if (i > 0)
             filename = filename.substring(0, i);
         if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH)
-            filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "...";
+            filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "&hellip;";
         long total = snark.meta.getTotalLength();
         // Early typecast, avoid possibly overflowing a temp integer
         long remaining = (long) snark.storage.needed() * (long) snark.meta.getPieceLength(0); 
@@ -453,7 +453,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 statusString = "<a title=\"" + err + "\">TrackerErr (" + curPeers + "/" + knownPeers + " peers)";
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
-                    err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "...";
+                    err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
                 statusString = "TrackerErr<br />(" + err + ")";
             }
         } else if (remaining <= 0) {

@@ -871,7 +871,7 @@ public class DataHelper {
     public static String formatDuration(long ms) {
         if (ms < 5 * 1000) {
             return ms + "ms";
-        } else if (ms < 5 * 60 * 1000) {
+        } else if (ms < 3 * 60 * 1000) {
             return (ms / 1000) + "s";
         } else if (ms < 120 * 60 * 1000) {
             return (ms / (60 * 1000)) + "m";

@@ -53,7 +53,7 @@ public class PersistentKeyRing extends KeyRing {
             if (key == null || key.length() != 44)
                 continue;
             String hb = prop.substring(PROP_PFX.length());
-            hb.replace("$", "=");
+            hb = hb.replace("$", "=");
             Hash dest = new Hash();
             SessionKey sk = new SessionKey();
             try {
@@ -71,7 +71,7 @@ public class PersistentKeyRing extends KeyRing {
         for (Entry<Hash, SessionKey> e : entrySet()) {
             buf.append("\n<tr><td>");
             Hash h = e.getKey();
-            buf.append(h.toBase64().substring(0, 6)).append("...");
+            buf.append(h.toBase64().substring(0, 6)).append("&hellip;");
             buf.append("<td>");
             LeaseSet ls = _ctx.netDb().lookupLeaseSetLocally(h);
             if (ls != null) {
@@ -81,13 +81,13 @@ public class PersistentKeyRing extends KeyRing {
                     if (in != null && in.getDestinationNickname() != null)
                         buf.append(in.getDestinationNickname());
                     else
-                        buf.append(dest.toBase64().substring(0, 6)).append("...");
+                        buf.append(dest.toBase64().substring(0, 6)).append("&hellip;");
                 } else {
                     String host = _ctx.namingService().reverseLookup(dest);
                     if (host != null)
                         buf.append(host);
                     else
-                        buf.append(dest.toBase64().substring(0, 6)).append("...");
+                        buf.append(dest.toBase64().substring(0, 6)).append("&hellip;");
                 }
             }
             buf.append("<td>");

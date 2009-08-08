@@ -129,7 +129,10 @@ public class PacketHandler {
     private void receiveKnownCon(Connection con, Packet packet) {
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
             if (packet.getSendStreamId() > 0) {
-                receivePing(packet);
+                if (con.getOptions().getAnswerPings())
+                    receivePing(packet);
+                else if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping Echo packet on existing con: " + packet);
             } else if (packet.getReceiveStreamId() > 0) {
                 receivePong(packet);
             } else {
@@ -230,7 +233,10 @@ public class PacketHandler {
     private void receiveUnknownCon(Packet packet, long sendId, boolean queueIfNoConn) {
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
             if (packet.getSendStreamId() > 0) {
-                receivePing(packet);
+                if (_manager.answerPings())
+                    receivePing(packet);
+                else if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping Echo packet on unknown con: " + packet);
             } else if (packet.getReceiveStreamId() > 0) {
                 receivePong(packet);
             } else {

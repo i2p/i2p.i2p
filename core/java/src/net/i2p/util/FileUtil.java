@@ -76,9 +76,10 @@ public class FileUtil {
     }
     
     public static boolean extractZip(File zipfile, File targetDir) {
+        ZipFile zip = null;
         try {
             byte buf[] = new byte[16*1024];
-            ZipFile zip = new ZipFile(zipfile);
+            zip = new ZipFile(zipfile);
             Enumeration entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
@@ -124,13 +125,16 @@ public class FileUtil {
                     }
                 }
             }
-            zip.close();
             return true;
         } catch (IOException ioe) {
             System.err.println("ERROR: Unable to extract the zip file");
             ioe.printStackTrace();
             return false;
-        } 
+        } finally {
+            if (zip != null) {
+                try { zip.close(); } catch (IOException ioe) {}
+            }
+        }
     }
     
     /**
