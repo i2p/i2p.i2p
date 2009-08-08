@@ -111,7 +111,7 @@ public class Blocklist {
             }
             for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash) iter.next();
-                String reason = "Blocklisted by router hash";
+                String reason = "Banned by router hash";
                 String comment = (String) _peerBlocklist.get(peer);
                 if (comment != null)
                     reason = reason + ": " + comment;
@@ -659,7 +659,7 @@ public class Blocklist {
      */
     public void shitlist(Hash peer) {
         // Temporary reason, until the job finishes
-        _context.shitlist().shitlistRouterForever(peer, "IP Blocklisted");
+        _context.shitlist().shitlistRouterForever(peer, "IP Banned");
         if (! "true".equals( _context.getProperty(PROP_BLOCKLIST_DETAIL, "true")))
             return;
         boolean shouldRunJob;
@@ -682,7 +682,7 @@ public class Blocklist {
             super(_context);
             _peer = p;
         }
-        public String getName() { return "Shitlist Peer Forever"; }
+        public String getName() { return "Ban Peer by IP"; }
         public void runJob() {
             shitlistForever(_peer);
             synchronized (_inProcess) {
@@ -735,7 +735,7 @@ public class Blocklist {
                             if (i != 3)
                                 reason = reason + '.';
                         }
-                        reason = reason + " blocklisted by entry \"" + buf + "\"";
+                        reason = reason + " banned by " + BLOCKLIST_FILE_DEFAULT + " entry \"" + buf + "\"";
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Shitlisting " + peer + " " + reason);
                         _context.shitlist().shitlistRouterForever(peer, reason);
@@ -755,7 +755,7 @@ public class Blocklist {
 
     /** write directly to the stream so we don't OOM on a huge list */
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h2>IP Blocklist</h2>");
+        out.write("<h2>Banned IPs</h2>");
         Set singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
         if (singles.size() > 0) {
