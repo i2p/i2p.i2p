@@ -341,32 +341,32 @@ public class SummaryHelper extends HelperBase {
         Collections.sort(clients, new AlphaComparator());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<u><b>Local destinations</b></u><br />");
+        buf.append("<h3>Local destinations</h3><hr><table>");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
             String name = getName(client);
             
-            buf.append("<b>*</b> ");
-            buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
+            buf.append("<tr><td align=\"right\"><b>*</b></td>");
+            buf.append("<td align=\"left\"><a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
             if (name.length() < 16)
                 buf.append(name);
             else
                 buf.append(name.substring(0,15)).append("&hellip;");
-            buf.append("</a><br />\n");
+            buf.append("</a></td></tr>\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                 if (timeToExpire < 0) {
-                    buf.append("<i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
-                    buf.append(" ago</i><br />\n");
+                    buf.append("<tr><td colspan=\"2\"><i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
+                    buf.append(" ago</i></td></tr>\n");
                 }
             } else {
-                buf.append("<i>No leases</i><br />\n");
+                buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>No leases</i></td></tr>\n");
             }
         }
-        // buf.append("<hr />\n");
+        // buf.append("</table><hr />\n");
         return buf.toString();
     }
     

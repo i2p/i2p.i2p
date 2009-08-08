@@ -1,14 +1,11 @@
 /* Optimised for less capable browers and system specifications */
 
 body {
-     margin: 0;
+     margin: 2px 0 0 2px;
      padding: 0;
      text-align: left;
      background: #bbf;
      color: #000;
-/*
-     font: 10pt/140% Verdana, Tahoma, Helvetica, sans-serif;
-*/
      font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
@@ -89,7 +86,7 @@ div.toolbar {
 
 div.routersummaryouter {
      float: left; 
-     width: 200px;
+     width: 205px;
      margin: 0;
      padding: 0;
      border: 0;
@@ -101,7 +98,7 @@ div.routersummary {
      width: 190px;
      color: inherit;
      margin: 0;
-     padding: 7px 0 0 0px;
+     padding: 7px 1px;
      text-align: center !important;
      border: 5px solid #bbf;
      font-size: 9pt;
@@ -110,13 +107,63 @@ div.routersummary {
      -moz-box-shadow: inset 0px 0px 0px 1px #99f;
 }
 
+div.routersummary input[type=text] {
+     text-align: right !important;
+}
+
 div.routersummary hr {
-     color: #bbf;
-     background: #bbf;
+     color: #eef;
+     background: #eef;
      height: 2px;
-     border-bottom: 1px inset #bbf;
-     margin: 5px 1px 4px 1px;
-     -moz-box-shadow: inset 0px -1px 0px 1px #99f;
+     border-bottom: 1px solid #eef;
+     margin: 8px 1px 7px 1px;
+     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
+}
+
+div.routersummary h3 {
+     border: 0px solid #f00;
+/*     border-bottom: 1px solid #99f !important;*/
+     font-size: 10pt;
+     letter-spacing: 0.05em;
+     margin: -7px 1px -7px 1px;
+     padding: 5px 0px 5px 0px;
+     background: #c5d5fb;
+     text-transform: uppercase;
+}
+
+div.routersummary h4 {
+     border: 0px solid #f00;
+     border-bottom: 0 !important;
+     font-size: 9pt;
+     letter-spacing: 0.05em;
+     margin: -7px 1px -7px 1px !important;
+     padding: 2px 3px 3px 3px;
+     background: #c1d1f7;
+     text-transform: capitalize;
+     text-decoration: none !important;
+     color: #2b2;
+}
+
+div.routersummary table {
+     border: 0;
+     text-align: center !important;
+     margin: -5px 5px;
+     width: 180px !important;
+     overflow: hidden;
+     font-size: 8pt;
+     padding: 0px -10px;
+     background-image: none !important;
+     background-color: transparent !important;
+}
+
+div.routersummary tr {
+     background-image: none !important;
+     background-color: transparent !important;
+     border: 0 !important;
+}
+
+div.routersummary form {
+     margin-top: 8px;
 }
 
 div.routersummary p {
@@ -132,33 +179,20 @@ div.routersummary a:hover {
      color: #f60;
 }
 
-div.routersummary input[type=text] {
-     text-align: right !important;
+div.routersummary td {
+     padding: 2px 4px;
+     background-image: none !important;
+     border: 0 !important;
 }
 
-div.warning {
-     margin: 20px 20px 10px 260px;
-     padding: 0px 20px 20px 75px;
-     background: #ffd;
-     border: 5px solid #fb7;
-     text-align: left;
-     color: inherit;
-     background-image:url("../images/errortriangle.png");
-     background-position: 17px center;
-     background-repeat:no-repeat;
-     -moz-border-radius: 15px;
-     -moz-box-shadow: inset 0px 0px 0px 2px #f60;
-     -kthml-border-radius: 15px;
-     -khtml-box-shadow: inset 0px 0px 0px 2px #f60;
+div.routersummary tr:nth-child(even) {
+     background-color: #f60;
+     background-image: none !important;
 }
 
-div.warning hr {
-     color: #fb7;
-     background: #fb7;
-     height: 5px;
-     border: 0px solid #fb7;
-     margin: 5px 0;
-     margin: 20px 0;
+div.routersummarytr:nth-child(odd) {
+     background-color: #f00;
+     background-image: none !important;
 }
 
 div.warning h3 {
@@ -167,7 +201,7 @@ div.warning h3 {
 }
 
 div.main {
-     margin: 0px 0px 0px 195px;
+     margin: 0px 0px 0px 196px;
      padding: 15px 15px 15px 15px;
      background: #eef;
      border: 5px solid #bbf;
@@ -193,7 +227,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: -5px 0px 0 195px;
+     margin: -5px 0px 0 196px;
      padding: -10px 15px 8px 15px;
      background: #ffffc0;
      border: 5px solid #bbf;
@@ -300,7 +334,7 @@ h1 {
      text-align: center;
      border: 5px solid #bbf;
      padding: 13px 10px 12px 10px;
-     margin: 0 0px 0 195px;
+     margin: 0 0px 0 196px;
      line-height: 93%;
      text-transform: uppercase;
      letter-spacing: 0.3em;

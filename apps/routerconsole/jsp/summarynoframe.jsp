@@ -15,8 +15,8 @@
 <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
 <jsp:setProperty name="uhelper" property="*" />
 <jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<center><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></center><hr />
-<center>
+<a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a><hr />
+
 <% java.io.File lpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");
     // you better have target="_top" for the links in there...
     if (lpath.exists()) { %>
@@ -25,12 +25,17 @@
 <jsp:setProperty name="linkhelper" property="maxLines" value="100" />
 <jsp:getProperty name="linkhelper" property="content" />
 <% } else { %>
-<u><b>I2P Services</b></u><br />
-<a href="susidns/index.jsp" target="_blank">Addressbook</a> 
+<h3>I2P Services</h3><hr>
+<table>
+<tr>
+<td><a href="susidns/index.jsp" target="_blank">Addressbook</a> 
 <a href="i2psnark/" target="_blank">Torrents</a>
 <a href="susimail/susimail" target="blank">Webmail</a>  
-<a href="http://127.0.0.1:7658/" target="_blank">Webserver</a><hr /> 
-<u><b>I2P Internals</b></u><br />
+<a href="http://127.0.0.1:7658/" target="_blank">Webserver</a></td>
+</tr></table><hr> 
+<h3>I2P Internals</h3><hr>
+<table><tr>
+<td>
 <a href="i2ptunnel/index.jsp" target="_blank">I2PTunnel</a> 
 <a href="tunnels.jsp" target="_top">Tunnels</a> 
 <a href="profiles.jsp" target="_top">Profiles</a> 
@@ -41,14 +46,24 @@
 <a href="oldstats.jsp" target="_top">Stats</a>
 <a href="config.jsp" target="_top">Configuration</a> 
 <a href="help.jsp" target="_top">Help</a></b>
+</td></tr></table>
 <% } %>
-</center>
-<hr />
-<u><b>General</b></u><br />
-<b>Ident:</b> (<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=." target="_top">view</a>)<br />
-<b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
-<b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
-<b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a>
+
+<hr>
+<h3>General</h3><hr>
+<h4>
+<a title="Your router identity is <jsp:getProperty name="helper" property="ident" />, never reveal it to anyone" href="netdb.jsp?r=." target="_top">Local Identity</a></h4>
+<hr>
+<table><tr>
+<td align="left">
+<b>Version:</b></td>
+<td align="right"><jsp:getProperty name="helper" property="version" /></td></tr>
+<tr>
+<td align="left">
+<b>Uptime:</b></td> 
+<td align="right"><jsp:getProperty name="helper" property="uptime" /></td></tr></table>
+<hr><h4><a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a></h4>
+<hr>
 <%
     if (helper.updateAvailable()) {
         // display all the time so we display the final failure message
@@ -63,24 +78,24 @@
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            out.print("<p><center><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
             out.print("<input type=\"hidden\" name=\"updateNonce\" value=\"" + nonce + "\" />\n");
-            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" /></form></center></p>\n");
+            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" /></form></p>\n");
         }
     }
 %>
-<p><center>
+<p>
 <%=net.i2p.router.web.ConfigRestartBean.renderStatus(request.getRequestURI(), request.getParameter("action"), request.getParameter("consoleNonce"))%>
-</center></p>
+</p>
 <hr />
-<u><b><a href="peers.jsp" target="_top">Peers</a></b></u><br />
-<b>Active:</b> <jsp:getProperty name="helper" property="activePeers" />/<jsp:getProperty name="helper" property="activeProfiles" /><br />
-<b>Fast:</b> <jsp:getProperty name="helper" property="fastPeers" /><br />
-<b>High capacity:</b> <jsp:getProperty name="helper" property="highCapacityPeers" /><br />
-<b>Well integrated:</b> <jsp:getProperty name="helper" property="wellIntegratedPeers" /><br />
-<b>Known:</b> <jsp:getProperty name="helper" property="allPeers" /><br /><%
+<h3><a href="peers.jsp" target="_top">Peers</a></h3><hr><table>
+<tr><td align="left"><b>Active:</b></td><td align="right"><jsp:getProperty name="helper" property="activePeers" />/<jsp:getProperty name="helper" property="activeProfiles" /></td></tr>
+<tr><td align="left"><b>Fast:</b></td><td align="right"><jsp:getProperty name="helper" property="fastPeers" /></td></tr>
+<tr><td align="left"><b>High capacity:</b></td><td align="right"><jsp:getProperty name="helper" property="highCapacityPeers" /></td></tr>
+<tr><td align="left"><b>Integrated:</b></td><td align="right"><jsp:getProperty name="helper" property="wellIntegratedPeers" /></td></tr>
+<tr><td align="left"><b>Known:</b></td><td align="right"><jsp:getProperty name="helper" property="allPeers" /></td></tr></table><hr><%
     if (helper.getActivePeers() <= 0) {
-        %><b><a href="config.jsp" target="_top">check your NAT/firewall</a></b><br /><%
+        %><h4><a href="config.jsp" target="_top">check your NAT/firewall</a></h4><%
     }
     // If showing the reseed link is allowed
     if (helper.allowReseed()) {
@@ -107,22 +122,25 @@
         }
     }
  %><hr />
-<u><b><a href="config.jsp" title="Configure the bandwidth limits" target="_top">Bandwidth in/out</a></b></u><br />
-<b>1s:</b> <jsp:getProperty name="helper" property="inboundSecondKBps" />/<jsp:getProperty name="helper" property="outboundSecondKBps" />KBps<br />
-<b>5m:</b> <jsp:getProperty name="helper" property="inboundFiveMinuteKBps" />/<jsp:getProperty name="helper" property="outboundFiveMinuteKBps" />KBps<br />
-<b>Total:</b> <jsp:getProperty name="helper" property="inboundLifetimeKBps" />/<jsp:getProperty name="helper" property="outboundLifetimeKBps" />KBps<br />
-<b>Used:</b> <jsp:getProperty name="helper" property="inboundTransferred" />/<jsp:getProperty name="helper" property="outboundTransferred" /><br />
+<h3><a href="config.jsp" title="Configure the bandwidth limits" target="_top">Bandwidth in/out</a></h3><hr>
+<table>
+<tr><td align="left"><b>1s:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundSecondKBps" />/<jsp:getProperty name="helper" property="outboundSecondKBps" />K/s</td></tr>
+<tr><td align="left"><b>5m:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundFiveMinuteKBps" />/<jsp:getProperty name="helper" property="outboundFiveMinuteKBps" />K/s</td></tr>
+<tr><td align="left"><b>Total:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundLifetimeKBps" />/<jsp:getProperty name="helper" property="outboundLifetimeKBps" />K/s</td></tr>
+<tr><td align="left"><b>Used:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundTransferred" />/<jsp:getProperty name="helper" property="outboundTransferred" /></td></tr></table>
 <hr />
-<u><b>Tunnels in/out</b></u><br />
-<b>Exploratory:</b> <jsp:getProperty name="helper" property="inboundTunnels" />/<jsp:getProperty name="helper" property="outboundTunnels" /><br />
-<b>Client:</b> <jsp:getProperty name="helper" property="inboundClientTunnels" />/<jsp:getProperty name="helper" property="outboundClientTunnels" /><br />
-<b>Participating:</b> <jsp:getProperty name="helper" property="participatingTunnels" /><br />
-<hr />
-<u><b>Congestion</b></u><br />
-<b>Job lag:</b> <jsp:getProperty name="helper" property="jobLag" /><br />
-<b>Message delay:</b> <jsp:getProperty name="helper" property="messageDelay" /><br />
-<b>Tunnel lag:</b> <jsp:getProperty name="helper" property="tunnelLag" /><br />
-<b>Handle backlog:</b> <jsp:getProperty name="helper" property="inboundBacklog" /><br />
-<b><jsp:getProperty name="helper" property="tunnelStatus" /></b><br />
-<hr />
+<h3>Tunnels in/out</h3><hr>
+<table><tr>
+<td align="left"><b>Exploratory:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundTunnels" />/<jsp:getProperty name="helper" property="outboundTunnels" /></td></tr>
+<tr><td align="left"><b>Client:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundClientTunnels" />/<jsp:getProperty name="helper" property="outboundClientTunnels" /></td></tr>
+<tr><td align="left"><b>Participating:</b></td><td align="right"><jsp:getProperty name="helper" property="participatingTunnels" /></td></tr></table>
+<hr>
+<h3>Congestion</h3><hr>
+<table><tr>
+<td align="left"><b>Job lag:</b></td><td align="right"><jsp:getProperty name="helper" property="jobLag" /></td></tr>
+<tr><td align="left"><b>Message delay:</b></td><td align="right"><jsp:getProperty name="helper" property="messageDelay" /></td></tr>
+<tr><td align="left"><b>Tunnel lag:</b></td><td align="right"><jsp:getProperty name="helper" property="tunnelLag" /></td></tr>
+<tr><td align="left"><b>Backlog:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundBacklog" /></td></tr><table>
+<hr><h4><jsp:getProperty name="helper" property="tunnelStatus" /></h4>
+<hr>
 <jsp:getProperty name="helper" property="destinations" />

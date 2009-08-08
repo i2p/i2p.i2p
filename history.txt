@@ -1,3 +1,13 @@
+2009-08-07 dr|z3d
+    * summarynoframe.jsp
+      - Main content now tabulated for better presentation
+      - Headings now more prominent
+      - Pruning where necessary of text strings
+    * Console themes (light/dark/classic)
+      - Ensure functionality with new sidepanel layout
+      - Custom hacks for IE/classic
+      - Enhanced form/button presentation    
+
 2009-08-07 zzz
     * build.xml:
       - Try to automate the release process

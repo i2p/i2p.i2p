@@ -69,7 +69,7 @@
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" />\n");
             out.print("<button type=\"submit\">Disable " + d + "s Refresh</button>\n");
         }
-        out.print("</form></p>\n");
+        out.print("</form></p><hr />\n");
     }
 %>
 </div>
