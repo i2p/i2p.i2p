@@ -359,14 +359,14 @@ public class SummaryHelper extends HelperBase {
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                 if (timeToExpire < 0) {
-                    buf.append("<tr><td colspan=\"2\"><i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
+                    buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
                     buf.append(" ago</i></td></tr>\n");
                 }
             } else {
                 buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>No leases</i></td></tr>\n");
             }
         }
-        // buf.append("</table><hr />\n");
+        buf.append("</table><hr />\n");
         return buf.toString();
     }
     
