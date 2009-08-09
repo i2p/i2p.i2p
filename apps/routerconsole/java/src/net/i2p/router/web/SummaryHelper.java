@@ -347,7 +347,7 @@ public class SummaryHelper extends HelperBase {
             Destination client = (Destination)iter.next();
             String name = getName(client);
             
-            buf.append("<tr><td align=\"right\"><b>*</b></td>");
+            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/server.png\" alt=\"Server\" title=\"hello zzz!\"></td>");
             buf.append("<td align=\"left\"><a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
             if (name.length() < 16)
