@@ -6,7 +6,6 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
-import net.i2p.router.admin.AdminManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.Calculator;
@@ -35,7 +34,6 @@ import net.i2p.util.KeyRing;
  */
 public class RouterContext extends I2PAppContext {
     private Router _router;
-    private AdminManager _adminManager;
     private ClientManagerFacade _clientManagerFacade;
     private ClientMessagePool _clientMessagePool;
     private JobQueue _jobQueue;
@@ -91,7 +89,6 @@ public class RouterContext extends I2PAppContext {
         return envProps;
     }
     public void initAll() {
-        //_adminManager = new AdminManager(this);
         if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
             _clientManagerFacade = new ClientManagerFacadeImpl(this);
         else
@@ -149,11 +146,6 @@ public class RouterContext extends I2PAppContext {
     /** convenience method for querying the router's ident */
     public Hash routerHash() { return _router.getRouterInfo().getIdentity().getHash(); }
 
-    /**
-     * Controls a basic admin interface
-     *
-     */
-    public AdminManager adminManager() { return _adminManager; }
     /**
      * How are we coordinating clients for the router?
      */
