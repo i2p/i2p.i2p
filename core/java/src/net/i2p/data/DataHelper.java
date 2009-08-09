@@ -212,6 +212,11 @@ public class DataHelper {
     /**
      * A more efficient Properties.load
      *
+     * Some of the other differences:
+     * - This does not process or drop backslashes
+     * - '#' or ';' starts a comment line, but '!' does not
+     * - Leading whitespace is not trimmed
+     * - '=' is the only key-termination character (not ':' or whitespace)
      */
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);
