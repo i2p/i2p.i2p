@@ -30,11 +30,12 @@ public class UpdateHandler {
     protected static UpdateRunner _updateRunner;
     protected RouterContext _context;
     protected Log _log;
-    protected DecimalFormat _pct = new DecimalFormat("00.0%");
     protected String _updateFile;
+    private String _action;
     
     protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
     protected static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
+    protected static final String PROP_LAST_UPDATE_TIME = "router.updateLastDownloaded";
 
     public UpdateHandler() {
         this(ContextHelper.getContext(null));
@@ -48,7 +49,7 @@ public class UpdateHandler {
     /**
      * Configure this bean to query a particular router context
      *
-     * @param contextId begging few characters of the routerHash, or null to pick
+     * @param contextId beginning few characters of the routerHash, or null to pick
      *                  the first one we come across.
      */
     public void setContextId(String contextId) {
@@ -60,18 +61,25 @@ public class UpdateHandler {
         }
     }
     
+    public void setUpdateAction(String val) { _action = val; }
     
     public void setUpdateNonce(String nonce) { 
         if (nonce == null) return;
         if (nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.nonce")) ||
             nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.noncePrev"))) {
-            update();
+            if (_action != null && _action.contains("Unsigned")) {
+                // Not us, have NewsFetcher instantiate the correct class.
+                NewsFetcher fetcher = NewsFetcher.getInstance(_context);
+                fetcher.fetchUnsigned();
+            } else {
+                update();
+            }
         }
     }
 
     public void update() {
         // don't block waiting for the other one to finish
-        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS, "false"))) {
+        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
             _log.error("Update already running");
             return;
         }
@@ -106,6 +114,9 @@ public class UpdateHandler {
         protected boolean _isRunning;
         protected boolean done;
         protected String _status;
+        protected EepGet _get;
+        private final DecimalFormat _pct = new DecimalFormat("0.0%");
+
         public UpdateRunner() { 
             _isRunning = false;
             this.done = false;
@@ -129,22 +140,15 @@ public class UpdateHandler {
                 _log.debug("Selected update URL: " + updateURL);
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-            String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
-            int proxyPort = -1;
+            int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
             try {
-                proxyPort = Integer.parseInt(port);
-            } catch (NumberFormatException nfe) {
-                return;
-            }
-            try {
-                EepGet get = null;
                 if (shouldProxy)
                     // 40 retries!!
-                    get = new EepGet(_context, proxyHost, proxyPort, 40, SIGNED_UPDATE_FILE, updateURL, false);
+                    _get = new EepGet(_context, proxyHost, proxyPort, 40, _updateFile, updateURL, false);
                 else
-                    get = new EepGet(_context, 1, _updateFile, updateURL, false);
-                get.addStatusListener(UpdateRunner.this);
-                get.fetch();
+                    _get = new EepGet(_context, 1, _updateFile, updateURL, false);
+                _get.addStatusListener(UpdateRunner.this);
+                _get.fetch();
             } catch (Throwable t) {
                 _context.logManager().getLog(UpdateHandler.class).error("Error updating", t);
             }
@@ -177,6 +181,15 @@ public class UpdateHandler {
             if (err == null) {
                 String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
                 this.done = true;
+                // So unsigned update handler doesn't overwrite unless newer.
+                String lastmod = _get.getLastModified();
+                long modtime = 0;
+                if (lastmod != null)
+                    modtime = NewsFetcher.parse822Date(lastmod);
+                if (modtime <= 0)
+                    modtime = _context.clock().now();
+                _context.router().setConfigSetting(PROP_LAST_UPDATE_TIME, "" + modtime);
+                _context.router().saveConfig();
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
                     _status = "<b>Update verified</b><br />Restarting";
@@ -208,7 +221,7 @@ public class UpdateHandler {
         public void attempting(String url) {}
     }
     
-    private void restart() {
+    protected void restart() {
         _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }

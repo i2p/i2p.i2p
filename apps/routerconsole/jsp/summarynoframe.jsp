@@ -12,9 +12,6 @@
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
 <jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="uhelper" scope="request" />
-<jsp:setProperty name="uhelper" property="*" />
-<jsp:setProperty name="uhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <center><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></center><hr />
 <center>
 <% java.io.File lpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");
@@ -50,7 +47,7 @@
 <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
 <b>Reachability:</b> <a href="config.jsp#help" target="_top"><jsp:getProperty name="helper" property="reachability" /></a>
 <%
-    if (helper.updateAvailable()) {
+    if (helper.updateAvailable() || helper.unsignedUpdateAvailable()) {
         // display all the time so we display the final failure message
         out.print("<br />" + update.getStatus());
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress"))) {
@@ -65,7 +62,11 @@
             String uri = request.getRequestURI();
             out.print("<p><center><form action=\"" + uri + "\" method=\"GET\">\n");
             out.print("<input type=\"hidden\" name=\"updateNonce\" value=\"" + nonce + "\" />\n");
-            out.print("<input type=\"submit\" value=\"Download " + uhelper.getUpdateVersion() + " Update\" /></form></center></p>\n");
+            if (helper.updateAvailable())
+                out.print("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >Download " + helper.getUpdateVersion() + " Update</button>\n");
+            if (helper.unsignedUpdateAvailable())
+                out.print("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >Download Unsigned<br />" + helper.getUnsignedUpdateVersion() + " Update</button>\n");
+            out.print("</form></center></p>\n");
         }
     }
 %>

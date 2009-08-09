@@ -64,6 +64,12 @@
           <td class= "mediumtags" align="right"><b>Trusted keys:</b> 
           <td><textarea name="trustedKeys" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea> 
         <tr>
+          <td class= "mediumtags" align="right"><b>Update with unsigned development builds?</b> 
+          <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /> 
+        <tr>
+          <td class= "mediumtags" align="right"><b>Unsigned Build URL:</b></td>
+          <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td>
+        <tr>
           <td>
           <td><div class="formaction"> 
               <input type="submit" name="action" value="Save" />
