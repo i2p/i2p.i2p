@@ -10,7 +10,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
 import org.bouncycastle.crypto.digests.MD5Digest;
-import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.Mac;
+import org.bouncycastle.crypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-MD5 of a key+message.  All the good stuff occurs
@@ -49,7 +50,7 @@ public class HMACGenerator {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        HMac mac = acquire();
+        I2PHMac mac = acquire();
         mac.init(key.getData());
         mac.update(data, offset, length);
         //byte rv[] = new byte[Hash.HASH_LENGTH];
@@ -73,7 +74,7 @@ public class HMACGenerator {
         if ((key == null) || (key.getData() == null) || (curData == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        HMac mac = acquire();
+        I2PHMac mac = acquire();
         mac.init(key.getData());
         mac.update(curData, curOffset, curLength);
         byte rv[] = acquireTmp();
@@ -86,17 +87,17 @@ public class HMACGenerator {
         return eq;
     }
     
-    protected HMac acquire() {
+    protected I2PHMac acquire() {
         synchronized (_available) {
             if (_available.size() > 0)
-                return (HMac)_available.remove(0);
+                return (I2PHMac)_available.remove(0);
         }
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
-        return new HMac(new MD5Digest(), 32);
+        return new I2PHMac(new MD5Digest(), 32);
     }
-    private void release(HMac mac) {
+    private void release(Mac mac) {
         synchronized (_available) {
             if (_available.size() < 64)
                 _available.add(mac);
