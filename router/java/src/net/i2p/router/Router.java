@@ -771,14 +771,15 @@ public class Router {
         out.flush();
     }
     
-    private static int MAX_MSG_LENGTH = 120;
+    //private static int MAX_MSG_LENGTH = 120;
     private static final void appendLogMessage(StringBuilder buf, String msg) {
         // disable this code for the moment because i think it
         // looks ugly (on the router console)
-        if (true) {
+        //if (true) {
             buf.append(msg);
             return;
-        }
+        //}
+/******
         if (msg.length() < MAX_MSG_LENGTH) {
             buf.append(msg);
             return;
@@ -810,9 +811,11 @@ public class Router {
             newline = msg.indexOf('\n');
             len = msg.length();
         }
+******/
     }
     
     /** main-ish method for testing appendLogMessage */
+/******
     private static final void testAppendLog() {
         StringBuilder buf = new StringBuilder(1024);
         Router.appendLogMessage(buf, "hi\nhow are you\nh0h0h0");
@@ -846,6 +849,7 @@ public class Router {
         System.out.println("line: [" + buf.toString() + "]");
         buf.setLength(0);
     }
+******/
     
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
