@@ -121,7 +121,9 @@ public class StatisticsManager implements Service {
             //includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
             //includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
             //includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.participatingTunnels", stats, new long[] { 60*60*1000 });
+            // total event count can be used to track uptime
+            boolean hideTotals = ! RouterVersion.VERSION.equals("0.7.6");
+            includeRate("tunnel.participatingTunnels", stats, new long[] { 60*60*1000 }, hideTotals);
             //includeRate("tunnel.testSuccessTime", stats, new long[] { 10*60*1000l });
             //includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
             //includeRate("udp.sendConfirmTime", stats, new long[] { 10*60*1000 });

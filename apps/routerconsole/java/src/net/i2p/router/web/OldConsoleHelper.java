@@ -6,7 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import net.i2p.router.RouterContext;
-import net.i2p.router.admin.StatsGenerator;
 
 public class OldConsoleHelper extends HelperBase {
     public OldConsoleHelper() {}

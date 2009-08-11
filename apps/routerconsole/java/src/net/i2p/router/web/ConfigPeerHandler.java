@@ -20,22 +20,22 @@ public class ConfigPeerHandler extends FormHandler {
         if ("Save Configuration".equals(_action)) {
             _context.router().saveConfig();
             addFormNotice("Settings saved - not really!!!!!");
-        } else if (_action.startsWith("Shitlist")) {
+        } else if (_action.startsWith("Ban")) {
             Hash h = getHash();
             if (h != null) {
-                _context.shitlist().shitlistRouterForever(h, "Manually shitlisted via <a href=\"configpeer.jsp\">configpeer.jsp</a>");
-                addFormNotice("Peer " + _peer + " shitlisted forever");
+                _context.shitlist().shitlistRouterForever(h, "Manually banned via <a href=\"configpeer.jsp\">configpeer.jsp</a>");
+                addFormNotice("Peer " + _peer + " banned until restart");
                 return;
             }
             addFormError("Invalid peer");
-        } else if (_action.startsWith("Unshitlist")) {
+        } else if (_action.startsWith("Unban")) {
             Hash h = getHash();
             if (h != null) {
                 if (_context.shitlist().isShitlisted(h)) {
                     _context.shitlist().unshitlistRouter(h);
-                    addFormNotice("Peer " + _peer + " unshitlisted");
+                    addFormNotice("Peer " + _peer + " unbanned");
                 } else
-                    addFormNotice("Peer " + _peer + " is not currently shitlisted");
+                    addFormNotice("Peer " + _peer + " is not currently banned");
                 return;
             }
             addFormError("Invalid peer");

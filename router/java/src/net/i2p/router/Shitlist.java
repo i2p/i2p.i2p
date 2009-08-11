@@ -65,7 +65,7 @@ public class Shitlist {
             _toUnshitlist = new ArrayList(4);
             getTiming().setStartAfter(ctx.clock().now() + SHITLIST_CLEANER_START_DELAY);
         }
-        public String getName() { return "Cleanup shitlist"; }
+        public String getName() { return "Expire banned peers"; }
         public void runJob() {
             _toUnshitlist.clear();
             long now = getContext().clock().now();
@@ -253,7 +253,7 @@ public class Shitlist {
 
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h2>Shitlist</h2>");
+        buf.append("<h2>Banned Peers</h2>");
         Map<Hash, Entry> entries = new TreeMap(new HashComparator());
         
         entries.putAll(_entries);
@@ -273,7 +273,7 @@ public class Shitlist {
                 buf.append("<br />\n");
                 buf.append(entry.cause);
             }
-            buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64()).append("#unsh\">unshitlist now</a>)");
+            buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64()).append("#unsh\">unban now</a>)");
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");

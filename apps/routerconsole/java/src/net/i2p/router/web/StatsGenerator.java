@@ -1,4 +1,4 @@
-package net.i2p.router.admin;
+package net.i2p.router.web;
 
 import java.io.IOException;
 import java.io.Writer;

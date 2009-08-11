@@ -17,6 +17,10 @@ import java.util.Properties;
 /**
  * Simple config file handler.
  * 
+ * Warning - browser needs double quotes and double backslashes on Windows
+ * e.g.
+ * browser="C:\\Program Files\\Mozilla Firefox\\firefox.exe"
+ *
  * @author hypercubus
  */
 public class ConfigFile {

@@ -39,12 +39,12 @@
  <h2>Manual Peer Controls</h2>
  <div class="mediumtags">Router Hash:
  <input type="text" size="55" name="peer" value="<%=peer%>" /></div>
- <h3>Manually Shitlist / Unshitlist a Router</h3>
+ <h3>Manually Ban / Unban a Peer</h3>
  Shitlisting will prevent the participation of this peer in tunnels you create. 
       <hr />      
       <div class="formaction"> 
-        <input type="submit" name="action" value="Shitlist peer until restart" />
-        <input type="submit" name="action" value="Unshitlist peer" />
+        <input type="submit" name="action" value="Ban peer until restart" />
+        <input type="submit" name="action" value="Unban peer" />
         <% if (! "".equals(peer)) { %>
         <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
