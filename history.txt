@@ -1,3 +1,9 @@
+2009-08-11 dr|z3d
+    * Extensive sidepanel overhaul
+      - Ensure all sidepanel headings link to pertinent pages
+      - First stage of enhanced Local Destinations sub-panel presentation
+      - Move Configuration, Help, and I2PTunnel manager links to headings
+
 2009-08-07 dr|z3d
     * summarynoframe.jsp
       - Main content now tabulated for better presentation
