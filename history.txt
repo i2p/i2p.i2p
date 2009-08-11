@@ -3,6 +3,7 @@
       - Ensure all sidepanel headings link to pertinent pages
       - First stage of enhanced Local Destinations sub-panel presentation
       - Move Configuration, Help, and I2PTunnel manager links to headings
+      - Add tooltips to all linked content; table content next in line
 
 2009-08-07 dr|z3d
     * summarynoframe.jsp

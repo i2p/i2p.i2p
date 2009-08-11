@@ -60,6 +60,22 @@ div.logo a:hover {
      color: #900;
 }
 
+div.warning {
+     margin: 20px 20px 10px 260px;
+     padding: 0px 20px 20px 75px;
+     background: #ffd;
+     border: 5px solid #fb7;
+     text-align: left;
+     color: inherit;
+     background-image:url("../images/errortriangle.png");
+     background-position: 17px center;
+     background-repeat:no-repeat;
+     -moz-border-radius: 15px;
+     -moz-box-shadow: inset 0px 0px 0px 2px #f60;
+     -kthml-border-radius: 15px;
+     -khtml-box-shadow: inset 0px 0px 0px 2px #f60;
+}
+
 div.warning a:link {
      color: #f60;
      text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.5);
@@ -76,6 +92,14 @@ div.warning a:hover{
 
 div.warning a:active{
      color: #900;
+}
+
+div.warning hr {
+     color: #fb7;
+     background: #fb7;
+     height: 5px;
+     border: 0px solid #fb7;
+     margin: 5px 0;
 }
 
 div.toolbar {
