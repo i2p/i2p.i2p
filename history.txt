@@ -1,3 +1,35 @@
+2009-08-11 zzz
+    * Android:
+      - Merge in the branch
+      - Build instructions in the android/ dir
+      - Rename HMac to I2PHMac to avoid android lib conflicts
+      - Configurable number of PRNG buffers in AsyncFortunaStandalone
+        (router.prng.buffers=16) to control memory use - these
+        are 256KB each.
+      - Configurable size of the DecayingBloomFilters
+        (router.decayingBloomFilterM=23) to control memory use - there
+        are 4 pairs of these (8 total), each 2**(M-3) bytes,
+        or 8MB total for M=23.
+      - There's at least two unsolved fatal problems:
+        1) Most of the routerinfo signature verifications fail,
+           including our own
+        2) It randomly dies after a while
+    * Console:
+      - Rename the shitlist and the blocklist
+      - Try to reduce servlet problems on iframe
+      - Select server or client icon for local dests
+    * EepHead: New
+    * Move StatsGenerator from router to routerconsole
+    * Move the unused AdminManager from router to the apps directory
+    * NetDb stats: Hide part. tunnel total events, effective next release
+    * Router: Comment out dead oldconsole code
+    * Updater:
+      - Add new unsigned update option, triggered by
+        last-modified date, using the new EepHead.
+        Buttons still are not hidden after download complete.
+      - Make the .sud updater use the temp dir when proxied
+      - Several cleanups
+
 2009-08-11 dr|z3d
     * Extensive sidepanel overhaul
       - Ensure all sidepanel headings link to pertinent pages

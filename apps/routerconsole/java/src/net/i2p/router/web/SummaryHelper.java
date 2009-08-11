@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
@@ -346,23 +347,32 @@ public class SummaryHelper extends HelperBase {
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
             String name = getName(client);
+            Hash h = client.calculateHash();
             
-            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/server.png\" alt=\"Server\" title=\"Server/client\"></td>");
-            buf.append("<td align=\"left\"><a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
+            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/");
+            if (_context.clientManager().shouldPublishLeaseSet(h))
+                buf.append("server.png\" alt=\"Server\" title=\"Server\" />");
+            else
+                buf.append("client.png\" alt=\"Client\" title=\"Client\" />");
+            buf.append("</td><td align=\"left\"><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
             if (name.length() < 16)
                 buf.append(name);
             else
                 buf.append(name.substring(0,15)).append("&hellip;");
             buf.append("</a></td><td align=\right\"><img src=\"/themes/console/images/local_up.png\" alt=\"status\" title=\"status\"></td></tr>\n");
-            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
+            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                 if (timeToExpire < 0) {
+                    // red or yellow light
                     buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
                     buf.append(" ago</i></td></tr>\n");
+                } else {
+                    // green light
                 }
             } else {
+                // yellow light
                 buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>No leases</i></td></tr>\n");
             }
         }
