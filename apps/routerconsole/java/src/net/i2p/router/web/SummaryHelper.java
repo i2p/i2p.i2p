@@ -360,23 +360,24 @@ public class SummaryHelper extends HelperBase {
                 buf.append(name);
             else
                 buf.append(name.substring(0,15)).append("&hellip;");
-            buf.append("</a></td><td align=\right\"><img src=\"/themes/console/images/local_up.png\" alt=\"status\" title=\"status\"></td></tr>\n");
+            buf.append("</a></td>\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                 if (timeToExpire < 0) {
-                    // red or yellow light
-                    buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
-                    buf.append(" ago</i></td></tr>\n");
-                } else {
-                    // green light
+                    // red or yellow light                 
+                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Rebuilding&hellip;\" title=\"Leases expired ").append(DataHelper.formatDuration(0-timeToExpire));
+                    buf.append(" ago. Rebuilding..\"></td></tr>\n");                    
+            } else {
+                    // green light 
+                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"Ready\"></td></tr>\n");
                 }
             } else {
                 // yellow light
-                buf.append("<tr><td>&nbsp;</td><td align=\"left\"><i>No leases</i></td></tr>\n");
+                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Building&hellip;\" title=\"Tunnel building in progress&hellip;\"></td></tr>\n");
             }
         }
-        buf.append("</table><hr />\n");
+        buf.append("</table><hr>\n");
         return buf.toString();
     }
     

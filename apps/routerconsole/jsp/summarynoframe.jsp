@@ -21,7 +21,7 @@
 <jsp:setProperty name="linkhelper" property="maxLines" value="100" />
 <jsp:getProperty name="linkhelper" property="content" />
 <% } else { %>
-<h3><a href="/configclients.jsp" target="_blank" title="Configure startup of clients and webapps (services); manually start dormant services.">I2P Services</a></h3><hr>
+<h3><a href="/configclients.jsp" target="_top" title="Configure startup of clients and webapps (services); manually start dormant services.">I2P Services</a></h3><hr>
 <table>
 <tr>
 <td><a href="susidns/index.jsp" target="_blank" title="Manage your I2P hosts file here (I2P domain name resolution).">Addressbook</a> 
