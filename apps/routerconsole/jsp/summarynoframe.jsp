@@ -12,8 +12,7 @@
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
 <jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<center><a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a></center><hr />
-<center>
+<a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a><hr />
 <% java.io.File lpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");
     // you better have target="_top" for the links in there...
     if (lpath.exists()) { %>
@@ -79,7 +78,7 @@
                 out.print("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >Download " + helper.getUpdateVersion() + " Update</button>\n");
             if (helper.unsignedUpdateAvailable())
                 out.print("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >Download Unsigned<br />" + helper.getUnsignedUpdateVersion() + " Update</button>\n");
-            out.print("</form></center></p>\n");
+            out.print("</form></p>\n");
         }
     }
 %>
