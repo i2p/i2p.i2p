@@ -81,6 +81,7 @@ public class TrackerClient extends I2PAppThread
     started = false;
   }
 
+    @Override
   public void start() {
       if (stop) throw new RuntimeException("Dont rerun me, create a copy");
       super.start();
@@ -109,6 +110,7 @@ public class TrackerClient extends I2PAppThread
     return !stop && _util.connected();
   }
   
+    @Override
   public void run()
   {
     String infoHash = urlencode(meta.getInfoHash());
@@ -162,7 +164,7 @@ public class TrackerClient extends I2PAppThread
     try
       {
         if (!verifyConnected()) return;
-        boolean started = false;
+        boolean runStarted = false;
         boolean firstTime = true;
         int consecutiveFails = 0;
         Random r = new Random();
@@ -178,7 +180,7 @@ public class TrackerClient extends I2PAppThread
                 if (firstTime) {
                   delay = r.nextInt(30*1000);
                   firstTime = false;
-                } else if (completed && started)
+                } else if (completed && runStarted)
                   delay = 3*SLEEP*60*1000 + random;
                 else if (coordinator.trackerProblems != null && ++consecutiveFails < MAX_CONSEC_FAILS)
                   delay = INITIAL_SLEEP;
@@ -221,7 +223,7 @@ public class TrackerClient extends I2PAppThread
               Tracker tr = (Tracker)iter.next();
               if ((!stop) && (!tr.stop) &&
                   (completed || coordinator.needPeers()) &&
-                  (event == COMPLETED_EVENT || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
+                  (event.equals(COMPLETED_EVENT) || System.currentTimeMillis() > tr.lastRequestTime + tr.interval))
               {
                 try
                   {
@@ -237,7 +239,7 @@ public class TrackerClient extends I2PAppThread
                     tr.consecutiveFails = 0;
                     if (tr.isPrimary)
                         consecutiveFails = 0;
-                    started = true;
+                    runStarted = true;
                     tr.started = true;
 
                     Set peers = info.getPeers();
@@ -296,7 +298,7 @@ public class TrackerClient extends I2PAppThread
 
             // we could try and total the unique peers but that's too hard for now
             coordinator.trackerSeenPeers = maxSeenPeers;
-            if (!started)
+            if (!runStarted)
                 _util.debug("         Retrying in one minute...", Snark.DEBUG);
           } // *** end of while loop
       } // try
@@ -338,7 +340,7 @@ public class TrackerClient extends I2PAppThread
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
       + "&left=" + left
-      + ((event != NO_EVENT) ? ("&event=" + event) : "");
+      + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
     _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
       
     tr.lastRequestTime = System.currentTimeMillis();

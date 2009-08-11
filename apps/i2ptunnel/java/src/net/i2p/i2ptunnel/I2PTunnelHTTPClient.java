@@ -191,6 +191,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
      * create the default options (using the default timeout, etc)
      * unused?
      */
+    @Override
     protected I2PSocketOptions getDefaultOptions() {
         Properties defaultOpts = getTunnel().getClientOptions();
         if (!defaultOpts.contains(I2PSocketOptions.PROP_READ_TIMEOUT))
@@ -207,6 +208,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
      * create the default options (using the default timeout, etc)
      *
      */
+    @Override
     protected I2PSocketOptions getDefaultOptions(Properties overrides) {
         Properties defaultOpts = getTunnel().getClientOptions();
         defaultOpts.putAll(overrides);
@@ -561,8 +563,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 return;
             }
 
-            Destination dest = I2PTunnel.destFromName(destination);
-            if (dest == null) {
+            Destination clientDest = I2PTunnel.destFromName(destination);
+            if (clientDest == null) {
                 //l.log("Could not resolve " + destination + ".");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
@@ -594,7 +596,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
             // dont want to hard link to here
             //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
-            I2PSocket i2ps = createI2PSocket(dest, getDefaultOptions(opts));
+            I2PSocket i2ps = createI2PSocket(clientDest, getDefaultOptions(opts));
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             I2PTunnelRunner runner = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);

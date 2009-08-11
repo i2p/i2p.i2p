@@ -7,14 +7,11 @@ package net.i2p.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Properties;
-import java.util.Set;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
@@ -23,7 +20,6 @@ import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.util.I2PThread;
-import net.i2p.util.Log;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -35,10 +31,10 @@ import net.i2p.util.Log;
  */
 class I2PSimpleSession extends I2PSessionImpl2 {
     private boolean _destReceived;
-    private Object _destReceivedLock;
+    private /* FIXME final FIXME */ Object _destReceivedLock;
     private Destination _destination;
     private boolean _bwReceived;
-    private Object _bwReceivedLock;
+    private /* FIXME final FIXME */ Object _bwReceivedLock;
     private int[] _bwLimits;
 
     /**
@@ -65,6 +61,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
      * @throws I2PSessionException if there is a configuration error or the router is
      *                             not reachable
      */
+    @Override
     public void connect() throws I2PSessionException {
         _closed = false;
         _availabilityNotifier.stopNotifying();
@@ -109,6 +106,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         }
     }
 
+    @Override
     public Destination lookupDest(Hash h) throws I2PSessionException {
         if (_closed)
             return null;
@@ -125,6 +123,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         return _destination;
     }
 
+    @Override
     public int[] bandwidthLimits() throws I2PSessionException {
         if (_closed)
             return null;

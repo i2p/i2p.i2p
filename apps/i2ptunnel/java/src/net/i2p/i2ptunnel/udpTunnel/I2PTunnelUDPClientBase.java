@@ -60,7 +60,7 @@ import net.i2p.util.Log;
 
     private ServerSocket ss;
 
-    private Object startLock = new Object();
+    private final Object startLock = new Object();
     private boolean startRunning = false;
 
     private byte[] pubkey;

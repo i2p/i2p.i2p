@@ -106,6 +106,7 @@ public class Peer implements Comparable
   /**
    * Returns the String representation of the peerID.
    */
+    @Override
   public String toString()
   {
     if (peerID != null)
@@ -125,6 +126,7 @@ public class Peer implements Comparable
   /**
    * The hash code of a Peer is the hash code of the peerID.
    */
+    @Override
   public int hashCode()
   {
     return peerID.hashCode() ^ (2 << _id);
@@ -134,6 +136,7 @@ public class Peer implements Comparable
    * Two Peers are equal when they have the same PeerID.
    * All other properties are ignored.
    */
+    @Override
   public boolean equals(Object o)
   {
     if (o instanceof Peer)

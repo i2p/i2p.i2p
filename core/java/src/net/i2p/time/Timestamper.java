@@ -18,9 +18,9 @@ import net.i2p.util.Log;
 public class Timestamper implements Runnable {
     private I2PAppContext _context;
     private Log _log;
-    private List<String> _servers;
+    private final List<String> _servers;
     private List<String> _priorityServers;
-    private List<UpdateListener> _listeners;
+    private final List<UpdateListener> _listeners;
     private int _queryFrequency;
     private int _concurringServers;
     private volatile boolean _disabled;
@@ -52,6 +52,9 @@ public class Timestamper implements Runnable {
         this(ctx, lsnr, true);
     }
     public Timestamper(I2PAppContext ctx, UpdateListener lsnr, boolean daemon) {
+        // moved here to prevent problems with synchronized statements.
+        _servers = new ArrayList(3);
+        _listeners = new ArrayList(1);
         // Don't bother starting a thread if we are disabled.
         // This means we no longer check every 5 minutes to see if we got enabled,
         // so the property must be set at startup.
@@ -65,8 +68,6 @@ public class Timestamper implements Runnable {
         _daemon = daemon;
         _initialized = false;
         _wellSynced = false;
-        _servers = new ArrayList(3);
-        _listeners = new ArrayList(1);
         if (lsnr != null)
             _listeners.add(lsnr);
         updateConfig();

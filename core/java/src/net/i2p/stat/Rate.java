@@ -33,7 +33,7 @@ public class Rate {
     private long _period;
 
     /** locked during coalesce and addData */
-    private Object _lock = new Object();
+    private final Object _lock = new Object();
 
     /** in the current (partial) period, what is the total value acrued through all events? */
     public double getCurrentTotalValue() {
@@ -450,6 +450,26 @@ public class Rate {
                && _extremeTotalEventTime == r.getExtremeTotalEventTime()
                && _lifetimeTotalValue == r.getLifetimeTotalValue() && _lifetimeEventCount == r.getLifetimeEventCount()
                && _lifetimeTotalEventTime == r.getLifetimeTotalEventTime();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 67 * hash + (int)(Double.doubleToLongBits(this._currentTotalValue) ^ (Double.doubleToLongBits(this._currentTotalValue) >>> 32));
+        hash = 67 * hash + (int)(this._currentEventCount ^ (this._currentEventCount >>> 32));
+        hash = 67 * hash + (int)(this._currentTotalEventTime ^ (this._currentTotalEventTime >>> 32));
+        hash = 67 * hash + (int)(Double.doubleToLongBits(this._lastTotalValue) ^ (Double.doubleToLongBits(this._lastTotalValue) >>> 32));
+        hash = 67 * hash + (int)(this._lastEventCount ^ (this._lastEventCount >>> 32));
+        hash = 67 * hash + (int)(this._lastTotalEventTime ^ (this._lastTotalEventTime >>> 32));
+        hash = 67 * hash + (int)(Double.doubleToLongBits(this._extremeTotalValue) ^ (Double.doubleToLongBits(this._extremeTotalValue) >>> 32));
+        hash = 67 * hash + (int)(this._extremeEventCount ^ (this._extremeEventCount >>> 32));
+        hash = 67 * hash + (int)(this._extremeTotalEventTime ^ (this._extremeTotalEventTime >>> 32));
+        hash = 67 * hash + (int)(Double.doubleToLongBits(this._lifetimeTotalValue) ^ (Double.doubleToLongBits(this._lifetimeTotalValue) >>> 32));
+        hash = 67 * hash + (int)(this._lifetimeEventCount ^ (this._lifetimeEventCount >>> 32));
+        hash = 67 * hash + (int)(this._lifetimeTotalEventTime ^ (this._lifetimeTotalEventTime >>> 32));
+        hash = 67 * hash + (int)(this._creationDate ^ (this._creationDate >>> 32));
+        hash = 67 * hash + (int)(this._period ^ (this._period >>> 32));
+        return hash;
     }
 
     @Override

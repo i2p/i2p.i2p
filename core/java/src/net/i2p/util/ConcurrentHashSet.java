@@ -23,22 +23,27 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
         _map = new ConcurrentHashMap(capacity);
     }
 
+    @Override
     public boolean add(E o) {
         return _map.put(o, DUMMY) == null;
     }
 
+    @Override
     public void clear() {
         _map.clear();
     }
 
+    @Override
     public boolean contains(Object o) {
         return _map.containsKey(o);
     }
 
+    @Override
     public boolean isEmpty() {
         return _map.isEmpty();
     }
 
+    @Override
     public boolean remove(Object o) {
         return _map.remove(o) != null;
     }
@@ -51,6 +56,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
         return _map.keySet().iterator();
     }
 
+    @Override
     public boolean addAll(Collection<? extends E> c) {
         boolean rv = false;
         for (E e : c)

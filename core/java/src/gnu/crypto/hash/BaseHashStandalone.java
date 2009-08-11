@@ -164,6 +164,7 @@ public abstract class BaseHashStandalone implements IMessageDigestStandalone {
 
    // methods to be implemented by concrete subclasses ------------------------
 
+    @Override
    public abstract Object clone();
 
    public abstract boolean selfTest();

@@ -169,6 +169,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
   }
 
+    @Override
   public void addRandomByte(byte b)
   {
     pools[pool].update(b);
@@ -177,6 +178,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     pool = (pool + 1) % NUM_POOLS;
   }
 
+    @Override
   public void addRandomBytes(byte[] buf, int offset, int length)
   {
     pools[pool].update(buf, offset, length);
@@ -244,6 +246,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       cryptixKeyBuf = CryptixAESKeyCache.createNew();
     }
 
+        @Override
     public final byte nextByte()
     {
       byte[] b = new byte[1];
@@ -251,6 +254,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       return b[0];
     }
 
+        @Override
     public final void nextBytes(byte[] out, int offset, int length)
     {
       if (!seeded)
@@ -280,11 +284,13 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       ndx = 0;
     }
 
+        @Override
     public final void addRandomByte(byte b)
     {
       addRandomBytes(new byte[] { b });
     }
 
+        @Override
     public final void addRandomBytes(byte[] seed, int offset, int length)
     {
       hash.update(key, 0, key.length);

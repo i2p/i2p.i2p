@@ -40,7 +40,7 @@ public class OrderedProperties extends Properties {
     private Map _data;
 
     /** lock this before touching _order or _data */
-    private Object _lock = new Object();
+    private final Object _lock = new Object();
 
     public OrderedProperties() {
         super();
@@ -269,6 +269,7 @@ public class OrderedProperties extends Properties {
             return -2;
         }
 
+        /* FIXME missing hashCode() method FIXME */
         @Override
         public boolean equals(Object o) {
             if (o == null) return false;

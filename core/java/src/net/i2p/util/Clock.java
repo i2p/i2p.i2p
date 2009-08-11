@@ -44,7 +44,7 @@ public class Clock implements Timestamper.UpdateListener {
     
     protected volatile long _offset;
     protected boolean _alreadyChanged;
-    private Set _listeners;
+    private final Set _listeners;
 
     /** if the clock is skewed by 3+ days, fuck 'em */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;

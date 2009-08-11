@@ -51,6 +51,7 @@ public class Advertiser extends ThreadCore
 	//	Thread
 	////////////////////////////////////////////////
 	
+    @Override
 	public void run() 
 	{
 		Device dev = getDevice();

@@ -152,6 +152,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.wasUnreachable(dest); 
     }
     
+    @Override
     public byte[] getIP(Hash dest) { 
         return _manager.getIP(dest); 
     }
@@ -416,6 +417,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
     }
 
+    @Override
     public void queueLookup(byte[] ip) {
         _geoIP.add(ip);
     }
@@ -426,6 +428,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *
      *  @return two-letter lower-case country code or null
      */
+    @Override
     public String getCountry(Hash peer) {
         byte[] ip = TransportImpl.getIP(peer);
         if (ip != null)
@@ -452,6 +455,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /** full name for a country code, or the code if we don't know the name */
+    @Override
     public String getCountryName(String c) {
         if (_geoIP == null)
             return c;
@@ -462,6 +466,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /** Provide a consistent "look" for displaying router IDs in the console */
+    @Override
     public String renderPeerHTML(Hash peer) {
         String h = peer.toBase64().substring(0, 4);
         StringBuilder buf = new StringBuilder(128);

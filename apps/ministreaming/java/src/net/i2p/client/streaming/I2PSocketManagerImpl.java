@@ -40,7 +40,7 @@ import net.i2p.util.Log;
 class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     private I2PAppContext _context;
     private Log _log;
-    private /* final */ I2PSession _session;
+    private /* FIXME final FIXME */ I2PSession _session;
     private I2PServerSocketImpl _serverSocket = null;
     private final Object lock = new Object(); // for locking socket lists
     private HashMap<String,I2PSocket> _outSockets;

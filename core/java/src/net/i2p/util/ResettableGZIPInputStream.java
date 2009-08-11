@@ -169,16 +169,16 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         // handle flags...
         if (0 != (flags & (1<<5))) {
             // extra header, read and ignore
-            int len = 0;
+            int _len = 0;
             c = in.read();
             if (c == -1) throw new IOException("EOF reading the extra header");
-            len = c;
+            _len = c;
             c = in.read();
             if (c == -1) throw new IOException("EOF reading the extra header");
-            len += (c << 8);
+            _len += (c << 8);
             
             // now skip that data
-            for (int i = 0; i < len; i++) {
+            for (int i = 0; i < _len; i++) {
                 c = in.read();
                 if (c == -1) throw new IOException("EOF reading the extra header's body");
             }

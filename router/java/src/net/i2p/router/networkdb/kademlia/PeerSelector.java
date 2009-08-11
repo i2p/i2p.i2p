@@ -42,6 +42,7 @@ public class PeerSelector {
      *
      * @return ordered list of Hash objects
      */
+    /* FIXME Exporting non-public type through public API FIXME */
     public List selectMostReliablePeers(Hash key, int numClosest, Set alreadyChecked, KBucketSet kbuckets) {// LINT -- Exporting non-public type through public API
         // get the peers closest to the key
         List nearest = selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
@@ -55,6 +56,7 @@ public class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
+    /* FIXME Exporting non-public type through public API FIXME */
     public List selectNearestExplicit(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) {// LINT -- Exporting non-public type through public API
         if (true)
             return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets);
@@ -91,6 +93,7 @@ public class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
+    /* FIXME Exporting non-public type through public API FIXME */
     public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { // LINT -- Exporting non-public type through public API
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
@@ -195,6 +198,7 @@ public class PeerSelector {
      *
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
+    /* FIXME Exporting non-public type through public API FIXME */
     public List selectNearest(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { // LINT -- Exporting non-public type through public API
         // sure, this may not be exactly correct per kademlia (peers on the border of a kbucket in strict kademlia
         // would behave differently) but I can see no reason to keep around an /additional/ more complicated algorithm.

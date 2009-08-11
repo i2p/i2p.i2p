@@ -278,7 +278,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     private static final void showVersionCLI(String signedFile) {
         String versionString = new TrustedUpdate().getVersionString(new File(signedFile));
 
-        if (versionString == "")
+        if (versionString.equals(""))
             System.out.println("No version string found in file '" + signedFile + "'");
         else
             System.out.println("Version: " + versionString);

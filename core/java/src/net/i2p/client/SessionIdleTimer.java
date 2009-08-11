@@ -36,6 +36,7 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
     /**
      *  reduce, shutdown, or both must be true
      */
+    /* FIXME Exporting non-public type through public API FIXME */
     public SessionIdleTimer(I2PAppContext context, I2PSessionImpl session, boolean reduce, boolean shutdown) {
         _context = context;
         _session = session;

@@ -41,7 +41,7 @@ class PeerConnectionOut implements Runnable
   private boolean quit;
 
   // Contains Messages.
-  private List sendQueue = new ArrayList();
+  private final List sendQueue = new ArrayList();
   
   private static long __id = 0;
   private long _id;

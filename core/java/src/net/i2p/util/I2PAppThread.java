@@ -43,6 +43,7 @@ public class I2PAppThread extends I2PThread {
         super(r, name, isDaemon);
     }
     
+    @Override
     protected void fireOOM(OutOfMemoryError oom) {
         for (Iterator iter = _threadListeners.iterator(); iter.hasNext(); ) {
             OOMEventListener listener = (OOMEventListener)iter.next();

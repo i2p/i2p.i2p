@@ -16,7 +16,7 @@ import net.i2p.data.Hash;
  */
 public final class SHA256Generator {
     private List _digests;
-    private List _digestsGnu;
+    private final List _digestsGnu;
     public SHA256Generator(I2PAppContext context) {
         _digests = new ArrayList(32);
         _digestsGnu = new ArrayList(32);

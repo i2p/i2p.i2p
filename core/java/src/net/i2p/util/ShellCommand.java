@@ -51,7 +51,7 @@ public class ShellCommand {
      */
     private class CommandThread extends Thread {
 
-        Object  caller;
+        final Object  caller;
         boolean consumeOutput;
         String  shellCommand;
 

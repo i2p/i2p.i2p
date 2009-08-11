@@ -20,12 +20,12 @@ import net.i2p.util.Log;
 public class BufferedStatLog implements StatLog {
     private I2PAppContext _context;
     private Log _log;
-    private StatEvent _events[];
+    private final StatEvent _events[];
     private int _eventNext;
     private int _lastWrite;
     /** flush stat events to disk after this many events (or 30s)*/
     private int _flushFrequency;
-    private List _statFilters;
+    private final List _statFilters;
     private String _lastFilters;
     private BufferedWriter _out;
     private String _outFile;
@@ -125,7 +125,7 @@ public class BufferedStatLog implements StatLog {
     }
     
     private class StatLogWriter implements Runnable {
-        private SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
+        private final SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
         public void run() {
             int writeStart = -1;
             int writeEnd = -1;

@@ -467,6 +467,7 @@ class BuildHandler {
         return 0;
     }
     
+    @SuppressWarnings("static-access")
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
         long nextId = req.readNextTunnelId();
@@ -626,7 +627,8 @@ class BuildHandler {
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
             // (enough layers jrandom?)
             TunnelBuildReplyMessage replyMsg = new TunnelBuildReplyMessage(_context);
-            for (int i = 0; i < state.msg.RECORD_COUNT; i++) // LINT -- Accessing Static field "RECORD_COUNT"
+            /* FIXME Accessing static field "RECORD_COUNT" FIXME */
+            for (int i = 0; i < state.msg.RECORD_COUNT; i++)
                 replyMsg.setRecord(i, state.msg.getRecord(i));
             replyMsg.setUniqueId(req.readReplyMessageId());
             replyMsg.setMessageExpiration(_context.clock().now() + 10*1000);

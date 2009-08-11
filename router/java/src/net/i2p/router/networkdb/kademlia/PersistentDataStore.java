@@ -63,6 +63,7 @@ class PersistentDataStore extends TransientDataStore {
         writer.start();
     }
 
+    @Override
     public boolean isInitialized() { return _initialized; }
 
     // this doesn't stop the read job or the writer, maybe it should?
@@ -78,6 +79,7 @@ class PersistentDataStore extends TransientDataStore {
         _dbDir = _facade.getDbDir();
     }
     
+    @Override
     public void rescan() {
         if (_initialized)
             _readJob.wakeup();
@@ -176,7 +178,7 @@ class PersistentDataStore extends TransientDataStore {
      */
     private class Writer implements Runnable {
         private final Map<Hash, DataStructure>_keys;
-        private Object _waitLock;
+        private final Object _waitLock;
         private volatile boolean _quit;
 
         public Writer() { 

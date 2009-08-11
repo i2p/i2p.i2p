@@ -43,6 +43,7 @@ class YKGenerator {
     private static int MIN_NUM_BUILDERS = -1;
     private static int MAX_NUM_BUILDERS = -1;
     private static int CALC_DELAY = -1;
+    /* FIXME final type if you are to syncronize FIXME */
     private static volatile List _values = new ArrayList(50); // list of BigInteger[] values (y and k)
     private static Thread _precalcThread = null;
 

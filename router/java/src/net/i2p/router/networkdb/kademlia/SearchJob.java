@@ -27,7 +27,6 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 
 /**

@@ -272,8 +272,8 @@ public class Action
 			actionRes.setResponse(this);
 		}
 		else {
-			UPnPStatus upnpStatus = getStatus();
-			actionRes.setFaultResponse(upnpStatus.getCode(), upnpStatus.getDescription());
+			UPnPStatus _upnpStatus = getStatus();
+			actionRes.setFaultResponse(_upnpStatus.getCode(), _upnpStatus.getDescription());
 		}
 		if (Debug.isOn() == true)
 			actionRes.print();

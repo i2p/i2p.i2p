@@ -151,7 +151,7 @@ public interface PeerListener
    *
    * @param state the PeerState for the peer
    */
-  void savePeerPartial(PeerState state);
+  void savePeerPartial(PeerState state); /* FIXME Exporting non-public type through public API FIXME */
 
   /**
    * Called when a peer has connected and there may be a partially
@@ -161,7 +161,7 @@ public interface PeerListener
    *
    * @return request (contains the partial data and valid length)
    */
-  Request getPeerPartial(BitField havePieces);
+  Request getPeerPartial(BitField havePieces); /* FIXME Exporting non-public type through public API FIXME */
 
   /** Mark a peer's requested pieces unrequested when it is disconnected
    *  This prevents premature end game

@@ -107,6 +107,7 @@ public class PeerID implements Comparable
   /**
    * The hash code of a PeerID is the exclusive or of all id bytes.
    */
+    @Override
   public int hashCode()
   {
     return hash;
@@ -127,6 +128,7 @@ public class PeerID implements Comparable
   /**
    * Two PeerIDs are equal when they have the same id, address and port.
    */
+    @Override
   public boolean equals(Object o)
   {
     if (o instanceof PeerID)
@@ -171,6 +173,7 @@ public class PeerID implements Comparable
    * and address is the base64 dest (was the base64 hash of the dest) which
    * should match what the bytemonsoon tracker reports on its web pages.
    */
+    @Override
   public String toString()
   {
     int nonZero = 0;

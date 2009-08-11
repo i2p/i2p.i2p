@@ -15,7 +15,7 @@ import net.i2p.data.ByteArray;
  *
  */
 public final class ByteCache {
-    private static Map _caches = new HashMap(16);
+    private final static Map _caches = new HashMap(16);
     /**
      * Get a cache responsible for objects of the given size
      *
@@ -36,7 +36,7 @@ public final class ByteCache {
     }
     private Log _log;
     /** list of available and available entries */
-    private List _available;
+    private final List _available;
     private int _maxCached;
     private int _entrySize;
     private long _lastOverflow;

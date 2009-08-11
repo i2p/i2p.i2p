@@ -131,6 +131,7 @@ public class ControlPoint implements HTTPRequestListener
 		this(DEFAULT_SSDP_PORT, DEFAULT_EVENTSUB_PORT);
 	}
 
+    @Override
 	public void finalize()
 	{
 		stop();
@@ -506,8 +507,8 @@ public class ControlPoint implements HTTPRequestListener
 	public void search(String target, int mx)
 	{
 		SSDPSearchRequest msReq = new SSDPSearchRequest(target, mx);
-		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
-		ssdpSearchResponseSocketList.post(msReq);
+		SSDPSearchResponseSocketList _ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
+		_ssdpSearchResponseSocketList.post(msReq);
 	}
 
 	public void search(String target)
@@ -790,8 +791,8 @@ public class ControlPoint implements HTTPRequestListener
 		
 		int retryCnt = 0;
 		int bindPort = getHTTPPort();
-		HTTPServerList httpServerList = getHTTPServerList();
-		while (httpServerList.open(bindPort) == false) {
+		HTTPServerList _httpServerList = getHTTPServerList();
+		while (_httpServerList.open(bindPort) == false) {
 			retryCnt++;
 			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
 				Debug.warning("Failed to open HTTP event listener port " + bindPort);
@@ -802,40 +803,40 @@ public class ControlPoint implements HTTPRequestListener
 			setHTTPPort(bindPort - 1);
 			bindPort = getHTTPPort();
 		}
-		httpServerList.addRequestListener(this);
-		httpServerList.start();
+		_httpServerList.addRequestListener(this);
+		_httpServerList.start();
 		
 		////////////////////////////////////////
 		// Notify Socket
 		////////////////////////////////////////
 		
-		SSDPNotifySocketList ssdpNotifySocketList = getSSDPNotifySocketList();
-		if (ssdpNotifySocketList.open() == false) {
+		SSDPNotifySocketList _ssdpNotifySocketList = getSSDPNotifySocketList();
+		if (_ssdpNotifySocketList.open() == false) {
 			Debug.warning("Failed to open SSDP notify port 1900");
 			return false;
 		}
-		ssdpNotifySocketList.setControlPoint(this);			
-		ssdpNotifySocketList.start();
+		_ssdpNotifySocketList.setControlPoint(this);
+		_ssdpNotifySocketList.start();
 		
 		////////////////////////////////////////
 		// SeachResponse Socket
 		////////////////////////////////////////
 		
-		int ssdpPort = getSSDPPort();
+		int _ssdpPort = getSSDPPort();
 		retryCnt = 0;
-		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
-		while (ssdpSearchResponseSocketList.open(ssdpPort) == false) {
+		SSDPSearchResponseSocketList _ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
+		while (_ssdpSearchResponseSocketList.open(_ssdpPort) == false) {
 			retryCnt++;
 			if (UPnP.SERVER_RETRY_COUNT < retryCnt) {
-				Debug.warning("Failed to open SSDP search response port " + ssdpPort);
+				Debug.warning("Failed to open SSDP search response port " + _ssdpPort);
 				return false;
 			}
 			// I2P go down not up so we don't run into other I2P things
-			setSSDPPort(ssdpPort - 1);
-			ssdpPort = getSSDPPort();
+			setSSDPPort(_ssdpPort - 1);
+			_ssdpPort = getSSDPPort();
 		}
-		ssdpSearchResponseSocketList.setControlPoint(this);
-		ssdpSearchResponseSocketList.start();
+		_ssdpSearchResponseSocketList.setControlPoint(this);
+		_ssdpSearchResponseSocketList.start();
 
 		////////////////////////////////////////
 		// search root devices
@@ -878,20 +879,20 @@ public class ControlPoint implements HTTPRequestListener
 	{ 
 		unsubscribe();
 		
-		SSDPNotifySocketList ssdpNotifySocketList = getSSDPNotifySocketList();
-		ssdpNotifySocketList.stop();
-		ssdpNotifySocketList.close();
-		ssdpNotifySocketList.clear();
+		SSDPNotifySocketList _ssdpNotifySocketList = getSSDPNotifySocketList();
+		_ssdpNotifySocketList.stop();
+		_ssdpNotifySocketList.close();
+		_ssdpNotifySocketList.clear();
 		
-		SSDPSearchResponseSocketList ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
-		ssdpSearchResponseSocketList.stop();
-		ssdpSearchResponseSocketList.close();
-		ssdpSearchResponseSocketList.clear();
+		SSDPSearchResponseSocketList _ssdpSearchResponseSocketList = getSSDPSearchResponseSocketList();
+		_ssdpSearchResponseSocketList.stop();
+		_ssdpSearchResponseSocketList.close();
+		_ssdpSearchResponseSocketList.clear();
 
-		HTTPServerList httpServerList = getHTTPServerList();
-		httpServerList.stop();
-		httpServerList.close();
-		httpServerList.clear();
+		HTTPServerList _httpServerList = getHTTPServerList();
+		_httpServerList.stop();
+		_httpServerList.close();
+		_httpServerList.clear();
 			
 		////////////////////////////////////////
 		// Disposer

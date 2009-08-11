@@ -7,7 +7,6 @@ package org.klomp.snark;
 import java.util.Arrays;
 import java.util.Properties;
 
-import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;

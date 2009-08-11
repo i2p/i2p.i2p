@@ -35,8 +35,8 @@ public class EventDispatcherImpl implements EventDispatcher {
     private final static Log _log = new Log(EventDispatcherImpl.class);
 
     private boolean _ignore = false;
-    private HashMap _events = new HashMap(4);
-    private ArrayList _attached = new ArrayList();
+    private /* FIXME final FIXME */ HashMap _events = new HashMap(4);
+    private final ArrayList _attached = new ArrayList();
     
     public EventDispatcher getEventDispatcher() {
         return this;

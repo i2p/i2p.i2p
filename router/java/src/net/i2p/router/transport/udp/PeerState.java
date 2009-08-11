@@ -1003,7 +1003,8 @@ public class PeerState {
             return MAX_RTO;
     }
     
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }// LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
     public int add(OutboundMessageState state) {
         if (_dead) { 

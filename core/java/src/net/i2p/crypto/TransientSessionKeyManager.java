@@ -36,9 +36,9 @@ import net.i2p.util.SimpleTimer;
 public class TransientSessionKeyManager extends SessionKeyManager {
     private Log _log;
     /** Map allowing us to go from the targeted PublicKey to the OutboundSession used */
-    private Map<PublicKey, OutboundSession> _outboundSessions;
+    private final Map<PublicKey, OutboundSession> _outboundSessions;
     /** Map allowing us to go from a SessionTag to the containing TagSet */
-    private Map<SessionTag, TagSet> _inboundTagSets;
+    private final Map<SessionTag, TagSet> _inboundTagSets;
     protected I2PAppContext _context;
     private volatile boolean _alive;
 
@@ -81,6 +81,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     }
     private TransientSessionKeyManager() { this(null); }
     
+    @Override
     public void shutdown() {
          _alive = false;
         synchronized (_inboundTagSets) {
@@ -105,6 +106,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
 
 
     /** TagSet */
+    /* FIXME Exporting non-public type through public API */
     protected Set<TagSet> getInboundTagSets() {
         synchronized (_inboundTagSets) {
             return new HashSet(_inboundTagSets.values());
@@ -112,12 +114,14 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     }
 
     /** OutboundSession */
+    /* FIXME Exporting non-public type through public API */
     protected Set<OutboundSession> getOutboundSessions() {
         synchronized (_outboundSessions) {
             return new HashSet(_outboundSessions.values());
         }
     }
 
+    /* FIXME Exporting non-public type through public API */
     protected void setData(Set<TagSet> inboundTagSets, Set<OutboundSession> outboundSessions) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Loading " + inboundTagSets.size() + " inbound tag sets, and " 
@@ -557,7 +561,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         private SessionKey _currentKey;
         private long _established;
         private long _lastUsed;
-        private List<TagSet> _tagSets;
+        private /* FIXME final FIXME */ List<TagSet> _tagSets;
 
         public OutboundSession(PublicKey target) {
             this(target, null, _context.clock().now(), _context.clock().now(), new ArrayList());

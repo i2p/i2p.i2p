@@ -11,7 +11,7 @@ public class Frequency {
     private long _lastEvent;
     private long _start = now();
     private long _count = 0;
-    private Object _lock = this; // new Object(); // in case we want to do fancy sync later
+    private final Object _lock = this; // new Object(); // in case we want to do fancy sync later
 
     public Frequency(long period) {
         setPeriod(period);

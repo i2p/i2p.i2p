@@ -84,6 +84,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionStatusMessage)) {

@@ -36,9 +36,9 @@ public class RouterInfo extends DataStructureImpl {
     private final static Log _log = new Log(RouterInfo.class);
     private RouterIdentity _identity;
     private volatile long _published;
-    private Set _addresses;
-    private Set _peers;
-    private Properties _options;
+    private final Set _addresses;
+    private final Set _peers;
+    private /* FIXME final FIXME */ Properties _options;
     private volatile Signature _signature;
     private volatile Hash _currentRoutingKey;
     private volatile byte _routingKeyGenMod[];

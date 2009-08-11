@@ -79,7 +79,8 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public TunnelPool getTunnelPool() { return _pool; }
     
 
-    public void setTestJob(TestJob job) { _testJob = job; } // LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public void setTestJob(TestJob job) { _testJob = job; }
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
     // Fix memory leaks caused by references if you need to use pairedTunnel

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.crypto.SessionKeyManager;
-import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -114,7 +113,7 @@ public class ClientConnectionRunner {
             t.setDaemon(true);
             t.setPriority(I2PThread.MAX_PRIORITY);
             t.start();
-            _out = _socket.getOutputStream(); // LINT -- OWCH! needs a better way so it can be final.
+            _out = _socket.getOutputStream(); // FIXME OWCH! needs a better way so it can be final. FIXME
             _reader.startReading();
         } catch (IOException ioe) {
             _log.error("Error starting up the runner", ioe);

@@ -89,8 +89,8 @@ public class SOAPRequest extends HTTPRequest
 		try {
 			ByteArrayInputStream byteIn = new ByteArrayInputStream(content);
 			Parser xmlParser = SOAP.getXMLParser();
-			Node rootNode = xmlParser.parse(byteIn);
-			soapRes.setEnvelopeNode(rootNode);
+			Node _rootNode = xmlParser.parse(byteIn);
+			soapRes.setEnvelopeNode(_rootNode);
 		}
 		catch (Exception e) {
 			Debug.warning(e);
@@ -170,6 +170,7 @@ public class SOAPRequest extends HTTPRequest
 	//	print
 	////////////////////////////////////////////////
 	
+    @Override
 	public void print()
 	{
 		Debug.message(toString());

@@ -26,7 +26,7 @@ public abstract class NamingService {
 
     private final static Log _log = new Log(NamingService.class);
     protected I2PAppContext _context;
-    private HashMap _cache;
+    private /* FIXME final FIXME */ HashMap _cache;
 
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";

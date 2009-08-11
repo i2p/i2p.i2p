@@ -27,6 +27,7 @@ import net.i2p.util.Log;
  */
 public class SendMessageExpiresMessage extends SendMessageMessage {
     private final static Log _log = new Log(SendMessageExpiresMessage.class);
+    /* FIXME hides another field FIXME */
     public final static int MESSAGE_TYPE = 36;
     private SessionId _sessionId;
     private Destination _destination;
@@ -87,10 +88,12 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
         }
     }
     
+    @Override
     public int getType() {
         return MESSAGE_TYPE;
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SendMessageExpiresMessage)) {

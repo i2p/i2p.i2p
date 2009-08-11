@@ -14,16 +14,12 @@ import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
 
 import org.cybergarage.upnp.Action;
-import org.cybergarage.upnp.ActionList;
-import org.cybergarage.upnp.Argument;
 import org.cybergarage.upnp.ArgumentList;
 import org.cybergarage.upnp.ControlPoint;
 import org.cybergarage.upnp.Device;
 import org.cybergarage.upnp.DeviceList;
 import org.cybergarage.upnp.Service;
 import org.cybergarage.upnp.ServiceList;
-import org.cybergarage.upnp.ServiceStateTable;
-import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.device.DeviceChangeListener;
 import org.cybergarage.upnp.event.EventListener;
 import org.freenetproject.DetectedIP;
@@ -373,7 +369,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	private String _lastAction;
 	private Service _lastService;
 	private ArgumentList _lastArgumentList;
-	private Object toStringLock = new Object();
+	private final Object toStringLock = new Object();
 	private String toString(String action, String arg, Service serv) {
 		synchronized(toStringLock) {
 			if ((!action.equals(_lastAction)) ||

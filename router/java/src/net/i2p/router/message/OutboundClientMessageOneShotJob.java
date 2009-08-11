@@ -213,7 +213,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
       *
       * Key the cache on the source+dest pair.
       */
-    private static HashMap<String, LeaseSet> _leaseSetCache = new HashMap();
+    private final static HashMap<String, LeaseSet> _leaseSetCache = new HashMap();
     private LeaseSet getReplyLeaseSet(boolean force) {
         LeaseSet newLS = getContext().netDb().lookupLeaseSetLocally(_from.calculateHash());
         if (newLS == null)
@@ -313,7 +313,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * lease).
      *
      */
-    private static HashMap<String, Lease> _leaseCache = new HashMap();
+    private final static HashMap<String, Lease> _leaseCache = new HashMap();
     private boolean getNextLease() {
         _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
         if (_leaseSet == null) {
@@ -453,7 +453,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * before upper layers like streaming lib fail, even for low-bandwidth
      * connections like IRC.
      */
-    private static HashMap<String, Long> _lastReplyRequestCache = new HashMap();
+    private final static HashMap<String, Long> _lastReplyRequestCache = new HashMap();
 
     /**
      * Send the message to the specified tunnel by creating a new garlic message containing
@@ -752,7 +752,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Key the caches on the source+dest pair.
      *
      */
-    private static HashMap<String, TunnelInfo> _tunnelCache = new HashMap();
+    private static final HashMap<String, TunnelInfo> _tunnelCache = new HashMap();
     private static HashMap<String, TunnelInfo> _backloggedTunnelCache = new HashMap();
     private TunnelInfo selectOutboundTunnel(Destination to) {
         TunnelInfo tunnel;
@@ -918,6 +918,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
         }
         
+        @Override
         public String toString() {
             return "sending " + _toString + " waiting for token " + _pendingToken
                    + " for cloveId " + _cloveId;

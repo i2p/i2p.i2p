@@ -212,6 +212,8 @@ public class HashCash implements Comparable<HashCash> {
   /**
        * Two objects are considered equal if they are both of type HashCash and have an identical string representation
        */
+  /* FIXME missing hashCode() method FIXME */
+  @Override
   public boolean equals(Object obj) {
     if(obj instanceof HashCash)
       return toString().equals(obj.toString());
@@ -222,6 +224,7 @@ public class HashCash implements Comparable<HashCash> {
   /**
        * Returns the canonical string representation of the HashCash
        */
+  @Override
   public String toString() {
     return myToken;
   }

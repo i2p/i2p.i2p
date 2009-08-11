@@ -21,7 +21,7 @@ class MessageState {
     private long _nonce;
     private String _prefix;
     private MessageId _id;
-    private Set _receivedStatus;
+    private final Set _receivedStatus;
     private SessionKey _key;
     private SessionKey _newKey;
     private Set _tags;

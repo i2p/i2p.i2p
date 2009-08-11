@@ -11,7 +11,7 @@ import java.util.List;
  *
  */
 public final class CryptixAESKeyCache {
-    private List _availableKeys;
+    private final List _availableKeys;
     
     private static final int KEYSIZE = 32; // 256bit AES
     private static final int BLOCKSIZE = 16;

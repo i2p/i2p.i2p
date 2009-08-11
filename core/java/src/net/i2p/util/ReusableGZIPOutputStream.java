@@ -14,7 +14,7 @@ import net.i2p.data.DataHelper;
  *
  */
 public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
-    private static ArrayList _available = new ArrayList(16);
+    private static final ArrayList _available = new ArrayList(16);
     /**
      * Pull a cached instance
      */

@@ -210,7 +210,8 @@ public class InboundEstablishState {
     public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
     /** RemoteHostId, uniquely identifies an attempt */
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }// LINT -- Exporting non-public type through public API
+    // FIXME Exporting non-public type through public API FIXME
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
         if (_receivedIdentity == null)

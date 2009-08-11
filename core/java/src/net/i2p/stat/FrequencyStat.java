@@ -58,6 +58,8 @@ public class FrequencyStat {
         return null;
     }
 
+    /* FIXME missing equals() method FIXME */
+    @Override
     public int hashCode() {
         return _statName.hashCode();
     }

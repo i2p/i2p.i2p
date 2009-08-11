@@ -25,9 +25,9 @@ public class StatManager {
     private I2PAppContext _context;
 
     /** stat name to FrequencyStat */
-    private Map _frequencyStats;
+    private final Map _frequencyStats;
     /** stat name to RateStat */
-    private Map _rateStats;
+    private final Map _rateStats;
     private StatLog _statLog;
 
     public static final String PROP_STAT_FILTER = "stat.logFilters";

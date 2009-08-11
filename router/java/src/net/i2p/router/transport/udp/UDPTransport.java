@@ -40,7 +40,7 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class UDPTransport extends TransportImpl implements TimedWeightedPriorityMessageQueue.FailedListener {
-    private RouterContext _context; // LINT -- field hides a field
+    private RouterContext _rContext;
     private Log _log;
     private UDPEndpoint _endpoint;
     /** Peer (Hash) to PeerState */
@@ -322,6 +322,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int getLocalPort() { return _externalListenPort; }
     public InetAddress getLocalAddress() { return _externalListenHost; }
     public int getExternalPort() { return _externalListenPort; }
+    @Override
     public int getRequestedPort() {
         if (_externalListenPort > 0)
             return _externalListenPort;
@@ -346,6 +347,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ip publicly routable IPv4 only
      * @param port 0 if unknown
      */
+    @Override
     public void externalAddressReceived(String source, byte[] ip, int port) {
         String s = RemoteHostId.toString(ip);
         if (_log.shouldLog(Log.WARN))
@@ -368,6 +370,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  If this is wrong, the peer test will figure it out and change the status.
      *  Don't do anything if UPnP claims failure.
      */
+    @Override
     public void forwardPortStatus(int port, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {
             if (success)
@@ -518,7 +521,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
      */
-    public PeerState getPeerState(RemoteHostId hostInfo) { // LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public PeerState getPeerState(RemoteHostId hostInfo) {
         synchronized (_peersByRemoteHost) {
             return (PeerState)_peersByRemoteHost.get(hostInfo);
         }
@@ -755,7 +759,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }// LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
     
     void dropPeer(Hash peer, boolean shouldShitlist, String why) {
         PeerState state = getPeerState(peer);
@@ -2182,6 +2187,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";
+    @Override
     public short getReachabilityStatus() { 
         String override = _context.getProperty(PROP_REACHABILITY_STATUS_OVERRIDE);
         if (override == null)
@@ -2201,7 +2207,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testEvent.runTest();
     }
     
-    public PeerState pickTestPeer(RemoteHostId dontInclude) {// LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public PeerState pickTestPeer(RemoteHostId dontInclude) {
         List peers = null;
         synchronized (_peersByIdent) {
             peers = new ArrayList(_peersByIdent.values());

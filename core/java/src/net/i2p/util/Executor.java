@@ -7,7 +7,7 @@ import net.i2p.I2PAppContext;
 class Executor implements Runnable {
     private I2PAppContext _context;
     private Log _log;
-    private List _readyEvents;
+    private final List _readyEvents;
     private SimpleStore runn;
 
     public Executor(I2PAppContext ctx, Log log, List events, SimpleStore x) {

@@ -77,10 +77,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
     protected void clientConnectionRun(Socket s) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("got a connection.");
-        Destination dest = pickDestination();
+        Destination clientDest = pickDestination();
         I2PSocket i2ps = null;
         try {
-            i2ps = createI2PSocket(dest);
+            i2ps = createI2PSocket(clientDest);
             i2ps.setReadTimeout(readTimeout);
             StringBuilder expectedPong = new StringBuilder();
             Thread in = new I2PThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in");

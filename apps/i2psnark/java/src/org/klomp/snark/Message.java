@@ -110,6 +110,7 @@ class Message
       dos.write(data, off, len);
   }
 
+    @Override
   public String toString()
   {
     switch (type)

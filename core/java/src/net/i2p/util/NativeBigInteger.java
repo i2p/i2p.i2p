@@ -24,8 +24,6 @@ import freenet.support.CPUInformation.IntelCPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.FileUtil;
-import net.i2p.util.Log;
 
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,

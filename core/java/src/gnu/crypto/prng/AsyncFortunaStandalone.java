@@ -47,6 +47,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     }
 
     /** the seed is only propogated once the prng is started with startup() */
+    @Override
     public void seed(byte val[]) {
         Map props = new HashMap(1);
         props.put(SEED, (Object)val);
@@ -54,6 +55,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         //fillBlock();
     }
   
+    @Override
     protected void allocBuffer() {}
     
     /**
@@ -133,6 +135,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         }
     }
 
+    @Override
     public void fillBlock()
     {
         rotateBuffer();

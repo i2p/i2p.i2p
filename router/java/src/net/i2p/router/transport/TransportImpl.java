@@ -28,7 +28,6 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
-import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;

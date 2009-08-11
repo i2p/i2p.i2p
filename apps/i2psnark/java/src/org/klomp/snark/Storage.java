@@ -46,7 +46,7 @@ public class Storage
   private final StorageListener listener;
   private I2PSnarkUtil _util;
 
-  private BitField bitfield; // BitField to represent the pieces
+  private /* FIXME final FIXME */ BitField bitfield; // BitField to represent the pieces
   private int needed; // Number of pieces needed
   private boolean _probablyComplete;  // use this to decide whether to open files RO
 

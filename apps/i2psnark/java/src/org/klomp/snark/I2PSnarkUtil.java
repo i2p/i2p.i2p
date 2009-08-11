@@ -46,7 +46,7 @@ public class I2PSnarkUtil {
     private Map _opts;
     private I2PSocketManager _manager;
     private boolean _configured;
-    private Set _shitlist;
+    private final Set _shitlist;
     private int _maxUploaders;
     private int _maxUpBW;
     private int _maxConnections;

@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class PetNameDB {
     /** name (String) to PetName mapping */
-    private Map _names;
+    private final Map _names;
     private String _path;
     
     public PetNameDB() {

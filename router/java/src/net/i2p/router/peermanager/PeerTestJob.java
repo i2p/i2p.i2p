@@ -50,7 +50,8 @@ public class PeerTestJob extends JobImpl {
     /** number of peers to test each round */
     private int getTestConcurrency() { return 1; }
     
-    public void startTesting(PeerManager manager) { // LINT -- Exporting non-public type through public API
+    // FIXME Exporting non-public type through public API FIXME
+    public void startTesting(PeerManager manager) {
         _manager = manager;
         _keepTesting = true;
         this.getTiming().setStartAfter(getContext().clock().now() + DEFAULT_PEER_TEST_DELAY);

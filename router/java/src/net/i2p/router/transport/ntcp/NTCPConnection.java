@@ -6,14 +6,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.Adler32;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -24,7 +22,6 @@ import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.Log;
 

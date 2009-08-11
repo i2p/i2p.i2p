@@ -43,7 +43,7 @@ public class EepGet {
     protected String _actualURL;
     private String _postData;
     private boolean _allowCaching;
-    protected List _listeners;
+    protected final List _listeners;
     
     private boolean _keepFetching;
     private Socket _proxy;
@@ -256,8 +256,8 @@ public class EepGet {
         private long _discarded;
         private long _lastComplete;
         private boolean _firstTime;
-        private DecimalFormat _pct = new DecimalFormat("00.0%");
-        private DecimalFormat _kbps = new DecimalFormat("###,000.00");
+        private final DecimalFormat _pct = new DecimalFormat("00.0%");
+        private final DecimalFormat _kbps = new DecimalFormat("###,000.00");
         public CLIStatusListener() { 
             this(1024, 40);
         }

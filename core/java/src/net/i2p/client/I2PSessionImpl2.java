@@ -33,7 +33,7 @@ import net.i2p.util.Log;
 class I2PSessionImpl2 extends I2PSessionImpl {
 
     /** set of MessageState objects, representing all of the messages in the process of being sent */
-    private Set _sendingStates;
+    private /* FIXME final FIXME */ Set _sendingStates;
     /** max # seconds to wait for confirmation of the message send */
     private final static long SEND_TIMEOUT = 60 * 1000; // 60 seconds to send 
     /** should we gzip each payload prior to sending it? */

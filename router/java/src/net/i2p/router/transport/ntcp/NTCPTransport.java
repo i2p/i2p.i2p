@@ -555,6 +555,7 @@ public class NTCPTransport extends TransportImpl {
      *  to decide whether to enable inbound NTCP. SSU will have CSFI build a new
      *  NTCP address when it transitions to OK.
      */
+    @Override
     public void forwardPortStatus(int port, boolean success, String reason) {
         if (_log.shouldLog(Log.WARN)) {
             if (success)
@@ -564,6 +565,7 @@ public class NTCPTransport extends TransportImpl {
         }
     }
 
+    @Override
     public int getRequestedPort() {
         // would be nice to do this here but we can't easily get to the UDP transport.getRequested_Port()
         // from here, so we do it in TransportManager.
@@ -581,6 +583,7 @@ public class NTCPTransport extends TransportImpl {
      * We have to be careful here because much of the router console code assumes
      * that the reachability status is really just the UDP status.
      */
+    @Override
     public short getReachabilityStatus() { 
         if (isAlive() && _myAddress != null) {
             synchronized (_conLock) {

@@ -137,6 +137,7 @@ public class BitField
     return count >= size;
   }
 
+    @Override
   public String toString()
   {
     // Not very efficient

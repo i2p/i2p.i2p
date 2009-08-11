@@ -65,6 +65,7 @@ public class XmlPullParserException extends Exception {
     */
 
     //NOTE: code that prints this and detail is difficult in J2ME
+    @Override
     public void printStackTrace() {
         if (detail == null) {
             super.printStackTrace();

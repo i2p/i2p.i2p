@@ -73,7 +73,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** reader that always searches for messages */
     protected I2CPMessageReader _reader;
     /** where we pipe our messages */
-    protected OutputStream _out;
+    protected /* FIXME final FIXME */OutputStream _out;
 
     /** who we send events to */
     protected I2PSessionListener _sessionListener;

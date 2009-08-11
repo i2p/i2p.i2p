@@ -879,7 +879,8 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
     
-    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {// LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
@@ -929,7 +930,8 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
     
-    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {// LINT -- Exporting non-public type through public API
+    /* FIXME Exporting non-public type through public API FIXME */
+    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
         InetAddress aliceAddr = null;
         try {
             aliceAddr = InetAddress.getByAddress(alice.getIP());

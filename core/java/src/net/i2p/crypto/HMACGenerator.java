@@ -22,9 +22,9 @@ import org.bouncycastle.crypto.macs.I2PHMac;
 public class HMACGenerator {
     private I2PAppContext _context;
     /** set of available HMAC instances for calculate */
-    protected List _available;
+    protected final List _available;
     /** set of available byte[] buffers for verify */
-    private List _availableTmp;
+    private final  List _availableTmp;
     
     public HMACGenerator(I2PAppContext context) {
         _context = context;

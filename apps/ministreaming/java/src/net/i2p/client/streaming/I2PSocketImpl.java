@@ -29,7 +29,7 @@ class I2PSocketImpl implements I2PSocket {
     private Destination remote;
     private String localID;
     private String remoteID;
-    private Object remoteIDWaiter = new Object();
+    private final Object remoteIDWaiter = new Object();
     private I2PInputStream in;
     private I2POutputStream out;
     private I2PSocket.SocketErrorListener _socketErrorListener;
@@ -42,7 +42,7 @@ class I2PSocketImpl implements I2PSocket {
     private long _closedOn;
     private long _remoteIdSetTime;
     private I2PSocketOptions _options;
-    private Object flagLock = new Object();
+    private final Object flagLock = new Object();
 
     /**
      * Whether the I2P socket has already been closed.
@@ -306,7 +306,7 @@ class I2PSocketImpl implements I2PSocket {
     //--------------------------------------------------
     private class I2PInputStream extends InputStream {
         private String streamName;
-        private ByteCollector bc = new ByteCollector();
+        private final ByteCollector bc = new ByteCollector();
         private boolean inStreamClosed = false;
 
         private long readTimeout = -1;

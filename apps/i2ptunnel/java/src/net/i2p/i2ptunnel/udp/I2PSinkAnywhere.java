@@ -67,5 +67,5 @@ public class I2PSinkAnywhere implements Sink {
     protected boolean raw;
     protected I2PSession sess;
     protected Destination dest;
-    protected I2PDatagramMaker maker; // should be final and use a factory. LINT
+    protected I2PDatagramMaker maker; // FIXME should be final and use a factory. FIXME
 }

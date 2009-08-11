@@ -1,3 +1,11 @@
+2009-08-11 sponge
+    * Code Janitor time! Many fixes and documenting fixes that should be
+      done in the future. for the most part, this is a general code cleanup.
+    * On smaller/embedded systems, the "final" keyword cleanups will have
+      more of an impact than on larger systems.
+    * Document missing hashCode() methods.
+    * Unhide more variables to make code easier to read.
+
 2009-08-11 zzz
     * Android:
       - Merge in the branch

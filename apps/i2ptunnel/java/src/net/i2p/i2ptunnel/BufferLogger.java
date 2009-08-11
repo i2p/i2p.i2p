@@ -14,7 +14,7 @@ import net.i2p.util.Log;
  */
 class BufferLogger implements Logging {
     private final static Log _log = new Log(BufferLogger.class);
-    private ByteArrayOutputStream _baos; // should be final and use a factory. LINT
+    private ByteArrayOutputStream _baos; // FIXME should be final and use a factory. FIXME
     private boolean _ignore;
 
     /**

@@ -51,11 +51,13 @@ class Request
       throw new IndexOutOfBoundsException("Illegal Request " + toString());
   }
 
+    @Override
   public int hashCode()
   {
     return piece ^ off ^ len;
   }
 
+    @Override
   public boolean equals(Object o)
   {
     if (o instanceof Request)
@@ -67,6 +69,7 @@ class Request
     return false;
   }
 
+    @Override
   public String toString()
   {
     return "(" + piece + "," + off + "," + len + ")";

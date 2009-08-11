@@ -124,8 +124,9 @@ public class UDPPacket {
     void setMessageType(int type) { _messageType = type; }
     int getFragmentCount() { return _fragmentCount; }
     void setFragmentCount(int count) { _fragmentCount = count; }
-    
-    public RemoteHostId getRemoteHost() {// LINT -- Exporting non-public type through public API
+
+    // FIXME Exporting non-public type through public API FIXME
+    public RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
             long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();

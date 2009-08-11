@@ -29,13 +29,13 @@ public class SnarkManager implements Snark.CompleteListener {
     public static SnarkManager instance() { return _instance; }
     
     /** map of (canonical) filename to Snark instance (unsynchronized) */
-    private Map _snarks;
-    private Object _addSnarkLock;
-    private File _configFile;
+    private final Map _snarks;
+    private final Object _addSnarkLock;
+    private /* FIXME final FIXME */ File _configFile;
     private Properties _config;
     private I2PAppContext _context;
     private Log _log;
-    private List _messages;
+    private final List _messages;
     private I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
@@ -747,6 +747,7 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     public class SnarkManagerShutdown extends I2PAppThread {
+        @Override
         public void run() {
             Set names = listTorrentFiles();
             for (Iterator iter = names.iterator(); iter.hasNext(); ) {

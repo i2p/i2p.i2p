@@ -12,10 +12,8 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSimpleClient;
 import net.i2p.data.Base32;
-import net.i2p.data.Base64;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.data.LeaseSet;
 
 /**
  * Connect via I2CP and ask the router to look up

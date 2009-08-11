@@ -27,7 +27,6 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
-import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Peer;
 import org.klomp.snark.Snark;
@@ -46,6 +45,7 @@ public class I2PSnarkServlet extends HttpServlet {
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     
+    @Override
     public void init(ServletConfig cfg) throws ServletException {
         super.init(cfg);
         _context = I2PAppContext.getGlobalContext();
@@ -59,6 +59,7 @@ public class I2PSnarkServlet extends HttpServlet {
         _manager.start();
     }
     
+    @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");

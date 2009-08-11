@@ -42,7 +42,7 @@ public class TunnelGateway {
     protected Receiver _receiver;
     protected long _lastFlush;
     protected int _flushFrequency;
-    protected DelayedFlush _delayedFlush;// LINT -- Exporting non-public type through public API
+    protected DelayedFlush _delayedFlush;// FIXME Exporting non-public type through public API FIXME
     protected int _messagesSent;
     
     /**

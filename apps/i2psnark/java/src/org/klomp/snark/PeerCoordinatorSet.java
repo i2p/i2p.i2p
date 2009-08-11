@@ -12,7 +12,7 @@ import java.util.Set;
  * from it there too)
  */
 public class PeerCoordinatorSet {
-    private Set _coordinators;
+    private final Set _coordinators;
     
     public PeerCoordinatorSet() {
         _coordinators = new HashSet();

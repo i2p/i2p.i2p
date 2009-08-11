@@ -20,13 +20,24 @@ public class Piece implements Comparable {
         return this.peers.size() - ((Piece)o).peers.size();
     }
     
+    @Override
     public boolean equals(Object o) {
-        if (o == null) return false;
-        try {
-            return this.id == ((Piece)o).id;
-        } catch (ClassCastException cce) {
-            return false;
+        if (o instanceof Piece) {
+            if (o == null) return false;
+            try {
+                return this.id == ((Piece)o).id;
+            } catch (ClassCastException cce) {
+                return false;
+            }
         }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + this.id;
+        return hash;
     }
     
     public int getId() { return this.id; }
@@ -36,6 +47,7 @@ public class Piece implements Comparable {
     public boolean isRequested() { return this.requested; }
     public void setRequested(boolean requested) { this.requested = requested; } 
     
+    @Override
     public String toString() {
         return String.valueOf(id);
     }

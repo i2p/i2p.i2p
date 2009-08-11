@@ -31,7 +31,7 @@ public class Hash extends DataStructureImpl {
     private byte[] _data;
     private volatile String _stringified;
     private volatile String _base64ed;
-    private Map _xorCache;
+    private /* FIXME final FIXME */ Map _xorCache;
 
     public final static int HASH_LENGTH = 32;
     public final static Hash FAKE_HASH = new Hash(new byte[HASH_LENGTH]);

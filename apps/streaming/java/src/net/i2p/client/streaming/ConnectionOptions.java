@@ -62,7 +62,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final boolean DEFAULT_ANSWER_PINGS = true;
 
     // Syncronization fix, but doing it this way causes NPE...
-    // private final int _trend[] = new int[TREND_COUNT];
+    // FIXME private final int _trend[] = new int[TREND_COUNT]; FIXME
     private int _trend[];
 
     /**

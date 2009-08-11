@@ -5,8 +5,6 @@ import java.util.List;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
-import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;

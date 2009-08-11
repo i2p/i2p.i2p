@@ -21,10 +21,10 @@ public class SimpleTimer {
     private I2PAppContext _context;
     private Log _log;
     /** event time (Long) to event (TimedEvent) mapping */
-    private TreeMap _events;
+    private final TreeMap _events;
     /** event (TimedEvent) to event time (Long) mapping */
     private Map _eventTimes;
-    private List _readyEvents;
+    private final List _readyEvents;
     private SimpleStore runn;
 
     protected SimpleTimer() { this("SimpleTimer"); }

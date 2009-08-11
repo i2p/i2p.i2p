@@ -70,11 +70,11 @@ public class LogManager {
     /** the config file */
     private File _locationFile;
     /** Ordered list of LogRecord elements that have not been written out yet */
-    private List _records;
+    private /* FIXME final FIXME */ List _records;
     /** List of explicit overrides of log levels (LogLimit objects) */
-    private List _limits;
+    private /* FIXME final FIXME */ List _limits;
     /** String (scope) to Log object */
-    private Map _logs;
+    private /* FIXME final FIXME */ Map _logs;
     /** who clears and writes our records */
     private LogWriter _writer;
 

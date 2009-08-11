@@ -11,8 +11,8 @@ import net.i2p.I2PAppContext;
  */
 public class LogConsoleBuffer {
     private I2PAppContext _context;
-    private List _buffer;
-    private List _critBuffer;
+    private final List _buffer;
+    private final List _critBuffer;
 
     public LogConsoleBuffer(I2PAppContext context) {
         _context = context;

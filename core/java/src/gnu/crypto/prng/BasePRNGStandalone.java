@@ -172,6 +172,7 @@ public abstract class BasePRNGStandalone implements IRandomStandalone {
 
    // abstract methods to implement by subclasses -----------------------------
 
+  @Override
   public Object clone() throws CloneNotSupportedException
   {
     return super.clone();

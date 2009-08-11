@@ -153,6 +153,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
      * create the default options (using the default timeout, etc)
      *
      */
+    @Override
     protected I2PSocketOptions getDefaultOptions() {
         Properties defaultOpts = getTunnel().getClientOptions();
         if (!defaultOpts.contains(I2PSocketOptions.PROP_READ_TIMEOUT))
@@ -259,8 +260,8 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                 return;
             }
             
-            Destination dest = I2PTunnel.destFromName(destination);
-            if (dest == null) {
+            Destination clientDest = I2PTunnel.destFromName(destination);
+            if (clientDest == null) {
                 String str;
                 byte[] header;
                 if (usingWWWProxy)
@@ -276,7 +277,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                 return;
             }
 
-            I2PSocket i2ps = createI2PSocket(dest, getDefaultOptions());
+            I2PSocket i2ps = createI2PSocket(clientDest, getDefaultOptions());
             byte[] data = null;
             byte[] response = null;
             if (usingWWWProxy)

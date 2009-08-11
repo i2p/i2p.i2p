@@ -60,6 +60,7 @@ public class HTTPUSocket
 		open(bindPort);
 	}
 
+    @Override
 	protected void finalize()
 	{
 		close();

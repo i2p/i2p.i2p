@@ -203,6 +203,7 @@ public class SessionConfig extends DataStructureImpl {
         _signature.writeBytes(out);
     }
 
+    /* FIXME missing hashCode() method FIXME */
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionConfig)) {

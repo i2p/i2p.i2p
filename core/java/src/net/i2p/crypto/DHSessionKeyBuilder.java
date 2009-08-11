@@ -53,6 +53,7 @@ public class DHSessionKeyBuilder {
     private static int MIN_NUM_BUILDERS = -1;
     private static int MAX_NUM_BUILDERS = -1;
     private static int CALC_DELAY = -1;
+    /* FIXME this should be final if you syncronize FIXME */
     private static volatile List _builders = new ArrayList(50);
     private static Thread _precalcThread = null;
     private BigInteger _myPrivateValue;

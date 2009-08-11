@@ -79,6 +79,13 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + (this._sessionId != null ? this._sessionId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DestroySessionMessage: ");
