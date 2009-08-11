@@ -341,20 +341,20 @@ public class SummaryHelper extends HelperBase {
         Collections.sort(clients, new AlphaComparator());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3>Local destinations</h3><hr><table>");
+        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"Add/remove/edit &amp; control your client and server tunnels (local destinations).\"  title=\"View existing tunnels and tunnel build status.\">Local destinations</a></h3><hr><table>");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
             String name = getName(client);
             
-            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/server.png\" alt=\"Server\" title=\"hello zzz!\"></td>");
+            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/server.png\" alt=\"Server\" title=\"Server/client\"></td>");
             buf.append("<td align=\"left\"><a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
             if (name.length() < 16)
                 buf.append(name);
             else
                 buf.append(name.substring(0,15)).append("&hellip;");
-            buf.append("</a></td></tr>\n");
+            buf.append("</a></td><td align=\right\"><img src=\"/themes/console/images/local_up.png\" alt=\"status\" title=\"status\"></td></tr>\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();

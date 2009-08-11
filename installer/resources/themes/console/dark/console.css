@@ -123,21 +123,22 @@ div.routersummary hr {
 }
 
 div.routersummary h3 {
-     border: 0px solid #f00;
-/*     border-bottom: 1px solid #99f !important;*/
+     border: 0;
      font-size: 10pt;
      letter-spacing: 0.05em;
      margin: -7px -9px -10px -9px;
-     padding: 5px 0px 5px 0px;
+     padding: 3px 0px 5px 0px;
      background: #007;
      text-transform: uppercase;
      -moz-border-radius: 0;
      -khtml-border-radius: 0;
      border-radius: 0;
+     background: #007;
+     background-image: -moz-linear-gradient(top, bottom, from(#007), to(#005), color-stop(7%, #007), color-stop(100%, #005));
 }
 
 div.routersummary h4 {
-     border: 0px solid #f00;
+     border: 0;
      border-bottom: 0 !important;
      font-size: 9pt;
      letter-spacing: 0.05em;
@@ -147,6 +148,7 @@ div.routersummary h4 {
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
+     background-image: -moz-linear-gradient(top, bottom, from(#001), to(#005), color-stop(10%, #005), color-stop(100%, #004));
 }
 
 div.routersummary table {
