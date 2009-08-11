@@ -44,8 +44,15 @@ public class ConfigUpdateHelper extends HelperBase {
         if (Boolean.valueOf(proxy).booleanValue()) 
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
         else
-            
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
+    }
+    
+    public String getUpdateUnsigned() {
+        String foo = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
+        if (Boolean.valueOf(foo).booleanValue()) 
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"true\" >";
+        else
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
     }
     
     private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l, 48*60*60*1000l, -1l };
@@ -105,11 +112,11 @@ public class ConfigUpdateHelper extends HelperBase {
         return new TrustedUpdate(_context).getTrustedKeysString();
     }
 
-    public String getNewsStatus() { 
-        return NewsFetcher.getInstance(_context).status();
+    public String getZipURL() {
+        return _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL, "");
     }
 
-    public String getUpdateVersion() { 
-        return NewsFetcher.getInstance(_context).updateVersion();
+    public String getNewsStatus() { 
+        return NewsFetcher.getInstance(_context).status();
     }
 }

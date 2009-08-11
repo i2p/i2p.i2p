@@ -525,4 +525,15 @@ public class SummaryHelper extends HelperBase {
         return NewsFetcher.getInstance(_context).updateAvailable();
     }
 
+    public boolean unsignedUpdateAvailable() { 
+        return NewsFetcher.getInstance(_context).unsignedUpdateAvailable();
+    }
+
+    public String getUpdateVersion() { 
+        return NewsFetcher.getInstance(_context).updateVersion();
+    }
+
+    public String getUnsignedUpdateVersion() { 
+        return NewsFetcher.getInstance(_context).unsignedUpdateVersion();
+    }
 }

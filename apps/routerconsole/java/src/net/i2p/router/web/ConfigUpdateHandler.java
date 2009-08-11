@@ -16,6 +16,8 @@ public class ConfigUpdateHandler extends FormHandler {
     private String _proxyPort;
     private boolean _updateThroughProxy;
     private String _trustedKeys;
+    private boolean _updateUnsigned;
+    private String _zipURL;
 
     public static final String PROP_NEWS_URL = "router.newsURL";
 //  public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
@@ -30,7 +32,12 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_PROXY_HOST = "router.updateProxyHost";
     public static final String DEFAULT_PROXY_HOST = "127.0.0.1";
     public static final String PROP_PROXY_PORT = "router.updateProxyPort";
-    public static final String DEFAULT_PROXY_PORT = "4444";
+    public static final int DEFAULT_PROXY_PORT_INT = 4444;
+    public static final String DEFAULT_PROXY_PORT = "" + DEFAULT_PROXY_PORT_INT;
+    /** default false */
+    public static final String PROP_UPDATE_UNSIGNED = "router.updateUnsigned";
+    /** no default */
+    public static final String PROP_ZIP_URL = "router.updateUnsignedURL";
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
     public static final String DEFAULT_UPDATE_URL =
@@ -46,7 +53,9 @@ public class ConfigUpdateHandler extends FormHandler {
         if ("Check for update now".equals(_action)) {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
             fetcher.fetchNews();
-            if (fetcher.updateAvailable()) {
+            if (fetcher.shouldFetchUnsigned())
+                fetcher.fetchUnsigned();
+            if (fetcher.updateAvailable() || fetcher.unsignedUpdateAvailable()) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice("Update available, attempting to download now");
                 else
@@ -79,11 +88,8 @@ public class ConfigUpdateHandler extends FormHandler {
             }
         }
         
-        if (_updateThroughProxy) {
-            _context.router().setConfigSetting(PROP_SHOULD_PROXY, Boolean.TRUE.toString());
-        } else {
-            _context.router().setConfigSetting(PROP_SHOULD_PROXY, Boolean.FALSE.toString());
-        }
+        _context.router().setConfigSetting(PROP_SHOULD_PROXY, "" + _updateThroughProxy);
+        _context.router().setConfigSetting(PROP_UPDATE_UNSIGNED, "" + _updateUnsigned);
         
         String oldFreqStr = _context.router().getConfigSetting(PROP_REFRESH_FREQUENCY);
         long oldFreq = -1;
@@ -119,6 +125,14 @@ public class ConfigUpdateHandler extends FormHandler {
             }
         }
         
+        if ( (_zipURL != null) && (_zipURL.length() > 0) ) {
+            String oldURL = _context.router().getConfigSetting(PROP_ZIP_URL);
+            if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
+                _context.router().setConfigSetting(PROP_ZIP_URL, _zipURL);
+                addFormNotice("Updating unsigned update URL to " + _zipURL);
+            }
+        }
+        
         _context.router().saveConfig();
     }
     
@@ -132,4 +146,6 @@ public class ConfigUpdateHandler extends FormHandler {
     public void setUpdateThroughProxy(String foo) { _updateThroughProxy = true; }
     public void setProxyHost(String host) { _proxyHost = host; }
     public void setProxyPort(String port) { _proxyPort = port; }
+    public void setUpdateUnsigned(String foo) { _updateUnsigned = true; }
+    public void setZipURL(String url) { _zipURL = url; }
 }

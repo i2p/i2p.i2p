@@ -23,48 +23,50 @@ import net.i2p.data.DataHelper;
  *        [-o outputFile] 
  *        [-m markSize lineLen]
  *        url
+ *
+ * Bug: a malformed url http://example.i2p (no trailing '/') fails cryptically
  */
 public class EepGet {
     private I2PAppContext _context;
-    private Log _log;
-    private boolean _shouldProxy;
+    protected Log _log;
+    protected boolean _shouldProxy;
     private String _proxyHost;
     private int _proxyPort;
-    private int _numRetries;
+    protected int _numRetries;
     private long _minSize; // minimum and maximum acceptable response size, -1 signifies unlimited,
     private long _maxSize; // applied both against whole responses and chunks
     private String _outputFile;
     private OutputStream _outputStream;
     /** url we were asked to fetch */
-    private String _url;
+    protected String _url;
     /** the URL we actually fetch from (may differ from the _url in case of redirect) */
-    private String _actualURL;
+    protected String _actualURL;
     private String _postData;
     private boolean _allowCaching;
-    private List _listeners;
+    protected List _listeners;
     
     private boolean _keepFetching;
     private Socket _proxy;
     private OutputStream _proxyOut;
     private InputStream _proxyIn;
-    private OutputStream _out;
+    protected OutputStream _out;
     private long _alreadyTransferred;
     private long _bytesTransferred;
-    private long _bytesRemaining;
-    private int _currentAttempt;
+    protected long _bytesRemaining;
+    protected int _currentAttempt;
     private String _etag;
     private String _lastModified;
     private boolean _encodingChunked;
     private boolean _notModified;
     private String _contentType;
-    private boolean _transferFailed;
-    private boolean _headersRead;
-    private boolean _aborted;
+    protected boolean _transferFailed;
+    protected boolean _headersRead;
+    protected boolean _aborted;
     private long _fetchHeaderTimeout;
     private long _fetchEndTime;
-    private long _fetchInactivityTimeout;
-    private int _redirects;
-    private String _redirectLocation;
+    protected long _fetchInactivityTimeout;
+    protected int _redirects;
+    protected String _redirectLocation;
     
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
@@ -214,7 +216,7 @@ public class EepGet {
         return buf.toString();
     }
     
-    private static void usage() {
+    protected static void usage() {
         System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] [-t timeout] url");
     }
     
@@ -480,7 +482,7 @@ public class EepGet {
     }
 
     /** return true if the URL was completely retrieved */
-    private void doFetch(SocketTimeout timeout) throws IOException {
+    protected void doFetch(SocketTimeout timeout) throws IOException {
         _headersRead = false;
         _aborted = false;
         try {
@@ -625,7 +627,7 @@ public class EepGet {
         }
     }
 
-    private void readHeaders() throws IOException {
+    protected void readHeaders() throws IOException {
         String key = null;
         StringBuilder buf = new StringBuilder(32);
 
@@ -844,7 +846,7 @@ public class EepGet {
     private static final byte NL = '\n';
     private boolean isNL(byte b) { return (b == NL); }
 
-    private void sendRequest(SocketTimeout timeout) throws IOException {
+    protected void sendRequest(SocketTimeout timeout) throws IOException {
         if (_outputStream != null) {
             // We are reading into a stream supplied by a caller,
             // for which we cannot easily determine how much we've written.
@@ -892,7 +894,7 @@ public class EepGet {
             _log.debug("Request flushed");
     }
     
-    private String getRequest() throws IOException {
+    protected String getRequest() throws IOException {
         StringBuilder buf = new StringBuilder(512);
         boolean post = false;
         if ( (_postData != null) && (_postData.length() > 0) )
@@ -963,5 +965,4 @@ public class EepGet {
     public String getContentType() {
         return _contentType;
     }
-
 }
