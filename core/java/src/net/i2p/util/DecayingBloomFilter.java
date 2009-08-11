@@ -30,6 +30,7 @@ public class DecayingBloomFilter {
     private boolean _keepDecaying;
     private DecayEvent _decayEvent;
     
+    private static final int DEFAULT_M = 23;
     private static final boolean ALWAYS_MISS = false;
    
     /**
@@ -44,8 +45,12 @@ public class DecayingBloomFilter {
         _context = context;
         _log = context.logManager().getLog(DecayingBloomFilter.class);
         _entryBytes = entryBytes;
-        _current = new BloomSHA1(23, 11); //new BloomSHA1(23, 11);
-        _previous = new BloomSHA1(23, 11); //new BloomSHA1(23, 11);
+        // this is instantiated in four different places, they may have different
+        // requirements, but for now use this as a gross method of memory reduction.
+        // m == 23 => 1MB each BloomSHA1 (4 pairs = 8MB total)
+        int m = context.getProperty("router.decayingBloomFilterM", DEFAULT_M);
+        _current = new BloomSHA1(m, 11); //new BloomSHA1(23, 11);
+        _previous = new BloomSHA1(m, 11); //new BloomSHA1(23, 11);
         _durationMs = durationMs;
         int numExtenders = (32+ (entryBytes-1))/entryBytes - 1;
         if (numExtenders < 0)

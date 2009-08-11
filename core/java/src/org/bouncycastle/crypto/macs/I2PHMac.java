@@ -42,8 +42,12 @@ import org.bouncycastle.crypto.Mac;
  * a frequently used buffer (called on doFinal).  changes released into the public
  * domain in 2005.
  *
+ * This is renamed from HMac because the constructor HMac(digest, sz) does not exist
+ * in the standard bouncycastle library, thus it conflicts in JVMs that contain the
+ * standard library (Android).
+ *
  */
-public class HMac
+public class I2PHMac
 implements Mac
 {
     private final static int BLOCK_LENGTH = 64;
@@ -56,12 +60,12 @@ implements Mac
     private byte[] inputPad = new byte[BLOCK_LENGTH];
     private byte[] outputPad = new byte[BLOCK_LENGTH];
 
-    public HMac(
+    public I2PHMac(
         Digest digest)
     {
         this(digest, digest.getDigestSize()); 
     }
-    public HMac(
+    public I2PHMac(
         Digest digest, int sz)
     {
         this.digest = digest;
