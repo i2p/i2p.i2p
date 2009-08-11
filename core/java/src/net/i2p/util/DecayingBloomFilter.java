@@ -47,7 +47,7 @@ public class DecayingBloomFilter {
         _entryBytes = entryBytes;
         // this is instantiated in four different places, they may have different
         // requirements, but for now use this as a gross method of memory reduction.
-        // m == 23 => 2MB each BloomSHA1 (8MB total)
+        // m == 23 => 1MB each BloomSHA1 (4 pairs = 8MB total)
         int m = context.getProperty("router.decayingBloomFilterM", DEFAULT_M);
         _current = new BloomSHA1(m, 11); //new BloomSHA1(23, 11);
         _previous = new BloomSHA1(m, 11); //new BloomSHA1(23, 11);
