@@ -64,7 +64,8 @@ public class I2PSnarkServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
-        long stats[] = {0,0,0,0,0};
+        /** dl, ul, down rate, up rate, peers, size */
+        final long stats[] = {0,0,0,0,0,0};
         
         String nonce = req.getParameter("nonce");
         if ( (nonce != null) && (nonce.equals(String.valueOf(_nonce))) )
@@ -136,7 +137,10 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write(TABLE_EMPTY);
         } else if (snarks.size() > 1) {
             out.write("<tfoot><tr>\n" +
-                      "    <th align=\"left\" colspan=\"2\">Totals (" + snarks.size() + " torrents, " + stats[4] + " connected peers)</th>\n" +
+                      "    <th align=\"left\" colspan=\"2\">Totals (" +
+                      snarks.size() + " torrents, " +
+                      DataHelper.formatSize(stats[5]) + "B, " +
+                      stats[4] + " connected peers)</th>\n" +
                       "    <th>&nbsp;</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[1]) + "</th>\n" +
@@ -430,6 +434,7 @@ public class I2PSnarkServlet extends HttpServlet {
             stats[2] += downBps;
             stats[3] += upBps;
         }
+        stats[5] += total;
         
         boolean isValid = snark.meta != null;
         boolean singleFile = snark.meta.getFiles() == null;
