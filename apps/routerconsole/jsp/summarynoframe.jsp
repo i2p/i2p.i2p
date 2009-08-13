@@ -92,7 +92,7 @@
 <tr><td align="left"><b>High capacity:</b></td><td align="right"><jsp:getProperty name="helper" property="highCapacityPeers" /></td></tr>
 <tr><td align="left"><b>Integrated:</b></td><td align="right"><jsp:getProperty name="helper" property="wellIntegratedPeers" /></td></tr>
 <tr><td align="left"><b>Known:</b></td><td align="right"><jsp:getProperty name="helper" property="allPeers" /></td></tr></table><hr><%
-    if (helper.getActivePeers() <= 0) {
+    if (helper.showFirewallWarning()) {
         %><h4><a href="config.jsp" target="_top" title="Help with firewall configuration.">Check NAT/firewall</a></h4><%
     }
     // If showing the reseed link is allowed
