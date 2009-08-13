@@ -135,12 +135,14 @@ public class SummaryHelper extends HelperBase {
      * Retrieve amount of used memory.
      *
      */
+/********
     public String getMemory() {
         DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
         long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024;
         long usedPc = 100 - ((Runtime.getRuntime().freeMemory() * 100) / Runtime.getRuntime().totalMemory());
         return integerFormatter.format(used) + "KB (" + usedPc + "%)"; 
     }
+********/
     
     /**
      * How many peers we are talking to now
@@ -196,22 +198,26 @@ public class SummaryHelper extends HelperBase {
      * How many peers the router ranks as failing.
      *
      */
+/********
     public int getFailingPeers() { 
         if (_context == null) 
             return 0;
         else
             return _context.profileOrganizer().countFailingPeers();
     }
+********/
     /**
      * How many peers totally suck.
      *
      */
+/********
     public int getShitlistedPeers() { 
         if (_context == null) 
             return 0;
         else
             return _context.shitlist().getRouterCount();
     }
+********/
  
     /**
      * How fast we have been receiving data over the last second (pretty printed
@@ -510,6 +516,7 @@ public class SummaryHelper extends HelperBase {
         return String.valueOf(_context.tunnelManager().getInboundBuildQueueSize());
     }
     
+/*******
     public String getPRNGStatus() {
         Rate r = _context.statManager().getRate("prng.bufferWaitTime").getRate(60*1000);
         int use = (int) r.getLastEventCount();
@@ -531,6 +538,7 @@ public class SummaryHelper extends HelperBase {
             rv = rv + ' ' + (60*1000 / (use * i)) + 'x';
         return rv;
     }
+********/
 
     public boolean updateAvailable() { 
         return NewsFetcher.getInstance(_context).updateAvailable();

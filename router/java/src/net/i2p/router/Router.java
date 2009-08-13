@@ -885,7 +885,6 @@ public class Router {
         //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.deleteTempDir();
         RouterContext.listContexts().remove(_context);
-        //dumpStats();
         finalShutdown(exitCode);
     }
 
@@ -1065,10 +1064,6 @@ public class Router {
         _started = _context.clock().now();
         
         _log.log(Log.CRIT, "Restart complete");
-    }
-    
-    private void dumpStats() {
-        //_log.log(Log.CRIT, "Lifetime stats:\n\n" + StatsGenerator.generateStatsPage());
     }
     
     public static void main(String args[]) {
