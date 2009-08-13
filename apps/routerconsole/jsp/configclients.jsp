@@ -39,7 +39,7 @@ button span.hide{
  <jsp:getProperty name="clientshelper" property="form1" />
  </p><p>
  <i>To change other client options, edit the file
-<%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext())%>.
+<%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.
 All changes require restart to take effect.</i>
  </p> <hr /><div class="formaction">
  <input type="submit" name="action" value="Save Client Configuration" />
