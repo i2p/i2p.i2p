@@ -38,7 +38,9 @@ button span.hide{
  </p><p> <div class="wideload">
  <jsp:getProperty name="clientshelper" property="form1" />
  </p><p>
- <i>All changes require restart to take effect. To change other client options, edit the clients.config file.</i>
+ <i>To change other client options, edit the file
+<%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext())%>.
+All changes require restart to take effect.</i>
  </p> <hr /><div class="formaction">
  <input type="submit" name="action" value="Save Client Configuration" />
 </div></div>
@@ -57,7 +59,7 @@ button span.hide{
  <jsp:getProperty name="clientshelper" property="form2" />
  </p>
  <p>
- <i>All changes require restart to take effect. To change other webapp options, edit the webapps.config file.</i>
+ <i>All changes require restart to take effect.</i>
  </p>
  <hr><div class="formaction">
  <input type="submit" name="action" value="Save WebApp Configuration" />
