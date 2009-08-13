@@ -59,16 +59,16 @@ class ProfileOrganizerRenderer {
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>Peer Profiles</h2>\n");
         buf.append("<p>Showing ").append(order.size()).append(" recent profiles, hiding ").append(peers.size()-order.size()).append(" older profiles</p>");
-        buf.append("<table>");
-        buf.append("<tr>");
-        buf.append("<th>Peer</th>");
-        buf.append("<th>Groups (Caps)</th>");
-        buf.append("<th>Speed</th>");
-        buf.append("<th>Capacity</th>");
-        buf.append("<th>Integration</th>");
-        buf.append("<th>Failing?</th>");
-        buf.append("<th>&nbsp;</th>");
-        buf.append("</tr>");
+        buf.append("<table>" +
+                   "<tr>" +
+                   "<th>Peer</th>" +
+                   "<th>Groups (Caps)</th>" +
+                   "<th>Speed</th>" +
+                   "<th>Capacity</th>" +
+                   "<th>Integration</th>" +
+                   "<th>Failing?</th>" +
+                   "<th>&nbsp;</th>" +
+                   "</tr>");
         int prevTier = 1;
         for (Iterator iter = order.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
@@ -156,30 +156,30 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<h2>Floodfill and Integrated Peers</h2>\n");
-        buf.append("<table>");
-        buf.append("<tr>");
-        buf.append("<th class=\"smallhead\">Peer</th>");
-        buf.append("<th class=\"smallhead\">Caps</th>");
-        buf.append("<th class=\"smallhead\">Integ. Value</th>");
-        buf.append("<th class=\"smallhead\">Last Heard About</th>");
-        buf.append("<th class=\"smallhead\">Last Heard From</th>");
-//        buf.append("<th class=\"smallhead\">Last Successful Send</th>");
-        buf.append("<th class=\"smallhead\">Last Good Send</th>");        
-//        buf.append("<th class=\"smallhead\">Last Failed Send</th>");
-        buf.append("<th class=\"smallhead\">Last Bad Send</th>");
-        buf.append("<th class=\"smallhead\">10m Resp. Time</th>");
-        buf.append("<th class=\"smallhead\">1h Resp. Time</th>");
-        buf.append("<th class=\"smallhead\">1d Resp. Time</th>");
-//        buf.append("<th class=\"smallhead\">Successful Lookups</th>"); 
-        buf.append("<th class=\"smallhead\">Good Lookups</th>"); 
-//        buf.append("<th>Failed Lookups</th>");
-        buf.append("<th class=\"smallhead\">Bad Lookups</th>");        
-        buf.append("<th class=\"smallhead\">New Stores</th>");
-        buf.append("<th class=\"smallhead\">Old Stores</th>");
-        buf.append("<th class=\"smallhead\">1h Fail Rate</th>");
-        buf.append("<th class=\"smallhead\">1d Fail Rate</th>");
-        buf.append("</tr>");
+        buf.append("<h2>Floodfill and Integrated Peers</h2>\n" +
+                   "<table>" +
+                   "<tr>" +
+                   "<th class=\"smallhead\">Peer</th>" +
+                   "<th class=\"smallhead\">Caps</th>" +
+                   "<th class=\"smallhead\">Integ. Value</th>" +
+                   "<th class=\"smallhead\">Last Heard About</th>" +
+                   "<th class=\"smallhead\">Last Heard From</th>" +
+//                   "<th class=\"smallhead\">Last Successful Send</th>" +
+                   "<th class=\"smallhead\">Last Good Send</th>" +        
+//                   "<th class=\"smallhead\">Last Failed Send</th>" +
+                   "<th class=\"smallhead\">Last Bad Send</th>" +
+                   "<th class=\"smallhead\">10m Resp. Time</th>" +
+                   "<th class=\"smallhead\">1h Resp. Time</th>" +
+                   "<th class=\"smallhead\">1d Resp. Time</th>" +
+//                   "<th class=\"smallhead\">Successful Lookups</th>" + 
+                   "<th class=\"smallhead\">Good Lookups</th>" + 
+//                   "<th>Failed Lookups</th>" +
+                   "<th class=\"smallhead\">Bad Lookups</th>" +        
+                   "<th class=\"smallhead\">New Stores</th>" +
+                   "<th class=\"smallhead\">Old Stores</th>" +
+                   "<th class=\"smallhead\">1h Fail Rate</th>" +
+                   "<th class=\"smallhead\">1d Fail Rate</th>" +
+                   "</tr>");
         for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
@@ -222,14 +222,14 @@ class ProfileOrganizerRenderer {
         buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
         buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
         buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)");
-        buf.append("<h3>Definitions:</h3><ul>");
-        buf.append("<li><b>groups</b>: as determined by the profile organizer</li>");
-        buf.append("<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>");
-        buf.append("<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>");
-        buf.append("<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>");
-        buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
-        buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
-        buf.append("</ul></i>");
+        buf.append("<h3>Definitions:</h3><ul>" +
+                   "<li><b>groups</b>: as determined by the profile organizer</li>" +
+                   "<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>" +
+                   "<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>" +
+                   "<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>" +
+                   "<li><b>integration</b>: how many new peers have they told us about lately?</li>" +
+                   "<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>" +
+                   "</ul></i>");
         out.write(buf.toString());
         out.flush();
     }
