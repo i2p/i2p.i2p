@@ -970,13 +970,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             buf.append(")</b><br />\n");
             long exp = ls.getEarliestLeaseDate()-now;
             if (exp > 0)
-                buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br />\n");
+                buf.append("Expires in ").append(DataHelper.formatDuration(exp)).append("<br />\n");
             else
-                buf.append("Earliest expiration date was: <i>").append(DataHelper.formatDuration(0-exp)).append(" ago</i><br />\n");
+                buf.append("Expired ").append(DataHelper.formatDuration(0-exp)).append(" ago<br />\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
-                buf.append("Lease ").append(i).append(": gateway <i>");
-                buf.append(ls.getLease(i).getGateway().toBase64().substring(0,6));
-                buf.append("</i> tunnelId <i>").append(ls.getLease(i).getTunnelId().getTunnelId()).append("</i><br />\n");
+                buf.append("Lease ").append(i + 1).append(": Gateway ");
+                buf.append(_context.commSystem().renderPeerHTML(ls.getLease(i).getGateway()));
+                buf.append(" Tunnel ").append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br />\n");
             }
             buf.append("<hr />\n");
             out.write(buf.toString());
