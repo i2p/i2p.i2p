@@ -4,7 +4,7 @@
 <h2>Welkom bij I2P!</h2>
 <p>Als je net I2P opgestart hebt, zullen de 'Active:' (Actieve) getallen aan de linkerkant in de komende minuten stijgen, en je zal een "Shared clients" (Gedeelde clients) lokale bestemming zien staan aan de linkerkant (indien niet, <a href=#trouble>zie hieronder</a>). Eenmaal je deze bestemming ziet, kan je:</p>
 <ul>
- <li><b>surfen naar "eepsites"</b> - op I2P zijn er anonieme websites - stel je browser in om de <b>HTTP proxy op localhost, poort 4444</b> te gebruiken, en surf vervolgens naar een eepsite:<br /><br />
+ <li><b>surfen naar "eepsites"</b> - op I2P zijn er anonieme websites - stel je browser in om de <b>HTTP proxy op 127.0.0.1, poort 4444</b> te gebruiken, en surf vervolgens naar een eepsite:<br /><br />
      <ul>
          <li><a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p</a> en
              <a href="http://perv.i2p/stats.cgi">perv.i2p</a>: sites die lijsten bijhouden van actieve eepsites</li>
@@ -26,7 +26,7 @@
      In i2p zit een gebundelde <a href="/susimail/susimail">susimail</a>,
      een webgebaseerde anonimiteits-georienteerde pop3/smtp-client ingesteld om postman zijn e-mailservices te gebruiken.</li>
  <li><b>anoniem chatten</b> - start je eigen IRC-client op en verbind met
-     de server op <b>localhost poort 6668</b>.  Dit wijst naar een of twee anoniem gehoste
+     de server op <b>127.0.0.1 poort 6668</b>.  Dit wijst naar een of twee anoniem gehoste
      IRC servers, maar zowel jij als zei weten niet waar de andere is.</li>
  <li><b>anoniem bloggen</b> - neem een kijkje bij <a href="http://syndie.i2p2.de/">Syndie</a></li>
  <li>en veel meer</li>
@@ -36,13 +36,13 @@
 
 <p>We hebben aan I2P software toegevoegd om je je eigen eepsite te laten hosten - een
 <a href="http://jetty.mortbay.org/">Jetty</a> webserver, die luistert op
-<a href="http://localhost:7658/">http://localhost:7658/</a>.  Plaats gewoonweg je bestanden in
+<a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.  Plaats gewoonweg je bestanden in
 de <code>eepsite/docroot/</code> map (of plaats standaard JSP/Servlet <code>.war</code>
 bestanden onder <code>eepsite/webapps</code>, of standaard CGI scripts onder <code>eepsite/cgi-bin</code>) 
 en ze zullen verschijnen. Na een <a href="/i2ptunnel/">eepsite tunnel</a> opgestart te hebben die er naar wijst,
 zal je eepsite zichtbaar zijn voor anderen.
 Gedetailleerde instructies voor het starten van je eepsite staan op
-<a href="http://localhost:7658/">je tijdelijke eepsite-pagina</a>.
+<a href="http://127.0.0.1:7658/">je tijdelijke eepsite-pagina</a>.
 </p>
 
 <h2><a name="trouble">Problemen</a></h2>
@@ -51,7 +51,7 @@ Gedetailleerde instructies voor het starten van je eepsite staan op
 Als, na 30 minuten, je Active: (Actieve) verbonden/recent verbonden aantallen lager zijn dan 10 verbonden gebruikers,
 zou je best poort 8887 op je firewall openen voor een betere verbinding.
 Als je in het geheel geen eepsites kan zien (zelfs <a href="http://www.i2p2.i2p/">www.i2p2.i2p</a> niet),
-controleer dan nog eens of de proxy van je browser op localhost poort 4444 staat.
+controleer dan nog eens of de proxy van je browser op 127.0.0.1 poort 4444 staat.
 Je zou best ook de informatie controleren op de
 <a href="http://www.i2p2.i2p/">I2P website</a>, of plaats een bericht op het
 <a href="http://forum.i2p/">I2P discussie forum</a>, of kom langs bij #i2p of

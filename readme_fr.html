@@ -4,7 +4,7 @@
 <h2>Bienvenu a I2P!</h2>
 <p>Si vous venez juste de lancer I2P, les chiffres sur la gauche &agrave; cot&eacute; de Active devraient commencer &agrave; augmenter dans les prochaines minutes et vous verrez un "Shared client" en destination locale list&eacute;s sur la gauche (si non, <a href=#trouble>voir plus bas</a>). Une fois qu'ils apparaissent, vous pouvez:</p>
 <ul>
-  <li class="tidylist"><b>parcourir les "eepsites"</b> - sur I2P il y a des sites web anonymes h&eacute;berg&eacute;s - dites &agrave; votre navigateur d'utiliser <b>le HTTP proxy a l'adresse localhost port 4444</b>, ensuite vous pouvez naviguer sur les eepsites:<br />
+  <li class="tidylist"><b>parcourir les "eepsites"</b> - sur I2P il y a des sites web anonymes h&eacute;berg&eacute;s - dites &agrave; votre navigateur d'utiliser <b>le HTTP proxy a l'adresse 127.0.0.1 port 4444</b>, ensuite vous pouvez naviguer sur les eepsites:<br />
      <ul class="links">
           <li class="tidylist"><a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p</a> et
              <a href="http://perv.i2p/stats.cgi">perv.i2p</a>: listent les eepsites actifs</li>
@@ -22,7 +22,7 @@
   <li class="tidylist"><b>Utiliser le service de mail anonyme</b> - Postman a cr&eacute;&eacute; un syt&egrave;me de mails compatible avec un client de messagerie normal (POP3 / SMTP) qui permet d'envoyer des emails autant au sein d'i2p que vers et &agrave; partir de l'internet normal! Cr&eacute;ez-vous un compte &agrave;  <a href="http://hq.postman.i2p/">hq.postman.i2p</a>.
      Nous fournissons dans la version de base de i2p <a href="/susimail/susimail">susimail</a>,
      un client web pop3/smtp orient&eacute; sur l'anonymat qui est configur&eacute; pour acc&eacute;der aux services email de postman.</li>
-  <li class="tidylist"><b>Chatter de mani&egrave;re anonyme</b> - Activez votre client IRC et connectez-le sur le serveur <b>localhost port 6668</b>. Ceci pointe vers l'un des deux serveur IRC anonyme, mais ni vous ni eux ne savent qui est l'autre</li>
+  <li class="tidylist"><b>Chatter de mani&egrave;re anonyme</b> - Activez votre client IRC et connectez-le sur le serveur <b>127.0.0.1 port 6668</b>. Ceci pointe vers l'un des deux serveur IRC anonyme, mais ni vous ni eux ne savent qui est l'autre</li>
   <li class="tidylist"><b>Cr&eacute;ez-vous un blog anonyme</b> - Renseignez-vous chez <a href="http://syndie.i2p2.de/">Syndie</a></li>
   <li class="tidylist">Et bien d'autres</li>
 </ul>
@@ -31,9 +31,9 @@
 
 <p>Nous fournissons de base quelques logiciels pour vous permettre de cr&eacute;er votre propre eepsite - une instance 
 <a href="http://jetty.mortbay.org/">Jetty</a>, qui &eacute;coute sur
-<a href="http://localhost:7658/">http://localhost:7658/</a>.  Placer simplement vos fichiers dans le r&eacute;pertoire <code>eepsite/docroot/</code> (ou placez n'importe quel fichier JSP/Servlet standard <code>.war</code>) dans eepsite/webapps, ou script CGI standard dans <code>eepsite/cgi-bin</code>) et ils apparaitront. Apr&egrave;s avoir d&eacute;marr&eacute; un <a href="/i2ptunnel/">tunnel pour votre eepsite</a> (le tunnel doit pointer sur l'adresse locale du eepsite), votre eepsite sera visible pour les autes. Des instructions plus d&eacute;taill&eacute;es pour cr&eacute;er un eepsite se trouvent sur <a href="http://localhost:7658/">Votre eepsite temporaire</a>.
+<a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.  Placer simplement vos fichiers dans le r&eacute;pertoire <code>eepsite/docroot/</code> (ou placez n'importe quel fichier JSP/Servlet standard <code>.war</code>) dans eepsite/webapps, ou script CGI standard dans <code>eepsite/cgi-bin</code>) et ils apparaitront. Apr&egrave;s avoir d&eacute;marr&eacute; un <a href="/i2ptunnel/">tunnel pour votre eepsite</a> (le tunnel doit pointer sur l'adresse locale du eepsite), votre eepsite sera visible pour les autes. Des instructions plus d&eacute;taill&eacute;es pour cr&eacute;er un eepsite se trouvent sur <a href="http://127.0.0.1:7658/">Votre eepsite temporaire</a>.
 </p>
 
 <h2><a name="trouble">D&eacute;pannage</a></h2>
 
-<p>Soyez patient - i2p peut s'av&eacute;rer lent &agrave; d&eacute;marrer la premi&egrave;re fois car il recherche des pairs. Si, apr&egrave;s 30 minutes, votre Actives: connect&eacute;/r&eacute;cent compte moins de 10 pairs connect&eacute;s, vous devez ouvrir le port 8887 sur votre pare-feu pour avoir une meilleure connection. Si vous ne pouvez acc&eacute;der &agrave; aucun eepsite (m&ecirc;me <a href="http://www.i2p2.i2p/">www.i2p2.i2p</a>), soyez s&ucirc;r que votre navigateur utilise bien le proxy localhost sur le port 4444. Vous pouvez aussi faire part de votre d&eacute;marche sur le <a href="http://www.i2p2.i2p/">site web I2P</a>, poster des message sur le <a href="http://forum.i2p/">forum de discussion</a>, ou passer par #i2p ou #i2p-chat sur IRC sur le serveur <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, irc.postman.i2p ou irc.freshcoffee.i2p (ils sont li&eacute;s).</p><hr />
+<p>Soyez patient - i2p peut s'av&eacute;rer lent &agrave; d&eacute;marrer la premi&egrave;re fois car il recherche des pairs. Si, apr&egrave;s 30 minutes, votre Actives: connect&eacute;/r&eacute;cent compte moins de 10 pairs connect&eacute;s, vous devez ouvrir le port 8887 sur votre pare-feu pour avoir une meilleure connection. Si vous ne pouvez acc&eacute;der &agrave; aucun eepsite (m&ecirc;me <a href="http://www.i2p2.i2p/">www.i2p2.i2p</a>), soyez s&ucirc;r que votre navigateur utilise bien le proxy 127.0.0.1 sur le port 4444. Vous pouvez aussi faire part de votre d&eacute;marche sur le <a href="http://www.i2p2.i2p/">site web I2P</a>, poster des message sur le <a href="http://forum.i2p/">forum de discussion</a>, ou passer par #i2p ou #i2p-chat sur IRC sur le serveur <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, irc.postman.i2p ou irc.freshcoffee.i2p (ils sont li&eacute;s).</p><hr />

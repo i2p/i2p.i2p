@@ -1,9 +1,14 @@
+#
+# If you have a 'split' directory installation, with configuration
+# files in ~/.i2p (Linux) or %APPDATA%\I2P (Windows), be sure to
+# edit the file in the configuration directory, NOT the install directory.
+#
 # Blocking is now enabled by default.
 # To disable blocking, set router.blocklist.enable=false on configadvanced.jsp and restart.
 #
 # Add additional entries as desired, sorting not required.
 # This file is only read at router startup.
-# To manually block a router after startup, use the form on http://localhost:7657/configpeer.jsp
+# To manually block a router after startup, use the form on http://127.0.0.1:7657/configpeer.jsp
 # Warning - a large list will increase memory usage.
 # Please do not block too broadly, it will segment and harm the network.
 # For example, http://www.bluetack.co.uk/config/splist.zip is very broad and includes Tor users, it is not recommended.

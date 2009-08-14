@@ -753,6 +753,8 @@ public class Blocklist {
         // We already shitlisted in shitlist(peer), that's good enough
     }
 
+    private static final int MAX_DISPLAY = 1000;
+
     /** write directly to the stream so we don't OOM on a huge list */
     public void renderStatusHTML(Writer out) throws IOException {
         out.write("<h2>Banned IPs</h2>");
@@ -768,7 +770,8 @@ public class Blocklist {
         }
         if (_blocklistSize > 0) {
             out.write("<table><tr><th align=center colspan=2><b>IPs from Blocklist File</b></th></tr><tr><td align=center width=50%><b>From:</b></td><td align=center width=50%><b>To:</b></td></tr>");
-            for (int i = 0; i < _blocklistSize; i++) {
+            int max = Math.min(_blocklistSize, MAX_DISPLAY);
+            for (int i = 0; i < max; i++) {
                  int from = getFrom(_blocklist[i]);
                  out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
                  int to = getTo(_blocklist[i]);
@@ -777,6 +780,9 @@ public class Blocklist {
                  } else
                      out.write("&nbsp</td></tr>\n");
             }
+            if (_blocklistSize > MAX_DISPLAY)
+                out.write("<tr><th colspan=2>First " + MAX_DISPLAY + " displayed, see the " +
+                          BLOCKLIST_FILE_DEFAULT + " file for the full list</th></tr>");
             out.write("</table>");
         } else {
             out.write("<br><i>No blocklist file entries.</i>");

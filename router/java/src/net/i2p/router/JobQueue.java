@@ -564,7 +564,7 @@ public class JobQueue {
         ArrayList timedJobs = null;
         ArrayList activeJobs = new ArrayList(1);
         ArrayList justFinishedJobs = new ArrayList(4);
-        out.write("<!-- jobQueue rendering -->\n");
+        //out.write("<!-- jobQueue rendering -->\n");
         out.flush();
         
         int states[] = null;
@@ -587,6 +587,7 @@ public class JobQueue {
             numRunners = _queueRunners.size();
         }
         
+/*******
         StringBuilder str = new StringBuilder(128);
         str.append("<!-- after queueRunner sync: states: ");
         for (int i = 0; states != null && i < states.length; i++)
@@ -598,41 +599,44 @@ public class JobQueue {
         str.append("-->\n");
         out.write(str.toString());
         out.flush();
+*******/
         
         synchronized (_jobLock) {
             readyJobs = new ArrayList(_readyJobs); 
             timedJobs = new ArrayList(_timedJobs);
         }
-        out.write("<!-- jobQueue rendering: after jobLock sync -->\n");
-        out.flush();
+        //out.write("<!-- jobQueue rendering: after jobLock sync -->\n");
+        //out.flush();
         
         StringBuilder buf = new StringBuilder(32*1024);
-        buf.append("<b><div class=\"joblog\"><h3>I2P JobQueue</h3><div class=\"wideload\"># runners: ").append(numRunners).append(" [states=");
-        if (states != null) 
-            for (int i = 0; i < states.length; i++) 
-                buf.append(states[i]).append(" ");
-        buf.append("]</b><br />\n");
+        buf.append("<b><div class=\"joblog\"><h3>I2P Job Queue</h3><div class=\"wideload\">Job runners: ").append(numRunners);
+        //buf.append(" [states=");
+        //if (states != null) 
+        //    for (int i = 0; i < states.length; i++) 
+        //        buf.append(states[i]).append(" ");
+        //buf.append(']');
+        buf.append("</b><br />\n");
 
         long now = _context.clock().now();
 
-        buf.append("<hr><b># active jobs: ").append(activeJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>Active jobs: ").append(activeJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
             Job j = (Job)activeJobs.get(i);
-            buf.append("<li> [started ").append(now-j.getTiming().getStartAfter()).append("ms ago]: ");
+            buf.append("<li>[started ").append(DataHelper.formatDuration(now-j.getTiming().getStartAfter())).append(" ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append("<hr><b># just finished jobs: ").append(justFinishedJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>Just finished jobs: ").append(justFinishedJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = (Job)justFinishedJobs.get(i);
-            buf.append("<li> [finished ").append(now-j.getTiming().getActualEnd()).append("ms ago]: ");
+            buf.append("<li>[finished ").append(DataHelper.formatDuration(now-j.getTiming().getActualEnd())).append(" ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append("<hr><b># ready/waiting jobs: ").append(readyJobs.size()).append(" </b><i>(lots of these mean there's likely a big problem)</i><ol>\n");
+        buf.append("<hr><b>Ready/waiting jobs: ").append(readyJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = (Job)readyJobs.get(i);
-            buf.append("<li> [waiting ");
+            buf.append("<li>[waiting ");
             buf.append(DataHelper.formatDuration(now-j.getTiming().getStartAfter()));
             buf.append("]: ");
             buf.append(j.toString()).append("</li>\n");
@@ -640,7 +644,7 @@ public class JobQueue {
         buf.append("</ol>\n");
         out.flush();
 
-        buf.append("<hr><b># timed jobs: ").append(timedJobs.size()).append("</b><ol>\n");
+        buf.append("<hr><b>Scheduled jobs: ").append(timedJobs.size()).append("</b><ol>\n");
         TreeMap ordered = new TreeMap();
         for (int i = 0; i < timedJobs.size(); i++) {
             Job j = (Job)timedJobs.get(i);
@@ -654,12 +658,12 @@ public class JobQueue {
         }
         buf.append("</ol></div>\n");
         
-        out.write("<!-- jobQueue rendering: after main buffer, before stats -->\n");
+        //out.write("<!-- jobQueue rendering: after main buffer, before stats -->\n");
         out.flush();
         
         getJobStats(buf);
         
-        out.write("<!-- jobQueue rendering: after stats -->\n");
+        //out.write("<!-- jobQueue rendering: after stats -->\n");
         out.flush();
         
         out.write(buf.toString());
@@ -667,10 +671,10 @@ public class JobQueue {
     
     /** render the HTML for the job stats */
     private void getJobStats(StringBuilder buf) { 
-        buf.append("<table>\n");
-        buf.append("<tr><th>Job</th><th>Runs</th>");
-        buf.append("<th>Time</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th>");
-        buf.append("<th>Pending</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th></tr>\n");
+        buf.append("<table>\n" +
+                   "<tr><th>Job</th><th>Runs</th>" +
+                   "<th>Time</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th>" +
+                   "<th>Pending</th><th><i>Avg</i></th><th><i>Max</i></th><th><i>Min</i></th></tr>\n");
         long totRuns = 0;
         long totExecTime = 0;
         long avgExecTime = 0;
@@ -720,20 +724,17 @@ public class JobQueue {
                 avgPendingTime = totPendingTime / totRuns;
         }
 
-        buf.append("<tr><td colspan=\"10\"><hr /></td><tr>");
-        buf.append("<tr>");
-        buf.append("<td><i><b>").append("SUMMARY").append("</b></i></td>");
-        buf.append("<td><i>").append(totRuns).append("</i></td>");
-        buf.append("<td><i>").append(totExecTime).append("</i></td>");
-        buf.append("<td><i>").append(avgExecTime).append("</i></td>");
-        buf.append("<td><i>").append(maxExecTime).append("</i></td>");
-        buf.append("<td><i>").append(minExecTime).append("</i></td>");
-        buf.append("<td><i>").append(totPendingTime).append("</i></td>");
-        buf.append("<td><i>").append(avgPendingTime).append("</i></td>");
-        buf.append("<td><i>").append(maxPendingTime).append("</i></td>");
-        buf.append("<td><i>").append(minPendingTime).append("</i></td>");
-        buf.append("</tr>\n");
-	
-        buf.append("</table></div>\n");
+        buf.append("<tr class=\"tablefooter\">");
+        buf.append("<td><b>").append("SUMMARY").append("</b></td>");
+        buf.append("<td>").append(totRuns).append("</td>");
+        buf.append("<td>").append(totExecTime).append("</td>");
+        buf.append("<td>").append(avgExecTime).append("</td>");
+        buf.append("<td>").append(maxExecTime).append("</td>");
+        buf.append("<td>").append(minExecTime).append("</td>");
+        buf.append("<td>").append(totPendingTime).append("</td>");
+        buf.append("<td>").append(avgPendingTime).append("</td>");
+        buf.append("<td>").append(maxPendingTime).append("</td>");
+        buf.append("<td>").append(minPendingTime).append("</td>");
+        buf.append("</tr></table></div>\n");
     }
 }
