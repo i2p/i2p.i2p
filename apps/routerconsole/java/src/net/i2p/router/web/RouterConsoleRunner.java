@@ -205,6 +205,7 @@ public class RouterConsoleRunner {
         }
     }
     
+/*******
     public void stopConsole() {
         try {
             _server.stop();
@@ -212,6 +213,7 @@ public class RouterConsoleRunner {
             ie.printStackTrace();
         }
     }
+********/
     
     public static Properties webAppProperties() {
         Properties rv = new Properties();

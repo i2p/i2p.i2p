@@ -481,6 +481,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private static final long PUBLISH_DELAY = 3*1000;
     public void publish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
+        if (_context.router().gracefulShutdownInProgress())
+            return;
         Hash h = localLeaseSet.getDestination().calculateHash();
         try {
             store(h, localLeaseSet);
@@ -517,6 +519,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (!_initialized) return;
+        if (_context.router().gracefulShutdownInProgress())
+            return;
         // This isn't really used for anything
         // writeMyInfo(localRouterInfo);
         if (_context.router().isHidden()) return; // DE-nied!
@@ -1072,6 +1076,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         out.flush();
     }
     
+    /**
+     *  Be careful to use stripHTML for any displayed routerInfo data
+     *  to prevent vulnerabilities
+     */
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
@@ -1096,7 +1104,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
-            buf.append(addr.getTransportStyle()).append(": ");
+            buf.append(DataHelper.stripHTML(addr.getTransportStyle())).append(": ");
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);

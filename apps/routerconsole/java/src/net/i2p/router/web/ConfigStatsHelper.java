@@ -35,16 +35,13 @@ public class ConfigStatsHelper extends HelperBase {
     /**
      * Configure this bean to query a particular router context
      *
-     * @param contextId begging few characters of the routerHash, or null to pick
+     * @param contextId beginning few characters of the routerHash, or null to pick
      *                  the first one we come across.
      */
+    @Override
     public void setContextId(String contextId) {
-        try {
-            _context = ContextHelper.getContext(contextId);
-            _log = _context.logManager().getLog(ConfigStatsHelper.class);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        super.setContextId(contextId);
+        _log = _context.logManager().getLog(ConfigStatsHelper.class);
         
         _stats = new ArrayList();
         Map groups = _context.statManager().getStatsByGroup();

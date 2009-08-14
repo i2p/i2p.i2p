@@ -14,7 +14,7 @@ public abstract class HelperBase {
     /**
      * Configure this bean to query a particular router context
      *
-     * @param contextId begging few characters of the routerHash, or null to pick
+     * @param contextId beginning few characters of the routerHash, or null to pick
      *                  the first one we come across.
      */
     public void setContextId(String contextId) {
@@ -24,6 +24,9 @@ public abstract class HelperBase {
             t.printStackTrace();
         }
     }
+
+    /** might be useful in the jsp's */
+    //public RouterContext getContext() { return _context; }
 
     public void setWriter(Writer out) { _out = out; }
 }

@@ -64,7 +64,9 @@ public abstract class CommSystemFacade implements Service {
     public void queueLookup(byte[] ip) {}
     public String getCountry(Hash peer) { return null; }
     public String getCountryName(String code) { return code; }
-    public String renderPeerHTML(Hash peer) { return null; }
+    public String renderPeerHTML(Hash peer) {
+        return peer.toBase64().substring(0, 4);
+    }
     
     /** 
      * Tell other transports our address changed

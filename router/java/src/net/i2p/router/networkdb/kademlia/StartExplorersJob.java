@@ -42,7 +42,8 @@ class StartExplorersJob extends JobImpl {
     
     public String getName() { return "Start Explorers Job"; }
     public void runJob() {
-        if (! ((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled()) {
+        if (! (((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled() ||
+               getContext().router().gracefulShutdownInProgress())) {
             Set toExplore = selectKeysToExplore();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Keys to explore during this run: " + toExplore);
