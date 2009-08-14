@@ -127,7 +127,7 @@
 <tr><td align="left"><b>Total:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundLifetimeKBps" />/<jsp:getProperty name="helper" property="outboundLifetimeKBps" />K/s</td></tr>
 <tr><td align="left"><b>Used:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundTransferred" />/<jsp:getProperty name="helper" property="outboundTransferred" /></td></tr></table>
 <hr>
-<h3><a href="tunnels.jsp" target="_blank" title="View existing tunnels and tunnel build status.">Tunnels in/out</a></h3><hr>
+<h3><a href="tunnels.jsp" target="_top" title="View existing tunnels and tunnel build status.">Tunnels in/out</a></h3><hr>
 <table><tr>
 <td align="left"><b>Exploratory:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundTunnels" />/<jsp:getProperty name="helper" property="outboundTunnels" /></td></tr>
 <tr><td align="left"><b>Client:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundClientTunnels" />/<jsp:getProperty name="helper" property="outboundClientTunnels" /></td></tr>
