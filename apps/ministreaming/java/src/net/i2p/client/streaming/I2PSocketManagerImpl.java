@@ -36,6 +36,7 @@ import net.i2p.util.Log;
  * I2PSocketManager, it should not attempt to call I2PSession's setSessionListener
  * or receive any messages with its .receiveMessage
  *
+ * @deprecated use I2PSocketManagerFull
  */
 class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     private I2PAppContext _context;

@@ -17,6 +17,7 @@ import net.i2p.util.Log;
 /**
  * Initial stub implementation for the socket
  *
+ * @deprecated use I2PSocketFull
  */
 class I2PSocketImpl implements I2PSocket {
     private final static Log _log = new Log(I2PSocketImpl.class);

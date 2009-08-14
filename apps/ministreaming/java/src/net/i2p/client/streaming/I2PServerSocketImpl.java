@@ -15,6 +15,7 @@ import net.i2p.util.Log;
  * and pull from a queue populated by various threads (each of whom have their own
  * timeout)
  *
+ * @deprecated use I2PServerSocketFull
  */
 class I2PServerSocketImpl implements I2PServerSocket {
     private final static Log _log = new Log(I2PServerSocketImpl.class);

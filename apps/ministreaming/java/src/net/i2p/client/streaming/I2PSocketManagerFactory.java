@@ -158,12 +158,12 @@ public class I2PSocketManagerFactory {
     }
 
     private static I2PSocketManager createManager(I2PSession session, Properties opts, String name) {
-        if (false) {
-            I2PSocketManagerImpl mgr = new I2PSocketManagerImpl();
-            mgr.setSession(session);
+        //if (false) {
+            //I2PSocketManagerImpl mgr = new I2PSocketManagerImpl();
+            //mgr.setSession(session);
             //mgr.setDefaultOptions(new I2PSocketOptions());
-            return mgr;
-        } else {
+            //return mgr;
+        //} else {
             String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
             if (classname != null) {
                 try {
@@ -190,7 +190,7 @@ public class I2PSocketManagerFactory {
             } else {
                 throw new IllegalStateException("No manager class specified");
             }
-        }
+        //}
         
     }
 
