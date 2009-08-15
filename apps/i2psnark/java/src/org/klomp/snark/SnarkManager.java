@@ -324,7 +324,7 @@ public class SnarkManager implements Snark.CompleteListener {
                             Snark snark = getTorrent(name);
                             if ( (snark != null) && (snark.acceptor != null) ) {
                                 snark.acceptor.restart();
-                                addMessage("I2CP listener restarted for " + snark.meta.getName()) +".";
+                                addMessage("I2CP listener restarted for " + snark.meta.getName());
                             }
                         }
                     }
@@ -334,8 +334,8 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (shouldAutoStart() != autoStart) {
             _config.setProperty(PROP_AUTO_START, autoStart + "");
-            addMessage("Autostart of torrents set to " + autoStart);
-            changed = true + ".";
+            addMessage("Adjusted autostart to " + autoStart);
+            changed = true;
         }
         if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
             _config.setProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS, useOpenTrackers + "");
@@ -391,8 +391,8 @@ public class SnarkManager implements Snark.CompleteListener {
         try {
             filename = sfile.getCanonicalPath();
         } catch (IOException ioe) {
-            _log.error("Unable to add the torrent " + filename, ioe) + ".";
-            addMessage("ERR: Could not add the torrent '" + filename + "': " + ioe.getMessage()) + ".";
+            _log.error("Unable to add the torrent " + filename, ioe);
+            addMessage("ERR: Could not add the torrent '" + filename + "': " + ioe.getMessage());
             return;
         }
         File dataDir = getDataDir();
@@ -431,7 +431,7 @@ public class SnarkManager implements Snark.CompleteListener {
                         }
                     }
                 } catch (IOException ioe) {
-                    addMessage("Torrent in " + sfile.getName() + " is invalid: " + ioe.getMessage()) +".";
+                    addMessage("Torrent in " + sfile.getName() + " is invalid: " + ioe.getMessage());
                     if (sfile.exists())
                         sfile.delete();
                     return;
