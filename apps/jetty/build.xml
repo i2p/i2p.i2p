@@ -109,6 +109,13 @@
     <target name="distclean" depends="clean">
         <echo message="Not actually deleting the jetty libs (since they're so large)" />
     </target>
+    <target name="reallyclean" depends="distclean">
+        <delete dir="./jettylib" />
+    </target>
+    <target name="totallyclean" depends="clean">
+        <delete dir="./jettylib" />
+        <delete file="${jetty.filename}" />
+    </target>
     <target name="javadoc" >
         <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
         <available property="jetty.zip.javadocExtracted" file="build/javadoc" type="dir" />
