@@ -54,7 +54,7 @@
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
-        out.print("<br><p><form action=\"summaryframe.jsp\" method=\"GET\">\n");
+        out.print("<hr><p><form action=\"summaryframe.jsp\" method=\"GET\">\n");
         if ("0".equals(d)) {
             out.print("<b>Refresh (s):<b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" align=\"right\" />\n");
             out.print("<button type=\"submit\">Enable</button>\n");
@@ -63,7 +63,7 @@
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" />\n");
             out.print("<button type=\"submit\">Disable " + d + "s Refresh</button>\n");
         }
-        out.print("</form></p><br>\n");
+        out.print("</form></p><hr>\n");
     }
 %>
 </div></body></html>

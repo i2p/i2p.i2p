@@ -128,6 +128,4 @@
 <tr><td align="left"><b>Message delay:</b></td><td align="right"><jsp:getProperty name="helper" property="messageDelay" /></td></tr>
 <tr><td align="left"><b>Tunnel lag:</b></td><td align="right"><jsp:getProperty name="helper" property="tunnelLag" /></td></tr>
 <tr><td align="left"><b>Backlog:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundBacklog" /></td></tr>
-</table><hr><table title="Router tunnel build status.">
-<tr><td align="center"><h4><jsp:getProperty name="helper" property="tunnelStatus" /></h4></td></tr>
-</table><hr><jsp:getProperty name="helper" property="destinations" />
+</table><hr><h4><jsp:getProperty name="helper" property="tunnelStatus" /></h4><hr><jsp:getProperty name="helper" property="destinations" />
