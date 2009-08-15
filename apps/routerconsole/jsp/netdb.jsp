@@ -6,7 +6,6 @@
 <title>I2P Router Console - network database summary</title>
 <%@include file="css.jsp" %>
 </head><body>
-
 <%@include file="summary.jsp" %>
  <h1>I2P Network Database Summary</h1>
 <div class="main" id="main">
@@ -18,7 +17,4 @@
  <jsp:setProperty name="netdbHelper" property="router" value="<%=request.getParameter("r")%>" />
  <jsp:setProperty name="netdbHelper" property="lease" value="<%=request.getParameter("l")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
-</div>
-</div>
-</body>
-</html>
+</div></div></body></html>

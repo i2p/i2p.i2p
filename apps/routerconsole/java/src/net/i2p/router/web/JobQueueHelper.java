@@ -3,9 +3,7 @@ package net.i2p.router.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 
-import net.i2p.router.RouterContext;
 
 public class JobQueueHelper extends HelperBase {
     public JobQueueHelper() {}

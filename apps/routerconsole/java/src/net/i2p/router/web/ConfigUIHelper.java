@@ -12,7 +12,7 @@ public class ConfigUIHelper extends HelperBase {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
                 buf.append("checked=\"true\" ");
-            buf.append("value=\"").append(theme).append("\"/>").append(theme).append("<br />\n");
+            buf.append("value=\"").append(theme).append("\"/>").append(theme).append("<br>\n");
         }
         return buf.toString();
     }

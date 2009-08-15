@@ -18,6 +18,7 @@ public class ConfigLoggingHandler extends FormHandler {
     private String _dateFormat;
     private String _fileSize;
     
+    @Override
     protected void processForm() {
         if (_shouldSave) {
             saveChanges();

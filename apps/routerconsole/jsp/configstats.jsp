@@ -2,8 +2,7 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head>
-<title>I2P Router Console - config stats</title>
+<html><head><title>I2P Router Console - config stats</title>
 <%@include file="css.jsp" %>
 <script type="text/javascript">
 function init()
@@ -73,39 +72,40 @@ function toggleAll(category)
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
  <h3>Configure I2P Stat Collection</h3>
  Enable full stats?
- <input type="checkbox" class="optbox" name="isFull" value="true" <% 
+ <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
- (change requires restart to take effect)<br />
- Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
- Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<hr />
+ (change requires restart to take effect)<br>
+ Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br>
+ Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br>
  <div class="wideload">
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
- <tr class="tablefooter"><td align="left" colspan="3">
+ <tr class="tablefooter">
+     <td align="left" colspan="3">
      <b><%=statshelper.getCurrentGroupName()%></b>
      (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)
-     </td></tr><tr class="tablefooter"><td align="center"><b>Log</b></td><td align="center"><b>Graph</b></td><td></td></tr><%
+     </td></tr>
+ <tr class="tablefooter">
+    <td align="center"><b>Log</b></td>
+    <td align="center"><b>Graph</b></td>
+    <td></td></tr>
+        <%
      } // end iterating over required groups for the current stat %>
  <tr><td align="center">
      <a name="<%=statshelper.getCurrentStatName()%>"></a>
-     <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
+     <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
      if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
      <td align="center">
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
-       <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <% 
+       <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
        if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %>/><% } %></td>
-     <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br />
+     <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br>
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats %>
  <tr><td colspan="3"></td></tr>
  <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" /></td>
-     <td colspan="2">Advanced filter: 
+     <td colspan="2">Advanced filter:
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
-     <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="Save changes" /><input type="reset" value="Cancel" /></td></tr></form>
- </table>
-</div>
-</div>
-</div>
-</body>
-</html>
+     <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="Save changes" /><input type="reset" value="Cancel" /></td></tr>
+ </table></div></form></div></div></body></html>

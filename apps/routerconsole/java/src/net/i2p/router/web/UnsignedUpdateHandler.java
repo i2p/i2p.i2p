@@ -2,7 +2,6 @@ package net.i2p.router.web;
 
 import java.io.File;
 
-import net.i2p.I2PAppContext;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
@@ -99,11 +98,11 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                 _context.router().saveConfig();
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was downloaded, restarting to install it");
-                    _status = "<b>Update downloaded</b><br />Restarting";
+                    _status = "<b>Update downloaded</b><br>Restarting";
                     restart();
                 } else {
                     _log.log(Log.CRIT, "Update was downloaded, will be installed at next restart");
-                    _status = "<b>Update downloaded</b><br />";
+                    _status = "<b>Update downloaded</b><br>";
                     if (System.getProperty("wrapper.version") != null)
                         _status += "Click Restart to install";
                     else

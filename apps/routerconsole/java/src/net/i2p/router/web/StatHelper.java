@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.io.Writer;
 import java.util.Iterator;
 import java.util.Set;
 

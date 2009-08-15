@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -13,6 +12,7 @@ public class ConfigKeyringHandler extends FormHandler {
     private String _peer;
     private String _key;
     
+    @Override
     protected void processForm() {
         if ("Add key".equals(_action)) {
             if (_peer == null || _key == null) {

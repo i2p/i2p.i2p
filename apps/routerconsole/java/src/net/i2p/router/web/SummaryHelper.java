@@ -1,15 +1,12 @@
 package net.i2p.router.web;
 
 import java.text.Collator;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -18,7 +15,6 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
-import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -349,18 +345,18 @@ public class SummaryHelper extends HelperBase {
             String name = getName(client);
             Hash h = client.calculateHash();
             
-            buf.append("<tr><td align=\"right\"><b><img src=\"/themes/console/images/");
+            buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
             if (_context.clientManager().shouldPublishLeaseSet(h))
                 buf.append("server.png\" alt=\"Server\" title=\"Server\" />");
             else
                 buf.append("client.png\" alt=\"Client\" title=\"Client\" />");
-            buf.append("</td><td align=\"left\"><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
+            buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
             if (name.length() < 16)
                 buf.append(name);
             else
                 buf.append(name.substring(0,15)).append("&hellip;");
-            buf.append("</a></td>\n");
+            buf.append("</a></b></td>\n");
             LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
             if (ls != null) {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();

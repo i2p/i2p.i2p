@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.i2p.router.RouterContext;
 
 public class ConfigAdvancedHelper extends HelperBase {
     public ConfigAdvancedHelper() {}

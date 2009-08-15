@@ -2,34 +2,27 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head>
-<title>I2P Router Console - help</title>
+<html><head><title>I2P Router Console - help</title>
 <%@include file="css.jsp" %>
 </head><body>
-
 <%@include file="summary.jsp" %>
 <h1>I2P Router Help & Support</h1>
 <div class="main" id="main"><div align="justify">
-If you'd like to help improve or translate the documentation, or 
+If you'd like to help improve or translate the documentation, or
 help with other aspects of the project, please see the documentation for
-<a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a> 
-<br><br>Further assistance is available here:
-<br></div>
+<a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a>
+<br><br>Further assistance is available here:<br></div>
 <ul class="links">
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
-<li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.
-</ul>
-<br>
+<li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.</ul><br>
 You may also try the <a href="http://forum.i2p/">I2P forum</a>
-or IRC.<br />
+or IRC.<br>
 
 <h2>Summary Bar Information</h2><div align="justify">
 Many of the stats on the summary bar may be
 <a href="configstats.jsp">configured</a> to be
 <a href="graphs.jsp">graphed</a> for further analysis.
-</div>
-<h3>General</h3>
-<ul>
+</div><h3>General</h3><ul>
 <li class="tidylist"><b>Ident:</b>
 The first four characters (24 bits) of your 44-character (256-bit) Base64 router hash.
 The full hash is shown on your <a href="netdb.jsp?r=.">router info page</a>.
@@ -43,10 +36,7 @@ your computer's time.
 <li class="tidylist"><b>Reachability:</b>
 The router's view of whether it can be contacted by other routers.
 Further information is on the <a href="config.jsp#help">configuration page</a>.
-</ul>
-
-<h3>Peers</h3>
-<ul>
+</ul><h3>Peers</h3><ul>
 <li class="tidylist"><b>Active:</b>
 The first number is the number of peers you've sent or received a message from in the last few minutes.
 This may range from 8-10 to several hundred, depending on your total bandwidth,
@@ -75,21 +65,17 @@ This number is not the total size of the network;
 it may vary widely depending on your total bandwidth,
 shared bandwidth, and locally-generated traffic.
 I2P does not require a router to know every other router.
-</ul>
-
-<h3>Bandwidth in/out</h3><div align="justify">
+</ul><h3>Bandwidth in/out</h3><div align="justify">
 Should be self-explanatory. All values are in bytes per second, not bits per second.
 Change your bandwidth limits on the <a href="config.jsp#help">configuration page</a>.
-Bandwidth is <a href="graphs.jsp">graphed</a> by default.
-</div>
+Bandwidth is <a href="graphs.jsp">graphed</a> by default.</div>
+
 <h3>Local destinations</h3><div align="justify">
 The local applications connecting through your router.
 These may be clients started through <a href="i2ptunnel/index.jsp">I2PTunnel</a>
 or external programs connecting through SAM, BOB, or directly to I2CP.
-</div>
-<h3>Tunnels in/out</h3><div align="justify">
-The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><br>
-<ul>
+</div><h3>Tunnels in/out</h3><div align="justify">
+The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><br><ul>
 <li class="tidylist"><div align="justify"><b>Exploratory:</b>
 Tunnels built by your router and used for communication with the floodfill peers,
 building new tunnels, and testing existing tunnels.</div>
@@ -102,12 +88,10 @@ shared bandwidth, and amount of locally-generated traffic.
 The recommended method for limiting participating tunnels is
 to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
 You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
-the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.
-</ul>
+the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.</ul>
 
 <h3>Congestion</h3><div align="justify">
-Some basic indications of router overload:</div><br>
-<ul>
+Some basic indications of router overload:</div><br><ul>
 <li class="tidylist"><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
 Unfortunately, there are several other job queues in the router that may be congested,
@@ -143,42 +127,41 @@ participating tunnel through your router.
 Your router may accept all requests, accept or reject a percentage of requests,
 or reject all requests for a number of reasons, to control
 the bandwidth and CPU demands and maintain capacity for
-local clients.
-</ul>
+local clients.</ul>
 
 <h2>Legal stuff</h2><div align="justify">
-The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with 
-a few notable exceptions:</div><br /><ul>
+The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with
+a few notable exceptions:</div><br><ul>
 <li class="tidylist">ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
 <li class="tidylist">SHA256 and HMAC-SHA256, under the MIT license, written by the Legion of the Bouncycastle</li>
 <li class="tidylist">AES code, under the Cryptix (MIT) license, written by the Cryptix team</li>
 <li class="tidylist">SNTP code, under the BSD license, written by Adam Buckley</li>
-<li class="tidylist">The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo, 
+<li class="tidylist">The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo,
     ugha, duck, shendaras, and others.</li>
 </ul>
 
 <p>On top of the I2P router are a series of client applications, each with their own set of
 licenses and dependencies.  This webpage is being served as part of the I2P routerconsole
 client application, which is built off a trimmed down <a href="http://jetty.mortbay.com/jetty/index.html">Jetty</a>
-instance (trimmed down, as in, we do not include the demo apps or other add-ons, and we simplify configuration), 
-allowing you to deploy standard JSP/Servlet web applications into your router.  Jetty in turn makes use of 
+instance (trimmed down, as in, we do not include the demo apps or other add-ons, and we simplify configuration),
+allowing you to deploy standard JSP/Servlet web applications into your router.  Jetty in turn makes use of
 Apache's javax.servlet (javax.servlet.jar) implementation.
-This product includes software developed by the Apache Software Foundation 
+This product includes software developed by the Apache Software Foundation
 (http://www.apache.org/). </p>
 
 <p>Another application you can see on this webpage is <a href="http://www.i2p2.i2p/i2ptunnel">I2PTunnel</a>
 (your <a href="i2ptunnel/" target="_blank">web interface</a>) - a GPL'ed application written by mihi that
 lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).  There is also a
 <a href="http://susi.i2p/">susimail</a> web based mail client <a href="susimail/susimail">available</a> on
-the console, which is a GPL'ed application written by susi23.  The addressbook application, written by 
+the console, which is a GPL'ed application written by susi23.  The addressbook application, written by
 <a href="http://ragnarok.i2p/">Ragnarok</a> helps maintain your hosts.txt files (see ./addressbook/ for
 more information).</p>
 
 <p>The router by default also includes human's public domain <a href="http://www.i2p2.i2p/sam">SAM</a> bridge,
-which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.  
-There is also an optimized library for doing large number calculations - jbigi - which in turn uses the 
-LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and the installer is built with <a href="http://www.izforge.com/izpack/">IzPack</a>.  For 
-details on other applications available, as well as their licenses, please see the 
+which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.
+There is also an optimized library for doing large number calculations - jbigi - which in turn uses the
+LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and the installer is built with <a href="http://www.izforge.com/izpack/">IzPack</a>.  For
+details on other applications available, as well as their licenses, please see the
 <a href="http://www.i2p2.i2p/licenses">license policy</a>.  Source for the I2P code and most bundled
 client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
 .</p>
@@ -190,10 +173,7 @@ client applications can be found on our <a href="http://www.i2p2.i2p/download">d
  <jsp:setProperty name="contenthelper" property="maxLines" value="256" />
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
- 
- <p>A more complete list of changes can be found 
+
+ <p>A more complete list of changes can be found
  in the history.txt file in your i2p directory.
- </p><hr />
-</div>
-</body>
-</html>
+ </p><br></div></body></html>
