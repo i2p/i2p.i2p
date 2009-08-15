@@ -28,6 +28,7 @@ public class ConfigStatsHandler extends FormHandler {
         _isFull = false;
     }
     
+    @Override
     protected void processForm() {
         saveChanges();
     }

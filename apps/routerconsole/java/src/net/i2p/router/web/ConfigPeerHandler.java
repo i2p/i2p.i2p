@@ -1,12 +1,8 @@
 package net.i2p.router.web;
 
-import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Base64;
-import net.i2p.router.Router;
 import net.i2p.router.peermanager.PeerProfile;
-import net.i2p.util.Log;
 
 /**
  *
@@ -16,6 +12,7 @@ public class ConfigPeerHandler extends FormHandler {
     private String _speed;
     private String _capacity;
     
+    @Override
     protected void processForm() {
         if ("Save Configuration".equals(_action)) {
             _context.router().saveConfig();

@@ -10,7 +10,7 @@ String templateFile = request.getParameter("template");
 if (templateFile != null) {
   java.io.OutputStream cout = response.getOutputStream();
   response.setContentType("image/png");
-  rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(cout, templateFile);  
+  rendered = net.i2p.router.web.StatSummarizer.instance().renderPng(cout, templateFile);
 }
 net.i2p.stat.Rate rate = null;
 String stat = request.getParameter("stat");
@@ -19,11 +19,11 @@ boolean fakeBw = (stat != null && ("bw.combined".equals(stat)));
 net.i2p.stat.RateStat rs = net.i2p.I2PAppContext.getGlobalContext().statManager().getRate(stat);
 if ( !rendered && ((rs != null) || fakeBw) ) {
   long per = -1;
-  try { 
+  try {
     if (fakeBw)
       per = 60*1000;
     else
-      per = Long.parseLong(period); 
+      per = Long.parseLong(period);
     if (!fakeBw)
       rate = rs.getRate(per);
     if ( (rate != null) || (fakeBw) ) {
@@ -63,7 +63,7 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
     }
   } catch (NumberFormatException nfe) {}
 }
-if (!rendered) { 
+if (!rendered) {
   response.sendError(404, "That stat is not available");
 }
 %>

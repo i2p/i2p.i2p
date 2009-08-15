@@ -167,7 +167,7 @@ public class UpdateHandler {
             synchronized (_pct) {
                 buf.append(_pct.format(pct));
             }
-            buf.append(":<br />\n" + (currentWrite + alreadyTransferred));
+            buf.append(":<br>\n" + (currentWrite + alreadyTransferred));
             buf.append(" transferred");
             _status = buf.toString();
         }
@@ -192,11 +192,11 @@ public class UpdateHandler {
                 _context.router().saveConfig();
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
-                    _status = "<b>Update verified</b><br />Restarting";
+                    _status = "<b>Update verified</b><br>Restarting";
                     restart();
                 } else {
                     _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
-                    _status = "<b>Update downloaded</b><br />";
+                    _status = "<b>Update downloaded</b><br>";
                     if (System.getProperty("wrapper.version") != null)
                         _status += "Click Restart to install";
                     else

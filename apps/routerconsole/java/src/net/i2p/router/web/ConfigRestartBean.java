@@ -51,14 +51,14 @@ public class ConfigRestartBean {
             if (timeRemaining <= 0) {
                 return "<b>Shutdown imminent</b>";
             } else {
-                return "<b>Shutdown in " + DataHelper.formatDuration(timeRemaining) + "</b><br />"
+                return "<b>Shutdown in " + DataHelper.formatDuration(timeRemaining) + "</b><br>"
                      + buttons(urlBase, systemNonce, "shutdownImmediate,Shutdown immediately,cancelShutdown,Cancel shutdown");
             }
         } else if (restarting) {
             if (timeRemaining <= 0) {
                 return "<b>Restart imminent</b>";
             } else {
-                return "<b>Restart in " + DataHelper.formatDuration(timeRemaining) + "</b><br />"
+                return "<b>Restart in " + DataHelper.formatDuration(timeRemaining) + "</b><br>"
                      + buttons(urlBase, systemNonce, "restartImmediate,Restart immediately,cancelShutdown,Cancel restart");
             }
         } else {

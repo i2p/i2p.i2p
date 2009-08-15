@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import net.i2p.router.RouterContext;
 import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -38,6 +37,7 @@ public class ConfigStatsHelper extends HelperBase {
      * @param contextId begging few characters of the routerHash, or null to pick
      *                  the first one we come across.
      */
+    @Override
     public void setContextId(String contextId) {
         try {
             _context = ContextHelper.getContext(contextId);

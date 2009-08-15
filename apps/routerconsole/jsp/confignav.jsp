@@ -1,6 +1,6 @@
 <div class="confignav" id="confignav">
 <center>
-<% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
+<% if (request.getRequestURI().indexOf("config.jsp") != -1) {
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
  String userAgent = request.getHeader("User-Agent");
  if (userAgent == null || !userAgent.contains("MSIE")) {
@@ -25,5 +25,4 @@
  %>Stats | <% } else { %><a href="configstats.jsp">Stats</a> | <% }
  if (request.getRequestURI().indexOf("configadvanced.jsp") != -1) {
  %>Advanced<% } else { %><a href="configadvanced.jsp">Advanced</a><% } %>
-</center>
-</div>
+</center></div>

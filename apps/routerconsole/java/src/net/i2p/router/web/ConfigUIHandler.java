@@ -5,6 +5,7 @@ public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
     private String _config;
     
+    @Override
     protected void processForm() {
         if (_shouldSave)
             saveChanges();
