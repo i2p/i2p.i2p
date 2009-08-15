@@ -1,3 +1,11 @@
+2009-08-15 sponge
+    * Merge in dr|z3d and my own html fixes for router console java and jsp
+      files so that Opera (and now IE?) doesn't puke anymore on the missing 
+      and misplaced HTML tags.
+    * Optimized all jsp files so that they are shorter to save space, which
+      is then used to fix the broken HTML. We should break even space-wise.
+    * Bump to -13.
+
 2009-08-11 sponge
     * Code Janitor time! Many fixes and documenting fixes that should be
       done in the future. for the most part, this is a general code cleanup.
