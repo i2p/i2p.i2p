@@ -42,7 +42,6 @@
 <a href="oldstats.jsp" target="_top" title="Textual router performance statistics.">Stats</a>
 </td></tr></table>
 <% } %>
-
 <hr>
 <h3><a href="help.jsp" target="_top" title="I2P Router Help.">General</a></h3><hr>
 <h4>
@@ -95,9 +94,10 @@
     if (helper.showFirewallWarning()) {
         %><h4><a href="config.jsp" target="_top" title="Help with firewall configuration.">Check NAT/firewall</a></h4><%
     }
+    boolean reseedInProgress = Boolean.valueOf(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress")).booleanValue();
     // If showing the reseed link is allowed
     if (helper.allowReseed()) {
-        if ("true".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
+        if (reseedInProgress) {
             // While reseed occurring, show status message instead
             out.print("<i>" + System.getProperty("net.i2p.router.web.ReseedHandler.statusMessage","") + "</i><br />");
         } else {
@@ -113,7 +113,7 @@
         }
     }
     // If a new reseed ain't running, and the last reseed had errors, show error message
-    if ("false".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
+    if (!reseedInProgress) {
         String reseedErrorMessage = System.getProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
         if (reseedErrorMessage.length() > 0) {
             out.print("<i>" + reseedErrorMessage + "</i><br />");

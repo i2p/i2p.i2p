@@ -40,7 +40,7 @@
  <div class="mediumtags">Router Hash:
  <input type="text" size="55" name="peer" value="<%=peer%>" /></div>
  <h3>Manually Ban / Unban a Peer</h3>
- Shitlisting will prevent the participation of this peer in tunnels you create. 
+ Banning will prevent the participation of this peer in tunnels you create. 
       <hr />      
       <div class="formaction"> 
         <input type="submit" name="action" value="Ban peer until restart" />
