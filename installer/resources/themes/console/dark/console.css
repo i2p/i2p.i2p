@@ -325,7 +325,7 @@ div.messages li {
 }
 
 div.graphspanel {
-     padding: 0px 5px 10px 5px;
+     padding: 15px;
      margin: 10px 0px;
      background: #005;
      -moz-border-radius: 4px;
@@ -336,6 +336,12 @@ div.graphspanel {
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
+     text-align: center;
+}
+
+div.graphspanel form {
+     text-align: left;
+     padding: 15px;
 }
 
 div.graphspanel img {
@@ -347,7 +353,7 @@ div.graphspanel img {
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
-     opacity: 0.9;
+     opacity: 0.8;
 }
 
 div.graphspanel img:hover {
@@ -361,6 +367,7 @@ div.graphspanel img:hover {
      box-shadow: inset 0px 0px 1px 1px #f60;
      opacity: 1;
 }
+
 table {
      border-collapse: collapse;
      width: 100%;

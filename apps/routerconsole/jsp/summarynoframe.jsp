@@ -122,7 +122,7 @@
 <tr><td align="left"><b>Exploratory:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundTunnels" />/<jsp:getProperty name="helper" property="outboundTunnels" /></td></tr>
 <tr><td align="left"><b>Client:</b></td><td align="right"><jsp:getProperty name="helper" property="inboundClientTunnels" />/<jsp:getProperty name="helper" property="outboundClientTunnels" /></td></tr>
 <tr><td align="left"><b>Participating:</b></td><td align="right"><jsp:getProperty name="helper" property="participatingTunnels" /></td></tr>
-</table><hr><h3><a href="/oldstats.jsp#JobQueue" target="_top" title="What's in the router's job queue?">Congestion</a></h3><hr>
+</table><hr><h3><a href="/jobs.jsp" target="_top" title="What's in the router's job queue?">Congestion</a></h3><hr>
 <table>
 <tr><td align="left"><b>Job lag:</b></td><td align="right"><jsp:getProperty name="helper" property="jobLag" /></td></tr>
 <tr><td align="left"><b>Message delay:</b></td><td align="right"><jsp:getProperty name="helper" property="messageDelay" /></td></tr>
