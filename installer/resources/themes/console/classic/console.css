@@ -20,7 +20,8 @@ img {
 pre {
      overflow: auto;
      font-size: 8pt !important;
-     width: 100%;
+     width: 95%;
+     padding-top: 10px;
 }
 
 div.logo {

@@ -992,7 +992,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (full)
             size *= 4;
         StringBuilder buf = new StringBuilder(size);
-        out.write("<h2>Network Database Contents</h2>\n");
+        out.write("<h2>Network Database Contents (<a href=\"netdb.jsp?l=1\">View LeaseSets</a>)</h2>\n");
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
             out.write(buf.toString());
@@ -1000,7 +1000,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return;
         }
         
-        out.write("<a href=\"netdb.jsp?l=1\">View LeaseSets</a>");
         Hash us = _context.routerHash();
         out.write("<a name=\"routers\" ></a><h3>Routers (<a href=\"netdb.jsp");
         if (full)

@@ -27,13 +27,13 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
 
         <div class="separator">
-            <hr>
+            <hr />
         </div>
 
         <textarea id="statusMessages" rows="4" cols="60" readonly="readonly"><jsp:getProperty name="indexBean" property="messages" /></textarea>
 
         <div class="separator">
-            <hr>
+            <hr />
         </div>
 
         <div class="footer">
@@ -74,7 +74,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
         <div class="statusHeaderField rowItem">
             <label>Status:</label>
-<hr>        </div>
+<hr />        </div>
         
         <%
         for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
@@ -106,7 +106,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p">Preview</a>     
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-          %><span class="text">Base32 Address:<br><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
+          %><span class="text">Base32 Address:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
         <%
             } else {
           %><span class="comment">No Preview</span>
@@ -141,13 +141,13 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
 
         <div class="subdivider">
-            <hr>
+            <hr />
         </div>
         <%
         }
       %>
         <div class="separator">
-            <hr>
+            <hr />
         </div>
            
         <div class="footer">
@@ -194,7 +194,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
 
         <div class="separator">
-            <hr>
+            <hr />
         </div>
         <%
         for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
@@ -262,13 +262,13 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
         </div>
 
         <div class="subdivider">
-            <hr>
+            <hr />
         </div>
         <%
         }
       %>            
         <div class="separator">
-            <hr>
+            <hr />
         </div>
     
         <div class="footer">

@@ -50,7 +50,7 @@
             </div>
       
             <div class="separator">
-                <hr>
+                <hr />
             </div>
 
             <div id="nameField" class="rowItem">
@@ -78,7 +78,7 @@
             </div>
                  
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
                  
             <div id="targetField" class="rowItem">
@@ -110,7 +110,7 @@
             </div>
             
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
             
             <% if ("httpserver".equals(tunnelType)) {
@@ -164,7 +164,7 @@
             </div>
 
             <div class="separator">
-                <hr>
+                <hr />
             </div>
             
             <div id="tunnelOptionsField" class="rowItem">
@@ -232,7 +232,7 @@
             </div>
                             
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
             
             <div id="optionsField" class="rowItem">
@@ -252,7 +252,7 @@
             </div>
             
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
            
             <div id="optionsField" class="rowItem">
@@ -281,7 +281,7 @@
             </div>
                  
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
            
             <div id="optionsField" class="rowItem">
@@ -304,7 +304,7 @@
             </div>
                  
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
            
             <div id="optionsField" class="rowItem">
@@ -332,7 +332,7 @@
             </div>
 
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
            
             <div id="tunnelOptionsField" class="rowItem">
@@ -382,7 +382,7 @@
             </div>
                  
             <div class="subdivider">
-                <hr>
+                <hr />
             </div>
                  
             <div id="customOptionsField" class="rowItem">

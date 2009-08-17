@@ -1854,7 +1854,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (_context.shitlist().isShitlisted(peer.getRemotePeer(), STYLE)) {
                 if (!appended) buf.append("<br>");
-                buf.append(" <i>Shitlist</i>");
+                buf.append(" <i>Banned</i>");
                 appended = true;
             }
             //byte[] ip = getIP(peer.getRemotePeer());
@@ -2000,7 +2000,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</b></td> <td>&nbsp;</td> <td align=\"center\"><b>");
         buf.append(numPeers > 0 ? rtoTotal/numPeers : 0);
         buf.append("</b></td>\n      <td>&nbsp;</td> <td align=\"center\"><b>");
-        buf.append(sendTotal).append("</td></b> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n");
+        buf.append(sendTotal).append("</b></td> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n");
         buf.append("      <td align=\"center\"><b>").append(resentTotal);
         buf.append("</b></td> <td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n");
         buf.append(" </tr></table></div></p><p>\n");

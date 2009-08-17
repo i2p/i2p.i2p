@@ -643,7 +643,7 @@ public class FIFOBandwidthLimiter {
                 buf.append("ms ago</li>\n");
             }
         }
-        buf.append("</ol></li></ul></p><hr>\n");
+        buf.append("</ol></li></ul><hr>\n");
         out.write(buf.toString());
         out.flush();
     }

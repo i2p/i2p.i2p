@@ -74,7 +74,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include high tunnel quantities.</font></th></tr>");
 
-buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\"/>&nbsp;&nbsp;Inbound</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\"/>&nbsp;&nbsp;Outbound</th></tr>\n");
+buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\">&nbsp;&nbsp;Inbound</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\">&nbsp;&nbsp;Outbound</th></tr>\n");
 
 //        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
