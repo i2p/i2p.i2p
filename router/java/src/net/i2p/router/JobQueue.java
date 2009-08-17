@@ -611,7 +611,7 @@ public class JobQueue {
         if (states != null) 
             for (int i = 0; i < states.length; i++) 
                 buf.append(states[i]).append(" ");
-        buf.append("]</b><br />\n");
+        buf.append("]</b><br>\n");
 
         long now = _context.clock().now();
 
@@ -720,7 +720,7 @@ public class JobQueue {
                 avgPendingTime = totPendingTime / totRuns;
         }
 
-        buf.append("<tr><td colspan=\"10\"><hr /></td><tr>");
+        buf.append("<tr><td colspan=\"10\"><hr></td><tr>");
         buf.append("<tr>");
         buf.append("<td><i><b>").append("SUMMARY").append("</b></i></td>");
         buf.append("<td><i>").append(totRuns).append("</i></td>");

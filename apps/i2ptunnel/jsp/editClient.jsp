@@ -50,7 +50,7 @@
             </div>
       
             <div class="separator">
-                <hr />
+                <hr>
             </div>
 
             <div id="nameField" class="rowItem">
@@ -71,7 +71,7 @@
             </div>
                  
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
                  
             <div id="accessField" class="rowItem">
@@ -129,7 +129,7 @@
             </div>
                                             
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
            
             <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType)) {
@@ -197,7 +197,7 @@
             </div>
 
             <div class="separator">
-                <hr />
+                <hr>
             </div>
             
             <div id="tunnelOptionsField" class="rowItem">
@@ -265,7 +265,7 @@
             </div>
                             
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
             
             <div id="optionsField" class="rowItem">
@@ -286,7 +286,7 @@
                  
          <% if (!"streamrclient".equals(tunnelType)) { // streamr client sends pings so it will never be idle %>
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
            
             <div id="optionsField" class="rowItem">
@@ -314,7 +314,7 @@
             </div>
             
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
            
             <div id="optionsField" class="rowItem">
@@ -349,7 +349,7 @@
             </div>
                  
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
 
             <div id="optionsField" class="rowItem">
@@ -366,7 +366,7 @@
          <% } // !streamrclient %>
                  
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
 
          <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) { %>
@@ -393,7 +393,7 @@
             </div>
 
             <div class="subdivider">
-                <hr />
+                <hr>
             </div>
          <% } %>
            

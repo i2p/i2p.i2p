@@ -464,7 +464,7 @@ public class TunnelController implements Logging {
     private void getHttpClientSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
-            buf.append("<i>").append(description).append("</i><br />\n");
+            buf.append("<i>").append(description).append("</i><br>\n");
         buf.append("HTTP proxy listening on port ").append(getListenPort());
         String listenOn = getListenOnInterface();
         if ("0.0.0.0".equals(listenOn)) 
@@ -473,19 +473,19 @@ public class TunnelController implements Logging {
             buf.append(" (reachable locally only)");
         else
             buf.append(" (reachable at the ").append(listenOn).append(" interface)");
-        buf.append("<br />\n");
+        buf.append("<br>\n");
         String proxies = getProxyList();
         if ( (proxies == null) || (proxies.trim().length() <= 0) )
-            buf.append("Outproxy: default [squid.i2p]<br />\n");
+            buf.append("Outproxy: default [squid.i2p]<br>\n");
         else
-            buf.append("Outproxy: ").append(proxies).append("<br />\n");
+            buf.append("Outproxy: ").append(proxies).append("<br>\n");
         getOptionSummary(buf);
     }
     
     private void getClientSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
-            buf.append("<i>").append(description).append("</i><br />\n");
+            buf.append("<i>").append(description).append("</i><br>\n");
         buf.append("Client tunnel listening on port ").append(getListenPort());
         buf.append(" pointing at ").append(getTargetDestination());
         String listenOn = getListenOnInterface();
@@ -495,58 +495,58 @@ public class TunnelController implements Logging {
             buf.append(" (reachable locally only)");
         else
             buf.append(" (reachable at the ").append(listenOn).append(" interface)");
-        buf.append("<br />\n");
+        buf.append("<br>\n");
         getOptionSummary(buf);
     }
     
     private void getServerSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
-            buf.append("<i>").append(description).append("</i><br />\n");
+            buf.append("<i>").append(description).append("</i><br>\n");
         buf.append("Server tunnel pointing at port ").append(getTargetPort());
         buf.append(" on ").append(getTargetHost());
-        buf.append("<br />\n");
-        buf.append("Private destination loaded from ").append(getPrivKeyFile()).append("<br />\n");
+        buf.append("<br>\n");
+        buf.append("Private destination loaded from ").append(getPrivKeyFile()).append("<br>\n");
         getOptionSummary(buf);
     }
     
     private void getHttpServerSummary(StringBuilder buf) {
         String description = getDescription();
         if ( (description != null) && (description.trim().length() > 0) )
-            buf.append("<i>").append(description).append("</i><br />\n");
+            buf.append("<i>").append(description).append("</i><br>\n");
         buf.append("Server tunnel pointing at port ").append(getTargetPort());
         buf.append(" on ").append(getTargetHost());
         buf.append(" for the site ").append(getSpoofedHost());
-        buf.append("<br />\n");
-        buf.append("Private destination loaded from ").append(getPrivKeyFile()).append("<br />\n");
+        buf.append("<br>\n");
+        buf.append("Private destination loaded from ").append(getPrivKeyFile()).append("<br>\n");
         getOptionSummary(buf);
     }
     
     private void getOptionSummary(StringBuilder buf) {
         String opts = getClientOptions();
         if ( (opts != null) && (opts.length() > 0) )
-            buf.append("Network options: ").append(opts).append("<br />\n");
+            buf.append("Network options: ").append(opts).append("<br>\n");
         if (_running) {
             List sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
                 I2PSession session = (I2PSession)sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null) {
-                    buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br />\n");
+                    buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br>\n");
                     if ( ("server".equals(getType())) || ("httpserver".equals(getType())) ) {
                         buf.append("Full destination: ");
                         buf.append("<input type=\"text\" size=\"10\" onclick=\"this.select();\" ");
                         buf.append("value=\"").append(dest.toBase64()).append("\" />\n");
                         long val = new Random().nextLong();
                         if (val < 0) val = 0 - val;
-                        buf.append("<br />You can <a href=\"http://temp").append(val);
+                        buf.append("<br>You can <a href=\"http://temp").append(val);
                         buf.append(".i2p/?i2paddresshelper=").append(dest.toBase64()).append("\">view</a>");
                         buf.append(" it in a browser (only when you're using the eepProxy)\n");
-                        buf.append("<br />If you are going to share this on IRC, you need to split it up:<br />\n");
+                        buf.append("<br>If you are going to share this on IRC, you need to split it up:<br>\n");
                         String str = dest.toBase64();
-                        buf.append(str.substring(0, str.length()/2)).append("<br />\n");
-                        buf.append(str.substring(str.length()/2)).append("<br />\n");
-                        buf.append("You can also post it to <a href=\"http://forum.i2p/viewforum.php?f=16\">Eepsite announcement forum</a><br />");
+                        buf.append(str.substring(0, str.length()/2)).append("<br>\n");
+                        buf.append(str.substring(str.length()/2)).append("<br>\n");
+                        buf.append("You can also post it to <a href=\"http://forum.i2p/viewforum.php?f=16\">Eepsite announcement forum</a><br>");
                     }
                 }
             }

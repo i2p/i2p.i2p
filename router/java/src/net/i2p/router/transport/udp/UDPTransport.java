@@ -1843,17 +1843,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             boolean appended = false;
             if (_activeThrottle.isChoked(peer.getRemotePeer())) {
-                if (!appended) buf.append("<br />");
+                if (!appended) buf.append("<br>");
                 buf.append(" <i>Choked</i>");
                 appended = true;
             }
             if (peer.getConsecutiveFailedSends() > 0) {
-                if (!appended) buf.append("<br />");
+                if (!appended) buf.append("<br>");
                 buf.append(" <i>").append(peer.getConsecutiveFailedSends()).append(" fail(s)</i>");
                 appended = true;
             }
             if (_context.shitlist().isShitlisted(peer.getRemotePeer(), STYLE)) {
-                if (!appended) buf.append("<br />");
+                if (!appended) buf.append("<br>");
                 buf.append(" <i>Shitlist</i>");
                 appended = true;
             }
@@ -1985,7 +1985,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             numPeers++;
         }
         
-//        buf.append("<tr><td colspan=\"16\"><hr /></td></tr>\n");
+//        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
         buf.append(" <tr class=\"tablefooter\"> <td colspan=\"3\" align=\"right\"><b>Total</b></td>");
         buf.append("      <td align=\"center\" nowrap><b>");
         buf.append(formatKBps(bpsIn)).append("/").append(formatKBps(bpsOut));
@@ -2012,7 +2012,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         double nondupSent = ((double)bytesTransmitted - ((double)resentTotal)*averagePacketSize);
         double bwResent = (nondupSent <= 0 ? 0d : ((((double)resentTotal)*averagePacketSize) / nondupSent));
         buf.append("<h3>Percentage of bytes retransmitted (lifetime): ").append(formatPct(bwResent));
-        buf.append("</h3><i>(Includes retransmission required by packet loss)</i><br /></p>\n");
+        buf.append("</h3><i>(Includes retransmission required by packet loss)</i><br></p>\n");
         out.write(buf.toString());
         buf.setLength(0);
         out.write(KEY);
@@ -2032,24 +2032,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private static final String KEY = "<h3>Definitions:</h3><div class=\"configure\">" +
-        "<br><b id=\"def.peer\">Peer</b>: the remote peer.<br />\n" +
-        "<b id=\"def.dir\">Dir</b>: v means they offer to introduce us, ^ means we offer to introduce them.<br />\n" +
-        "<b id=\"def.idle\">Idle</b>: the idle time is how long since a packet has been received or sent.<br />\n" +
-        "<b id=\"def.rate\">In/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second).<br />\n" +
-        "<b id=\"def.up\">Up</b>: the uptime is how long ago this session was established.<br />\n" +
-        "<b id=\"def.skew\">Skew</b>: the skew says how far off the other user's clock is, relative to your own.<br />\n" +
-        "<b id=\"def.cwnd\">Cwnd</b>: the congestion window is how many bytes in 'in flight' you can send w/out an acknowledgement, / <br />\n" +
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent, /<br />\n" +
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the maximum number of concurrent messages to send, /<br />\n"+ 
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of consecutive sends which were blocked due to throws message window size.<br />\n" +
-        "<b id=\"def.ssthresh\">Sst</b>: the slow start threshold helps make sure the cwnd doesn't grow too fast.<br />\n" +
-        "<b id=\"def.rtt\">Rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet.<br />\n" +
-        "<b id=\"def.dev\">Dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout.<br />\n" +
-        "<b id=\"def.rto\">Rto</b>: the retransmit timeout controls how frequently an unacknowledged packet will be retransmitted.<br />\n" +
-        "<b id=\"def.mtu\">Mtu</b>: current sending packet size / estimated receiving packet size.<br />\n" +
-        "<b id=\"def.send\">TX</b>: the number of packets sent to the peer.<br />\n" +
-        "<b id=\"def.recv\">RX</b>: the number of packets received from the peer.<br />\n" +
-        "<b id=\"def.resent\">ReTX</b>: the number of packets retransmitted to the peer.<br />\n" +
+        "<br><b id=\"def.peer\">Peer</b>: the remote peer.<br>\n" +
+        "<b id=\"def.dir\">Dir</b>: v means they offer to introduce us, ^ means we offer to introduce them.<br>\n" +
+        "<b id=\"def.idle\">Idle</b>: the idle time is how long since a packet has been received or sent.<br>\n" +
+        "<b id=\"def.rate\">In/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second).<br>\n" +
+        "<b id=\"def.up\">Up</b>: the uptime is how long ago this session was established.<br>\n" +
+        "<b id=\"def.skew\">Skew</b>: the skew says how far off the other user's clock is, relative to your own.<br>\n" +
+        "<b id=\"def.cwnd\">Cwnd</b>: the congestion window is how many bytes in 'in flight' you can send w/out an acknowledgement, / <br>\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of currently active messages being sent, /<br>\n" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the maximum number of concurrent messages to send, /<br>\n"+ 
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the number of consecutive sends which were blocked due to throws message window size.<br>\n" +
+        "<b id=\"def.ssthresh\">Sst</b>: the slow start threshold helps make sure the cwnd doesn't grow too fast.<br>\n" +
+        "<b id=\"def.rtt\">Rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet.<br>\n" +
+        "<b id=\"def.dev\">Dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout.<br>\n" +
+        "<b id=\"def.rto\">Rto</b>: the retransmit timeout controls how frequently an unacknowledged packet will be retransmitted.<br>\n" +
+        "<b id=\"def.mtu\">Mtu</b>: current sending packet size / estimated receiving packet size.<br>\n" +
+        "<b id=\"def.send\">TX</b>: the number of packets sent to the peer.<br>\n" +
+        "<b id=\"def.recv\">RX</b>: the number of packets received from the peer.<br>\n" +
+        "<b id=\"def.resent\">ReTX</b>: the number of packets retransmitted to the peer.<br>\n" +
         "<b id=\"def.dupRecv\">DupRX</b>: the number of duplicate packets received from the peer." +
         "</div>\n";
     

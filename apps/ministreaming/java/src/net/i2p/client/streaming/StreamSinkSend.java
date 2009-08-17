@@ -104,7 +104,7 @@ public class StreamSinkSend {
     }
 
     /**
-     * Fire up the client.  <code>Usage: StreamSinkClient sendFile writeDelayMs serverDestFile</code> <br />
+     * Fire up the client.  <code>Usage: StreamSinkClient sendFile writeDelayMs serverDestFile</code> <br>
      * <ul>
      *  <li><b>sendFile</b>: filename to send</li>
      *  <li><b>writeDelayMs</b>: how long to wait between each .write (0 for no delay)</li>

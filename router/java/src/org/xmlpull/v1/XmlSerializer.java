@@ -233,15 +233,15 @@ public interface XmlSerializer {
     
     //    /**
     //     * Writes a start tag with the given namespace and name.
-    //     * <br />If there is no prefix defined (prefix == null) for the given namespace,
+    //     * <br>If there is no prefix defined (prefix == null) for the given namespace,
     //     * a prefix will be defined automatically.
-    //     * <br />If explicit prefixes is passed (prefix != null) then it will be used
+    //     * <br>If explicit prefixes is passed (prefix != null) then it will be used
     //      *and namespace declared if not already declared or
     //     * throw IllegalStateException the same prefix was already set on this
     //     * element (setPrefix()) and was bound to different namespace.
-    //     * <br />If namespace is null then prefix must be null too or IllegalStateException is thrown.
-    //     * <br />If namespace is null then no namespace prefix is printed but just name.
-    //     * <br />If namespace is empty string then serializer will make sure that
+    //     * <br>If namespace is null then prefix must be null too or IllegalStateException is thrown.
+    //     * <br>If namespace is null then no namespace prefix is printed but just name.
+    //     * <br>If namespace is empty string then serializer will make sure that
     //     * default empty namespace is declared (in XML 1.0 xmlns='')
     //     * or throw IllegalStateException if default namespace is already bound
     //     * to non-empty string.
@@ -252,15 +252,15 @@ public interface XmlSerializer {
     //    /**
     //     * Write an attribute. Calls to attribute() MUST follow a call to
     //     * startTag() immediately.
-    //     * <br />If there is no prefix defined (prefix == null) for the given namespace,
+    //     * <br>If there is no prefix defined (prefix == null) for the given namespace,
     //     * a prefix will be defined automatically.
-    //     * <br />If explicit prefixes is passed (prefix != null) then it will be used
+    //     * <br>If explicit prefixes is passed (prefix != null) then it will be used
     //     * and namespace declared if not already declared or
     //     * throw IllegalStateException the same prefix was already set on this
     //     * element (setPrefix()) and was bound to different namespace.
-    //     * <br />If namespace is null then prefix must be null too or IllegalStateException is thrown.
-    //     * <br />If namespace is null then no namespace prefix is printed but just name.
-    //     * <br />If namespace is empty string then serializer will make sure that
+    //     * <br>If namespace is null then prefix must be null too or IllegalStateException is thrown.
+    //     * <br>If namespace is null then no namespace prefix is printed but just name.
+    //     * <br>If namespace is empty string then serializer will make sure that
     //     * default empty namespace is declared (in XML 1.0 xmlns='')
     //     * or throw IllegalStateException if default namespace is already bound
     //     * to non-empty string.
@@ -270,12 +270,12 @@ public interface XmlSerializer {
     //
     //    /**
     //     * Write end tag. Repetition of namespace, prefix, and name is just for avoiding errors.
-    //     * <br />If namespace or name arguments are different from corresponding startTag call
+    //     * <br>If namespace or name arguments are different from corresponding startTag call
     //     * then IllegalArgumentException is thrown, if prefix argument is not null and is different
     //     * from corresponding starTag then IllegalArgumentException is thrown.
-    //     * <br />If namespace is null then prefix must be null too or IllegalStateException is thrown.
-    //     * <br />If namespace is null then no namespace prefix is printed but just name.
-    //     * <br />If namespace is empty string then serializer will make sure that
+    //     * <br>If namespace is null then prefix must be null too or IllegalStateException is thrown.
+    //     * <br>If namespace is null then no namespace prefix is printed but just name.
+    //     * <br>If namespace is empty string then serializer will make sure that
     //     * default empty namespace is declared (in XML 1.0 xmlns='').
     //     * <p><b>Background:</b> in kXML endTag had no arguments, and non matching tags were
     //     *  very difficult to find...</p>

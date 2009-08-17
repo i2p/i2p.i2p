@@ -536,9 +536,9 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         Set<OutboundSession> outbound = getOutboundSessions();
         for (Iterator<OutboundSession> iter = outbound.iterator(); iter.hasNext();) {
             OutboundSession sess = iter.next();
-            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toString()).append("<br />");
-            buf.append("<b>Established:</b> ").append(new Date(sess.getEstablishedDate())).append("<br />");
-            buf.append("<b>Last Used:</b> ").append(new Date(sess.getLastUsedDate())).append("<br />");
+            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toString()).append("<br>");
+            buf.append("<b>Established:</b> ").append(new Date(sess.getEstablishedDate())).append("<br>");
+            buf.append("<b>Last Used:</b> ").append(new Date(sess.getLastUsedDate())).append("<br>");
             buf.append("<b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>");
             buf.append("<tr><td><b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td></tr>");
             buf.append("<tr><td><ul>");

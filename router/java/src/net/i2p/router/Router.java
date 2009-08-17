@@ -597,23 +597,23 @@ public class Router {
                    "<option value=\"/oldconsole.jsp#netdb\">Network Database</option>\n" +
                    "<option value=\"/oldconsole.jsp#logs\">Log messages</option>\n" +
                    "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
-                   "<hr />\n");
+                   "<hr>\n");
 
         StringBuilder buf = new StringBuilder(32*1024);
         
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
-            buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br />\n");
-        buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br />\n");
-        buf.append("<b>Started on: </b> ").append(new Date(getWhenStarted())).append("<br />\n");
-        buf.append("<b>Clock offset: </b> ").append(_context.clock().getOffset()).append("ms (OS time: ").append(new Date(_context.clock().now() - _context.clock().getOffset())).append(")<br />\n");
+            buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br>\n");
+        buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br>\n");
+        buf.append("<b>Started on: </b> ").append(new Date(getWhenStarted())).append("<br>\n");
+        buf.append("<b>Clock offset: </b> ").append(_context.clock().getOffset()).append("ms (OS time: ").append(new Date(_context.clock().now() - _context.clock().getOffset())).append(")<br>\n");
         long tot = Runtime.getRuntime().totalMemory()/1024;
         long free = Runtime.getRuntime().freeMemory()/1024;
-        buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br />\n"); 
-        buf.append("<b>Version:</b> Router: ").append(RouterVersion.VERSION).append(" / SDK: ").append(CoreVersion.VERSION).append("<br />\n"); 
+        buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br>\n"); 
+        buf.append("<b>Version:</b> Router: ").append(RouterVersion.VERSION).append(" / SDK: ").append(CoreVersion.VERSION).append("<br>\n"); 
         if (_higherVersionSeen) 
-            buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://www.i2p.net/\">check</a> to see if there is a new release out<br />\n");
+            buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://www.i2p.net/\">check</a> to see if there is a new release out<br>\n");
 
-        buf.append("<hr /><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
+        buf.append("<hr><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
         buf.append("<ul>");
@@ -723,41 +723,41 @@ public class Router {
         
         _context.bandwidthLimiter().renderStatusHTML(out);
 
-        out.write("<hr /><a name=\"clients\"> </a>\n");
+        out.write("<hr><a name=\"clients\"> </a>\n");
         
         _context.clientManager().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"transports\"> </a>\n");
+        out.write("\n<hr><a name=\"transports\"> </a>\n");
         
         _context.commSystem().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"profiles\"> </a>\n");
+        out.write("\n<hr><a name=\"profiles\"> </a>\n");
         
         _context.peerManager().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"tunnels\"> </a>\n");
+        out.write("\n<hr><a name=\"tunnels\"> </a>\n");
         
         _context.tunnelManager().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"jobs\"> </a>\n");
+        out.write("\n<hr><a name=\"jobs\"> </a>\n");
         
         _context.jobQueue().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"shitlist\"> </a>\n");
+        out.write("\n<hr><a name=\"shitlist\"> </a>\n");
         
         _context.shitlist().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"pending\"> </a>\n");
+        out.write("\n<hr><a name=\"pending\"> </a>\n");
         
         _context.messageRegistry().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"netdb\"> </a>\n");
+        out.write("\n<hr><a name=\"netdb\"> </a>\n");
         
         _context.netDb().renderLeaseSetHTML(out);
         _context.netDb().renderStatusHTML(out);
         
         buf.setLength(0);
-        buf.append("\n<hr /><a name=\"logs\"> </a>\n");	
+        buf.append("\n<hr><a name=\"logs\"> </a>\n");	
         List msgs = _context.logManager().getBuffer().getMostRecentMessages();
         buf.append("\n<h2>Most recent console messages:</h2><table>\n");
         for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {

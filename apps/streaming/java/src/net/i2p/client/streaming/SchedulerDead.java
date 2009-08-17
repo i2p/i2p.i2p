@@ -8,7 +8,7 @@ import net.i2p.util.Log;
  * connection was reset.</p>
  *
  * <h2>Entry conditions:</h2><ul>
- * <li>Both sides have closed and ACKed and the timeout has passed. <br />
+ * <li>Both sides have closed and ACKed and the timeout has passed. <br>
  *     <b>or</b></li>
  * <li>A RESET was received</li>
  * </ul>

@@ -270,7 +270,7 @@ public class Shitlist {
             if ( (transports != null) && (transports.size() > 0) )
                 buf.append(" on the following transport: ").append(transports);
             if (entry.cause != null) {
-                buf.append("<br />\n");
+                buf.append("<br>\n");
                 buf.append(entry.cause);
             }
             buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64()).append("#unsh\">unban now</a>)");

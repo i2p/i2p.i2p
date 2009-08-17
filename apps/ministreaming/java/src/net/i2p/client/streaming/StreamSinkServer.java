@@ -155,7 +155,7 @@ public class StreamSinkServer {
     }
     
     /**
-     * Fire up the streaming server.  <code>Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile [numHandlers]</code><br />
+     * Fire up the streaming server.  <code>Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile [numHandlers]</code><br>
      * <ul>
      *  <li><b>sinkDir</b>: Directory to store received files in</li>
      *  <li><b>ourDestFile</b>: filename to write our binary destination to</li>

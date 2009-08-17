@@ -967,18 +967,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 else
                     buf.append(dest.toBase64().substring(0, 6));
             }
-            buf.append(")</b><br />\n");
+            buf.append(")</b><br>\n");
             long exp = ls.getEarliestLeaseDate()-now;
             if (exp > 0)
-                buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br />\n");
+                buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br>\n");
             else
-                buf.append("Earliest expiration date was: <i>").append(DataHelper.formatDuration(0-exp)).append(" ago</i><br />\n");
+                buf.append("Earliest expiration date was: <i>").append(DataHelper.formatDuration(0-exp)).append(" ago</i><br>\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 buf.append("Lease ").append(i).append(": gateway <i>");
                 buf.append(ls.getLease(i).getGateway().toBase64().substring(0,6));
-                buf.append("</i> tunnelId <i>").append(ls.getLease(i).getTunnelId().getTunnelId()).append("</i><br />\n");
+                buf.append("</i> tunnelId <i>").append(ls.getLease(i).getTunnelId().getTunnelId()).append("</i><br>\n");
             }
-            buf.append("<hr />\n");
+            buf.append("<hr>\n");
             out.write(buf.toString());
             buf.setLength(0);
         }
@@ -1076,18 +1076,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b><br />\n");
+            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b><br>\n");
         } else {
-            buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");
+            buf.append("<b>Peer info for:</b> ").append(hash).append("<br>\n");
         }
         
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden())
-            buf.append("Hidden, Updated: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
+            buf.append("Hidden, Updated: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br>\n");
         else if (age > 0)
-            buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
+            buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br>\n");
         else
-            buf.append("Published: <i>in ").append(DataHelper.formatDuration(0-age)).append("???</i><br />\n");
+            buf.append("Published: <i>in ").append(DataHelper.formatDuration(0-age)).append("???</i><br>\n");
         buf.append("Address(es): <i>");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
@@ -1103,19 +1103,19 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 buf.append('[').append(DataHelper.stripHTML(name)).append('=').append(DataHelper.stripHTML(val)).append("] ");
             }
         }
-        buf.append("</i><br />\n");
+        buf.append("</i><br>\n");
         if (full) {
-            buf.append("Stats: <br /><i><code>\n");
+            buf.append("Stats: <br><i><code>\n");
             for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 String val = info.getOption(key);
-                buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br />\n");
+                buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");
             }
             buf.append("</code></i>\n");
         } else {
             buf.append("<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>\n");
         }
-        buf.append("<hr />\n");
+        buf.append("<hr>\n");
     }
     
 }

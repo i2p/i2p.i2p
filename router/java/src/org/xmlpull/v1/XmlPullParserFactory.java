@@ -20,7 +20,7 @@ import java.util.Vector;
  * a comma separated list of class names of factories or parsers to try (in order from
  * left to the right). If none found, it will throw an exception.
  *
- * <br /><strong>NOTE:</strong>In J2SE or J2EE environments, you may want to use
+ * <br><strong>NOTE:</strong>In J2SE or J2EE environments, you may want to use
  * <code>newInstance(property, classLoaderCtx)</code>
  * where first argument is
  * <code>System.getProperty(XmlPullParserFactory.PROPERTY_NAME)</code>
