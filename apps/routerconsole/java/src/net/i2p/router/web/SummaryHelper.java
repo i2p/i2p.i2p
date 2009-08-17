@@ -366,7 +366,7 @@ public class SummaryHelper extends HelperBase {
                     buf.append(" ago. Rebuilding&hellip;\"></td></tr>\n");                    
             } else {
                     // green light 
-                    buf.append("<td align=\right\"><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"Ready\"></td></tr>\n");
+                    buf.append("<td align=\"right\"><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"Ready\"></td></tr>\n");
                 }
             } else {
                 // yellow light

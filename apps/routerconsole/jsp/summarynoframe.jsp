@@ -62,13 +62,13 @@
             if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<form action=\"" + uri + "\" method=\"GET\">\n");
             out.print("<input type=\"hidden\" name=\"updateNonce\" value=\"" + nonce + "\" />\n");
             if (helper.updateAvailable())
                 out.print("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >Download " + helper.getUpdateVersion() + " Update</button>\n");
             if (helper.unsignedUpdateAvailable())
                 out.print("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >Download Unsigned<br>" + helper.getUnsignedUpdateVersion() + " Update</button>\n");
-            out.print("</form></p>\n");
+            out.print("</form>\n");
         }
     }
 %>
