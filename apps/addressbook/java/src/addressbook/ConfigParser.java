@@ -39,6 +39,9 @@ import java.util.Map;
  * Utility class providing methods to parse and write files in config file
  * format, and subscription file format.
  * 
+ * TODO: Change file encoding from default to UTF-8?
+ *       Or switch to the DataHelper loadProps/storeProps methods?
+ * 
  * @author Ragnarok
  */
 public class ConfigParser {

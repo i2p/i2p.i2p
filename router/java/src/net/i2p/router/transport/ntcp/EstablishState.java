@@ -368,7 +368,8 @@ public class EstablishState {
                 if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
                     _transport.markReachable(_con.getRemotePeer().calculateHash(), false);
-                    _context.shitlist().shitlistRouter(_con.getRemotePeer().calculateHash(), "Outbound clock skew of " + diff + " ms");
+                    _context.shitlist().shitlistRouter(_con.getRemotePeer().calculateHash(),
+                                                       "Excessive clock skew: " + DataHelper.formatDuration(diff));
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {

@@ -4,8 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Properties;
 
@@ -190,7 +191,7 @@ public class WorkingDir {
         PrintWriter out = null;
         try {
             in = new FileInputStream(oldFile);
-            out = new PrintWriter(new BufferedWriter(new FileWriter(newFile)));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile), "UTF-8")));
             out.println("# Modified by I2P User dir migration script");
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
@@ -229,7 +230,7 @@ public class WorkingDir {
         PrintWriter out = null;
         try {
             in = new FileInputStream(oldFile);
-            out = new PrintWriter(new BufferedWriter(new FileWriter(newFile)));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile), "UTF-8")));
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
                 if (s.indexOf("./eepsite/") >= 0) {

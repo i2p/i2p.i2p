@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure 1.2//EN" "http://jetty.mortbay.org/configure_1_2.dtd">
 
 <!-- ========================================================================= -->
@@ -26,6 +26,13 @@
 <!--                                                                           -->
 <!-- Jetty errors and warnings will appear in wrapper.log, check there         -->
 <!-- to diagnose problems.                                                     -->
+<!--                                                                           -->
+<!-- Note that the XML encoding for this file is UTF-8.                        -->
+<!--                                                                           -->
+<!-- If you have a 'split' directory installation, with configuration          -->
+<!-- files in ~/.i2p (Linux) or %APPDATA%\I2P (Windows), be sure to            -->
+<!-- edit the file in the configuration directory, NOT the install directory.  -->
+<!--                                                                           -->
 <!-- ========================================================================= -->
 
 <!-- =============================================================== -->

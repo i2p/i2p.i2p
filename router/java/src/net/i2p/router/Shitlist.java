@@ -264,8 +264,12 @@ public class Shitlist {
             Hash key = e.getKey();
             Entry entry = e.getValue();
             buf.append("<li>").append(_context.commSystem().renderPeerHTML(key));
-            buf.append(" expiring in ");
-            buf.append(DataHelper.formatDuration(entry.expireOn-_context.clock().now()));
+            long expires = entry.expireOn-_context.clock().now();
+            if (expires < 5l*24*60*60*1000)
+                buf.append(" Temporary ban expiring in ");
+            else
+                buf.append(" Banned until restart or in ");
+            buf.append(DataHelper.formatDuration(expires));
             Set transports = entry.transports;
             if ( (transports != null) && (transports.size() > 0) )
                 buf.append(" on the following transport: ").append(transports);

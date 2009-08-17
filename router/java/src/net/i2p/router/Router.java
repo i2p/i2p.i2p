@@ -1013,12 +1013,17 @@ public class Router {
      * Save the current config options (returning true if save was 
      * successful, false otherwise)
      *
+     * Note that unlike DataHelper.storeProps(),
+     * this does escape the \r or \n that are unescaped in DataHelper.loadProps().
+     * Note that the escaping of \r or \n was probably a mistake and should be taken out.
+     *
      */
     public boolean saveConfig() {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_configFilename);
             StringBuilder buf = new StringBuilder(8*1024);
+            buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
             synchronized (_config) {
                 TreeSet ordered = new TreeSet(_config.keySet());
                 for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
@@ -1031,7 +1036,7 @@ public class Router {
                     buf.append(key).append('=').append(val).append('\n');
                 }
             }
-            fos.write(buf.toString().getBytes());
+            fos.write(buf.toString().getBytes("UTF-8"));
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error saving the config to " + _configFilename, ioe);

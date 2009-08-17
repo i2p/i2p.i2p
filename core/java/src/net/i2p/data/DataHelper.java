@@ -17,11 +17,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -217,6 +218,9 @@ public class DataHelper {
      * - '#' or ';' starts a comment line, but '!' does not
      * - Leading whitespace is not trimmed
      * - '=' is the only key-termination character (not ':' or whitespace)
+     *
+     * Note that the escaping of \r or \n was probably a mistake and should be taken out.
+     *
      */
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);
@@ -257,10 +261,14 @@ public class DataHelper {
         }
     }
     
+    /**
+     * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
+     */
     public static void storeProps(Properties props, File file) throws IOException {
         PrintWriter out = null;
         try {
-            out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")));
+            out.println("# NOTE: This I2P config file must use UTF-8 encoding");
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
                 String name = (String)iter.next();
                 String val = props.getProperty(name);
