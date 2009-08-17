@@ -149,7 +149,7 @@ class ProfileOrganizerRenderer {
                 if (total / fails <= 10)   // hide if < 10%
                     buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
             }
-            buf.append("&nbsp</td>");
+            buf.append("&nbsp;</td>");
             buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
             buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");

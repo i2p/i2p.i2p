@@ -12,7 +12,7 @@
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
 <jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"/></a><hr>
+<a href="index.jsp" target="_top"><img src="/themes/console/images/i2plogo.png" alt="I2P Router Console" title="I2P Router Console"></a><hr>
 <% java.io.File lpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/toolbar.html");
     // you better have target="_top" for the links in there...
     if (lpath.exists()) { %>
@@ -98,9 +98,9 @@
             if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
             System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
             String uri = request.getRequestURI();
-            out.print("<p><form action=\"" + uri + "\" method=\"GET\">\n");
+            out.print("<form action=\"" + uri + "\" method=\"GET\">\n");
             out.print("<input type=\"hidden\" name=\"reseedNonce\" value=\"" + nonce + "\" />\n");
-            out.print("<button type=\"submit\" >Reseed</button></form></p>\n");
+            out.print("<button type=\"submit\" >Reseed</button></form>\n");
         }
     }
     // If a new reseed ain't running, and the last reseed had errors, show error message

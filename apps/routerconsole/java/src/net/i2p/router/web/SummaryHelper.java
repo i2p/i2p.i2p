@@ -347,9 +347,9 @@ public class SummaryHelper extends HelperBase {
             
             buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
             if (_context.clientManager().shouldPublishLeaseSet(h))
-                buf.append("server.png\" alt=\"Server\" title=\"Server\" />");
+                buf.append("server.png\" alt=\"Server\" title=\"Server\">");
             else
-                buf.append("client.png\" alt=\"Client\" title=\"Client\" />");
+                buf.append("client.png\" alt=\"Client\" title=\"Client\">");
             buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
             buf.append("\" target=\"_top\" title=\"Show tunnels\">");
             if (name.length() < 16)

@@ -483,7 +483,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         buf.append(h);
         if (found)
             buf.append("</a>");
-        buf.append("</font></tt>");
+        buf.append("</tt>");
         return buf.toString();
     }
 }

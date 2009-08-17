@@ -775,7 +775,7 @@ public class Blocklist {
                  if (to != from) {
                      out.write(toStr(to)); out.write("</td></tr>\n");
                  } else
-                     out.write("&nbsp</td></tr>\n");
+                     out.write("&nbsp;</td></tr>\n");
             }
             out.write("</table>");
         } else {
