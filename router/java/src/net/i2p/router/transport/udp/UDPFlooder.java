@@ -90,7 +90,8 @@ class UDPFlooder implements Runnable {
                         if (to == null)
                             continue;
                         msg.setTarget(to);
-                        _context.statManager().getStatLog().addData(peer.getRemotePeer().toBase64().substring(0,6), "udp.floodDataSent", 1, 0);
+                        // warning, getStatLog() can be null
+                        //_context.statManager().getStatLog().addData(peer.getRemotePeer().toBase64().substring(0,6), "udp.floodDataSent", 1, 0);
 
                         _transport.send(msg);
                     } else {

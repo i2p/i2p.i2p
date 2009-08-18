@@ -15,7 +15,8 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
- * 
+ * Note - if no filter is defined in stat.logFilters at startup, this class will not
+ * be instantiated - see StatManager.
  */
 public class BufferedStatLog implements StatLog {
     private I2PAppContext _context;
@@ -46,7 +47,7 @@ public class BufferedStatLog implements StatLog {
         _lastWrite = _events.length-1;
         _statFilters = new ArrayList(10);
         _flushFrequency = 500;
-        _filtersSpecified = false;
+        updateFilters();
         I2PThread writer = new I2PThread(new StatLogWriter(), "StatLogWriter");
         writer.setDaemon(true);
         writer.start();
@@ -93,10 +94,7 @@ public class BufferedStatLog implements StatLog {
                     _statFilters.clear();
                     while (tok.hasMoreTokens())
                         _statFilters.add(tok.nextToken().trim());
-                    if (_statFilters.size() > 0)
-                        _filtersSpecified = true;
-                    else
-                        _filtersSpecified = false;
+                    _filtersSpecified = _statFilters.size() > 0;
                 }
             }
             _lastFilters = val;
@@ -107,9 +105,7 @@ public class BufferedStatLog implements StatLog {
             }
         }
         
-        String filename = _context.getProperty(StatManager.PROP_STAT_FILE);
-        if (filename == null)
-            filename = StatManager.DEFAULT_STAT_FILE;
+        String filename = _context.getProperty(StatManager.PROP_STAT_FILE, StatManager.DEFAULT_STAT_FILE);
         File foo = new File(filename);
         if (!foo.isAbsolute())
             filename = (new File(_context.getRouterDir(), filename)).getAbsolutePath();

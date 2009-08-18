@@ -333,7 +333,8 @@ public class Connection {
             ResendPacketEvent rpe = new ResendPacketEvent(packet, timeout);
         }
 
-        _context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
+        // warning, getStatLog() can be null
+        //_context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
         
         _lastSendTime = _context.clock().now();
         _outboundQueue.enqueue(packet);        

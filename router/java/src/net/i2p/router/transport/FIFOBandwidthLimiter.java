@@ -303,12 +303,13 @@ public class FIFOBandwidthLimiter {
             else
                 _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/(float)time;
 
-            if (_log.shouldLog(Log.WARN)) {
+            // warning, getStatLog() can be null
+            //if (_log.shouldLog(Log.WARN)) {
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("BW: time = " + time + " sent: " + _sendBps + " recv: " + _recvBps);
-                _context.statManager().getStatLog().addData("bw", "bw.sendBps1s", (long)_sendBps, sent);
-                _context.statManager().getStatLog().addData("bw", "bw.recvBps1s", (long)_recvBps, recv);
-            }
+            //    _context.statManager().getStatLog().addData("bw", "bw.sendBps1s", (long)_sendBps, sent);
+            //    _context.statManager().getStatLog().addData("bw", "bw.recvBps1s", (long)_recvBps, recv);
+            //}
 
             // Maintain an approximate average with a 15-second halflife
             // Weights (0.955 and 0.045) are tuned so that transition between two values (e.g. 0..10)
@@ -323,12 +324,13 @@ public class FIFOBandwidthLimiter {
             //else
                 _recvBps15s = (0.955f)*_recvBps15s + (0.045f)*((float)recv*1000)/(float)time;
 
-            if (_log.shouldLog(Log.WARN)) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("BW15: time = " + time + " sent: " + _sendBps + " recv: " + _recvBps);
-                _context.statManager().getStatLog().addData("bw", "bw.sendBps15s", (long)_sendBps15s, sent);
-                _context.statManager().getStatLog().addData("bw", "bw.recvBps15s", (long)_recvBps15s, recv);
-            }
+            // warning, getStatLog() can be null
+            //if (_log.shouldLog(Log.WARN)) {
+            //    if (_log.shouldLog(Log.DEBUG))
+            //        _log.debug("BW15: time = " + time + " sent: " + _sendBps + " recv: " + _recvBps);
+            //    _context.statManager().getStatLog().addData("bw", "bw.sendBps15s", (long)_sendBps15s, sent);
+            //    _context.statManager().getStatLog().addData("bw", "bw.recvBps15s", (long)_recvBps15s, recv);
+            //}
         }
     }
     

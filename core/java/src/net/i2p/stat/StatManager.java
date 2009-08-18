@@ -25,11 +25,17 @@ public class StatManager {
     private I2PAppContext _context;
 
     /** stat name to FrequencyStat */
-    private final Map _frequencyStats;
+    private final Map<String, FrequencyStat> _frequencyStats;
     /** stat name to RateStat */
-    private final Map _rateStats;
+    private final Map<String, RateStat> _rateStats;
+    /** may be null */
     private StatLog _statLog;
 
+    /**
+     *  Comma-separated stats or * for all.
+     *  This property must be set at startup, or
+     *  logging is disabled.
+     */
     public static final String PROP_STAT_FILTER = "stat.logFilters";
     public static final String PROP_STAT_FILE = "stat.logFile";
     public static final String DEFAULT_STAT_FILE = "stats.log";
@@ -65,17 +71,19 @@ public class StatManager {
     public StatManager(I2PAppContext context) {
         _log = context.logManager().getLog(StatManager.class);
         _context = context;
-        _frequencyStats = Collections.synchronizedMap(new HashMap(128));
+        _frequencyStats = Collections.synchronizedMap(new HashMap(8));
         _rateStats = new HashMap(128); // synchronized only on add //Collections.synchronizedMap(new HashMap(128));
-        _statLog = new BufferedStatLog(context);
+        if (getStatFilter() != null)
+            _statLog = new BufferedStatLog(context);
     }
     
+    /** may be null */
     public StatLog getStatLog() { return _statLog; }
     public void setStatLog(StatLog log) { 
         _statLog = log; 
         synchronized (_rateStats) {
-            for (Iterator iter = _rateStats.values().iterator(); iter.hasNext(); ) {
-                RateStat rs = (RateStat)iter.next();
+            for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext(); ) {
+                RateStat rs = iter.next();
                 rs.setStatLog(log);
             }
         }
@@ -122,28 +130,28 @@ public class StatManager {
 
     /** update the given frequency statistic, taking note that an event occurred (and recalculating all frequencies) */
     public void updateFrequency(String name) {
-        FrequencyStat freq = (FrequencyStat) _frequencyStats.get(name);
+        FrequencyStat freq = _frequencyStats.get(name);
         if (freq != null) freq.eventOccurred();
     }
 
     /** update the given rate statistic, taking note that the given data point was received (and recalculating all rates) */
     public void addRateData(String name, long data, long eventDuration) {
-        RateStat stat = (RateStat) _rateStats.get(name); // unsynchronized
+        RateStat stat = _rateStats.get(name); // unsynchronized
         if (stat != null) stat.addData(data, eventDuration);
     }
 
     public void coalesceStats() {
         synchronized (_frequencyStats) {
-            for (Iterator iter = _frequencyStats.values().iterator(); iter.hasNext();) {
-                FrequencyStat stat = (FrequencyStat)iter.next();
+            for (Iterator<FrequencyStat> iter = _frequencyStats.values().iterator(); iter.hasNext();) {
+                FrequencyStat stat = iter.next();
                 if (stat != null) {
                     stat.coalesceStats();
                 }
             }
         }
         synchronized (_rateStats) {
-            for (Iterator iter = _rateStats.values().iterator(); iter.hasNext();) {
-                RateStat stat = (RateStat)iter.next();
+            for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext();) {
+                RateStat stat = iter.next();
                 if (stat != null) {
                     stat.coalesceStats();
                 }
@@ -152,18 +160,18 @@ public class StatManager {
     }
 
     public FrequencyStat getFrequency(String name) {
-        return (FrequencyStat) _frequencyStats.get(name);
+        return _frequencyStats.get(name);
     }
 
     public RateStat getRate(String name) {
-        return (RateStat) _rateStats.get(name);
+        return _rateStats.get(name);
     }
 
-    public Set getFrequencyNames() {
+    public Set<String> getFrequencyNames() {
         return new HashSet(_frequencyStats.keySet());
     }
 
-    public Set getRateNames() {
+    public Set<String> getRateNames() {
         return new HashSet(_rateStats.keySet());
     }
 
@@ -180,14 +188,14 @@ public class StatManager {
     /** Group name (String) to a Set of stat names, ordered alphabetically */
     public Map getStatsByGroup() {
         Map groups = new TreeMap(Collator.getInstance());
-        for (Iterator iter = _frequencyStats.values().iterator(); iter.hasNext();) {
-            FrequencyStat stat = (FrequencyStat) iter.next();
+        for (Iterator<FrequencyStat> iter = _frequencyStats.values().iterator(); iter.hasNext();) {
+            FrequencyStat stat = iter.next();
             if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());
             Set names = (Set) groups.get(stat.getGroupName());
             names.add(stat.getName());
         }
-        for (Iterator iter = _rateStats.values().iterator(); iter.hasNext();) {
-            RateStat stat = (RateStat) iter.next();
+        for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext();) {
+            RateStat stat = iter.next();
             if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());
             Set names = (Set) groups.get(stat.getGroupName());
             names.add(stat.getName());
@@ -198,8 +206,10 @@ public class StatManager {
     public String getStatFilter() { return _context.getProperty(PROP_STAT_FILTER); }
     public String getStatFile() { return _context.getProperty(PROP_STAT_FILE, DEFAULT_STAT_FILE); }
 
-    // Save memory by not creating stats unless they are required for router operation
-    // Return true if the stat should be ignored.
+    /**
+     * Save memory by not creating stats unless they are required for router operation
+     * @return true if the stat should be ignored.
+     */
     public boolean ignoreStat(String statName) {
         if (_context.getProperty(PROP_STAT_FULL, DEFAULT_STAT_FULL).equalsIgnoreCase("true"))
             return false;
