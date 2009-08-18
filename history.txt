@@ -1,3 +1,9 @@
+2009-08-18 dr|z3d
+    * Fixes for sidepanel
+    * Overhauled classic theme for i2ptunnels
+    * First stage of code validation to fix broken and "illegal" code
+    * Multifarious other UI tweaks and fiddles.
+
 2009-08-15 sponge
     * Merge in dr|z3d and my own html fixes for router console java and jsp
       files so that Opera (and now IE?) doesn't puke anymore on the missing 
