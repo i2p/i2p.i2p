@@ -113,7 +113,7 @@ public class ClientAppConfig {
                 buf.append(PREFIX).append(i).append(".delay=").append(app.delay / 1000).append("\n");
                 buf.append(PREFIX).append(i).append(".startOnLoad=").append(!app.disabled).append("\n");
             }
-            fos.write(buf.toString().getBytes());
+            fos.write(buf.toString().getBytes("UTF-8"));
         } catch (IOException ioe) {
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}

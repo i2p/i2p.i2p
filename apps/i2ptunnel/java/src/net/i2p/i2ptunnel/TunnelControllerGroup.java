@@ -255,7 +255,7 @@ public class TunnelControllerGroup {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(cfgFile);
-            fos.write(buf.toString().getBytes());
+            fos.write(buf.toString().getBytes("UTF-8"));
             if (_log.shouldLog(Log.INFO))
                 _log.info("Config written to " + cfgFile.getPath());
         } catch (IOException ioe) {
