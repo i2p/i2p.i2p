@@ -1,4 +1,4 @@
-/* Optimised for less capable browers and system specifications */
+/* Optimised for less capable browsers and system specifications */
 
 body {
      margin: 2px 0 0 2px;
@@ -272,7 +272,7 @@ div.news li {
      list-style: none;
      margin: -15px 15px -20px -20px;
      padding: 0px 0 15px 0;
-     border-bottom: 2px solid #cc7;
+     border-bottom: 5px solid #cc7;
      border-top: 0px solid #cc7;     
      padding: 3px 5px 5px 5px;
      font-size: 12pt;

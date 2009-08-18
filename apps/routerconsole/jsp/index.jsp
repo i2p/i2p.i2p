@@ -24,7 +24,7 @@ if (System.getProperty("router.consoleNonce") == null) {
 
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <br><i><jsp:getProperty name="updatehelper" property="newsStatus" /></i><br>
+ <hr><i><jsp:getProperty name="updatehelper" property="newsStatus" /></i><br>
 </div><div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/readme.html"); %>

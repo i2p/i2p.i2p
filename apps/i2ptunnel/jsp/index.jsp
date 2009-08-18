@@ -4,7 +4,7 @@
 <jsp:setProperty name="indexBean" property="*" />
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>I2PTunnel Webmanager - List</title>
+    <title>I2P Tunnel Manager - List</title>
     
     <meta htt
 p-equiv="Content-Type" content="text/html; charset=UTF-8" />
