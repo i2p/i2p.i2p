@@ -399,7 +399,8 @@
             <div class="header"></div>
             <div class="footer">
                 <div class="toolbox">
-                    <span class="comment">NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted</span>
+                    <span class="comment">NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted.</span>
+                    <div class="separator"><hr /></div>
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><span class="accessKey">S</span>ave</button>
                     <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><span class="accessKey">D</span>elete</button>
