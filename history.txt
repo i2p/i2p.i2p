@@ -1,3 +1,6 @@
+2009-08-19 sponge
+    * Java code to set Router Console password for dr|z3d
+
 2009-08-18 dr|z3d
     * Fixes for sidepanel
     * Overhauled classic theme for i2ptunnels
