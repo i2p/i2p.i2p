@@ -84,8 +84,8 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
-        out.write("<center><div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\" class=\"snarklogo\"></a></table>");
-        out.write("<div class=\"snarknavbar\"><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
+        out.write("<center><div class=\"page\">");
+        out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"Refresh page\" class=\"snarkRefresh\">I2PSnark</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -116,13 +116,13 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("(<a href=\"" + req.getRequestURI() + "?p=1" + "\">Show Peers</a>)<br>\n");
         }
         out.write(TABLE_HEADER2);
-        out.write("<th align=\"left\">");
+        out.write("<th align=\"center\">");
         if (_manager.util().connected())
             out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
-                      "\" title=\"Stop all torrents and the i2p tunnel\">Stop All</a>");
+                      "\" title=\"Stop all torrents and the I2P tunnel\">Stop All</a>");
         else if (snarks.size() > 0)
             out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
-                      "\" title=\"Start all torrents and the i2p tunnel\">Start All</a>");
+                      "\" title=\"Start all torrents and the I2P tunnel\">Start All</a>");
         else
             out.write("&nbsp;");
         out.write("</th></tr></thead>\n");
@@ -487,7 +487,7 @@ public class I2PSnarkServlet extends HttpServlet {
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         out.write("<tr class=\"" + rowClass + "\">");
-        out.write("<td align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
+        out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
         out.write(statusString + "</td>\n\t");
         out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
@@ -521,7 +521,7 @@ public class I2PSnarkServlet extends HttpServlet {
         }
         out.write("</td>\n\t");
         
-        out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
+        out.write("<td align=\"center\" class=\"snarkTorrentETA " + rowClass + "\">");
         if(isRunning && remainingSeconds > 0)
             out.write(DataHelper.formatDuration(remainingSeconds*1000)); // (eta 6h)
         out.write("</td>\n\t");
@@ -541,7 +541,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if(isRunning)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
-        out.write("<td align=\"left\" class=\"snarkTorrentAction " + rowClass + "\">");
+        out.write("<td align=\"center\" class=\"snarkTorrentAction " + rowClass + "\">");
         String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.meta.getInfoHash());
         if (showPeers)
             parameters = parameters + "&p=1";
@@ -566,9 +566,9 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (!peer.isConnected())
                     continue;
                 out.write("<tr class=\"" + rowClass + "\">");
-                out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 String ch = peer.toString().substring(0, 4);
                 String client;
                 if ("AwMD".equals(ch))
@@ -587,7 +587,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Robert";
                 else
                     client = "Unknown (" + ch + ')';
-                out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
+                out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;" + peer.toString().substring(5, 9) + "");
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
                 out.write("</td>\n\t");
@@ -790,11 +790,11 @@ public class I2PSnarkServlet extends HttpServlet {
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
                                                "<thead>\n" +
-                                               "<tr><th align=\"left\">Status \n";
+                                               "<tr><th align=\"center\">Status \n";
 
     private static final String TABLE_HEADER2 = "</th>\n" +
                                                "    <th align=\"left\">Torrent</th>\n" +
-                                               "    <th align=\"right\">ETA</th>\n" +
+                                               "    <th align=\"center\">ETA</th>\n" +
                                                "    <th align=\"right\">Downloaded</th>\n" +
                                                "    <th align=\"right\">Uploaded</th>\n" +
                                                "    <th align=\"right\">Down Rate</th>\n" +
