@@ -33,7 +33,7 @@ class ProfileOrganizerRenderer {
         Set peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
-        long hideBefore = now - 2*60*60*1000;
+        long hideBefore = now - 90*60*1000;
         
         TreeSet order = new TreeSet(_comparator);
         TreeSet integratedPeers = new TreeSet(_comparator);
@@ -66,7 +66,7 @@ class ProfileOrganizerRenderer {
                    "<th>Speed</th>" +
                    "<th>Capacity</th>" +
                    "<th>Integration</th>" +
-                   "<th>Failing?</th>" +
+                   "<th>Status</th>" +
                    "<th>&nbsp;</th>" +
                    "</tr>");
         int prevTier = 1;
@@ -228,7 +228,7 @@ class ProfileOrganizerRenderer {
                    "<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>" +
                    "<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>" +
                    "<li><b>integration</b>: how many new peers have they told us about lately?</li>" +
-                   "<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>" +
+                   "<li><b>status</b>: is the peer banned, or unreachable, or failing tunnel tests?</li>" +
                    "</ul></i>");
         out.write(buf.toString());
         out.flush();
