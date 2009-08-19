@@ -139,8 +139,8 @@ td {
 	color:#310;
   min-width: 800px !important;
 /*  max-width: 800px !important; */
-  margin: 10px;
-  padding: 10px 10px 5px 10px;
+  margin: 5px 0px;
+  padding: 10px 10px 0px 10px;
   -moz-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
@@ -292,7 +292,7 @@ div.addtorrentsection {
 }
 
 div.configsection {
-  margin: 0 0 10px 0;
+  margin: 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
