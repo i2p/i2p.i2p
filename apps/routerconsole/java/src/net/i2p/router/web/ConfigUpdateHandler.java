@@ -54,7 +54,7 @@ public class ConfigUpdateHandler extends FormHandler {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
             fetcher.fetchNews();
             if (fetcher.shouldFetchUnsigned())
-                fetcher.fetchUnsigned();
+                fetcher.fetchUnsignedHead();
             if (fetcher.updateAvailable() || fetcher.unsignedUpdateAvailable()) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
                     addFormNotice("Update available, attempting to download now");

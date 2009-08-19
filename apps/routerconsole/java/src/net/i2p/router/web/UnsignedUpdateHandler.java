@@ -21,6 +21,7 @@ import net.i2p.util.Log;
  * </p>
  */
 public class UnsignedUpdateHandler extends UpdateHandler {
+    private static UnsignedUpdateRunner _unsignedUpdateRunner;
     private String _zipURL;
     private String _zipVersion;
 
@@ -34,19 +35,19 @@ public class UnsignedUpdateHandler extends UpdateHandler {
     @Override
     public void update() {
         // don't block waiting for the other one to finish
-        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS, "false"))) {
+        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
             _log.error("Update already running");
             return;
         }
         synchronized (UpdateHandler.class) {
-            if (_updateRunner == null) {
-                _updateRunner = new UnsignedUpdateRunner();
+            if (_unsignedUpdateRunner == null) {
+                _unsignedUpdateRunner = new UnsignedUpdateRunner();
             }
-            if (_updateRunner.isRunning()) {
+            if (_unsignedUpdateRunner.isRunning()) {
                 return;
             } else {
                 System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
-                I2PAppThread update = new I2PAppThread(_updateRunner, "Update");
+                I2PAppThread update = new I2PAppThread(_unsignedUpdateRunner, "UnsignedUpdate");
                 update.start();
             }
         }
@@ -64,6 +65,8 @@ public class UnsignedUpdateHandler extends UpdateHandler {
         @Override
         protected void update() {
             _status = "<b>Updating</b>";
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Starting unsigned update URL: " + _zipURL);
             // always proxy for now
             //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
@@ -74,19 +77,26 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                 _get.addStatusListener(UnsignedUpdateRunner.this);
                 _get.fetch();
             } catch (Throwable t) {
-                _context.logManager().getLog(UpdateHandler.class).error("Error updating", t);
+                _log.error("Error updating", t);
             }
         }
         
         /** eepget listener callback Overrides */
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
-            _status = "<b>Update downloaded</b>";
-            // we should really verify zipfile integrity here but there's no easy way to do it
-            String to = (new File(_context.getBaseDir(), Router.UPDATE_FILE)).getAbsolutePath();
+            File updFile = new File(_updateFile);
+            if (FileUtil.verifyZip(updFile)) {
+                _status = "<b>Update downloaded</b>";
+            } else {
+                updFile.delete();
+                _status = "<b>Unsigned update file is corrupt</b> from " + url;
+                _log.log(Log.CRIT, "Corrupt zip file from " + url);
+                return;
+            }
+            String to = (new File(_context.getRouterDir(), Router.UPDATE_FILE)).getAbsolutePath();
             boolean copied = FileUtil.copy(_updateFile, to, true);
             if (copied) {
-                (new File(_updateFile)).delete();
+                updFile.delete();
                 String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
                 this.done = true;
                 String lastmod = _get.getLastModified();

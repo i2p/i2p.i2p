@@ -138,6 +138,56 @@ public class FileUtil {
     }
     
     /**
+     * Verify the integrity of a zipfile.
+     * There doesn't seem to be any library function to do this,
+     * so we basically go through all the motions of extractZip() above,
+     * unzipping everything but throwing away the data.
+     *
+     * @return true if ok
+     */
+    public static boolean verifyZip(File zipfile) {
+        ZipFile zip = null;
+        try {
+            byte buf[] = new byte[16*1024];
+            zip = new ZipFile(zipfile);
+            Enumeration entries = zip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry)entries.nextElement();
+                if (entry.getName().indexOf("..") != -1) {
+                    //System.err.println("ERROR: Refusing to extract a zip entry with '..' in it [" + entry.getName() + "]");
+                    return false;
+                }
+                if (entry.isDirectory()) {
+                    // noop
+                } else {
+                    try {
+                        InputStream in = zip.getInputStream(entry);
+                        int read = 0;
+                        while ( (read = in.read(buf)) != -1) {
+                            // throw the data away
+                        }
+                        //System.err.println("INFO: File [" + entry.getName() + "] extracted");
+                        in.close();
+                    } catch (IOException ioe) {
+                        //System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + "]");
+                        //ioe.printStackTrace();
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (IOException ioe) {
+            //System.err.println("ERROR: Unable to extract the zip file");
+            //ioe.printStackTrace();
+            return false;
+        } finally {
+            if (zip != null) {
+                try { zip.close(); } catch (IOException ioe) {}
+            }
+        }
+    }
+    
+    /**
      * Read in the last few lines of a (newline delimited) textfile, or null if
      * the file doesn't exist.  
      *

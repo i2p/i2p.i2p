@@ -8,11 +8,12 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.util.EepGet;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -31,7 +32,9 @@ public class UpdateHandler {
     protected RouterContext _context;
     protected Log _log;
     protected String _updateFile;
+    protected static String _status = "";
     private String _action;
+    private String _nonce;
     
     protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
     protected static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
@@ -61,13 +64,22 @@ public class UpdateHandler {
         }
     }
     
-    public void setUpdateAction(String val) { _action = val; }
+    /** these two can be set in either order, so call checkUpdateAction() twice */
+    public void setUpdateAction(String val) {
+        _action = val;
+        checkUpdateAction();
+    }
     
     public void setUpdateNonce(String nonce) { 
-        if (nonce == null) return;
-        if (nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.nonce")) ||
-            nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.noncePrev"))) {
-            if (_action != null && _action.contains("Unsigned")) {
+        _nonce = nonce;
+        checkUpdateAction();
+    }
+
+    private void checkUpdateAction() { 
+        if (_nonce == null || _action == null) return;
+        if (_nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.nonce")) ||
+            _nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.noncePrev"))) {
+            if (_action.contains("Unsigned")) {
                 // Not us, have NewsFetcher instantiate the correct class.
                 NewsFetcher fetcher = NewsFetcher.getInstance(_context);
                 fetcher.fetchUnsigned();
@@ -90,16 +102,14 @@ public class UpdateHandler {
                 return;
             } else {
                 System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
-                I2PThread update = new I2PThread(_updateRunner, "Update");
+                I2PAppThread update = new I2PAppThread(_updateRunner, "SignedUpdate");
                 update.start();
             }
         }
     }
     
-    public String getStatus() {
-        if (_updateRunner == null)
-            return "";
-        return _updateRunner.getStatus();
+    public static String getStatus() {
+        return _status;
     }
     
     public boolean isDone() {
@@ -113,7 +123,6 @@ public class UpdateHandler {
     public class UpdateRunner implements Runnable, EepGet.StatusListener {
         protected boolean _isRunning;
         protected boolean done;
-        protected String _status;
         protected EepGet _get;
         private final DecimalFormat _pct = new DecimalFormat("0.0%");
 
@@ -126,7 +135,6 @@ public class UpdateHandler {
         public boolean isDone() {
             return this.done;
         }
-        public String getStatus() { return _status; }
         public void run() {
             _isRunning = true;
             update();
@@ -150,7 +158,7 @@ public class UpdateHandler {
                 _get.addStatusListener(UpdateRunner.this);
                 _get.fetch();
             } catch (Throwable t) {
-                _context.logManager().getLog(UpdateHandler.class).error("Error updating", t);
+                _log.error("Error updating", t);
             }
         }
         
@@ -167,15 +175,16 @@ public class UpdateHandler {
             synchronized (_pct) {
                 buf.append(_pct.format(pct));
             }
-            buf.append(":<br />\n" + (currentWrite + alreadyTransferred));
-            buf.append(" transferred");
+            buf.append(":<br>\n");
+            buf.append(DataHelper.formatSize(currentWrite + alreadyTransferred));
+            buf.append("B transferred");
             _status = buf.toString();
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             _status = "<b>Update downloaded</b>";
             TrustedUpdate up = new TrustedUpdate(_context);
             File f = new File(_updateFile);
-            File to = new File(_context.getBaseDir(), Router.UPDATE_FILE);
+            File to = new File(_context.getRouterDir(), Router.UPDATE_FILE);
             String err = up.migrateVerified(RouterVersion.VERSION, f, to);
             f.delete();
             if (err == null) {
@@ -233,9 +242,9 @@ public class UpdateHandler {
         while (tok.hasMoreTokens())
             URLList.add(tok.nextToken().trim());
         int size = URLList.size();
-        _log.log(Log.DEBUG, "Picking update source from " + size + " candidates.");
+        //_log.log(Log.DEBUG, "Picking update source from " + size + " candidates.");
         if (size <= 0) {
-            _log.log(Log.WARN, "Update list is empty - no update available");
+            _log.log(Log.CRIT, "Update source list is empty - cannot download update");
             return null;
         }
         int index = I2PAppContext.getGlobalContext().random().nextInt(size);

@@ -188,8 +188,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                     if (ms <= 0) return;
                     if (modtime > ms) {
                         _unsignedUpdateAvailable = true;
-                        // '07-Jul 21:09' with month name in the system locale
-                        _unsignedUpdateVersion = (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime));
+                        // '07-Jul 21:09 UTC' with month name in the system locale
+                        _unsignedUpdateVersion = (new SimpleDateFormat("dd-MMM HH:mm")).format(new Date(modtime)) + " UTC";
                         if (shouldInstall())
                             fetchUnsigned();
                     }

@@ -60,7 +60,7 @@
 <%
     if (helper.updateAvailable() || helper.unsignedUpdateAvailable()) {
         // display all the time so we display the final failure message
-        out.print("<br />" + update.getStatus());
+        out.print("<br>" + net.i2p.router.web.UpdateHandler.getStatus());
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress"))) {
         } else if((!update.isDone()) &&
                   request.getParameter("action") == null &&
@@ -76,7 +76,7 @@
             if (helper.updateAvailable())
                 out.print("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >Download " + helper.getUpdateVersion() + " Update</button>\n");
             if (helper.unsignedUpdateAvailable())
-                out.print("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >Download Unsigned<br />" + helper.getUnsignedUpdateVersion() + " Update</button>\n");
+                out.print("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >Download Unsigned<br>Update " + helper.getUnsignedUpdateVersion() + "</button>\n");
             out.print("</form></p>\n");
         }
     }
