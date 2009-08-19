@@ -52,7 +52,7 @@
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class= "mediumtags" align="right"><b>Unsigned Build URL:</b></td>
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td>
-        </tr><tr><td colspan="2">
+        </tr><tr class="tablefooter"><td colspan="2">
         <div class="formaction">
             <input type="submit" name="action" value="Save" />
             <input type="reset" value="Cancel" />

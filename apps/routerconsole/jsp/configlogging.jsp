@@ -47,7 +47,7 @@
         </tr><tr><td class="mediumtags" align="right"><b>Log level overrides:</b></td>
           <td><jsp:getProperty name="logginghelper" property="logLevelTable" /></td>
         </tr><tr><td colspan="2"><hr></td>
-        </tr><tr><td> <div align="right">
+        </tr><tr class="tablefooter"><td colspan="2"> <div class="formaction">
           <input type="submit" name="shouldsave" value="Save changes" />
           <input type="reset" value="Cancel" />
 </div></td></tr></table></div></form></div></div></body></html>
