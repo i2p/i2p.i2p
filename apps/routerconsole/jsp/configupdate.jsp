@@ -28,8 +28,8 @@
       <h3>Check for I2P and news updates</h3>
       <div class="wideload"><table border="0" cellspacing="5">
         <tr><td colspan="2"></tr>
-        <tr><td class= "mediumtags" align="right"><b>News:</b></td>
-          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i>Update In Progress</i><br> <% } else { %> <input type="submit" name="action" value="Check for update now" />
+        <tr><td class= "mediumtags" align="right"><b>News &amp; I2P Updates:</b></td>
+          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i>Update In Progress</i><br> <% } else { %> <input type="submit" name="action" value="Check for updates" />
             <% } %></td></tr>
         <tr><td colspan="2"><br></td></tr>
         <tr><td class= "mediumtags" align="right"><b>News URL:</b></td>
@@ -52,7 +52,7 @@
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class= "mediumtags" align="right"><b>Unsigned Build URL:</b></td>
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td>
-        </tr><tr><td>
+        </tr><tr><td colspan="2">
         <div class="formaction">
             <input type="submit" name="action" value="Save" />
             <input type="reset" value="Cancel" />

@@ -39,7 +39,7 @@ h4 {
      text-shadow: 0px 0px 1px rgba(32, 32, 192, 0.3);
      text-transform: uppercase;
      white-space: nowrap;
-     width: 772px;
+     width: 782px;
      letter-spacing: 0.09em;
 }
 
@@ -66,6 +66,7 @@ textarea, input, select, button, a {
 
 button {
      float: none;
+     height: 20px !important;
 }
 
 textarea {
@@ -121,7 +122,7 @@ hr {
 
 .control {
      margin: 2px;
-     padding: 0 0 4px 0;
+     padding: 2px;
      overflow: hidden;
      height: 20px;
      width: 60px;
@@ -130,6 +131,7 @@ hr {
      color: #000;
      border: 1px outset #ddddc0;
      text-align: center;
+     vertical-align: middle;
      white-space: nowrap;
 }
 
@@ -143,7 +145,7 @@ hr {
 }
 
 .panel {
-     width: 780px;
+     width: 790px;
      margin: 16px auto 16px auto;
      padding: 5px 10px;
      overflow: hidden;

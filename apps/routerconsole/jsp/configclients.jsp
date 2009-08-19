@@ -34,7 +34,7 @@ button span.hide{
  </p><div class="wideload">
  <p><jsp:getProperty name="clientshelper" property="form1" />
  </p><p><i>All changes require restart to take effect. To change other client options, edit the clients.config file.</i>
- </p><br><div class="formaction">
+ </p><hr><div class="formaction">
  <input type="submit" name="action" value="Save Client Configuration" />
 </div></div><h3>WebApp Configuration</h3><p>
  The Java web applications listed below are started by the webConsole client and run in the same JVM as the router.

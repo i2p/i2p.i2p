@@ -57,7 +57,7 @@
         out.print("It improves your anonymity by creating cover traffic, and helps the network.<br>");
     } else {
         out.print("You have configured I2P to share<b> " + share + "KBps</b>. ");
-        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<br>");
+        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr>");
     }
  %>
 </p><div class="formaction">

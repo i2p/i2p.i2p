@@ -1768,10 +1768,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int numPeers = 0;
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<p><b id=\"udpcon\"><h3>UDP connections: ").append(peers.size());
+        buf.append("<h3 id=\"udpcon\">UDP connections: ").append(peers.size());
         buf.append(". Limit: ").append(getMaxConnections());
         buf.append(". Timeout: ").append(DataHelper.formatDuration(_expireTimeout));
-        buf.append(".</b></h3>\n");
+        buf.append(".</h3>\n");
         buf.append("<div class=\"wideload\"><table>\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">Peer</a>");
         if (sortFlags != FLAG_ALPHA)
