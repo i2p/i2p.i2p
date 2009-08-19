@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.i2p.router.RouterContext;
 
 public class NavHelper extends HelperBase {
     private static Map _apps = new HashMap();

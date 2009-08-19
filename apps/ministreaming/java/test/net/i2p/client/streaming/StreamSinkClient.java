@@ -117,7 +117,7 @@ public class StreamSinkClient {
     }
 
     /**
-     * Fire up the client.  <code>Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile [concurrentSends]</code> <br />
+     * Fire up the client.  <code>Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile [concurrentSends]</code> <br>
      * <ul>
      *  <li><b>sendSizeKB</b>: how many KB to send, or -1 for unlimited</li>
      *  <li><b>writeDelayMs</b>: how long to wait between each .write (0 for no delay)</li>

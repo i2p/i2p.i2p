@@ -49,6 +49,7 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     
     
+    @Override
     protected void processForm() {
         if ("Check for update now".equals(_action)) {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());

@@ -132,9 +132,11 @@ class SummaryListener implements RateSummaryListener {
     RrdDb getData() { return _db; }
     long now() { return _context.clock().now(); }
     
+    @Override
     public boolean equals(Object obj) {
         return ((obj instanceof SummaryListener) && ((SummaryListener)obj)._rate.equals(_rate));
     }
+    @Override
     public int hashCode() { return _rate.hashCode(); }
 }
 

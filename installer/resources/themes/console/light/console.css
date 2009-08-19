@@ -119,21 +119,21 @@ div.routersummary hr {
 }
 
 div.routersummary h3 {
-     border: 0px solid #f00;
-/*     border-bottom: 1px solid #99f !important;*/
+     border: 0;
      font-size: 10pt;
-     letter-spacing: 0.05em;
+     letter-spacing: 0.04em;
      margin: -7px -9px -7px -9px;
      padding: 5px 0px 5px 0px;
      background: #c5d5fb;
      text-transform: uppercase;
+     background-image: -moz-linear-gradient(top, bottom, from(#ddf), to(#c5d5fb), color-stop(25%, #c5d5fb), color-stop(100%, #ddf));
 }
 
 div.routersummary h4 {
      border: 0px solid #f00;
      border-bottom: 0 !important;
-     font-size: 9pt;
-     letter-spacing: 0.05em;
+     font-size: 8.5pt;
+     letter-spacing: 0.02em;
      margin: -7px -9px -7px -9px !important;
      padding: 2px 3px 3px 3px;
      background: #c1d1f7;
@@ -145,7 +145,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -5px;
+     margin: -2px -4px;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -169,11 +169,11 @@ div.routersummary p {
 }     
 
 div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
 }
 
 div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 0px 0px 0.5px rgba(255, 255, 255, 0.7);
      color: #f60;
 }
 

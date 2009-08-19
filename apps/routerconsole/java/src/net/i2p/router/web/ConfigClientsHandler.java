@@ -20,13 +20,14 @@ import org.mortbay.jetty.Server;
  *  Saves changes to clients.config or webapps.config
  */
 public class ConfigClientsHandler extends FormHandler {
-    private Log _log;
+    private Log configClient_log;
     private Map _settings;
     
     public ConfigClientsHandler() {
-        _log = ContextHelper.getContext(null).logManager().getLog(ConfigClientsHandler.class);
+        configClient_log = ContextHelper.getContext(null).logManager().getLog(ConfigClientsHandler.class);
     }
 
+    @Override
     protected void processForm() {
         if (_action.startsWith("Save Client")) {
             saveClientChanges();
@@ -80,7 +81,7 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         ClientAppConfig ca = (ClientAppConfig) clients.get(i);
-        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
+        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), configClient_log);
         addFormNotice("Client " + ca.clientName + " started.");
     }
 

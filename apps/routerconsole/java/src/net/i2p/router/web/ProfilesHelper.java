@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import net.i2p.router.RouterContext;
 
 public class ProfilesHelper extends HelperBase {
     public ProfilesHelper() {}

@@ -49,16 +49,16 @@ public class ConfigRestartBean {
         long timeRemaining = ctx.router().getShutdownTimeRemaining();
         if (shuttingDown) {
             if (timeRemaining <= 0) {
-                return "<b>Shutdown imminent</b>";
+                return "<center><b>Shutdown imminent</b></center>";
             } else {
-                return "<b>Shutdown in " + DataHelper.formatDuration(timeRemaining) + "</b><br />"
+                return "<center><b>Shutdown in " + DataHelper.formatDuration(timeRemaining) + "</b></center><br>"
                      + buttons(urlBase, systemNonce, "shutdownImmediate,Shutdown immediately,cancelShutdown,Cancel shutdown");
             }
         } else if (restarting) {
             if (timeRemaining <= 0) {
-                return "<b>Restart imminent</b>";
+                return "<center><b>Restart imminent</b></center>";
             } else {
-                return "<b>Restart in " + DataHelper.formatDuration(timeRemaining) + "</b><br />"
+                return "<center><b>Restart in " + DataHelper.formatDuration(timeRemaining) + "</b></center><br>"
                      + buttons(urlBase, systemNonce, "restartImmediate,Restart immediately,cancelShutdown,Cancel restart");
             }
         } else {

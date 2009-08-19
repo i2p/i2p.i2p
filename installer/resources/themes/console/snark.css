@@ -47,7 +47,7 @@ body {
   color: #f30;
   border-bottom: 3px solid #f30;
   border-top: 3px solid #f30;
-  text-shadow: 0px 0px 1px rgba(255, 163, 0, 0.9);
+  text-shadow: 0px 0px 1px rgba(255, 32, 0, 0.5);
   }
 
 .snarkMessages {
@@ -95,7 +95,7 @@ th {
   border-top: 1px outset #001;
   border-bottom: 1px inset #001;  
   background: #f60 url('/themes/console/images/tabletitleorange.png') repeat-x;
-  text-align: right;
+/*  text-align: right; */
   whitespace: nowrap;
 }
 
@@ -107,7 +107,7 @@ th {
 
 td {
 	padding: 5px;
-  text-align: right;
+/*  text-align: right;*/
 }
 .snarkTorrentEven {
 	background-color: #fb1;
@@ -139,8 +139,8 @@ td {
 	color:#310;
   min-width: 800px !important;
 /*  max-width: 800px !important; */
-  margin: 20px;
-  padding: 10px 20px 5px 20px;
+  margin: 5px 0px;
+  padding: 10px 10px 0px 10px;
   -moz-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
@@ -224,7 +224,7 @@ img:hover{
 
 
 div.section {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
@@ -241,7 +241,7 @@ div.section {
 }
 
 div.mainsection {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
@@ -258,7 +258,7 @@ div.mainsection {
 }
 
 div.newtorrentsection {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
@@ -275,7 +275,7 @@ div.newtorrentsection {
 }
 
 div.addtorrentsection {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
@@ -292,7 +292,7 @@ div.addtorrentsection {
 }
 
 div.configsection {
-  margin: 0 0 20px 0;
+  margin: 0;
   padding: 10px;
   background: #ffe;
   border: 1px solid #001;
@@ -317,7 +317,7 @@ div.configsection a:hover{
 }
 
 .snarknavbar {
-  margin: 5px 0 20px 0 !important;
+  margin: 0 0 10px 0 !important;
   padding: 10px;
   border: 1px solid #001;
   -moz-border-radius: 4px;
@@ -326,4 +326,10 @@ div.configsection a:hover{
   background: #eef;
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
   background: #ddf url('../console/light/images/tabletile.png');
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 11pt;
+  color: #001;
+  text-shadow: 0px 0px 1px rgba(0, 0, 148, 0.9);
 }

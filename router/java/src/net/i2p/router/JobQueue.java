@@ -615,7 +615,7 @@ public class JobQueue {
         //    for (int i = 0; i < states.length; i++) 
         //        buf.append(states[i]).append(" ");
         //buf.append(']');
-        buf.append("</b><br />\n");
+        buf.append("</b><br>\n");
 
         long now = _context.clock().now();
 

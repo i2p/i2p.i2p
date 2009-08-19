@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import net.i2p.router.RouterContext;
 
 public class ConfigLoggingHelper extends HelperBase {
     public ConfigLoggingHelper() {}
@@ -43,7 +42,7 @@ public class ConfigLoggingHelper extends HelperBase {
             String level = limits.getProperty(prefix);
             buf.append(prefix).append('=').append(level).append('\n');
         }
-        buf.append("</textarea><br />\n");
+        buf.append("</textarea><br>\n");
         buf.append("<i>Add additional logging statements above. Example: net.i2p.router.tunnel=WARN</i><br>");
         buf.append("<i>Or put entries in the logger.config file. Example: logger.record.net.i2p.router.tunnel=WARN</i><br>");
         buf.append("<i>Valid levels are DEBUG, INFO, WARN, ERROR, CRIT</i>\n");

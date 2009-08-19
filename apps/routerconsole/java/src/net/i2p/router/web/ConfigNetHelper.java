@@ -4,7 +4,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
-import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Addresses;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPAddress;

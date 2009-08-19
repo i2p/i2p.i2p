@@ -80,7 +80,7 @@ public class StatsGenerator {
                 buf.append(stat);
                 buf.append("\">");
                 buf.append(stat);
-                buf.append("</a></b><br />");
+                buf.append("</a></b><br>");
                 if (_context.statManager().isFrequency(stat))
                     renderFrequency(stat, buf);
                 else
@@ -88,7 +88,7 @@ public class StatsGenerator {
                 out.write(buf.toString());
                 buf.setLength(0);
             }
-            out.write("</ul><hr />");
+            out.write("</ul><br>");
         }
         out.flush();
     }
@@ -97,7 +97,7 @@ public class StatsGenerator {
         FrequencyStat freq = _context.statManager().getFrequency(name);
         buf.append("<i>");
         buf.append(freq.getDescription());
-        buf.append("</i><br />");
+        buf.append("</i><br>");
         long uptime = _context.router().getUptime();
         long periods[] = freq.getPeriods();
         Arrays.sort(periods);
@@ -124,9 +124,9 @@ public class StatsGenerator {
             buf.append(" using the lifetime of ");
             buf.append(curFreq.getEventCount());
             buf.append(" events)");
-            buf.append("<br />");
+            buf.append("<br>");
         }
-        buf.append("<br />");
+        buf.append("<br>");
     }
     
     private void renderRate(String name, StringBuilder buf) {
@@ -135,10 +135,10 @@ public class StatsGenerator {
         if (! "".equals(d)) {
             buf.append("<i>");
             buf.append(d);
-            buf.append("</i><br />");
+            buf.append("</i><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
-            buf.append("No lifetime events<br />&nbsp;<br />");
+            buf.append("No lifetime events<br>&nbsp;<br>");
             return;
         }
         long now = _context.clock().now();
@@ -217,9 +217,9 @@ public class StatsGenerator {
         buf.append(num(rate.getLifetimeAverageValue()));
         buf.append(" over ");
         buf.append(rate.getLifetimeEventCount());
-        buf.append(" events<br /></li>");
+        buf.append(" events<br></li>");
         buf.append("</ul>");
-        buf.append("<br />");
+        buf.append("<br>");
     }
     
     private static void renderPeriod(StringBuilder buf, long period, String name) {

@@ -13,7 +13,7 @@
 <h1>I2P Network Configuration</h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
- 
+
  <jsp:useBean class="net.i2p.router.web.ConfigNetHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
@@ -25,45 +25,42 @@
     System.setProperty("net.i2p.router.web.ConfigNetHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
- <h3>Bandwidth limiter</h3>
- <p>
+ <h3>Bandwidth limiter</h3><p>
  <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
- </p>
-<p>
-   <div class="wideload">
-    <table>
-    <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
-    In <td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)<br />
-<!-- let's keep this simple...
- bursting up to 
-    <input name="inboundburstrate" type="text" size="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" /> KBps for
-    <jsp:getProperty name="nethelper" property="inboundBurstFactorBox" /><br />
--->
-    <tr><td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBps
-    Out <td>(<jsp:getProperty name="nethelper" property="outboundRateBits" />)<br />
-<!-- let's keep this simple...
- bursting up to 
-    <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
-  <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
- <i>KBps = kilobytes per second = 1024 bytes per second = 8192 bits per second.<br />
-    A negative rate sets the default.</i><br />
--->
-    <tr><td><jsp:getProperty name="nethelper" property="sharePercentageBox" />
-    Share <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)<br />
-  </table></div>
  </p><p>
+   <div class="wideload"><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps In
+        </td><td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)</td>
+<!-- let's keep this simple...
+ bursting up to
+    <input name="inboundburstrate" type="text" size="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" /> KBps for
+    <jsp:getProperty name="nethelper" property="inboundBurstFactorBox" /><br>
+-->
+    </tr><tr>
+        <td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBps Out
+        </td><td>(<jsp:getProperty name="nethelper" property="outboundRateBits" />)</td>
+<!-- let's keep this simple...
+ bursting up to
+    <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
+  <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br>
+ <i>KBps = kilobytes per second = 1024 bytes per second = 8192 bits per second.<br>
+    A negative rate sets the default.</i><br>
+-->
+    </tr><tr>
+        <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> Share</td>
+        <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
+</td></tr></table></div></p><p>
  <% int share = nethelper.getShareBandwidth();
     if (share < 12) {
         out.print("<b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
         out.print("I2P requires at least 12KBps to enable sharing. ");
         out.print("Please enable sharing (participating in tunnels) by configuring more bandwidth. ");
-        out.print("It improves your anonymity by creating cover traffic, and helps the network.<br />");
+        out.print("It improves your anonymity by creating cover traffic, and helps the network.<br>");
     } else {
         out.print("You have configured I2P to share<b> " + share + "KBps</b>. ");
-        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr />");
+        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr>");
     }
  %>
- </p><div class="formaction">
+</p><div class="formaction">
 <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /></div>
  <!--
  <b>Enable load testing: </b>
@@ -71,28 +68,25 @@
  <p>If enabled, your router will periodically anonymously probe some of your peers
  to see what sort of throughput they can handle.  This improves your router's ability
  to pick faster peers, but can cost substantial bandwidth.  Relevant data from the
- load testing is fed into the profiles as well as the 
+ load testing is fed into the profiles as well as the
  <a href="oldstats.jsp#test.rtt">test.rtt</a> and related stats.</p>
- <hr />
+ <br>
 -->
- <h3>IP and Transport Configuration</h3>
- <p>
+ <h3>IP and Transport Configuration</h3><p>
  <b>The default settings will work for most people. There is <a href="#chelp">help below</a>.</b>
- </p><p>
- <b>UPnP Configuration:</b><br />
+ </p><p><b>UPnP Configuration:</b><br>
     <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     Enable UPnP to open firewall ports - <a href="peers.jsp#upnp">UPnP status</a>
- </p><p>
- <b>IP Configuration:</b><br />
- Externally reachable hostname or IP address:<br />
+ </p><p><b>IP Configuration:</b><br>
+ Externally reachable hostname or IP address:<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> />
-    Use all auto-detect methods<br />
+    Use all auto-detect methods<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="local,ssu" <%=nethelper.getUdpAutoIPChecked(4) %> />
-    Disable UPnP IP address detection<br />
+    Disable UPnP IP address detection<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="upnp,ssu" <%=nethelper.getUdpAutoIPChecked(5) %> />
-    Ignore local interface IP address<br />
+    Ignore local interface IP address<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="ssu" <%=nethelper.getUdpAutoIPChecked(0) %> />
-    Use SSU IP address detection only<br />
+    Use SSU IP address detection only<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> />
     Specify hostname or IP:
     <input name ="udpHost1" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" />
@@ -109,52 +103,47 @@
            out.print("</select>\n");
        }
     %>
-    <br />
+    <br>
     <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
-    Hidden mode - do not publish IP <i>(prevents participating traffic)</i><br />
- </p><p>
- <b>UDP Configuration:</b><br />
+    Hidden mode - do not publish IP <i>(prevents participating traffic)</i><br>
+ </p><p><b>UDP Configuration:</b><br>
  UDP port:
- <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br />
+ <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br>
 <!-- let's keep this simple...
 <input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
  Require SSU introductions
  <i>(Enable if you cannot open your firewall)</i>
  </p><p>
- Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br />
+ Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br>
 -->
  </p><p>
- <b>TCP Configuration:</b><br />
- Externally reachable hostname or IP address:<br />
+ <b>TCP Configuration:</b><br>
+ Externally reachable hostname or IP address:<br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> />
     Use auto-detected IP address
     <i>(currently <jsp:getProperty name="nethelper" property="udpIP" />)</i>
-    if we are not firewalled<br />
+    if we are not firewalled<br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> />
-    Always use auto-detected IP address (Not firewalled)<br />
+    Always use auto-detected IP address (Not firewalled)<br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> />
     Specify hostname or IP:
-    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" /><br />
+    <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" /><br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> />
-    Disable inbound (Firewalled)<br />
+    Disable inbound (Firewalled)<br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> />
-    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP)</i><br />
+    Completely disable <i>(select only if behind a firewall that throttles or blocks outbound TCP)</i><br>
  </p><p>
- Externally reachable TCP port:<br />
+ Externally reachable TCP port:<br>
     <input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> />
     Use the same port configured for UDP
-    <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br />
+    <i>(currently <jsp:getProperty name="nethelper" property="udpPort" />)</i><br>
     <input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> />
     Specify Port:
-    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br />
- </p><p><b>Note: Changing these settings will restart your router.</b>
- </p><hr><div class="formaction">
+    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br>
+ </p><p><b>Note: Changing these settings will restart your router.</b></p>
+<hr><div class="formaction">
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" />
-</div>
-</div>
-<h3><a name="chelp">Configuration Help:</a></h3>
- <div align="justify">
- <p>
+</div><h3><a name="chelp">Configuration Help:</a></h3><div align="justify"><p>
  While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
  if the I2P port (generally 8887) is forwarded for both UDP and TCP.
  </p><p>
@@ -166,30 +155,30 @@
  </p>
 <!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
+</p>
 -->
- </p><p>
+<p>
  UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address
  and forward ports.
  UPnP support is beta, and may not work for any number of reasons:
- <ul>
+<ul>
 <li class="tidylist">No UPnP-compatible device present
 <li class="tidylist">UPnP disabled on the device
 <li class="tidylist">Software firewall interference with UPnP
 <li class="tidylist">Bugs in the device's UPnP implementation
 <li class="tidylist">Multiple firewall/routers in the internet connection path
 <li class="tidylist">UPnP device change, reset, or address change
- </ul><br>
+</ul><br>
  Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
  UPnP may be enabled or disabled above, but a change requires a router restart to take effect.
- </p><p>Hostnames entered above will be published in the network database.
+</p><p>Hostnames entered above will be published in the network database.
     They are <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.
     If you specify the wrong IP address or
     hostname, or do not properly configure your NAT or firewall, your network performance will degrade
-    substantially.  When in doubt, leave the settings at the defaults.</p>
- </p>
-<h3><a name="help">Reachability Help:</a></h3>
- <p>
+    substantially.  When in doubt, leave the settings at the defaults.
+</p>
+<h3><a name="help">Reachability Help:</a></h3><p>
  While I2P will work fine behind most firewalls, your speeds and network integration will generally improve
  if the I2P port (generally 8887) to both UDP and TCP.
  If you think you have opened up your firewall and I2P still thinks you are firewalled, remember
@@ -244,19 +233,17 @@
 <li class="tidylist"><b>ERR - Client Manager I2CP Error - check logs</b> -
      This is usually due to a port 7654 conflict. Check the logs to verify. Do you have another I2P instance running?
      Stop the conflicting program and restart I2P.
- </ul>
- </p>
- <hr />
+ </ul></p><br>
       <!--
  <b>Dynamic Router Keys: </b>
- <input type="checkbox" class="optbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
+ <input type="checkbox" class="optbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br>
  <p>
  This setting causes your router identity to be regenerated every time your IP address
  changes. If you have a dynamic IP this option can speed up your reintegration into
  the network (since people will have shitlisted your old router identity), and, for
  very weak adversaries, help frustrate trivial
  <a href="http://www.i2p.net/how_threatmodel#intersection">intersection
- attacks</a> against the NetDB.  Your different router identities would only be 
+ attacks</a> against the NetDB.  Your different router identities would only be
  'hidden' among other I2P users at your ISP, and further analysis would link
  the router identities further.</p>
  <p>Note that when I2P detects an IP address change, it will automatically
@@ -264,10 +251,6 @@
  update their profiles - any long lasting client connections will be disconnected,
  though such would likely already be the case anyway, since the IP address changed.
  </p>
- <hr />
+ <br>
 -->
-    </form>
-</div>
-</div>
-</body>
-</html>
+</div></form></div></div></body></html>

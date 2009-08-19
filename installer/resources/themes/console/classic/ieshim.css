@@ -122,7 +122,7 @@ div.routersummary hr {
 div.routersummary h3 {
      border: 0px solid #f00;
      text-align: center !important;
-     font-size: 10pt;
+     font-size: 9pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px;
      padding: 5px 0px 5px 0px;
@@ -133,7 +133,7 @@ div.routersummary h3 {
 div.routersummary h4 {
      border: 0px solid #f00;
      border-bottom: 0 !important;
-     font-size: 9pt;
+     font-size: 8.5pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px !important;
      padding: 2px 3px 3px 3px;
@@ -154,6 +154,7 @@ div.routersummary table {
      padding: 0px -10px;
      background-image: none !important;
      background-color: transparent !important;
+     text-align: center !important;
 }
 
 div.routersummary tr {
@@ -172,10 +173,12 @@ div.routersummary p {
      padding: 0;
 }     
 
+/*
 div.routersummary img {
      margin: 5px -10px -5px -10px;
      overflow: hidden;
 }     
+*/
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);

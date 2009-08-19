@@ -1,13 +1,10 @@
 package net.i2p.router.web;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
 import net.i2p.apps.systray.SysTray;
 import net.i2p.apps.systray.UrlLauncher;
-import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.startup.ClientAppConfig;
 
@@ -49,6 +46,7 @@ public class ConfigServiceHandler extends FormHandler {
         }
     }
     
+    @Override
     protected void processForm() {
         if (_action == null) return;
         
@@ -95,9 +93,9 @@ public class ConfigServiceHandler extends FormHandler {
                 SysTray tray = SysTray.getInstance();
                 if (tray != null) {
                     tray.show();
-                    addFormNotice("Systray enabled");
+                    addFormNotice("System tray icon enabled.");
                 } else {
-                    addFormNotice("Systray not supported on this platform");
+                    addFormNotice("System tray icon feature not supported on this platform. Sorry!");
                 }
             } catch (Throwable t) {
                 addFormError("Warning: unable to contact the systray manager - " + t.getMessage());
@@ -107,9 +105,9 @@ public class ConfigServiceHandler extends FormHandler {
                 SysTray tray = SysTray.getInstance();
                 if (tray != null) {
                     tray.hide();
-                    addFormNotice("Systray disabled");
+                    addFormNotice("System tray icon disabled.");
                 } else {
-                    addFormNotice("Systray not supported on this platform");
+                    addFormNotice("System tray icon feature not supported on this platform. Sorry!");
                 }
             } catch (Throwable t) {
                 addFormError("Warning: unable to contact the systray manager - " + t.getMessage());

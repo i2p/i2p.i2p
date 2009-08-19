@@ -1,7 +1,7 @@
 /* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
 
 body {
-     margin: 25px 10px 0 5px;
+     margin: 20px 5px 0 15px;
      padding: 0;
      text-align: center;
      background: #002;
@@ -79,7 +79,7 @@ a:active{
 div.routersummaryouter {
      float: left;
      width: 200px;
-     margin: 0 0 10px 20px;
+     margin: 0 0 10px 5px;
      padding: 0;
      border: 0;
      clear: left;/* fixes a bug in Opera */
@@ -125,7 +125,7 @@ div.routersummary hr {
 div.routersummary h3 {
      border: 0;
      font-size: 10pt;
-     letter-spacing: 0.05em;
+     letter-spacing: 0.04em;
      margin: -7px -9px -10px -9px;
      padding: 3px 0px 5px 0px;
      background: #007;
@@ -140,8 +140,8 @@ div.routersummary h3 {
 div.routersummary h4 {
      border: 0;
      border-bottom: 0 !important;
-     font-size: 9pt;
-     letter-spacing: 0.05em;
+     font-size: 8.5pt;
+     letter-spacing: 0.03em;
      margin: -7px -9px -10px -9px !important;
      padding: 2px 3px 5px 3px;
      background: #005;
@@ -154,7 +154,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -5px;
+     margin: -1px -4px -4px -4px;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -178,7 +178,7 @@ div.routersummary p {
 }     
 
 div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+     text-shadow: 0px 0px 1px rgba(192, 192, 255, 0.5);
 }
 
 div.routersummary a:hover {
@@ -224,7 +224,7 @@ div.warning {
 }
 
 div.main {
-     margin: 0px 0px 20px 215px;
+     margin: 0px 0px 20px 195px;
      padding: 0 15px 15px 25px;
      background: #002;
      text-align: left;
@@ -240,7 +240,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0px 15px 20px 240px;
+     margin: 0px 15px 20px 220px;
      padding: 20px 30px 20px 30px;
      border: 1px solid #99f;
      background: #004;
@@ -266,7 +266,7 @@ div.news li {
 
 div.confignav {
      padding: 15px 10px !important;
-     margin: 0 0 25px 0;
+     margin: 0 0 15px 0;
      background: #004 url('images/darkbluebg.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -325,7 +325,7 @@ div.messages li {
 }
 
 div.graphspanel {
-     padding: 15px 15px 15px 15px;
+     padding: 15px;
      margin: 10px 0px;
      background: #005;
      -moz-border-radius: 4px;
@@ -336,6 +336,12 @@ div.graphspanel {
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
+     text-align: center;
+}
+
+div.graphspanel form {
+     text-align: left;
+     padding: 15px;
 }
 
 div.graphspanel img {
@@ -347,7 +353,7 @@ div.graphspanel img {
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
-     opacity: 0.9;
+     opacity: 0.8;
 }
 
 div.graphspanel img:hover {
@@ -361,6 +367,7 @@ div.graphspanel img:hover {
      box-shadow: inset 0px 0px 1px 1px #f60;
      opacity: 1;
 }
+
 table {
      border-collapse: collapse;
      width: 100%;
@@ -497,7 +504,7 @@ h1 {
      text-align: left;
      color: #fff;
      padding: 10px 15px;
-     margin: 0 15px 25px 240px;
+     margin: 0 15px 15px 220px;
      font-size: 16pt;
      font-weight: bold;
      font-style: normal;
@@ -529,7 +536,7 @@ h2 {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      vertical-align: middle;
-     margin: 25px 0 20px 0 !important;
+     margin: 15px 0 10px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -757,8 +764,8 @@ form {}
 }
 
 .joblog {
-     margin: 25px 0 25px 0;
-     padding: 20px 30px 20px 30px !important;
+     margin: 	15px 0 15px 0;
+     padding: 20px !important;
      border: 1px solid #99f;
      background-color: #004;
      background: url("images/darkbluebg.png");

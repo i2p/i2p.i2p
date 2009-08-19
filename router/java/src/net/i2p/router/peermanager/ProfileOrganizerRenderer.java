@@ -95,7 +95,7 @@ class ProfileOrganizerRenderer {
             }
             
             if (tier != prevTier)
-                buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
+                buf.append("<tr><td colspan=\"7\"><hr></td></tr>\n");
             prevTier = tier;
             
             buf.append("<tr><td align=\"center\" nowrap>");
@@ -149,7 +149,7 @@ class ProfileOrganizerRenderer {
                 if (total / fails <= 10)   // hide if < 10%
                     buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
             }
-            buf.append("&nbsp</td>");
+            buf.append("&nbsp;</td>");
             buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
             buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
@@ -219,8 +219,8 @@ class ProfileOrganizerRenderer {
         buf.append("</table>");
 
         buf.append("<h3>Thresholds:</h3>");
-        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
-        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
+        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br>");
+        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br>");
         buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)");
         buf.append("<h3>Definitions:</h3><ul>" +
                    "<li><b>groups</b>: as determined by the profile organizer</li>" +

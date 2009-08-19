@@ -1,4 +1,4 @@
-/* Optimised for less capable browers and system specifications */
+/* Optimised for less capable browsers and system specifications */
 
 body {
      margin: 2px 0 0 2px;
@@ -20,7 +20,8 @@ img {
 pre {
      overflow: auto;
      font-size: 8pt !important;
-     width: 100%;
+     width: 95%;
+     padding-top: 10px;
 }
 
 div.logo {
@@ -110,7 +111,7 @@ div.toolbar {
 
 div.routersummaryouter {
      float: left; 
-     width: 205px;
+     width: 200px;
      margin: 0;
      padding: 0;
      border: 0;
@@ -119,7 +120,7 @@ div.routersummaryouter {
 
 div.routersummary {
      background: #ddf;
-     width: 190px;
+     width: 185px;
      color: inherit;
      margin: 0;
      padding: 7px 1px;
@@ -171,7 +172,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 5px;
+     margin: -5px 5px -5px 2px;
      width: 180px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -225,7 +226,7 @@ div.warning h3 {
 }
 
 div.main {
-     margin: 0px 0px 0px 196px;
+     margin: 0px 0px 0px 195px;
      padding: 15px 15px 15px 15px;
      background: #eef;
      border: 5px solid #bbf;
@@ -251,7 +252,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: -5px 0px 0 196px;
+     margin: -5px 0px 0 195px;
      padding: -10px 15px 8px 15px;
      background: #ffffc0;
      border: 5px solid #bbf;
@@ -271,7 +272,7 @@ div.news li {
      list-style: none;
      margin: -15px 15px -20px -20px;
      padding: 0px 0 15px 0;
-     border-bottom: 2px solid #cc7;
+     border-bottom: 5px solid #cc7;
      border-top: 0px solid #cc7;     
      padding: 3px 5px 5px 5px;
      font-size: 12pt;
@@ -358,7 +359,7 @@ h1 {
      text-align: center;
      border: 5px solid #bbf;
      padding: 13px 10px 12px 10px;
-     margin: 0 0px 0 196px;
+     margin: 0 0px 0 195px;
      line-height: 93%;
      text-transform: uppercase;
      letter-spacing: 0.3em;

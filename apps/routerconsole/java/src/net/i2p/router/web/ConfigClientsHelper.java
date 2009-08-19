@@ -6,7 +6,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
 
 public class ConfigClientsHelper extends HelperBase {

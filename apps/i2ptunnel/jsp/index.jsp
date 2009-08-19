@@ -4,7 +4,7 @@
 <jsp:setProperty name="indexBean" property="*" />
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>I2PTunnel Webmanager - List</title>
+    <title>I2P Tunnel Manager - List</title>
     
     <meta htt
 p-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -106,7 +106,7 @@ p-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p">Preview</a>     
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-          %><span class="text">Base32 Address:<br><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
+          %><span class="text">Base32 Address:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
         <%
             } else {
           %><span class="comment">No Preview</span>

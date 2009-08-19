@@ -778,7 +778,7 @@ public class Blocklist {
                  if (to != from) {
                      out.write(toStr(to)); out.write("</td></tr>\n");
                  } else
-                     out.write("&nbsp</td></tr>\n");
+                     out.write("&nbsp;</td></tr>\n");
             }
             if (_blocklistSize > MAX_DISPLAY)
                 out.write("<tr><th colspan=2>First " + MAX_DISPLAY + " displayed, see the " +

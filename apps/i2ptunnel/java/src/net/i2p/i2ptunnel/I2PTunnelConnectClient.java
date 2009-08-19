@@ -345,7 +345,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             if (targetRequest != null) {
                 out.write(targetRequest.getBytes());
                 if (usingWWWProxy)
-                    out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
+                    out.write(("<br />WWW proxy: " + wwwProxy).getBytes());
             }
             out.write("</div>".getBytes());
             out.write("\n</body></html>\n".getBytes());

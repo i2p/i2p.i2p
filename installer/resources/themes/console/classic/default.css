@@ -1,182 +1,204 @@
 body {
-	margin :  0px;
-	padding : 0px;
-	text-align : center;
-	font-family : Arial, Helvetica, sans-serif;
-	background-color : #ffffff;
-	color :  #000000;
-    font-size : 100%;
-    
-    /* we've avoided Tantek Hacks so far,
-    ** but we can't avoid using the non-w3c method of 
-    ** box rendering. (and therefore one of mozilla's
-    ** proprietry -moz properties (which hopefully they'll
-    ** drop soon).
-    */
-    -moz-box-sizing : border-box;
-    box-sizing :      border-box;
+     margin: 0px;
+     padding: 0px;
+     text-align: center;
+     font: 10pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background: #bbf;
+     color: #000;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 div {
-    -moz-box-sizing : border-box;
-    box-sizing :      border-box;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 h4, label {
-    margin :   0px;
-    padding :  2px;
-    float :   left;
-    width :  150px;
-    height :  24px;
-    font-weight :  bold;
-    text-align :  right;
-    font-size :   1.0em;
-    -moz-box-sizing: border-box;
-    box-sizing :     border-box;
+     margin: 0px;
+     padding: 2px;
+     float: left;
+     width: 150px;
+     height: 24px;
+     font-weight: normal;
+     text-align: right;
+     font-size: 8.5pt;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 h4 {
-    font-size : 1.2em;
-    text-align : center;
-    width : 750px;
+     font-size: 10.5pt;
+     text-align: center !important;
+     font-weight: bold;
+     border: 1px solid #77f;
+     border-top: 2px solid #77f;
+     margin: -6px 0 5px -10px !important;
+     padding: 5px 10px 25px 10px;
+     background: #fff;
+     text-shadow: 0px 0px 1px rgba(32, 32, 192, 0.3);
+     text-transform: uppercase;
+     white-space: nowrap;
+     width: 782px;
+     letter-spacing: 0.09em;
+}
+
+label {
+     font-style: italic;
+     margin: 0 3px 0 -3px;
 }
 
 a {
-    text-decoration : none;
+     text-decoration: none;
 }
 
 form {
-	margin : 0px;
+     margin: 0px;
 }
 
 textarea, input, select, button, a {
-    font-family : Arial, Helvetica, sans-serif;
-    -moz-box-sizing : border-box;
-    box-sizing :      border-box;
-    font-size : 1.0em;
-    float : left;
+     -moz-box-sizing: border-box;
+     box-sizing: border-box;
+     font: 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     float: left;
+     margin: 2px 0 5px 0;
 }
 
 button {
-    float : none;
+     float: none;
+     height: 20px !important;
 }
 
 textarea {
-    border : 1px solid #ddddc0;
+     border: 1px solid #ddddc0;
 }
 
 br {
-    clear : left;
+     clear: left;
 }
 
 div.statusNotRunning {
-    float : left;
-    width : 82px;
-    height : 24px;
-	color : #dd0000;
+     float: left;
+     width: 82px;
+     height: 24px;
+     color: #d00;
 }
+
 div.statusRunning {
-    float : left;
-    width : 82px;
-    height : 24px;
-	color : #00dd00;
+     float: left;
+     width: 82px;
+     height: 24px;
+     color: #0d0;
 }
+
 div.statusStarting {
-    float : left;
-    width : 82px;
-    height : 24px;
-	color : #339933;
+     float: left;
+     width: 82px;
+     height: 24px;
+     color: #393;
 }
 
 hr {
-    display : none;
+     display: none;
 }
 
 .separator, .subdivider {
-    clear : both;
-    height : 1px;
-    margin : 3px 0px 3px 0px;
-    border-bottom : 1px solid #ddddc0;
+     clear: both;
+     height: 1px;
+     margin: 5px -8px 5px -8px;
+     border-bottom: 1px solid #aaf;
 }
 
 .subdivider {
-    border-bottom : 1px dashed #ddddc0;
+     border-bottom: 1px dotted #aaf;
+     margin: 0 0 10px 0;
 }
 
 .freetext {
-    width : 150px;
-    height : 22px;
-    border : 1px solid #aaaac0;
+     width: 150px;
+     height: 22px;
+     border: 1px solid #aaf;
 }
 
 .control {
-    margin :  0 4px 0 0;
-    padding : 0 0 4px 0;
-    overflow : hidden;
-    height : 20px;
-    width :  60px;
-    font-weight : normal;
-    background-color :  #dddddd;
-    color : black;
-    border : 1px outset #ddddc0;
-    text-align :  center;
-    white-space : nowrap;
+     margin: 2px;
+     padding: 2px;
+     overflow: hidden;
+     height: 20px;
+     width: 60px;
+     font-weight: bold;
+     background: #ddd;
+     color: #000;
+     border: 1px outset #ddddc0;
+     text-align: center;
+     vertical-align: middle;
+     white-space: nowrap;
 }
 
 .control:hover {
-    background-color : #ffffed;
+     background: #229;
+     color: #fff;
 }
 
 .control:active {
-    border : 2px inset;
+     border: 2px inset;
 }
 
 .panel {
-    width : 760px;
-    margin : 16px auto 16px auto;
-    overflow : hidden;
-	text-align : left;
-    font-size : 0.8em;
-	background-color : #ffffef;
-	border : 4px solid #ffffd0;
+     width: 790px;
+     margin: 16px auto 16px auto;
+     padding: 5px 10px;
+     overflow: hidden;
+     text-align: left;
+     font-size: 8pt;
+     background: #eef;
+     border: 4px solid #77f;
+     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
 }
 
 .panel .footer {
-    float : right;
-    padding : 4px;
+
+     padding: 4px;
 }
 
 .toolbox {
-    float : right;
+     width: 100%;
 }
 
 .rowItem {
-    width : 750px;
-    float :  left;
-    margin :  0px;
+     width: 750px;
+     float: left;
+     margin: 0px;
 }
 
 .comment {
-    font-style : italic;
+     font-style: italic;
+     white-space: nowrap;
 }
 
 .text {
-    height : 24px;
-    width : 150px;
-    padding : 2px 0 0 2px;
-    float : left;
-    margin : 0;
+     height: 24px;
+     width: 150px;
+     padding: 2px 0 0 2px;
+     float: left;
+     margin: 0;
+     font-weight: bold;
 }
 
 .accessKey {
-    text-decoration : underline;
+     text-decoration: underline;
 }
 
 #globalOperationsPanel {
-    background-color : #ffefef;
-	border : 4px solid #ffd0d0;
+     background: #eef;
+     border: 4px solid #77f;
+     -moz-box-shadow: inset 0px 0px 0px 1px #900;
+     padding: 5px 5px 10px 5px;
+     text-align: right;
 }
 
 #globalOperationsPanel .control {
-    width : 100px;
+     width: 100px !important;
+     margin-top: 3px; 
+     float: right;
 }

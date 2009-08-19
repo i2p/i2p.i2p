@@ -720,7 +720,7 @@ public class NTCPTransport extends TransportImpl {
         }
 
         if (peers.size() > 0) {
-//            buf.append("<tr> <td colspan=\"11\"><hr /></td></tr>\n");
+//            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
             buf.append("<tr class=\"tablefooter\"> <td align=\"center\"><b>").append(peers.size()).append(" peers</b></td> <td>&nbsp;</td> <td>&nbsp;");
             buf.append("</td> <td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("/").append(formatRate(bpsSend/1024)).append("K/s</b>");
             buf.append("</td> <td align=\"center\"><b>").append(DataHelper.formatDuration(totalUptime/peers.size()));

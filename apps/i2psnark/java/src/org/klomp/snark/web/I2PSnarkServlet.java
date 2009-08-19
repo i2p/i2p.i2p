@@ -85,8 +85,8 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
-        out.write("<center><div class=\"page\"><table border=\"0\" width=\"100%\"><tr><td align=\"center\" class=\"snarkTitle\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"I2PSnark (Manual Page Refresh)\"><img src=\"/themes/console/images/i2psnark.png\" alt=\"I2PSnark Anonymous BitTorrent Client\" border=\"0\" class=\"snarklogo\"></a></table>");
-        out.write("<div class=\"snarknavbar\"><a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
+        out.write("<center><div class=\"page\">");
+        out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"Refresh page\" class=\"snarkRefresh\">I2PSnark</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -112,18 +112,18 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(TABLE_HEADER);
         if (_manager.util().connected() && snarks.size() > 0) {
             if (peerParam != null)
-                out.write("(<a href=\"" + req.getRequestURI() + "\">Hide Peers</a>)<br />\n");
+                out.write("(<a href=\"" + req.getRequestURI() + "\">Hide Peers</a>)<br>\n");
             else
-                out.write("(<a href=\"" + req.getRequestURI() + "?p=1" + "\">Show Peers</a>)<br />\n");
+                out.write("(<a href=\"" + req.getRequestURI() + "?p=1" + "\">Show Peers</a>)<br>\n");
         }
         out.write(TABLE_HEADER2);
-        out.write("<th align=\"left\">");
+        out.write("<th align=\"center\">");
         if (_manager.util().connected())
             out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
-                      "\" title=\"Stop all torrents and the i2p tunnel\">Stop All</a>");
+                      "\" title=\"Stop all torrents and the I2P tunnel\">Stop All</a>");
         else if (snarks.size() > 0)
             out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
-                      "\" title=\"Start all torrents and the i2p tunnel\">Start All</a>");
+                      "\" title=\"Start all torrents and the I2P tunnel\">Start All</a>");
         else
             out.write("&nbsp;");
         out.write("</th></tr></thead>\n");
@@ -460,7 +460,7 @@ public class I2PSnarkServlet extends HttpServlet {
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
-                statusString = "TrackerErr<br />(" + err + ")";
+                statusString = "TrackerErr<br>(" + err + ")";
             }
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
@@ -492,7 +492,7 @@ public class I2PSnarkServlet extends HttpServlet {
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         out.write("<tr class=\"" + rowClass + "\">");
-        out.write("<td align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
+        out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
         out.write(statusString + "</td>\n\t");
         out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
@@ -526,7 +526,7 @@ public class I2PSnarkServlet extends HttpServlet {
         }
         out.write("</td>\n\t");
         
-        out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
+        out.write("<td align=\"center\" class=\"snarkTorrentETA " + rowClass + "\">");
         if(isRunning && remainingSeconds > 0)
             out.write(DataHelper.formatDuration(remainingSeconds*1000)); // (eta 6h)
         out.write("</td>\n\t");
@@ -546,7 +546,7 @@ public class I2PSnarkServlet extends HttpServlet {
         if(isRunning)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
-        out.write("<td align=\"left\" class=\"snarkTorrentAction " + rowClass + "\">");
+        out.write("<td align=\"center\" class=\"snarkTorrentAction " + rowClass + "\">");
         String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.meta.getInfoHash());
         if (showPeers)
             parameters = parameters + "&p=1";
@@ -558,7 +558,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("<a href=\"" + uri + "?action=Start" + parameters
                           + "\" title=\"Start the torrent\">Start</a> ");
             out.write("<a href=\"" + uri + "?action=Remove" + parameters
-                      + "\" title=\"Remove the torrent from the active list, deleting the .torrent file\">Remove</a><br />");
+                      + "\" title=\"Remove the torrent from the active list, deleting the .torrent file\">Remove</a><br>");
             out.write("<a href=\"" + uri + "?action=Delete" + parameters
                       + "\" title=\"Delete the .torrent file and the associated data file(s)\">Delete</a> ");
         }
@@ -571,9 +571,9 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (!peer.isConnected())
                     continue;
                 out.write("<tr class=\"" + rowClass + "\">");
-                out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 String ch = peer.toString().substring(0, 4);
                 String client;
                 if ("AwMD".equals(ch))
@@ -592,7 +592,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Robert";
                 else
                     client = "Unknown (" + ch + ')';
-                out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9) + "</tt>");
+                out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;" + peer.toString().substring(5, 9) + "");
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
                 out.write("</td>\n\t");
@@ -660,13 +660,13 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">Add Torrent:</span><br />\n");
+        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">Add Torrent:</span><br>\n");
         out.write("From URL&nbsp;: <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" /> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
-        //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
-        out.write("<input type=\"submit\" value=\"Add torrent\" name=\"action\" /><br />\n");
-        out.write("<span class=\"snarkAddInfo\">Alternately, you can copy .torrent files to " + _manager.getDataDir().getAbsolutePath() + "<br />\n");
-        out.write("Removing that .torrent file will cause the torrent to stop.<br /></span>\n");
+        //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
+        out.write("<input type=\"submit\" value=\"Add torrent\" name=\"action\" /><br>\n");
+        out.write("<span class=\"snarkAddInfo\">Alternately, you can copy .torrent files to " + _manager.getDataDir().getAbsolutePath() + "<br>\n");
+        out.write("Removing that .torrent file will cause the torrent to stop.<br></span>\n");
         out.write("</form>\n</span></div>");  
     }
     
@@ -680,11 +680,11 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("<span class=\"snarkConfigTitle\">Create Torrent:</span><br />\n");
-        //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br />\n");
+        out.write("<span class=\"snarkConfigTitle\">Create Torrent:</span><br>\n");
+        //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write("Data to seed: " + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
                   + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
-                  + "\" title=\"File to seed (must be within the specified path)\" /><br />\n");
+                  + "\" title=\"File to seed (must be within the specified path)\" /><br>\n");
         out.write("Tracker: <select name=\"announceURL\"><option value=\"\">Select a tracker</option>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
@@ -714,15 +714,15 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" />\n");
-        out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br />\n");
+        out.write("<span class=\"snarkConfigTitle\">Configuration:</span><br>\n");
         out.write("Data directory: <input type=\"text\" size=\"40\" name=\"dataDir\" value=\"" + dataDir + "\" ");
-        out.write("title=\"Directory to store torrents and data\" disabled=\"true\" /> <i>(Edit i2psnark.config and restart to change)</i><br />\n");
+        out.write("title=\"Directory to store torrents and data\" disabled=\"true\" /> <i>(Edit i2psnark.config and restart to change)</i><br>\n");
         out.write("Auto start: <input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
                   + "title=\"If true, automatically start torrents that are added\" />");
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
         //Auto stop: <input type="checkbox" name="autoStop" value="true" title="If true, automatically stop torrents that are removed from the data directory" />
-        //out.write("<br />\n");
+        //out.write("<br>\n");
 /*
         out.write("Seed percentage: <select name=\"seedPct\" disabled=\"true\" >\n\t");
         if (seedPct <= 0)
@@ -737,28 +737,28 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<option value=\"150\" selected=\"true\">150%</option>\n\t");
         else
             out.write("<option value=\"150\">150%</option>\n\t");
-        out.write("</select><br />\n");
+        out.write("</select><br>\n");
 */
         out.write("Total uploader limit: <input type=\"text\" name=\"upLimit\" value=\""
-                  + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" /> peers<br />\n");
+                  + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" /> peers<br>\n");
         out.write("Up bandwidth limit: <input type=\"text\" name=\"upBW\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Half <a href=\"/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br />\n");
+                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" /> KBps <i>(Half <a href=\"/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br>\n");
         
         out.write("Use open trackers also: <input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
                   + "title=\"If true, uses open trackers in addition\" /> ");
         out.write("Announce URLs: <input type=\"text\" name=\"openTrackers\" value=\""
-                  + openTrackers + "\" size=\"50\" /><br />\n");
+                  + openTrackers + "\" size=\"50\" /><br>\n");
 
         //out.write("\n");
         out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
                   + _manager.util().getEepProxyHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
-                  + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br />\n");
+                  + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br>\n");
         out.write("I2CP host: <input type=\"text\" name=\"i2cpHost\" value=\"" 
                   + _manager.util().getI2CPHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"i2cpPort\" value=\"" +
-                  + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" /> <br />\n");
+                  + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" /> <br>\n");
         StringBuilder opts = new StringBuilder(64);
         Map options = new TreeMap(_manager.util().getI2CPOptions());
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
@@ -768,7 +768,7 @@ public class I2PSnarkServlet extends HttpServlet {
             opts.append(key).append('=').append(val).append(' ');
         }
         out.write("I2CP opts: <input type=\"text\" name=\"i2cpOpts\" size=\"80\" value=\""
-                  + opts.toString() + "\" /><br />\n");
+                  + opts.toString() + "\" /><br>\n");
         out.write("<input type=\"submit\" value=\"Save configuration\" name=\"action\" />\n");
         out.write("</span>\n");
         out.write("</form></div>");
@@ -795,11 +795,11 @@ public class I2PSnarkServlet extends HttpServlet {
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
                                                "<thead>\n" +
-                                               "<tr><th align=\"left\">Status \n";
+                                               "<tr><th align=\"center\">Status \n";
 
     private static final String TABLE_HEADER2 = "</th>\n" +
                                                "    <th align=\"left\">Torrent</th>\n" +
-                                               "    <th align=\"right\">ETA</th>\n" +
+                                               "    <th align=\"center\">ETA</th>\n" +
                                                "    <th align=\"right\">Downloaded</th>\n" +
                                                "    <th align=\"right\">Uploaded</th>\n" +
                                                "    <th align=\"right\">Down Rate</th>\n" +

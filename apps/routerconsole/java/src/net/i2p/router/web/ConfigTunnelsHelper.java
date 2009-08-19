@@ -5,7 +5,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.Destination;
-import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 
 public class ConfigTunnelsHelper extends HelperBase {
@@ -75,7 +74,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">PERFORMANCE WARNING - Settings include high tunnel quantities.</font></th></tr>");
 
-buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\"/>&nbsp;&nbsp;Inbound</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\"/>&nbsp;&nbsp;Outbound</th></tr>\n");
+buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\">&nbsp;&nbsp;Inbound</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\">&nbsp;&nbsp;Outbound</th></tr>\n");
 
 //        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
@@ -177,7 +176,7 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
             buf.append(prop).append("=").append(val).append(" ");
         }
         buf.append("\"/></td></tr>\n");
-//        buf.append("<tr><td colspan=\"3\"><hr /></td></tr>\n");
+//        buf.append("<tr><td colspan=\"3\"><br></td></tr>\n");
     }
 
     private void renderOptions(StringBuilder buf, int min, int max, int now, String prefix, String name) {

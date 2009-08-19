@@ -493,8 +493,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             processed += cfg.getProcessedMessagesCount();
         }
         out.write("</table>\n");
-        out.write("<div class=\"statusnotes\"><center><b>Inactive participating tunnels: " + inactive + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B</b></center></div>\n");
+        out.write("<div class=\"statusnotes\"><b>Inactive participating tunnels: " + inactive + "</b></div>\n");
+        out.write("<div class=\"statusnotes\"><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processed*1024) + "B</b></div>\n");
         renderPeers(out);
     }
     
@@ -542,9 +542,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 continue; // don't display tunnels in their grace period
             live++;
             if (info.isInbound())
-                out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"/></td>");
+                out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"></td>");
             else
-                out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"/></td>");
+                out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"></td>");
             out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration(timeLeft) + "</td>\n");
             out.write(" <td class=\"cells\" align=\"center\">" + info.getProcessedMessagesCount() + "KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
@@ -558,7 +558,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 }
                 if (info.getLength() < maxLength && (info.getLength() == 1 || j == info.getLength() - 2)) {
                     for (int k = info.getLength(); k < maxLength; k++)
-                        out.write(" <td class=\"cells\" align=\"center\">&nbsp</td>");
+                        out.write(" <td class=\"cells\" align=\"center\">&nbsp;</td>");
                 }
             }
             out.write("</tr>\n");

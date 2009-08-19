@@ -388,7 +388,7 @@ public class ClientManager {
     
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(8*1024);
-        buf.append("<u><b>Local destinations</b></u><br />");
+        buf.append("<u><b>Local destinations</b></u><br>");
         
         Map runners = null;
         synchronized (_runners) {
@@ -397,39 +397,39 @@ public class ClientManager {
         for (Iterator iter = runners.keySet().iterator(); iter.hasNext(); ) {
             Destination dest = (Destination)iter.next();
             ClientConnectionRunner runner = (ClientConnectionRunner)runners.get(dest);
-            buf.append("<b>*</b> ").append(dest.calculateHash().toBase64().substring(0,6)).append("<br />\n");
+            buf.append("<b>*</b> ").append(dest.calculateHash().toBase64().substring(0,6)).append("<br>\n");
             LeaseSet ls = runner.getLeaseSet();
             if (ls == null) {
-                buf.append("<font color=\"red\"><i>No lease</i></font><br />\n");
+                buf.append("<font color=\"red\"><i>No lease</i></font><br>\n");
             } else { 
                 long leaseAge = ls.getEarliestLeaseDate() - _ctx.clock().now();
                 if (leaseAge <= 0) { 
                     buf.append("<font color=\"red\"><i>Lease expired ");
-                    buf.append(DataHelper.formatDuration(0-leaseAge)).append(" ago</i></font><br />\n");
+                    buf.append(DataHelper.formatDuration(0-leaseAge)).append(" ago</i></font><br>\n");
                 } else {
                     int count = ls.getLeaseCount();
                     if (count <= 0) {
-                        buf.append("<font color=\"red\"><i>No tunnels</i></font><br />\n");
+                        buf.append("<font color=\"red\"><i>No tunnels</i></font><br>\n");
                     } else {
                         TunnelId id = ls.getLease(0).getTunnelId();
                         TunnelInfo info = _ctx.tunnelManager().getTunnelInfo(id);
                         if (info == null) {
-                            buf.append("<font color=\"red\"><i>Failed tunnels</i></font><br />\n");
+                            buf.append("<font color=\"red\"><i>Failed tunnels</i></font><br>\n");
                         } else {
                             buf.append(count).append(" x ");
                             buf.append(info.getLength() - 1).append(" hop tunnel");
                             if (count != 1)
                                 buf.append('s');
-                            buf.append("<br />\n");
+                            buf.append("<br>\n");
                             buf.append("Expiring in ").append(DataHelper.formatDuration(leaseAge));
-                            buf.append("<br />\n");
+                            buf.append("<br>\n");
                         }
                     }
                 }
             }
         }
         
-        buf.append("\n<hr />\n");
+        buf.append("\n<hr>\n");
         out.write(buf.toString());
         out.flush();
     }
