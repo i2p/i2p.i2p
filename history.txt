@@ -1,3 +1,57 @@
+2009-08-20 zzz
+    * Config files:
+      - Add some path and encoding help
+    * configclients.jsp: Add full path to config file
+    * configpeer.jsp: Limit max displayed banned IPs
+    * Console:
+      - Don't display firewall warning unless it's real
+      - Cleanups
+    * DataHelper, I2PTunnel, Router:
+      - Save config files in UTF-8 rather than the default encoding,
+        since we read them in UTF-8!
+    * eepsite_index_de.html: localhost -> 127.0.0.1
+    * i2psnark: Add size total
+    * I2PTunnel:
+      - Make IRC Proxy non-shared, delayed-start, close-on-idle
+        for new users, for the anonymity benefits (see "Shared Clients,
+        Correlation and Collusion" http://zzz.i2p/topics/217 )
+      - Remove "experimental" flag on new client options
+    * Jetty build: More clean targets
+    * jetty.xml: Change encoding to UTF-8
+    * jobs.jsp: Cleanup
+    * logs.jsp: Add system encoding
+    * Ministreaming: Cleanups, deprecation, move demos out of the lib
+    * netdb.jsp: Flags for leases
+    * NTCP: Clean up clock skew shitlist message
+    * profiles.jsp:
+      - Rename the Failing column
+      - Reduce the time cutoff again to 90m (was 2h)
+    * readme*html: localhost -> 127.0.0.1
+    * Router: Don't do some things when we are shutting down
+    * Shitlist: Clean up expire message
+    * Stats:
+      - Fix BufferedStatsLog so it works at all
+      - Don't instantiate BufferedStatsLog unless stats.logFilters
+        property is defined (restart now required to enable logging)
+        This eliminates the StatLogWriter thread and a decent
+        amount of memory.
+      - Move two CLI classes out of the lib
+      - Commment out places where getStatLog() isn't checked for null
+      - Cleanups
+    * Transports: Lower conn limit factor to 50 (was 60)
+    * Update:
+      - Fix problems where a requested unsigned update would actually
+        kick off a signed update
+      - Fix problem when policy set to notify, and clicking
+        check for update, incorrectly causing unsigned update download
+        and bad messages
+      - Verify zip integrity of unsigned updates
+      - Move zip files to router dir, not base dir
+      - More tweaks and cleanup
+    * VMCommSystem fixups
+    * WorkingDir: Ensure modified files are processed with UTF-8 encoding
+    * XmlPull: Remove, unused.
+
 2009-08-19 sponge
     * Java code to set Router Console password for dr|z3d
 

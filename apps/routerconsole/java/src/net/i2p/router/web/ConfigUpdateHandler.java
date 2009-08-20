@@ -51,7 +51,7 @@ public class ConfigUpdateHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if ("Check for update now".equals(_action)) {
+        if (_action != null && _action.startsWith("Check")) {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
             fetcher.fetchNews();
             if (fetcher.shouldFetchUnsigned())
