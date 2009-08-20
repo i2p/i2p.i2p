@@ -2,6 +2,8 @@
    /*
     * This should be included inside <head>...</head>,
     * as it sets the stylesheet.
+    *
+    * This is included almost 30 times, so keep whitespace etc. to a minimum.
     */
 
    response.setHeader("Pragma", "no-cache");
@@ -15,6 +17,8 @@
        session.setAttribute("i2p.contextId", request.getParameter("i2p.contextId"));
    }
 %>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" href="favicon.ico">
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="cssHelper" scope="request" />
 <jsp:setProperty name="cssHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <link href="<%=cssHelper.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">

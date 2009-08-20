@@ -10,7 +10,6 @@
 <html><head>
 <%@include file="css.jsp" %>
 <title>Summary Bar</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <%
     // try hard to avoid an error page in the iframe after shutdown
     String action = request.getParameter("action");

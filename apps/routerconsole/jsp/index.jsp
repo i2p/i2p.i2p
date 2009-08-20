@@ -5,8 +5,6 @@
 <html><head>
 <%@include file="css.jsp" %>
 <title>I2P Router Console - home</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="shortcut icon" href="/themes/console/images/favicon.ico" />
 </head><body>
 <%
 if (System.getProperty("router.consoleNonce") == null) {
