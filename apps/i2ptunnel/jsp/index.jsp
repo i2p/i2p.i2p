@@ -1,3 +1,9 @@
+<%
+    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+    if (request.getCharacterEncoding() == null)
+        request.setCharacterEncoding("UTF-8");
+%>
+<%@page pageEncoding="UTF-8"%>
 <%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"%><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" />
@@ -6,13 +12,12 @@
 <head>
     <title>I2P Tunnel Manager - List</title>
     
-    <meta htt
-p-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+    <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
     
     <% if (indexBean.allowCSS()) {
-  %><link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-    <link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
+  %><link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
   %>

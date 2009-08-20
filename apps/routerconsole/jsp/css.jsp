@@ -6,6 +6,10 @@
     * This is included almost 30 times, so keep whitespace etc. to a minimum.
     */
 
+   // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+   if (request.getCharacterEncoding() == null)
+       request.setCharacterEncoding("UTF-8");
+
    response.setHeader("Pragma", "no-cache");
    response.setHeader("Cache-Control","no-cache");
    response.setDateHeader("Expires", 0);
