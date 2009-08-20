@@ -84,7 +84,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
-        out.write("<center><div class=\"page\">");
+        out.write("<center>");
         out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"Refresh page\" class=\"snarkRefresh\">I2PSnark</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
@@ -95,10 +95,10 @@ public class I2PSnarkServlet extends HttpServlet {
             if (e < 0)
                 continue;
             baseURL = baseURL.substring(e + 1);
-            out.write("<a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
+            out.write(" <a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
         }
         out.write("</div>\n");
-        out.write("<div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
+        out.write("<div class=\"page\"><div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
@@ -493,7 +493,7 @@ public class I2PSnarkServlet extends HttpServlet {
         
         if (remaining == 0)
             out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
-                      + "\" title=\"Click to access completed downloaded..\">");
+                      + "\" title=\"View file\">");
         out.write(filename);
         if (remaining == 0)
             out.write("</a>");
@@ -568,7 +568,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("<tr class=\"" + rowClass + "\">");
                 out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 String ch = peer.toString().substring(0, 4);
                 String client;
                 if ("AwMD".equals(ch))
@@ -587,7 +587,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Robert";
                 else
                     client = "Unknown (" + ch + ')';
-                out.write("<font size=-1>" + client + "</font>&nbsp;&nbsp;" + peer.toString().substring(5, 9) + "");
+                out.write("" + client + "&nbsp;&nbsp;" + peer.toString().substring(5, 9) + "");
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
                 out.write("</td>\n\t");
@@ -596,12 +596,12 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 float pct = (float) (100.0 * (float) peer.completed() / snark.meta.getPieces());
                 if (pct == 100.0)
-                    out.write("<font size=-1>Seed</font>");
+                    out.write("Seed");
                 else {
                     String ps = String.valueOf(pct);
                     if (ps.length() > 5)
                         ps = ps.substring(0, 5);
-                    out.write("<font size=-1>" + ps + "%</font>");
+                    out.write("" + ps + "%");
                 }
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
@@ -610,14 +610,14 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (remaining > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
                         out.write("<font color=#008000>");
-                        out.write("<font size=-1>" + formatSize(peer.getDownloadRate()) + "ps</font></font>");
+                        out.write("" + formatSize(peer.getDownloadRate()) + "ps</font>");
                     } else {
-                        out.write("<font color=#a00000><font size=-1><a title=\"");
+                        out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInteresting())
                             out.write("Uninteresting\">");
                         else
                             out.write("Choked\">");
-                        out.write(formatSize(peer.getDownloadRate()) + "ps</a></font></font>");
+                        out.write(formatSize(peer.getDownloadRate()) + "ps</a></font>");
                     }
                 }
                 out.write("</td>\n\t");
@@ -625,14 +625,14 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (pct != 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
                         out.write("<font color=#008000>");
-                        out.write("<font size=-1>" + formatSize(peer.getUploadRate()) + "ps</font></font>");
+                        out.write("" + formatSize(peer.getUploadRate()) + "ps</font>");
                     } else {
-                        out.write("<font color=#a00000><font size=-1><a title=\"");
+                        out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInterested())
                             out.write("Uninterested\">");
                         else
                             out.write("Choking\">");
-                        out.write(formatSize(peer.getUploadRate()) + "ps</a></font></font>");
+                        out.write(formatSize(peer.getUploadRate()) + "ps</a></font>");
                     }
                 }
                 out.write("</td>\n\t");
