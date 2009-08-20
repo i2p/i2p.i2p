@@ -154,28 +154,35 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("</tr>\n");
 
         // custom options
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Inbound options:</td>\n");
-        buf.append("<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
-        buf.append(".inboundOptions\" type=\"text\" size=\"32\" ");
-        buf.append("value=\"");
+        // There is no facility to set these, either in ConfigTunnelsHandler or
+        // TunnelPoolOptions, so make the boxes readonly.
+        // And let's not display them at all unless they have contents, which should be rare.
         Properties props = in.getUnknownOptions();
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-            String prop = (String)iter.next();
-            String val = (String)props.getProperty(prop);
-            buf.append(prop).append("=").append(val).append(" ");
+        if (props.size() > 0) {
+            buf.append("<tr><td align=\"right\" class=\"mediumtags\">Inbound options:</td>\n" +
+                       "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
+            buf.append(".inboundOptions\" type=\"text\" size=\"32\" disabled=\"true\" " +
+                       "value=\"");
+            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+                String prop = (String)iter.next();
+                String val = (String)props.getProperty(prop);
+                buf.append(prop).append('=').append(val).append(' ');
+            }
+            buf.append("\"></td></tr>\n");
         }
-        buf.append("\"/></td></tr>\n");
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">Outbound options:</td>\n");
-        buf.append("<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
-        buf.append(".outboundOptions\" type=\"text\" size=\"32\" ");
-        buf.append("value=\"");
-        props = in.getUnknownOptions();
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-            String prop = (String)iter.next();
-            String val = (String)props.getProperty(prop);
-            buf.append(prop).append("=").append(val).append(" ");
+        props = out.getUnknownOptions();
+        if (props.size() > 0) {
+            buf.append("<tr><td align=\"right\" class=\"mediumtags\">Outbound options:</td>\n" +
+                       "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
+            buf.append(".outboundOptions\" type=\"text\" size=\"32\" disabled=\"true\" " +
+                       "value=\"");
+            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+                String prop = (String)iter.next();
+                String val = (String)props.getProperty(prop);
+                buf.append(prop).append('=').append(val).append(' ');
+            }
+            buf.append("\"></td></tr>\n");
         }
-        buf.append("\"/></td></tr>\n");
 //        buf.append("<tr><td colspan=\"3\"><br></td></tr>\n");
     }
 
