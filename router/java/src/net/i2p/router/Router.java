@@ -1109,7 +1109,11 @@ public class Router {
                 return;
             }
             System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
-            boolean ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
+            // verify the whole thing first
+            // we could remember this fails, and not bother restarting, but who cares...
+            boolean ok = FileUtil.verifyZip(updateFile);
+            if (ok)
+                ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             if (ok)
                 System.out.println("INFO: Update installed");
             else
@@ -1132,6 +1136,7 @@ public class Router {
                     updateFile.deleteOnExit();
                 }
             }
+            // exit whether ok or not
             if (System.getProperty("wrapper.version") != null)
                 System.out.println("INFO: Restarting after update");
             else
