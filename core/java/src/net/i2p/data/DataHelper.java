@@ -521,7 +521,8 @@ public class DataHelper {
     /** Write out a string to the stream as specified by the I2P data structure spec.  Note that the max
      * size for a string allowed by the spec is 255 bytes.
      *
-     * WARNING - this method destroys the encoding
+     * WARNING - this method destroys the encoding, and therefore violates
+     * the data structure spec.
      *
      * @param out stream to write string
      * @param string string to write out: null strings are perfectly valid, but strings of excess length will
@@ -537,7 +538,7 @@ public class DataHelper {
             int len = string.length();
             if (len > 255)
                 throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
-                                              + string.length() + " [" + string + "]");
+                                              + len + " [" + string + "]");
             writeLong(out, 1, len);
             for (int i = 0; i < len; i++)
                 out.write((byte)(string.charAt(i) & 0xFF));
@@ -566,7 +567,7 @@ public class DataHelper {
             int len = raw.length;
             if (len > 255)
                 throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
-                                              + string.length() + " [" + string + "]");
+                                              + len + " [" + string + "]");
             writeLong(out, 1, len);
             out.write(raw);
         }
