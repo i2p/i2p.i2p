@@ -23,6 +23,7 @@ pre {
      text-align: left;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #333;
+     margin: 10px;
 }
 
 div.logo {
