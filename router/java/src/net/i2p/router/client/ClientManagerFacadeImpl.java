@@ -215,7 +215,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * @return set of Destination objects
      */
     @Override
-    public Set listClients() {
+    public Set<Destination> listClients() {
         if (_manager != null)
             return _manager.listClients();
         else
