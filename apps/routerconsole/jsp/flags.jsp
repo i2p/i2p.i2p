@@ -25,6 +25,12 @@ if (c != null && c.length() > 0) {
     if (rendered)
         cout.close();
 }
+/*
+ *  Send a 403 instead of a 404, because the server sends error.jsp
+ *  for 404 errors, complete with the summary bar, which would be
+ *  a huge load for a page full of flags if the user didn't have the
+ *  flags directory for some reason.
+ */
 if (!rendered)
-    response.sendError(404, "Not found");
+    response.sendError(403, "Flag not found");
 %>
