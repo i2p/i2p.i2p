@@ -103,6 +103,28 @@ div.warning hr {
      margin: 5px 0;
 }
 
+/* console error messages */
+
+div.sorry {
+     padding: 20px;
+     background: #ddf;
+     margin: -2px 1px 0 195px;
+     border: 5px solid #bbf;
+     text-align: justify;
+     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     word-wrap: break-word;
+     font-weight: bold;
+     color: #001;
+}
+
+div.sorry hr {
+     color: #001;
+     background: #001;
+     height: 1px;
+     border: 1px solid #001;
+     margin: 10px 0;
+}
+
 div.toolbar {
      margin: 0em 0em 2em 0em;
      font-weight: bold;

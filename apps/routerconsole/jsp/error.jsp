@@ -12,7 +12,7 @@
     }
     // If it can't find the iframe or viewtheme.jsp I wonder if the whole thing blows up...
 %>
-<html><head><title>I2P Router Console</title>
+<html><head><title>I2P Router Console - Page Not Found</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <%@include file="css.jsp" %>
 <link rel="shortcut icon" href="favicon.ico" /></head><body>
@@ -23,6 +23,7 @@ if (System.getProperty("router.consoleNonce") == null) {
 %>
 <%@include file="summary.jsp" %>
 <h1><%=ERROR_CODE%> <%=ERROR_MESSAGE%></h1>
-<div class="warning" id="warning">
-The Router Console page <%=ERROR_URI%> was not found.
+<div class="sorry" id="warning">
+Sorry! You appear to be requesting a non-existent Router Console page.<hr>
+Error 404: <%=ERROR_URI%> not found.
 </div></body></html>
