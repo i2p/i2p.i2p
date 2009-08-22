@@ -263,12 +263,12 @@ public class ConnectionPacketHandler {
                     numResends++;
                 
                 // ACK the tags we delivered so we can use them
-                if ( (p.getKeyUsed() != null) && (p.getTagsSent() != null) 
-                      && (p.getTagsSent().size() > 0) ) {
-                    _context.sessionKeyManager().tagsDelivered(p.getTo().getPublicKey(), 
-                                                               p.getKeyUsed(), 
-                                                               p.getTagsSent());
-                }
+                //if ( (p.getKeyUsed() != null) && (p.getTagsSent() != null) 
+                //      && (p.getTagsSent().size() > 0) ) {
+                //    _context.sessionKeyManager().tagsDelivered(p.getTo().getPublicKey(), 
+                //                                               p.getKeyUsed(), 
+                //                                               p.getTagsSent());
+                //}
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet acked after " + p.getAckTime() + "ms: " + p);
             }

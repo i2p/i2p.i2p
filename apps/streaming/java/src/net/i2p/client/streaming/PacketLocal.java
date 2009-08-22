@@ -47,11 +47,31 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public Destination getTo() { return _to; }
     public void setTo(Destination to) { _to = to; }
     
+    /**
+     * @deprecated should always return null
+     */
     public SessionKey getKeyUsed() { return _keyUsed; }
-    public void setKeyUsed(SessionKey key) { _keyUsed = key; }
+
+    /**
+     * @deprecated I2PSession throws out the tags
+     */
+    public void setKeyUsed(SessionKey key) {
+        if (key != null)
+            _log.error("Who is sending tags thru the streaming lib?");
+        _keyUsed = key;
+    }
     
+    /**
+     * @deprecated should always return null or an empty set
+     */
     public Set getTagsSent() { return _tagsSent; }
+
+    /**
+     * @deprecated I2PSession throws out the tags
+     */
     public void setTagsSent(Set tags) { 
+        if (tags != null && tags.size() > 0)
+            _log.error("Who is sending tags thru the streaming lib? " + tags.size());
         if ( (_tagsSent != null) && (_tagsSent.size() > 0) && (tags.size() > 0) ) {
             //int old = _tagsSent.size();
             //_tagsSent.addAll(tags);

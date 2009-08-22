@@ -36,16 +36,18 @@ public class PacketQueue {
     
     /**
      * Add a new packet to be sent out ASAP
+     *
+     * keys and tags disabled since dropped in I2PSession
      */
     public void enqueue(PacketLocal packet) {
         packet.prepare();
         
-        SessionKey keyUsed = packet.getKeyUsed();
-        if (keyUsed == null)
-            keyUsed = new SessionKey();
-        Set tagsSent = packet.getTagsSent();
-        if (tagsSent == null)
-            tagsSent = new HashSet(0);
+        //SessionKey keyUsed = packet.getKeyUsed();
+        //if (keyUsed == null)
+        //    keyUsed = new SessionKey();
+        //Set tagsSent = packet.getTagsSent();
+        //if (tagsSent == null)
+        //    tagsSent = new HashSet(0);
 
         // cache this from before sendMessage
         String conStr = null;
@@ -92,13 +94,19 @@ public class PacketQueue {
                 // I2PSessionImpl2
                 //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires);
                 // I2PSessionMuxedImpl
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires,
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, expires,
+                //                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+                // I2PSessionMuxedImpl no tags
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, null, null, expires,
                                  I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
             else
                 // I2PSessionImpl2
                 //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, 0);
                 // I2PSessionMuxedImpl
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent,
+                //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent,
+                //                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+                // I2PSessionMuxedImpl no tags
+                sent = _session.sendMessage(packet.getTo(), buf, 0, size, null, null,
                                  I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
             end = _context.clock().now();
             
@@ -129,13 +137,11 @@ public class PacketQueue {
             if (c != null) // handle race on b0rk
                 c.disconnect(false);
         } else {
-            packet.setKeyUsed(keyUsed);
-            packet.setTagsSent(tagsSent);
+            //packet.setKeyUsed(keyUsed);
+            //packet.setTagsSent(tagsSent);
             packet.incrementSends();
             if (_log.shouldLog(Log.DEBUG)) {
-                String msg = "SEND " + packet + (tagsSent.size() > 0 
-                             ? " with " + tagsSent.size() + " tags"
-                             : "")
+                String msg = "SEND " + packet
                              + " send # " + packet.getNumSends()
                              + " sendTime: " + (end-begin)
                              + " con: " + conStr;
