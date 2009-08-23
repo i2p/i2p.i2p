@@ -514,7 +514,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                    "<table>");
         Set<TagSet> inbound = getInboundTagSets();
         Map<SessionKey, Set<TagSet>> inboundSets = new HashMap(inbound.size());
-        // FIXME what does this loop do? nothing?
+        // Build a map of the inbound tag sets, grouped by SessionKey
         for (Iterator<TagSet> iter = inbound.iterator(); iter.hasNext();) {
             TagSet ts = iter.next();
             if (!inboundSets.containsKey(ts.getAssociatedKey())) inboundSets.put(ts.getAssociatedKey(), new HashSet());
@@ -541,8 +541,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             out.write(buf.toString());
             buf.setLength(0);
         }
-        buf.append("<tr><td colspan=\"2\">Total tags: ").append(total).append(" (");
-        buf.append(DataHelper.formatSize(32*total)).append("B)</td></tr>\n" +
+        buf.append("<tr><th colspan=\"2\">Total tags: ").append(total).append(" (");
+        buf.append(DataHelper.formatSize(32*total)).append("B)</th></tr>\n" +
                    "</table>" +
                    "<h2><b>Outbound sessions</b></h2>" +
                    "<table>");
@@ -552,12 +552,12 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             OutboundSession sess = iter.next();
             Set<TagSet> sets = new TreeSet(new TagSetComparator());
             sets.addAll(sess.getTagSets());
-            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toString()).append("<br>" +
+            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toBase64().substring(0, 64)).append("<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration(now - sess.getEstablishedDate())).append(" ago<br>" +
                        "<b>Last Used:</b> ").append(DataHelper.formatDuration(now - sess.getLastUsedDate())).append(" ago<br>" +
-                       "<b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>" +
-                       "<tr><td><b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td></tr>" +
-                       "<tr><td><ul>");
+                       "<b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td>" +
+                       "<td><b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>" +
+                       "<tr><td colspan=\"2\"><ul>");
             for (Iterator<TagSet> siter = sets.iterator(); siter.hasNext();) {
                 TagSet ts = siter.next();
                 int size = ts.getTags().size();
@@ -569,8 +569,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             out.write(buf.toString());
             buf.setLength(0);
         }
-        buf.append("<tr><td colspan=\"2\">Total tags: ").append(total).append(" (");
-        buf.append(DataHelper.formatSize(32*total)).append("B)</td></tr>\n" +
+        buf.append("<tr><th colspan=\"2\">Total tags: ").append(total).append(" (");
+        buf.append(DataHelper.formatSize(32*total)).append("B)</th></tr>\n" +
                    "</table>");
 
         out.write(buf.toString());
