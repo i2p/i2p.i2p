@@ -9,7 +9,10 @@ package net.i2p.crypto;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -503,57 +507,83 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         return removed;
     }
 
-    public String renderStatusHTML() {
+    @Override
+    public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h2>Inbound sessions</h2>");
-        buf.append("<table>");
+        buf.append("<h2>Inbound sessions</h2>" +
+                   "<table>");
         Set<TagSet> inbound = getInboundTagSets();
         Map<SessionKey, Set<TagSet>> inboundSets = new HashMap(inbound.size());
+        // FIXME what does this loop do? nothing?
         for (Iterator<TagSet> iter = inbound.iterator(); iter.hasNext();) {
             TagSet ts = iter.next();
             if (!inboundSets.containsKey(ts.getAssociatedKey())) inboundSets.put(ts.getAssociatedKey(), new HashSet());
             Set<TagSet> sets = inboundSets.get(ts.getAssociatedKey());
             sets.add(ts);
         }
+        int total = 0;
+        long now = _context.clock().now();
         for (Iterator<SessionKey> iter = inboundSets.keySet().iterator(); iter.hasNext();) {
             SessionKey skey = iter.next();
-            Set<TagSet> sets = inboundSets.get(skey);
-            buf.append("<tr><td><b>Session key</b>: ").append(skey.toBase64()).append("</td>");
-            buf.append("<td><b># Sets:</b> ").append(sets.size()).append("</td></tr>");
-            buf.append("<tr><td colspan=\"2\"><ul>");
+            Set<TagSet> sets = new TreeSet(new TagSetComparator());
+            sets.addAll(inboundSets.get(skey));
+            buf.append("<tr><td><b>Session key</b>: ").append(skey.toBase64()).append("</td>" +
+                       "<td><b># Sets:</b> ").append(sets.size()).append("</td></tr>" +
+                       "<tr><td colspan=\"2\"><ul>");
             for (Iterator<TagSet> siter = sets.iterator(); siter.hasNext();) {
                 TagSet ts = siter.next();
-                buf.append("<li><b>Received on:</b> ").append(new Date(ts.getDate())).append(" with ")
-                   .append(ts.getTags().size()).append(" tags remaining</li>");
+                int size = ts.getTags().size();
+                total += size;
+                buf.append("<li><b>Received:</b> ").append(DataHelper.formatDuration(now - ts.getDate())).append(" ago with ");
+                buf.append(size).append(" tags remaining</li>");
             }
-            buf.append("</ul></td></tr>");
+            buf.append("</ul></td></tr>\n");
+            out.write(buf.toString());
+            buf.setLength(0);
         }
-        buf.append("</table>");
-
-        buf.append("<h2><b>Outbound sessions</b></h2>");
-
-        buf.append("<table>");
+        buf.append("<tr><td colspan=\"2\">Total tags: ").append(total).append(" (");
+        buf.append(DataHelper.formatSize(32*total)).append("B)</td></tr>\n" +
+                   "</table>" +
+                   "<h2><b>Outbound sessions</b></h2>" +
+                   "<table>");
+        total = 0;
         Set<OutboundSession> outbound = getOutboundSessions();
         for (Iterator<OutboundSession> iter = outbound.iterator(); iter.hasNext();) {
             OutboundSession sess = iter.next();
-            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toString()).append("<br>");
-            buf.append("<b>Established:</b> ").append(new Date(sess.getEstablishedDate())).append("<br>");
-            buf.append("<b>Last Used:</b> ").append(new Date(sess.getLastUsedDate())).append("<br>");
-            buf.append("<b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>");
-            buf.append("<tr><td><b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td></tr>");
-            buf.append("<tr><td><ul>");
-            for (Iterator<TagSet> siter = sess.getTagSets().iterator(); siter.hasNext();) {
+            Set<TagSet> sets = new TreeSet(new TagSetComparator());
+            sets.addAll(sess.getTagSets());
+            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toString()).append("<br>" +
+                       "<b>Established:</b> ").append(DataHelper.formatDuration(now - sess.getEstablishedDate())).append(" ago<br>" +
+                       "<b>Last Used:</b> ").append(DataHelper.formatDuration(now - sess.getLastUsedDate())).append(" ago<br>" +
+                       "<b># Sets:</b> ").append(sess.getTagSets().size()).append("</td></tr>" +
+                       "<tr><td><b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td></tr>" +
+                       "<tr><td><ul>");
+            for (Iterator<TagSet> siter = sets.iterator(); siter.hasNext();) {
                 TagSet ts = siter.next();
-                buf.append("<li><b>Sent on:</b> ").append(new Date(ts.getDate())).append(" with ").append(
-                                                                                                          ts.getTags()
-                                                                                                            .size())
-                   .append(" tags remaining</li>");
+                int size = ts.getTags().size();
+                total += size;
+                buf.append("<li><b>Sent:</b> ").append(DataHelper.formatDuration(now - ts.getDate())).append(" ago with ");
+                buf.append(size).append(" tags remaining</li>");
             }
-            buf.append("</ul></td></tr>");
+            buf.append("</ul></td></tr>\n");
+            out.write(buf.toString());
+            buf.setLength(0);
         }
-        buf.append("</table>");
+        buf.append("<tr><td colspan=\"2\">Total tags: ").append(total).append(" (");
+        buf.append(DataHelper.formatSize(32*total)).append("B)</td></tr>\n" +
+                   "</table>");
 
-        return buf.toString();
+        out.write(buf.toString());
+    }
+
+    /**
+     *  Just for the HTML method above so we can see what's going on easier
+     *  Earliest first
+     */
+    private class TagSetComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return (int) (((TagSet)l).getDate() - ((TagSet)r).getDate());
+        }
     }
 
     class OutboundSession {
@@ -760,7 +790,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         @Override
         public int hashCode() {
             long rv = 0;
-            if (_key != null) rv = rv * 7 + _key.hashCode();
+            if (_key != null) rv = _key.hashCode();
             rv = rv * 7 + _date;
             // no need to hashCode the tags, key + date should be enough
             return (int) rv;

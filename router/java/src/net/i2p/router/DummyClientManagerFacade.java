@@ -41,7 +41,7 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {}
     
     public SessionConfig getClientSessionConfig(Destination _dest) { return null; }
-    public SessionKeyManager getClientSessionKeyManager(Destination _dest) { return null; }
+    public SessionKeyManager getClientSessionKeyManager(Hash _dest) { return null; }
     
     public void requestLeaseSet(Hash dest, LeaseSet set) {}
     

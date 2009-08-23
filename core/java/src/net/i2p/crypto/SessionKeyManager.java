@@ -9,6 +9,8 @@ package net.i2p.crypto;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -130,4 +132,6 @@ public class SessionKeyManager {
      */
     public void shutdown() { // nop
     }
+
+    public void renderStatusHTML(Writer out) throws IOException {}
 }

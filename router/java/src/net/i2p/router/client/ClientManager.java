@@ -328,9 +328,10 @@ public class ClientManager {
     
     /**
      * Return the client's SessionKeyManager
-     *
+     * Use this instead of the RouterContext.sessionKeyManager()
+     * to prevent correlation attacks across destinations
      */
-    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+    public SessionKeyManager getClientSessionKeyManager(Hash dest) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)
             return runner.getSessionKeyManager();

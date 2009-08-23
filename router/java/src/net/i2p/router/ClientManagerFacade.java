@@ -92,6 +92,6 @@ public abstract class ClientManagerFacade implements Service {
      *
      */
     public abstract SessionConfig getClientSessionConfig(Destination dest);
-    public abstract SessionKeyManager getClientSessionKeyManager(Destination dest);
+    public abstract SessionKeyManager getClientSessionKeyManager(Hash dest);
     public void renderStatusHTML(Writer out) throws IOException { }
 }
