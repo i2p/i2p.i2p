@@ -105,6 +105,19 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props) 
             throws DataFormatException, IOException {
+        writeProperties(rawStream, props, false);
+    }
+
+    /**
+     * jrandom disabled UTF-8 in mid-2004, for performance reasons,
+     * i.e. slow foo.getBytes("UTF-8")
+     * Re-enable it so we can pass UTF-8 tunnel names through the I2CP SessionConfig.
+     *
+     * Use utf8 = false for RouterAddress (fast, non UTF-8)
+     * Use utf8 = true for SessionConfig (slow, UTF-8)
+     */
+    public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
+            throws DataFormatException, IOException {
         if (props != null) {
             OrderedProperties p = new OrderedProperties();
             p.putAll(props);
@@ -112,12 +125,15 @@ public class DataHelper {
             for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
                 String key = (String) iter.next();
                 String val = p.getProperty(key);
-                // now make sure they're in UTF-8
-                //key = new String(key.getBytes(), "UTF-8");
-                //val = new String(val.getBytes(), "UTF-8");
-                writeString(baos, key);
+                if (utf8)
+                    writeStringUTF8(baos, key);
+                else
+                    writeString(baos, key);
                 baos.write(_equalBytes);
-                writeString(baos, val);
+                if (utf8)
+                    writeStringUTF8(baos, val);
+                else
+                    writeString(baos, val);
                 baos.write(_semicolonBytes);
             }
             baos.close();
@@ -486,6 +502,7 @@ public class DataHelper {
     /** Read in a string from the stream as specified by the I2P data structure spec.
      * A string is 1 or more bytes where the first byte is the number of bytes (not characters!)
      * in the string and the remaining 0-255 bytes are the non-null terminated UTF-8 encoded character array.
+     *
      * @param in stream to read from
      * @throws DataFormatException if the stream doesn't contain a validly formatted string
      * @throws IOException if there is an IO error reading the string
@@ -496,11 +513,16 @@ public class DataHelper {
         byte raw[] = new byte[size];
         int read = read(in, raw);
         if (read != size) throw new DataFormatException("Not enough bytes to read the string");
-        return new String(raw);
+        // the following constructor throws an UnsupportedEncodingException which is an IOException,
+        // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
+        return new String(raw, "UTF-8");
     }
 
     /** Write out a string to the stream as specified by the I2P data structure spec.  Note that the max
      * size for a string allowed by the spec is 255 bytes.
+     *
+     * WARNING - this method destroys the encoding, and therefore violates
+     * the data structure spec.
      *
      * @param out stream to write string
      * @param string string to write out: null strings are perfectly valid, but strings of excess length will
@@ -516,10 +538,38 @@ public class DataHelper {
             int len = string.length();
             if (len > 255)
                 throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
-                                              + string.length() + " [" + string + "]");
+                                              + len + " [" + string + "]");
             writeLong(out, 1, len);
             for (int i = 0; i < len; i++)
                 out.write((byte)(string.charAt(i) & 0xFF));
+        }
+    }
+
+    /** Write out a string to the stream as specified by the I2P data structure spec.  Note that the max
+     * size for a string allowed by the spec is 255 bytes.
+     *
+     * This method correctly uses UTF-8
+     *
+     * @param out stream to write string
+     * @param string UTF-8 string to write out: null strings are perfectly valid, but strings of excess length will
+     *               cause a DataFormatException to be thrown
+     * @throws DataFormatException if the string is not valid
+     * @throws IOException if there is an IO error writing the string
+     */
+    private static void writeStringUTF8(OutputStream out, String string) 
+        throws DataFormatException, IOException {
+        if (string == null) {
+            writeLong(out, 1, 0);
+        } else {
+            // the following method throws an UnsupportedEncodingException which is an IOException,
+            // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
+            byte[] raw = string.getBytes("UTF-8");
+            int len = raw.length;
+            if (len > 255)
+                throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
+                                              + len + " [" + string + "]");
+            writeLong(out, 1, len);
+            out.write(raw);
         }
     }
 

@@ -63,7 +63,12 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
     }
   } catch (NumberFormatException nfe) {}
 }
+/*
+ *  Send a 403 instead of a 404, because the server sends error.jsp
+ *  for 404 errors, complete with the summary bar, which would be
+ *  a huge load for a page full of graphs if there's a problem
+ */
 if (!rendered) {
-  response.sendError(404, "That stat is not available");
+  response.sendError(403, "That stat is not available");
 }
 %>

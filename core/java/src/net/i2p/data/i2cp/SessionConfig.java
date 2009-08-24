@@ -173,7 +173,7 @@ public class SessionConfig extends DataStructureImpl {
             _log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
             _log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);
             _destination.writeBytes(out);
-            DataHelper.writeProperties(out, _options);
+            DataHelper.writeProperties(out, _options, true);  // UTF-8
             DataHelper.writeDate(out, _creationDate);
         } catch (IOException ioe) {
             _log.error("IOError signing", ioe);
@@ -198,7 +198,7 @@ public class SessionConfig extends DataStructureImpl {
         if ((_destination == null) || (_options == null) || (_signature == null) || (_creationDate == null))
             throw new DataFormatException("Not enough data to create the session config");
         _destination.writeBytes(out);
-        DataHelper.writeProperties(out, _options);
+        DataHelper.writeProperties(out, _options, true);  // UTF-8
         DataHelper.writeDate(out, _creationDate);
         _signature.writeBytes(out);
     }

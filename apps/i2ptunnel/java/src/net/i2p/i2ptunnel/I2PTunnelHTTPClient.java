@@ -843,6 +843,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 String type;
                 if (filename.endsWith(".css"))
                     type = "text/css";
+                else if (filename.endsWith(".ico"))
+                    type = "image/x-icon";
                 else if (filename.endsWith(".png"))
                     type = "image/png";
                 else if (filename.endsWith(".jpg"))

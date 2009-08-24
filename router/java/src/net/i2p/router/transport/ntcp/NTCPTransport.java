@@ -645,20 +645,20 @@ public class NTCPTransport extends TransportImpl {
         buf.append("<p><b id=\"ntcpcon\"><h3>NTCP connections: ").append(peers.size());
         buf.append(". Limit: ").append(getMaxConnections());
         buf.append(". Timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
-        buf.append(".</b></h3>\n");
-        buf.append("<div class=\"wideload\"><table>\n");
-        buf.append("<tr><th><a href=\"#def.peer\">Peer</a></th>");
-        buf.append("<th>Dir</th>");
-        buf.append("<th align=\"right\"><a href=\"#def.idle\">Idle</a></th>");
-        buf.append("<th align=\"right\"><a href=\"#def.rate\">In/Out</a></th>");
-        buf.append("<th align=\"right\"><a href=\"#def.up\">Up</a></th>");
-        buf.append("<th align=\"right\"><a href=\"#def.skew\">Skew</a></th>");
-        buf.append("<th align=\"right\"><a href=\"#def.send\">TX</a></th>");
-        buf.append("<th align=\"right\"><a href=\"#def.recv\">RX</a></th>");
-        buf.append("<th>Out queue</th>");
-        buf.append("<th>Backlogged?</th>");
-        buf.append("<th>Reading?</th>");
-        buf.append(" </tr>\n");
+        buf.append(".</b></h3>\n" +
+                   "<div class=\"wideload\"><table>\n" +
+                   "<tr><th><a href=\"#def.peer\">Peer</a></th>" +
+                   "<th>Dir</th>" +
+                   "<th align=\"right\"><a href=\"#def.idle\">Idle</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.rate\">In/Out</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.up\">Up</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.skew\">Skew</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.send\">TX</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.recv\">RX</a></th>" +
+                   "<th>Out queue</th>" +
+                   "<th>Backlogged?</th>" +
+                   "<th>Reading?</th>" +
+                   " </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
@@ -726,8 +726,8 @@ public class NTCPTransport extends TransportImpl {
             buf.append("</td> <td align=\"center\"><b>").append(DataHelper.formatDuration(totalUptime/peers.size()));
             buf.append("</b></td> <td align=\"center\"><b>").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
             buf.append("</b></td> <td align=\"center\"><b>").append(totalSend).append("</b></td> <td align=\"center\"><b>").append(totalRecv);
-            buf.append("</b></td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;");
-            buf.append("</td></tr>\n");
+            buf.append("</b></td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;" +
+                       "</td></tr>\n");
         }
 
         buf.append("</table></div></p>\n");

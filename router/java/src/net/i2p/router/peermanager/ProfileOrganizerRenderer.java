@@ -111,10 +111,11 @@ class ProfileOrganizerRenderer {
             if (isIntegrated) buf.append(", Integrated");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null) {
-                buf.append(" (").append(info.getCapabilities());
+                // prevent HTML injection in the caps and version
+                buf.append(" (").append(DataHelper.stripHTML(info.getCapabilities()));
                 String v = info.getOption("router.version");
                 if (v != null)
-                    buf.append(' ').append(v);
+                    buf.append(' ').append(DataHelper.stripHTML(v));
                 buf.append(')');
             }
             
@@ -153,6 +154,9 @@ class ProfileOrganizerRenderer {
             buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
             buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
+            // let's not build the whole page in memory (~500 bytes per peer)
+            out.write(buf.toString());
+            buf.setLength(0);
         }
         buf.append("</table>");
 
@@ -189,7 +193,7 @@ class ProfileOrganizerRenderer {
             buf.append("</td>");
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null)
-                buf.append("<td align=\"center\">" + info.getCapabilities() + "</td>");
+                buf.append("<td align=\"center\">").append(DataHelper.stripHTML(info.getCapabilities())).append("</td>");
             else
                 buf.append("<td>&nbsp;</td>");
             buf.append("</code></td>");

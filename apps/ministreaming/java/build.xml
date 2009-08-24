@@ -23,7 +23,8 @@
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" deprecation="on" source="1.5" target="1.5" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
+        <!-- half of this is deprecated classes so turn deprecation off -->
+        <javac srcdir="./src" debug="true" deprecation="off" source="1.5" target="1.5" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
