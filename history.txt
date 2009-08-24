@@ -1,3 +1,33 @@
+2009-08-24 zzz
+    * ClientManager:
+      - Prevent client destination theft by rejecting duplicates
+      - Java 5 cleanups
+    * Console:
+      - Put favicon on every page
+      - Make every page UTF-8, ☃ safe for snowmen
+      - Remove options boxes on configtunnels.jsp
+      - Fix UTF-8 form submission (i2ptunnel too)
+      - Throw 403 instead of 404 from flags.jsp and viewstat.jsp
+        so we don't render error.jsp
+    * I2CP: Fix the SessionConfig serializer in DataHelper,
+      so that UTF-8 tunnel names are not corrupted by
+      I2CP and can be displayed on the console
+    * Message: Move 2 unused classes out of the router lib (~15KB)
+      (more SKM prep)
+    * Message, I2PSession, SessionKeyManager, Console:
+      Prep for SessionKeyManager work in the router -
+      Fix up SKM renderStatusHTML(); add debug.jsp to see it;
+      Redefine getClientSessionKeyManager();
+      More cleanups
+    * Ministreaming: Kill deprecation warnings
+    * profiles.jsp: Bulletproofing, less memory usage
+    * Streaming, I2PSession:
+      Prep for SessionKeyManager work in the router -
+      Comment out, deprecate, and javadoc for unused keys and tags,
+      they are vestiges of end-to-end crypto
+    * Updates: Verify zip at startup before extracting
+    * Wrapper: Take a couple fields out of the log so it's narrower
+
 2009-08-20 zzz
     * Config files:
       - Add some path and encoding help
