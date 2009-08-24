@@ -194,7 +194,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * Return the client's current manager or null if not connected
      *
      */
-    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+    public SessionKeyManager getClientSessionKeyManager(Hash dest) {
         if (_manager != null)
             return _manager.getClientSessionKeyManager(dest);
         else {
@@ -215,7 +215,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * @return set of Destination objects
      */
     @Override
-    public Set listClients() {
+    public Set<Destination> listClients() {
         if (_manager != null)
             return _manager.listClients();
         else

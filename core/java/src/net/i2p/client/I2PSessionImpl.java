@@ -355,17 +355,23 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     public abstract boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
     
+    /**
+     * @param keyUsed unused - no end-to-end crypto
+     * @param tagsSent unused - no end-to-end crypto
+     */
     public abstract boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, 
                                         Set tagsSent) throws I2PSessionException;
 
     public abstract void receiveStatus(int msgId, long nonce, int status);
 
+/****** no end-to-end crypto
     protected static final Set createNewTags(int num) {
         Set tags = new HashSet();
         for (int i = 0; i < num; i++)
             tags.add(new SessionTag(true));
         return tags;
     }
+*******/
 
     /**
      * Recieve a payload message and let the app know its available

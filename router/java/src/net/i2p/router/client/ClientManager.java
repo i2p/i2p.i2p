@@ -42,8 +42,8 @@ import net.i2p.util.Log;
 public class ClientManager {
     private Log _log;
     private ClientListenerRunner _listener;
-    private final HashMap _runners;        // Destination --> ClientConnectionRunner
-    private final Set _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
+    private final HashMap<Destination, ClientConnectionRunner>  _runners;        // Destination --> ClientConnectionRunner
+    private final Set<ClientConnectionRunner> _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
     private RouterContext _ctx;
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */
@@ -90,21 +90,21 @@ public class ClientManager {
     public void shutdown() {
         _log.info("Shutting down the ClientManager");
         _listener.stopListening();
-        Set runners = new HashSet();
+        Set<ClientConnectionRunner> runners = new HashSet();
         synchronized (_runners) {
-            for (Iterator iter = _runners.values().iterator(); iter.hasNext();) {
-                ClientConnectionRunner runner = (ClientConnectionRunner)iter.next();
+            for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {
+                ClientConnectionRunner runner = iter.next();
                 runners.add(runner);
             }
         }
         synchronized (_pendingRunners) {
-            for (Iterator iter = _pendingRunners.iterator(); iter.hasNext();) {
-                ClientConnectionRunner runner = (ClientConnectionRunner)iter.next();
+            for (Iterator<ClientConnectionRunner> iter = _pendingRunners.iterator(); iter.hasNext();) {
+                ClientConnectionRunner runner = iter.next();
                 runners.add(runner);
             }
         }
-        for (Iterator iter = runners.iterator(); iter.hasNext(); ) {
-            ClientConnectionRunner runner = (ClientConnectionRunner)iter.next();
+        for (Iterator<ClientConnectionRunner> iter = runners.iterator(); iter.hasNext(); ) {
+            ClientConnectionRunner runner = iter.next();
             runner.stopRunning();
         }
     }
@@ -131,15 +131,26 @@ public class ClientManager {
         }
     }
     
+    /**
+     * Add to the clients list. Check for a dup destination.
+     */
     public void destinationEstablished(ClientConnectionRunner runner) {
+        Destination dest = runner.getConfig().getDestination();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("DestinationEstablished called for destination " + runner.getConfig().getDestination().calculateHash().toBase64());
+            _log.debug("DestinationEstablished called for destination " + dest.calculateHash().toBase64());
 
         synchronized (_pendingRunners) {
             _pendingRunners.remove(runner);
         }
+        boolean fail = false;
         synchronized (_runners) {
-            _runners.put(runner.getConfig().getDestination(), runner);
+            fail = _runners.containsKey(dest);
+            if (!fail)
+                _runners.put(dest, runner);
+        }
+        if (fail) {
+            _log.log(Log.CRIT, "Client attempted to register duplicate destination " + dest.calculateHash().toBase64());
+            runner.disconnectClient("Duplicate destination");
         }
     }
     
@@ -278,8 +289,8 @@ public class ClientManager {
         return true;
     }
 
-    public Set listClients() {
-        Set rv = new HashSet();
+    public Set<Destination> listClients() {
+        Set<Destination> rv = new HashSet();
         synchronized (_runners) {
             rv.addAll(_runners.keySet());
         }
@@ -293,7 +304,7 @@ public class ClientManager {
         long inLock = 0;
         synchronized (_runners) {
             inLock = _ctx.clock().now();
-            rv = (ClientConnectionRunner)_runners.get(dest);
+            rv = _runners.get(dest);
         }
         long afterLock = _ctx.clock().now();
         if (afterLock - beforeLock > 50) {
@@ -317,9 +328,10 @@ public class ClientManager {
     
     /**
      * Return the client's SessionKeyManager
-     *
+     * Use this instead of the RouterContext.sessionKeyManager()
+     * to prevent correlation attacks across destinations
      */
-    public SessionKeyManager getClientSessionKeyManager(Destination dest) {
+    public SessionKeyManager getClientSessionKeyManager(Hash dest) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)
             return runner.getSessionKeyManager();
@@ -331,8 +343,8 @@ public class ClientManager {
         if (destHash == null) 
             return null;
         synchronized (_runners) {
-            for (Iterator iter = _runners.values().iterator(); iter.hasNext(); ) {
-                ClientConnectionRunner cur = (ClientConnectionRunner)iter.next();
+            for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext(); ) {
+                ClientConnectionRunner cur = iter.next();
                 if (cur.getDestHash().equals(destHash))
                     return cur;
 	    }
@@ -354,8 +366,8 @@ public class ClientManager {
         }
     }
     
-    Set getRunnerDestinations() {
-        Set dests = new HashSet();
+    Set<Destination> getRunnerDestinations() {
+        Set<Destination> dests = new HashSet();
         long beforeLock = _ctx.clock().now();
         long inLock = 0;
         synchronized (_runners) {
@@ -390,13 +402,13 @@ public class ClientManager {
         StringBuilder buf = new StringBuilder(8*1024);
         buf.append("<u><b>Local destinations</b></u><br>");
         
-        Map runners = null;
+        Map<Destination, ClientConnectionRunner> runners = null;
         synchronized (_runners) {
             runners = (Map)_runners.clone();
         }
-        for (Iterator iter = runners.keySet().iterator(); iter.hasNext(); ) {
-            Destination dest = (Destination)iter.next();
-            ClientConnectionRunner runner = (ClientConnectionRunner)runners.get(dest);
+        for (Iterator<Destination> iter = runners.keySet().iterator(); iter.hasNext(); ) {
+            Destination dest = iter.next();
+            ClientConnectionRunner runner = runners.get(dest);
             buf.append("<b>*</b> ").append(dest.calculateHash().toBase64().substring(0,6)).append("<br>\n");
             LeaseSet ls = runner.getLeaseSet();
             if (ls == null) {

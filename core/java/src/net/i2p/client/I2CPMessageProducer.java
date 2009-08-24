@@ -93,6 +93,10 @@ class I2CPMessageProducer {
     /**
      * Package up and send the payload to the router for delivery
      *
+     * @param tag unused - no end-to-end crypto
+     * @param tags unused - no end-to-end crypto
+     * @param key unused - no end-to-end crypto
+     * @param newKey unused - no end-to-end crypto
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag,
                             SessionKey key, Set tags, SessionKey newKey, long expires) throws I2PSessionException {
@@ -135,6 +139,10 @@ class I2CPMessageProducer {
     /**
      * Create a new signed payload and send it off to the destination
      *
+     * @param tag unused - no end-to-end crypto
+     * @param tags unused - no end-to-end crypto
+     * @param key unused - no end-to-end crypto
+     * @param newKey unused - no end-to-end crypto
      */
     private Payload createPayload(Destination dest, byte[] payload, SessionTag tag, SessionKey key, Set tags,
                                   SessionKey newKey) throws I2PSessionException {
