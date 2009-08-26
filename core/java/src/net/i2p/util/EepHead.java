@@ -93,7 +93,7 @@ public class EepHead extends EepGet {
         }
     }
     
-    protected static void usage() {
+    private static void usage() {
         System.err.println("EepHead [-p 127.0.0.1:4444] [-n #retries] [-t timeout] url");
     }
     
@@ -191,6 +191,8 @@ public class EepHead extends EepGet {
         buf.append("Accept-Encoding: \r\n");
         if (_shouldProxy)
             buf.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
+        // This will be replaced if we are going through I2PTunnelHTTPClient
+        buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("Connection: close\r\n\r\n");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");

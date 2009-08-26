@@ -17,6 +17,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketEepGet;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.DataFormatException;
@@ -231,7 +232,13 @@ public class I2PSnarkUtil {
         if (rewrite)
             fetchURL = rewriteAnnounce(url);
         //_log.debug("Rewritten url [" + fetchURL + "]");
-        EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, retries, out.getAbsolutePath(), fetchURL);
+        //EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, retries, out.getAbsolutePath(), fetchURL);
+        // Use our tunnel for announces and .torrent fetches too! Make sure we're connected first...
+        if (!connected()) {
+            if (!connect())
+                return null;
+        }
+        EepGet get = new I2PSocketEepGet(_context, _manager, retries, out.getAbsolutePath(), fetchURL);
         if (get.fetch()) {
             _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;

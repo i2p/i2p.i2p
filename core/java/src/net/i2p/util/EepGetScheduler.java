@@ -7,7 +7,7 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 
 /**
- *
+ *  @deprecated unused a webapp version would be nice though
  */
 public class EepGetScheduler implements EepGet.StatusListener {
     private I2PAppContext _context;

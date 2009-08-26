@@ -751,10 +751,10 @@ public class I2PSnarkServlet extends HttpServlet {
                   + openTrackers + "\" size=\"50\" /><br>\n");
 
         //out.write("\n");
-        out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
-                  + _manager.util().getEepProxyHost() + "\" size=\"15\" /> ");
-        out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
-                  + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br>\n");
+        //out.write("EepProxy host: <input type=\"text\" name=\"eepHost\" value=\""
+        //          + _manager.util().getEepProxyHost() + "\" size=\"15\" /> ");
+        //out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
+        //          + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br>\n");
         out.write("I2CP host: <input type=\"text\" name=\"i2cpHost\" value=\"" 
                   + _manager.util().getI2CPHost() + "\" size=\"15\" /> ");
         out.write("port: <input type=\"text\" name=\"i2cpPort\" value=\"" +

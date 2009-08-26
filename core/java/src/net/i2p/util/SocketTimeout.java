@@ -5,6 +5,15 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ *  This should be deprecated.
+ *  It is only used by EepGet, and it uses the inefficient SimpleTimer.
+ *  The only advantage seems to be a total timeout period, which is the second
+ *  argument to EepGet.fetch(headerTimeout, totalTimeout, inactivityTimeout),
+ *  which is most likely always set to -1.
+ *
+ *  Use socket.setsotimeout instead?
+ */
 public class SocketTimeout implements SimpleTimer.TimedEvent {
     private Socket _targetSocket;
     private long _startTime;
