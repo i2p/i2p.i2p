@@ -1,6 +1,7 @@
 package net.i2p.router;
 
 import net.i2p.util.DecayingBloomFilter;
+import net.i2p.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -95,7 +96,7 @@ public class MessageValidator {
     }
     
     public void startup() {
-        _filter = new DecayingBloomFilter(_context, (int)Router.CLOCK_FUDGE_FACTOR * 2, 8);
+        _filter = new DecayingHashSet(_context, (int)Router.CLOCK_FUDGE_FACTOR * 2, 8, "RouterMV");
     }
     
     void shutdown() {

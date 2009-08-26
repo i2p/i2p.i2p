@@ -5,6 +5,7 @@ import java.util.Map;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.DecayingBloomFilter;
+import net.i2p.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -52,7 +53,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         // may want to extend the DecayingBloomFilter so we can use a smaller 
         // array size (currently its tuned for 10 minute rates for the 
         // messageValidator)
-        _recentlyCompletedMessages = new DecayingBloomFilter(_context, DECAY_PERIOD, 4);
+        _recentlyCompletedMessages = new DecayingHashSet(_context, DECAY_PERIOD, 4, "UDPIMF");
         _ackSender.startup();
         _messageReceiver.startup();
     }

@@ -10,6 +10,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.util.DecayingBloomFilter;
+import net.i2p.util.DecayingHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -22,7 +23,7 @@ public class BuildMessageProcessor {
     private DecayingBloomFilter _filter;
     
     public BuildMessageProcessor(I2PAppContext ctx) {
-        _filter = new DecayingBloomFilter(ctx, 60*1000, 32);
+        _filter = new DecayingHashSet(ctx, 60*1000, 32, "TunnelBMP");
         ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*1000, 10*60*1000 });
     }
     /**
