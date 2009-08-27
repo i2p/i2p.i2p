@@ -540,8 +540,17 @@ public class TunnelDispatcher implements Service {
      * This is similar to the code in ../RouterThrottleImpl.java
      * We drop in proportion to how far over the limit we are.
      * Perhaps an exponential function would be better?
+     *
+     * The drop probability is adjusted for the size of the message.
+     * At this stage, participants and IBGWs see a standard 1024 byte message.
+     * OBEPs however may see a wide variety of sizes.
+     *
+     * @param type unused except for logging
+     * @param length the length of the message
      */
-    public boolean shouldDropParticipatingMessage() {
+    public boolean shouldDropParticipatingMessage(String type, int length) {
+        if (length <= 0)
+            return false;
         RateStat rs = _context.statManager().getRate("tunnel.participatingBandwidth");
         if (rs == null)
             return false;
@@ -574,13 +583,19 @@ public class TunnelDispatcher implements Service {
         float pctDrop = (used - maxBps) / used;
         if (pctDrop <= 0)
             return false;
+        // drop in proportion to size w.r.t. a standard 1024-byte message
+        // this is a little expensive but we want to adjust the curve between 0 and 1
+        // Most messages are 1024, only at the OBEP do we see other sizes
+        if (length != 1024)
+            pctDrop = (float) Math.pow(pctDrop, 1024d / length);
         float rand = _context.random().nextFloat();
         boolean reject = rand <= pctDrop;
         if (reject) {
             if (_log.shouldLog(Log.WARN)) {
                 int availBps = (int) (((maxKBps*1024)*share) - used);
                 _log.warn("Drop part. msg. avail/max/used " + availBps + "/" + (int) maxBps + "/" 
-                          + used + " %Drop = " + pctDrop);
+                          + used + " %Drop = " + pctDrop
+                          + ' ' + type + ' ' + length);
             }
             _context.statManager().addRateData("tunnel.participatingMessageDropped", 1, 0);
         }
