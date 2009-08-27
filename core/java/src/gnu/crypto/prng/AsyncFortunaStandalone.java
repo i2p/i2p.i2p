@@ -12,7 +12,11 @@ import net.i2p.util.Log;
  * has been eaten)
  */
 public class AsyncFortunaStandalone extends FortunaStandalone implements Runnable {
-    private static final int DEFAULT_BUFFERS = 16;
+    /**
+     * This is set to 2 to minimize memory usage for standalone apps.
+     * The router must override this via the prng.buffers property in the router context.
+     */
+    private static final int DEFAULT_BUFFERS = 2;
     private static final int BUFSIZE = 256*1024;
     private int _bufferCount;
     private final byte asyncBuffers[][];
@@ -28,7 +32,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     
     public AsyncFortunaStandalone(I2PAppContext context) {
         super();
-        _bufferCount = context.getProperty("router.prng.buffers", DEFAULT_BUFFERS);
+        _bufferCount = Math.max(context.getProperty("prng.buffers", DEFAULT_BUFFERS), 2);
         asyncBuffers = new byte[_bufferCount][BUFSIZE];
         status = new int[_bufferCount];
         for (int i = 0; i < _bufferCount; i++)

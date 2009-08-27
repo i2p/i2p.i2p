@@ -798,12 +798,20 @@ public class DataHelper {
      * 
      */
     public static int hashCode(byte b[]) {
+        // Java 5 now has its own method, and the old way
+        // is horrible for arrays smaller than 32.
+        // otoh, for sizes >> 32, java's method may be too slow
         int rv = 0;
         if (b != null) {
-            for (int i = 0; i < b.length && i < 32; i++)
-                rv += (b[i] << i);
+            if (b.length <= 32) {
+                rv = Arrays.hashCode(b);
+            } else {
+                for (int i = 0; i < b.length && i < 32; i++)
+                    rv ^= (b[i] << i);  // xor better than + in tests
+            }
         }
         return rv;
+
     }
 
     /**

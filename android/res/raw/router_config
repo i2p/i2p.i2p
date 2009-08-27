@@ -3,7 +3,7 @@
 i2p.dir.temp=/data/data/net.i2p.router/files/tmp
 i2p.dir.pid=/data/data/net.i2p.router/files/tmp
 # save memory
-router.prng.buffers=2
+prng.buffers=2
 router.decayingBloomFilterM=20
 stat.full=false
 i2np.udp.maxConnections=30

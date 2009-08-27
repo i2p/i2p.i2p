@@ -67,9 +67,15 @@ public class SigningPublicKey extends DataStructureImpl {
         return DataHelper.eq(_data, ((SigningPublicKey) obj)._data);
     }
 
+    /** the key has enough randomness in it, use the first 4 bytes for speed */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(_data);
+        int rv = 0;
+        if (_data != null) {
+            for (int i = 0; i < 4; i++)
+                rv ^= (_data[i] << (i*8));
+        }
+        return rv;
     }
 
     @Override

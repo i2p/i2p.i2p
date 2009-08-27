@@ -1,18 +1,19 @@
 package net.i2p.router.tunnel;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
+import net.i2p.util.ConcurrentHashSet;
 
 /** 
  * waste lots of RAM 
  */
 class HashSetIVValidator implements IVValidator {
-    private final HashSet _received;
+    private final Set<ByteArray> _received;
     
     public HashSetIVValidator() {
-        _received = new HashSet();
+        _received = new ConcurrentHashSet();
     }
     
     public boolean receiveIV(byte ivData[], int ivOffset, byte payload[], int payloadOffset) {
@@ -21,10 +22,7 @@ class HashSetIVValidator implements IVValidator {
         byte iv[] = new byte[HopProcessor.IV_LENGTH];
         DataHelper.xor(ivData, ivOffset, payload, payloadOffset, iv, 0, HopProcessor.IV_LENGTH);
         ByteArray ba = new ByteArray(iv);
-        boolean isNew = false;
-        synchronized (_received) {
-            isNew = _received.add(ba);
-        }
+        boolean isNew = _received.add(ba);
         return isNew;
     }
 }

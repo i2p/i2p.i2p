@@ -91,6 +91,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      *  Perhaps the http server (which does its own compression)
      *  and P2P apps (with generally uncompressible data) should
      *  set to false.
+     *
+     *  Todo: don't compress if destination is local?
      */
     private static final int DONT_COMPRESS_SIZE = 66;
     protected boolean shouldCompress(int size) {

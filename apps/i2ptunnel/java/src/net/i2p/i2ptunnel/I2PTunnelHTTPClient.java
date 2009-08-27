@@ -37,7 +37,7 @@ import net.i2p.util.Log;
  * or
  *   $method $path $protocolVersion\nHost: $site
  * or
- *   $method http://i2p/$site/$path $protocolVersion
+ *   $method http://i2p/$b64key/$path $protocolVersion
  * or 
  *   $method /$site/$path $protocolVersion
  * </pre>
