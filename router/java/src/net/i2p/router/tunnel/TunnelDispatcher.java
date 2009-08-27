@@ -545,7 +545,13 @@ public class TunnelDispatcher implements Service {
      * At this stage, participants and IBGWs see a standard 1024 byte message.
      * OBEPs however may see a wide variety of sizes.
      *
-     * @param type unused except for logging
+     * Network-wise, it's most efficient to drop OBEP messages, because they
+     * are unfragmented and we know their size. Therefore we drop the big ones
+     * and we drop a single wrapped I2CP message, not a fragment of one or more messages.
+     * Also, the OBEP is the earliest identifiable hop in the message's path
+     * (a plain participant could be earlier or later, but on average is later)
+     *
+     * @param type message hop location and type
      * @param length the length of the message
      */
     public boolean shouldDropParticipatingMessage(String type, int length) {
@@ -583,11 +589,18 @@ public class TunnelDispatcher implements Service {
         float pctDrop = (used - maxBps) / used;
         if (pctDrop <= 0)
             return false;
+        // increase the drop probability for OBEP,
+        // and lower it for IBGW, for network efficiency
+        double len = length;
+        if (type.startsWith("OBEP"))
+            len *= 1.5;
+        else if (type.startsWith("IBGW"))
+            len /= 1.5;
         // drop in proportion to size w.r.t. a standard 1024-byte message
         // this is a little expensive but we want to adjust the curve between 0 and 1
         // Most messages are 1024, only at the OBEP do we see other sizes
-        if (length != 1024)
-            pctDrop = (float) Math.pow(pctDrop, 1024d / length);
+        if (len != 1024d)
+            pctDrop = (float) Math.pow(pctDrop, 1024d / len);
         float rand = _context.random().nextFloat();
         boolean reject = rand <= pctDrop;
         if (reject) {
