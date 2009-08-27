@@ -1,3 +1,37 @@
+2009-08-28 zzz
+    * Client: Fail if no date handshake after 30s or no leaseset
+      after 5m, rather than hanging forever.
+    * Console:
+      - Prevent OOMs in NewsFetcher or StatsSummarizer from
+        killing the router
+      - Fix favicon (-17)
+    * Data: Speed up many hashcodes
+    * DataHelper: Fix byte array hashcode for small arrays
+    * DecayingBloomFilter:
+      - Replace with new DecayingHashSet for 3 of 4 uses,
+        and also in the 4th if the router is low-bandwidth.
+        Saves 8 MB heap.
+    * EepGet, I2PSnark:
+      - New I2PSocketEepGet fetches through existing tunnels
+        rather than through the proxy
+      - Use new eepget for i2psnark
+      - Add a fake user agent for non-proxied fetches
+      - Cleanups
+    * NetDb:
+      - oops, store leaseset locally even when shutting down
+        (fix -16)
+      - Java 5 cleanups
+    * PRNG:
+      - Rename config option to prng.buffers (was router.prng.buffers)
+      - Change the default from 16 to 2 for I2PAppContext (saves 3.5MB)
+    * Tunnel:
+      - Adjust the random drop probability for the message size
+      - Concurrentify HashSetIVValidator
+    * TunnelPool:
+      - Don't test tunnels when shutting down
+      - Less rates
+      - Java 5 cleanups
+
 2009-08-24 zzz
     * ClientManager:
       - Prevent client destination theft by rejecting duplicates
