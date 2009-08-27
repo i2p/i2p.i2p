@@ -14,7 +14,7 @@
 %>
 <html><head><title>I2P Router Console</title>
 <%@include file="css.jsp" %>
-<link rel="shortcut icon" href="favicon.ico" /></head><body>
+</head><body>
 <%
 if (System.getProperty("router.consoleNonce") == null) {
     System.setProperty("router.consoleNonce", new java.util.Random().nextLong() + "");
