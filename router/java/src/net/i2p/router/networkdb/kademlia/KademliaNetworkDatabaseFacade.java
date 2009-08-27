@@ -490,8 +490,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
-        if (_context.router().gracefulShutdownInProgress())
-            return;
+        // If we're exiting, don't publish.
+        // If we're restarting, keep publishing to minimize the downtime.
+        if (_context.router().gracefulShutdownInProgress()) {
+            int code = _context.router().scheduledGracefulExitCode();
+            if (code == Router.EXIT_GRACEFUL || code == Router.EXIT_HARD)
+                return;
+        }
         
         RepublishLeaseSetJob j = null;
         synchronized (_publishingLeaseSets) {
