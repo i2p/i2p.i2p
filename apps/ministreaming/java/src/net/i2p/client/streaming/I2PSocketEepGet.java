@@ -107,7 +107,7 @@ public class I2PSocketEepGet extends EepGet {
                     try {
                         int slash = 1 + file.substring(1).indexOf("/");
                         host = file.substring(1, slash);
-                        _actualURL = "http:/" + file.substring(slash);  // get the extra slash from the substring
+                        _actualURL = "http://" + host + file.substring(slash);
                     } catch (IndexOutOfBoundsException ioobe) {
                         throw new IOException("Bad /i2p/ format: " + _actualURL);
                     }
