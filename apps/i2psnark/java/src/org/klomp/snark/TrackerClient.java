@@ -313,9 +313,9 @@ public class TrackerClient extends I2PAppThread
         try
           {
             // try to contact everybody we can
-            // We don't need I2CP connection for eepget
-            // if (!verifyConnected()) return;
+            // Don't try to restart I2CP connection just to say goodbye
             for (Iterator iter = trackers.iterator(); iter.hasNext(); ) {
+              if (!verifyConnected()) return;
               Tracker tr = (Tracker)iter.next();
               if (tr.started && (!tr.stop) && tr.trackerProblems == null)
                   doRequest(tr, infoHash, peerID, uploaded,

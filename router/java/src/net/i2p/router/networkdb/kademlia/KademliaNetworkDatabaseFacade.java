@@ -56,7 +56,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private final Set _exploreKeys = new HashSet(64); // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    private final Set<Hash> _exploreKeys = new HashSet(64); // set of Hash objects that we should search on (to fill up a bucket, not to get data)
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -72,7 +72,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * removed when the job decides to stop running.
      *
      */
-    private final Map _publishingLeaseSets;
+    private final Map<Hash, RepublishLeaseSetJob> _publishingLeaseSets;
     
     /** 
      * Hash of the key currently being searched for, pointing the SearchJob that
@@ -80,7 +80,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * added on to the list of jobs fired on success/failure
      *
      */
-    private final Map _activeRequests;
+    private final Map<Hash, SearchJob> _activeRequests;
     
     /**
      * The search for the given key is no longer active
@@ -160,7 +160,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _exploreJob.updateExploreSchedule();
     }
     
-    public Set getExploreKeys() {
+    public Set<Hash> getExploreKeys() {
         if (!_initialized) return null;
         synchronized (_exploreKeys) {
             return new HashSet(_exploreKeys);
@@ -302,12 +302,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /**
      * Get the routers closest to that key in response to a remote lookup
      */
-    public Set findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) {
+    public Set<RouterInfo> findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) {
         if (!_initialized) return null;
         return getRouters(_peerSelector.selectNearest(key, maxNumRouters, peersToIgnore, _kb));
     }
     
-    private Set getRouters(Collection hashes) {
+    private Set<RouterInfo> getRouters(Collection hashes) {
         if (!_initialized) return null;
         Set rv = new HashSet(hashes.size());
         for (Iterator iter = hashes.iterator(); iter.hasNext(); ) {
@@ -481,8 +481,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private static final long PUBLISH_DELAY = 3*1000;
     public void publish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
-        if (_context.router().gracefulShutdownInProgress())
-            return;
         Hash h = localLeaseSet.getDestination().calculateHash();
         try {
             store(h, localLeaseSet);
@@ -492,6 +490,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
             return;
+        // If we're exiting, don't publish.
+        // If we're restarting, keep publishing to minimize the downtime.
+        if (_context.router().gracefulShutdownInProgress()) {
+            int code = _context.router().scheduledGracefulExitCode();
+            if (code == Router.EXIT_GRACEFUL || code == Router.EXIT_HARD)
+                return;
+        }
         
         RepublishLeaseSetJob j = null;
         synchronized (_publishingLeaseSets) {
@@ -855,7 +860,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         return leases;
     }
-    private Set getRouters() {
+    private Set<RouterInfo> getRouters() {
         if (!_initialized) return null;
         Set routers = new HashSet();
         Set keys = getDataStore().getKeys();

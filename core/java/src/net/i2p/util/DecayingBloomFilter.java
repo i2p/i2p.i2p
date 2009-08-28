@@ -14,6 +14,10 @@ import org.xlattice.crypto.filters.BloomSHA1;
  * entries per second with virtually no false positive rate.  Down the line, 
  * this may be refactored to allow tighter control of the size necessary for the
  * contained bloom filters, but a fixed 2MB overhead isn't that bad.
+ *
+ * NOTE: At 1MBps, the tunnel IVV will see an unacceptable false positive rate
+ * of almost 0.1% with the current m and k values; however using DHS instead will use 30MB.
+ * Further analysis and tweaking for the tunnel IVV may be required.
  */
 public class DecayingBloomFilter {
     private I2PAppContext _context;
@@ -26,13 +30,18 @@ public class DecayingBloomFilter {
     private byte _extended[];
     private byte _longToEntry[];
     private long _longToEntryMask;
-    private long _currentDuplicates;
+    protected long _currentDuplicates;
     private boolean _keepDecaying;
     private DecayEvent _decayEvent;
+    /** just for logging */
+    private String _name;
     
     private static final int DEFAULT_M = 23;
     private static final boolean ALWAYS_MISS = false;
    
+    /** noop for DHS */
+    public DecayingBloomFilter() {}
+
     /**
      * Create a bloom filter that will decay its entries over time.  
      *
@@ -42,9 +51,15 @@ public class DecayingBloomFilter {
      *                   against with sufficient random values.
      */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes) {
+        this(context, durationMs, entryBytes, "DBF");
+    }
+
+    /** @param name just for logging / debugging / stats */
+    public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name) {
         _context = context;
         _log = context.logManager().getLog(DecayingBloomFilter.class);
         _entryBytes = entryBytes;
+        _name = name;
         // this is instantiated in four different places, they may have different
         // requirements, but for now use this as a gross method of memory reduction.
         // m == 23 => 1MB each BloomSHA1 (4 pairs = 8MB total)
@@ -67,6 +82,17 @@ public class DecayingBloomFilter {
         _decayEvent = new DecayEvent();
         _keepDecaying = true;
         SimpleTimer.getInstance().addEvent(_decayEvent, _durationMs);
+        if (_log.shouldLog(Log.WARN))
+           _log.warn("New DBF " + name + " m = " + m + " entryBytes = " + entryBytes +
+                     " numExtenders = " + numExtenders + " cycle (s) = " + (durationMs / 1000));
+        // try to get a handle on memory usage vs. false positives
+        context.statManager().createRateStat("router.decayingBloomFilter." + name + ".size",
+             "Size", "Router", new long[] { Math.max(60*1000, durationMs) });
+        context.statManager().createRateStat("router.decayingBloomFilter." + name + ".dups",
+             "1000000 * Duplicates/Size", "Router", new long[] { Math.max(60*1000, durationMs) });
+        context.statManager().createRateStat("router.decayingBloomFilter." + name + ".log10(falsePos)",
+             "log10 of the false positive rate (must have net.i2p.util.DecayingBloomFilter=DEBUG)",
+             "Router", new long[] { Math.max(60*1000, durationMs) });
     }
     
     public long getCurrentDuplicateCount() { return _currentDuplicates; }
@@ -196,9 +222,12 @@ public class DecayingBloomFilter {
     private void decay() {
         int currentCount = 0;
         long dups = 0;
+        double fpr = 0d;
         synchronized (this) {
             BloomSHA1 tmp = _previous;
             currentCount = _current.size();
+            if (_log.shouldLog(Log.DEBUG) && currentCount > 0)
+                fpr = _current.falsePositives();
             _previous = _current;
             _current = tmp;
             _current.clear();
@@ -206,8 +235,19 @@ public class DecayingBloomFilter {
             _currentDuplicates = 0;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Decaying the filter after inserting " + currentCount 
-                       + " elements and " + dups + " false positives");
+            _log.debug("Decaying the filter " + _name + " after inserting " + currentCount 
+                       + " elements and " + dups + " false positives with FPR = " + fpr);
+        _context.statManager().addRateData("router.decayingBloomFilter." + _name + ".size",
+                                           currentCount, 0);
+        if (currentCount > 0)
+            _context.statManager().addRateData("router.decayingBloomFilter." + _name + ".dups",
+                                               1000l*1000*dups/currentCount, 0);
+        if (fpr > 0d) {
+            // only if log.shouldLog(Log.DEBUG) ...
+            long exponent = (long) Math.log10(fpr);
+            _context.statManager().addRateData("router.decayingBloomFilter." + _name + ".log10(falsePos)",
+                                               exponent, 0);
+        }
     }
     
     private class DecayEvent implements SimpleTimer.TimedEvent {
@@ -219,18 +259,27 @@ public class DecayingBloomFilter {
         }
     }
     
+    /**
+     *  Theoretical false positive rate for   16 KBps: 1.17E-21
+     *  Theoretical false positive rate for   24 KBps: 9.81E-20
+     *  Theoretical false positive rate for   32 KBps: 2.24E-18
+     *  Theoretical false positive rate for  256 KBps: 7.45E-9
+     *  Theoretical false positive rate for  512 KBps: 5.32E-6
+     *  Theoretical false positive rate for 1024 KBps: 1.48E-3
+     */
     public static void main(String args[]) {
         int kbps = 256;
-        int iterations = 100;
+        int iterations = 10;
         testByLong(kbps, iterations);
         testByBytes(kbps, iterations);
     }
-    public static void testByLong(int kbps, int numRuns) {
+    private static void testByLong(int kbps, int numRuns) {
         int messages = 60 * 10 * kbps;
         Random r = new Random();
         DecayingBloomFilter filter = new DecayingBloomFilter(I2PAppContext.getGlobalContext(), 600*1000, 8);
         int falsePositives = 0;
         long totalTime = 0;
+        double fpr = 0d;
         for (int j = 0; j < numRuns; j++) {
             long start = System.currentTimeMillis();
             for (int i = 0; i < messages; i++) {
@@ -240,15 +289,17 @@ public class DecayingBloomFilter {
                 }
             }
             totalTime += System.currentTimeMillis() - start;
+            fpr = filter.getFalsePositiveRate();
             filter.clear();
         }
         filter.stopDecaying();
+        System.out.println("False postive rate should be " + fpr);
         System.out.println("After " + numRuns + " runs pushing " + messages + " entries in "
                            + DataHelper.formatDuration(totalTime/numRuns) + " per run, there were "
                            + falsePositives + " false positives");
 
     }
-    public static void testByBytes(int kbps, int numRuns) {
+    private static void testByBytes(int kbps, int numRuns) {
         byte iv[][] = new byte[60*10*kbps][16];
         Random r = new Random();
         for (int i = 0; i < iv.length; i++)
@@ -257,18 +308,21 @@ public class DecayingBloomFilter {
         DecayingBloomFilter filter = new DecayingBloomFilter(I2PAppContext.getGlobalContext(), 600*1000, 16);
         int falsePositives = 0;
         long totalTime = 0;
+        double fpr = 0d;
         for (int j = 0; j < numRuns; j++) {
             long start = System.currentTimeMillis();
             for (int i = 0; i < iv.length; i++) {
                 if (filter.add(iv[i])) {
                     falsePositives++;
-                    System.out.println("False positive " + falsePositives + " (testByLong j=" + j + " i=" + i + ")");
+                    System.out.println("False positive " + falsePositives + " (testByBytes j=" + j + " i=" + i + ")");
                 }
             }
             totalTime += System.currentTimeMillis() - start;
+            fpr = filter.getFalsePositiveRate();
             filter.clear();
         }
         filter.stopDecaying();
+        System.out.println("False postive rate should be " + fpr);
         System.out.println("After " + numRuns + " runs pushing " + iv.length + " entries in "
                            + DataHelper.formatDuration(totalTime/numRuns) + " per run, there were "
                            + falsePositives + " false positives");

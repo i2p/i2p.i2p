@@ -12,7 +12,7 @@ import net.i2p.apps.systray.SysTray;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
@@ -160,11 +160,11 @@ public class RouterConsoleRunner {
         }
 
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
-        I2PThread t = new I2PThread(fetcher, "NewsFetcher");
+        Thread t = new I2PAppThread(fetcher, "NewsFetcher");
         t.setDaemon(true);
         t.start();
         
-        I2PThread st = new I2PThread(new StatSummarizer(), "StatSummarizer");
+        Thread st = new I2PAppThread(new StatSummarizer(), "StatSummarizer");
         st.setDaemon(true);
         st.start();
     }

@@ -101,10 +101,12 @@ public class RouterIdentity extends DataStructureImpl {
                && DataHelper.eq(getPublicKey(), ident.getPublicKey());
     }
     
+    /** the public key has enough randomness in it to use it by itself for speed */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getCertificate()) + DataHelper.hashCode(getSigningPublicKey())
-               + DataHelper.hashCode(getPublicKey());
+        if (_publicKey == null)
+            return 0;
+        return _publicKey.hashCode();
     }
     
     @Override

@@ -75,19 +75,28 @@ public class RouterContext extends I2PAppContext {
         //initAll();
         _contexts.add(this);
     }
+
     /**
+     * Set properties where the defaults must be different from those
+     * in I2PAppContext.
+     *
      * Unless we are explicitly disabling the timestamper, we want to use it.
      * We need this now as the new timestamper default is disabled (so we don't
      * have each I2PAppContext creating their own SNTP queries all the time)
      *
+     * Set more PRNG buffers, as the default is now small for the I2PAppContext.
+     *
      */
-    static final Properties filterProps(Properties envProps) {
+    private static final Properties filterProps(Properties envProps) {
         if (envProps == null)
             envProps = new Properties();
         if (envProps.getProperty("time.disabled") == null)
             envProps.setProperty("time.disabled", "false");
+        if (envProps.getProperty("prng.buffers") == null)
+            envProps.setProperty("prng.buffers", "16");
         return envProps;
     }
+
     public void initAll() {
         if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
             _clientManagerFacade = new ClientManagerFacadeImpl(this);

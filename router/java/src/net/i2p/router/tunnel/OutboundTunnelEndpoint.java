@@ -43,7 +43,7 @@ public class OutboundTunnelEndpoint {
                            + (toTunnel != null ? toTunnel.getTunnelId() + "" : ""));
             // don't drop it if we are the target
             if ((!_context.routerHash().equals(toRouter)) &&
-                _context.tunnelDispatcher().shouldDropParticipatingMessage())
+                _context.tunnelDispatcher().shouldDropParticipatingMessage("OBEP " + msg.getType(), msg.getMessageSize()))
                 return;
             _config.incrementSentMessages();
             _outDistributor.distribute(msg, toRouter, toTunnel);

@@ -35,7 +35,7 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
             }
         }
         
-        if (_context.tunnelDispatcher().shouldDropParticipatingMessage())
+        if (_context.tunnelDispatcher().shouldDropParticipatingMessage("IBGW", encrypted.length))
             return -1;
         _config.incrementSentMessages();
         TunnelDataMessage msg = new TunnelDataMessage(_context);

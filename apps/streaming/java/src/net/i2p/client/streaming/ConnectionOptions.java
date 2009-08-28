@@ -266,6 +266,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.contains(PROP_SLOW_START_GROWTH_RATE_FACTOR))
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 2));
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
+            // wow 5 minutes!!! FIXME!!
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));

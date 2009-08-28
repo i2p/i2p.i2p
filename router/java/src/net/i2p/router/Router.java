@@ -330,6 +330,7 @@ public class Router {
         _context.blocklist().startup();
         
         // let the timestamper get us sync'ed
+        // this will block for quite a while on a disconnected machine
         long before = System.currentTimeMillis();
         _context.clock().getTimestamper().waitForInitialization();
         long waited = System.currentTimeMillis() - before;

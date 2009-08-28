@@ -37,9 +37,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private RouterContext _context;
     private Log _log;
     /** Hash (destination) to TunnelPool */
-    private final Map _clientInboundPools;
+    private final Map<Hash, TunnelPool> _clientInboundPools;
     /** Hash (destination) to TunnelPool */
-    private final Map _clientOutboundPools;
+    private final Map<Hash, TunnelPool> _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
     private BuildExecutor _executor;
@@ -90,7 +90,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (destination == null) return selectInboundTunnel();
         TunnelPool pool = null;
         synchronized (_clientInboundPools) {
-            pool = (TunnelPool)_clientInboundPools.get(destination);
+            pool = _clientInboundPools.get(destination);
         }
         if (pool != null) {
             return pool.selectTunnel();
@@ -119,7 +119,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (destination == null) return selectOutboundTunnel();
         TunnelPool pool = null;
         synchronized (_clientOutboundPools) {
-            pool = (TunnelPool)_clientOutboundPools.get(destination);
+            pool = _clientOutboundPools.get(destination);
         }
         if (pool != null) {
             return pool.selectTunnel();
@@ -130,8 +130,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelInfo getTunnelInfo(TunnelId id) {
         TunnelInfo info = null;
         synchronized (_clientInboundPools) {
-            for (Iterator iter = _clientInboundPools.values().iterator(); iter.hasNext(); ) {
-                TunnelPool pool = (TunnelPool)iter.next();
+            for (Iterator<TunnelPool> iter = _clientInboundPools.values().iterator(); iter.hasNext(); ) {
+                TunnelPool pool = iter.next();
                 info = pool.getTunnel(id);
                 if (info != null)
                     return info;
@@ -166,7 +166,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             Hash client = (Hash)destinations.get(i);
             TunnelPool pool = null;
             synchronized (_clientInboundPools) {
-                pool = (TunnelPool)_clientInboundPools.get(client);
+                pool = _clientInboundPools.get(client);
             }
             count += pool.listTunnels().size();
         }
@@ -182,7 +182,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             Hash client = (Hash)destinations.get(i);
             TunnelPool pool = null;
             synchronized (_clientOutboundPools) {
-                pool = (TunnelPool)_clientOutboundPools.get(client);
+                pool = _clientOutboundPools.get(client);
             }
             count += pool.listTunnels().size();
         }
@@ -196,9 +196,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return false;
         TunnelPool pool;
         if (tunnel.isInbound())
-            pool = (TunnelPool)_clientInboundPools.get(client); 
+            pool = _clientInboundPools.get(client); 
         else
-            pool = (TunnelPool)_clientOutboundPools.get(client); 
+            pool = _clientOutboundPools.get(client); 
         if (pool == null)
             return false;
         return pool.listTunnels().contains(tunnel);
@@ -211,7 +211,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelPoolSettings getInboundSettings(Hash client) { 
         TunnelPool pool = null;
         synchronized (_clientInboundPools) { 
-            pool = (TunnelPool)_clientInboundPools.get(client); 
+            pool = _clientInboundPools.get(client); 
         }
         if (pool != null)
             return pool.getSettings();
@@ -221,7 +221,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelPoolSettings getOutboundSettings(Hash client) { 
         TunnelPool pool = null;
         synchronized (_clientOutboundPools) { 
-            pool = (TunnelPool)_clientOutboundPools.get(client); 
+            pool = _clientOutboundPools.get(client); 
         }
         if (pool != null)
             return pool.getSettings();
@@ -234,10 +234,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings) {
         setSettings(_clientOutboundPools, client, settings);
     }
-    private void setSettings(Map pools, Hash client, TunnelPoolSettings settings) {
+    private void setSettings(Map<Hash, TunnelPool> pools, Hash client, TunnelPoolSettings settings) {
         TunnelPool pool = null;
         synchronized (pools) { 
-            pool = (TunnelPool)pools.get(client); 
+            pool = pools.get(client); 
         }
         if (pool != null) {
             settings.setDestination(client); // prevent spoofing or unset dest
@@ -260,7 +260,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         TunnelPool outbound = null;
         // should we share the clientPeerSelector across both inbound and outbound?
         synchronized (_clientInboundPools) {
-            inbound = (TunnelPool)_clientInboundPools.get(dest);
+            inbound = _clientInboundPools.get(dest);
             if (inbound == null) {
                 inbound = new TunnelPool(_context, this, settings.getInboundSettings(), 
                                          new ClientPeerSelector());
@@ -270,7 +270,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             }
         }
         synchronized (_clientOutboundPools) {
-            outbound = (TunnelPool)_clientOutboundPools.get(dest);
+            outbound = _clientOutboundPools.get(dest);
             if (outbound == null) {
                 outbound = new TunnelPool(_context, this, settings.getOutboundSettings(), 
                                           new ClientPeerSelector());
@@ -294,10 +294,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         TunnelPool inbound = null;
         TunnelPool outbound = null;
         synchronized (_clientInboundPools) {
-            inbound = (TunnelPool)_clientInboundPools.remove(destination);
+            inbound = _clientInboundPools.remove(destination);
         }
         synchronized (_clientOutboundPools) {
-            outbound = (TunnelPool)_clientOutboundPools.remove(destination);
+            outbound = _clientOutboundPools.remove(destination);
         }
         if (inbound != null)
             inbound.shutdown();
@@ -305,20 +305,24 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             outbound.shutdown();
     }
     
+    /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
-        buildComplete();
-        if (cfg.getLength() > 1) {
+        //buildComplete();
+        if (cfg.getLength() > 1 &&
+            !_context.router().gracefulShutdownInProgress()) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
+                // never seen this before, do we reallly need to bother
+                // trying so hard to find his pool?
                 _log.error("How does this not have a pool?  " + cfg, new Exception("baf"));
                 if (cfg.getDestination() != null) {
                     if (cfg.isInbound()) {
                         synchronized (_clientInboundPools) {
-                            pool = (TunnelPool)_clientInboundPools.get(cfg.getDestination());
+                            pool = _clientInboundPools.get(cfg.getDestination());
                         }
                     } else {
                         synchronized (_clientOutboundPools) {
-                            pool = (TunnelPool)_clientOutboundPools.get(cfg.getDestination());
+                            pool = _clientOutboundPools.get(cfg.getDestination());
                         }
                     }
                 } else {
@@ -333,6 +337,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             _context.jobQueue().addJob(new TestJob(_context, cfg, pool));
         }
     }
+
+    /** ?? */
     void buildComplete() {}
     
     public void startup() { 
@@ -384,7 +390,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
     
     /** list of TunnelPool instances currently in play */
-    void listPools(List out) {
+    void listPools(List<TunnelPool> out) {
         synchronized (_clientInboundPools) {
             out.addAll(_clientInboundPools.values());
         }
@@ -407,19 +413,19 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>Exploratory tunnels (<a href=\"/configtunnels.jsp#exploratory\">config</a>):</h2>\n");
         renderPool(out, _inboundExploratory, _outboundExploratory);
         
-        List destinations = null;
+        List<Hash> destinations = null;
         synchronized (_clientInboundPools) {
             destinations = new ArrayList(_clientInboundPools.keySet());
         }
         for (int i = 0; i < destinations.size(); i++) {
-            Hash client = (Hash)destinations.get(i);
+            Hash client = destinations.get(i);
             TunnelPool in = null;
             TunnelPool outPool = null;
             synchronized (_clientInboundPools) {
-                in = (TunnelPool)_clientInboundPools.get(client);
+                in = _clientInboundPools.get(client);
             }
             synchronized (_clientOutboundPools) {
-                outPool = (TunnelPool)_clientOutboundPools.get(client);
+                outPool = _clientOutboundPools.get(client);
             }
             String name = (in != null ? in.getSettings().getDestinationNickname() : null);
             if ( (name == null) && (outPool != null) )
@@ -505,7 +511,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     }
 
     private void renderPool(Writer out, TunnelPool in, TunnelPool outPool) throws IOException {
-        List tunnels = null;
+        List<TunnelInfo> tunnels = null;
         if (in == null)
             tunnels = new ArrayList();
         else
@@ -519,7 +525,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         int live = 0;
         int maxLength = 1;
         for (int i = 0; i < tunnels.size(); i++) {
-            TunnelInfo info = (TunnelInfo)tunnels.get(i);
+            TunnelInfo info = tunnels.get(i);
             if (info.getLength() > maxLength)
                 maxLength = info.getLength();
         }
@@ -536,7 +542,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         out.write("</tr>\n");
         for (int i = 0; i < tunnels.size(); i++) {
-            TunnelInfo info = (TunnelInfo)tunnels.get(i);
+            TunnelInfo info = tunnels.get(i);
             long timeLeft = info.getExpiration()-_context.clock().now();
             if (timeLeft <= 0)
                 continue; // don't display tunnels in their grace period

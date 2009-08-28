@@ -130,10 +130,10 @@ public class RouterAddress extends DataStructureImpl {
                && DataHelper.eq(getTransportStyle(), addr.getTransportStyle());
     }
     
+    /** the style should be sufficient, for speed */
     @Override
     public int hashCode() {
-        return getCost() + DataHelper.hashCode(getTransportStyle()) + DataHelper.hashCode(getExpiration())
-               + DataHelper.hashCode(getOptions());
+        return DataHelper.hashCode(getTransportStyle());
     }
     
     @Override

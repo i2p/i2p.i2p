@@ -150,7 +150,7 @@ public class TunnelParticipant {
     }
 
     private void send(HopConfig config, TunnelDataMessage msg, RouterInfo ri) {
-        if (_context.tunnelDispatcher().shouldDropParticipatingMessage())
+        if (_context.tunnelDispatcher().shouldDropParticipatingMessage("TDM", 1024))
             return;
         _config.incrementSentMessages();
         long oldId = msg.getUniqueId();

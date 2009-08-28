@@ -345,12 +345,12 @@ public class LeaseSet extends DataStructureImpl {
 
     }
     
+    /** the destination has enough randomness in it to use it by itself for speed */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getEncryptionKey()) +
-        //(int)_version +
-               DataHelper.hashCode(_leases) + DataHelper.hashCode(getSignature())
-               + DataHelper.hashCode(getSigningKey()) + DataHelper.hashCode(getDestination());
+        if (_destination == null)
+            return 0;
+        return _destination.hashCode();
     }
     
     @Override

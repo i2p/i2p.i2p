@@ -27,7 +27,7 @@ import net.i2p.data.DataHelper;
  * Bug: a malformed url http://example.i2p (no trailing '/') fails cryptically
  */
 public class EepGet {
-    private I2PAppContext _context;
+    protected I2PAppContext _context;
     protected Log _log;
     protected boolean _shouldProxy;
     private String _proxyHost;
@@ -35,8 +35,8 @@ public class EepGet {
     protected int _numRetries;
     private long _minSize; // minimum and maximum acceptable response size, -1 signifies unlimited,
     private long _maxSize; // applied both against whole responses and chunks
-    private String _outputFile;
-    private OutputStream _outputStream;
+    protected String _outputFile;
+    protected OutputStream _outputStream;
     /** url we were asked to fetch */
     protected String _url;
     /** the URL we actually fetch from (may differ from the _url in case of redirect) */
@@ -47,10 +47,10 @@ public class EepGet {
     
     private boolean _keepFetching;
     private Socket _proxy;
-    private OutputStream _proxyOut;
-    private InputStream _proxyIn;
+    protected OutputStream _proxyOut;
+    protected InputStream _proxyIn;
     protected OutputStream _out;
-    private long _alreadyTransferred;
+    protected long _alreadyTransferred;
     private long _bytesTransferred;
     protected long _bytesRemaining;
     protected int _currentAttempt;
@@ -67,6 +67,10 @@ public class EepGet {
     protected long _fetchInactivityTimeout;
     protected int _redirects;
     protected String _redirectLocation;
+    /** this will be replaced by the HTTP Proxy if we are using it */
+    protected static final String USER_AGENT = "Wget/1.11.4";
+    protected static final long CONNECT_TIMEOUT = 45*1000;
+    protected static final long INACTIVITY_TIMEOUT = 60*1000;
     
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
@@ -118,7 +122,7 @@ public class EepGet {
         _transferFailed = false;
         _headersRead = false;
         _aborted = false;
-        _fetchHeaderTimeout = 45*1000;
+        _fetchHeaderTimeout = CONNECT_TIMEOUT;
         _listeners = new ArrayList(1);
         _etag = etag;
         _lastModified = lastModified;
@@ -134,7 +138,7 @@ public class EepGet {
         int numRetries = 5;
         int markSize = 1024;
         int lineLen = 40;
-        int inactivityTimeout = 60*1000;
+        long inactivityTimeout = INACTIVITY_TIMEOUT;
         String etag = null;
         String saveAs = null;
         String url = null;
@@ -183,7 +187,7 @@ public class EepGet {
 
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, proxyHost, proxyPort, numRetries, saveAs, url, true, etag);
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
-        get.fetch(45*1000, -1, inactivityTimeout);
+        get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout);
     }
     
     public static String suggestName(String url) {
@@ -216,7 +220,7 @@ public class EepGet {
         return buf.toString();
     }
     
-    protected static void usage() {
+    private static void usage() {
         System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] [-t timeout] url");
     }
     
@@ -247,7 +251,7 @@ public class EepGet {
         public void headerReceived(String url, int currentAttempt, String key, String val);
         public void attempting(String url);
     }
-    private class CLIStatusListener implements StatusListener {
+    protected class CLIStatusListener implements StatusListener {
         private int _markSize;
         private int _lineSize;
         private long _startedOn;
@@ -497,7 +501,7 @@ public class EepGet {
         if (_fetchInactivityTimeout > 0)
             timeout.setInactivityTimeout(_fetchInactivityTimeout);
         else
-            timeout.setInactivityTimeout(60*1000);
+            timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
         
         if (_redirectLocation != null) {
             try {
@@ -829,12 +833,12 @@ public class EepGet {
         }
     }
 
-    private void increment(byte[] lookahead, int cur) {
+    private static void increment(byte[] lookahead, int cur) {
         lookahead[0] = lookahead[1];
         lookahead[1] = lookahead[2];
         lookahead[2] = (byte)cur;
     }
-    private boolean isEndOfHeaders(byte lookahead[]) {
+    private static boolean isEndOfHeaders(byte lookahead[]) {
         byte first = lookahead[0];
         byte second = lookahead[1];
         byte third = lookahead[2];
@@ -844,7 +848,7 @@ public class EepGet {
 
     /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
-    private boolean isNL(byte b) { return (b == NL); }
+    private static boolean isNL(byte b) { return (b == NL); }
 
     protected void sendRequest(SocketTimeout timeout) throws IOException {
         if (_outputStream != null) {
@@ -895,7 +899,7 @@ public class EepGet {
     }
     
     protected String getRequest() throws IOException {
-        StringBuilder buf = new StringBuilder(512);
+        StringBuilder buf = new StringBuilder(2048);
         boolean post = false;
         if ( (_postData != null) && (_postData.length() > 0) )
             post = true;
@@ -906,7 +910,7 @@ public class EepGet {
         String path = url.getPath();
         String query = url.getQuery();
         if (query != null)
-            path = path + "?" + query;
+            path = path + '?' + query;
         if (!path.startsWith("/"))
 	    path = "/" + path;
         if ( (port == 80) || (port == 443) || (port <= 0) ) path = proto + "://" + host + path;
@@ -923,12 +927,11 @@ public class EepGet {
             buf.append(_alreadyTransferred);
             buf.append("-\r\n");
         }
-        buf.append("Accept-Encoding: \r\n");
         if (_shouldProxy)
             buf.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
         if (!_allowCaching) {
-            buf.append("Cache-control: no-cache\r\n");
-            buf.append("Pragma: no-cache\r\n");
+            buf.append("Cache-control: no-cache\r\n" +
+                       "Pragma: no-cache\r\n");
         }
         if ((_etag != null) && (_alreadyTransferred <= 0)) {
             buf.append("If-None-Match: ");
@@ -942,7 +945,10 @@ public class EepGet {
         }
         if (post)
             buf.append("Content-length: ").append(_postData.length()).append("\r\n");
-        buf.append("Connection: close\r\n\r\n");
+        // This will be replaced if we are going through I2PTunnelHTTPClient
+        buf.append("User-Agent: " + USER_AGENT + "\r\n" +
+                   "Accept-Encoding: \r\n" +
+                   "Connection: close\r\n\r\n");
         if (post)
             buf.append(_postData);
         if (_log.shouldLog(Log.DEBUG))
