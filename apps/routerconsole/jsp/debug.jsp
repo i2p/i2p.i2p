@@ -1,10 +1,11 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>DEBUG</title>
+<html><head><title>I2P Router Console - Debug</title>
 <%@include file="css.jsp" %>
 </head><body>
 <%@include file="summary.jsp" %>
+<h1>Router SKM</h1>
 <div class="main" id="main">
 <%
     /*
@@ -15,7 +16,7 @@
     /*
      *  Print out the status for all the SessionKeyManagers
      */
-    out.print("<h1>Router SKM</h1>");
+
     ctx.sessionKeyManager().renderStatusHTML(out);
     java.util.Set<net.i2p.data.Destination> clients = ctx.clientManager().listClients();
     for (net.i2p.data.Destination dest : clients) {
