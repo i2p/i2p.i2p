@@ -388,9 +388,13 @@ public class I2PAppContext {
      * The session key manager which coordinates the sessionKey / sessionTag
      * data.  This component allows transparent operation of the 
      * ElGamal/AES+SessionTag algorithm, and contains all of the session tags
-     * for one particular application.  If you want to seperate multiple apps
-     * to have their own sessionTags and sessionKeys, they should use different
-     * I2PAppContexts, and hence, different sessionKeyManagers.
+     * for one particular application.
+     *
+     * This is deprecated for client use, it should be used only by the router
+     * as its own key manager. Not that clients are doing end-to-end crypto anyway.
+     *
+     * For client crypto within the router,
+     * use RouterContext.clientManager.getClientSessionKeyManager(dest)
      *
      */
     public SessionKeyManager sessionKeyManager() { 
