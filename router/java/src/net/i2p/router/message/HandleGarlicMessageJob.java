@@ -31,14 +31,18 @@ import net.i2p.util.Log;
 public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
     private Log _log;
     private GarlicMessage _message;
-    private RouterIdentity _from;
-    private Hash _fromHash;
-    private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
+    //private RouterIdentity _from;
+    //private Hash _fromHash;
+    //private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
     //private MessageHandler _handler;
-    private GarlicMessageParser _parser;
+    //private GarlicMessageParser _parser;
    
     private final static int FORWARD_PRIORITY = 50;
     
+    /**
+     *  @param from ignored
+     *  @param fromHash ignored
+     */
     public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash) {
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
@@ -46,11 +50,11 @@ public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageRece
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New handle garlicMessageJob called w/ message from [" + from + "]", new Exception("Debug"));
         _message = msg;
-        _from = from;
-        _fromHash = fromHash;
-        _cloves = new HashMap();
+        //_from = from;
+        //_fromHash = fromHash;
+        //_cloves = new HashMap();
         //_handler = new MessageHandler(context);
-        _parser = new GarlicMessageParser(context);
+        //_parser = new GarlicMessageParser(context);
     }
     
     public String getName() { return "Handle Inbound Garlic Message"; }
