@@ -28,6 +28,8 @@ class TestJob extends JobImpl {
     private TunnelInfo _outTunnel;
     private TunnelInfo _replyTunnel;
     private PooledTunnelCreatorConfig _otherTunnel;
+    /** save this so we can tell the SKM to kill it if the test fails */
+    private SessionTag _encryptTag;
     
     /** base to randomize the test delay on */
     private static final int TEST_DELAY = 30*1000;
@@ -125,12 +127,12 @@ class TestJob extends JobImpl {
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
-        SessionTag encryptTag = new SessionTag(true);
+        _encryptTag = new SessionTag(true);
         SessionKey sentKey = new SessionKey();
         Set sentTags = null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
                                                               getContext().keyManager().getPublicKey(), 
-                                                              encryptKey, encryptTag);
+                                                              encryptKey, _encryptTag);
 
         if (msg == null) {
             // overloaded / unknown peers / etc
@@ -138,7 +140,8 @@ class TestJob extends JobImpl {
             return;
         }
         Set encryptTags = new HashSet(1);
-        encryptTags.add(encryptTag);
+        encryptTags.add(_encryptTag);
+        // Register the single tag with the SKM
         getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
 
         if (_log.shouldLog(Log.DEBUG))
@@ -304,8 +307,11 @@ class TestJob extends JobImpl {
         public void runJob() {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Timeout: found? " + _found, getAddedBy());
-            if (!_found)
+            if (!_found) {
+                // don't clog up the SKM with old one-tag tagsets
+                getContext().sessionKeyManager().consumeTag(_encryptTag);
                 testFailed(getContext().clock().now() - _started);
+            }
         }
         
         @Override
