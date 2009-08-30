@@ -89,6 +89,8 @@ public class SessionKey extends DataStructureImpl {
 
     @Override
     public String toString() { 
+        return "SessionKey " + toBase64();
+      /****
         if (true) return super.toString(); 
         StringBuilder buf = new StringBuilder(64);
         buf.append("[SessionKey: ");
@@ -103,5 +105,6 @@ public class SessionKey extends DataStructureImpl {
         }
         buf.append("]");
         return buf.toString();
+      ****/
     }
 }

@@ -58,4 +58,8 @@ public class SessionTag extends ByteArray {
         out.write(getData());
     }
 
+    @Override
+    public String toString() {
+        return "SessionTag " + toBase64();
+    }
 }
