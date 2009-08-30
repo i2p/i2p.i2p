@@ -309,7 +309,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         //buildComplete();
         if (cfg.getLength() > 1 &&
-            !_context.router().gracefulShutdownInProgress()) {
+            (!_context.router().gracefulShutdownInProgress()) &&
+            !Boolean.valueOf(_context.getProperty("router.disableTunnelTesting")).booleanValue()) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
                 // never seen this before, do we reallly need to bother
