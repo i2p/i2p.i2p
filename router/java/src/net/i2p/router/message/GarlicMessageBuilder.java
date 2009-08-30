@@ -17,7 +17,7 @@ import java.util.Set;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
@@ -59,14 +59,16 @@ public class GarlicMessageBuilder {
      *
      *  So a value somewhat higher than the low threshold
      *  seems appropriate.
+     *
+     *  Use care when adjusting these values. See ConnectionOptions in streaming,
+     *  and TransientSessionKeyManager in crypto, for more information.
      */
     private static final int DEFAULT_TAGS = 40;
-    private static final int LOW_THRESHOLD = 20;
+    private static final int LOW_THRESHOLD = 30;
 
-    public static int estimateAvailableTags(RouterContext ctx, PublicKey key, Destination local) {
-        // per-dest Unimplemented
-        //SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
-        SessionKeyManager skm = ctx.sessionKeyManager();
+    /** @param local non-null; do not use this method for the router's SessionKeyManager */
+    public static int estimateAvailableTags(RouterContext ctx, PublicKey key, Hash local) {
+        SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);
         if (skm == null)
             return 0;
         SessionKey curKey = skm.getCurrentKey(key);
@@ -75,19 +77,54 @@ public class GarlicMessageBuilder {
         return skm.getAvailableTags(key, curKey);
     }
     
-    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
-        return buildMessage(ctx, config, new SessionKey(), new HashSet());
+    /**
+     * Unused and probably a bad idea.
+     *
+     * Used below only on a recursive call if the garlic message contains a garlic message.
+     * We don't need the SessionKey or SesssionTags returned
+     * This uses the router's SKM, which is probably not what you want.
+     * This isn't fully implemented, because the key and tags aren't saved - maybe
+     * it should force elGamal?
+     *
+     * @param ctx scope
+     * @param config how/what to wrap
+     */
+    private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config) {
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        log.error("buildMessage 2 args, using router SKM", new Exception("who did it"));
+        return buildMessage(ctx, config, new SessionKey(), new HashSet(), ctx.sessionKeyManager());
     }
 
-    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, DEFAULT_TAGS);
+    /**
+     * called by OCMJH
+     *
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
+     */
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
+                                             SessionKeyManager skm) {
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, DEFAULT_TAGS, false, skm);
     }
 
-    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver) {
+    /** unused */
+    /***
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags,
+                                             int numTagsToDeliver) {
         return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, false);
     }
+    ***/
 
-    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver, boolean forceElGamal) {
+    /**
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
+     * @param numTagsToDeliver only if the estimated available tags are below the threshold
+     */
+    private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
+                                             int numTagsToDeliver, boolean forceElGamal, SessionKeyManager skm) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
@@ -104,14 +141,14 @@ public class GarlicMessageBuilder {
         if (log.shouldLog(Log.INFO))
             log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
         
-        SessionKey curKey = ctx.sessionKeyManager().getCurrentKey(key);
+        SessionKey curKey = skm.getCurrentKey(key);
         SessionTag curTag = null;
         if (curKey == null)
-            curKey = ctx.sessionKeyManager().createSession(key);
+            curKey = skm.createSession(key);
         if (!forceElGamal) {
-            curTag = ctx.sessionKeyManager().consumeNextAvailableTag(key, curKey);
+            curTag = skm.consumeNextAvailableTag(key, curKey);
             
-            int availTags = ctx.sessionKeyManager().getAvailableTags(key, curKey);
+            int availTags = skm.getAvailableTags(key, curKey);
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Available tags for encryption to " + key + ": " + availTags);
 
@@ -120,7 +157,7 @@ public class GarlicMessageBuilder {
                     wrappedTags.add(new SessionTag(true));
                 if (log.shouldLog(Log.INFO))
                     log.info("Too few are available (" + availTags + "), so we're including more");
-            } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 60*1000) {
+            } else if (skm.getAvailableTimeLeft(key, curKey) < 60*1000) {
                 // if we have enough tags, but they expire in under 30 seconds, we want more
                 for (int i = 0; i < numTagsToDeliver; i++)
                     wrappedTags.add(new SessionTag(true));
@@ -138,16 +175,19 @@ public class GarlicMessageBuilder {
     }
     
     /**
+     *  used by TestJob and directly above
+     *
      * @param ctx scope
      * @param config how/what to wrap
-     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedKey unused - why??
      * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param target public key of the location being garlic routed to (may be null if we 
      *               know the encryptKey and encryptTag)
      * @param encryptKey sessionKey used to encrypt the current message
      * @param encryptTag sessionTag used to encrypt the current message
      */
-    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, PublicKey target, SessionKey encryptKey, SessionTag encryptTag) {
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
+                                             PublicKey target, SessionKey encryptKey, SessionTag encryptTag) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         if (config == null)
             throw new IllegalArgumentException("Null config specified");
@@ -209,6 +249,7 @@ public class GarlicMessageBuilder {
                         cloves[i] = buildClove(ctx, (PayloadGarlicConfig)c);
                     } else {
                         log.debug("Subclove IS NOT a payload garlic clove");
+                        // See notes below
                         cloves[i] = buildClove(ctx, c);
                     }
                     if (cloves[i] == null)
@@ -242,6 +283,22 @@ public class GarlicMessageBuilder {
         return buildCommonClove(ctx, clove, config);
     }
     
+    /**
+     *  UNUSED
+     *
+     *  The Garlic Message we are building contains another garlic message,
+     *  as specified by a GarlicConfig (NOT a PayloadGarlicConfig).
+     *
+     *  So this calls back to the top, to buildMessage(ctx, config),
+     *  which uses the router's SKM, i.e. the wrong one.
+     *  Unfortunately we've lost the reference to the SessionKeyManager way down here,
+     *  so we can't call buildMessage(ctx, config, key, tags, skm).
+     *
+     *  If we do ever end up constructing a garlic message that contains a garlic message,
+     *  we'll have to fix this by passing the skm through the last buildMessage,
+     *  through buildCloveSet, to here.
+     *
+     */
     private static byte[] buildClove(RouterContext ctx, GarlicConfig config) throws DataFormatException, IOException {
         GarlicClove clove = new GarlicClove(ctx);
         GarlicMessage msg = buildMessage(ctx, config);

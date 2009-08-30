@@ -10,6 +10,7 @@ package net.i2p.router.message;
 
 import java.util.Date;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -32,13 +33,14 @@ public class GarlicMessageParser {
         _log = _context.logManager().getLog(GarlicMessageParser.class);
     }
     
-    public CloveSet getGarlicCloves(GarlicMessage message, PrivateKey encryptionKey) {
+    /** @param skm use tags from this session key manager */
+    public CloveSet getGarlicCloves(GarlicMessage message, PrivateKey encryptionKey, SessionKeyManager skm) {
         byte encData[] = message.getData();
         byte decrData[] = null;
         try {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Decrypting with private key " + encryptionKey);
-            decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey);
+            decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey, skm);
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error decrypting", dfe);

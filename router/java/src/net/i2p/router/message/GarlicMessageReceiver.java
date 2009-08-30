@@ -8,6 +8,7 @@ package net.i2p.router.message;
  *
  */
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
@@ -47,13 +48,16 @@ public class GarlicMessageReceiver {
         _clientDestination = clientDestination;
         _parser = new GarlicMessageParser(context);
         _receiver = receiver;
+        //_log.error("New GMR dest = " + clientDestination);
     }
     
     public void receive(GarlicMessage message) {
         PrivateKey decryptionKey = null;
+        SessionKeyManager skm = null;
         if (_clientDestination != null) {
             LeaseSetKeys keys = _context.keyManager().getKeys(_clientDestination);
-            if (keys != null) {
+            skm = _context.clientManager().getClientSessionKeyManager(_clientDestination);
+            if (keys != null && skm != null) {
                 decryptionKey = keys.getDecryptionKey();
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -62,9 +66,10 @@ public class GarlicMessageReceiver {
             }
         } else {
             decryptionKey = _context.keyManager().getPrivateKey();
+            skm = _context.sessionKeyManager();
         }
         
-        CloveSet set = _parser.getGarlicCloves(message, decryptionKey);
+        CloveSet set = _parser.getGarlicCloves(message, decryptionKey, skm);
         if (set != null) {
             for (int i = 0; i < set.getCloveCount(); i++) {
                 GarlicClove clove = set.getClove(i);

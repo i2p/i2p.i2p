@@ -17,6 +17,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -46,13 +47,15 @@ class OutboundClientMessageJobHelper {
      *
      * For now, its just a tunneled DeliveryStatusMessage
      *
+     * Unused?
+     *
      * @param bundledReplyLeaseSet if specified, the given LeaseSet will be packaged with the message (allowing
      *                             much faster replies, since their netDb search will return almost instantly)
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
                                              Payload data, Hash from, Destination dest, TunnelInfo replyTunnel,
-                                             SessionKey wrappedKey, Set wrappedTags, 
+                                             SessionKey wrappedKey, Set<SessionTag> wrappedTags, 
                                              boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         PayloadGarlicConfig dataClove = buildDataClove(ctx, data, dest, expiration);
         return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, wrappedKey, 
@@ -62,15 +65,18 @@ class OutboundClientMessageJobHelper {
      * Allow the app to specify the data clove directly, which enables OutboundClientMessage to resend the
      * same payload (including expiration and unique id) in different garlics (down different tunnels)
      *
+     * This is called from OCMOSJ
+     *
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
                                              PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel, SessionKey wrappedKey, 
-                                             Set wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
+                                             Set<SessionTag> wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, requireAck, bundledReplyLeaseSet);
         if (config == null)
             return null;
-        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags);
+        GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
+                                                              ctx.clientManager().getClientSessionKeyManager(from));
         return msg;
     }
     
