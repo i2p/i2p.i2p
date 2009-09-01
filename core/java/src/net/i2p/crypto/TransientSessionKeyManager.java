@@ -699,10 +699,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
          */
         List<TagSet> getTagSets() {
             List<TagSet> rv;
-            synchronized (_unackedTagSets) {
-                rv = new ArrayList(_unackedTagSets);
-            }
             synchronized (_tagSets) {
+                rv = new ArrayList(_unackedTagSets);
                 rv.addAll(_tagSets);
             }
             return rv;
@@ -714,17 +712,21 @@ public class TransientSessionKeyManager extends SessionKeyManager {
          *  because the tagset was originally placed directly on the acked list.
          */
         void ackTags(TagSet set) {
-            if (_unackedTagSets.remove(set)) {
-                _tagSets.add(set);
-                _acked = true;
+            synchronized (_tagSets) {
+                if (_unackedTagSets.remove(set)) {
+                    _tagSets.add(set);
+                    _acked = true;
+                }
             }
             set.setAcked();
         }
 
         /** didn't get an ack for these tags */
         void failTags(TagSet set) {
-            _unackedTagSets.remove(set);
-            _tagSets.remove(set);
+            synchronized (_tagSets) {
+                _unackedTagSets.remove(set);
+                _tagSets.remove(set);
+            }
         }
 
         public PublicKey getTarget() {
@@ -919,6 +921,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         /** only used in renderStatusHTML() for debugging */
         public boolean getAcked() { return _acked; }
         
+/******    this will return a dup if two in the same ms, so just use java
         @Override
         public int hashCode() {
             long rv = 0;
@@ -936,6 +939,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
                    //&& DataHelper.eq(ts.getTags(), getTags())
                    && ts.getDate() == _date;
         }
+******/
 
         @Override
         public String toString() {
