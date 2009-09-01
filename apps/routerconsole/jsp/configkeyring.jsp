@@ -40,9 +40,9 @@
           <td class="mediumtags" align="right">Dest. name, hash, or full key:</td>
           <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea></td>
         </tr><tr>
-          <td class="mediumtags" align="right">Session Key:</td>
+          <td class="mediumtags" align="right">Encryption Key:</td>
           <td><input type="text" size="55" name="key" /></td>
         </tr><tr>
-          <td></td>
-          <td align="right"><input type="submit" name="action" value="Add key" /></td>
+          <td align="right" colspan="2"><input type="submit" name="action" value="Add key" />
+             <input type="submit" name="action" value="Delete key" /> <input type="reset" value="Cancel" /></td>
 </tr></table></div></form></div></div></body></html>

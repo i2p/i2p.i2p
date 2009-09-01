@@ -6,7 +6,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.util.ConvertToHash;
 
 /**
- *  Support additions via B64 Destkey, B64 Desthash, or blahblah.i2p
+ *  Support additions via B64 Destkey, B64 Desthash, blahblah.i2p, and others supported by ConvertToHash
  */
 public class ConfigKeyringHandler extends FormHandler {
     private String _peer;
@@ -14,21 +14,36 @@ public class ConfigKeyringHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if ("Add key".equals(_action)) {
-            if (_peer == null || _key == null) {
-                addFormError("You must enter a destination and a key");
+        if (_action == null) return;
+        boolean adding = _action.startsWith("Add");
+        if (adding || _action.startsWith("Delete")) {
+            if (_peer == null)
+                addFormError("You must enter a destination");
+            if (_key == null && adding)
+                addFormError("You must enter a key");
+            if (_peer == null || (_key == null && adding))
                 return;
-            }
             Hash h = ConvertToHash.getHash(_peer);
-            SessionKey sk = new SessionKey();
-            try {
-                sk.fromBase64(_key);
-            } catch (DataFormatException dfe) {}
-            if (h != null && h.getData() != null && sk.getData() != null) {
-                _context.keyRing().put(h, sk);
-                addFormNotice("Key for " + h.toBase64() + " added to keyring");
-            } else {
-                addFormError("Invalid destination or key");
+            if (adding) {
+                SessionKey sk = new SessionKey();
+                try {
+                    sk.fromBase64(_key);
+                } catch (DataFormatException dfe) {}
+                if (h != null && h.getData() != null && sk.getData() != null) {
+                    _context.keyRing().put(h, sk);
+                    addFormNotice("Key for " + h.toBase64() + " added to keyring");
+                } else {
+                    addFormError("Invalid destination or key");
+                }
+            } else {  // Delete
+                if (h != null && h.getData() != null) {
+                    if (_context.keyRing().remove(h) != null)
+                        addFormNotice("Key for " + h.toBase64() + " removed from keyring");
+                    else
+                        addFormNotice("Key for " + h.toBase64() + " not found in keyring");
+                } else {
+                    addFormError("Invalid destination");
+                }
             }
         } else {
             addFormError("Unsupported");
