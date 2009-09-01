@@ -28,20 +28,20 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelDispatcher implements Service {
-    private RouterContext _context;
-    private Log _log;
-    private Map<TunnelId, TunnelGateway> _outboundGateways;
-    private Map<TunnelId, OutboundTunnelEndpoint> _outboundEndpoints;
-    private Map<TunnelId, TunnelParticipant> _participants;
-    private Map<TunnelId, TunnelGateway> _inboundGateways;
-    private Map<TunnelId, HopConfig> _participatingConfig;
+    private final RouterContext _context;
+    private final Log _log;
+    private final Map<TunnelId, TunnelGateway> _outboundGateways;
+    private final Map<TunnelId, OutboundTunnelEndpoint> _outboundEndpoints;
+    private final Map<TunnelId, TunnelParticipant> _participants;
+    private final Map<TunnelId, TunnelGateway> _inboundGateways;
+    private final Map<TunnelId, HopConfig> _participatingConfig;
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     private long _lastParticipatingExpiration;
     private BloomFilterIVValidator _validator;
-    private LeaveTunnel _leaveJob;
+    private final LeaveTunnel _leaveJob;
     /** what is the date/time we last deliberately dropped a tunnel? **/
     private long _lastDropTime;
-    private TunnelGatewayPumper _pumper;
+    private final TunnelGatewayPumper _pumper;
     
     /** Creates a new instance of TunnelDispatcher */
     public TunnelDispatcher(RouterContext ctx) {
@@ -615,14 +615,14 @@ public class TunnelDispatcher implements Service {
         return reject;
     }
 
-    private static final int DROP_BASE_INTERVAL = 40 * 1000;
-    private static final int DROP_RANDOM_BOOST = 10 * 1000;
+    //private static final int DROP_BASE_INTERVAL = 40 * 1000;
+    //private static final int DROP_RANDOM_BOOST = 10 * 1000;
 
     /**
      * If a router is too overloaded to build its own tunnels,
      * the build executor may call this.
      */
-
+/*******
     public void dropBiggestParticipating() {
 
        List<HopConfig> partTunnels = listParticipatingTunnels();
@@ -677,7 +677,8 @@ public class TunnelDispatcher implements Service {
        remove(biggest);
        _lastDropTime = _context.clock().now() + _context.random().nextInt(DROP_RANDOM_BOOST);
     }
-    
+******/
+
     public void startup() {
         // NB: 256 == assume max rate (size adjusted to handle 256 messages per second)
         _validator = new BloomFilterIVValidator(_context, 256);
