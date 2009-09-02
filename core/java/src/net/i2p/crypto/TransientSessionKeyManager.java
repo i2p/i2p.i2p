@@ -56,7 +56,7 @@ import net.i2p.util.SimpleTimer;
  * GarlicMessageBuilder must be chosen with streaming lib windows sizes in mind.
  * If a single TagSet is not delivered, there will be no stall as long as the
  * current window size is smaller than the minimum tag threshold.
- * A second consecutive TagSet delivery failure will cause a complete stall, as
+ * Additional TagSets will be sent before the acked tags completely run out. See below.
  * all subsequent messages will fail to decrypt.
  * See ConnectionOptions in streaming for more information.
  *
@@ -420,7 +420,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
 
         if ( (sessionTags.size() <= 0) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("Received 0 tags for key " + key);
-        if (false) aggressiveExpire();
+        //if (false) aggressiveExpire();
     }
     
     /**
@@ -810,8 +810,14 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             synchronized (_tagSets) {
                 for (int i = 0; i < _tagSets.size(); i++) {
                     TagSet set = _tagSets.get(i);
-                    if (set.getDate() + SESSION_TAG_DURATION_MS > now)
-                        tags += set.getTags().size();
+                    if (set.getDate() + SESSION_TAG_DURATION_MS > now) {
+                        int sz = set.getTags().size();
+                        // so tags are sent when the acked tags are below
+                        // 30, 17, and 4.
+                        if (!set.getAcked())
+                            sz /= 3;
+                        tags += sz;
+                    }
                 }
             }
             return tags;
@@ -860,7 +866,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         private SessionKey _key;
         private long _date;
         //private Exception _createdBy;
-        /** only used in renderStatusHTML() for debugging */
+        /** did we get an ack for this tagset? */
         private boolean _acked;
 
         public TagSet(Set<SessionTag> tags, SessionKey key, long date) {
@@ -918,7 +924,6 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         //public Exception getCreatedBy() { return _createdBy; }
 
         public void setAcked() { _acked = true; }
-        /** only used in renderStatusHTML() for debugging */
         public boolean getAcked() { return _acked; }
         
 /******    this will return a dup if two in the same ms, so just use java
