@@ -1091,7 +1091,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
             buf.append("<b>Peer info for:</b> ").append(hash).append("\n");
-            buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>]</th></tr><td>\n");
+            if (full) {
+                buf.append("[<a href=\"netdb.jsp\" >Back</a>]</th></tr><td>\n");
+            } else {
+                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>]</th></tr><td>\n");
+            }
         }
         
         long age = _context.clock().now() - info.getPublished();

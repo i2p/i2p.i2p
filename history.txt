@@ -1,3 +1,6 @@
+2009-09-02 sponge
+    * Small logic fix for dr|z3d
+
 2009-08-28 zzz
     * Client: Fail if no date handshake after 30s or no leaseset
       after 5m, rather than hanging forever.
