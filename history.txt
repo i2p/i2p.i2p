@@ -1,3 +1,28 @@
+2009-09-04 zzz
+    * SessionKeyManager, OCMOSJ, Garlic:
+      - Enable per-client SessionKeyManagers for better anonymity
+      - tagsDelivered() now means tags are sent, not acked.
+      - OCMOSJ uses the new TagSetHandle object returned from tagsDelivered()
+        to call tagsAcked() or failTags() as appropriate.
+      - Assume tags delivered on an established session to
+        reduce streaming lib stalls caused by massive tag deliveries;
+        should increase throughput and window sizes on long-lived streams
+      - Unacked tagsets on a new session are stored on a separate list
+      - Don't kill an OB Session just because it's temporarily out of tags
+      - Increase min tag threshold to 30 (was 20) due to new speculative
+        tags delivered scheme, and to increase effective max window
+      - More Java 5 and dead code cleanups, and more comments and javadoc,
+        debug logging cleanups
+      - Key toString()s for easier debugging
+      - HandleGarlicMessageJob: cleanup of unused things
+    * Tunnel TestJob:
+      - Consume the tag after a failed test so it doesn't
+        stay in the SKM
+      - Disable tests with router.disableTunnelTesting=true
+    * configkeyring.jsp: Add delete and cancel buttons
+    * Logging: Fix directory for rotated log
+    * TunnelDispatcher: Cleanup
+
 2009-09-02 sponge
     * Small logic fix for dr|z3d
 
