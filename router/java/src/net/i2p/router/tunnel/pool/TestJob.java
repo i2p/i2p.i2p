@@ -3,6 +3,7 @@ package net.i2p.router.tunnel.pool;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
@@ -130,12 +131,13 @@ class TestJob extends JobImpl {
         payload.setExpiration(m.getMessageExpiration());
 
         SessionKey encryptKey = getContext().keyGenerator().generateSessionKey();
-        _encryptTag = new SessionTag(true);
+        SessionTag encryptTag = new SessionTag(true);
+        _encryptTag = encryptTag;
         SessionKey sentKey = new SessionKey();
         Set sentTags = null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(getContext(), payload, sentKey, sentTags, 
                                                               getContext().keyManager().getPublicKey(), 
-                                                              encryptKey, _encryptTag);
+                                                              encryptKey, encryptTag);
 
         if (msg == null) {
             // overloaded / unknown peers / etc
@@ -143,9 +145,15 @@ class TestJob extends JobImpl {
             return;
         }
         Set encryptTags = new HashSet(1);
-        encryptTags.add(_encryptTag);
-        // Register the single tag with the SKM
-        getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
+        encryptTags.add(encryptTag);
+        // Register the single tag with the appropriate SKM
+        if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+            SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
+            if (skm != null)
+                skm.tagsReceived(encryptKey, encryptTags);
+        } else {
+            getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
+        }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending garlic test of " + _outTunnel + " / " + _replyTunnel);
@@ -312,7 +320,13 @@ class TestJob extends JobImpl {
                 _log.warn("Timeout: found? " + _found, getAddedBy());
             if (!_found) {
                 // don't clog up the SKM with old one-tag tagsets
-                getContext().sessionKeyManager().consumeTag(_encryptTag);
+                if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
+                    SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());
+                    if (skm != null)
+                        skm.consumeTag(_encryptTag);
+                } else {
+                    getContext().sessionKeyManager().consumeTag(_encryptTag);
+                }
                 testFailed(getContext().clock().now() - _started);
             }
         }
