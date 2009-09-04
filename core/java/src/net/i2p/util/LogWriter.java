@@ -196,7 +196,10 @@ class LogWriter implements Runnable {
         _rotationNum++;
         if (_rotationNum > max) _rotationNum = 0;
 
-        return new File(replace(pattern, _rotationNum));
+        String newf = replace(pattern, _rotationNum);
+        if (base != null)
+            return new File(base, newf);
+        return new File(newf);
     }
 
     /**
