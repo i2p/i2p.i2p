@@ -102,8 +102,8 @@ public abstract class SAMHandler implements Runnable {
     }
     
     static public void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
-    	while (data.hasRemaining()) out.write(data);           
-    	out.socket().getOutputStream().flush();
+        while (data.hasRemaining()) out.write(data);           
+        out.socket().getOutputStream().flush();
     }
     
     /** 
@@ -124,9 +124,13 @@ public abstract class SAMHandler implements Runnable {
      * @return True if the string was successfully written, false otherwise
      */
     protected final boolean writeString(String str) {
+        boolean success;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending the client: [" + str + "]");
-        return writeString(str, socket);
+        synchronized (socketWLock) {
+            success = writeString(str, socket);
+        }
+        return success;
     }
 
     public static boolean writeString(String str, SocketChannel out)
