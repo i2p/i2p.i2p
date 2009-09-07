@@ -1,3 +1,6 @@
+2009-09-07 mkvore
+    * removes a SAM v1&2 bug
+
 2009-09-04 zzz
     * SessionKeyManager, OCMOSJ, Garlic:
       - Enable per-client SessionKeyManagers for better anonymity
