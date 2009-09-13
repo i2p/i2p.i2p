@@ -102,8 +102,8 @@ public abstract class SAMHandler implements Runnable {
     }
     
     static public void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
-    	while (data.hasRemaining()) out.write(data);           
-    	out.socket().getOutputStream().flush();
+        while (data.hasRemaining()) out.write(data);           
+        out.socket().getOutputStream().flush();
     }
     
     /** 
