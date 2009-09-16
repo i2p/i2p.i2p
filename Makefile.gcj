@@ -5,7 +5,7 @@
 GCJ=gcj #/usr/local/gcc-4.0.2/bin/gcj
 EXTRA_LD_PATH= #/usr/local/gcc-4.0.2/lib
 ANT=ant #/opt/apache-ant-1.6.5/bin/ant
-ANT_TARGET=buildclean
+ANT_TARGET=build2
 NATIVE_DIR=native
 
 ## 
@@ -24,20 +24,22 @@ JAR_BASE=i2p.jar mstreaming.jar streaming.jar
 JAR_CLIENTS=i2ptunnel.jar sam.jar
 JAR_ROUTER=router.jar
 JAR_JBIGI=jbigi.jar
-JAR_XML=xml-apis.jar resolver.jar xercesImpl.jar
 JAR_CONSOLE=\
-            i2psnark.jar \
             javax.servlet.jar \
             commons-el.jar \
             commons-logging.jar \
 	    jasper-runtime.jar \
-            ant-apache-bcel.jar \
-            ant.jar \
             jasper-compiler.jar \
             org.mortbay.jetty.jar \
 	    routerconsole.jar
-JAR_SUCKER=jdom.jar rome-0.7.jar sucker.jar
 LIBI2P_JARS=${JAR_BASE} ${JAR_CLIENTS} ${JAR_ROUTER} ${JAR_JBIGI}
+LIBSAM_JARS=${JAR_BASE} sam.jar
+LIBROUTER_JARS=i2p.jar ${JAR_ROUTER} ${JAR_JBIGI}
+LIBCONSOLE_JARS=${LIBROUTER_JARS} ${JAR_CONSOLE}
+LIBSNARK_JARS=${LIBROUTER_JARS} i2psnark.jar
+# update:
+# similar error with gcj 4.3.3.
+#
 # unfortunately, its not quite ready for most end users, as the
 # ${JAR_CONSOLE} fails to compile with: 
 # org/apache/commons/logging/impl/LogKitLogger.java: In class 'org.apache.commons.logging.impl.LogKitLogger':
@@ -95,7 +97,36 @@ native_shared: libi2p.so
 	@echo "  i2ptunnel will, so it will start all the proxies defined in i2ptunnel.config"
 
 libi2p.so:
-	@echo "* Building libi2p.so"
-	@(cd build ; time ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/libi2p.so ${LIBI2P_JARS} ; cd .. )
-	@ls -l ${NATIVE_DIR}/libi2p.so
-	@echo "* libi2p.so built"
+	@echo "* Building $@"
+	@(cd build ; time ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/$@ ${LIBI2P_JARS} ; cd .. )
+	@ls -l ${NATIVE_DIR}/$@
+	@echo "* $@ built"
+
+sam: jars libi2psam.so
+
+libi2psam.so:
+	@echo "* Building $@"
+	@rm -f ${NATIVE_DIR}/$@
+	@(cd build ; time ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/$@ ${LIBSAM_JARS} ; cd .. )
+	@ls -l ${NATIVE_DIR}/$@
+	@echo "* $@ built"
+
+router: jars libi2prouter.so
+
+libi2prouter.so:
+	@echo "* Building $@"
+	@rm -f ${NATIVE_DIR}/$@
+	@(cd build ; time ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/$@ ${LIBROUTER_JARS} ; cd .. )
+	@ls -l ${NATIVE_DIR}/$@
+	@echo "* $@ built"
+
+console: jars libi2pconsole.so
+
+# doesn't work, see above
+libi2pconsole.so:
+	@echo "* Building $@"
+	@rm -f ${NATIVE_DIR}/$@
+	@(cd build ; time ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/$@ ${LIBCONSOLE_JARS} ; cd .. )
+	@ls -l ${NATIVE_DIR}/$@
+	@echo "* $@ built"
+
