@@ -292,7 +292,7 @@ class ProfileOrganizerRenderer {
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
     private final static String na = "n/a";
 
-    String avg (PeerProfile prof, long rate) {
+    private static String avg (PeerProfile prof, long rate) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
                 return na;
@@ -306,7 +306,7 @@ class ProfileOrganizerRenderer {
             return Math.round(d/c) + "ms";
     }
 
-    String davg (DBHistory dbh, long rate) {
+    private static String davg (DBHistory dbh, long rate) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
                 return na;
