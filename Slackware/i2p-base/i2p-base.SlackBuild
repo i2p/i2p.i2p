@@ -24,7 +24,7 @@ mkdir -p $PKG
 # es: usr/local
 NAME=i2p-base
 VERSION=0.0.1
-BUILD=1sim
+BUILD=1sponge
 ARCH=noarch
 INSTALL_DIR=opt
 cd $PKG
@@ -38,5 +38,9 @@ sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
-requiredbuilder -v -y -s $CWD $PKG
+#
+# Not really that important to exec this.
+#requiredbuilder -v -y -s $CWD $PKG
+#
+cat $CWD/slack-required > $PKG/install/slack-required
 makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.tgz

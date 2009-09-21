@@ -1,2 +1,4 @@
-glibc >= 2.7-i486-17 | glibc-solibs >= 2.7-i486-17
-perl >= 5.10.0-i486-1
+jre >= 5
+i2p-base >= 0.0.1
+bash >= 3.1.017
+

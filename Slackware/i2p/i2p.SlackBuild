@@ -15,7 +15,7 @@
 # It's suggested to subscribe to various dns host, like i2host.i2p
 # For any additional information, visit i2host.i2p and forum.i2p
 
-BUILD=1sim
+BUILD=1sponge
 
 # put here installation dir, without first and last /
 # eg: usr/local
@@ -113,5 +113,11 @@ sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
-requiredbuilder -v -y -s $CWD $PKG
+#
+# requiredbuilder fucks up REALLY bad, and thinks java is perl?!
+# It also did not catch the shell requirements! BOOOOOOOOOOO! HISSSSSSSS!
+#
+#requiredbuilder -v -y -s $CWD $PKG
+#
+cat $CWD/slack-required > $PKG/install/slack-required
 makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.tgz
