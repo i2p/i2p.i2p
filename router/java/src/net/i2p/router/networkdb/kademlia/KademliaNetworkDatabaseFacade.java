@@ -1003,7 +1003,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         StringBuilder buf = new StringBuilder(size);
         out.write("<h2>Network Database Contents (<a href=\"netdb.jsp?l=1\">View LeaseSets</a>)</h2>\n");
         if (!_initialized) {
-            buf.append("<i>Not initialized</i>\n");
+            buf.append("Not initialized\n");
             out.write(buf.toString());
             out.flush();
             return;
@@ -1052,8 +1052,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             buf.append("<tr><th>Version</th><th>Count</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
-                buf.append("<tr><td>").append(DataHelper.stripHTML(routerVersion));
-                buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
+                buf.append("<tr><td align=\"center\">").append(DataHelper.stripHTML(routerVersion));
+                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }
@@ -1071,7 +1071,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
                 buf.append(_context.commSystem().getCountryName(country));
-                buf.append("</td><td align=\"right\">").append(num).append("</td></tr>\n");
+                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }
@@ -1086,21 +1086,26 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
+        buf.append("<table><tr><th><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b><br>\n");
+            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
-            buf.append("<b>Peer info for:</b> ").append(hash).append("<br>\n");
+            buf.append("<b>Peer info for:</b> ").append(hash).append("\n");
+            if (full) {
+                buf.append("[<a href=\"netdb.jsp\" >Back</a>]</th></tr><td>\n");
+            } else {
+                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>]</th></tr><td>\n");
+            }
         }
         
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden())
-            buf.append("Hidden, Updated: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br>\n");
+            buf.append("<b>Hidden, Updated:</b> ").append(DataHelper.formatDuration(age)).append(" ago<br>\n");
         else if (age > 0)
-            buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br>\n");
+            buf.append("<b>Published:</b> ").append(DataHelper.formatDuration(age)).append(" ago<br>\n");
         else
-            buf.append("Published: <i>in ").append(DataHelper.formatDuration(0-age)).append("???</i><br>\n");
-        buf.append("Address(es): <i>");
+            buf.append("<b>Published:</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
+        buf.append("<b>Address(es):</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
@@ -1115,19 +1120,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 buf.append('[').append(DataHelper.stripHTML(name)).append('=').append(DataHelper.stripHTML(val)).append("] ");
             }
         }
-        buf.append("</i><br>\n");
+        buf.append("</td></tr>\n");
         if (full) {
-            buf.append("Stats: <br><i><code>\n");
+            buf.append("<tr><td>Stats: <br><code>\n");
             for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 String val = info.getOption(key);
                 buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");
             }
-            buf.append("</code></i>\n");
+            buf.append("</code></td></tr>\n");
         } else {
-            buf.append("<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>\n");
         }
-        buf.append("<hr>\n");
+        buf.append("</td></tr>\n");
     }
-    
+
 }

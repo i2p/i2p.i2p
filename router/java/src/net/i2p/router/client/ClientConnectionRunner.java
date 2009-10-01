@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -188,11 +189,11 @@ public class ClientConnectionRunner {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SessionEstablished called for destination " + _destHashCache.toBase64());
         _config = config;
-        // per-dest unimplemented
-        //if (_sessionKeyManager == null)
-        //    _sessionKeyManager = new TransientSessionKeyManager(_context);
-        //else
-        //    _log.error("SessionEstablished called for twice for destination " + _destHashCache.toBase64().substring(0,4));
+        // per-destination session key manager to prevent rather easy correlation
+        if (_sessionKeyManager == null)
+            _sessionKeyManager = new TransientSessionKeyManager(_context);
+        else
+            _log.error("SessionEstablished called for twice for destination " + _destHashCache.toBase64().substring(0,4));
         _manager.destinationEstablished(this);
     }
     

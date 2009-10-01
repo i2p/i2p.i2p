@@ -128,6 +128,10 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
         return sendMessage(dest, payload, 0, payload.length, null, null, 0, proto, fromport, toport);
     }
 
+    /**
+     * @param keyUsed unused - no end-to-end crypto
+     * @param tagsSent unused - no end-to-end crypto
+     */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                SessionKey keyUsed, Set tagsSent, long expires)
@@ -135,6 +139,10 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
         return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0, PROTO_UNSPECIFIED, PORT_UNSPECIFIED, PORT_UNSPECIFIED);
     }
 
+    /**
+     * @param keyUsed unused - no end-to-end crypto
+     * @param tagsSent unused - no end-to-end crypto
+     */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
                                int proto, int fromport, int toport) throws I2PSessionException {
@@ -142,6 +150,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
     }
 
     /**
+     *  @param keyUsed unused - no end-to-end crypto
+     *  @param tagsSent unused - no end-to-end crypto
      *  @param proto 1-254 or 0 for unset; recommended:
      *         I2PSession.PROTO_UNSPECIFIED
      *         I2PSession.PROTO_STREAMING

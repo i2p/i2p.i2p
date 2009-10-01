@@ -1,3 +1,103 @@
+2009-09-21 sponge
+    * fixups to SlackBuilds. requiredbuilder does the wrong thing, and
+      thinks that java is perl! This isn't really a big deal, 
+      the file format is simple enough and the requirements are known.
+
+2009-09-07 mkvore
+    * removes a SAM v1&2 bug
+
+2009-09-04 zzz
+    * SessionKeyManager, OCMOSJ, Garlic:
+      - Enable per-client SessionKeyManagers for better anonymity
+      - tagsDelivered() now means tags are sent, not acked.
+      - OCMOSJ uses the new TagSetHandle object returned from tagsDelivered()
+        to call tagsAcked() or failTags() as appropriate.
+      - Assume tags delivered on an established session to
+        reduce streaming lib stalls caused by massive tag deliveries;
+        should increase throughput and window sizes on long-lived streams
+      - Unacked tagsets on a new session are stored on a separate list
+      - Don't kill an OB Session just because it's temporarily out of tags
+      - Increase min tag threshold to 30 (was 20) due to new speculative
+        tags delivered scheme, and to increase effective max window
+      - More Java 5 and dead code cleanups, and more comments and javadoc,
+        debug logging cleanups
+      - Key toString()s for easier debugging
+      - HandleGarlicMessageJob: cleanup of unused things
+    * Tunnel TestJob:
+      - Consume the tag after a failed test so it doesn't
+        stay in the SKM
+      - Disable tests with router.disableTunnelTesting=true
+    * configkeyring.jsp: Add delete and cancel buttons
+    * Logging: Fix directory for rotated log
+    * TunnelDispatcher: Cleanup
+
+2009-09-02 sponge
+    * Small logic fix for dr|z3d
+
+2009-08-28 zzz
+    * Client: Fail if no date handshake after 30s or no leaseset
+      after 5m, rather than hanging forever.
+    * Console:
+      - Prevent OOMs in NewsFetcher or StatsSummarizer from
+        killing the router
+      - Fix favicon (-17)
+    * Data: Speed up many hashcodes
+    * DataHelper: Fix byte array hashcode for small arrays
+    * DecayingBloomFilter:
+      - Replace with new DecayingHashSet for 3 of 4 uses,
+        and also in the 4th if the router is low-bandwidth.
+        Saves 8 MB heap.
+    * EepGet, I2PSnark:
+      - New I2PSocketEepGet fetches through existing tunnels
+        rather than through the proxy
+      - Use new eepget for i2psnark
+      - Add a fake user agent for non-proxied fetches
+      - Cleanups
+    * NetDb:
+      - oops, store leaseset locally even when shutting down
+        (fix -16)
+      - Java 5 cleanups
+    * PRNG:
+      - Rename config option to prng.buffers (was router.prng.buffers)
+      - Change the default from 16 to 2 for I2PAppContext (saves 3.5MB)
+    * Tunnel:
+      - Adjust the random drop probability for the message size
+      - Concurrentify HashSetIVValidator
+    * TunnelPool:
+      - Don't test tunnels when shutting down
+      - Less rates
+      - Java 5 cleanups
+
+2009-08-24 zzz
+    * ClientManager:
+      - Prevent client destination theft by rejecting duplicates
+      - Java 5 cleanups
+    * Console:
+      - Put favicon on every page
+      - Make every page UTF-8, ☃ safe for snowmen
+      - Remove options boxes on configtunnels.jsp
+      - Fix UTF-8 form submission (i2ptunnel too)
+      - Throw 403 instead of 404 from flags.jsp and viewstat.jsp
+        so we don't render error.jsp
+    * I2CP: Fix the SessionConfig serializer in DataHelper,
+      so that UTF-8 tunnel names are not corrupted by
+      I2CP and can be displayed on the console
+    * Message: Move 2 unused classes out of the router lib (~15KB)
+      (more SKM prep)
+    * Message, I2PSession, SessionKeyManager, Console:
+      Prep for SessionKeyManager work in the router -
+      Fix up SKM renderStatusHTML(); add debug.jsp to see it;
+      Redefine getClientSessionKeyManager();
+      More cleanups
+    * Ministreaming: Kill deprecation warnings
+    * profiles.jsp: Bulletproofing, less memory usage
+    * Streaming, I2PSession:
+      Prep for SessionKeyManager work in the router -
+      Comment out, deprecate, and javadoc for unused keys and tags,
+      they are vestiges of end-to-end crypto
+    * Updates: Verify zip at startup before extracting
+    * Wrapper: Take a couple fields out of the log so it's narrower
+
 2009-08-20 zzz
     * Config files:
       - Add some path and encoding help

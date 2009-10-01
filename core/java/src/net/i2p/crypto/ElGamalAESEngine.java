@@ -59,14 +59,18 @@ public class ElGamalAESEngine {
     }
 
     /**
-     * Decrypt the message using the given private key using tags from the given key manager.
+     * Decrypt the message using the given private key using tags from the default key manager.
+     *
+     * @deprecated specify the key manager!
      */
     public byte[] decrypt(byte data[], PrivateKey targetPrivateKey) throws DataFormatException {
         return decrypt(data, targetPrivateKey, _context.sessionKeyManager());
     }
 
     /**
-     * Decrypt the message using the given private key.  This works according to the
+     * Decrypt the message using the given private key
+     * and using tags from the specified key manager.
+     * This works according to the
      * ElGamal+AES algorithm in the data structure spec.
      *
      */

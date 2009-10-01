@@ -12,7 +12,7 @@ import org.bouncycastle.crypto.macs.I2PHMac;
 
 /**
  * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
- * in {@link org.bouncycastle.crypto.macs.HMac} and 
+ * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
  * {@link org.bouncycastle.crypto.digests.MD5Digest}.
  *
  */

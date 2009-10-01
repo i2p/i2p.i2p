@@ -349,24 +349,35 @@ public class ConnectionManager {
             return new HashSet(_connectionByInboundId.values());
         }
     }
+
+    /** blocking */
     public boolean ping(Destination peer, long timeoutMs) {
-        return ping(peer, timeoutMs, true);
+        return ping(peer, timeoutMs, true, null);
     }
     public boolean ping(Destination peer, long timeoutMs, boolean blocking) {
-        return ping(peer, timeoutMs, blocking, null, null, null);
+        return ping(peer, timeoutMs, blocking, null);
     }
 
+    /**
+     * @deprecated I2PSession ignores tags, use non-tag variant
+     * @param keyToUse ignored
+     * @param tagsToSend ignored
+     */
     public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set tagsToSend, PingNotifier notifier) {
+        return ping(peer, timeoutMs, blocking, notifier);
+    }
+
+    public boolean ping(Destination peer, long timeoutMs, boolean blocking, PingNotifier notifier) {
         Long id = new Long(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
         PacketLocal packet = new PacketLocal(_context, peer);
         packet.setSendStreamId(id.longValue());
         packet.setFlag(Packet.FLAG_ECHO);
         packet.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         packet.setOptionalFrom(_session.getMyDestination());
-        if ( (keyToUse != null) && (tagsToSend != null) ) {
-            packet.setKeyUsed(keyToUse);
-            packet.setTagsSent(tagsToSend);
-        }
+        //if ( (keyToUse != null) && (tagsToSend != null) ) {
+        //    packet.setKeyUsed(keyToUse);
+        //    packet.setTagsSent(tagsToSend);
+        //}
         
         PingRequest req = new PingRequest(peer, packet, notifier);
         
@@ -435,7 +446,7 @@ public class ConnectionManager {
         }
         public void pong() { 
             _log.debug("Ping successful");
-            _context.sessionKeyManager().tagsDelivered(_peer.getPublicKey(), _packet.getKeyUsed(), _packet.getTagsSent());
+            //_context.sessionKeyManager().tagsDelivered(_peer.getPublicKey(), _packet.getKeyUsed(), _packet.getTagsSent());
             synchronized (ConnectionManager.PingRequest.this) {
                 _ponged = true; 
                 ConnectionManager.PingRequest.this.notifyAll();

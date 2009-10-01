@@ -85,13 +85,13 @@ public abstract class ClientManagerFacade implements Service {
      *
      * @return set of Destination objects
      */
-    public Set listClients() { return Collections.EMPTY_SET; }
+    public Set<Destination> listClients() { return Collections.EMPTY_SET; }
     
     /**
      * Return the client's current config, or null if not connected
      *
      */
     public abstract SessionConfig getClientSessionConfig(Destination dest);
-    public abstract SessionKeyManager getClientSessionKeyManager(Destination dest);
+    public abstract SessionKeyManager getClientSessionKeyManager(Hash dest);
     public void renderStatusHTML(Writer out) throws IOException { }
 }

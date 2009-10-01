@@ -37,13 +37,13 @@ FreeBSD*)
 Linux*)
 	COMPILEFLAGS="-fPIC -Wall"
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
-	LINKFLAGS="-shared -static -static-libgcc -Wl,-soname,libjcpuid-x86-linux.so"
+	LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
 	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-linux.so";;
 esac
 
 echo "Compiling C code..."
 rm -f $LIBFILE
-$CC $LINKFLAGS $INCLUDES src/*.c -o $LIBFILE
+$CC $COMPILEFLAGS $LINKFLAGS $INCLUDES src/*.c -o $LIBFILE
 strip $LIBFILE
 echo Built $LIBFILE
 

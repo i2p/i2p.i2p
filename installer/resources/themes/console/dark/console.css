@@ -223,6 +223,34 @@ div.warning {
      word-wrap: break-word;
 }
 
+/* console error messages */
+
+div.sorry {
+     margin: 5px 15px 10px 220px;
+     padding: 20px 20px 20px 75px;
+     background: #005;
+     border: 1px solid #99f;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image:url("images/errortriangle.png");
+     background-position:15px center;
+     background-repeat:no-repeat;
+     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     word-wrap: break-word;
+     font-weight: bold;
+     color: #eef;
+}
+
+div.sorry hr {
+     color: #eef;
+     background: #eef;
+     height: 1px;
+     border: 1px solid #eef;
+     margin: 10px 0;
+}     
+
 div.main {
      margin: 0px 0px 20px 195px;
      padding: 0 15px 15px 25px;

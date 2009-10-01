@@ -1,7 +1,7 @@
 /* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
 
 body {
-     margin: 25px 10px 0 5px;
+     margin: 15px 0 0 10px;
      padding: 0em;
      text-align: center;
      background: #eef;
@@ -23,6 +23,7 @@ pre {
      text-align: left;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #333;
+     margin: 10px;
 }
 
 div.logo {
@@ -78,7 +79,7 @@ a:active{
 div.routersummaryouter {
      float: left;
      width: 215px;
-     margin: 0 0 10px 20px;
+     margin: 0 0 10px 0px;
      padding: 0;
      border: 0;
      clear: left;/* fixes a bug in Opera */
@@ -183,7 +184,6 @@ div.routersummary td {
      border: 0 !important;
 }
 
-
 div.routersummary tr:nth-child(even) {
      background-color: #f60;
      background-image: none !important;
@@ -193,6 +193,8 @@ div.routersummarytr:nth-child(odd) {
      background-color: #f00;
      background-image: none !important;
 }
+
+/* proxy error messages */
 
 div.warning {
      margin: 5px 20px 10px 240px;
@@ -212,8 +214,36 @@ div.warning {
      word-wrap: break-word;
 }
 
+/* console error messages */
+
+div.sorry {
+     margin: 5px 15px 10px 220px;
+     padding: 20px 20px 20px 75px;
+     background: #ffb;
+     border: 1px solid #002;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     text-align: justify;
+     background-image: url("images/errortriangle.png");
+     background-position: 15px center;
+     background-repeat: no-repeat;
+     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
+     word-wrap: break-word;
+     font-weight: bold;
+     color: #331;
+}
+
+div.sorry hr {
+     color: #552;
+     background: #552;
+     height: 1px;
+     border: 1px solid #552;
+     margin: 10px 0;
+}     
+
 div.main {
-     margin: 0px 0px 20px 220px;
+     margin: 0px 0px 20px 195px;
      padding: 0 15px 15px 25px;
      background: #eef;
      text-align: left;
@@ -237,7 +267,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0px 15px 20px 245px;
+     margin: 0px 15px 10px 220px;
      padding: 20px 30px 20px 30px;
      border: 1px solid #003;
      color: #410;
@@ -302,7 +332,7 @@ div.news h4 {
 
 div.confignav {
      padding: 15px 10px !important;
-     margin: 0 0 25px 0;
+     margin: 0 0px 15px 0;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -316,8 +346,8 @@ div.confignav {
 }
 
 div.configure {
-     padding: 0 15px 15px 15px !important;
-     margin: 10px 0px 25px 0;
+     padding: 0 15px 0px 15px !important;
+     margin: 0px 0px 15px 0;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -325,6 +355,17 @@ div.configure {
      border: 1px solid #000022;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      min-width: 400px;
+}
+
+div.configure h3, div.graphspanel h3 {
+     border: 1px solid #002;
+     border-left: 5px solid #002;
+     padding: 3px 5px 3px 5px;
+     margin: 15px 0 15px 0;
+     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 0 4px 4px 0;
+     -khtml-border-radius: 0 4px 4px 0;
+     background: #eef;
 }
 
 div.graphspanel {
@@ -365,7 +406,7 @@ div.graphspanel form {
 
 div.messages {
      padding: 10px;
-     margin: 10px 0 20px 0;
+     margin: 10px 0 15px 0;
      background: #ddf;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -397,7 +438,7 @@ table {
      border-collapse: collapse;
      width: 100%;
      border: 1px solid #000022;
-     margin: 5px 0px 5px 0px;
+     margin: 10px -15px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
@@ -462,7 +503,7 @@ div.main li {
      text-align: left;
      list-style: square;
      margin: 2px 5px 0px 20px;
-     padding: 1px 20px 1px 10px;
+     padding: 1px 10px 1px 10px;
      line-height: 150%;
      word-wrap: break-word;
 }
@@ -528,7 +569,7 @@ h1 {
      text-align: left;
      color: #002;
      padding: 10px 15px;
-     margin: 0 15px 25px 245px;
+     margin: 0 15px 15px 220px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
@@ -554,7 +595,7 @@ h2 {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     margin: 25px 0 20px 0 !important;
+     margin: 15px 0px 10px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
 }
@@ -571,7 +612,7 @@ h3 {
      border: 1px solid #002;
      border-left: 5px solid #002;
      padding: 3px 5px 3px 5px;
-     margin: 20px 0 15px 0;
+     margin: 10px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
@@ -764,8 +805,8 @@ form {}
 }
 
 .joblog {
-     margin: 25px 0 25px 0;
-     padding: 20px 40px 20px 40px !important;
+     margin: 15px 0;
+     padding: 10px 20px !important;
      border: 1px solid #003;
      background-color: #004;
      background: #ddf url('images/lightbluetile.png');
@@ -784,6 +825,10 @@ form {}
 
  .joblog:ul {
      word-wrap: break-word !important;
+}
+
+.joblog table {
+     margin-top: 10px;
 }
 
 .smallhead {

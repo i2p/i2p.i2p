@@ -354,6 +354,7 @@ public class Connection {
          */
     }
     
+/*********
     private class PingNotifier implements ConnectionManager.PingNotifier {
         private long _startedPingOn;
         public PingNotifier() {
@@ -367,6 +368,7 @@ public class Connection {
                 _options.updateRTT((int)time*2);
         }
     }
+*********/
     
     List ackPackets(long ackThrough, long nacks[]) {
         if (ackThrough < _highestAckedThrough) {
@@ -548,20 +550,21 @@ public class Connection {
         killOutstandingPackets();
     }
     
+    /** ignore tag issues */
     private void killOutstandingPackets() {
-        boolean tagsCancelled = false;
+        //boolean tagsCancelled = false;
         synchronized (_outboundPackets) {
             for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
                 PacketLocal pl = (PacketLocal)iter.next();
-                if ( (pl.getTagsSent() != null) && (pl.getTagsSent().size() > 0) )
-                    tagsCancelled = true;
+                //if ( (pl.getTagsSent() != null) && (pl.getTagsSent().size() > 0) )
+                //    tagsCancelled = true;
                 pl.cancelled();
             }
             _outboundPackets.clear();
             _outboundPackets.notifyAll();
         }            
-        if (tagsCancelled)
-            _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
+        //if (tagsCancelled)
+        //    _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
     }
     
     private class DisconnectEvent implements SimpleTimer.TimedEvent {
@@ -1140,12 +1143,12 @@ public class Connection {
                 
                 // in case things really suck, the other side may have lost thier
                 // session tags (e.g. they restarted), so jump back to ElGamal.
-                int failTagsAt = _options.getMaxResends() - 2;
-                if ( (newWindowSize == 1) && (numSends == failTagsAt) ) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Optimistically failing tags at resend " + numSends);
-                    _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
-                }
+                //int failTagsAt = _options.getMaxResends() - 2;
+                //if ( (newWindowSize == 1) && (numSends == failTagsAt) ) {
+                //    if (_log.shouldLog(Log.WARN))
+                //        _log.warn("Optimistically failing tags at resend " + numSends);
+                //    _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
+                //}
                 
                 if (numSends - 1 > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))

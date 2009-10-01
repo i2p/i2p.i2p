@@ -15,21 +15,21 @@
 
 mkdir -p lib/
 mkdir -p bin/local
-VER=4.2.4
+VER=4.3.1
 
 if [ "$1" != "dynamic" -a ! -d gmp-$VER ]
 then
-	TAR=gmp-$VER.tar.bz2
+	TAR=gmp-$VER.tar.lzma
         if [ ! -f $TAR ]
         then
-		echo "GMP tarball $TAR not found. You must download it from http://gmplib.org/"
-		exit 1
+	    echo "Downloading ftp://ftp.gmplib.org/pub/gmp-4.3.1/gmp-4.3.1.tar.lzma"
+	    wget ftp://ftp.gmplib.org/pub/gmp-4.3.1/gmp-4.3.1.tar.lzma
         fi
 
 	echo "Building the jbigi library with GMP Version $VER"
 
 	echo "Extracting GMP..."
-	tar -xjf gmp-$VER.tar.bz2
+	tar -xf gmp-$VER.tar.lzma --lzma
 fi
 
 cd bin/local
@@ -42,7 +42,7 @@ then
 			# --with-pic is required for static linking
 			../../gmp-$VER/configure --with-pic;;
 		*)
-			../../gmp-$VER/configure;;
+			../../gmp-$VER/configure --with-pic;;
 	esac
 	make
 	sh ../../build_jbigi.sh static
@@ -54,7 +54,7 @@ cp *jbigi???* ../../lib/
 echo 'Library copied to lib/'
 cd ../..
 
-I2P=~/i2p
+I2P=~/i2p/i2p
 if [ ! -f $I2P/lib/i2p.jar ]
 then
 	echo "I2P installation not found in $I2P - correct \$I2P definition in script to run speed test"

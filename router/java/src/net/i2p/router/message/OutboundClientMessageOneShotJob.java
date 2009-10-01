@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
+import net.i2p.crypto.TagSetHandle;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
@@ -20,6 +22,7 @@ import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
@@ -471,7 +474,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return;
         }
 
-        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey(), _from);
+        int existingTags = GarlicMessageBuilder.estimateAvailableTags(getContext(), _leaseSet.getEncryptionKey(),
+                                                                      _from.calculateHash());
         _outTunnel = selectOutboundTunnel(_to);
         // boolean wantACK = _wantACK || existingTags <= 30 || getContext().random().nextInt(100) < 5;
         // what's the point of 5% random? possible improvements or replacements:
@@ -489,7 +493,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
-        Set tags = new HashSet();
+        Set<SessionTag> tags = new HashSet();
         // If we want an ack, bundle a leaseSet... (so he can get back to us)
         LeaseSet replyLeaseSet = getReplyLeaseSet(wantACK);
         // ... and vice versa  (so we know he got it)
@@ -531,8 +535,16 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         SendTimeoutJob onFail = null;
         ReplySelector selector = null;
         if (wantACK) {
-            onReply = new SendSuccessJob(getContext(), sessKey, tags);
-            onFail = new SendTimeoutJob(getContext());
+            TagSetHandle tsh = null;
+            if ( (sessKey != null) && (tags != null) && (tags.size() > 0) ) {
+                if (_leaseSet != null) {
+                    SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
+                    if (skm != null)
+                        tsh = skm.tagsDelivered(_leaseSet.getEncryptionKey(), sessKey, tags);
+                }
+            }
+            onReply = new SendSuccessJob(getContext(), sessKey, tsh);
+            onFail = new SendTimeoutJob(getContext(), sessKey, tsh);
             selector = new ReplySelector(token);
         }
         
@@ -550,9 +562,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                            + _lease.getGateway().toBase64());
 
             DispatchJob dispatchJob = new DispatchJob(getContext(), msg, selector, onReply, onFail, (int)(_overallExpiration-getContext().clock().now()));
-            if (false) // dispatch may take 100+ms, so toss it in its own job
-                getContext().jobQueue().addJob(dispatchJob);
-            else
+            //if (false) // dispatch may take 100+ms, so toss it in its own job
+            //    getContext().jobQueue().addJob(dispatchJob);
+            //else
                 dispatchJob.runJob();
         } else {
             if (_log.shouldLog(Log.WARN))
@@ -848,6 +860,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     
     /** build the payload clove that will be used for all of the messages, placing the clove in the status structure */
     private boolean buildClove() {
+// FIXME set SKM
         PayloadGarlicConfig clove = new PayloadGarlicConfig();
         
         DeliveryInstructions instructions = new DeliveryInstructions();
@@ -932,14 +945,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private class SendSuccessJob extends JobImpl implements ReplyJob {
         private SessionKey _key;
-        private Set _tags;
+        private TagSetHandle _tags;
         
         /**
          * Create a new success job that will be fired when the message encrypted with
          * the given session key and bearing the specified tags are confirmed delivered.
          *
          */
-        public SendSuccessJob(RouterContext enclosingContext, SessionKey key, Set tags) {
+        public SendSuccessJob(RouterContext enclosingContext, SessionKey key, TagSetHandle tags) {
             super(enclosingContext);
             _key = key;
             _tags = tags;
@@ -955,10 +968,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                            + ": SUCCESS!  msg " + _clientMessageId
                            + " sent after " + sendTime + "ms");
             
-            if ( (_key != null) && (_tags != null) && (_tags.size() > 0) ) {
-                if (_leaseSet != null)
-                    getContext().sessionKeyManager().tagsDelivered(_leaseSet.getEncryptionKey(),
-                                                                   _key, _tags);
+            if (_key != null && _tags != null && _leaseSet != null) {
+                SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
+                if (skm != null)
+                    skm.tagsAcked(_leaseSet.getEncryptionKey(), _key, _tags);
             }
             
             long dataMsgId = _cloveId;
@@ -994,8 +1007,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private class SendTimeoutJob extends JobImpl {
-        public SendTimeoutJob(RouterContext enclosingContext) {
+        private SessionKey _key;
+        private TagSetHandle _tags;
+
+        public SendTimeoutJob(RouterContext enclosingContext, SessionKey key, TagSetHandle tags) {
             super(enclosingContext);
+            _key = key;
+            _tags = tags;
         }
         
         public String getName() { return "Send client message timed out"; }
@@ -1005,6 +1023,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                            + ": Soft timeout through the lease " + _lease);
             
             _lease.setNumFailure(_lease.getNumFailure()+1);
+            if (_key != null && _tags != null && _leaseSet != null) {
+                SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
+                if (skm != null)
+                    skm.failTags(_leaseSet.getEncryptionKey(), _key, _tags);
+            }
             dieFatal();
         }
     }

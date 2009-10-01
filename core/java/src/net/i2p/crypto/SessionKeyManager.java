@@ -9,6 +9,8 @@ package net.i2p.crypto;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -93,7 +95,8 @@ public class SessionKeyManager {
      * method after receiving an ack to a message delivering them)
      *
      */
-    public void tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) { // nop
+    public TagSetHandle tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) { // nop
+         return null;
     }
 
     /**
@@ -130,4 +133,8 @@ public class SessionKeyManager {
      */
     public void shutdown() { // nop
     }
+
+    public void renderStatusHTML(Writer out) throws IOException {}
+    public void failTags(PublicKey target, SessionKey key, TagSetHandle ts) {}
+    public void tagsAcked(PublicKey target, SessionKey key, TagSetHandle ts) {}
 }

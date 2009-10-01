@@ -176,4 +176,4 @@ client applications can be found on our <a href="http://www.i2p2.i2p/download">d
 
  <p>A more complete list of changes can be found
  in the history.txt file in your i2p directory.
- </p><br></div></body></html>
+ </p><hr></div></body></html>

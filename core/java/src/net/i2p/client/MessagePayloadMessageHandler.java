@@ -22,6 +22,8 @@ import net.i2p.util.Log;
  * of a message by accepting it, decrypting the payload, adding it to the set of
  * recieved messages, and telling the router that it has been recieved correctly.
  *
+ * We don't really decrypt (no more end-to-end crypto)
+ *
  * @author jrandom
  */
 class MessagePayloadMessageHandler extends HandlerImpl {
@@ -51,21 +53,24 @@ class MessagePayloadMessageHandler extends HandlerImpl {
 
     /**
      * Decrypt the payload
+     *
+     * We don't really decrypt (no more end-to-end crypto)
+     * If we do, we need to use the correct key manager in the decrypt() call below
      */
     private Payload decryptPayload(MessagePayloadMessage msg, I2PSessionImpl session) throws DataFormatException {
         Payload payload = msg.getPayload();
-        if (!I2CPMessageProducer.END_TO_END_CRYPTO) {
+        //if (!I2CPMessageProducer.END_TO_END_CRYPTO) {
             payload.setUnencryptedData(payload.getEncryptedData());
             return payload;
-        }
+        //}
             
-        byte[] data = _context.elGamalAESEngine().decrypt(payload.getEncryptedData(), session.getDecryptionKey());
-        if (data == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error decrypting the payload");
-            throw new DataFormatException("Unable to decrypt the payload");
-        }
-        payload.setUnencryptedData(data);
-        return payload;
+        //byte[] data = _context.elGamalAESEngine().decrypt(payload.getEncryptedData(), session.getDecryptionKey());
+        //if (data == null) {
+        //    if (_log.shouldLog(Log.WARN))
+        //        _log.warn("Error decrypting the payload");
+        //    throw new DataFormatException("Unable to decrypt the payload");
+        //}
+        //payload.setUnencryptedData(data);
+        //return payload;
     }
 }
