@@ -860,7 +860,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     
     /** build the payload clove that will be used for all of the messages, placing the clove in the status structure */
     private boolean buildClove() {
-// FIXME set SKM
         PayloadGarlicConfig clove = new PayloadGarlicConfig();
         
         DeliveryInstructions instructions = new DeliveryInstructions();
@@ -960,6 +959,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         public String getName() { return "Send client message successful"; }
         public void runJob() {
+            // do we leak tags here?
             if (_finished) return;
             _finished = true;
             long sendTime = getContext().clock().now() - _start;
