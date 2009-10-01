@@ -102,6 +102,7 @@ public class GarlicMessageBuilder {
      * @param config how/what to wrap
      * @param wrappedKey output parameter that will be filled with the sessionKey used
      * @param wrappedTags output parameter that will be filled with the sessionTags used
+     * @param skm non-null
      */
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              SessionKeyManager skm) {
@@ -122,6 +123,7 @@ public class GarlicMessageBuilder {
      * @param wrappedKey output parameter that will be filled with the sessionKey used
      * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param numTagsToDeliver only if the estimated available tags are below the threshold
+     * @param skm non-null
      */
     private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              int numTagsToDeliver, boolean forceElGamal, SessionKeyManager skm) {

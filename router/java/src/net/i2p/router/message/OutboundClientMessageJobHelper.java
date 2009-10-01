@@ -10,6 +10,7 @@ package net.i2p.router.message;
 
 import java.util.Set;
 
+import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -75,8 +76,11 @@ class OutboundClientMessageJobHelper {
         GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, requireAck, bundledReplyLeaseSet);
         if (config == null)
             return null;
+        SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(from);
+        if (skm == null)
+            return null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags,
-                                                              ctx.clientManager().getClientSessionKeyManager(from));
+                                                              skm);
         return msg;
     }
     
