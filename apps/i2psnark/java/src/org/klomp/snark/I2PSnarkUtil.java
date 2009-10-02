@@ -334,6 +334,10 @@ public class I2PSnarkUtil {
         return rv;
     }
     
+    public void setOpenTrackerString(String ot) { 
+        _opts.put(PROP_OPENTRACKERS, ot);
+    }
+
     public String getOpenTrackerString() { 
         String rv = (String) _opts.get(PROP_OPENTRACKERS);
         if (rv == null)

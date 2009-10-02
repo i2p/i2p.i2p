@@ -194,6 +194,7 @@ public class SnarkManager implements Snark.CompleteListener {
             _util.setProxy(eepHost, eepPort);
         _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
         _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
+        _util.setOpenTrackerString(_config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS));
         getDataDir().mkdirs();
     }
     
@@ -345,6 +346,7 @@ public class SnarkManager implements Snark.CompleteListener {
         if (openTrackers != null) {
             if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
                 _config.setProperty(I2PSnarkUtil.PROP_OPENTRACKERS, openTrackers.trim());
+                _util.setOpenTrackerString(openTrackers);
                 addMessage("Open Tracker list changed - torrent restart required to take effect.");
                 changed = true;
             }
