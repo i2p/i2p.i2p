@@ -57,12 +57,12 @@ configuration *
 <div id="messages">${cfg.messages}</div>
 <form method="POST" action="config.jsp">
 <div id="config">
-<input type="hidden" name="serial" value="${cfg.serial}" />
+<input type="hidden" name="serial" value="${cfg.serial}" >
 <textarea name="config" rows="10" cols="80">${cfg.config}</textarea>
 </div>
 <div id="buttons">
-<input type="image" src="images/save.png" name="action" value="save" alt="Save Config"/>
-<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Config"/>
+<input type="image" src="images/save.png" name="action" value="save" alt="Save Config">
+<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Config">
 </div>
 </form>
 <div id="help">

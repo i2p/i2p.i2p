@@ -56,12 +56,12 @@ subscriptions *
 <div id="messages">${subs.messages}</div>
 <form method="POST" action="subscriptions.jsp">
 <div id="content">
-<input type="hidden" name="serial" value="${subs.serial}" />
+<input type="hidden" name="serial" value="${subs.serial}" >
 <textarea name="content" rows="10" cols="80">${subs.content}</textarea>
 </div>
 <div id="buttons">
-<input type="image" src="images/save.png" name="action" value="save" alt="Save Subscriptions" />
-<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Subscriptions" />
+<input type="image" src="images/save.png" name="action" value="save" alt="Save Subscriptions" >
+<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Subscriptions" >
 </div>
 </form>
 <div id="help">

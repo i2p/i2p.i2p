@@ -102,12 +102,12 @@
 </div>
 
 <form method="POST" action="addressbook.jsp">
-<input type="hidden" name="begin" value="0"/>
-<input type="hidden" name="end" value="99"/>
+<input type="hidden" name="begin" value="0">
+<input type="hidden" name="end" value="99">
 <div id="search">
 <table><tr>
-<td class="search">Search: <input type="text" name="search" value="${book.search}" size="20" /></td>
-<td class="search"><input type="image" src="images/search.png" name="submitsearch" value="search" alt="Search" /></td>
+<td class="search">Search: <input type="text" name="search" value="${book.search}" size="20" ></td>
+<td class="search"><input type="image" src="images/search.png" name="submitsearch" value="search" alt="Search" ></td>
 </tr>
 </table>
 </div>
@@ -116,9 +116,9 @@
 </c:if>
 
 <form method="POST" action="addressbook.jsp">
-<input type="hidden" name="serial" value="${book.serial}"/>
-<input type="hidden" name="begin" value="0"/>
-<input type="hidden" name="end" value="99"/>
+<input type="hidden" name="serial" value="${book.serial}">
+<input type="hidden" name="begin" value="0">
+<input type="hidden" name="end" value="99">
 
 <c:if test="${book.notEmpty}">
 
@@ -151,7 +151,7 @@
 
 <c:if test="${book.master || book.router || book.published || book.private}">
 <div id="buttons">
-<p class="buttons"><input type="image" name="action" value="delete" src="images/delete.png" alt="Delete checked" />
+<p class="buttons"><input type="image" name="action" value="delete" src="images/delete.png" alt="Delete checked" >
 </p>
 </div>
 </c:if>
@@ -170,7 +170,7 @@
 <b>Hostname:</b> <input type="text" name="hostname" value="${book.hostname}" size="20">
 <b>Destination:</b> <textarea name="destination" rows="1" style="height: 3em;" cols="40" wrap="off" >${book.destination}</textarea><br/>
 </p><p>
-<input type="image" name="action" value="add" src="images/add.png" alt="Add destination" />
+<input type="image" name="action" value="add" src="images/add.png" alt="Add destination" >
 </p>
 </div>
 
