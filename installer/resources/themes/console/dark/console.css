@@ -294,7 +294,7 @@ div.news li {
 
 div.confignav {
      padding: 15px 10px !important;
-     margin: 0 0 15px 0;
+     margin: 15px 0;
      background: #004 url('images/darkbluebg.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -324,7 +324,7 @@ div.configure {
 
 div.messages {
      padding: 10px;
-     margin: 10px 0 20px 0;
+     margin: 10px 0 15px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -333,6 +333,9 @@ div.messages {
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
+     font-weight: bold;
+     font-size: 9pt;
+     color: #ddf;
 }
 
 div.messages span.error {
@@ -354,7 +357,7 @@ div.messages li {
 
 div.graphspanel {
      padding: 15px;
-     margin: 10px 0px;
+     margin: 15px 0px;
      background: #005;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -400,7 +403,6 @@ table {
      border-collapse: collapse;
      width: 100%;
      border: 1px solid #99f;
-     margin: 5px 0px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
      background: #003;
@@ -532,7 +534,7 @@ h1 {
      text-align: left;
      color: #fff;
      padding: 10px 15px;
-     margin: 0 15px 15px 220px;
+     margin: 0 15px 10px 220px;
      font-size: 16pt;
      font-weight: bold;
      font-style: normal;
@@ -564,7 +566,7 @@ h2 {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      vertical-align: middle;
-     margin: 15px 0 10px 0 !important;
+     margin: 15px 0 15px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -584,7 +586,7 @@ h3 {
      border: 1px solid #99f;
      border-left: 5px solid #99f;
      padding: 3px 5px 3px 5px;
-     margin: 20px 0 15px 0;
+/*     margin: 20px 0 15px 0;*/
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
