@@ -1,3 +1,15 @@
+2009-10-02 zzz
+    * BuildMessageTest: Move out of the lib
+    * i2psnark: Fix changing opentracker list
+    * Makefile.gcj: fixups
+    * OCMOSJ: Fix SKM NPE on closed dest
+    * ProfileOrganizerRenderer: static tweaks
+    * SusiDNS: HTML transitional fixes, might help opera
+    * Tunnel IVValidator: Increase size of bloom filter
+      for high-bw routers (>= 512KBps share bw) to reduce
+      false positive rate. Adds 2MB heap for >= 512KBps routers
+      and 6MB for >= 1536KBps.
+
 2009-09-21 sponge
     * fixups to SlackBuilds. requiredbuilder does the wrong thing, and
       thinks that java is perl! This isn't really a big deal, 
