@@ -47,6 +47,8 @@ public class BloomSHA1 {
     protected final int filterBits;
     protected final int filterWords;
     
+/* (24,11) too big - see KeySelector
+
     public static void main(String args[]) {
         BloomSHA1 b = new BloomSHA1(24, 11);
         for (int i = 0; i < 100; i++) {
@@ -55,14 +57,17 @@ public class BloomSHA1 {
             b.insert(v);
         }
     }
+*/
     
     
     /**
      * Creates a filter with 2^m bits and k 'hash functions', where
      * each hash function is portion of the 160-bit SHA1 hash.   
 
-     * @param m determines number of bits in filter, defaults to 20
-     * @param k number of hash functions, defaults to 8
+     * @param m determines number of bits in filter
+     * @param k number of hash functionsx
+     *
+     * See KeySelector for important restriction on max m and k
      */
     public BloomSHA1( int m, int k) {
         // XXX need to devise more reasonable set of checks

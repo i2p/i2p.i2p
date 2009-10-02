@@ -25,14 +25,21 @@ public class BloomFilterIVValidator implements IVValidator {
      */
     private static final int HALFLIFE_MS = 10*60*1000;
     private static final int MIN_SHARE_KBPS_TO_USE_BLOOM = 64;
+    private static final int MIN_SHARE_KBPS_FOR_BIG_BLOOM = 512;
+    private static final int MIN_SHARE_KBPS_FOR_HUGE_BLOOM = 1536;
 
     public BloomFilterIVValidator(RouterContext ctx, int KBps) {
         _context = ctx;
         // Select the filter based on share bandwidth.
-        // Note that at rates approaching 1MB, we need to do something else,
-        // as the Bloom filter false positive rates approach 0.1%. FIXME
-        if (getShareBandwidth(ctx) < MIN_SHARE_KBPS_TO_USE_BLOOM)
+        // Note that at rates above 512KB, we increase the filter size
+        // to keep acceptable false positive rates.
+        // See DBF, BloomSHA1, and KeySelector for details.
+        if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM)
             _filter = new DecayingHashSet(ctx, HALFLIFE_MS, 16, "TunnelIVV"); // appx. 4MB max
+        else if (KBps >= MIN_SHARE_KBPS_FOR_HUGE_BLOOM)
+            _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 25);  // 8MB fixed
+        else if (KBps >= MIN_SHARE_KBPS_FOR_BIG_BLOOM)
+            _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 24);  // 4MB fixed
         else
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV");  // 2MB fixed
         ctx.statManager().createRateStat("tunnel.duplicateIV", "Note that a duplicate IV was received", "Tunnels", 
@@ -48,11 +55,4 @@ public class BloomFilterIVValidator implements IVValidator {
         return !dup; // return true if it is OK, false if it isn't
     }
     public void destroy() { _filter.stopDecaying(); }
-
-    private static int getShareBandwidth(RouterContext ctx) {
-        int irateKBps = ctx.bandwidthLimiter().getInboundKBytesPerSecond();
-        int orateKBps = ctx.bandwidthLimiter().getOutboundKBytesPerSecond();
-        double pct = ctx.router().getSharePercentage();
-        return (int) (pct * Math.min(irateKBps, orateKBps));
-    }
 }

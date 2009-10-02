@@ -51,6 +51,13 @@ public class KeySelector {
      * @param k    number of 'hash functions'
      * @param bitOffset array of k bit offsets (offset of flag bit in word)
      * @param wordOffset array of k word offsets (offset of word flag is in)
+     *
+     * Note that if k and m are too big, the GenericWordSelector blows up -
+     * The max for 32-byte keys is m=23 and k=11.
+     * The precise restriction appears to be:
+     * ((5k + (k-1)(m-5)) / 8) + 2 < keySizeInBytes
+     *
+     * It isn't clear how to fix this.
      */
     public KeySelector (int m, int k, int[] bitOffset, int [] wordOffset) {
         //if ( (m < 2) || (m > 20)|| (k < 1) 
@@ -121,7 +128,7 @@ public class KeySelector {
     }
     /** 
      * Extracts the k word offsets from a key.  Suitable for general
-     * values of m and k.
+     * values of m and k. See above for formula for max m and k.
      */
     public class GenericWordSelector implements WordSelector {
         /** Extract the k offsets into the word offset array */
@@ -176,6 +183,8 @@ public class KeySelector {
                         // bits from third byte
                         bitsToGet -= 8;
                         if (bitsToGet > 0) {
+                            // AIOOBE here if m and k too big (23,11 is the max)
+                            // for a 32-byte key - see above
                             wordOffset[j] |= 
                                 ((0xff & b[curByte + 2]) >> (8 - bitsToGet))
                                                     << (stride - bitsToGet) ;

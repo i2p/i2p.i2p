@@ -680,9 +680,18 @@ public class TunnelDispatcher implements Service {
 ******/
 
     public void startup() {
-        // NB: 256 == assume max rate (size adjusted to handle 256 messages per second)
-        _validator = new BloomFilterIVValidator(_context, 256);
+        // Note that we only use the validator for participants and OBEPs, not IBGWs, so
+        // this BW estimate will be high by about 33% assuming 2-hop tunnels average
+        _validator = new BloomFilterIVValidator(_context, getShareBandwidth(_context));
     }
+
+    private static int getShareBandwidth(RouterContext ctx) {
+        int irateKBps = ctx.bandwidthLimiter().getInboundKBytesPerSecond();
+        int orateKBps = ctx.bandwidthLimiter().getOutboundKBytesPerSecond();
+        double pct = ctx.router().getSharePercentage();
+        return (int) (pct * Math.min(irateKBps, orateKBps));
+    }
+
     public void shutdown() {
         if (_validator != null)
             _validator.destroy();

@@ -37,6 +37,7 @@ public class DecayingBloomFilter {
     private String _name;
     
     private static final int DEFAULT_M = 23;
+    private static final int DEFAULT_K = 11;
     private static final boolean ALWAYS_MISS = false;
    
     /** noop for DHS */
@@ -56,16 +57,24 @@ public class DecayingBloomFilter {
 
     /** @param name just for logging / debugging / stats */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name) {
+        // this is instantiated in four different places, they may have different
+        // requirements, but for now use this as a gross method of memory reduction.
+        // m == 23 => 1MB each BloomSHA1 (4 pairs = 8MB total)
+        this(context, durationMs, entryBytes, name, context.getProperty("router.decayingBloomFilterM", DEFAULT_M));
+    }
+
+    /** @param m filter size exponent */
+    public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name, int m) {
         _context = context;
         _log = context.logManager().getLog(DecayingBloomFilter.class);
         _entryBytes = entryBytes;
         _name = name;
-        // this is instantiated in four different places, they may have different
-        // requirements, but for now use this as a gross method of memory reduction.
-        // m == 23 => 1MB each BloomSHA1 (4 pairs = 8MB total)
-        int m = context.getProperty("router.decayingBloomFilterM", DEFAULT_M);
-        _current = new BloomSHA1(m, 11); //new BloomSHA1(23, 11);
-        _previous = new BloomSHA1(m, 11); //new BloomSHA1(23, 11);
+        int k = DEFAULT_K;
+        // max is (23,11) or (26,10); see KeySelector for details
+        if (m > DEFAULT_M)
+            k--;
+        _current = new BloomSHA1(m, k);
+        _previous = new BloomSHA1(m, k);
         _durationMs = durationMs;
         int numExtenders = (32+ (entryBytes-1))/entryBytes - 1;
         if (numExtenders < 0)
@@ -83,7 +92,7 @@ public class DecayingBloomFilter {
         _keepDecaying = true;
         SimpleTimer.getInstance().addEvent(_decayEvent, _durationMs);
         if (_log.shouldLog(Log.WARN))
-           _log.warn("New DBF " + name + " m = " + m + " entryBytes = " + entryBytes +
+           _log.warn("New DBF " + name + " m = " + m + " k = " + k + " entryBytes = " + entryBytes +
                      " numExtenders = " + numExtenders + " cycle (s) = " + (durationMs / 1000));
         // try to get a handle on memory usage vs. false positives
         context.statManager().createRateStat("router.decayingBloomFilter." + name + ".size",
@@ -260,12 +269,25 @@ public class DecayingBloomFilter {
     }
     
     /**
+     *  This filter is used only for participants and OBEPs, not
+     *  IBGWs, so depending on your assumptions of avg. tunnel length,
+     *  the performance is somewhat better than the gross share BW
+     *  would indicate.
+     *
+     *  Following stats for m=23, k=11:
      *  Theoretical false positive rate for   16 KBps: 1.17E-21
      *  Theoretical false positive rate for   24 KBps: 9.81E-20
      *  Theoretical false positive rate for   32 KBps: 2.24E-18
      *  Theoretical false positive rate for  256 KBps: 7.45E-9
      *  Theoretical false positive rate for  512 KBps: 5.32E-6
      *  Theoretical false positive rate for 1024 KBps: 1.48E-3
+     *  Then it gets bad: 1280 .67%; 1536 2.0%; 1792 4.4%; 2048 8.2%.
+     *
+     *  Following stats for m=24, k=10:
+     *  1280 4.5E-5; 1792 5.6E-4; 2048 0.14%
+     *
+     *  Following stats for m=25, k=10:
+     *  1792 2.4E-6; 4096 0.14%
      */
     public static void main(String args[]) {
         int kbps = 256;
