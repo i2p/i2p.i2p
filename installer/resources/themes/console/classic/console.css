@@ -249,7 +249,7 @@ div.warning h3 {
 
 div.main {
      margin: 0px 0px 0px 195px;
-     padding: 15px 15px 15px 15px;
+     padding: 15px;
      background: #eef;
      border: 5px solid #bbf;
      border-top: 0;
@@ -392,7 +392,7 @@ h1 {
 
 h2 {
      font-size: 14pt;
-     padding: 10px;
+     padding: 0px 10px 10px 10px;
      border-bottom: 5px solid #bbf;
      border-top: 0px solid #bbf;
      letter-spacing: 0.04em;
@@ -414,9 +414,9 @@ h3 {
 table {
      border-collapse: collapse; 
      border: 5px solid #bbf;
-     margin: 5px 0px;
+     margin: 0 0 5px 0;
      cell-padding: 1px;
-     font-size: 7pt;
+     font-size: 7.5pt;
      background: #fff;
      width: 100%;
 }
