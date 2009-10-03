@@ -268,7 +268,7 @@ div.main textarea {
 
 div.news {
      margin: 0px 15px 10px 220px;
-     padding: 15px 25px 15px 25px;
+     padding: 10px 25px 15px 25px;
      border: 1px solid #003;
      color: #410;
      border-radius: 4px;
@@ -595,7 +595,7 @@ h2 {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     margin: 15px 0px 10px 0 !important;
+     margin: 15px 0px 5px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
 }
@@ -612,7 +612,7 @@ h3 {
      border: 1px solid #002;
      border-left: 5px solid #002;
      padding: 3px 5px 3px 5px;
-     margin: 15px 0 5px 0;
+     margin: 15px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
