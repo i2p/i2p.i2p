@@ -268,7 +268,7 @@ div.main textarea {
 
 div.news {
      margin: 0px 15px 10px 220px;
-     padding: 20px 30px 20px 30px;
+     padding: 15px 25px 15px 25px;
      border: 1px solid #003;
      color: #410;
      border-radius: 4px;
@@ -346,7 +346,7 @@ div.confignav {
 }
 
 div.configure {
-     padding: 0 15px 0px 15px !important;
+     padding: 5px 15px 0px 15px !important;
      margin: 0px 0px 15px 0;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
@@ -612,7 +612,7 @@ h3 {
      border: 1px solid #002;
      border-left: 5px solid #002;
      padding: 3px 5px 3px 5px;
-     margin: 10px 0 15px 0;
+     margin: 15px 0 5px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;

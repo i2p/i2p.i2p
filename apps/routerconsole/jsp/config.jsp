@@ -27,7 +27,7 @@
  <input type="hidden" name="action" value="blah" />
  <h3>Bandwidth limiter</h3><p>
  <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
- </p><p>
+ </p>
    <div class="wideload"><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps In
         </td><td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)</td>
 <!-- let's keep this simple...
