@@ -1065,7 +1065,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (countryList.size() > 0) {
             Collections.sort(countryList);
             buf.append("<table>\n");
-            buf.append("<tr><th>Country</th><th>Count</th></tr>\n");
+            buf.append("<tr><th align=\"left\">Country</th><th>Count</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
