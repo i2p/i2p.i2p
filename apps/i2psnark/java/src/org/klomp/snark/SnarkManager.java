@@ -194,7 +194,9 @@ public class SnarkManager implements Snark.CompleteListener {
             _util.setProxy(eepHost, eepPort);
         _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
         _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
-        _util.setOpenTrackerString(_config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS));
+        String ot = _config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS);
+        if (ot != null)
+            _util.setOpenTrackerString(ot);
         getDataDir().mkdirs();
     }
     

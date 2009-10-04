@@ -1,3 +1,6 @@
+2009-10-04 zzz
+    * i2psnark: Fix NPE caused by last checkin (thanks wuxia!)
+
 2009-10-02 zzz
     * BuildMessageTest: Move out of the lib
     * i2psnark: Fix changing opentracker list
