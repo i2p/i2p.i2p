@@ -438,7 +438,7 @@ table {
      border-collapse: collapse;
      width: 100%;
      border: 1px solid #000022;
-     margin: 10px -15px 5px 0px;
+     margin: 1px -15px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
@@ -595,7 +595,7 @@ h2 {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     margin: 15px 0px 5px 0 !important;
+     margin: 15px 0px 15px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
 }
