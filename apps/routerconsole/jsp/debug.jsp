@@ -23,7 +23,7 @@
         net.i2p.data.Hash h = dest.calculateHash();
         net.i2p.crypto.SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(h);
         if (skm != null) {
-            out.print("<h1>" + h.toBase64().substring(0,6) + " SKM</h1>");
+            out.print("<h2>" + h.toBase64().substring(0,6) + " SKM</h2>");
             skm.renderStatusHTML(out);
         }
     }

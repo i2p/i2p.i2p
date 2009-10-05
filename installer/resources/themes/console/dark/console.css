@@ -407,6 +407,7 @@ table {
      cell-padding: 1px;
      font-size: 7pt;
      background: #003;
+     margin: 1px 0;
 }
 
 table hr {
