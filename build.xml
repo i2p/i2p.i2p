@@ -322,8 +322,6 @@
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
     <target name="prepthemeupdates">
-        <!-- CSS now in docs/, not in the .war; just in case anybody is using defCon1 -->
-        <copy file="installer/resources/themes/console/defCon1/console.css" todir="pkg-temp/docs/themes/console/defCon1/" />
         <!-- Add extricated I2PSnark css here, for now -->
         <copy file="installer/resources/themes/console/snark.css" todir="pkg-temp/docs/themes/console/" />
         <!-- these files now in docs/, not in the .war -->
