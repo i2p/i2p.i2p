@@ -82,7 +82,7 @@ public class PacketHandler {
     public void startup() { 
         _keepReading = true;
         for (int i = 0; i < _handlers.size(); i++) {
-            I2PThread t = new I2PThread((Handler)_handlers.get(i), "Packet handler " + i + ": " + _endpoint.getListenPort());
+            I2PThread t = new I2PThread((Handler)_handlers.get(i), "UDP Packet handler " + i + "/" + _handlers.size());
             t.setDaemon(true);
             t.start();
         }

@@ -39,8 +39,8 @@ public class UDPEndpoint {
                 _socket = new DatagramSocket(_listenPort);
             else
                 _socket = new DatagramSocket(_listenPort, _bindAddress);
-            _sender = new UDPSender(_context, _socket, "UDPSend on " + _listenPort);
-            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceive on " + _listenPort);
+            _sender = new UDPSender(_context, _socket, "UDPSender");
+            _receiver = new UDPReceiver(_context, _transport, _socket, "UDPReceiver");
             _sender.startup();
             _receiver.startup();
         } catch (SocketException se) {
