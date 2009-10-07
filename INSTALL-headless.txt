@@ -3,9 +3,10 @@ Headless I2P installation instructions
 1) java -jar i2pinstall.exe -console       (you've already done this)
 
 This will run the installer in text mode, including running the postinstall.sh
-script, which will start the router and launch a browser.
+script. After that, you may run 'sh i2prouter start'
+which will start the router and attempt to launch a browser.
 
-If you do not have an X server running, the browser launch will fail, and
+If you do not have an X server running, the browser launch will probably fail, and
 you may use:
   lynx http://localhost:7657/index.jsp
 to configure the router.

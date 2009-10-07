@@ -27,6 +27,7 @@ Build and tag:
 	ant pkg
 	mtn ci
 	mtn tag h: i2p-0.7.xx
+	mtn cert t:i2p-0.7.xx branch i2p.i2p.release
 	Sync with mtn.i2p2.i2p
 
 Create a signed update file with:

@@ -1,3 +1,7 @@
+2009-10-07 zzz
+    * Doc and eepsite_index updates
+    * UDP: Remove port number from thread names
+
 2009-10-04 zzz
     * i2psnark: Fix NPE caused by last checkin (thanks wuxia!)
 
