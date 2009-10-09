@@ -181,16 +181,17 @@ public class ElGamalEngine {
         for (i = 0; i < val.length; i++)
             if (val[i] != (byte) 0x00) break;
 
-        //ByteArrayInputStream bais = new ByteArrayInputStream(val, i, val.length - i);
-        byte hashData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(val, i + 1, hashData, 0, Hash.HASH_LENGTH);
-        Hash hash = new Hash(hashData);
         int payloadLen = val.length - i - 1 - Hash.HASH_LENGTH;
         if (payloadLen < 0) {
             if (_log.shouldLog(Log.ERROR)) 
                 _log.error("Decrypted data is too small (" + (val.length - i)+ ")");
             return null;
         }
+
+        //ByteArrayInputStream bais = new ByteArrayInputStream(val, i, val.length - i);
+        byte hashData[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(val, i + 1, hashData, 0, Hash.HASH_LENGTH);
+        Hash hash = new Hash(hashData);
         byte rv[] = new byte[payloadLen];
         System.arraycopy(val, i + 1 + Hash.HASH_LENGTH, rv, 0, rv.length);
 

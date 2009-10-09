@@ -1,5 +1,7 @@
 2009-10-09 zzz
+    * ElGamalEngine: Fix rare AIOOBE (thanks hottuna!)
     * I2PTunnel: Fix persistent client tunnel keyfile location
+    * peers.jsp: Fix NTCP rate formatting (thanks hottuna!)
 
 2009-10-09 dr|z3d
     * Add paste.i2p2.i2p, and echelon's software links to readmes (thanks 
