@@ -1,6 +1,11 @@
 2009-10-09 zzz
     * I2PTunnel: Fix persistent client tunnel keyfile location
 
+2009-10-09 dr|z3d
+    * Add paste.i2p2.i2p, and echelon's software links to readmes (thanks 
+      to GoHE for Swedish translations); cosmetic tweaks to same.
+    * Various optimizations and tweaks to all 3 themes.
+
 2009-10-07 zzz
     * Doc and eepsite_index updates
     * UDP: Remove port number from thread names
