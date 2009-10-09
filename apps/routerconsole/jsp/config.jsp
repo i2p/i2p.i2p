@@ -48,7 +48,7 @@
     </tr><tr>
         <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> Share</td>
         <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
-</td></tr></table></div></p><p>
+</td></tr></table></div></p>
  <% int share = nethelper.getShareBandwidth();
     if (share < 12) {
         out.print("<b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
@@ -60,7 +60,7 @@
         out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr>");
     }
  %>
-</p><div class="formaction">
+<div class="formaction">
 <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /></div>
  <!--
  <b>Enable load testing: </b>
@@ -171,7 +171,7 @@
 </ul><br>
  Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
  UPnP may be enabled or disabled above, but a change requires a router restart to take effect.
-</p><p>Hostnames entered above will be published in the network database.
+<p>Hostnames entered above will be published in the network database.
     They are <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.
     If you specify the wrong IP address or
@@ -233,7 +233,7 @@
 <li class="tidylist"><b>ERR - Client Manager I2CP Error - check logs</b> -
      This is usually due to a port 7654 conflict. Check the logs to verify. Do you have another I2P instance running?
      Stop the conflicting program and restart I2P.
- </ul></p><br>
+ </ul><hr>
       <!--
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" class="optbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br>

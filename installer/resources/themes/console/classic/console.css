@@ -259,13 +259,17 @@ div.main {
      -moz-box-shadow: inset 0px 0px 0px 1px #99f;
 }
 
+div.main ul {
+     margin: 0;
+}
+
 div.main li {
-     padding-bottom: 10px;
+     padding: 0 0 5px 0;
      list-style: square;
 }
 
 div.main li:first-child {
-     padding-top: 20px;
+     padding-top: 5px;
 }
 
 div.main textarea {

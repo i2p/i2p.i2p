@@ -226,7 +226,7 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 5px 15px 10px 220px;
+     margin: 15px 15px 10px 220px;
      padding: 20px 20px 20px 75px;
      background: #005;
      border: 1px solid #99f;
@@ -310,7 +310,7 @@ div.confignav {
 }
 
 div.configure {
-     padding: 5px 15px 15px 15px;
+     padding: 5px 15px 0 15px;
      margin: 10px 0px;
      background: #005;
      -moz-border-radius: 4px;
@@ -357,7 +357,7 @@ div.messages li {
 }
 
 div.graphspanel {
-     padding: 15px;
+     padding: 10px 15px 0 15px;
      margin: 15px 0px;
      background: #005;
      -moz-border-radius: 4px;
@@ -373,7 +373,11 @@ div.graphspanel {
 
 div.graphspanel form {
      text-align: left;
-     padding: 15px;
+     padding: 0 15px 0px 15px;
+}
+
+div.graphspanel hr {
+     margin: 10px -15px 10px -15px;
 }
 
 div.graphspanel img {
@@ -822,6 +826,10 @@ form {}
  .joblog:ul {
      word-wrap: break-word !important;
      text-align: justify;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
 }
 
 .smallhead {
