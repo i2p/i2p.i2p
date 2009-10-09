@@ -1,3 +1,6 @@
+2009-10-09 zzz
+    * I2PTunnel: Fix persistent client tunnel keyfile location
+
 2009-10-07 zzz
     * Doc and eepsite_index updates
     * UDP: Remove port number from thread names

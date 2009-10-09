@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -114,7 +115,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         this.localPort = localPort;
         this.l = l;
         this.handlerName = handlerName + _clientId;
-        this.privKeyFile = pkf;
         _ownDest = ownDest; // == ! shared client
 
 
@@ -123,6 +123,14 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+
+        // normalize path so we can find it
+        if (pkf != null) {
+            File keyFile = new File(pkf);
+            if (!keyFile.isAbsolute())
+                keyFile = new File(_context.getConfigDir(), pkf);
+            this.privKeyFile = keyFile.getAbsolutePath();
+        }
 
         // no need to load the netDb with leaseSets for destinations that will never 
         // be looked up
@@ -277,6 +285,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel) {
         return buildSocketManager(tunnel, null);
     }
+
+    /** @param pkf absolute path or null */
     protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel, String pkf) {
         Properties props = new Properties();
         props.putAll(tunnel.getClientOptions());
