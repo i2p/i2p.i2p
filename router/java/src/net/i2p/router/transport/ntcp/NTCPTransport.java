@@ -735,7 +735,7 @@ public class NTCPTransport extends TransportImpl {
         buf.setLength(0);
     }
 
-    private static final NumberFormat _rateFmt = new DecimalFormat("#,#0.00");
+    private static final NumberFormat _rateFmt = new DecimalFormat("#,##0.00");
     private static String formatRate(float rate) {
         synchronized (_rateFmt) { return _rateFmt.format(rate); }
     }
