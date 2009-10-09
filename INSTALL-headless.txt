@@ -14,6 +14,16 @@ to configure the router.
 If you're having trouble, swing by http://forum.i2p2.de/, check the
 website at http://www.i2p2.de/, or get on irc://irc.freenode.net/#i2p
 
+I2P will create and store files and configuration data in the user directory
+~/.i2p/ on Linux and %APPDATA%\I2P\ on Windows. This directory is created
+when I2P is run for the first time. It also creates files in the system
+temporary directory specified by the Java Virtual Machine.
+To change the location of these directories, or to configure I2P to
+put all files in this directory (the so-called "portable" configuration),
+edit the files i2prouter (Linux) and wrapper.config (Linux and Windows)
+where there are comments labeled "PORTABLE". Do this before you
+run I2P for the first time.
+
 To run I2P explicitly:
    (*nix): sh i2prouter start
    (win*): I2P.exe
