@@ -382,13 +382,13 @@ public class SummaryHelper extends HelperBase {
                     // red or yellow light                 
                     buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Rebuilding&hellip;\" title=\"Leases expired ").append(DataHelper.formatDuration(0-timeToExpire));
                     buf.append(" ago. Rebuilding&hellip;\"></td></tr>\n");                    
-            } else {
+                } else {
                     // green light 
                     buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"Ready\"></td></tr>\n");
                 }
             } else {
                 // yellow light
-                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Building&hellip;\" title=\"Tunnel building in progress&hellip;\"></td></tr>\n");
+                buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Building&hellip;\" title=\"Tunnel building in progress&hellip;\"></td></tr>\n");
             }
         }
         buf.append("</table><hr>\n");

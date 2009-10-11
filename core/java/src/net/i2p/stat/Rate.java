@@ -452,8 +452,14 @@ public class Rate {
                && _lifetimeTotalEventTime == r.getLifetimeTotalEventTime();
     }
 
+    /**
+     * It doesn't appear that Rates are ever stored in a Set or Map
+     * (RateStat stores in an array) so let's make this easy.
+     * We can always make something faster if it's actually used.
+     */
     @Override
     public int hashCode() {
+/*****
         int hash = 5;
         hash = 67 * hash + (int)(Double.doubleToLongBits(this._currentTotalValue) ^ (Double.doubleToLongBits(this._currentTotalValue) >>> 32));
         hash = 67 * hash + (int)(this._currentEventCount ^ (this._currentEventCount >>> 32));
@@ -470,6 +476,8 @@ public class Rate {
         hash = 67 * hash + (int)(this._creationDate ^ (this._creationDate >>> 32));
         hash = 67 * hash + (int)(this._period ^ (this._period >>> 32));
         return hash;
+******/
+        return toString().hashCode();
     }
 
     @Override

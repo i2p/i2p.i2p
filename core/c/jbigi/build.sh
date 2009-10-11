@@ -54,7 +54,7 @@ cp *jbigi???* ../../lib/
 echo 'Library copied to lib/'
 cd ../..
 
-I2P=~/i2p/i2p
+I2P=~/i2p
 if [ ! -f $I2P/lib/i2p.jar ]
 then
 	echo "I2P installation not found in $I2P - correct \$I2P definition in script to run speed test"

@@ -12,8 +12,6 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelGatewayZeroHop extends TunnelGateway {
-    private RouterContext TunnelContext;
-    private Log TunnelLog;
     private TunnelCreatorConfig _config;
     private OutboundMessageDistributor _outDistributor;
     private InboundMessageDistributor _inDistributor;
@@ -23,11 +21,9 @@ public class TunnelGatewayZeroHop extends TunnelGateway {
      */
     public TunnelGatewayZeroHop(RouterContext context, TunnelCreatorConfig config) {
         super(context, null, null, null);
-        TunnelContext = context;
-        TunnelLog = context.logManager().getLog(TunnelGatewayZeroHop.class);
         _config = config;
         if (config.isInbound())
-            _inDistributor = new InboundMessageDistributor(TunnelContext, config.getDestination());
+            _inDistributor = new InboundMessageDistributor(context, config.getDestination());
         else
             _outDistributor = new OutboundMessageDistributor(context, 400);
     }
@@ -53,8 +49,8 @@ public class TunnelGatewayZeroHop extends TunnelGateway {
      */
     @Override
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
-        if (TunnelLog.shouldLog(Log.DEBUG))
-            TunnelLog.debug("zero hop gateway: distribute " + (_config.isInbound() ? "inbound " : " outbound ")
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("zero hop gateway: distribute " + (_config.isInbound() ? "inbound " : " outbound ")
                        + " to " + (toRouter != null ? toRouter.toBase64().substring(0,4) : "" )
                        + "." + (toTunnel != null ? toTunnel.getTunnelId() + "" : "")
                        + ": " + msg);

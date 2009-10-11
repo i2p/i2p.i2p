@@ -177,7 +177,8 @@ class PeerTestManager {
                     testComplete(false);
             } catch (UnknownHostException uhe) {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to get our IP from bob's reply: " + from + ", " + testInfo, uhe);
+                    _log.error("Unable to get our IP (length " + ip.length +
+                               ") from bob's reply: " + from + ", " + testInfo, uhe);
             }
         } else {
             PeerState charlieSession = _transport.getPeerState(from);

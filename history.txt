@@ -1,3 +1,8 @@
+* 2009-10-12  0.7.7 released
+
+2009-10-11 zzz
+    * Misc. cleanups after review, prep for release
+
 2009-10-09 zzz
     * ElGamalEngine: Fix rare AIOOBE (thanks hottuna!)
     * I2PTunnel: Fix persistent client tunnel keyfile location

@@ -592,7 +592,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Robert";
                 else
                     client = "Unknown (" + ch + ')';
-                out.write("" + client + "&nbsp;&nbsp;" + peer.toString().substring(5, 9) + "");
+                out.write(client + "&nbsp;&nbsp;" + peer.toString().substring(5, 9));
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
                 out.write("</td>\n\t");
@@ -606,7 +606,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     String ps = String.valueOf(pct);
                     if (ps.length() > 5)
                         ps = ps.substring(0, 5);
-                    out.write("" + ps + "%");
+                    out.write(ps + "%");
                 }
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
@@ -615,7 +615,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (remaining > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
                         out.write("<font color=#008000>");
-                        out.write("" + formatSize(peer.getDownloadRate()) + "ps</font>");
+                        out.write(formatSize(peer.getDownloadRate()) + "ps</font>");
                     } else {
                         out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInteresting())
@@ -630,7 +630,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 if (pct != 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
                         out.write("<font color=#008000>");
-                        out.write("" + formatSize(peer.getUploadRate()) + "ps</font>");
+                        out.write(formatSize(peer.getUploadRate()) + "ps</font>");
                     } else {
                         out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInterested())

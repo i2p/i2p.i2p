@@ -40,7 +40,6 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class UDPTransport extends TransportImpl implements TimedWeightedPriorityMessageQueue.FailedListener {
-    private RouterContext _rContext;
     private Log _log;
     private UDPEndpoint _endpoint;
     /** Peer (Hash) to PeerState */

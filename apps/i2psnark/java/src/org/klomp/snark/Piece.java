@@ -24,11 +24,7 @@ public class Piece implements Comparable {
     public boolean equals(Object o) {
         if (o instanceof Piece) {
             if (o == null) return false;
-            try {
-                return this.id == ((Piece)o).id;
-            } catch (ClassCastException cce) {
-                return false;
-            }
+            return this.id == ((Piece)o).id;
         }
         return false;
     }
