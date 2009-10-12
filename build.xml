@@ -407,8 +407,6 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
-        <!-- New readme_*.html files - For one release only -->
-        <copy file="readme_zh.html" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
@@ -581,13 +579,17 @@
 	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
 	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
-        <echo message="Everything is checked in, right?" />
+        <echo message="Everything is checked in, right? Let's be sure:" />
+        <exec executable="mtn">
+            <arg value="st" />
+        </exec>
         <input message="Enter new version number:" addproperty="release.number" />
         <fail message="You must enter a version number." >
             <condition>
                 <equals arg1="${release.number}" arg2=""/>
             </condition>
         </fail>
+        <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall.exe" tofile="i2pinstall_${release.number}.exe" />
         <delete file="i2pupdate.sud" failonerror="false" />
@@ -597,6 +599,7 @@
                 <equals arg1="${release.privkey}" arg2=""/>
             </condition>
         </fail>
+        <echo message="Key file is ${release.privkey}" />
         <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="build/i2p.jar" />
@@ -629,6 +632,7 @@
         </java>
         <!-- will this use the monotonerc file in the current workspace? -->
         <echo message="Checking out fresh copy into ../i2p-${release-number} for tarballing:" />
+        <delete dir="../i2p-${release.number}" />
         <exec executable="mtn">
             <arg value="co" />
             <arg value="-b" />
@@ -641,10 +645,13 @@
             <arg value="-C" />
             <arg value=".." />
             <arg value="--exclude" />
-            <arg value="i2p-${release.number}/_MTN/" />
+            <arg value="i2p-${release.number}/_MTN*" />
             <arg value="i2p-${release.number}/" />
         </exec>
         <echo message="Sign the files:" />
+        <delete file="i2pinstall_${release.number}.exe.sig" />
+        <delete file="i2psource_${release.number}.tar.bz2.sig" />
+        <delete file="i2pupdate_${release.number}.zip.sig" />
         <exec executable="gpg">
             <arg value="-b" />
             <arg value="i2pinstall_${release.number}.exe" />
