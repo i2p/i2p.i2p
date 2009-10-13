@@ -214,8 +214,8 @@ div.warning {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      text-align: justify;
-     background-image:url("images/errortriangle.png");
-     background-position:15px center;
+     background-image:url("../images/itoopie_sm.png");
+     background-position:10px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f00;
@@ -269,7 +269,7 @@ div.main textarea {
 
 div.news {
      margin: 15px 15px 15px 220px;
-     padding: 20px 30px 20px 30px;
+     padding: 5px 30px 15px 30px;
      border: 1px solid #99f;
      background: #004;
      background-image: -moz-linear-gradient(top, bottom, from(#003), to(#005), color-stop(30%, #003), color-stop(100%, #001));
@@ -287,10 +287,24 @@ div.news {
 div.news li {
      text-align: justify;
      list-style: url('images/info_dark.png');
-     margin: 0 10px 0 30px;
-     padding: 5px;
+     margin: 0 10px 0 20px;
+     padding: 5px 5px 5px 0;
      vertical-align: middle;
      word-wrap: break-word;
+}
+
+div.news h4 {
+     border-bottom: 1px;
+     border-bottom-style: dotted;
+     border-bottom-color: #99f;
+     padding: 0 0 5px 0;
+     margin: 5px 0 10px 0;
+     font-size: 10pt;
+     opacity: 0.8;
+}
+
+div.news p {
+     margin-top: -5px;
 }
 
 div.confignav {
@@ -792,8 +806,8 @@ form {}
      color: #eef;
      text-align: center;
      border: 1px solid #99f !important;
-     border-top: 0px !important;
-     margin: -5px 0 5px 0; 
+/*     border-top: 0px !important;*/
+     margin: -3px 0 5px 0; 
      padding: 7px;
      background: #004;
      -moz-box-shadow: inset 0px 0px 0px 1px #009;
@@ -801,7 +815,7 @@ form {}
      box-shadow: inset 0px 0px 0px 1px #009;
 }
 
-.joblog {
+div.joblog {
      margin: 	15px 0 15px 0;
      padding: 5px 20px 10px 20px !important;
      border: 1px solid #99f;
@@ -811,7 +825,7 @@ form {}
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     text-align: justify;
+     text-align: justify !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -820,16 +834,32 @@ form {}
  
  div.joblog:li {
      word-wrap: break-word !important;
-     text-align: justify;
+     text-align: justify !important;
+     line-height: 80% !important;
 }
 
- .joblog:ul {
+div.joblog:ul {
      word-wrap: break-word !important;
      text-align: justify;
 }
 
+div.joblog li:first-child {
+     margin-top: 10px;
+}
+div.joblog li:last-child {
+     margin-bottom: -15px;
+}
+
 div.joblog form:first-child {
      margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 130%;
 }
 
 .smallhead {

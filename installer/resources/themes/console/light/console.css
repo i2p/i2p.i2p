@@ -198,7 +198,7 @@ div.routersummarytr:nth-child(odd) {
 
 div.warning {
      margin: 5px 20px 10px 240px;
-     padding: 0px 25px 20px 75px;
+     padding: 5px 25px 20px 75px;
      background: #fff;
      border: 1px solid #002;
      text-align: left;
@@ -207,11 +207,12 @@ div.warning {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      text-align: justify;
-     background-image:url("images/errortriangle.png");
-     background-position:15px center;
+     background-image:url("../images/itoopie_sm.png");     
+     background-position:10px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 1px 0px #d00;
      word-wrap: break-word;
+     min-width: 400px;
 }
 
 /* console error messages */
@@ -803,7 +804,7 @@ form {}
      background: #bcf;
      -moz-box-shadow: inset 0px 0px 2px 1px #eef;
 }
-
+/*
 .joblog {
      margin: 15px 0;
      padding: 10px 20px !important;
@@ -829,6 +830,56 @@ form {}
 
 .joblog table {
      margin-top: 10px;
+}
+*/
+
+div.joblog {
+     margin: 15px 0;
+     padding: 10px 20px !important;
+     border: 1px solid #003;
+     background-color: #004;
+     background: #ddf url('images/lightbluetile.png');
+     color: #001;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: justify;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     overflow: auto;
+ }
+ 
+ div.joblog:li {
+     word-wrap: break-word !important;
+     text-align: justify !important;
+     line-height: 80% !important;
+}
+
+div.joblog:ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+}
+
+div.joblog li:first-child {
+     margin-top: 10px;
+}
+div.joblog li:last-child {
+     margin-bottom: -10px;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 130%;
+}
+
+div.joblog hr {
+     margin: 15px 0;
 }
 
 .smallhead {
