@@ -23,7 +23,7 @@ number of session keys transferred, by improving the
 methods of dropping messages during overload, and by reducing
 drops by high-bandwidth routers.
 There is a new <a href="/configupdate.jsp">unsigned update option</a>
-for those of you that would like automatic udpates to bleeding-edge development versions.
+for those of you that would like automatic updates to bleeding-edge development versions.
 </p><p>
 The release also contains several changes to reduce memory and CPU usage,
 and a large assortment of bug fixes.
