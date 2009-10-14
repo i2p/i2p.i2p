@@ -463,14 +463,15 @@ public class Router {
             ri.addCapability(CAPABILITY_BW256);
         }
         
-        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
+        // if prop set to true, don't tell people we are ff even if we are
+        if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context) &&
+            !Boolean.valueOf(_context.getProperty("router.hideFloodfillParticipant")).booleanValue())
             ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
         
-        if("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+        if(Boolean.valueOf(_context.getProperty(PROP_HIDDEN)).booleanValue())
             ri.addCapability(RouterInfo.CAPABILITY_HIDDEN);
         
-        String forceUnreachable = _context.getProperty(PROP_FORCE_UNREACHABLE);
-        if ( (forceUnreachable != null) && ("true".equalsIgnoreCase(forceUnreachable)) ) {
+        if (Boolean.valueOf(_context.getProperty(PROP_FORCE_UNREACHABLE)).booleanValue()) {
             ri.addCapability(CAPABILITY_UNREACHABLE);
             return;
         }
@@ -582,7 +583,13 @@ public class Router {
         //_context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
     }
     
+    /**
+     *  this is for oldconsole.jsp, pretty much unused except as a way to get memory info,
+     *  so let's comment out the rest, it is available elsewhere, and we don't really
+     *  want to spend a minute rendering a multi-megabyte page in memory.
+     */
     public void renderStatusHTML(Writer out) throws IOException {
+/****************
         out.write("<h1>Router console</h1>\n" +
                    "<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><br>\n" +
                    "<form action=\"/oldconsole.jsp\">" +
@@ -599,21 +606,25 @@ public class Router {
                    "<option value=\"/oldconsole.jsp#logs\">Log messages</option>\n" +
                    "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
                    "<hr>\n");
+**************/
 
-        StringBuilder buf = new StringBuilder(32*1024);
+        StringBuilder buf = new StringBuilder(4*1024);
         
+        // Please don't change the text or formatting, tino matches it in his scripts
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
             buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br>\n");
-        buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br>\n");
+        buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append("<br>\n");
+        buf.append("<b>RouterUptime: </b> " ).append(DataHelper.formatDuration(getUptime())).append(" <br>\n");
         buf.append("<b>Started on: </b> ").append(new Date(getWhenStarted())).append("<br>\n");
         buf.append("<b>Clock offset: </b> ").append(_context.clock().getOffset()).append("ms (OS time: ").append(new Date(_context.clock().now() - _context.clock().getOffset())).append(")<br>\n");
+        buf.append("<b>RouterVersion:</b> ").append(RouterVersion.FULL_VERSION).append(" / SDK: ").append(CoreVersion.VERSION).append("<br>\n"); 
         long tot = Runtime.getRuntime().totalMemory()/1024;
         long free = Runtime.getRuntime().freeMemory()/1024;
         buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br>\n"); 
-        buf.append("<b>Version:</b> Router: ").append(RouterVersion.VERSION).append(" / SDK: ").append(CoreVersion.VERSION).append("<br>\n"); 
         if (_higherVersionSeen) 
             buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://www.i2p.net/\">check</a> to see if there is a new release out<br>\n");
 
+/*********
         buf.append("<hr><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
@@ -768,6 +779,7 @@ public class Router {
             buf.append("</pre></td></tr>\n");
         }
         buf.append("</table>\n");
+***********/
         out.write(buf.toString());
         out.flush();
     }
