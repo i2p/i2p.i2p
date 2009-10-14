@@ -269,16 +269,17 @@ div.main textarea {
 
 div.news {
      margin: 15px 15px 15px 220px;
-     padding: 5px 30px 15px 30px;
+     padding: 5px 30px 10px 30px;
      border: 1px solid #99f;
      background: #004;
      background-image: -moz-linear-gradient(top, bottom, from(#003), to(#005), color-stop(30%, #003), color-stop(100%, #001));
 /*     background: #003 url("images/darkbluetile.png");*/
-     color: #eef;
+     color: #aaf;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     text-align: justify;
+     font-size: 7.5pt;
+     text-align: right;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -305,7 +306,13 @@ div.news h4 {
 
 div.news p {
      margin-top: -5px;
+     font-size: 8.5pt;
+     color: #eef;
 }
+
+div.news hr {
+     margin: -2px 0 5px 0;
+}     
 
 div.confignav {
      padding: 15px 10px !important;
@@ -689,6 +696,11 @@ hr {
      border: 0px solid #99f;
      margin: 10px 0;
 }
+
+hr:last-child {
+     margin-top: 20px;
+}
+
 
 sidebarlogo {
      text-align: center;

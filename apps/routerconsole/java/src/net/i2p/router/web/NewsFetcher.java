@@ -77,7 +77,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
          long now = _context.clock().now();
          return
              (_lastUpdated > 0 ? "News last updated " + DataHelper.formatDuration(now - _lastUpdated) + " ago" : "") +
-             (_lastFetch > _lastUpdated ? ", last checked " + DataHelper.formatDuration(now - _lastFetch) + " ago" : "");
+             (_lastFetch > _lastUpdated ? "; last checked " + DataHelper.formatDuration(now - _lastFetch) + " ago." : "");
     }
     
     public void run() {

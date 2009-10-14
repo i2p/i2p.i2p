@@ -495,7 +495,7 @@ hr {
 }
 
 div.joblog {
-     margin-top: -10px;
+     margin: 10px 0;
      line-height: 130% !important;
 }
 
@@ -530,7 +530,7 @@ div.joblog p {
 }
 
 div.joblog h3 {
-     margin: -5px 0 5px 0;
+     margin: 5px 0 5px 0;
 }
 
 div.joblog hr {
