@@ -1,30 +1,29 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 
 public class ProfilesHelper extends HelperBase {
     public ProfilesHelper() {}
     
+    /** @return empty string, writes directly to _out */
     public String getProfileSummary() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(16*1024);
         try {
-            _context.profileOrganizer().renderStatusHTML(new OutputStreamWriter(baos));
+            ProfileOrganizerRenderer rend = new ProfileOrganizerRenderer(_context.profileOrganizer(), _context);
+            rend.renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        return new String(baos.toByteArray());
+        return "";
     }
     
+    /** @return empty string, writes directly to _out */
     public String getShitlistSummary() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
         try {
-            _context.shitlist().renderStatusHTML(new OutputStreamWriter(baos));
+            _context.shitlist().renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        return new String(baos.toByteArray());
+        return "";
     }
 }

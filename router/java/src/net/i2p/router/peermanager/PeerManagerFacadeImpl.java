@@ -78,8 +78,8 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         return _manager.getPeersByCapability(capability); 
     }
 
+    /** @deprecated, moved to routerconsole */
     public void renderStatusHTML(Writer out) throws IOException { 
-        _manager.renderStatusHTML(out); 
     }
     
 }

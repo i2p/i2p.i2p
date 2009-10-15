@@ -250,8 +250,4 @@ class PeerManager {
             return rv;
         }
     }
-
-    public void renderStatusHTML(Writer out) throws IOException { 
-        _organizer.renderStatusHTML(out); 
-    }
 }
