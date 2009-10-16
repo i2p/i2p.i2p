@@ -138,7 +138,7 @@ public class StatsGenerator {
             buf.append("</i><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
-            buf.append("No lifetime events<br>&nbsp;<br>");
+            buf.append("No lifetime events<br>");
             return;
         }
         long now = _context.clock().now();

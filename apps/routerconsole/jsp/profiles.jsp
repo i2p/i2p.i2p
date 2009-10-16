@@ -11,7 +11,6 @@
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="profilesHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="profilesHelper" property="profileSummary" />
- <br>
  <a name="shitlist"> </a>
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
-</div></div></body></html>
+<hr></div></div></body></html>

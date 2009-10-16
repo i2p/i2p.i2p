@@ -8,21 +8,21 @@
 <%@include file="summary.jsp" %>
 <h1>I2P Router Logs</h1>
 <div class="main" id="main">
- <div class="joblog"><h3>Version:</h3><a name="version"> </a>
- Please include this information in bug reports.
+ <div class="joblog"><h3>I2P Version & Running Environment</h3><a name="version"> </a>
+ <i>Please include this information in bug reports:</i>
  <p>
-I2P <jsp:getProperty name="helper" property="version" /><br>
-<%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%><br>
-<%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
-CPU <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
-jbigi <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
-Encoding <%=System.getProperty("file.encoding")%><br></p><br>
+I2P version: <b><jsp:getProperty name="helper" property="version" /></b><br>
+Java version: <b><%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%></b><br>
+Platform: <b><%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%></b><br>
+Processor: <b><%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)</b><br>
+Jbigi: <b><%=net.i2p.util.NativeBigInteger.loadStatus()%></b><br>
+Encoding: <b><%=System.getProperty("file.encoding")%></b></p>
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <h3>Critical logs:</h3><a name="criticallogs"> </a>
+ <h3>Critical Logs</h3><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" /><br>
- <h3>Router logs (<a href="configlogging.jsp">configure</a>):</h3>
+ <h3>Router Logs [<a href="configlogging.jsp">configure</a>]</h3>
  <jsp:getProperty name="logsHelper" property="logs" /><br>
- <h3>Service (Wrapper) logs:</h3><a name="servicelogs"> </a>
+ <h3>Service (Wrapper) Logs</h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div></div></body></html>

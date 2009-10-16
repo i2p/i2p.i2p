@@ -12,4 +12,4 @@
  <h1>I2P Router Statistics</h1>
 <div class="main" id="main">
  <jsp:getProperty name="oldhelper" property="stats" />
-</div></body></html>
+<hr></div></body></html>
