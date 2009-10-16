@@ -139,7 +139,7 @@ public class ProfileOrganizer {
     }
 
     public void setUs(Hash us) { _us = us; }
-    Hash getUs() { return _us; }
+    public Hash getUs() { return _us; }
     
     public double getSpeedThreshold() { return _thresholdSpeedValue; }
     public double getCapacityThreshold() { return _thresholdCapacityValue; }
@@ -256,11 +256,6 @@ public class ProfileOrganizer {
         PeerProfile prof = getProfile(profile);
         if (prof != null)
             _persistenceHelper.writeProfile(prof, out);
-    }
-    
-    public void renderStatusHTML(Writer out) throws IOException {
-        ProfileOrganizerRenderer rend = new ProfileOrganizerRenderer(this, _context);
-        rend.renderStatusHTML(out);
     }
     
     /**

@@ -94,9 +94,22 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
+    private static final int MAX_TO_FLOOD = 9;
+
+    /**
+     *  Send to a subset of all floodfill peers.
+     *  We do this to implement Kademlia within the floodfills, i.e.
+     *  we flood to those closest to the key.
+     */
     public void flood(DataStructure ds) {
+        Hash key;
+        if (ds instanceof LeaseSet)
+            key = ((LeaseSet)ds).getDestination().calculateHash();
+        else
+            key = ((RouterInfo)ds).getIdentity().calculateHash();
+        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
-        List peers = sel.selectFloodfillParticipants(getKBuckets());
+        List peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
         int flooded = 0;
         for (int i = 0; i < peers.size(); i++) {
             Hash peer = (Hash)peers.get(i);
@@ -107,12 +120,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
             if (ds instanceof LeaseSet) {
-                msg.setKey(((LeaseSet)ds).getDestination().calculateHash());
                 msg.setLeaseSet((LeaseSet)ds);
             } else {
-                msg.setKey(((RouterInfo)ds).getIdentity().calculateHash());
                 msg.setRouterInfo((RouterInfo)ds);
             }
+            msg.setKey(key);
             msg.setReplyGateway(null);
             msg.setReplyToken(0);
             msg.setReplyTunnel(null);
@@ -125,11 +137,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             _context.commSystem().processMessage(m);
             flooded++;
             if (_log.shouldLog(Log.INFO))
-                _log.info("Flooding the entry for " + msg.getKey().toBase64() + " to " + peer.toBase64());
+                _log.info("Flooding the entry for " + key.toBase64() + " to " + peer.toBase64());
         }
         
         if (_log.shouldLog(Log.INFO))
-            _log.info("Flooded the to " + flooded + " peers");
+            _log.info("Flooded the data to " + flooded + " of " + peers.size() + " peers");
     }
 
     private static final int FLOOD_PRIORITY = 200;

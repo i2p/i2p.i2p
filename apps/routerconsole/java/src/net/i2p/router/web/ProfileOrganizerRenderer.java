@@ -1,4 +1,4 @@
-package net.i2p.router.peermanager;
+package net.i2p.router.web;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -12,6 +12,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.peermanager.DBHistory;
+import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 

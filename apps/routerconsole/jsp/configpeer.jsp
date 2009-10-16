@@ -66,6 +66,7 @@
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="profilesHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
  <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />

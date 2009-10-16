@@ -17,10 +17,14 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
 
+/**
+ *  This extends StoreJob to fire off a FloodfillVerifyStoreJob after success.
+ *
+ */
 class FloodfillStoreJob extends StoreJob {    
     private FloodfillNetworkDatabaseFacade _facade;
     /**
-     * Create a new search for the routingKey specified
+     * Send a data structure to the floodfills
      * 
      */
     public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
@@ -31,7 +35,7 @@ class FloodfillStoreJob extends StoreJob {
      * @param toSkip set of peer hashes of people we dont want to send the data to (e.g. we
      *               already know they have it).  This can be null.
      */
-    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set toSkip) {
+    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context, facade, key, data, onSuccess, onFailure, timeoutMs, toSkip);
         _facade = facade;
     }
