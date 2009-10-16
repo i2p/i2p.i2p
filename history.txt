@@ -1,3 +1,6 @@
+2009-10-16 dr|z3d
+    * Extensive UI whitespace cleanups and positional finessing.
+
 2009-10-16 zzz
     * Crypto: Two more test classes out of the lib
     * FloodfillMonitor: Slow down the volunteers again
