@@ -1,3 +1,17 @@
+2009-10-16 zzz
+    * Crypto: Two more test classes out of the lib
+    * FloodfillMonitor: Slow down the volunteers again
+    * oldconsole.jsp: Remove almost all of it, add lines for tino
+    * MessageHistory: Cleanups
+    * NetDb: Rework part 1 of N:
+      - Flood only to those closest to the key
+      - Java 5 fixups
+    * ProfileOrganizerRenderer:
+      - Move to routerconsole
+      - Write directly to Writer for speed
+    * Router: Add router.hideFloodfillParticipant option for testing
+    * StatisticsManager: Cleanup after release
+
 * 2009-10-12  0.7.7 released
 
 2009-10-11 zzz
