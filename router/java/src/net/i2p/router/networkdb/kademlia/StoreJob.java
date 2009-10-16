@@ -56,7 +56,7 @@ class StoreJob extends JobImpl {
     private final static int STORE_PRIORITY = 100;
     
     /**
-     * Create a new search for the routingKey specified
+     * Send a data structure to the floodfills
      * 
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
@@ -69,7 +69,7 @@ class StoreJob extends JobImpl {
      *               already know they have it).  This can be null.
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
-                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set toSkip) {
+                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
         getContext().statManager().createRateStat("netDb.storeRouterInfoSent", "How many routerInfo store messages have we sent?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -146,7 +146,7 @@ class StoreJob extends JobImpl {
         // This will help minimize active connections for floodfill peers and allow
         // the network to scale.
         // Perhaps the ultimate solution is to send RouterInfos through a lease also.
-        List closestHashes;
+        List<Hash> closestHashes;
         if (_state.getData() instanceof RouterInfo) 
             closestHashes = getMostReliableRouters(_state.getTarget(), toCheck, _state.getAttempted());
         else
@@ -165,8 +165,8 @@ class StoreJob extends JobImpl {
             //_state.addPending(closestHashes);
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Continue sending key " + _state.getTarget() + " after " + _state.getAttempted().size() + " tries to " + closestHashes);
-            for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Iterator<Hash> iter = closestHashes.iterator(); iter.hasNext(); ) {
+                Hash peer = iter.next();
                 DataStructure ds = _facade.getDataStore().get(peer);
                 if ( (ds == null) || !(ds instanceof RouterInfo) ) {
                     if (_log.shouldLog(Log.INFO))
@@ -215,7 +215,7 @@ class StoreJob extends JobImpl {
      *
      * @return ordered list of Hash objects
      */
-    private List getClosestRouters(Hash key, int numClosest, Set alreadyChecked) {
+    private List<Hash> getClosestRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Current routing key for " + key + ": " + rkey);
@@ -225,7 +225,7 @@ class StoreJob extends JobImpl {
         return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, ks);
     }
 
-    private List getMostReliableRouters(Hash key, int numClosest, Set alreadyChecked) {
+    private List<Hash> getMostReliableRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         KBucketSet ks = _facade.getKBuckets();
         if (ks == null) return new ArrayList();

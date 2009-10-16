@@ -32,16 +32,16 @@ class FloodfillPeerSelector extends PeerSelector {
      * @return List of Hash for the peers selected
      */
     @Override
-    public List selectMostReliablePeers(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    public List<Hash> selectMostReliablePeers(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, true);
     }
 
     @Override
-    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+    public List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, false);
     }
 
-    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
+    public List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
         peersToIgnore.add(_context.routerHash());
@@ -56,30 +56,55 @@ class FloodfillPeerSelector extends PeerSelector {
         return rv;
     }
     
-    /** Returned list will not include our own hash */
-    public List selectFloodfillParticipants(KBucketSet kbuckets) {
+    /**
+     *  @return all floodfills not shitlisted forever. list will not include our own hash
+     *
+     */
+    public List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
         if (kbuckets == null) return new ArrayList();
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, null, 0);
         kbuckets.getAll(matches);
         return matches.getFloodfillParticipants();
     }
     
+    /**
+     *  @return all floodfills not shitlisted foreverx
+     *  @param maxNumRouters max to return
+     *  Sorted by closest to the key if > maxNumRouters, otherwise not
+     */
+    public List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
+        List<Hash> ffs = selectFloodfillParticipants(kbuckets);
+        if (ffs.size() <= maxNumRouters)
+            return ffs; // unsorted
+        TreeMap<BigInteger, Hash> sorted = new TreeMap();
+        for (int i = 0; i < ffs.size(); i++) {
+            Hash h = ffs.get(i);
+            BigInteger diff = getDistance(key, h);
+            sorted.put(diff, h);
+        }
+        List<Hash> rv = new ArrayList(maxNumRouters);
+        for (int i = 0; i < maxNumRouters; i++) {
+            rv.add(sorted.remove(sorted.firstKey()));
+        }
+        return rv;
+    }
+    
     private class FloodfillSelectionCollector implements SelectionCollector {
-        private TreeMap _sorted;
-        private List _floodfillMatches;
+        private TreeMap<BigInteger, Hash> _sorted;
+        private List<Hash>  _floodfillMatches;
         private Hash _key;
-        private Set _toIgnore;
+        private Set<Hash>  _toIgnore;
         private int _matches;
         private int _wanted;
-        public FloodfillSelectionCollector(Hash key, Set toIgnore, int wanted) {
+        public FloodfillSelectionCollector(Hash key, Set<Hash> toIgnore, int wanted) {
             _key = key;
             _sorted = new TreeMap();
-            _floodfillMatches = new ArrayList(1);
+            _floodfillMatches = new ArrayList(8);
             _toIgnore = toIgnore;
             _matches = 0;
             _wanted = wanted;
         }
-        public List getFloodfillParticipants() { return _floodfillMatches; }
+        public List<Hash> getFloodfillParticipants() { return _floodfillMatches; }
         private static final int EXTRA_MATCHES = 100;
         public void add(Hash entry) {
             //if (_context.profileOrganizer().isFailing(entry))
@@ -115,15 +140,15 @@ class FloodfillPeerSelector extends PeerSelector {
             _matches++;
         }
         /** get the first $howMany entries matching */
-        public List get(int howMany) {
+        public List<Hash> get(int howMany) {
             return get(howMany, false);
         }
 
-        public List get(int howMany, boolean preferConnected) {
+        public List<Hash> get(int howMany, boolean preferConnected) {
             Collections.shuffle(_floodfillMatches, _context.random());
-            List rv = new ArrayList(howMany);
-            List badff = new ArrayList(howMany);
-            List unconnectedff = new ArrayList(howMany);
+            List<Hash> rv = new ArrayList(howMany);
+            List<Hash> badff = new ArrayList(howMany);
+            List<Hash> unconnectedff = new ArrayList(howMany);
             int found = 0;
             long now = _context.clock().now();
             // Only add in "good" floodfills here...
