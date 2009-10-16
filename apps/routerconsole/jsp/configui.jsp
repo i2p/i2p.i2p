@@ -20,7 +20,7 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
-<div class="configure"><h3>Router Console Theme</h3>
+<div class="configure"><div class="topshimten"><h3>Router Console Theme</h3></div>
 <%
  // userAgent defined in confignav
  if (userAgent == null || !userAgent.contains("MSIE")) {

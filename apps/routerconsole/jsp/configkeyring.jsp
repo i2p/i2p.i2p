@@ -17,14 +17,12 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHelper" id="keyringhelper" scope="request" />
  <jsp:setProperty name="keyringhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<div class="configure"><p><h3>Keyring</h3>
+<div class="configure"><h2>Keyring</h2>
  The router keyring is used to decrypt encrypted leaseSets.
  The keyring may contain keys for local or remote encrypted destinations.
  <div class="wideload"><p>
  <jsp:getProperty name="keyringhelper" property="summary" />
 </p></div>
-
- <br>
 
  <form action="configkeyring.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce");

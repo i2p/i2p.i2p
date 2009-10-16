@@ -209,6 +209,15 @@ div.routersummary tr {
      border: 0 !important;
 }
 
+.tunnels {
+     margin-top: 3px;
+}
+
+.tunnels tr {
+     padding: 4px 0 !important;
+     margin-left: -7px !important;
+}
+     
 div.routersummary form {
      margin-top: 8px;
 }
@@ -260,7 +269,7 @@ div.main {
 }
 
 div.main ul {
-     margin: 0;
+     margin: 5px 0 -10px -10px;
 }
 
 div.main li {
@@ -274,9 +283,26 @@ div.main li:first-child {
      padding-top: 15px;
 }
 
+div.main hr:last-child {
+     margin: 15px 0 10px 0;
+}
+
 div.main textarea {
      width: 98% !important; 
      margin: 2px 0 2px 5px;
+}
+
+div.main h2 {
+     margin-top: 20px;
+}
+
+div.welcome {
+     margin-top: 5px;
+}
+
+div.main h2:first-child, div.main h3:first-child {
+     margin-top: 0px;
+     margin-bottom: 10px;
 }
 
 div.news {
@@ -299,11 +325,11 @@ div.news {
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: -15px 15px -30px -20px;
+     margin: -15px 15px -25px -20px;
      padding: 0px 0 15px 0;
      border-bottom: 2px dotted #cc7;
      border-top: 0px solid #cc7;     
-     padding: 3px 5px 5px 5px;
+     padding: 3px 5px 5px 0;
      font-size: 10pt;
      color: #540;
 }
@@ -326,9 +352,9 @@ div.news a:visited {
 div.news hr {
      color: #cc7;
      background: #cc7;
-     height: 2px;
+     height: 1px;
      border: 0px solid #cccc77;
-     margin: 5px 0;
+     margin: 2px 0 0 0;
 }
 
 div.confignav {
@@ -361,6 +387,22 @@ div.configure tr, div.configure td {
 div.configure tr {
      -moz-box-shadow: inset 0px 0px 1px 0px #bbf;
 }
+
+div.configure li:first-child, div.main li:first-child {
+     margin-top: -10px;
+}
+
+div.configure li:last-child {
+     margin-bottom: -5px;
+}
+
+div.configure h2:first-child {
+     margin-top: 15px;
+}
+
+.topshimten {
+     margin-top: 15px;
+} 
 
 div.messages {
      padding: 0px 10px;
@@ -417,6 +459,7 @@ h3 {
      border-bottom: 3px solid #aaf;
      border-top: 0px solid #aaf;
      letter-spacing: 0.04em;
+     margin-bottom: 10px;
 }
 
 .proxyfooter{
@@ -513,6 +556,7 @@ div.joblog:ul {
 div.joblog li:first-child {
      margin-top: -10px;
 }
+
 div.joblog li:last-child {
      margin-bottom: -10px;
 }
@@ -530,7 +574,11 @@ div.joblog p {
 }
 
 div.joblog h3 {
-     margin: 5px 0 5px 0;
+     margin: 10px 0 10px 0;
+}
+
+div.joblog h3:first-child {
+     margin: 5px 0 15px 0;
 }
 
 div.joblog hr {
@@ -571,10 +619,10 @@ p {
 }
 
 .langbox {
-     margin: 20px -15px 0px 5px;
+     margin: 10px -20px 0px 5px;
      color: #001;
      font-size: 7pt;
-     width: 180px;
+     width: 220px;
      text-align: center;
      float: right;
      valign: middle;
@@ -641,7 +689,7 @@ tt {
 }
 
 div.graphspanel {
-     padding: 20px 10px;
+     padding: 15px 5px 20px 5px;
      margin: -20px;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;

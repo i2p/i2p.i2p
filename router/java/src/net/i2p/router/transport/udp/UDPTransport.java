@@ -2002,7 +2002,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(sendTotal).append("</b></td> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n");
         buf.append("      <td align=\"center\"><b>").append(resentTotal);
         buf.append("</b></td> <td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n");
-        buf.append(" </tr></table></div></p><p>\n");
+        buf.append(" </tr></table></div>\n");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         // NPE here early
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();
@@ -2011,7 +2011,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         double nondupSent = ((double)bytesTransmitted - ((double)resentTotal)*averagePacketSize);
         double bwResent = (nondupSent <= 0 ? 0d : ((((double)resentTotal)*averagePacketSize) / nondupSent));
         buf.append("<h3>Percentage of bytes retransmitted (lifetime): ").append(formatPct(bwResent));
-        buf.append("</h3><i>(Includes retransmission required by packet loss)</i><br></p>\n");
+        buf.append("</h3><i>(Includes retransmission required by packet loss)</i>\n");
         out.write(buf.toString());
         buf.setLength(0);
         out.write(KEY);
@@ -2031,7 +2031,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private static final String KEY = "<h3>Definitions:</h3><div class=\"configure\">" +
-        "<br><b id=\"def.peer\">Peer</b>: the remote peer.<br>\n" +
+        "<p><b id=\"def.peer\">Peer</b>: the remote peer.<br>\n" +
         "<b id=\"def.dir\">Dir</b>: v means they offer to introduce us, ^ means we offer to introduce them.<br>\n" +
         "<b id=\"def.idle\">Idle</b>: the idle time is how long since a packet has been received or sent.<br>\n" +
         "<b id=\"def.rate\">In/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second).<br>\n" +
@@ -2049,10 +2049,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.send\">TX</b>: the number of packets sent to the peer.<br>\n" +
         "<b id=\"def.recv\">RX</b>: the number of packets received from the peer.<br>\n" +
         "<b id=\"def.resent\">ReTX</b>: the number of packets retransmitted to the peer.<br>\n" +
-        "<b id=\"def.dupRecv\">DupRX</b>: the number of duplicate packets received from the peer." +
+        "<b id=\"def.dupRecv\">DupRX</b>: the number of duplicate packets received from the peer.</p>" +
         "</div>\n";
     
-    /**
+    /*
      * Cache the bid to reduce object churn
      */
     private class SharedBid extends TransportBid {

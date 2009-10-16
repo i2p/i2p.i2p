@@ -71,12 +71,12 @@ function toggleAll(category)
  <input type="hidden" name="action" value="foo" />
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
  <h3>Configure I2P Stat Collection</h3>
- Enable full stats?
+ <p>Enable full stats?
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
  (change requires restart to take effect)<br>
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br>
- Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br>
+Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br></p>
  <div class="wideload">
  <table>
  <% while (statshelper.hasMoreStats()) {

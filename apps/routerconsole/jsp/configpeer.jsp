@@ -31,7 +31,6 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigPeerHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigPeerHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce")%>" />
-<p>
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
@@ -40,7 +39,6 @@
  <input type="text" size="55" name="peer" value="<%=peer%>" /></div>
  <h3>Manually Ban / Unban a Peer</h3>
  Banning will prevent the participation of this peer in tunnels you create.
-      <hr>
       <div class="formaction">
         <input type="submit" name="action" value="Ban peer until restart" />
         <input type="submit" name="action" value="Unban peer" />
@@ -53,26 +51,22 @@
  Bonuses may be positive or negative, and affect the peer's inclusion in Fast
       and High Capacity tiers. Fast peers are used for client tunnels, and High
       Capacity peers are used for some exploratory tunnels. Current bonuses are
-      displayed on the <a href="profiles.jsp">profiles page</a>.
-      <p>
+      displayed on the <a href="profiles.jsp">profiles page</a>.<br>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
  %>
- <hr>
  <div class="mediumtags">Speed:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
  Capacity:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
  <input type="submit" name="action" value="Adjust peer bonuses" /></div>
- </p>
  </form>
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
- <hr>
  <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 

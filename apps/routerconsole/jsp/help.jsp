@@ -18,11 +18,11 @@ help with other aspects of the project, please see the documentation for
 You may also try the <a href="http://forum.i2p/">I2P forum</a>
 or IRC.<br>
 
-<h2>Summary Bar Information</h2><div align="justify">
+<h2>Summary Bar Information</h2><p>
 Many of the stats on the summary bar may be
 <a href="configstats.jsp">configured</a> to be
 <a href="graphs.jsp">graphed</a> for further analysis.
-</div><h3>General</h3><ul>
+</p><h3>General</h3><ul>
 <li class="tidylist"><b>Ident:</b>
 The first four characters (24 bits) of your 44-character (256-bit) Base64 router hash.
 The full hash is shown on your <a href="netdb.jsp?r=.">router info page</a>.
@@ -129,9 +129,8 @@ or reject all requests for a number of reasons, to control
 the bandwidth and CPU demands and maintain capacity for
 local clients.</ul>
 
-<h2>Legal stuff</h2><div align="justify">
-The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with
-a few notable exceptions:</div><br><ul>
+<h2>Legal stuff</h2><p>The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with
+a few notable exceptions:</p><ul>
 <li class="tidylist">ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
 <li class="tidylist">SHA256 and HMAC-SHA256, under the MIT license, written by the Legion of the Bouncycastle</li>
 <li class="tidylist">AES code, under the Cryptix (MIT) license, written by the Cryptix team</li>
@@ -166,7 +165,7 @@ details on other applications available, as well as their licenses, please see t
 client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
 .</p>
 
-<h2>Release history</h2>
+<h2>Release history</h2><br>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
