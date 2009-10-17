@@ -7,16 +7,16 @@
 </head><body>
 <%@include file="summary.jsp" %>
 <h1>I2P Router Help & Support</h1>
-<div class="main" id="main"><div align="justify">
+<div class="main" id="main"><p>
 If you'd like to help improve or translate the documentation, or
 help with other aspects of the project, please see the documentation for
 <a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a>
-<br><br>Further assistance is available here:<br></div>
+<br><br>Further assistance is available here:</p>
 <ul class="links">
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
-<li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.</ul><br>
-You may also try the <a href="http://forum.i2p/">I2P forum</a>
-or IRC.<br>
+<li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.</ul>
+<p>You may also try the <a href="http://forum.i2p/">I2P forum</a>
+or IRC.</p>
 
 <h2>Summary Bar Information</h2><p>
 Many of the stats on the summary bar may be
@@ -165,7 +165,7 @@ details on other applications available, as well as their licenses, please see t
 client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
 .</p>
 
-<h2>Release history</h2><br>
+<h2>Release history</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />

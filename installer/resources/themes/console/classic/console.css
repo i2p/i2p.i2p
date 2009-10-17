@@ -169,11 +169,10 @@ div.routersummary hr {
 
 div.routersummary h3 {
      border: 0px solid #f00;
-/*     border-bottom: 1px solid #99f !important;*/
-     font-size: 10pt;
+     font-size: 9.5pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px;
-     padding: 5px 0px 5px 0px;
+     padding: 3px 0;
      background: #c5d5fb;
      text-transform: uppercase;
 }
@@ -181,10 +180,10 @@ div.routersummary h3 {
 div.routersummary h4 {
      border: 0px solid #f00;
      border-bottom: 0 !important;
-     font-size: 9pt;
+     font-size: 8.5pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px !important;
-     padding: 2px 3px 3px 3px;
+     padding: 2px 3px;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -630,6 +629,15 @@ p {
 
 .langbox img {
      padding: 0 2px; /* Ignored by IE8 */
+}
+
+.links {
+     padding-bottom: -2px;
+     text-align: justify;
+}
+
+.links li {
+     list-style-image: url("../images/link.png") !important;
 }
 
 a:link{

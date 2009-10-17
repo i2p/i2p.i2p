@@ -11,12 +11,12 @@
  <div class="joblog"><h3>I2P Version & Running Environment</h3><a name="version"> </a>
  <i>Please include this information in bug reports:</i>
  <p>
-I2P version: <b><jsp:getProperty name="helper" property="version" /></b><br>
-Java version: <b><%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%></b><br>
-Platform: <b><%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%></b><br>
-Processor: <b><%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)</b><br>
-Jbigi: <b><%=net.i2p.util.NativeBigInteger.loadStatus()%></b><br>
-Encoding: <b><%=System.getProperty("file.encoding")%></b></p>
+<b>I2P version:</b> <jsp:getProperty name="helper" property="version" /><br>
+<b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%><br>
+<b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
+<b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
+<b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
+<b>Encoding:</b> <%=System.getProperty("file.encoding")%></p>
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <h3>Critical Logs</h3><a name="criticallogs"> </a>

@@ -71,4 +71,4 @@
  <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 
-</div></div></div></body></html>
+</div></div><br></div></body></html>

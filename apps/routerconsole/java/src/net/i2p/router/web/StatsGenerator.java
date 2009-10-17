@@ -58,7 +58,7 @@ public class StatsGenerator {
         buf.append("Statistics gathered during this router's uptime (");
         long uptime = _context.router().getUptime();
         buf.append(DataHelper.formatDuration(uptime));
-        buf.append(").  The data gathered is quantized over a 1 minute period, so should just be used as an estimate<p />");
+        buf.append(").  The data gathered is quantized over a 1 minute period, so should just be used as an estimate.");
 
         out.write(buf.toString());
         buf.setLength(0);
