@@ -1771,7 +1771,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(". Limit: ").append(getMaxConnections());
         buf.append(". Timeout: ").append(DataHelper.formatDuration(_expireTimeout));
         buf.append(".</h3>\n");
-        buf.append("<div class=\"wideload\"><table>\n");
+        buf.append("<table>\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">Peer</a>");
         if (sortFlags != FLAG_ALPHA)
             buf.append(" <a href=\"").append(urlBase).append("?sort=0\">V</a> ");

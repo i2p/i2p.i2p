@@ -186,6 +186,12 @@ div.routersummary p {
      padding: 0;
 }     
 
+div.refresh {
+     margin-top: -10px !important;
+     margin-bottom: -4px !important;
+     padding: 2px 0 0px 0 !important;
+}
+
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 0px 0px 1px rgba(192, 192, 255, 0.5);
 }

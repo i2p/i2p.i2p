@@ -642,11 +642,11 @@ public class NTCPTransport extends TransportImpl {
         long totalRecv = 0;
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3 id=\"ntcpcon\">NTCP connections: ").append(peers.size());
+        buf.append("<div class=\"wideload\"><h3 id=\"ntcpcon\">NTCP connections: ").append(peers.size());
         buf.append(". Limit: ").append(getMaxConnections());
         buf.append(". Timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
         buf.append(".</h3>\n" +
-                   "<div class=\"wideload\"><table>\n" +
+                   "<table>\n" +
                    "<tr><th><a href=\"#def.peer\">Peer</a></th>" +
                    "<th>Dir</th>" +
                    "<th align=\"right\"><a href=\"#def.idle\">Idle</a></th>" +
@@ -730,7 +730,7 @@ public class NTCPTransport extends TransportImpl {
                        "</td></tr>\n");
         }
 
-        buf.append("</table></div>\n");
+        buf.append("</table>\n");
         out.write(buf.toString());
         buf.setLength(0);
     }

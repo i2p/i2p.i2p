@@ -9,6 +9,6 @@
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.JobQueueHelper" id="jobQueueHelper" scope="request" />
  <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="jobQueueHelper" property="writer" value="<%=out%>" />
+ <jsp:setProperty name="jobQueueHelper" property="writer" value="<%=out%>" /><hr>
  <jsp:getProperty name="jobQueueHelper" property="jobQueueSummary" />
 </div></body></html>

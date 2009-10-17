@@ -218,7 +218,14 @@ div.routersummary tr {
 }
      
 div.routersummary form {
-     margin-top: 8px;
+     margin-top: -6px !important;
+     margin-bottom: -4px !important;     
+}
+
+div.refresh {
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+     padding: 2px 0 !important;
 }
 
 div.routersummary p {
@@ -268,7 +275,7 @@ div.main {
 }
 
 div.main ul {
-     margin: 5px 0 -10px -10px;
+     margin: -10px 0 -10px -10px;
 }
 
 div.main li {
@@ -293,6 +300,7 @@ div.main textarea {
 
 div.main h2 {
      margin-top: 20px;
+     margin-bottom: -5px;
 }
 
 div.welcome {
@@ -300,8 +308,25 @@ div.welcome {
 }
 
 div.main h2:first-child, div.main h3:first-child {
-     margin-top: 0px;
-     margin-bottom: 10px;
+     margin-top: 0px; 
+     margin-bottom: -5px;
+}
+
+div.wideload h2 {
+     margin-bottom: 0px !important;
+}
+
+div.wideload h3:first-child {
+     margin-top: 0 !important;
+}
+
+div.wideload h3 {
+     margin-top: 15px !important;      
+     margin-bottom: 0px !important;
+}
+
+div.wideload p !important {
+     margin-top: 5px;
 }
 
 div.news {
@@ -401,6 +426,7 @@ div.configure h2:first-child {
 
 .topshimten {
      margin-top: 15px;
+     margin-bottom: 15px;
 } 
 
 div.messages {
@@ -615,6 +641,7 @@ p {
 
 .formaction {
      text-align: right;
+     margin: -10px -5px;
 }
 
 .langbox {
@@ -634,6 +661,7 @@ p {
 .links {
      padding-bottom: -2px;
      text-align: justify;
+     margin-top: 5px !important;
 }
 
 .links li {
@@ -731,7 +759,7 @@ div.graphspanel hr {
      margin: 10px 0;
 }
 
-div.graphspanel form {
+div.graphspanel form:last-child {
      text-align: left;
      margin: 0 20px;
 }

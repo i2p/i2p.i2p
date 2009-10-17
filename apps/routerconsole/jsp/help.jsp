@@ -165,7 +165,7 @@ details on other applications available, as well as their licenses, please see t
 client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
 .</p>
 
-<h2>Release history</h2>
+<h2>Release history</h2><br>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
