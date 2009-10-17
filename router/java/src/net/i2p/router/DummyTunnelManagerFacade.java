@@ -10,11 +10,14 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
+import net.i2p.router.tunnel.pool.TunnelPool;
 
 /**
  * Build and maintain tunnels throughout the network.
@@ -50,4 +53,10 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public void restart() {}
     public void shutdown() {}
     public void startup() {}
+
+    public void listPools(List<TunnelPool> out) {}
+    public Map<Hash, TunnelPool> getInboundClientPools() { return null; }
+    public Map<Hash, TunnelPool> getOutboundClientPools() { return null; }
+    public TunnelPool getInboundExploratoryPool() { return null; }
+    public TunnelPool getOutboundExploratoryPool() { return null; }
 }
