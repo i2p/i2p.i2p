@@ -17,23 +17,24 @@ public class NetDbHelper extends HelperBase {
     public void setLease(String l) { _lease = "1".equals(l); }
     
     public String getNetDbSummary() {
+        NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
             if (_out != null) {
                 if (_routerPrefix != null)
-                    _context.netDb().renderRouterInfoHTML(_out, _routerPrefix);
+                    renderer.renderRouterInfoHTML(_out, _routerPrefix);
                 else if (_lease)
-                    _context.netDb().renderLeaseSetHTML(_out);
+                    renderer.renderLeaseSetHTML(_out);
                 else
-                    _context.netDb().renderStatusHTML(_out, _full);
+                    renderer.renderStatusHTML(_out, _full);
                 return "";
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
                 if (_routerPrefix != null)
-                    _context.netDb().renderRouterInfoHTML(new OutputStreamWriter(baos), _routerPrefix);
+                    renderer.renderRouterInfoHTML(new OutputStreamWriter(baos), _routerPrefix);
                 else if (_lease)
-                    _context.netDb().renderLeaseSetHTML(new OutputStreamWriter(baos));
+                    renderer.renderLeaseSetHTML(new OutputStreamWriter(baos));
                 else
-                    _context.netDb().renderStatusHTML(new OutputStreamWriter(baos), _full);
+                    renderer.renderStatusHTML(new OutputStreamWriter(baos), _full);
                 return new String(baos.toByteArray());
             }
         } catch (IOException ioe) {
