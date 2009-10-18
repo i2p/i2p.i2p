@@ -319,4 +319,9 @@ class ProfileOrganizerRenderer {
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             return "" + c;
     }
+
+    /** translate a string */
+    private String _(String s) {
+        return Messages.getString(s, _context);
+    }
 }

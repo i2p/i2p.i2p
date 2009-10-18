@@ -268,4 +268,8 @@ public class NetDbRenderer {
         buf.append("</td></tr>\n");
     }
 
+    /** translate a string */
+    private String _(String s) {
+        return Messages.getString(s, _context);
+    }
 }

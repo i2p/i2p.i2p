@@ -22,4 +22,10 @@ public class CSSHelper extends HelperBase {
         }
         return url;
     }
+
+    /** change default language for the router but don't save it */
+    public void setLang(String lang) {
+        if (lang != null && lang.length() > 0)
+            _context.router().setConfigSetting(Messages.PROP_LANG, lang);
+    }
 }

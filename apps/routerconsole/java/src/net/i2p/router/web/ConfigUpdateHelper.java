@@ -87,7 +87,7 @@ public class ConfigUpdateHelper extends HelperBase {
         buf.append("<select name=\"updatePolicy\">");
         
         if ("notify".equals(policy))
-            buf.append("<option value=\"notify\" selected=\"true\">Notify only</option>");
+            buf.append("<option value=\"notify\" selected=\"true\">").append(_("Notify only")).append("</option>");
         else
             buf.append("<option value=\"notify\">Notify only</option>");
 

@@ -235,4 +235,9 @@ public class StatsGenerator {
     
     private final static DecimalFormat _pct = new DecimalFormat("#0.00%");
     private final static String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
+
+    /** translate a string */
+    private String _(String s) {
+        return Messages.getString(s, _context);
+    }
 }

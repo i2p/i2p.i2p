@@ -73,6 +73,15 @@
         <delete dir="./tmpextract" />
         
         <ant target="war" />
+
+        <!-- Update the messages_*.po files.
+             We need to supply something for windows, and then change the fail property to true,
+             or else not run this on windows -->
+        <exec executable="sh" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <!-- jar again to get the latest messages_*.class files -->
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
     <target name="war" depends="precompilejsp">
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
@@ -115,6 +124,7 @@
         </java>
         
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
+               encoding="UTF-8"
                destdir="../jsp/WEB-INF/classes/" 
                srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <compilerarg line="${javac.compilerargs}" />
@@ -133,10 +143,13 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
         </javac>
+
+        <!-- save these so we can run gettext on the generated java files later
         <delete>
             <fileset dir="../jsp/WEB-INF/" includes="**/*.java" />
             <fileset dir="../jsp/WEB-INF/" includes="**/*.jsp" />
         </delete>
+        -->
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />
         <loadfile property="jspc.web.fragment" srcfile="../jsp/web-fragment.xml" />
         <replace file="../jsp/web-out.xml">

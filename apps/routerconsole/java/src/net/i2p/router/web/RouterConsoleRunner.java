@@ -111,6 +111,7 @@ public class RouterConsoleRunner {
             File tmpdir = new File(workDir, ROUTERCONSOLE + "-" + _listenPort);
             tmpdir.mkdir();
             wac.setTempDirectory(tmpdir);
+            wac.addHandler(0, new LocaleWebAppHandler(I2PAppContext.getGlobalContext()));
             initialize(wac);
             File dir = new File(_webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());

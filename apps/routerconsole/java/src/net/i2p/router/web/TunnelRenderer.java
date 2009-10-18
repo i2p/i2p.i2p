@@ -310,4 +310,9 @@ public class TunnelRenderer {
     private String netDbLink(Hash peer) {
         return _context.commSystem().renderPeerHTML(peer);
     }
+
+    /** translate a string */
+    private String _(String s) {
+        return Messages.getString(s, _context);
+    }
 }
