@@ -1,11 +1,12 @@
 #
 # Update messages_xx.po and messages_xx.class files,
 # from both java and jsp sources.
-# Requires installed programs xgettext, msgfmt, and find.
+# Requires installed programs xgettext, msgfmt, msgmerge, and find.
 # zzz - public domain
 #
 CLASS=net.i2p.router.web.messages
 TMPFILE=build/javafiles.txt
+export TZ=UTC
 
 for i in ../locale/messages_*.po
 do
@@ -31,12 +32,24 @@ do
 	# In a jsp, you must use a helper or handler that has the context set.
 	# To start a new translation, copy the header from an old translation to the new .po file,
 	# then ant distclean updater.
-	xgettext -f build/javafiles.txt -F -L java --keyword=_ --keyword=cssHelper._ --keyword=handler._ --keyword=formhandler._ -o $i -j
+	find src ../jsp/WEB-INF -name *.java > $TMPFILE
+	xgettext -f $TMPFILE -F -L java --keyword=_ --keyword=cssHelper._ --keyword=handler._ --keyword=formhandler._ -o ${i}t
 	if [ $? -ne 0 ]
 	then
 		echo 'Warning - xgettext failed, not updating translations'
+		rm -f ${i}t
 		break
 	fi
+	msgmerge -U --backup=none $i ${i}t
+	if [ $? -ne 0 ]
+	then
+		echo 'Warning - msgmerge failed, not updating translations'
+		rm -f ${i}t
+		break
+	fi
+	rm -f ${i}t
+	# so we don't do this again
+	touch $i
 
 	# convert to class files in build/obj
 	msgfmt --java -r $CLASS -l $LG -d build/obj $i
