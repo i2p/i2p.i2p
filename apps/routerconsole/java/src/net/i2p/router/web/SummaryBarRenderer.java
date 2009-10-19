@@ -264,12 +264,14 @@ public class SummaryBarRenderer {
         buf.setLength(0);
 
 
+        boolean anotherLine = false;
         if (_helper.showFirewallWarning()) {
             buf.append("<h4><a href=\"config.jsp\" target=\"_top\" title=\"")
                .append(_("Help with firewall configuration"))
                .append("\">")
                .append(_("Check NAT/firewall"))
                .append("</a></h4>");
+            anotherLine = true;
         }
 
         boolean reseedInProgress = Boolean.valueOf(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress")).booleanValue();
@@ -289,116 +291,120 @@ public class SummaryBarRenderer {
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
                 buf.append("<button type=\"submit\" >Reseed</button></form>\n");
             }
+            anotherLine = true;
         }
         // If a new reseed ain't running, and the last reseed had errors, show error message
         if (!reseedInProgress) {
             String reseedErrorMessage = System.getProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
             if (reseedErrorMessage.length() > 0) {
                 buf.append("<i>").append(reseedErrorMessage).append("</i><br>");
+                anotherLine = true;
             }
         }
+        if (anotherLine)
+            buf.append("<hr>");
 
 
+        buf.append("<h3><a href=\"config.jsp\" title=\"")
+           .append(_("Configure router bandwidth allocation"))
+           .append("\" target=\"_top\">")
+           .append(_("Bandwidth in/out"))
+           .append("</a></h3><hr>" +
+                   "<table>\n" +
 
-    buf.append("<hr><h3><a href=\"config.jsp\" title=\"")
-       .append(_("Configure router bandwidth allocation"))
-       .append("\" target=\"_top\">")
-       .append(_("Bandwidth in/out"))
-       .append("</a></h3><hr>" +
-               "<table>\n" +
+                   "<tr><td align=\"left\"><b>1s:</b></td><td align=\"right\">")
+           .append(_helper.getInboundSecondKBps())
+           .append('/')
+           .append(_helper.getOutboundSecondKBps())
+           .append("K/s</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>1s:</b></td><td align=\"right\">")
-       .append(_helper.getInboundSecondKBps())
-       .append('/')
-       .append(_helper.getOutboundSecondKBps())
-       .append("K/s</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>5m:</b></td><td align=\"right\">")
+           .append(_helper.getInboundFiveMinuteKBps())
+           .append('/')
+           .append(_helper.getOutboundFiveMinuteKBps())
+           .append("K/s</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>5m:</b></td><td align=\"right\">")
-       .append(_helper.getInboundFiveMinuteKBps())
-       .append('/')
-       .append(_helper.getOutboundFiveMinuteKBps())
-       .append("K/s</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Total"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getInboundLifetimeKBps())
+           .append('/')
+           .append(_helper.getOutboundLifetimeKBps())
+           .append("K/s</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Total"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getInboundLifetimeKBps())
-       .append('/')
-       .append(_helper.getOutboundLifetimeKBps())
-       .append("K/s</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Used"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getInboundTransferred())
+           .append('/')
+           .append(_helper.getOutboundTransferred())
+           .append("</td></tr></table>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Used"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getInboundTransferred())
-       .append('/')
-       .append(_helper.getOutboundTransferred())
-       .append("</td></tr></table>\n" +
+                   "<hr><h3><a href=\"tunnels.jsp\" target=\"_top\" title=\"")
+           .append(_("View existing tunnels and tunnel build status"))
+           .append("\">")
+           .append(_("Tunnels in/out"))
+           .append("</a></h3><hr>" +
+                   "<table>\n" +
 
-               "<hr><h3><a href=\"tunnels.jsp\" target=\"_top\" title=\"")
-       .append(_("View existing tunnels and tunnel build status"))
-       .append("\">")
-       .append(_("Tunnels in/out"))
-       .append("</a></h3><hr>" +
-               "<table>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Exploratory"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getInboundTunnels())
+           .append('/')
+           .append(_helper.getOutboundTunnels())
+           .append("</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Exploratory"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getInboundTunnels())
-       .append('/')
-       .append(_helper.getOutboundTunnels())
-       .append("</td></tr>\n" +
+                  "<tr><td align=\"left\"><b>")
+           .append(_("Client"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getInboundClientTunnels())
+           .append('/')
+           .append(_helper.getOutboundClientTunnels())
+           .append("</td></tr>\n" +
 
-              "<tr><td align=\"left\"><b>")
-       .append(_("Client"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getInboundClientTunnels())
-       .append('/')
-       .append(_helper.getOutboundClientTunnels())
-       .append("</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Participating"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getParticipatingTunnels())
+           .append("</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Participating"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getParticipatingTunnels())
-       .append("</td></tr>\n" +
+                   "</table><hr><h3><a href=\"/jobs.jsp\" target=\"_top\" title=\"")
+           .append(_("What's in the router's job queue?"))
+           .append("\">")
+           .append(_("Congestion"))
+           .append("</a></h3><hr>" +
+                   "<table>\n" +
 
-               "</table><hr><h3><a href=\"/jobs.jsp\" target=\"_top\" title=\"")
-       .append(_("What's in the router's job queue?"))
-       .append("\">")
-       .append(_("Congestion"))
-       .append("</a></h3><hr>" +
-               "<table>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Job lag"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getJobLag())
+           .append("</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Job lag"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getJobLag())
-       .append("</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Message delay"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getMessageDelay())
+           .append("</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Message delay"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getMessageDelay())
-       .append("</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Tunnel lag"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getTunnelLag())
+           .append("</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Tunnel lag"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getTunnelLag())
-       .append("</td></tr>\n" +
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Backlog"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getInboundBacklog())
+           .append("</td></tr>\n" +
 
-               "<tr><td align=\"left\"><b>")
-       .append(_("Backlog"))
-       .append(":</b></td><td align=\"right\">")
-       .append(_helper.getInboundBacklog())
-       .append("</td></tr>\n" +
+                   "</table><hr><h4>")
+           .append(_helper.getTunnelStatus())
+           .append("</h4><hr>\n")
+           .append(_helper.getDestinations());
 
-               "</table><hr><h4>")
-       .append(_helper.getTunnelStatus())
-       .append("</h4><hr>\n")
-       .append(_helper.getDestinations());
 
 
         out.write(buf.toString());

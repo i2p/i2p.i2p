@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-19 13:41+0000\n"
+"POT-Creation-Date: 2009-10-19 21:30+0000\n"
 "PO-Revision-Date: 2009-10-19 12:59+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@par>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:293
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:332
 msgid "Update policy"
 msgstr ""
 
@@ -75,7 +75,7 @@ msgid "I2P Internals"
 msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:80
-#: src/net/i2p/router/web/SummaryBarRenderer.java:339
+#: src/net/i2p/router/web/SummaryBarRenderer.java:344
 msgid "View existing tunnels and tunnel build status"
 msgstr ""
 
@@ -211,66 +211,66 @@ msgstr ""
 msgid "Known"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:269
+#: src/net/i2p/router/web/SummaryBarRenderer.java:270
 msgid "Help with firewall configuration"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:271
+#: src/net/i2p/router/web/SummaryBarRenderer.java:272
 msgid "Check NAT/firewall"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:304
+#: src/net/i2p/router/web/SummaryBarRenderer.java:309
 msgid "Configure router bandwidth allocation"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:306
+#: src/net/i2p/router/web/SummaryBarRenderer.java:311
 msgid "Bandwidth in/out"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:323
+#: src/net/i2p/router/web/SummaryBarRenderer.java:328
 msgid "Total"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:331
+#: src/net/i2p/router/web/SummaryBarRenderer.java:336
 msgid "Used"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:341
+#: src/net/i2p/router/web/SummaryBarRenderer.java:346
 msgid "Tunnels in/out"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:346
+#: src/net/i2p/router/web/SummaryBarRenderer.java:351
 msgid "Exploratory"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:354
+#: src/net/i2p/router/web/SummaryBarRenderer.java:359
 msgid "Client"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:362
+#: src/net/i2p/router/web/SummaryBarRenderer.java:367
 msgid "Participating"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:368
+#: src/net/i2p/router/web/SummaryBarRenderer.java:373
 msgid "What's in the router's job queue?"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:370
+#: src/net/i2p/router/web/SummaryBarRenderer.java:375
 msgid "Congestion"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:375
+#: src/net/i2p/router/web/SummaryBarRenderer.java:380
 msgid "Job lag"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:381
+#: src/net/i2p/router/web/SummaryBarRenderer.java:386
 msgid "Message delay"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:387
+#: src/net/i2p/router/web/SummaryBarRenderer.java:392
 msgid "Tunnel lag"
 msgstr ""
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:393
+#: src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Backlog"
 msgstr ""
