@@ -374,6 +374,9 @@ public class TunnelDispatcher implements Service {
         _context.statManager().addRateData("tunnel.dispatchDataTime", dispatchTime, dispatchTime);
     }
 
+    /** High for now, just to prevent long-lived-message attacks */
+    private static final long MAX_FUTURE_EXPIRATION = 3*60*1000 + Router.CLOCK_FUDGE_FACTOR;
+
     /**
      * We are the inbound tunnel gateway, so encrypt it as necessary and forward
      * it on.
@@ -385,7 +388,10 @@ public class TunnelDispatcher implements Service {
         if (gw != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch where we are the inbound gateway: " + gw + ": " + msg);
-            if ( (msg.getMessageExpiration() < before - Router.CLOCK_FUDGE_FACTOR) || (msg.getMessage().getMessageExpiration() < before - Router.CLOCK_FUDGE_FACTOR) ) {
+            long minTime = before - Router.CLOCK_FUDGE_FACTOR;
+            long maxTime = before + MAX_FUTURE_EXPIRATION;
+            if ( (msg.getMessageExpiration() < minTime) || (msg.getMessage().getMessageExpiration() < minTime) ||
+                 (msg.getMessageExpiration() > maxTime) || (msg.getMessage().getMessageExpiration() > maxTime) ) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Not dispatching a gateway message for tunnel " + msg.getTunnelId().getTunnelId()
                                + " as the wrapper's expiration is in " + DataHelper.formatDuration(msg.getMessageExpiration()-before)
@@ -463,6 +469,12 @@ public class TunnelDispatcher implements Service {
                     _log.warn("why are you sending a tunnel message that expired " 
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
                                + msg, new Exception("cause"));
+            } else if (msg.getMessageExpiration() > before + MAX_FUTURE_EXPIRATION) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("why are you sending a tunnel message that expires " 
+                               + (msg.getMessageExpiration() - before) + "ms from now? "
+                               + msg, new Exception("cause"));
+                return;
             }
             long tid1 = outboundTunnel.getTunnelId();
             long tid2 = (targetTunnel != null ? targetTunnel.getTunnelId() : -1);
