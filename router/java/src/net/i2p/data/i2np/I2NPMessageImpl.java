@@ -362,10 +362,10 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 return new TunnelGatewayMessage(context);
             case DataMessage.MESSAGE_TYPE:
                 return new DataMessage(context);
-            case TunnelCreateMessage.MESSAGE_TYPE:
-                return new TunnelCreateMessage(context);
-            case TunnelCreateStatusMessage.MESSAGE_TYPE:
-                return new TunnelCreateStatusMessage(context);
+            //case TunnelCreateMessage.MESSAGE_TYPE:
+            //    return new TunnelCreateMessage(context);
+            //case TunnelCreateStatusMessage.MESSAGE_TYPE:
+            //    return new TunnelCreateStatusMessage(context);
             case TunnelBuildMessage.MESSAGE_TYPE:
                 return new TunnelBuildMessage(context);
             case TunnelBuildReplyMessage.MESSAGE_TYPE:

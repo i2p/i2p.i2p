@@ -123,6 +123,7 @@ public class MessageHistory {
      * @param replyTunnel the tunnel sourceRoutePeer should forward the source routed message to
      * @param replyThrough the gateway of the tunnel that the sourceRoutePeer will be sending to
      */
+/********
     public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, TunnelId replyTunnel, Hash replyThrough) {
         if (!_doLog) return;
         StringBuilder buf = new StringBuilder(128);
@@ -137,6 +138,7 @@ public class MessageHistory {
             buf.append("who forwards it through [").append(replyTunnel.getTunnelId()).append("] on [").append(getName(replyThrough)).append("]");
         addEntry(buf.toString());
     }
+*********/
     
     /**
      * The local router has received a request to join the createTunnel with the next hop being nextPeer,
@@ -148,6 +150,7 @@ public class MessageHistory {
      * @param ok whether we will join the tunnel
      * @param sourceRoutePeer peer through whom we should send our garlic routed ok through
      */
+/*********
     public void receiveTunnelCreate(TunnelId createTunnel, Hash nextPeer, Date expire, boolean ok, Hash sourceRoutePeer) {
         if (!_doLog) return;
         StringBuilder buf = new StringBuilder(128);
@@ -158,6 +161,7 @@ public class MessageHistory {
         buf.append("ok? ").append(ok).append(" expiring on [").append(getTime(expire.getTime())).append("]");
         addEntry(buf.toString());
     }
+*********/
     
     /**
      * The local router has joined the given tunnel operating in the given state.
