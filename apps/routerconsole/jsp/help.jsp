@@ -11,11 +11,11 @@
 If you'd like to help improve or translate the documentation, or
 help with other aspects of the project, please see the documentation for
 <a href="http://www.i2p2.i2p/getinvolved.html">volunteers.</a>
-<br><br>Further assistance is available here:</p>
+</p><p>Further assistance is available here:
 <ul class="links">
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.</ul>
-<p>You may also try the <a href="http://forum.i2p/">I2P forum</a>
+</p><p>You may also try the <a href="http://forum.i2p/">I2P forum</a>
 or IRC.</p>
 
 <h2>Summary Bar Information</h2><p>
@@ -75,7 +75,7 @@ The local applications connecting through your router.
 These may be clients started through <a href="i2ptunnel/index.jsp">I2PTunnel</a>
 or external programs connecting through SAM, BOB, or directly to I2CP.
 </div><h3>Tunnels in/out</h3><div align="justify">
-The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><br><ul>
+The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><ul>
 <li class="tidylist"><div align="justify"><b>Exploratory:</b>
 Tunnels built by your router and used for communication with the floodfill peers,
 building new tunnels, and testing existing tunnels.</div>
@@ -91,7 +91,7 @@ You may also limit the total number by setting <tt>router.maxParticipatingTunnel
 the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.</ul>
 
 <h3>Congestion</h3><div align="justify">
-Some basic indications of router overload:</div><br><ul>
+Some basic indications of router overload:</div><ul>
 <li class="tidylist"><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
 Unfortunately, there are several other job queues in the router that may be congested,
@@ -165,7 +165,7 @@ details on other applications available, as well as their licenses, please see t
 client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
 .</p>
 
-<h2>Release history</h2><br>
+<h2>Release history</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />

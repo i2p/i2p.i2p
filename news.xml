@@ -9,14 +9,21 @@
             publicurl="http://dev.i2p.net/pipermail/i2p/2005-July/000826.html"
             anonlogs="http://i2p/Nf3ab-ZFkmI-LyMt7GjgT-jfvZ3zKDl0L96pmGQXF1B82W2Bfjf0n7~288vafocjFLnQnVcmZd~-p0-Oolfo9aW2Rm-AhyqxnxyLlPBqGxsJBXjPhm1JBT4Ia8FB-VXt0BuY0fMKdAfWwN61-tj4zIcQWRxv3DFquwEf035K~Ra4SWOqiuJgTRJu7~o~DzHVljVgWIzwf8Z84cz0X33pv-mdG~~y0Bsc2qJVnYwjjR178YMcRSmNE0FVMcs6f17c6zqhMw-11qjKpY~EJfHYCx4lBWF37CD0obbWqTNUIbL~78vxqZRT3dgAgnLixog9nqTO-0Rh~NpVUZnoUi7fNR~awW5U3Cf7rU7nNEKKobLue78hjvRcWn7upHUF45QqTDuaM3yZa7OsjbcH-I909DOub2Q0Dno6vIwuA7yrysccN1sbnkwZbKlf4T6~iDdhaSLJd97QCyPOlbyUfYy9QLNExlRqKgNVJcMJRrIual~Lb1CLbnzt0uvobM57UpqSAAAA/meeting141"
             publiclogs="http://www.i2p.net/meeting141" />
+
+<h4><ul><li>2009-10-18: Website &amp; Console Translation - Help Needed!</li></ul></h4>
+
 <p>
+Shortly after the release of <a href="http://www.i2p2.i2p/release-0.7.7.html">I2P version 0.7.7</a>, we are happy to announce the first stage of the <a href="http://i2p2.i2p/index_zh.html">Chinese translation</a> of the <a href="http://www.i2p2.i2p">website</a>, thanks to our new Chinese translator, "walking". This we hope is the start of a bigger trend to get the website and console translated into YOUR language. Please visit the #i2p chat channel on <a href="irc://irc.freenode.net/i2p"> Freenode IRC</a> or anonymously over I2P via <a href="irc://127.0.0.1:6668/i2p">localhost:6668</a> if you wish to help. We appeal at this time especially to French and Spanish translators, since we seem to have plenty of you running I2P!</p>
+
 <h4><ul><li>2009-10-12: <b>0.7.7 <a href="http://www.i2p2.i2p/release-0.7.7.html">Released</a></b></li></ul></h4>
-</p><p>
+<p>
 I2P version 0.7.7 contains several anonymity improvements.
 The use of session keys for crypto was completely reworked,
-and I2PSnark now uses its own tunnels for tracker communication.
+and <a href="/i2psnark">I2PSnark</a> now uses its own tunnels for tracker communication.
 Work continues on improving the router console,
-including conformance to HTML standards and better support of UTF-8.
+including conformance to HTML standards, better support of UTF-8, and dr|z3d's ongoing
+<a href="/configui.jsp">console theme</a> wizardry, including an extensively 
+reworked "classic" theme optimized for less capable computers or browsers.
 </p><p>
 Work also continues on increasing speeds, both by reducing the
 number of session keys transferred, by improving the

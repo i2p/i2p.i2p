@@ -296,6 +296,7 @@ div.main hr:last-child {
 div.main textarea {
      width: 98% !important; 
      margin: 2px 0 2px 5px;
+     min-height: 96px;
 }
 
 div.main h2 {
@@ -349,7 +350,7 @@ div.news {
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: -15px 15px -25px -20px;
+     margin: 15px 15px -10px -20px;
      padding: 0px 0 15px 0;
      border-bottom: 2px dotted #cc7;
      border-top: 0px solid #cc7;     
@@ -361,6 +362,20 @@ div.news li {
 div.news p {
      color: #330;
      font-size: 9pt;
+     margin-bottom: -10px;
+}
+/*
+div.news p:first-child {
+     padding-top: 15px !important;
+}
+
+ 
+div.news p:nth-child(2n) {
+     padding-top: 15px !important;
+}
+*/
+div.news p:last-child {
+     margin-bottom: 10px;
 }
 
 div.news a:link {
