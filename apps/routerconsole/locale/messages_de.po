@@ -1,25 +1,276 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-18 10:03-0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2009-10-19 13:41+0000\n"
+"PO-Revision-Date: 2009-10-19 12:50+0000\n"
+"Last-Translator: foo <foo@bar>\n"
+"Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:441
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:293
 msgid "Update policy"
 msgstr "Update policy in german foobarbaz"
 
 #: src/net/i2p/router/web/ConfigUpdateHelper.java:90
 msgid "Notify only"
 msgstr "Notify only in german"
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:26
+#: src/net/i2p/router/web/SummaryBarRenderer.java:28
+msgid "I2P Router Console"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:42
+msgid "I2P Services"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:48
+msgid "Manage your I2P hosts file here (I2P domain name resolution)"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:50
+msgid "Addressbook"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:54
+msgid "Built-in anonymous BitTorrent Client"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:56
+msgid "Torrents"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:60
+msgid "Anonymous webmail client"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:62
+msgid "Webmail"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:66
+msgid "Anonymous resident webserver"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:68
+msgid "Webserver"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:72
+msgid "Configure I2P Router"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:74
+msgid "I2P Internals"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:80
+#: src/net/i2p/router/web/SummaryBarRenderer.java:339
+msgid "View existing tunnels and tunnel build status"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:82
+msgid "Tunnels"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:86
+#: src/net/i2p/router/web/SummaryBarRenderer.java:221
+msgid "Show all current peer connections"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:88
+#: src/net/i2p/router/web/SummaryBarRenderer.java:223
+msgid "Peers"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:92
+msgid "Show recent peer performance profiles"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:94
+msgid "Profiles"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:98
+msgid "Show list of all known I2P routers"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:100
+msgid "NetDB"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:104
+msgid "Health Report"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:106
+msgid "Logs"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:110
+msgid "Show the router's workload, and how it's performing"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:112
+msgid "Jobs"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:116
+msgid "Graph router performance"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:118
+msgid "Graphs"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:122
+msgid "Textual router performance statistics"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:124
+msgid "Stats"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:134
+msgid "I2P Router Help"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:136
+msgid "General"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:139
+msgid "Your unique I2P router identity is"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:143
+msgid "never reveal it to anyone"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:145
+msgid "Local Identity"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:150
+msgid "Version"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:157
+msgid "How long we've been running for this session"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:160
+msgid "Uptime"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:167
+msgid ""
+"Help with configuring your firewall and router for optimal I2P performance"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:194
+msgid "Download"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:198
+#: src/net/i2p/router/web/SummaryBarRenderer.java:207
+msgid "Update"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:203
+msgid "Download Unsigned"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:229
+msgid "Active"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:237
+msgid "Fast"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:243
+msgid "High capacity"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:249
+msgid "Integrated"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:255
+msgid "Known"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:269
+msgid "Help with firewall configuration"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:271
+msgid "Check NAT/firewall"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:304
+msgid "Configure router bandwidth allocation"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:306
+msgid "Bandwidth in/out"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:323
+msgid "Total"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:331
+msgid "Used"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:341
+msgid "Tunnels in/out"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:346
+msgid "Exploratory"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:354
+msgid "Client"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:362
+msgid "Participating"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:368
+msgid "What's in the router's job queue?"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:370
+msgid "Congestion"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:375
+msgid "Job lag"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:381
+msgid "Message delay"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:387
+msgid "Tunnel lag"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:393
+msgid "Backlog"
+msgstr ""
