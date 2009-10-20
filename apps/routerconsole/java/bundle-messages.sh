@@ -27,13 +27,16 @@ do
 	# translate calls must be one of the forms:
 	# _("foo")
 	# cssHelper._("foo")
+	# cssHelper.title("foo")
 	# handler._("foo")
 	# formhandler._("foo")
 	# In a jsp, you must use a helper or handler that has the context set.
 	# To start a new translation, copy the header from an old translation to the new .po file,
 	# then ant distclean updater.
 	find src ../jsp/WEB-INF -name *.java > $TMPFILE
-	xgettext -f $TMPFILE -F -L java --keyword=_ --keyword=cssHelper._ --keyword=handler._ --keyword=formhandler._ -o ${i}t
+	xgettext -f $TMPFILE -F -L java \
+                 --keyword=_ --keyword=cssHelper._ --keyword=cssHelper.title --keyword=handler._ --keyword=formhandler._ \
+	         -o ${i}t
 	if [ $? -ne 0 ]
 	then
 		echo 'Warning - xgettext failed, not updating translations'

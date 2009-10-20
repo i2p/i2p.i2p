@@ -2,8 +2,9 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config update</title>
+<html><head>
 <%@include file="css.jsp" %>
+<%=cssHelper.title("config update")%>
 </head><body>
 
 <%@include file="summary.jsp" %>

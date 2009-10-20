@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-19 21:30+0000\n"
+"POT-Creation-Date: 2009-10-20 11:55+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -17,18 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: German\n"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:332
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:95
+msgid "config update"
+msgstr "config update in german test test test"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:334
 msgid "Update policy"
 msgstr "Update policy in german foobarbaz"
 
-#: src/net/i2p/router/web/ConfigUpdateHelper.java:90
-msgid "Notify only"
-msgstr "Notify only in german"
-
+#: src/net/i2p/router/web/CSSHelper.java:36
 #: src/net/i2p/router/web/SummaryBarRenderer.java:26
 #: src/net/i2p/router/web/SummaryBarRenderer.java:28
 msgid "I2P Router Console"
 msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:90
+msgid "Notify only"
+msgstr "Notify only in german"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:42
 msgid "I2P Services"

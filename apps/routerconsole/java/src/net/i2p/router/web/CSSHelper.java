@@ -28,4 +28,15 @@ public class CSSHelper extends HelperBase {
         if (lang != null && lang.length() > 0)
             _context.router().setConfigSetting(Messages.PROP_LANG, lang);
     }
+
+    /** translate the title and display consistently */
+    public String title(String s) {
+         StringBuilder buf = new StringBuilder(128);
+         buf.append("<title>")
+            .append(_("I2P Router Console"))
+            .append(" - ")
+            .append(_(s))
+            .append("</title>");
+         return buf.toString();
+    }
 }
