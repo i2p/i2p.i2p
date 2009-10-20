@@ -69,6 +69,8 @@ public class Messages {
                 // Would it be faster to specify a class loader?
                 // No matter we only do this once per lang.
                 rv = ResourceBundle.getBundle(BUNDLE_NAME, new Locale(lang));
+                if (rv != null)
+                    _bundles.put(lang, rv);
             } catch (MissingResourceException e) {
                 _missing.add(lang);
             }
