@@ -62,7 +62,8 @@ public class ContentHelper extends HelperBase {
 
     /**
      * Convert file.ext to file_lang.ext if it exists.
-     * Get lang from either the cgi lang param or from the default locale.
+     * Get lang from the cgi lang param, then properties, then from the default locale.
+     * _context must be set to check the property.
      */
     private String filename() {
         int lastdot = _page.lastIndexOf('.');
@@ -70,9 +71,13 @@ public class ContentHelper extends HelperBase {
             return _page;
         String lang = _lang;
         if (lang == null || lang.length() <= 0) {
-            lang = Locale.getDefault().getLanguage();
-            if (lang == null || lang.length() <= 0)
-                return _page;
+            if (_context != null)
+                lang = _context.getProperty(Messages.PROP_LANG);
+            if (lang == null || lang.length() <= 0) {
+                lang = Locale.getDefault().getLanguage();
+                if (lang == null || lang.length() <= 0)
+                    return _page;
+            }
         }
         if (lang.equals("en"))
             return _page;

@@ -8,11 +8,14 @@ package net.i2p.router;
  *
  */
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
+import net.i2p.router.tunnel.pool.TunnelPool;
 
 /**
  * Build and maintain tunnels throughout the network.
@@ -74,4 +77,14 @@ public interface TunnelManagerFacade extends Service {
     public void setOutboundSettings(TunnelPoolSettings settings);
     public void setInboundSettings(Hash client, TunnelPoolSettings settings);
     public void setOutboundSettings(Hash client, TunnelPoolSettings settings);
+    /** for TunnelRenderer in router console */
+    public void listPools(List<TunnelPool> out);
+    /** for TunnelRenderer in router console */
+    public Map<Hash, TunnelPool> getInboundClientPools();
+    /** for TunnelRenderer in router console */
+    public Map<Hash, TunnelPool> getOutboundClientPools();
+    /** for TunnelRenderer in router console */
+    public TunnelPool getInboundExploratoryPool();
+    /** for TunnelRenderer in router console */
+    public TunnelPool getOutboundExploratoryPool();
 }

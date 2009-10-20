@@ -29,5 +29,6 @@ if (System.getProperty("router.consoleNonce") == null) {
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
  <jsp:setProperty name="contenthelper" property="lang" value="<%=request.getParameter("lang")%>" />
+ <jsp:setProperty name="contenthelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="contenthelper" property="content" />
 </div></body></html>

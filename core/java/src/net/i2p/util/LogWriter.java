@@ -153,13 +153,13 @@ class LogWriter implements Runnable {
             if (!parent.exists()) {
                 boolean ok = parent.mkdirs();
                 if (!ok) {
-                    System.err.println("Unable to create the parent directy: " + parent.getAbsolutePath());
-                    System.exit(0);
+                    System.err.println("Unable to create the parent directory: " + parent.getAbsolutePath());
+                    //System.exit(0);
                 }
             }
             if (!parent.isDirectory()) {
                 System.err.println("wtf, we cannot put the logs in a subdirectory of a plain file!  we want to stre the log as " + f.getAbsolutePath());
-                System.exit(0);
+                //System.exit(0);
             }
         }
         try {

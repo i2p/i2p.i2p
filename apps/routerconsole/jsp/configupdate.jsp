@@ -2,8 +2,9 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config update</title>
+<html><head>
 <%@include file="css.jsp" %>
+<%=cssHelper.title("config update")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
@@ -36,7 +37,7 @@
           <td><input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
         </tr><tr><td class= "mediumtags" align="right"><b>Refresh frequency:</b>
           <td><jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /></td><tr>
-          <td class= "mediumtags" align="right"><b>Update policy:</b></td>
+          <td class= "mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td>
         <tr><td class= "mediumtags" align="right"><b>Update through the eepProxy?</b></td>
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td>

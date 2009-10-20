@@ -18,8 +18,8 @@ import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.TunnelCreateMessage;
-import net.i2p.data.i2np.TunnelCreateStatusMessage;
+//import net.i2p.data.i2np.TunnelCreateMessage;
+//import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.util.I2PThread;
@@ -74,7 +74,7 @@ public class InNetMessagePool implements Service {
         _context.statManager().createRateStat("inNetPool.dropped", "How often do we drop a message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("inNetPool.droppedDeliveryStatusDelay", "How long after a delivery status message is created do we receive it back again (for messages that are too slow to be handled)", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("inNetPool.duplicate", "How often do we receive a duplicate message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("inNetPool.droppedTunnelCreateStatusMessage", "How often we drop a slow-to-arrive tunnel request response", "InNetPool", new long[] { 60*60*1000l, 24*60*60*1000l });
+        //_context.statManager().createRateStat("inNetPool.droppedTunnelCreateStatusMessage", "How often we drop a slow-to-arrive tunnel request response", "InNetPool", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("inNetPool.droppedDbLookupResponseMessage", "How often we drop a slow-to-arrive db search response", "InNetPool", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("pool.dispatchDataTime", "How long a tunnel dispatch takes", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("pool.dispatchGatewayTime", "How long a tunnel gateway dispatch takes", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -125,8 +125,8 @@ public class InNetMessagePool implements Service {
         
         if (invalidReason != null) {
             int level = Log.WARN;
-            if (messageBody instanceof TunnelCreateMessage)
-                level = Log.INFO;
+            //if (messageBody instanceof TunnelCreateMessage)
+            //    level = Log.INFO;
             if (_log.shouldLog(level))
                 _log.log(level, "Duplicate message received [" + messageBody.getUniqueId() 
                           + " expiring on " + exp + "]: " + messageBody.getClass().getName() + ": " + invalidReason 
@@ -195,10 +195,10 @@ public class InNetMessagePool implements Service {
                                 _log.warn("Dropping unhandled delivery status message created " + timeSinceSent + "ms ago: " + messageBody);
                             _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent, timeSinceSent);
                         }
-                    } else if (type == TunnelCreateStatusMessage.MESSAGE_TYPE) {
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Dropping slow tunnel create request response: " + messageBody);
-                        _context.statManager().addRateData("inNetPool.droppedTunnelCreateStatusMessage", 1, 0);
+                    //} else if (type == TunnelCreateStatusMessage.MESSAGE_TYPE) {
+                    //    if (_log.shouldLog(Log.INFO))
+                    //        _log.info("Dropping slow tunnel create request response: " + messageBody);
+                    //    _context.statManager().addRateData("inNetPool.droppedTunnelCreateStatusMessage", 1, 0);
                     } else if (type == DatabaseSearchReplyMessage.MESSAGE_TYPE) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Dropping slow db lookup response: " + messageBody);

@@ -60,6 +60,4 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public Set<Hash> getAllRouters() { return new HashSet(_routers.keySet()); }
     public Set findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) { return new HashSet(_routers.values()); }
-
-    public void renderStatusHTML(Writer out) throws IOException {}
 }

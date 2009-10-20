@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.IOException;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -563,4 +564,28 @@ public class SummaryHelper extends HelperBase {
     public String getUnsignedUpdateVersion() { 
         return NewsFetcher.getInstance(_context).unsignedUpdateVersion();
     }
+
+    /** output the summary bar to _out */
+    public void renderSummaryBar() throws IOException {
+        SummaryBarRenderer renderer = new SummaryBarRenderer(_context, this);
+        renderer.renderSummaryHTML(_out);
+    }
+
+    /* below here is stuff we need to get from summarynoframe.jsp to SummaryBarRenderer */
+
+    private String _action;
+    public void setAction(String s) { _action = s; }
+    public String getAction() { return _action; }
+
+    private String _consoleNonce;
+    public void setConsoleNonce(String s) { _consoleNonce = s; }
+    public String getConsoleNonce() { return _consoleNonce; }
+
+    private String _updateNonce;
+    public void setUpdateNonce(String s) { _updateNonce = s; }
+    public String getUpdateNonce() { return _updateNonce; }
+
+    private String _requestURI;
+    public void setRequestURI(String s) { _requestURI = s; }
+    public String getRequestURI() { return _requestURI; }
 }

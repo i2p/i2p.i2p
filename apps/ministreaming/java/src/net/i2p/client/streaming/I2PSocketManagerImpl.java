@@ -673,6 +673,8 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
      * Ping the specified peer, returning true if they replied to the ping within 
      * the timeout specified, false otherwise.  This call blocks.
      *
+     * @deprecated timeout is ignored - use I2PSocketManagerFull.ping()
+     * @param timeoutMs ignored
      */
     public boolean ping(Destination peer, long timeoutMs) {
         try {

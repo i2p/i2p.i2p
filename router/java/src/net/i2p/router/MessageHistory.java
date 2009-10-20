@@ -39,9 +39,8 @@ public class MessageHistory {
     private final static byte[] NL = System.getProperty("line.separator").getBytes();
     private final static int FLUSH_SIZE = 1000; // write out at least once every 1000 entries
         
-    /** config property determining whether we want to debug with the message history */
+    /** config property determining whether we want to debug with the message history - default false */
     public final static String PROP_KEEP_MESSAGE_HISTORY = "router.keepHistory";
-    public final static boolean DEFAULT_KEEP_MESSAGE_HISTORY = false;
     /** config property determining where we want to log the message history, if we're keeping one */
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";
@@ -67,19 +66,8 @@ public class MessageHistory {
     String getFilename() { return _historyFile; }
     
     private void updateSettings() {
-        String keepHistory = _context.router().getConfigSetting(PROP_KEEP_MESSAGE_HISTORY);
-        if (keepHistory != null) {
-            _doLog = Boolean.TRUE.toString().equalsIgnoreCase(keepHistory);
-        } else {
-            _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
-        }
-
-        String filename = null;
-        if (_doLog) {
-            filename = _context.router().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
-            if ( (filename == null) || (filename.trim().length() <= 0) )
-                filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
-        }
+        _doLog = Boolean.valueOf(_context.getProperty(PROP_KEEP_MESSAGE_HISTORY)).booleanValue();
+        _historyFile = _context.getProperty(PROP_MESSAGE_HISTORY_FILENAME, DEFAULT_MESSAGE_HISTORY_FILENAME);
     }
     
     /**
@@ -96,13 +84,6 @@ public class MessageHistory {
             _reinitializeJob.getTiming().setStartAfter(_context.clock().now()+5000);
             _context.jobQueue().addJob(_reinitializeJob);
         } else {
-            String filename = null;
-            filename = _context.router().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
-            if ( (filename == null) || (filename.trim().length() <= 0) )
-                filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
-
-            _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
-            _historyFile = filename;
             _localIdent = getName(_context.routerHash());
             // _unwrittenEntries = new ArrayList(64);
             updateSettings();
@@ -142,6 +123,7 @@ public class MessageHistory {
      * @param replyTunnel the tunnel sourceRoutePeer should forward the source routed message to
      * @param replyThrough the gateway of the tunnel that the sourceRoutePeer will be sending to
      */
+/********
     public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, TunnelId replyTunnel, Hash replyThrough) {
         if (!_doLog) return;
         StringBuilder buf = new StringBuilder(128);
@@ -156,6 +138,7 @@ public class MessageHistory {
             buf.append("who forwards it through [").append(replyTunnel.getTunnelId()).append("] on [").append(getName(replyThrough)).append("]");
         addEntry(buf.toString());
     }
+*********/
     
     /**
      * The local router has received a request to join the createTunnel with the next hop being nextPeer,
@@ -167,6 +150,7 @@ public class MessageHistory {
      * @param ok whether we will join the tunnel
      * @param sourceRoutePeer peer through whom we should send our garlic routed ok through
      */
+/*********
     public void receiveTunnelCreate(TunnelId createTunnel, Hash nextPeer, Date expire, boolean ok, Hash sourceRoutePeer) {
         if (!_doLog) return;
         StringBuilder buf = new StringBuilder(128);
@@ -177,6 +161,7 @@ public class MessageHistory {
         buf.append("ok? ").append(ok).append(" expiring on [").append(getTime(expire.getTime())).append("]");
         addEntry(buf.toString());
     }
+*********/
     
     /**
      * The local router has joined the given tunnel operating in the given state.

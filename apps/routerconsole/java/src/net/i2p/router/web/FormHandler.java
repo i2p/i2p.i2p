@@ -190,4 +190,8 @@ public class FormHandler {
         }
     }
     
+    /** translate a string */
+    public String _(String s) {
+        return Messages.getString(s, _context);
+    }
 }

@@ -29,4 +29,9 @@ public abstract class HelperBase {
     //public RouterContext getContext() { return _context; }
 
     public void setWriter(Writer out) { _out = out; }
+
+    /** translate a string */
+    public String _(String s) {
+        return Messages.getString(s, _context);
+    }
 }
