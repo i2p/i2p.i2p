@@ -154,7 +154,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -4px -4px -4px;
+     margin: -4px -4px -4px -5px !important;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -169,17 +169,18 @@ div.routersummary tr {
      border: 0 !important;
 }
 
-.tunnels {
-     margin-top: 0 !important;
-}
-
-.tunnels tr {
-     padding: 4px 0 !important;
-     margin-left: -6px !important;
-}
-
+/*
 div.routersummary form {
      margin-top: 8px;
+}
+*/
+
+div.routersummary form {
+     margin: -6px 0 -7px;
+}
+
+div.routersummary form:first-child {
+     margin: 6px 0 -4px 0 !important;
 }
 
 div.routersummary p {
@@ -202,20 +203,19 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 2px 4px;
+     padding: 2px 2px 1px 2px;
      background-image: none !important;
      border: 0 !important;
 }
 
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
+div routersummary hr:last-child {
+     margin-top: 5px;
+     margin-bottom: 0px !important;
 }
 
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
+div.tunnels {
+     padding-top: 2px !important;
+     margin-left: -2px;
 }
 
 div.warning {
@@ -729,7 +729,6 @@ hr:last-child {
      margin-top: 20px;
      margin-bottom: 20px !important;
 }
-
 
 sidebarlogo {
      text-align: center;

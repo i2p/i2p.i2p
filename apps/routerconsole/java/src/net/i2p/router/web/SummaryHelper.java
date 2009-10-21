@@ -357,7 +357,7 @@ public class SummaryHelper extends HelperBase {
         Collections.sort(clients, new AlphaComparator());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"Add/remove/edit &amp; control your client and server tunnels (local destinations).\"  title=\"View existing tunnels and tunnel build status.\">Local destinations</a></h3><hr><table class=\"tunnels\">");
+        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"Add/remove/edit &amp; control your client and server tunnels (local destinations).\"  title=\"View existing tunnels and tunnel build status.\">Local destinations</a></h3><hr><div class=\"tunnels\"><table>");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
@@ -392,7 +392,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Building&hellip;\" title=\"Tunnel building in progress&hellip;\"></td></tr>\n");
             }
         }
-        buf.append("</table><hr>\n");
+        buf.append("</table></div><hr>\n");
         return buf.toString();
     }
     

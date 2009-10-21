@@ -146,7 +146,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -4px -4px;
+     margin: -5px -5px;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -161,9 +161,11 @@ div.routersummary tr {
      border: 0 !important;
 }
 
-.tunnels {
-     margin-top: -2px !important;
-     margin-left: -7px !important;
+div.tunnels {
+     margin-top: 5px !important;
+     margin-left: -2px !important;
+     margin-bottom: 3px !important;
+     padding-top: 1px;
 }
 
 .tunnels tr {
@@ -171,7 +173,12 @@ div.routersummary tr {
 }
 
 div.routersummary form {
-     margin-top: 8px;
+     margin: -6px 0 -5px 0;
+}
+
+div.routersummary form:last-child {
+     margin: 4px 0 -12px 0 !important;
+     padding: 4px;
 }
 
 div.routersummary p {
@@ -180,7 +187,7 @@ div.routersummary p {
 
 div.refresh {
      margin-top: -6px !important;
-     margin-bottom: -8px !important;
+     margin-bottom: 0px !important;
      padding: 2px 0 0px 0 !important;
 }
 
@@ -194,7 +201,7 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 2px 4px;
+     padding: 1px 3px;
      background-image: none !important;
      border: 0 !important;
 }
@@ -595,6 +602,7 @@ a:active{
      list-style: url(../images/link.png) !important;
      padding-bottom: -2px;
      text-align: justify;
+     line-height: 120% !important;
 }
 
 .links li:first-child {
