@@ -182,7 +182,7 @@ div.routersummary form {
 }
 
 div.routersummary form:last-child {
-     margin: 4px 0 -12px 0 !important;
+     margin: 0 !important;
      padding: 0;
 }
 

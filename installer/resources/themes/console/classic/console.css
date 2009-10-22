@@ -172,7 +172,7 @@ div.routersummary h3 {
      font-size: 9.5pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px;
-     padding: 3px 0;
+     padding: 1px 0;
      background: #c5d5fb;
      text-transform: uppercase;
 }
@@ -183,7 +183,7 @@ div.routersummary h4 {
      font-size: 8.5pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px !important;
-     padding: 2px 3px;
+     padding: 1px 3px;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -193,11 +193,11 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 5px -5px 2px;
+     margin: -5px 4px -5px 3px;
      width: 180px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0px -10px;
+     padding: 0 -10px;
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -208,12 +208,12 @@ div.routersummary tr {
      border: 0 !important;
 }
 
-.tunnels {
-     margin-top: 3px;
+div.tunnels table{
+     margin: 0 !important;
 }
 
 .tunnels tr {
-     padding: 4px 0 !important;
+     padding: 2px 0 !important;
      margin-left: -7px !important;
 }
      
@@ -242,19 +242,9 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 2px 4px;
+     padding: 0 4px;
      background-image: none !important;
      border: 0 !important;
-}
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
-}
-
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
 }
 
 div.warning h3 {
