@@ -119,12 +119,17 @@ div.routersummary hr {
      -moz-box-shadow: inset 0px 1px 1px 1px #001;
 }
 
+div routersummary hr:last-child {
+     margin-top: 5px;
+     margin-bottom: -5px !important;
+}
+
 div.routersummary h3 {
      border: 0;
      font-size: 9.5pt;
      letter-spacing: 0.04em;
      margin: -7px -9px -7px -9px;
-     padding: 3px 0;
+     padding: 1px 0;
      background: #c5d5fb;
      text-transform: uppercase;
      background-image: -moz-linear-gradient(top, bottom, from(#ddf), to(#c5d5fb), color-stop(25%, #c5d5fb), color-stop(100%, #ddf));
@@ -136,7 +141,7 @@ div.routersummary h4 {
      font-size: 8.5pt;
      letter-spacing: 0.02em;
      margin: -7px -9px -7px -9px !important;
-     padding: 2px 3px 3px 3px;
+     padding: 0px 3px 1px 3px;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -146,7 +151,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -5px;
+     margin: -7px -5px -6px -5px;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -162,10 +167,10 @@ div.routersummary tr {
 }
 
 div.tunnels {
-     margin-top: 5px !important;
+     margin-top: 6px !important;
      margin-left: -2px !important;
      margin-bottom: 3px !important;
-     padding-top: 1px;
+     padding-top: 3px !important;
 }
 
 .tunnels tr {
@@ -178,7 +183,7 @@ div.routersummary form {
 
 div.routersummary form:last-child {
      margin: 4px 0 -12px 0 !important;
-     padding: 4px;
+     padding: 0;
 }
 
 div.routersummary p {
@@ -204,16 +209,6 @@ div.routersummary td {
      padding: 1px 3px;
      background-image: none !important;
      border: 0 !important;
-}
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
-}
-
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
 }
 
 /* proxy error messages */
@@ -904,22 +899,25 @@ div.joblog {
      overflow: auto;
  }
  
+ div.joblog:ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+     line-height: 100% !important;
+}
+
  div.joblog:li {
      word-wrap: break-word !important;
      text-align: justify !important;
      line-height: 80% !important;
-}
-
-div.joblog:ul {
-     word-wrap: break-word !important;
-     text-align: justify;
+     padding: 0;
 }
 
 div.joblog li:first-child {
      margin-top: 10px;
+
 }
 div.joblog li:last-child {
-     margin-bottom: -15px;
+     margin-bottom: 5px;
 }
 
 div.joblog form:first-child {
