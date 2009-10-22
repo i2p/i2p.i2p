@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-10-20 11:55+0000\n"
-"PO-Revision-Date: 2009-10-22 01:00+0800\n"
+"PO-Revision-Date: 2009-10-22 15:38+0800\n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: foo <foo@par>\n"
 "MIME-Version: 1.0\n"
@@ -112,7 +112,7 @@ msgstr "包含所有已知I2P路由器的列表"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:100
 msgid "NetDB"
-msgstr "网络数据库"
+msgstr "NetDB"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:104
 msgid "Health Report"
@@ -241,7 +241,7 @@ msgstr "已使用"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:346
 msgid "Tunnels in/out"
-msgstr "通道(上/下行)"
+msgstr "隧道(上/下行)"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:351
 msgid "Exploratory"
