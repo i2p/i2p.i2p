@@ -11,4 +11,4 @@
  <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="jobQueueHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="jobQueueHelper" property="jobQueueSummary" />
-</div></body></html>
+<hr></div></body></html>

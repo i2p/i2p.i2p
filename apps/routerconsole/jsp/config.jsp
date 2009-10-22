@@ -28,7 +28,7 @@
  <h3>Bandwidth limiter</h3><p>
  <b>I2P will work best if you configure your rates to match the speed of your internet connection.</b>
  </p>
-   <div class="wideload"><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps In
+   <div class="wideload"><p><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps In
         </td><td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)</td>
 <!-- let's keep this simple...
  bursting up to
@@ -48,16 +48,16 @@
     </tr><tr>
         <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> Share</td>
         <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
-</td></tr></table></div></p>
+</td></tr></table></p></div></p>
  <% int share = nethelper.getShareBandwidth();
     if (share < 12) {
-        out.print("<b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
+        out.print("<p><b>NOTE</b>: You have configured I2P to share only " + share + "KBps. ");
         out.print("I2P requires at least 12KBps to enable sharing. ");
         out.print("Please enable sharing (participating in tunnels) by configuring more bandwidth. ");
-        out.print("It improves your anonymity by creating cover traffic, and helps the network.<br>");
+        out.print("It improves your anonymity by creating cover traffic, and helps the network.</p>");
     } else {
-        out.print("You have configured I2P to share<b> " + share + "KBps</b>. ");
-        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.<hr>");
+        out.print("<p>You have configured I2P to share<b> " + share + "KBps</b>. ");
+        out.print("The higher the share bandwidth the more you improve your anonymity and help the network.</p><hr>");
     }
  %>
 <div class="formaction">
@@ -160,7 +160,7 @@
 <p>
  UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address
  and forward ports.
- UPnP support is beta, and may not work for any number of reasons:
+UPnP support is beta, and may not work for any number of reasons:
 <ul>
 <li class="tidylist">No UPnP-compatible device present
 <li class="tidylist">UPnP disabled on the device
@@ -168,9 +168,9 @@
 <li class="tidylist">Bugs in the device's UPnP implementation
 <li class="tidylist">Multiple firewall/routers in the internet connection path
 <li class="tidylist">UPnP device change, reset, or address change
-</ul><br>
+</ul></p><p>
  Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
- UPnP may be enabled or disabled above, but a change requires a router restart to take effect.
+UPnP may be enabled or disabled above, but a change requires a router restart to take effect.</p>
 <p>Hostnames entered above will be published in the network database.
     They are <b>not private</b>.
     Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.
@@ -233,7 +233,7 @@
 <li class="tidylist"><b>ERR - Client Manager I2CP Error - check logs</b> -
      This is usually due to a port 7654 conflict. Check the logs to verify. Do you have another I2P instance running?
      Stop the conflicting program and restart I2P.
- </ul><hr>
+ </ul></p><hr>
       <!--
  <b>Dynamic Router Keys: </b>
  <input type="checkbox" class="optbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br>

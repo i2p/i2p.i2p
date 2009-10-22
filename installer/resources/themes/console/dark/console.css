@@ -213,7 +213,7 @@ div.tunnels {
 }
 
 div.tunnels table {
-     margin-top: -3px !important;
+     margin: -3px 0 !important;
 }
 
 div.tunnels td {

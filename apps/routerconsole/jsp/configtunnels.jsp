@@ -20,23 +20,23 @@
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- <div class="configure"><p><i>
+ <div class="configure"><p>
  NOTE: The default settings work for most people.
  There is a fundamental tradeoff between anonymity and performance.
  Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 hops, 3 hops + 0-2 hops),
  or a high quantity + backup quantity, may severely reduce performance or reliability.
  High CPU and/or high outbound bandwidth usage may result.
  Change these settings with care, and adjust them if you have problems.
- </i></p><div class="wideload">
- <form action="configtunnels.jsp" method="POST">
+<div class="wideload">
+<form action="configtunnels.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <jsp:getProperty name="tunnelshelper" property="form" />
- <i>Note - Exploratory tunnel setting changes are stored in the router.config file.</i><br>
- <i>Client tunnel changes are temporary and are not saved.</i><br>
- <i>To make permanent client tunnel changes see the </i><a href="i2ptunnel/index.jsp">i2ptunnel page</a>.<br>
+ Note: Exploratory tunnel setting changes are stored in the router.config file.
+ Client tunnel changes are temporary and are not saved.
+To make permanent client tunnel changes see the <a href="i2ptunnel/index.jsp">i2ptunnel page</a>.
  <hr><div class="formaction"><input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" /></div>
- </form></div></div></div></body></html>
+ </form></p></div></div></div></body></html>

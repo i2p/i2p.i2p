@@ -35,10 +35,10 @@
  <a name="unsh"> </a>
  <a name="bonus"> </a>
  <h2>Manual Peer Controls</h2>
- <div class="mediumtags">Router Hash:
- <input type="text" size="55" name="peer" value="<%=peer%>" /></div>
+ <div class="mediumtags"><p>Router Hash:
+<input type="text" size="55" name="peer" value="<%=peer%>" /></p></div>
  <h3>Manually Ban / Unban a Peer</h3>
- Banning will prevent the participation of this peer in tunnels you create.
+ <p>Banning will prevent the participation of this peer in tunnels you create.</p>
       <div class="formaction">
         <input type="submit" name="action" value="Ban peer until restart" />
         <input type="submit" name="action" value="Unban peer" />
@@ -48,20 +48,20 @@
       </div>
 
  <h3>Adjust Profile Bonuses</h3>
- Bonuses may be positive or negative, and affect the peer's inclusion in Fast
+ <p>Bonuses may be positive or negative, and affect the peer's inclusion in Fast
       and High Capacity tiers. Fast peers are used for client tunnels, and High
       Capacity peers are used for some exploratory tunnels. Current bonuses are
-      displayed on the <a href="profiles.jsp">profiles page</a>.<br>
+    displayed on the <a href="profiles.jsp">profiles page</a>.</p>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
  %>
- <div class="mediumtags">Speed:
+ <div class="mediumtags"><p>Speed:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
  Capacity:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
- <input type="submit" name="action" value="Adjust peer bonuses" /></div>
+ <input type="submit" name="action" value="Adjust peer bonuses" /></p></div>
  </form>
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
@@ -71,4 +71,4 @@
  <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 
-</div></div><br></div></body></html>
+</div><hr></div></div></body></html>

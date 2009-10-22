@@ -25,4 +25,4 @@
  <jsp:getProperty name="logsHelper" property="logs" />
  <h3>Service (Wrapper) Logs</h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
-</div></div></body></html>
+</div><hr></div></body></html>

@@ -78,7 +78,7 @@ function toggleAll(category)
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br>
 Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br></p>
  <div class="wideload">
- <table>
+ <p><table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
  <tr class="tablefooter">
@@ -108,4 +108,4 @@ Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</
      <td colspan="2">Advanced filter:
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
      <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="Save changes" /><input type="reset" value="Cancel" /></td></tr>
- </table></div></form></div></div></body></html>
+ </table></p></div></form></div></div></body></html>

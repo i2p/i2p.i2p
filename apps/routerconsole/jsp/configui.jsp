@@ -25,7 +25,7 @@
  // userAgent defined in confignav
  if (userAgent == null || !userAgent.contains("MSIE")) {
 %>
- <form action="configui.jsp" method="POST">
+<form action="configui.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUIHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigUIHandler.nonce", new java.util.Random().nextLong()+""); %>
