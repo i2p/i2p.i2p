@@ -20,9 +20,9 @@
  <jsp:useBean class="net.i2p.router.web.LogsHelper" id="logsHelper" scope="request" />
  <jsp:setProperty name="logsHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <h3>Critical Logs</h3><a name="criticallogs"> </a>
- <jsp:getProperty name="logsHelper" property="criticalLogs" /><br>
+ <jsp:getProperty name="logsHelper" property="criticalLogs" />
  <h3>Router Logs [<a href="configlogging.jsp">configure</a>]</h3>
- <jsp:getProperty name="logsHelper" property="logs" /><br>
+ <jsp:getProperty name="logsHelper" property="logs" />
  <h3>Service (Wrapper) Logs</h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div></div></body></html>
