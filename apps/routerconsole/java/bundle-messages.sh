@@ -26,6 +26,7 @@ do
 	# extract strings from java and jsp files, and update messages.po files
 	# translate calls must be one of the forms:
 	# _("foo")
+	# _x("foo")
 	# cssHelper._("foo")
 	# cssHelper.title("foo")
 	# handler._("foo")
@@ -35,7 +36,8 @@ do
 	# then ant distclean updater.
 	find src ../jsp/WEB-INF -name *.java > $TMPFILE
 	xgettext -f $TMPFILE -F -L java \
-                 --keyword=_ --keyword=cssHelper._ --keyword=cssHelper.title --keyword=handler._ --keyword=formhandler._ \
+                 --keyword=_ --keyword=_x --keyword=cssHelper._ --keyword=cssHelper.title \
+                 --keyword=handler._ --keyword=formhandler._ \
 	         -o ${i}t
 	if [ $? -ne 0 ]
 	then

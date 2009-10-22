@@ -202,9 +202,9 @@ public class SummaryBarRenderer {
                     buf.append("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >")
                        .append(_("Download Unsigned"))
                        .append("<br>")
-                       .append(_helper.getUnsignedUpdateVersion())
-                       .append(' ')
                        .append(_("Update"))
+                       .append(' ')
+                       .append(_helper.getUnsignedUpdateVersion())
                        .append("</button>\n");
                 }
                 buf.append("</form>\n");

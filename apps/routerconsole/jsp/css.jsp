@@ -29,4 +29,12 @@
    cssHelper.setLang(request.getParameter("lang"));
 %>
 <link href="<%=cssHelper.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">
+<%
+   // make the fonts bigger for chinese
+   if (cssHelper.getLang().equals("zh")) {
+%>
+<link href="<%=cssHelper.getTheme(request.getHeader("User-Agent"))%>console_big.css" rel="stylesheet" type="text/css">
+<%
+   }
+%>
 <!--[if IE]><link href="/themes/console/classic/ieshim.css" rel="stylesheet" type="text/css" /><![endif]-->

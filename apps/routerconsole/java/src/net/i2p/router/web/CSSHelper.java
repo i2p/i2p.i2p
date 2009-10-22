@@ -29,6 +29,11 @@ public class CSSHelper extends HelperBase {
             _context.router().setConfigSetting(Messages.PROP_LANG, lang);
     }
 
+    /** needed for conditional css loads for zh */
+    public String getLang() {
+        return Messages.getLanguage(_context);
+    }
+
     /** translate the title and display consistently */
     public String title(String s) {
          StringBuilder buf = new StringBuilder(128);

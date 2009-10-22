@@ -54,7 +54,7 @@ public class Messages {
         }
     }
 
-    private static String getLanguage(I2PAppContext ctx) {
+    public static String getLanguage(I2PAppContext ctx) {
         String lang = ctx.getProperty(PROP_LANG);
         if (lang == null || lang.length() <= 0)
             lang = _localeLang;
