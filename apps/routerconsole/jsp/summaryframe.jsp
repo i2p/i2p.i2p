@@ -53,14 +53,14 @@
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
-        out.print("<hr><form action=\"summaryframe.jsp\" method=\"GET\">\n");
+        out.print("<hr><div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"GET\">\n");
         if ("0".equals(d)) {
-            out.print("<b>Refresh (s):<b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" align=\"right\" />\n");
-            out.print("<button type=\"submit\">Enable</button>\n");
+            out.print("<b>Refresh (s):<b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
+            out.print("<button type=\"submit\">Enable</button></div>\n");
         } else {
             // this will load in the iframe but subsequent pages will not have the iframe
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" />\n");
-            out.print("<button type=\"submit\">Disable " + d + "s Refresh</button>\n");
+            out.print("<button type=\"submit\">Disable " + d + "s Refresh</button></div>\n");
         }
         out.print("</form><hr>\n");
     }

@@ -68,8 +68,8 @@ div.warning {
      border: 5px solid #fb7;
      text-align: left;
      color: inherit;
-     background-image:url("../images/errortriangle.png");
-     background-position: 17px center;
+     background-image:url("../images/itoopie_sm.png");     
+     background-position: 12px center;
      background-repeat:no-repeat;
      -moz-border-radius: 15px;
      -moz-box-shadow: inset 0px 0px 0px 2px #f60;
@@ -169,11 +169,10 @@ div.routersummary hr {
 
 div.routersummary h3 {
      border: 0px solid #f00;
-/*     border-bottom: 1px solid #99f !important;*/
-     font-size: 10pt;
+     font-size: 9.5pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px;
-     padding: 5px 0px 5px 0px;
+     padding: 1px 0;
      background: #c5d5fb;
      text-transform: uppercase;
 }
@@ -181,10 +180,10 @@ div.routersummary h3 {
 div.routersummary h4 {
      border: 0px solid #f00;
      border-bottom: 0 !important;
-     font-size: 9pt;
+     font-size: 8.5pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px !important;
-     padding: 2px 3px 3px 3px;
+     padding: 1px 3px;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -194,11 +193,11 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 5px -5px 2px;
+     margin: -5px 4px -5px 3px;
      width: 180px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0px -10px;
+     padding: 0 -10px;
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -209,8 +208,24 @@ div.routersummary tr {
      border: 0 !important;
 }
 
+div.tunnels table{
+     margin: 0 !important;
+}
+
+.tunnels tr {
+     padding: 2px 0 !important;
+     margin-left: -7px !important;
+}
+     
 div.routersummary form {
-     margin-top: 8px;
+     margin-top: -6px !important;
+     margin-bottom: -4px !important;     
+}
+
+div.refresh {
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+     padding: 2px 0 !important;
 }
 
 div.routersummary p {
@@ -227,19 +242,9 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 2px 4px;
+     padding: 0 4px;
      background-image: none !important;
      border: 0 !important;
-}
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
-}
-
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
 }
 
 div.warning h3 {
@@ -249,7 +254,7 @@ div.warning h3 {
 
 div.main {
      margin: 0px 0px 0px 195px;
-     padding: 15px;
+     padding: 15px 15px 10px 15px;
      background: #eef;
      border: 5px solid #bbf;
      border-top: 0;
@@ -260,35 +265,74 @@ div.main {
 }
 
 div.main ul {
-     margin: 0;
+     margin: -10px 0 -10px -10px;
 }
 
 div.main li {
      padding: 0 0 5px 0;
      list-style: square;
+     word-wrap: break-word;
+     margin-right: 20px;
 }
 
 div.main li:first-child {
-     padding-top: 5px;
+     padding-top: 15px;
+}
+
+div.main hr:last-child {
+     margin: 15px 0 10px 0;
 }
 
 div.main textarea {
      width: 98% !important; 
      margin: 2px 0 2px 5px;
+     min-height: 96px;
+}
+
+div.main h2 {
+     margin-top: 20px;
+     margin-bottom: -5px;
+}
+
+div.welcome {
+     margin-top: 5px;
+}
+
+div.main h2:first-child, div.main h3:first-child {
+     margin-top: 0px; 
+     margin-bottom: -5px;
+}
+
+div.wideload h2 {
+     margin-bottom: 0px !important;
+}
+
+div.wideload h3:first-child {
+     margin-top: 0 !important;
+}
+
+div.wideload h3 {
+     margin-top: 15px !important;      
+     margin-bottom: 0px !important;
+}
+
+div.wideload p !important {
+     margin-top: 5px;
 }
 
 div.news {
      margin: -5px 0px 0 195px;
-     padding: -10px 15px 8px 15px;
+     padding: -10px 0px 8px 0px;
      background: #ffffc0;
      border: 5px solid #bbf;
-     text-align: justify;
-     color: inherit;
+     text-align: right;
+     color: #770;
      min-width: 600px;
      padding-bottom: 8px;
      padding-left: 10px;
      padding-right: 10px;
      -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+     font-size: 7pt;
 }
 
 /* convert the list entry to our title */
@@ -296,34 +340,50 @@ div.news {
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: -15px 15px -20px -20px;
+     margin: 15px 15px -10px -20px;
      padding: 0px 0 15px 0;
-     border-bottom: 5px solid #cc7;
+     border-bottom: 2px dotted #cc7;
      border-top: 0px solid #cc7;     
-     padding: 3px 5px 5px 5px;
-     font-size: 12pt;
+     padding: 3px 5px 5px 0;
+     font-size: 10pt;
      color: #540;
 }
 
 div.news p {
      color: #330;
+     font-size: 9pt;
+     margin-bottom: -10px;
 }
+/*
+div.news p:first-child {
+     padding-top: 15px !important;
+}
+
+ 
+div.news p:nth-child(2n) {
+     padding-top: 15px !important;
+}
+*/
+div.news p:last-child {
+     margin-bottom: 10px;
+}
+
 div.news a:link {
-     color: #773;
+     color: #663;
      text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
 }
 
 div.news a:visited {
-     color: #f00 !important;
+     color: #773 !important;
      text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
 }
 
 div.news hr {
      color: #cc7;
      background: #cc7;
-     height: 2px;
-     border: 0px solid #cc7;
-     margin: 5px 0;
+     height: 1px;
+     border: 0px solid #cccc77;
+     margin: 2px 0 0 0;
 }
 
 div.confignav {
@@ -339,10 +399,14 @@ div.configure {
      padding: 0px 20px 0px 20px;
 }
 
+div.configure hr {
+     margin: 15px 0;
+}
+
 div.configure table {
      font-size: 9pt;
      font-weight: bold;
-     -moz-box-shadow: inset 0px 0px 1px 1px #001;
+     border: 1px solid #bbf;
 }
 
 div.configure tr, div.configure td {
@@ -352,6 +416,23 @@ div.configure tr, div.configure td {
 div.configure tr {
      -moz-box-shadow: inset 0px 0px 1px 0px #bbf;
 }
+
+div.configure li:first-child, div.main li:first-child {
+     margin-top: -10px;
+}
+
+div.configure li:last-child {
+     margin-bottom: -5px;
+}
+
+div.configure h2:first-child {
+     margin-top: 15px;
+}
+
+.topshimten {
+     margin-top: 15px;
+     margin-bottom: 15px;
+} 
 
 div.messages {
      padding: 0px 10px;
@@ -367,8 +448,8 @@ div.messages {
 }
 
 div.messages li, div.messages ul {
-     padding: 15px 0 5px 5px;
-     margin: -15px 0 0 0;
+     padding: 10px 0 0 5px;
+     margin: -10px 0 0 0;
 }
 
 div.messages span.error {
@@ -397,17 +478,18 @@ h1 {
 h2 {
      font-size: 14pt;
      padding: 0px 10px 10px 10px;
-     border-bottom: 5px solid #bbf;
-     border-top: 0px solid #bbf;
+     border-bottom: 3px solid #aaf;
+     border-top: 0px solid #aaf;
      letter-spacing: 0.04em;
 }
 
 h3 {
      font-size: 12pt;
      padding: 0 10px 10px 10px;
-     border-bottom: 5px solid #bbf;
-     border-top: 0px solid #bbf;
+     border-bottom: 3px solid #aaf;
+     border-top: 0px solid #aaf;
      letter-spacing: 0.04em;
+     margin-bottom: 10px;
 }
 
 .proxyfooter{
@@ -417,7 +499,7 @@ h3 {
 
 table {
      border-collapse: collapse; 
-     border: 5px solid #bbf;
+     border: 1px solid #bbf;
      margin: 0 0 5px 0;
      cell-padding: 1px;
      font-size: 7.5pt;
@@ -442,7 +524,7 @@ th {
      background-color: #fff;
      padding: 8px 2px;
      text-align: center;
-     border-bottom: 1px solid #88f;
+     border-bottom: 1px solid #bbf;
 }
 
 tt {
@@ -466,11 +548,11 @@ tr:nth-child(odd) {
 }
 
 hr {
-     color: #bbf;
-     background: #bbf;
-     height: 5px;
-     border: 0px solid #bbf;
-     margin: 5px 0;
+     color: #aaf;
+     background: #aaf;
+     height: 3px;
+     border: 0px solid #aaf;
+     margin: 3px 0;
 }
 
 .statusnotes {
@@ -483,6 +565,58 @@ hr {
      border: 5px solid #bbf;
      border-top: 0;
      padding: 4px 0 2px 0;
+}
+
+div.joblog {
+     margin: 10px 0;
+     line-height: 130% !important;
+}
+
+div.joblog:li {
+     word-wrap: break-word !important;
+     text-align: justify !important;
+     line-height: 80% !important;
+}
+
+div.joblog:ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+}
+
+div.joblog li:first-child {
+     margin-top: -10px;
+}
+
+div.joblog li:last-child {
+     margin-bottom: -10px;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 130%;
+}
+
+div.joblog h3 {
+     margin: 10px 0 20px 0;
+}
+
+div.joblog h3:first-child {
+     margin: 5px 0 15px 0;
+}
+
+div.joblog hr {
+     margin: 15px 0 15px;
+}
+
+div.joblog ol {
+     margin-bottom: 0px;
 }
  
 input {
@@ -512,13 +646,14 @@ p {
 
 .formaction {
      text-align: right;
+     margin: -10px -5px;
 }
 
 .langbox {
-     margin: 20px -15px 0px 5px;
+     margin: 10px -20px 0px 5px;
      color: #001;
      font-size: 7pt;
-     width: 180px;
+     width: 220px;
      text-align: center;
      float: right;
      valign: middle;
@@ -526,6 +661,16 @@ p {
 
 .langbox img {
      padding: 0 2px; /* Ignored by IE8 */
+}
+
+.links {
+     padding-bottom: -2px;
+     text-align: justify;
+     margin-top: 5px !important;
+}
+
+.links li {
+     list-style-image: url("../images/link.png") !important;
 }
 
 a:link{
@@ -565,7 +710,7 @@ tt {
 }
 
 .tablefooter {
-     border: 1px solid #88f;
+     border: 1px solid #bbf;
 }
 
 .tablefooter tr, .tablefooter td {
@@ -575,15 +720,17 @@ tt {
      line-height: 150%;
      word-wrap: nowrap;
      padding: 8px 1px;
+     border-top: 2px solid #bbf;
 }
 
 .tidylist {
      text-align: justify;
      padding-right: 30px;
+     margin-right: 20px;
 }
 
 div.graphspanel {
-     padding: 20px 10px;
+     padding: 15px 5px 20px 5px;
      margin: -20px;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
@@ -595,11 +742,12 @@ div.graphspanel {
 }
 
 div.graphspanel img {
-     border: 1px solid #99f;
+     border: 1px solid #77f;
      padding: 2px;
      margin: 6px;
-     background: #ddf;
-     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+     background: #ccf;
+     -moz-box-shadow: inset 0px 0px 0px 0px #002;
+     opacity: 0.9;
 }
 
 div.graphspanel img:hover {
@@ -609,17 +757,19 @@ div.graphspanel img:hover {
      text-align: center !important;
      background: #001;
      -moz-box-shadow: inset 0px 0px 2px 1px #f60;
+     opacity: 1;
 }
 
 div.graphspanel hr {
-     margin: 20px 0;
+     margin: 10px 0;
 }
 
-div.graphspanel form {
+div.graphspanel form:last-child {
      text-align: left;
      margin: 0 20px;
 }
 
 div.graphspanel h3 {
      text-align: left;
+     margin: 10px 20px 10px 20px;
 }

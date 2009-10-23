@@ -1,3 +1,54 @@
+2009-10-21 dr|z3d
+    * Enhance index.jsp with "paperclips" for the main links
+    * Tighten sidepanel layout to gain us some vertical screen real estate
+    * Update news.xml with the correct link for Chinese translation page
+
+2009-10-20 zzz
+    * I2NP: Remove old TunnelCreateMessage and TunnelCreateStatusMessage
+    * Logger: Don't kill the whole JVM if we can't open the log file
+    * MessageHistory: Cleanups
+    * NetDb: Move renderStatusHTML to routerconsole
+    * Router Console translation infrastructure:
+      - Persistent lang setting with routerconsole.lang=xx
+      - Loading any page with ?lang=xx changes the persistent setting
+      - Add a custom Jetty handler to load foo_xx.jsp if it
+        exists for language xx. This is for jsp files with lots
+        of text in them. Otherwise use inline translate methods.
+        Not for included jsps.
+      - Add a script to create and update messages_xx.po translation
+        files, and create ResourceBundles from them
+      - Add class to translate strings from cached ResourceBundles
+      - Add translate wrappers to HelperBase, FormHandler, and *Renderer,
+        so calls can be made from both jsp and java files
+      - Add example translations on configupdate.jsp - two in
+        the jsp itself and one in the helper.
+      - This is for strings in routerconsole only. Will be expanded
+        to other webapps and the router later.
+    * summarynoframe.jsp:
+      - Refactor to SummaryBarRenderer (saves 100KB)
+      - Add translate tags
+      - Use context RNG for nonces
+      - Transitional HTML style for input tags
+    * TunnelDispatcher: Drop messages that expire far in the future
+    * TunnelPoolManager: Move renderStatusHTML to routerconsole
+
+2009-10-16 dr|z3d
+    * Extensive UI whitespace cleanups and positional finessing.
+
+2009-10-16 zzz
+    * Crypto: Two more test classes out of the lib
+    * FloodfillMonitor: Slow down the volunteers again
+    * i2psnark: Add TPB tracker
+    * NetDb: Rework part 1 of N:
+      - Flood only to those closest to the key
+      - Java 5 fixups
+    * oldconsole.jsp: Remove almost all of it, add lines for tino
+    * ProfileOrganizerRenderer:
+      - Move to routerconsole
+      - Write directly to Writer for speed
+    * Router: Add router.hideFloodfillParticipant option for testing
+    * StatisticsManager: Cleanup after release
+
 * 2009-10-12  0.7.7 released
 
 2009-10-11 zzz
