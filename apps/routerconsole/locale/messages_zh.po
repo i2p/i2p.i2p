@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-20 11:55+0000\n"
+"POT-Creation-Date: 2009-10-23 04:37+0000\n"
 "PO-Revision-Date: 2009-10-22 15:38+0800\n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: foo <foo@par>\n"
@@ -21,9 +21,58 @@ msgstr ""
 msgid "config update"
 msgstr "更新设置"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:334
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:209
+msgid "I2P Update Configuration"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:326
+msgid "Check for I2P and news updates"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:328
+msgid "News &amp; I2P Updates"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:336
+msgid "News URL"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:340
+msgid "Refresh frequency"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:344
 msgid "Update policy"
 msgstr "更新策略"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:348
+msgid "Update through the eepProxy?"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:352
+msgid "eepProxy host"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:356
+msgid "eepProxy port"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:360
+#, fuzzy
+msgid "Update URLs"
+msgstr "更新"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:364
+msgid "Trusted keys"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:368
+msgid "Update with unsigned development builds?"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:372
+msgid "Unsigned Build URL"
+msgstr ""
 
 #: src/net/i2p/router/web/CSSHelper.java:36
 #: src/net/i2p/router/web/SummaryBarRenderer.java:26
@@ -179,7 +228,8 @@ msgid "Uptime"
 msgstr "运行时间"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:167
-msgid "Help with configuring your firewall and router for optimal I2P performance"
+msgid ""
+"Help with configuring your firewall and router for optimal I2P performance"
 msgstr "如何正确配置防火墙和(物理)路由器优化I2P性能"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:194
@@ -278,4 +328,3 @@ msgstr "隧道延迟"
 #: src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Backlog"
 msgstr "积压"
-
