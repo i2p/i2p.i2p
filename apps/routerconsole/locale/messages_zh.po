@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-23 04:37+0000\n"
-"PO-Revision-Date: 2009-10-22 15:38+0800\n"
+"POT-Creation-Date: 2009-10-23 05:33+0000\n"
+"PO-Revision-Date: 2009-10-23 13:57+0800\n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: foo <foo@par>\n"
 "MIME-Version: 1.0\n"
@@ -17,29 +17,85 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:96
+msgid "I2P Router Console - config advanced"
+msgstr "I2P 路由控制台 - 高级设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:223
+msgid "I2P Advanced Configuration"
+msgstr "I2P 高级设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:325
+msgid "Advanced I2P Configuration"
+msgstr "I2P 高级设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:329
+msgid "NOTE"
+msgstr "注意"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:331
+msgid "Some changes may require a restart to take effect."
+msgstr "某些设置需要程序重启后生效。"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:95
+msgid "I2P Router Console - config keyring"
+msgstr "I2P 路由控制台 - 钥匙环设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:209
+msgid "I2P Keyring Configuration"
+msgstr "I2P 钥匙环设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:318
+msgid "Keyring"
+msgstr "钥匙环"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:320
+msgid "The router keyring is used to decrypt encrypted leaseSets."
+msgstr "路由的钥匙环被用来解密和加密 leaseSets."
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:323
+msgid "The keyring may contain keys for local or remote encrypted destinations."
+msgstr "钥匙环可以包含本地和远程的加密目标(Destination)."
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:333
+msgid "Manual Keyring Addition"
+msgstr "手动添加钥匙环"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:335
+msgid "Enter keys for encrypted remote destinations here."
+msgstr "在此处添加远程加密目标的密钥。"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:337
+msgid "Dest. name, hash, or full key"
+msgstr "目标(Dest.)名称, HASH, 或完整公钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:339
+msgid "Encryption Key"
+msgstr "加密密钥"
+
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:95
 msgid "config update"
 msgstr "更新设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:209
 msgid "I2P Update Configuration"
-msgstr ""
+msgstr "I2P 更新设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:326
 msgid "Check for I2P and news updates"
-msgstr ""
+msgstr "检查I2P软件及新闻更新"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:328
 msgid "News &amp; I2P Updates"
-msgstr ""
+msgstr "软件及新闻更新"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:336
 msgid "News URL"
-msgstr ""
+msgstr "新闻链接"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:340
 msgid "Refresh frequency"
-msgstr ""
+msgstr "更新频率"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:344
 msgid "Update policy"
@@ -47,32 +103,39 @@ msgstr "更新策略"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:348
 msgid "Update through the eepProxy?"
-msgstr ""
+msgstr "通过eepProxy更新?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:352
 msgid "eepProxy host"
-msgstr ""
+msgstr "eepProxy主机"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:356
 msgid "eepProxy port"
-msgstr ""
+msgstr "eepProxy端口"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:360
-#, fuzzy
 msgid "Update URLs"
-msgstr "更新"
+msgstr "更新链接"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:364
 msgid "Trusted keys"
-msgstr ""
+msgstr "可信公钥"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:368
 msgid "Update with unsigned development builds?"
-msgstr ""
+msgstr "更新包括未签名的开发版?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:372
 msgid "Unsigned Build URL"
-msgstr ""
+msgstr "未签名软件链接"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:94
+msgid "I2P Router Console - tunnel summary"
+msgstr "I2P 路由控制台 - 隧道概况"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:208
+msgid "I2P Tunnel Summary"
+msgstr "I2P 隧道概况"
 
 #: src/net/i2p/router/web/CSSHelper.java:36
 #: src/net/i2p/router/web/SummaryBarRenderer.java:26
@@ -126,7 +189,7 @@ msgstr "设置 I2P 路由器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:74
 msgid "I2P Internals"
-msgstr "I2P内部设置"
+msgstr "I2P 内部设置"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:80
 #: src/net/i2p/router/web/SummaryBarRenderer.java:344
@@ -197,7 +260,7 @@ msgstr "统计数据"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:134
 msgid "I2P Router Help"
-msgstr "I2P路由帮助"
+msgstr "I2P 路由帮助"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:136
 msgid "General"
@@ -228,8 +291,7 @@ msgid "Uptime"
 msgstr "运行时间"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:167
-msgid ""
-"Help with configuring your firewall and router for optimal I2P performance"
+msgid "Help with configuring your firewall and router for optimal I2P performance"
 msgstr "如何正确配置防火墙和(物理)路由器优化I2P性能"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:194
@@ -328,3 +390,4 @@ msgstr "隧道延迟"
 #: src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Backlog"
 msgstr "积压"
+

@@ -30,7 +30,7 @@
       <div class="wideload"><table border="0" cellspacing="5">
         <tr><td colspan="2"></tr>
         <tr><td class= "mediumtags" align="right"><b><%=cssHelper._("News &amp; I2P Updates")%>:</b></td>
-          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i>Update In Progress</i><br> <% } else { %> <input type="submit" name="action" value="Check for updates" />
+          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=cssHelper._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" value="Check for updates" />
             <% } %></td></tr>
         <tr><td colspan="2"><br></td></tr>
         <tr><td class= "mediumtags" align="right"><b><%=cssHelper._("News URL")%>:</b></td>
