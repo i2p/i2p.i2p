@@ -4,11 +4,11 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("graphs")%>
+<%=intl.title("graphs")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
-<h1><%=cssHelper._("I2P Performance Graphs")%></h1>
+<h1><%=intl._("I2P Performance Graphs")%></h1>
 <div class="main" id="main">
  <div class="graphspanel">
  <div class="widepanel">

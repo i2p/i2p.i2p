@@ -4,13 +4,13 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("logs")%>
+<%=intl.title("logs")%>
 </head><body>
 <%@include file="summary.jsp" %>
-<h1><%=cssHelper._("I2P Router Logs")%></h1>
+<h1><%=intl._("I2P Router Logs")%></h1>
 <div class="main" id="main">
- <div class="joblog"><h3><%=cssHelper._("I2P Version & Running Environment")%></h3><a name="version"> </a>
- <i><%=cssHelper._("Please include this information in bug reports")%>:</i>
+ <div class="joblog"><h3><%=intl._("I2P Version & Running Environment")%></h3><a name="version"> </a>
+ <i><%=intl._("Please include this information in bug reports")%>:</i>
  <p>
 <b>I2P version:</b> <jsp:getProperty name="helper" property="version" /><br>
 <b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%><br>

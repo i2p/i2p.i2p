@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("config clients")%>
+<%=intl.title("config clients")%>
 <style type='text/css'>
 button span.hide{
     display:none;
@@ -15,7 +15,7 @@ button span.hide{
 
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<h1><%=cssHelper._("I2P Client Configuration")%></h1>
+<h1><%=intl._("I2P Client Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
 
@@ -30,8 +30,8 @@ button span.hide{
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigClientsHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce")%>" />
- <h3><%=cssHelper._("Client Configuration")%></h3><p>
- <%=cssHelper._("The Java clients listed below are started by the router and run in the same JVM.")%>
+ <h3><%=intl._("Client Configuration")%></h3><p>
+ <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
  </p><div class="wideload">
  <p><jsp:getProperty name="clientshelper" property="form1" />
  </p><p><i>To change other client options, edit the file
@@ -39,7 +39,7 @@ button span.hide{
 All changes require restart to take effect.</i>
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="Save Client Configuration" />
-</div></div><h3><%=cssHelper._("WebApp Configuration")%></h3><p>
+</div></div><h3><%=intl._("WebApp Configuration")%></h3><p>
  The Java web applications listed below are started by the webConsole client and run in the same JVM as the router.
  They are usually web applications accessible through the router console.
  They may be complete applications (e.g. i2psnark),
@@ -52,7 +52,7 @@ All changes require restart to take effect.</i>
  </p><div class="wideload"><p>
  <jsp:getProperty name="clientshelper" property="form2" />
  </p><p>
- <i><%=cssHelper._("All changes require restart to take effect.")%></i>
+ <i><%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="Save WebApp Configuration" />
  </div></div></form></div></div></body></html>

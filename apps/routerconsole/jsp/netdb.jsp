@@ -4,10 +4,10 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("network database summary")%>
+<%=intl.title("network database summary")%>
 </head><body>
 <%@include file="summary.jsp" %>
- <h1><%=cssHelper._("I2P Network Database Summary")%></h1>
+ <h1><%=intl._("I2P Network Database Summary")%></h1>
 <div class="main" id="main">
  <div class="wideload">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />

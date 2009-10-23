@@ -4,10 +4,10 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("peer connections")%>
+<%=intl.title("peer connections")%>
 </head><body>
 <%@include file="summary.jsp" %>
-<h1><%=cssHelper._("I2P Network Peers")%></h1>
+<h1><%=intl._("I2P Network Peers")%></h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.PeerHelper" id="peerHelper" scope="request" />
  <jsp:setProperty name="peerHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

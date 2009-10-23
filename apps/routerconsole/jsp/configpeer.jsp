@@ -4,11 +4,11 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("config peers")%>
+<%=intl.title("config peers")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
-<h1><%=cssHelper._("I2P Peer Configuration")%></h1>
+<h1><%=intl._("I2P Peer Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
 
@@ -35,11 +35,11 @@
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
- <h2><%=cssHelper._("Manual Peer Controls")%></h2>
- <div class="mediumtags"><p><%=cssHelper._("Router Hash")%>:
+ <h2><%=intl._("Manual Peer Controls")%></h2>
+ <div class="mediumtags"><p><%=intl._("Router Hash")%>:
 <input type="text" size="55" name="peer" value="<%=peer%>" /></p></div>
- <h3><%=cssHelper._("Manually Ban / Unban a Peer")%></h3>
- <p><%=cssHelper._("Banning will prevent the participation of this peer in tunnels you create.")%></p>
+ <h3><%=intl._("Manually Ban / Unban a Peer")%></h3>
+ <p><%=intl._("Banning will prevent the participation of this peer in tunnels you create.")%></p>
       <div class="formaction">
         <input type="submit" name="action" value="Ban peer until restart" />
         <input type="submit" name="action" value="Unban peer" />
@@ -48,7 +48,7 @@
         <% } %>
       </div>
 
- <h3><%=cssHelper._("Adjust Profile Bonuses")%></h3>
+ <h3><%=intl._("Adjust Profile Bonuses")%></h3>
  <p>Bonuses may be positive or negative, and affect the peer's inclusion in Fast
       and High Capacity tiers. Fast peers are used for client tunnels, and High
       Capacity peers are used for some exploratory tunnels. Current bonuses are
@@ -58,9 +58,9 @@
         // get existing bonus values?
     }
  %>
- <div class="mediumtags"><p><%=cssHelper._("Speed")%>:
+ <div class="mediumtags"><p><%=intl._("Speed")%>:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
- <%=cssHelper._("Capacity")%>:
+ <%=intl._("Capacity")%>:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
  <input type="submit" name="action" value="Adjust peer bonuses" /></p></div>
  </form>

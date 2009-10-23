@@ -4,13 +4,13 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("statistics")%>
+<%=intl.title("statistics")%>
 </head><body>
 <%@include file="summary.jsp" %>
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="oldhelper" scope="request" />
 <jsp:setProperty name="oldhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <jsp:setProperty name="oldhelper" property="writer" value="<%=out%>" />
- <h1><%=cssHelper._("I2P Router Statistics")%></h1>
+ <h1><%=intl._("I2P Router Statistics")%></h1>
 <div class="main" id="main">
  <jsp:getProperty name="oldhelper" property="stats" />
 <hr></div></body></html>

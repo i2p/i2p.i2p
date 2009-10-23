@@ -4,14 +4,14 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("config tunnels")%>
+<%=intl.title("config tunnels")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
 <jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<h1><%=cssHelper._("I2P Tunnel Configuration")%></h1>
+<h1><%=intl._("I2P Tunnel Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
  <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />

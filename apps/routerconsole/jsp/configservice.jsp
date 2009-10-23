@@ -4,11 +4,11 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("config service")%>
+<%=intl.title("config service")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
-<h1><%=cssHelper._("I2P Service Configuration")%></h1>
+<h1><%=intl._("I2P Service Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
 
@@ -22,7 +22,7 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigServiceHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigServiceHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce")%>" />
- <h3><%=cssHelper._("Shutdown the router")%></h3>
+ <h3><%=intl._("Shutdown the router")%></h3>
  <p>Graceful shutdown lets the router satisfy the agreements it has already made
  before shutting down, but may take a few minutes.  If you need to kill the
  router immediately, that option is available as well.</p>
@@ -44,7 +44,7 @@
  <% } %></div>
 
  <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
- <h3><%=cssHelper._("Systray integration")%></h3>
+ <h3><%=intl._("Systray integration")%></h3>
  <p>On the windows platform, there is a small application to sit in the system
  tray, allowing you to view the router's status (later on, I2P client applications
  will be able to integrate their own functionality into the system tray as well).
@@ -52,7 +52,7 @@
  <hr><div class="formaction">
  <input type="submit" name="action" value="Show systray icon" />
  <input type="submit" name="action" value="Hide systray icon" />
-</div><h3><%=cssHelper._("Run on startup")%></h3>
+</div><h3><%=intl._("Run on startup")%></h3>
  <p>You can control whether I2P is run on startup or not by selecting one of the
  following options - I2P will install (or remove) a service accordingly.  You can
  also run the <code>install_i2p_service_winnt.bat</code> (or
@@ -66,7 +66,7 @@
  <% } %>
 
  <% if (System.getProperty("wrapper.version") != null) { %>
- <h3><%=cssHelper._("Debugging")%></h3>
+ <h3><%=intl._("Debugging")%></h3>
  <p>At times, it may be helpful to debug I2P by getting a thread dump.  To do so,
  please select the following option and review the thread dumped to
  <a href="logs.jsp#servicelogs">wrapper.log</a>.</p>
@@ -74,7 +74,7 @@
  <input type="submit" name="action" value="Dump threads" />
 <% } %></div>
 
- <h3><%=cssHelper._("Launch browser on router startup?")%></h3>
+ <h3><%=intl._("Launch browser on router startup?")%></h3>
  <p>I2P's main configuration interface is this web console, so for your convenience
  I2P can launch a web browser pointing at
  <a href="http://127.0.0.1:7657/index.jsp">http://127.0.0.1:7657/index.jsp</a> whenever
