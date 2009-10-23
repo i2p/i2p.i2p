@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("I2P Router Console - tunnel summary")%>
+<%=cssHelper.title("tunnel summary")%>
 </head><body>
 <%@include file="summary.jsp" %><h1><%=cssHelper._("I2P Tunnel Summary")%></h1>
 <div class="main" id="main">

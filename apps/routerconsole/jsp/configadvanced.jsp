@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("I2P Router Console - config advanced")%>
+<%=cssHelper.title("config advanced")%>
 </head><body>
 
 <%@include file="summary.jsp" %>

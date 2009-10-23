@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<%=cssHelper.title("I2P Router Console - config keyring")%>
+<%=cssHelper.title("config keyring")%>
 </head><body>
 
 <%@include file="summary.jsp" %>

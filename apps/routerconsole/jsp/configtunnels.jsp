@@ -2,15 +2,16 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config tunnels</title>
+<html><head>
 <%@include file="css.jsp" %>
+<%=cssHelper.title("config tunnels")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
 <jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<h1>I2P Tunnel Configuration</h1>
+<h1><%=cssHelper._("I2P Tunnel Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
  <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />
