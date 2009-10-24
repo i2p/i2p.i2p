@@ -22,12 +22,12 @@
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure"><p>
- NOTE: The default settings work for most people.
- There is a fundamental tradeoff between anonymity and performance.
- Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 hops, 3 hops + 0-2 hops),
- or a high quantity + backup quantity, may severely reduce performance or reliability.
- High CPU and/or high outbound bandwidth usage may result.
- Change these settings with care, and adjust them if you have problems.
+ <%=intl._("NOTE")%>: 
+ <%=intl._("The default settings work for most people.")%> 
+ <%=intl._("There is a fundamental tradeoff between anonymity and performance.")%>
+ <%=intl._("Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 hops, 3 hops + 0-2 hops), or a high quantity + backup quantity, may severely reduce performance or reliability.")%>
+ <%=intl._("High CPU and/or high outbound bandwidth usage may result.")%>
+ <%=intl._("Change these settings with care, and adjust them if you have problems.")%>
 <div class="wideload">
 <form action="configtunnels.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce");
@@ -36,8 +36,8 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
  <jsp:getProperty name="tunnelshelper" property="form" />
- Note: Exploratory tunnel setting changes are stored in the router.config file.
- Client tunnel changes are temporary and are not saved.
-To make permanent client tunnel changes see the <a href="i2ptunnel/index.jsp">i2ptunnel page</a>.
+ <%=intl._("Note")%>: <%=intl._("Exploratory tunnel setting changes are stored in the router.config file.")%>
+ <%=intl._("Client tunnel changes are temporary and are not saved.")%>
+<%=intl._("To make permanent client tunnel changes see the")%> <a href="i2ptunnel/index.jsp"><%=intl._("i2ptunnel page")%></a>.
  <hr><div class="formaction"><input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" /></div>
  </form></p></div></div></div></body></html>

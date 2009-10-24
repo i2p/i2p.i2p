@@ -34,21 +34,15 @@ button span.hide{
  <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
  </p><div class="wideload">
  <p><jsp:getProperty name="clientshelper" property="form1" />
- </p><p><i>To change other client options, edit the file
-<%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.
-All changes require restart to take effect.</i>
+ </p><p><i><%=intl._("To change other client options, edit the file")%>
+ <%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.
+ <%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="Save Client Configuration" />
 </div></div><h3><%=intl._("WebApp Configuration")%></h3><p>
- The Java web applications listed below are started by the webConsole client and run in the same JVM as the router.
- They are usually web applications accessible through the router console.
- They may be complete applications (e.g. i2psnark),
- front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel),
- or have no web interface at all (e.g. addressbook).
+ <%=intl._("The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook).")%>
  </p><p>
- A web app may also be disabled by removing the .war file from the webapps directory;
- however the .war file and web app will reappear when you update your router to a newer version,
- so disabling the web app here is the preferred method.
+ <%=intl._("A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method.")%>
  </p><div class="wideload"><p>
  <jsp:getProperty name="clientshelper" property="form2" />
  </p><p>
