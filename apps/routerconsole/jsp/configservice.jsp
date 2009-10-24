@@ -23,16 +23,19 @@
     System.setProperty("net.i2p.router.web.ConfigServiceHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce")%>" />
  <h3><%=intl._("Shutdown the router")%></h3>
- <p><%=intl._("Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes. If you need to kill the router immediately, that option is available as well.")%>
-   </p>
+ <p><%=intl._("Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes.")%> 
+    <%=intl._("If you need to kill the router immediately, that option is available as well.")%></p>
   <hr><div class="formaction">
  <input type="submit" name="action" value="Shutdown gracefully" />
  <input type="submit" name="action" value="Shutdown immediately" />
  <input type="submit" name="action" value="Cancel graceful shutdown" />
  </div>
  <% if (System.getProperty("wrapper.version") != null) { %>
- <p><%=intl._("If you want the router to restart itself after shutting down, you can choose one of the following.  This is useful in some situations - for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on.  A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately.  After tearing down the router, it will wait 1 minute before starting back up again.")%>
-   </p>
+ <p><%=intl._("If you want the router to restart itself after shutting down, you can choose one of the following.")%> 
+    <%=intl._("This is useful in some situations")%> - 
+    <%=intl._("for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on.")%> 
+    <%=intl._("A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately.")%> 
+    <%=intl._("After tearing down the router, it will wait 1 minute before starting back up again.")%></p>
  <hr><div class="formaction">
  <input type="submit" name="action" value="Graceful restart" />
  <input type="submit" name="action" value="Hard restart" />
@@ -40,25 +43,28 @@
 
  <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
  <h3><%=intl._("Systray integration")%></h3>
- <p><%=intl._("On the windows platform, there is a small application to sit in the system tray, allowing you to view the router's status (later on, I2P client applications will be able to integrate their own functionality into the system tray as well). If you are on windows, you can either enable or disable that icon here.")%>
-  </p>
+ <p><%=intl._("On the windows platform, there is a small application to sit in the system tray, allowing you to view the router's status")%> 
+    <%=intl._("(later on, I2P client applications will be able to integrate their own functionality into the system tray as well).")%> 
+    <%=intl._("If you are on windows, you can either enable or disable that icon here.")%></p>
  <hr><div class="formaction">
  <input type="submit" name="action" value="Show systray icon" />
  <input type="submit" name="action" value="Hide systray icon" />
 </div><h3><%=intl._("Run on startup")%></h3>
- <p><%=intl._("You can control whether I2P is run on startup or not by selecting one of the following options - I2P will install (or remove) a service accordingly.")%> 
+ <p><%=intl._("You can control whether I2P is run on startup or not by selecting one of the following options")%> - 
+    <%=intl._("I2P will install (or remove) a service accordingly.")%> 
     <%=intl._("If you prefer the command line, you can also run the ")%> <code>install_i2p_service_winnt.bat</code> (<%=intl._("or")%>
  <code>uninstall_i2p_service_winnt.bat</code>).</p>
  <hr><div class="formaction">
  <input type="submit" name="action" value="Run I2P on startup" />
 <input type="submit" name="action" value="Don't run I2P on startup" /></div>
- <p><b><%=intl._("Note")%>:</b> <%=intl._("If you are running I2P as service right now, removing it will shut down your router immediately.  You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat.")%>
-  </p>
+ <p><b><%=intl._("Note")%>:</b> <%=intl._("If you are running I2P as service right now, removing it will shut down your router immediately.")%> 
+    <%=intl._("You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat.")%></p>
  <% } %>
 
  <% if (System.getProperty("wrapper.version") != null) { %>
  <h3><%=intl._("Debugging")%></h3>
- <p><%=intl._("At times, it may be helpful to debug I2P by getting a thread dump.  To do so, please select the following option and review the thread dumped to")%>
+ <p> At times, it may be helpful to debug I2P by getting a thread dump. 
+     To do so, please select the following option and review the thread dumped to
  <a href="logs.jsp#servicelogs">wrapper.log</a>.</p>
   <hr><div class="formaction">
  <input type="submit" name="action" value="Dump threads" />

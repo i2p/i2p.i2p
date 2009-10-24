@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-24 05:55+0000\n"
+"POT-Creation-Date: 2009-10-24 08:33+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -121,7 +121,7 @@ msgid "Specify hostname or IP"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:413
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:340
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:356
 msgid "or"
 msgstr ""
 
@@ -180,7 +180,7 @@ msgid "Specify Port"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:487
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:342
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:358
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:363
 msgid "Note"
 msgstr ""
@@ -754,70 +754,102 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:320
 msgid ""
 "Graceful shutdown lets the router satisfy the agreements it has already made "
-"before shutting down, but may take a few minutes. If you need to kill the "
-"router immediately, that option is available as well."
+"before shutting down, but may take a few minutes."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:324
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:322
+msgid ""
+"If you need to kill the router immediately, that option is available as well."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:326
 msgid ""
 "If you want the router to restart itself after shutting down, you can choose "
-"one of the following.  This is useful in some situations - for example, if "
-"you changed some settings that client applications only read at startup, "
-"such as the routerconsole password or the interface it listens on.  A "
-"graceful restart will take a few minutes (but your peers will appreciate "
-"your patience), while a hard restart does so immediately.  After tearing "
-"down the router, it will wait 1 minute before starting back up again."
+"one of the following."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:328
+msgid "This is useful in some situations"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:330
-msgid "Systray integration"
+msgid ""
+"for example, if you changed some settings that client applications only read "
+"at startup, such as the routerconsole password or the interface it listens "
+"on."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:332
 msgid ""
-"On the windows platform, there is a small application to sit in the system "
-"tray, allowing you to view the router's status (later on, I2P client "
-"applications will be able to integrate their own functionality into the "
-"system tray as well). If you are on windows, you can either enable or "
-"disable that icon here."
+"A graceful restart will take a few minutes (but your peers will appreciate "
+"your patience), while a hard restart does so immediately."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:334
-msgid "Run on startup"
-msgstr ""
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:336
 msgid ""
-"You can control whether I2P is run on startup or not by selecting one of the "
-"following options - I2P will install (or remove) a service accordingly."
+"After tearing down the router, it will wait 1 minute before starting back up "
+"again."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:338
-msgid "If you prefer the command line, you can also run the "
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:340
+msgid "Systray integration"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:342
+msgid ""
+"On the windows platform, there is a small application to sit in the system "
+"tray, allowing you to view the router's status"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:344
 msgid ""
-"If you are running I2P as service right now, removing it will shut down your "
-"router immediately.  You may want to consider shutting down gracefully, as "
-"above, then running uninstall_i2p_service_winnt.bat."
+"(later on, I2P client applications will be able to integrate their own "
+"functionality into the system tray as well)."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:346
+msgid "If you are on windows, you can either enable or disable that icon here."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:348
+msgid "Run on startup"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:350
+msgid ""
+"You can control whether I2P is run on startup or not by selecting one of the "
+"following options"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:352
-msgid "Debugging"
+msgid "I2P will install (or remove) a service accordingly."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:354
-msgid ""
-"At times, it may be helpful to debug I2P by getting a thread dump.  To do "
-"so, please select the following option and review the thread dumped to"
-msgstr ""
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:358
-msgid "Launch browser on router startup?"
+msgid "If you prefer the command line, you can also run the "
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:360
+msgid ""
+"If you are running I2P as service right now, removing it will shut down your "
+"router immediately."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:362
+msgid ""
+"You may want to consider shutting down gracefully, as above, then running "
+"uninstall_i2p_service_winnt.bat."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:370
+msgid "Debugging"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:374
+msgid "Launch browser on router startup?"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:376
 msgid ""
 "I2P's main configuration interface is this web console, so for your "
 "convenience I2P can launch a web browser on startup pointing at"
