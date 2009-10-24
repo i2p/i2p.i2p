@@ -2,11 +2,8 @@
 <center>
 <% if (request.getRequestURI().indexOf("config.jsp") != -1) {
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
- String userAgent = request.getHeader("User-Agent");
- if (userAgent == null || !userAgent.contains("MSIE")) {
      if (request.getRequestURI().indexOf("configui.jsp") != -1) {
      %>UI | <% } else { %><a href="configui.jsp">UI</a> | <% }
- }
  if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
  %>Service | <% } else { %><a href="configservice.jsp">Service</a> | <% }
  if (request.getRequestURI().indexOf("configupdate.jsp") != -1) {

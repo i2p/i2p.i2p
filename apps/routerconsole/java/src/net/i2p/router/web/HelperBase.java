@@ -34,4 +34,14 @@ public abstract class HelperBase {
     public String _(String s) {
         return Messages.getString(s, _context);
     }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    public static String _x(String s) {
+        return s;
+    }
 }

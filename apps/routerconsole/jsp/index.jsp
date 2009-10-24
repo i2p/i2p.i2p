@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsp" %>
-<title>I2P Router Console - home</title>
+<%=intl.title("home")%>
 </head><body>
 <%
 if (System.getProperty("router.consoleNonce") == null) {
@@ -12,7 +12,7 @@ if (System.getProperty("router.consoleNonce") == null) {
 }
 %>
 
-<%@include file="summary.jsp" %><h1>I2P Router Console</h1>
+<%@include file="summary.jsp" %><h1><%=intl._("I2P Router Console")%></h1>
 <div class="news" id="news">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="newshelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml"); %>

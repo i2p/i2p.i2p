@@ -143,6 +143,11 @@ public class FileUtil {
      * so we basically go through all the motions of extractZip() above,
      * unzipping everything but throwing away the data.
      *
+     * Todo: verify zip header? Although this would break the undocumented
+     * practice of renaming the i2pupdate.sud file to i2pupdate.zip and
+     * letting the unzip method skip over the leading 56 bytes of
+     * "junk" (sig and version)
+     *
      * @return true if ok
      */
     public static boolean verifyZip(File zipfile) {

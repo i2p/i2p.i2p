@@ -23,10 +23,18 @@
 %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="shortcut icon" href="/themes/console/images/favicon.ico">
-<jsp:useBean class="net.i2p.router.web.CSSHelper" id="cssHelper" scope="request" />
-<jsp:setProperty name="cssHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
+<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <%
-   cssHelper.setLang(request.getParameter("lang"));
+   intl.setLang(request.getParameter("lang"));
 %>
-<link href="<%=cssHelper.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">
+<%
+   // make the fonts bigger for chinese
+   if (intl.getLang().equals("zh")) {
+%>
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_big.css" rel="stylesheet" type="text/css">
+<%
+   }
+%>
 <!--[if IE]><link href="/themes/console/classic/ieshim.css" rel="stylesheet" type="text/css" /><![endif]-->

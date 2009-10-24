@@ -1,3 +1,18 @@
+2009-10-23 zzz
+    * Certificate: Fix the (apparently unused) readBytes(byte[], int) method
+      for a null certificate - http://zzz.i2p/topics/388 - thanks HungryHobo
+    * Console:
+      - Don't hide link to configui.jsp for IE any more
+      - Add lang selection on configui.jsp
+      - Tag strings in configui.jsp
+      - Load console_big.css if lang == zh
+      - Add _x() tag for static iniitializers
+      - HTML transitional input tags
+      - Rename cssHelper to intl for ease of tagging
+    * Update: Better error message when .sud file not found or truncated
+      http://forum.i2p/viewtopic.php?t=3979
+      The bug with the file going to the wrong place was fixed a couple months ago.
+
 2009-10-21 dr|z3d
     * Enhance index.jsp with "paperclips" for the main links
     * Tighten sidepanel layout to gain us some vertical screen real estate

@@ -414,8 +414,14 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      *         data was moved, and an error <code>String</code> otherwise.
      */
     public String migrateVerified(String currentVersion, File signedFile, File outputFile) {
-        if (!isUpdatedVersion(currentVersion, signedFile))
-            return "Downloaded version is not greater than current version";
+        if (!signedFile.exists())
+            return "File not found: " + signedFile.getAbsolutePath();
+        if (!isUpdatedVersion(currentVersion, signedFile)) {
+            if ("".equals(_newVersion))
+                return "Truncated or corrupt file: " + signedFile.getAbsolutePath();
+            else
+                return "Downloaded version is not greater than current version";
+        }
 
         if (!verify(signedFile))
             return "Unknown signing key or corrupt file";

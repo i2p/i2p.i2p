@@ -113,7 +113,7 @@ public class Certificate extends DataStructureImpl {
     
     public int readBytes(byte source[], int offset) throws DataFormatException {
         if (source == null) throw new DataFormatException("Cert is null");
-        if (source.length <= offset + 3)
+        if (source.length < offset + 3)
             throw new DataFormatException("Cert is too small [" + source.length + " off=" + offset + "]");
 
         int cur = offset;

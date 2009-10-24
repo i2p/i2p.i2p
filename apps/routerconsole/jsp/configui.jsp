@@ -2,8 +2,9 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config UI</title>
+<html><head>
 <%@include file="css.jsp" %>
+<%=intl.title("config UI")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
@@ -11,7 +12,7 @@
 <jsp:useBean class="net.i2p.router.web.ConfigUIHelper" id="uihelper" scope="request" />
 <jsp:setProperty name="uihelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
-<h1>I2P UI Configuration</h1>
+<h1><%=uihelper._("I2P UI Configuration")%></h1>
 <div class="main" id="main">
 
  <%@include file="confignav.jsp" %>
@@ -20,23 +21,27 @@
  <jsp:setProperty name="formhandler" property="*" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
-<div class="configure"><div class="topshimten"><h3>Router Console Theme</h3></div>
-<%
- // userAgent defined in confignav
- if (userAgent == null || !userAgent.contains("MSIE")) {
-%>
+<div class="configure"><div class="topshimten"><h3><%=uihelper._("Router Console Theme")%></h3></div>
  <form action="configui.jsp" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUIHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigUIHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce")%>" />
- <input type="hidden" name="action" value="blah" />
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce")%>" >
+ <input type="hidden" name="action" value="blah" >
+<%
+ String userAgent = request.getHeader("User-Agent");
+ if (userAgent == null || !userAgent.contains("MSIE")) {
+%>
  <jsp:getProperty name="uihelper" property="settings" />
-<hr><div class="formaction">
-<input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" />
-</div></form></div>
 <% } else { %>
-Theme selection disabled for Internet Explorer, sorry.<hr>If you're not using IE, it's likely that
-your browser is pretending to be IE; please configure your browser (or proxy) to use a different User Agent string if you'd like to access the console themes.
+<%=uihelper._("Theme selection disabled for Internet Explorer, sorry.")%>
+<hr>
+<%=uihelper._("If you're not using IE, it's likely that your browser is pretending to be IE; please configure your browser (or proxy) to use a different User Agent string if you'd like to access the console themes.")%>
 <% } %>
+<h3><%=uihelper._("Router Console Language")%></h3>
+<jsp:getProperty name="uihelper" property="langSettings" />
+<%=uihelper._("Please contribute to the router console translation project! Contact the developers on IRC #i2p to help.")%>
+<hr><div class="formaction">
+<input type="submit" name="shouldsave" value="Apply" > <input type="reset" value="Cancel" >
+</div></form></div>
 </div></body></html>
