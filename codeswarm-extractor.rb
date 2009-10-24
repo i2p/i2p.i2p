@@ -34,15 +34,6 @@ roots.each do |root|
     revs << rev
   end
 end
-#while roots.size > 0 do
-#  rev = roots.pop
-#  revs << rev
-#  next unless rev.class == String
-#  results = `mtn automate children #{rev}`.split("\n").map {|n| n.strip}
-#  results.each do |rev|
-#    roots << rev
-#  end if results.size > 0
-#end
 
 # open the file
 f=File::open('/tmp/i2p.xml', 'w')
@@ -72,7 +63,6 @@ revs.each do |rev|
   puts author
   info.each do |line|
     next unless line
-    #f << "<event date=\"#{DateTime.parse(date).to_time.to_i*1000}\" filename=\"#{line[1].strip[1..-2]}\" author=\"#{MAPPING[author] or author[1..-2]}\" />\n" if line[0].strip == "patch"
     d << [date, line[1].strip[1..-2], (MAPPING[author] or author[1..-2])] if line[0].strip == "patch"
   end
 end
