@@ -59,7 +59,7 @@
         out.print(intl._("Please enable sharing (participating in tunnels) by configuring more bandwidth. "));
         out.print(intl._("It improves your anonymity by creating cover traffic, and helps the network.")+"</p>");
     } else {
-        out.print("<p>You have configured I2P to share<b> " + share + "KBps</b>. ");
+        out.print("<p>" + intl._("You have configured I2P to share") + "<b> " + share + "KBps</b>. ");
         out.print(intl._("The higher the share bandwidth the more you improve your anonymity and help the network.")+"</p><hr>");
     }
  %>
@@ -76,7 +76,7 @@
  <br>
 -->
  <h3><%=intl._("IP and Transport Configuration")%></h3><p>
- <b>The default settings will work for most people. There is <a href="#chelp">help below</a>.</b>
+ <b><%=intl._("The default settings will work for most people.")%> There is <a href="#chelp">help below</a>.</b>
  </p><p><b><%=intl._("UPnP Configuration")%>:</b><br>
     <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     <%=intl._("Enable UPnP to open firewall ports")%> - <a href="peers.jsp#upnp"><%=intl._("UPnP status")%></a>
@@ -109,8 +109,8 @@
     <br>
     <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
     <%=intl._("Hidden mode - do not publish IP")%> <i><%=intl._("(prevents participating traffic)")%></i><br>
- </p><p><b>UDP Configuration:</b><br>
- UDP port:
+ </p><p><b><%=intl._("UDP Configuration:")%></b><br>
+ <%=intl._("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br>
 <!-- let's keep this simple...
 <input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
