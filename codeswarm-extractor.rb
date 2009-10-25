@@ -17,7 +17,7 @@ MAPPING={
   '"jrandom@i2p.net"' => 'jrandom',
   '"jrandom-transfer@i2p.net"' => 'jrandom',
   '"transport@welterde.de"' => 'welterde',
-  '"echelon@mail.i2p"' => 'eche|on'
+  '"echelon@mail.i2p"' => 'eche|on',
   '"z3d@i2p"' => 'dr|z3d',
   '"cervantes@mail.i2p"' => 'cervantes',
   '"BlubMail@mail.i2p"' => 'BlubMail'
@@ -48,10 +48,12 @@ revs.each do |rev|
   certs_=`mtn automate certs #{rev}`.split("\n").map{|l|l2=l.strip; l2.split(" ", 2) if l2 != ""}
   author=certs_[3][1]
   date=nil
+  branch='""'
   certs_.each_index do |i|
     next unless certs_[i]
     if certs_[i][1]
       date=certs_[i+1][1] if certs_[i][1].strip === '"date"'
+      branch=certs_[i+1][1] if certs_[i][1].strip === '"branch"'
     end
   end
   info=`mtn automate get_revision #{rev}`.strip.split("\n").map{|l|l2=l.strip; l2.split(" ", 2) if l2 != ""}
@@ -60,10 +62,12 @@ revs.each do |rev|
   print " - "
   print date
   print " - "
+  print branch
+  print " - "
   puts author
   info.each do |line|
     next unless line
-    d << [date, line[1].strip[1..-2], (MAPPING[author] or author[1..-2])] if line[0].strip == "patch"
+    d << [date, (branch.strip[1..-2] + '//' + line[1].strip[1..-2]), (MAPPING[author] or author[1..-2])] if line[0].strip == "patch"
   end
 end
 
