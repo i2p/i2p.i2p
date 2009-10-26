@@ -2,11 +2,16 @@
 
 #
 # Skeleton sh script suitable for starting and stopping
-# wrapped Java apps on the Solaris platform.
+# "wrapped" Java apps.
 #
 # Make sure that PIDFILE points to the correct location,
 # if you have changed the default location set in the
 # wrapper configuration file.
+#
+# Note that the wrapper only supports Windows, Mac, and
+# certain Linux architectures. If this script fails to
+# successfully invoke i2psvc on your platform,
+# try the runplain.sh script instead.
 #
 
 #-----------------------------------------------------------------------------
