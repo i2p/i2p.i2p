@@ -22,10 +22,10 @@
     } else {
         // since we don't have an iframe this will reload the base page, and
         // the new delay will be passed to the iframe above
-        out.print("<form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
+        out.print("<div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
         out.print("<b>Refresh (s):</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
         out.print("<button type=\"submit\">Enable</button>\n");
-        out.print("</form></div>\n");
+        out.print("</form></div></div>\n");
     }
 %>
 </div>

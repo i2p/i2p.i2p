@@ -55,7 +55,7 @@ public class NetDbRenderer {
 
     public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
+        buf.append("<h2>" + _("Network Database RouterInfo Lookup") + "</h2>\n");
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
@@ -70,7 +70,7 @@ public class NetDbRenderer {
                 }
             }
             if (notFound)
-                buf.append("Router ").append(routerPrefix).append(" not found in network database");
+                buf.append(_("Router") + " ").append(routerPrefix).append(" " + _("not found in network database") );
         }
         out.write(buf.toString());
         out.flush();
@@ -82,8 +82,8 @@ public class NetDbRenderer {
 
     public void renderLeaseSetHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h2>Network Database Contents</h2>\n");
-        buf.append("<a href=\"netdb.jsp\">View RouterInfo</a>");
+        buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
+        buf.append("<a href=\"netdb.jsp\">" + _("View") + " RouterInfo</a>");
         buf.append("<h3>LeaseSets</h3>\n");
         Set leases = new TreeSet(new LeaseSetComparator());
         leases.addAll(_context.netDb().getLeases());
@@ -94,17 +94,17 @@ public class NetDbRenderer {
             Hash key = dest.calculateHash();
             buf.append("<b>LeaseSet: ").append(key.toBase64());
             if (_context.clientManager().isLocal(dest)) {
-                buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">Local</a> ");
+                buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))
-                    buf.append("Unpublished ");
-                buf.append("Destination ");
+                    buf.append(_("Unpublished") + " ");
+                buf.append(_("Destination") + " ");
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
             } else {
-                buf.append(" (Destination ");
+                buf.append(" (" + _("Destination") + " ");
                 String host = _context.namingService().reverseLookup(dest);
                 if (host != null)
                     buf.append(host);
@@ -118,9 +118,9 @@ public class NetDbRenderer {
             else
                 buf.append("Expired ").append(DataHelper.formatDuration(0-exp)).append(" ago<br>\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
-                buf.append("Lease ").append(i + 1).append(": Gateway ");
+                buf.append("Lease ").append(i + 1).append(": " + _("Gateway") + " ");
                 buf.append(_context.commSystem().renderPeerHTML(ls.getLease(i).getGateway()));
-                buf.append(" Tunnel ").append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
+                buf.append(" " + _("Tunnel") + " ").append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
             }
             buf.append("<hr>\n");
             out.write(buf.toString());
@@ -135,21 +135,21 @@ public class NetDbRenderer {
         if (full)
             size *= 4;
         StringBuilder buf = new StringBuilder(size);
-        out.write("<h2>Network Database Contents (<a href=\"netdb.jsp?l=1\">View LeaseSets</a>)</h2>\n");
+        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View") + " LeaseSets</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
-            buf.append("Not initialized\n");
+            buf.append("" + _("Not initialized") + "\n");
             out.write(buf.toString());
             out.flush();
             return;
         }
         
         Hash us = _context.routerHash();
-        out.write("<a name=\"routers\" ></a><h3>Routers (<a href=\"netdb.jsp");
+        out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb.jsp");
         if (full)
-            out.write("#routers\" >view without");
+            out.write("#routers\" >" + _("view without") + "");
         else
-            out.write("?f=1#routers\" >view with");
-        out.write(" stats</a>)</h3>\n");
+            out.write("?f=1#routers\" >" + _("view with") + "");
+        out.write(" " + _("stats") + "</a>)</h3>\n");
         
         RouterInfo ourInfo = _context.router().getRouterInfo();
         renderRouterInfo(buf, ourInfo, true, true);
@@ -183,7 +183,7 @@ public class NetDbRenderer {
         if (versionList.size() > 0) {
             Collections.sort(versionList, Collections.reverseOrder());
             buf.append("<table>\n");
-            buf.append("<tr><th>Version</th><th>Count</th></tr>\n");
+            buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
                 buf.append("<tr><td align=\"center\">").append(DataHelper.stripHTML(routerVersion));
@@ -199,7 +199,7 @@ public class NetDbRenderer {
         if (countryList.size() > 0) {
             Collections.sort(countryList);
             buf.append("<table>\n");
-            buf.append("<tr><th align=\"left\">Country</th><th>Count</th></tr>\n");
+            buf.append("<tr><th align=\"left\">" + _("Country") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
@@ -222,9 +222,9 @@ public class NetDbRenderer {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<table><tr><th><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b></th></tr><tr><td>\n");
+            buf.append("<a name=\"our-info\" ></a><b>" + _("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
-            buf.append("<b>Peer info for:</b> ").append(hash).append("\n");
+            buf.append("<b>" + _("Peer info for") + ":</b> ").append(hash).append("\n");
             if (full) {
                 buf.append("[<a href=\"netdb.jsp\" >Back</a>]</th></tr><td>\n");
             } else {
@@ -234,12 +234,12 @@ public class NetDbRenderer {
         
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden())
-            buf.append("<b>Hidden, Updated:</b> ").append(DataHelper.formatDuration(age)).append(" ago<br>\n");
+            buf.append("<b>" + _("Hidden") + ", " + _("Updated") + ":</b> ").append(DataHelper.formatDuration(age)).append(" " + _("ago") + "<br>\n");
         else if (age > 0)
-            buf.append("<b>Published:</b> ").append(DataHelper.formatDuration(age)).append(" ago<br>\n");
+            buf.append("<b>" + _("Published") + ":</b> ").append(DataHelper.formatDuration(age)).append(" " + _("ago") + "<br>\n");
         else
-            buf.append("<b>Published:</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
-        buf.append("<b>Address(es):</b> ");
+            buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
+        buf.append("<b>" + _("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
@@ -256,7 +256,7 @@ public class NetDbRenderer {
         }
         buf.append("</td></tr>\n");
         if (full) {
-            buf.append("<tr><td>Stats: <br><code>\n");
+            buf.append("<tr><td>" + _("Stats") + ": <br><code>\n");
             for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 String val = info.getOption(key);

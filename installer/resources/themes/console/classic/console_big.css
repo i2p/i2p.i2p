@@ -6,7 +6,7 @@ body {
      text-align: left;
      background: #bbf;
      color: #000;
-     font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 9pt/140%  Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 .hide {
@@ -19,7 +19,7 @@ img {
 
 pre {
      overflow: auto;
-     font-size: 8pt !important;
+     font-size: 9pt !important;
      width: 95%;
      padding-top: 10px;
 }
@@ -48,16 +48,16 @@ div.logo hr {
 }
 
 div.logo a:link, div.logo a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
+     text-shadow: 1px 1px 1px rgba(0, 0, 32, 0.5);
 }
 
 div.logo a:active {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 1px 1px 1px rgba(255, 96, 0, 0.7);
      color: #f60;
 }
 
 div.logo a:hover {
-     text-shadow: 0px 0px 1px rgba(128, 0, 0, 0.7);
+     text-shadow: 1px 1px 1px rgba(128, 0, 0, 0.7);
      color: #900;
 }
 
@@ -79,7 +79,7 @@ div.warning {
 
 div.warning a:link {
      color: #f60;
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.5);
+     text-shadow: 1px 1px 1px rgba(255, 96, 0, 0.5);
 }
 
 div.warning a:visited{
@@ -88,7 +88,7 @@ div.warning a:visited{
 
 div.warning a:hover{
      color: #d30;
-  text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+  text-shadow: 1px 1px 1px rgba(255, 96, 0, 0.7);
 }
 
 div.warning a:active{
@@ -169,7 +169,7 @@ div.routersummary hr {
 
 div.routersummary h3 {
      border: 0px solid #f00;
-     font-size: 9.5pt;
+     font-size: 12pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px;
      padding: 1px 0;
@@ -180,7 +180,7 @@ div.routersummary h3 {
 div.routersummary h4 {
      border: 0px solid #f00;
      border-bottom: 0 !important;
-     font-size: 8.5pt;
+     font-size: 10pt;
      letter-spacing: 0.05em;
      margin: -7px 1px -7px 1px !important;
      padding: 1px 3px;
@@ -196,7 +196,7 @@ div.routersummary table {
      margin: -5px 4px -5px 3px;
      width: 180px !important;
      overflow: hidden;
-     font-size: 8pt;
+     font-size: 9pt;
      padding: 0 -10px;
      background-image: none !important;
      background-color: transparent !important;
@@ -233,11 +233,11 @@ div.routersummary p {
 }     
 
 div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+     text-shadow: 1px 1px 1px rgba(0, 0, 32, 0.3);
 }
 
 div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 1px 1px 1px rgba(255, 96, 0, 0.7);
      color: #f60;
 }
 
@@ -370,12 +370,12 @@ div.news p:last-child {
 
 div.news a:link {
      color: #663;
-     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+     text-shadow: 1px 1px 1px rgba(128, 128, 48, 0.3);
 }
 
 div.news a:visited {
      color: #773 !important;
-     text-shadow: 0px 0px 1px rgba(128, 128, 48, 0.3);
+     text-shadow: 1px 1px 1px rgba(128, 128, 48, 0.3);
 }
 
 div.news hr {
@@ -462,7 +462,7 @@ div.messages span.notice {
 
 h1 {
      font-size: 18pt;
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.7);
+     text-shadow: 1px 1px 1px rgba(0, 0, 32, 0.7);
      text-align: center;
      border: 5px solid #bbf;
      padding: 13px 10px 12px 10px;
@@ -485,6 +485,7 @@ h2 {
 
 h3 {
      font-size: 12pt;
+     font-family:ºÚÌå;
      padding: 0 10px 10px 10px;
      border-bottom: 3px solid #aaf;
      border-top: 0px solid #aaf;
@@ -502,7 +503,7 @@ table {
      border: 1px solid #bbf;
      margin: 0 0 5px 0;
      cell-padding: 1px;
-     font-size: 7.5pt;
+     font-size: 9pt;
      background: #fff;
      width: 100%;
 }
@@ -517,7 +518,7 @@ table hr {
 }
 
 table tt {
-     font-size: 7.5pt;
+     font-size: 9pt;
 }
 
 th {
@@ -528,11 +529,11 @@ th {
 }
 
 tt {
-     font-size: 8pt;
+     font-size: 9pt;
 }
 
 tt, pre {
-     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
      
 td {
@@ -557,7 +558,7 @@ hr {
 
 .statusnotes {
      font-style: italic;
-     font-size: 8pt;
+     font-size: 9pt;
      color: #001;
      text-align: center;
      margin: -7px 0 7px 0; 
@@ -604,7 +605,7 @@ div.joblog p {
 }
 
 div.joblog h3 {
-     margin: 10px 0 20px 0;
+     margin: 10px 0 10px 0;
 }
 
 div.joblog h3:first-child {
@@ -635,8 +636,18 @@ select {
 
 submit {
      margin: 3px 5px 3px 5px;
-     padding 2px 0;
-     font: 8pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 2px 0;
+     font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+table td b{
+      font-weight:normal;
+}
+
+i {
+  font-weight:normal;
+  font-size:10pt;
+  font-family:"ºÚÌå";
 }
 
 p {
@@ -673,23 +684,23 @@ p {
      list-style-image: url("../images/link.png") !important;
 }
 
+a{
+     white-space:nowrap; 
+}
+
 a:link{
      color: #006;
      text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
 }
 
 a:visited{
      color: #448;
      text-decoration: none;
-     font-weight: bold;
 }
 
 a:hover{
      color: #f60;
      text-decoration: underline;
-     font-weight: bold;
 }
 
 a:active{
@@ -715,7 +726,7 @@ tt {
 
 .tablefooter tr, .tablefooter td {
      background: #bbf;
-     font-size: 8pt;
+     font-size: 9pt;
      font-weight: bold;
      line-height: 150%;
      word-wrap: nowrap;

@@ -27,8 +27,8 @@ do
 	# translate calls must be one of the forms:
 	# _("foo")
 	# _x("foo")
-	# cssHelper._("foo")
-	# cssHelper.title("foo")
+	# intl._("foo")
+	# intl.title("foo")
 	# handler._("foo")
 	# formhandler._("foo")
 	# In a jsp, you must use a helper or handler that has the context set.
@@ -36,7 +36,7 @@ do
 	# then ant distclean updater.
 	find src ../jsp/WEB-INF -name *.java > $TMPFILE
 	xgettext -f $TMPFILE -F -L java \
-                 --keyword=_ --keyword=_x --keyword=cssHelper._ --keyword=cssHelper.title \
+                 --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
                  --keyword=handler._ --keyword=formhandler._ \
 	         -o ${i}t
 	if [ $? -ne 0 ]

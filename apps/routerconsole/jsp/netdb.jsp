@@ -3,11 +3,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<title>I2P Router Console - network database summary</title>
 <%@include file="css.jsp" %>
+<%=intl.title("network database summary")%>
 </head><body>
 <%@include file="summary.jsp" %>
- <h1>I2P Network Database Summary</h1>
+ <h1><%=intl._("I2P Network Database Summary")%></h1>
 <div class="main" id="main">
  <div class="wideload">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />

@@ -2,12 +2,13 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config peers</title>
+<html><head>
 <%@include file="css.jsp" %>
+<%=intl.title("config peers")%>
 </head><body>
 
 <%@include file="summary.jsp" %>
-<h1>I2P Peer Configuration</h1>
+<h1><%=intl._("I2P Peer Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
 
@@ -31,50 +32,41 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigPeerHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigPeerHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce")%>" />
-<p>
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
- <h2>Manual Peer Controls</h2>
- <div class="mediumtags">Router Hash:
- <input type="text" size="55" name="peer" value="<%=peer%>" /></div>
- <h3>Manually Ban / Unban a Peer</h3>
- Banning will prevent the participation of this peer in tunnels you create.
-      <hr>
+ <h2><%=intl._("Manual Peer Controls")%></h2>
+ <div class="mediumtags"><p><%=intl._("Router Hash")%>:
+<input type="text" size="55" name="peer" value="<%=peer%>" /></p></div>
+ <h3><%=intl._("Manually Ban / Unban a Peer")%></h3>
+ <p><%=intl._("Banning will prevent the participation of this peer in tunnels you create.")%></p>
       <div class="formaction">
-        <input type="submit" name="action" value="Ban peer until restart" />
-        <input type="submit" name="action" value="Unban peer" />
+        <input type="submit" name="action" value="<%=intl._("Ban peer until restart")%>" />
+        <input type="submit" name="action" value="<%=intl._("Unban peer")%>" />
         <% if (! "".equals(peer)) { %>
         <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
       </div>
 
- <h3>Adjust Profile Bonuses</h3>
- Bonuses may be positive or negative, and affect the peer's inclusion in Fast
-      and High Capacity tiers. Fast peers are used for client tunnels, and High
-      Capacity peers are used for some exploratory tunnels. Current bonuses are
-      displayed on the <a href="profiles.jsp">profiles page</a>.
-      <p>
+ <h3><%=intl._("Adjust Profile Bonuses")%></h3>
+ <p><%=intl._("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles.jsp"><%=intl._("profiles page")%></a>.</p>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
  %>
- <hr>
- <div class="mediumtags">Speed:
+ <div class="mediumtags"><p><%=intl._("Speed")%>:
  <input type="text" size="8" name="speed" value="<%=speed%>" />
- Capacity:
+ <%=intl._("Capacity")%>:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
- <input type="submit" name="action" value="Adjust peer bonuses" /></div>
- </p>
+ <input type="submit" name="action" value="<%=intl._("Adjust peer bonuses")%>" /></p></div>
  </form>
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="profilesHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
- <hr>
  <div class="wideload">
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
 
-</div></div></div></body></html>
+</div><hr></div></div></body></html>

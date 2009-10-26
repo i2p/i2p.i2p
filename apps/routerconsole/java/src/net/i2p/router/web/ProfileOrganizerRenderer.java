@@ -228,9 +228,9 @@ class ProfileOrganizerRenderer {
         buf.append("</table>");
 
         buf.append("<h3>Thresholds:</h3>");
-        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br>");
+        buf.append("<p><b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br>");
         buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br>");
-        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)");
+        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)</p>");
         buf.append("<h3>Definitions:</h3><ul>" +
                    "<li><b>groups</b>: as determined by the profile organizer</li>" +
                    "<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>" +

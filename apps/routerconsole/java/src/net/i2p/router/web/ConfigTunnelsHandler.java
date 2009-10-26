@@ -137,9 +137,9 @@ public class ConfigTunnelsHandler extends FormHandler {
         if (saveRequired) {
             boolean saved = _context.router().saveConfig();
             if (saved) 
-                addFormNotice("Exploratory tunnel configuration saved successfully.");
+                addFormNotice(_("Exploratory tunnel configuration saved successfully."));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs.");
+                addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
     private static final int getInt(Object val) { 

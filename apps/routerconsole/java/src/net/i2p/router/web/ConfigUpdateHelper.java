@@ -72,9 +72,9 @@ public class ConfigUpdateHelper extends HelperBase {
                 buf.append("\" selected=\"true\"");
             
             if (PERIODS[i] == -1)
-                buf.append("\">Never</option>\n");
+                buf.append("\">" + _("Never") + "</option>\n");
             else
-                buf.append("\">Every ").append(DataHelper.formatDuration(PERIODS[i])).append("</option>\n");
+                buf.append("\">" + _("Every") + " ").append(DataHelper.formatDuration(PERIODS[i])).append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
@@ -89,18 +89,18 @@ public class ConfigUpdateHelper extends HelperBase {
         if ("notify".equals(policy))
             buf.append("<option value=\"notify\" selected=\"true\">").append(_("Notify only")).append("</option>");
         else
-            buf.append("<option value=\"notify\">Notify only</option>");
+            buf.append("<option value=\"notify\">" + _("Notify only") + "</option>");
 
         if ("download".equals(policy))
-            buf.append("<option value=\"download\" selected=\"true\">Download and verify only</option>");
+            buf.append("<option value=\"download\" selected=\"true\">" + _("Download and verify only") + "</option>");
         else
-            buf.append("<option value=\"download\">Download and verify only</option>");
+            buf.append("<option value=\"download\">" + _("Download and verify only") + "</option>");
         
         if (System.getProperty("wrapper.version") != null) {
             if ("install".equals(policy))
-                buf.append("<option value=\"install\" selected=\"true\">Download, verify, and restart</option>");
+                buf.append("<option value=\"install\" selected=\"true\">" + _("Download, verify, and restart") + "</option>");
             else
-                buf.append("<option value=\"install\">Download, verify, and restart</option>");
+                buf.append("<option value=\"install\">" + _("Download, verify, and restart") + "</option>");
         }
         
         buf.append("</select>\n");
