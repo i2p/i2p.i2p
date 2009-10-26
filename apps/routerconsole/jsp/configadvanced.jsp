@@ -32,7 +32,7 @@
  <h3><%=intl._("Advanced I2P Configuration")%></h3>
  <textarea rows="32" cols="60" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
       <div class="formaction">
-        <input type="submit" name="shouldsave" value="Apply" />
-        <input type="reset" value="Cancel" /><br>
+        <input type="submit" name="shouldsave" value="<%=intl._("Apply")%>" />
+        <input type="reset" value="<%=intl._("Cancel")%>" /><br>
  <b><%=intl._("NOTE")%>:</b> <%=intl._("Some changes may require a restart to take effect.")%>
  </div></form></div></div></div></body></html>

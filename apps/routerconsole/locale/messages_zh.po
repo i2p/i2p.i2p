@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-25 17:07+0000\n"
+"POT-Creation-Date: 2009-10-26 10:43+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -47,7 +47,7 @@ msgid "Share"
 msgstr "共享"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:363
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:337
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:341
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:337
 msgid "NOTE"
 msgstr "注意"
@@ -74,6 +74,7 @@ msgstr "共享的带宽越多，您的匿名性越强同时能帮助网络成长
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:373
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:502
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:367
 #: src/net/i2p/router/web/ConfigNetHandler.java:47
 #: src/net/i2p/router/web/ConfigNetHandler.java:249
 msgid "Save changes"
@@ -81,6 +82,10 @@ msgstr "保存修改"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:375
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:504
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:339
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:353
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:369
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:357
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:390
 msgid "Cancel"
 msgstr "取消"
@@ -140,7 +145,7 @@ msgid "Select Interface"
 msgstr "选择网络接口"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:419
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:356
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:370
 msgid "or"
 msgstr "或"
 
@@ -206,7 +211,7 @@ msgid "Specify Port"
 msgstr "指定端口"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:497
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:358
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:376
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:363
 msgid "Note"
 msgstr "注意"
@@ -346,6 +351,7 @@ msgid "The router is currently testing whether your UDP port is firewalled."
 msgstr "路由器正在测试您的UDP端口是否被防火墙阻挡。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:573
+#: src/net/i2p/router/web/NetDbRenderer.java:237
 msgid "Hidden"
 msgstr "隐藏(Hidden)"
 
@@ -513,7 +519,12 @@ msgstr "I2P 高级设置"
 msgid "Advanced I2P Configuration"
 msgstr "I2P 高级设置"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:339
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:337
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:355
+msgid "Apply"
+msgstr "应用"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:343
 msgid "Some changes may require a restart to take effect."
 msgstr "某些设置需要程序重启后生效。"
 
@@ -538,21 +549,31 @@ msgid "To change other client options, edit the file"
 msgstr "修改其他客户端设置请编辑文件"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:353
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:363
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:365
 msgid "All changes require restart to take effect."
 msgstr "所有更改均需要程序重启才能生效。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:355
+#: src/net/i2p/router/web/ConfigClientsHandler.java:32
+msgid "Save Client Configuration"
+msgstr "保存客户程序设置"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:357
 msgid "WebApp Configuration"
 msgstr "WebApp 设置"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:357
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:359
 msgid "The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook)."
 msgstr "下面列出的Java Web 程序随客户端“web控制台”一同启动，并与路由运行于同一JVM中。这些Web程序通常可以通过路由器界面直接访问。他们可能是完整的程序 (例如  i2psnark/BT客户端),其他客户端程序的前端或必须单独启动的程序(例如. susidns, i2ptunnel),甚至根本没有Web界面(例如 addressbook)。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:359
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:361
 msgid "A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method."
 msgstr "从webapps目录中删除相应的.war文件同样可以禁用Web程序;然而这些 .war 文件和Web程序在更新I2P后还会再次出现,所以推荐在这里通过设置的方法禁用不用的Web程序。"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:367
+#: src/net/i2p/router/web/ConfigClientsHandler.java:34
+msgid "Save WebApp Configuration"
+msgstr "保存 WebApp 设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:106
 msgid "config keyring"
@@ -589,6 +610,16 @@ msgstr "目标(Dest.)名称, HASH, 或完整公钥"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:347
 msgid "Encryption Key"
 msgstr "加密密钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:349
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:18
+msgid "Add key"
+msgstr "添加密钥"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:351
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:19
+msgid "Delete key"
+msgstr "删除密钥"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:107
 msgid "config logging"
@@ -666,25 +697,40 @@ msgstr "手动封锁/解封某个节点"
 msgid "Banning will prevent the participation of this peer in tunnels you create."
 msgstr "封锁将阻止节点参与您的隧道创建"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:352
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:348
+#: src/net/i2p/router/web/ConfigPeerHandler.java:20
+msgid "Ban peer until restart"
+msgstr "封锁节点直到重启"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:350
+#: src/net/i2p/router/web/ConfigPeerHandler.java:28
+msgid "Unban peer"
+msgstr "节点解封"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:356
+#: src/net/i2p/router/web/ConfigPeerHandler.java:39
 msgid "Adjust Profile Bonuses"
 msgstr "调整节点评分"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:354
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:358
 msgid "Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the"
 msgstr "评分(Bonuse)可能为正或为负并影响节点是否评为快速和高容量节点。快速节点用于客户程序通道，高容量节点用于探索隧道。当前评分显示于"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:356
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:360
 msgid "profiles page"
 msgstr "节点信息页面"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:364
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:368
 msgid "Speed"
 msgstr "速度"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:368
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:372
 msgid "Capacity"
 msgstr "容量"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:376
+msgid "Adjust peer bonuses"
+msgstr "调整节点评分"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:106
 msgid "config service"
@@ -706,77 +752,132 @@ msgstr "平滑关闭(Graceful Shutdown)让路由器在关闭前完成已达成�
 msgid "If you need to kill the router immediately, that option is available as well."
 msgstr "当然你也可以选择立即关闭路由。"
 
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:324
+#: src/net/i2p/router/web/ConfigServiceHandler.java:53
+msgid "Shutdown gracefully"
+msgstr "平滑关闭"
+
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:326
+#: src/net/i2p/router/web/ConfigServiceHandler.java:57
+msgid "Shutdown immediately"
+msgstr "立刻关闭"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:328
+#: src/net/i2p/router/web/ConfigServiceHandler.java:61
+msgid "Cancel graceful shutdown"
+msgstr "取消平滑关闭"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:332
 msgid "If you want the router to restart itself after shutting down, you can choose one of the following."
 msgstr "如果你想要路由器关闭后自动重新启动，可以选择下面的选项。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:328
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:334
 msgid "This is useful in some situations"
 msgstr "重启在某些情况下有用"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:330
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:336
 msgid "for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on."
 msgstr "例如当修改了客户程序仅在启动时读取的设置，比如路由器控制界面的密码，监听的接口。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:332
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:338
 msgid "A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately."
 msgstr "平滑重启可能会等待几分钟的时间(但你的节点一定会感激你的耐心)，硬重启可以立即完成。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:334
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:340
 msgid "After tearing down the router, it will wait 1 minute before starting back up again."
 msgstr "路由关闭后将等待1分钟再重新启动。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:340
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:342
+#: src/net/i2p/router/web/ConfigServiceHandler.java:64
+msgid "Graceful restart"
+msgstr "平滑重启"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:344
+#: src/net/i2p/router/web/ConfigServiceHandler.java:68
+msgid "Hard restart"
+msgstr "硬重启"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:350
 msgid "Systray integration"
 msgstr "使用系统托盘"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:342
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:352
 msgid "On the windows platform, there is a small application to sit in the system tray, allowing you to view the router's status"
 msgstr "Windows 平台允许小程序进驻系统托盘，让你可以查看路由状态"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:344
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:354
 msgid "(later on, I2P client applications will be able to integrate their own functionality into the system tray as well)."
 msgstr "(以后的 I2P 客户端程序也会将它们的功能集成到系统托盘里)。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:346
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:356
 msgid "If you are on windows, you can either enable or disable that icon here."
 msgstr "如果你使用Windows, 可以在这里开启或关闭这个托盘图标。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:348
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:358
+#: src/net/i2p/router/web/ConfigServiceHandler.java:91
+msgid "Show systray icon"
+msgstr "显示托盘图标"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:360
+#: src/net/i2p/router/web/ConfigServiceHandler.java:103
+msgid "Hide systray icon"
+msgstr "隐藏系统图标"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:362
 msgid "Run on startup"
 msgstr "系统启动时运行"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:364
 msgid "You can control whether I2P is run on startup or not by selecting one of the following options"
 msgstr "这里你可以通过下面的选项来设置开机后 I2P 是否启动"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:352
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:366
 msgid "I2P will install (or remove) a service accordingly."
 msgstr "I2P将相应的将自身安装为服务(或卸载服务)。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:354
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:368
 msgid "If you prefer the command line, you can also run the "
 msgstr "如果你偏好使用命令行，可以运行"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:360
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:372
+#: src/net/i2p/router/web/ConfigServiceHandler.java:80
+msgid "Run I2P on startup"
+msgstr "系统启动时运行I2P"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:374
+#: src/net/i2p/router/web/ConfigServiceHandler.java:82
+msgid "Don't run I2P on startup"
+msgstr "系统启动时不运行I2P"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:378
 msgid "If you are running I2P as service right now, removing it will shut down your router immediately."
 msgstr "如果您目前已经以服务形式运行 I2P ，删除 I2P 服务将立刻关闭路由器。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:362
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:380
 msgid "You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat."
 msgstr "您可以考虑先平滑关闭路由，待退出后运行 uninstall_i2p_service_winnt.bat。"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:370
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:388
 msgid "Debugging"
 msgstr "调试"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:374
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:392
 msgid "Launch browser on router startup?"
 msgstr "路由器启动时运行浏览器?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:376
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:394
 msgid "I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at"
 msgstr "此Web控制台是I2P的主要设置界面，所以如果您您觉得有必要I2P可以在路由启动时调用浏览器打开"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:396
+#: src/net/i2p/router/web/ConfigServiceHandler.java:115
+msgid "View console on startup"
+msgstr "程序启动时显示控制台"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:398
+#: src/net/i2p/router/web/ConfigServiceHandler.java:118
+msgid "Do not view console on startup"
+msgstr "启动后不打开控制台"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:107
 msgid "config stats"
@@ -1063,14 +1164,45 @@ msgstr "隧道概况"
 msgid "I2P Tunnel Summary"
 msgstr "I2P 隧道概况"
 
-#: src/net/i2p/router/web/ConfigClientsHelper.java:17
-msgid "Class and arguments"
-msgstr "类与"
+#: src/net/i2p/router/web/ConfigClientsHandler.java:59
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:49
+msgid "Unsupported"
+msgstr "未支持的"
 
+#: src/net/i2p/router/web/ConfigClientsHandler.java:74
+msgid "Client configuration saved successfully - restart required to take effect."
+msgstr "客户程序设置保存成功 - 程序重启后生效"
+
+#: src/net/i2p/router/web/ConfigClientsHandler.java:80
+msgid "Bad client index."
+msgstr "客户程序索引无效"
+
+#: src/net/i2p/router/web/ConfigClientsHandler.java:85
 #: src/net/i2p/router/web/ConfigClientsHelper.java:17
 #: src/net/i2p/router/web/SummaryBarRenderer.java:359
 msgid "Client"
 msgstr "客户"
+
+#: src/net/i2p/router/web/ConfigClientsHandler.java:85
+#: src/net/i2p/router/web/ConfigClientsHandler.java:120
+msgid "started"
+msgstr "已启动"
+
+#: src/net/i2p/router/web/ConfigClientsHandler.java:102
+msgid "WebApp configuration saved successfully - restart required to take effect."
+msgstr "WebApp设置保存成功 - 程序重启后生效"
+
+#: src/net/i2p/router/web/ConfigClientsHandler.java:122
+msgid "Failed to start"
+msgstr "启动失败"
+
+#: src/net/i2p/router/web/ConfigClientsHandler.java:128
+msgid "Failed to find server."
+msgstr "服务器或服务程序查找失败。"
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:17
+msgid "Class and arguments"
+msgstr "类与参数"
 
 #: src/net/i2p/router/web/ConfigClientsHelper.java:17
 #: src/net/i2p/router/web/ConfigClientsHelper.java:33
@@ -1093,6 +1225,22 @@ msgstr "Web程序(WebApp)"
 #: src/net/i2p/router/web/ConfigClientsHelper.java:66
 msgid "Start"
 msgstr "启动"
+
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:21
+msgid "You must enter a destination"
+msgstr "您必须输入一个目标"
+
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:23
+msgid "You must enter a key"
+msgstr "您必须输入一个密钥"
+
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:36
+msgid "Invalid destination or key"
+msgstr "目标或密钥无效"
+
+#: src/net/i2p/router/web/ConfigKeyringHandler.java:45
+msgid "Invalid destination"
+msgstr "目标无效"
 
 #: src/net/i2p/router/web/ConfigNetHandler.java:119
 msgid "Rechecking router reachability..."
@@ -1170,41 +1318,53 @@ msgstr "正在更新共享带宽比例"
 msgid "Updated bandwidth limits"
 msgstr "带宽限制更新完毕"
 
-#: src/net/i2p/router/web/ConfigServiceHandler.java:53
-msgid "Shutdown gracefully"
-msgstr "平滑关闭"
+#: src/net/i2p/router/web/ConfigPeerHandler.java:24
+#: src/net/i2p/router/web/ConfigPeerHandler.java:33
+#: src/net/i2p/router/web/ConfigPeerHandler.java:35
+msgid "Peer"
+msgstr "节点"
+
+#: src/net/i2p/router/web/ConfigPeerHandler.java:24
+msgid "banned until restart"
+msgstr "已封锁直到重启"
+
+#: src/net/i2p/router/web/ConfigPeerHandler.java:27
+#: src/net/i2p/router/web/ConfigPeerHandler.java:38
+#: src/net/i2p/router/web/ConfigPeerHandler.java:59
+msgid "Invalid peer"
+msgstr "无效节点"
+
+#: src/net/i2p/router/web/ConfigPeerHandler.java:33
+msgid "unbanned"
+msgstr "已解封"
+
+#: src/net/i2p/router/web/ConfigPeerHandler.java:35
+msgid "is not currently banned"
+msgstr "目前未封锁"
+
+#: src/net/i2p/router/web/ConfigPeerHandler.java:47
+msgid "Bad speed value"
+msgstr "速度值无效"
+
+#: src/net/i2p/router/web/ConfigPeerHandler.java:52
+msgid "Bad capacity value"
+msgstr "容量值无效"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:56
 msgid "Graceful shutdown initiated"
 msgstr "开始平滑关闭"
 
-#: src/net/i2p/router/web/ConfigServiceHandler.java:57
-msgid "Shutdown immediately"
-msgstr "立刻关闭"
-
 #: src/net/i2p/router/web/ConfigServiceHandler.java:60
 msgid "Shutdown immediately!  boom bye bye bad bwoy"
 msgstr "立即关闭！不推荐"
-
-#: src/net/i2p/router/web/ConfigServiceHandler.java:61
-msgid "Cancel graceful shutdown"
-msgstr "取消平滑关闭"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:63
 msgid "Graceful shutdown cancelled"
 msgstr "平滑关闭已取消"
 
-#: src/net/i2p/router/web/ConfigServiceHandler.java:64
-msgid "Graceful restart"
-msgstr "平滑重启"
-
 #: src/net/i2p/router/web/ConfigServiceHandler.java:67
 msgid "Graceful restart requested"
 msgstr "平滑重启已请求"
-
-#: src/net/i2p/router/web/ConfigServiceHandler.java:68
-msgid "Hard restart"
-msgstr "硬重启"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:71
 msgid "Hard restart requested"
@@ -1226,18 +1386,6 @@ msgstr "更换密钥并关闭"
 msgid "Rekeying after graceful shutdown"
 msgstr "平滑关闭后更换密钥"
 
-#: src/net/i2p/router/web/ConfigServiceHandler.java:80
-msgid "Run I2P on startup"
-msgstr "系统启动时运行I2P"
-
-#: src/net/i2p/router/web/ConfigServiceHandler.java:82
-msgid "Don't run I2P on startup"
-msgstr "系统启动时不运行I2P"
-
-#: src/net/i2p/router/web/ConfigServiceHandler.java:91
-msgid "Show systray icon"
-msgstr "显示托盘图标"
-
 #: src/net/i2p/router/web/ConfigServiceHandler.java:96
 msgid "System tray icon enabled."
 msgstr "系统托盘图标已启用"
@@ -1252,25 +1400,13 @@ msgstr "您的平台不支持系统托盘图标功能"
 msgid "Warning: unable to contact the systray manager"
 msgstr "警告：与托盘管理器通讯失败"
 
-#: src/net/i2p/router/web/ConfigServiceHandler.java:103
-msgid "Hide systray icon"
-msgstr "隐藏系统图标"
-
 #: src/net/i2p/router/web/ConfigServiceHandler.java:108
 msgid "System tray icon disabled."
 msgstr "系统托盘已禁用"
 
-#: src/net/i2p/router/web/ConfigServiceHandler.java:115
-msgid "View console on startup"
-msgstr "程序启动时显示控制台"
-
 #: src/net/i2p/router/web/ConfigServiceHandler.java:117
 msgid "Console is to be shown on startup"
 msgstr "启动后显示控制台"
-
-#: src/net/i2p/router/web/ConfigServiceHandler.java:118
-msgid "Do not view console on startup"
-msgstr "启动后不打开控制台"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:120
 msgid "Console is not to be shown on startup"
@@ -1291,6 +1427,100 @@ msgstr "服务已卸载"
 #: src/net/i2p/router/web/ConfigServiceHandler.java:139
 msgid "Warning: unable to remove the service"
 msgstr "警告：无法卸载服务"
+
+#: src/net/i2p/router/web/ConfigTunnelsHandler.java:140
+msgid "Exploratory tunnel configuration saved successfully."
+msgstr "探索隧道设置保存成功。"
+
+#: src/net/i2p/router/web/ConfigTunnelsHandler.java:142
+msgid "Error saving the configuration (applied but not saved) - please see the error logs."
+msgstr "配置保存出错(已应用但未保存) - 参见错误日志"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:21
+#: src/net/i2p/router/web/TunnelRenderer.java:40
+msgid "Exploratory tunnels"
+msgstr "探测隧道"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:41
+#: src/net/i2p/router/web/TunnelRenderer.java:59
+msgid "Client tunnels for"
+msgstr "客户隧道 - "
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:64
+msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
+msgstr "匿名性警告 - 设置中包括 0-跳点 隧道"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:69
+msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
+msgstr "匿名性警告 - 设置中包括 1-跳点 隧道"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:72
+msgid "PERFORMANCE WARNING - Settings include very long tunnels."
+msgstr "性能警告 - 设置中包括长隧道"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:75
+msgid "PERFORMANCE WARNING - Settings include high tunnel quantities."
+msgstr "性能警告 - 设置中包括高质量隧道"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:77
+msgid "Inbound"
+msgstr "入站"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:77
+msgid "Outbound"
+msgstr "出站"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:82
+msgid "Depth"
+msgstr "深度"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:85
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:87
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:92
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:94
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:102
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:103
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:104
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:106
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:108
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:113
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:114
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:115
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:117
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:119
+msgid "hop"
+msgstr "跳点"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:99
+msgid "Randomization"
+msgstr "随机"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:123
+msgid "Quantity"
+msgstr "质量"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:126
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:128
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:133
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:135
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:143
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:145
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:150
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:152
+msgid "tunnel"
+msgstr "隧道"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:140
+msgid "Backup quantity"
+msgstr "备用质量"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:162
+msgid "Inbound options"
+msgstr "入站选项"
+
+#: src/net/i2p/router/web/ConfigTunnelsHelper.java:175
+msgid "Outbound options"
+msgstr "出站选项"
 
 #: src/net/i2p/router/web/ConfigUIHelper.java:6
 msgid "classic"
@@ -1338,7 +1568,7 @@ msgstr "有更新可用，点左侧按钮下载"
 
 #: src/net/i2p/router/web/ConfigUpdateHandler.java:65
 msgid "No update available"
-msgstr "无可用更新"
+msgstr "无更新"
 
 #: src/net/i2p/router/web/ConfigUpdateHandler.java:72
 msgid "Updating news URL to"
@@ -1395,6 +1625,115 @@ msgstr "仅下载并验证"
 msgid "Download, verify, and restart"
 msgstr "仅下载、验证并重启"
 
+#: src/net/i2p/router/web/NetDbRenderer.java:58
+msgid "Network Database RouterInfo Lookup"
+msgstr "网络数据库 RouterInfo 检索"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:73
+msgid "Router"
+msgstr "路由器"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:73
+msgid "not found in network database"
+msgstr "在网络数据库概况未找到"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:85
+#: src/net/i2p/router/web/NetDbRenderer.java:138
+msgid "Network Database Contents"
+msgstr "网络数据库内容"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:86
+#: src/net/i2p/router/web/NetDbRenderer.java:138
+msgid "View"
+msgstr "查看"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:97
+msgid "Local"
+msgstr "本地"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:99
+msgid "Unpublished"
+msgstr "未发布"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:100
+#: src/net/i2p/router/web/NetDbRenderer.java:107
+msgid "Destination"
+msgstr "目标"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:121
+#: src/net/i2p/router/web/TunnelRenderer.java:155
+msgid "Gateway"
+msgstr "网关"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:123
+msgid "Tunnel"
+msgstr "隧道"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:140
+msgid "Not initialized"
+msgstr "未初始化"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:147
+msgid "Routers"
+msgstr "路由器"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:149
+msgid "view without"
+msgstr "查看不带"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:151
+msgid "view with"
+msgstr "查看带"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:152
+msgid "stats"
+msgstr "统计"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:186
+#: src/net/i2p/router/web/NetDbRenderer.java:202
+msgid "Count"
+msgstr "计数"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:186
+#: src/net/i2p/router/web/SummaryBarRenderer.java:150
+msgid "Version"
+msgstr "版本"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:202
+msgid "Country"
+msgstr "国家"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:225
+msgid "Our info"
+msgstr "我方信息"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:227
+msgid "Peer info for"
+msgstr "节点信息"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:237
+msgid "Updated"
+msgstr "已更新"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:237
+#: src/net/i2p/router/web/NetDbRenderer.java:239
+msgid "ago"
+msgstr "前"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:239
+#: src/net/i2p/router/web/NetDbRenderer.java:241
+msgid "Published"
+msgstr "发布"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:242
+msgid "Address(es)"
+msgstr "地址"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:259
+#: src/net/i2p/router/web/SummaryBarRenderer.java:124
+msgid "Stats"
+msgstr "统计数据"
+
 #: src/net/i2p/router/web/SummaryBarRenderer.java:42
 msgid "I2P Services"
 msgstr "I2P 服务"
@@ -1445,6 +1784,7 @@ msgid "View existing tunnels and tunnel build status"
 msgstr "查看现存隧道及隧道的建立状态"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:82
+#: src/net/i2p/router/web/TunnelRenderer.java:252
 msgid "Tunnels"
 msgstr "隧道"
 
@@ -1502,10 +1842,6 @@ msgstr "统计图"
 msgid "Textual router performance statistics"
 msgstr "路由性能文字统计"
 
-#: src/net/i2p/router/web/SummaryBarRenderer.java:124
-msgid "Stats"
-msgstr "统计数据"
-
 #: src/net/i2p/router/web/SummaryBarRenderer.java:134
 msgid "I2P Router Help"
 msgstr "I2P路由帮助"
@@ -1525,10 +1861,6 @@ msgstr "切勿将其告诉任何人"
 #: src/net/i2p/router/web/SummaryBarRenderer.java:145
 msgid "Local Identity"
 msgstr "本地身份"
-
-#: src/net/i2p/router/web/SummaryBarRenderer.java:150
-msgid "Version"
-msgstr "版本"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:157
 msgid "How long we've been running for this session"
@@ -1634,6 +1966,106 @@ msgstr "隧道延迟"
 #: src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Backlog"
 msgstr "积压"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:40
+#: src/net/i2p/router/web/TunnelRenderer.java:61
+msgid "config"
+msgstr "设置"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:69
+msgid "Participating tunnels"
+msgstr "共享隧道"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:70
+msgid "From"
+msgstr "从"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:70
+msgid "Receive on"
+msgstr "接收"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:71
+msgid "Expiration"
+msgstr "到期"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:71
+msgid "Send on"
+msgstr "发送"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:71
+msgid "To"
+msgstr "至"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:72
+msgid "Rate"
+msgstr "速度"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:72
+msgid "Role"
+msgstr "职能"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:72
+#: src/net/i2p/router/web/TunnelRenderer.java:155
+msgid "Usage"
+msgstr "使用情况"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:116
+msgid "Outbound Endpoint"
+msgstr "出站终端"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:118
+msgid "Inbound Gateway"
+msgstr "入站网关"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:120
+#: src/net/i2p/router/web/TunnelRenderer.java:161
+msgid "Participant"
+msgstr "参与节点"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:125
+msgid "Inactive participating tunnels"
+msgstr "不活跃的共享隧道"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:126
+msgid "Lifetime bandwidth usage"
+msgstr "运行期间带宽使用情况"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:155
+msgid "Expiry"
+msgstr "到期"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:155
+msgid "In/Out"
+msgstr "入/出"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:158
+msgid "Participants"
+msgstr "参与节点"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:164
+msgid "Endpoint"
+msgstr "终端"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:204
+#: src/net/i2p/router/web/TunnelRenderer.java:210
+msgid "Build in progress"
+msgstr "创建中"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:204
+msgid "inbound"
+msgstr "入站"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:210
+msgid "outbound"
+msgstr "出站"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:214
+msgid "No tunnels; waiting for the grace period to end."
+msgstr "无隧道；等待宽限期结束。"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:233
+msgid "Tunnel Counts By Peer"
+msgstr "每节点隧道计数"
 
 #~ msgid ""
 #~ "If you want the router to restart itself after shutting down, you can "

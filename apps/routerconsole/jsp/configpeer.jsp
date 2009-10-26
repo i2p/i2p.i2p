@@ -41,8 +41,8 @@
  <h3><%=intl._("Manually Ban / Unban a Peer")%></h3>
  <p><%=intl._("Banning will prevent the participation of this peer in tunnels you create.")%></p>
       <div class="formaction">
-        <input type="submit" name="action" value="Ban peer until restart" />
-        <input type="submit" name="action" value="Unban peer" />
+        <input type="submit" name="action" value="<%=intl._("Ban peer until restart")%>" />
+        <input type="submit" name="action" value="<%=intl._("Unban peer")%>" />
         <% if (! "".equals(peer)) { %>
         <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
@@ -59,7 +59,7 @@
  <input type="text" size="8" name="speed" value="<%=speed%>" />
  <%=intl._("Capacity")%>:
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
- <input type="submit" name="action" value="Adjust peer bonuses" /></p></div>
+ <input type="submit" name="action" value="<%=intl._("Adjust peer bonuses")%>" /></p></div>
  </form>
  <a name="shitlist"> </a>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />

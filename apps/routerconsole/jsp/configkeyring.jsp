@@ -42,6 +42,6 @@
           <td class="mediumtags" align="right"><%=intl._("Encryption Key")%>:</td>
           <td><input type="text" size="55" name="key" /></td>
         </tr><tr>
-          <td align="right" colspan="2"><input type="submit" name="action" value="Add key" />
-             <input type="submit" name="action" value="Delete key" /> <input type="reset" value="Cancel" /></td>
+          <td align="right" colspan="2"><input type="submit" name="action" value="<%=intl._("Add key")%>" />
+             <input type="submit" name="action" value="<%=intl._("Delete key")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" /></td>
 </tr></table></p></div></form></div></div></body></html>

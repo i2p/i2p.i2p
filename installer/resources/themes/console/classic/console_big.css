@@ -19,7 +19,7 @@ img {
 
 pre {
      overflow: auto;
-     font-size: 8pt !important;
+     font-size: 9pt !important;
      width: 95%;
      padding-top: 10px;
 }
@@ -503,7 +503,7 @@ table {
      border: 1px solid #bbf;
      margin: 0 0 5px 0;
      cell-padding: 1px;
-     font-size: 7.5pt;
+     font-size: 9pt;
      background: #fff;
      width: 100%;
 }
@@ -518,7 +518,7 @@ table hr {
 }
 
 table tt {
-     font-size: 7.5pt;
+     font-size: 9pt;
 }
 
 th {
@@ -529,11 +529,11 @@ th {
 }
 
 tt {
-     font-size: 8pt;
+     font-size: 9pt;
 }
 
 tt, pre {
-     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
      
 td {
@@ -558,7 +558,7 @@ hr {
 
 .statusnotes {
      font-style: italic;
-     font-size: 8pt;
+     font-size: 9pt;
      color: #001;
      text-align: center;
      margin: -7px 0 7px 0; 
@@ -637,11 +637,17 @@ select {
 submit {
      margin: 3px 5px 3px 5px;
      padding: 2px 0;
-     font: 8pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 9pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
 table td b{
       font-weight:normal;
+}
+
+i {
+  font-weight:normal;
+  font-size:10pt;
+  font-family:"ºÚÌå";
 }
 
 p {
@@ -720,7 +726,7 @@ tt {
 
 .tablefooter tr, .tablefooter td {
      background: #bbf;
-     font-size: 8pt;
+     font-size: 9pt;
      font-weight: bold;
      line-height: 150%;
      word-wrap: nowrap;
