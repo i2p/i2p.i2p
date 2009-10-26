@@ -81,7 +81,7 @@ public class ConfigServiceHandler extends FormHandler {
             installService();
         } else if (_("Don't run I2P on startup").equals(_action)) {
             uninstallService();
-        } else if ("Dump threads".equals(_action)) {
+        } else if (_("Dump threads").equals(_action)) {
             try {
                 WrapperManager.requestThreadDump();
             } catch (Throwable t) {

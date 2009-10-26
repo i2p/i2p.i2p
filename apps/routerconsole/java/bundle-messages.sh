@@ -15,7 +15,7 @@ do
 	LG=${LG%.po}
 
 	# make list of java files newer than the .po file
-	find src ../jsp/WEB-INF -name *.java -newer $i > $TMPFILE
+	find src ../jsp/WEB-INF strings -name *.java -newer $i > $TMPFILE
 	if [ -s build/obj/net/i2p/router/web/messages_$LG.class -a ! -s $TMPFILE ]
 	then
 		continue
@@ -31,13 +31,15 @@ do
 	# intl.title("foo")
 	# handler._("foo")
 	# formhandler._("foo")
+	# net.i2p.router.web.Messages.getString("foo")
 	# In a jsp, you must use a helper or handler that has the context set.
 	# To start a new translation, copy the header from an old translation to the new .po file,
 	# then ant distclean updater.
-	find src ../jsp/WEB-INF -name *.java > $TMPFILE
+	find src ../jsp/WEB-INF strings -name *.java > $TMPFILE
 	xgettext -f $TMPFILE -F -L java \
                  --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
                  --keyword=handler._ --keyword=formhandler._ \
+                 --keyword=net.i2p.router.web.Messages.getString \
 	         -o ${i}t
 	if [ $? -ne 0 ]
 	then
@@ -60,7 +62,7 @@ do
 	msgfmt --java -r $CLASS -l $LG -d build/obj $i
 	if [ $? -ne 0 ]
 	then
-		echo 'Warning - xgettext failed, not updating translations'
+		echo 'Warning - msgfmt failed, not updating translations'
 		break
 	fi
 done

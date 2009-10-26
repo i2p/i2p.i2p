@@ -23,8 +23,16 @@
         // since we don't have an iframe this will reload the base page, and
         // the new delay will be passed to the iframe above
         out.print("<div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
-        out.print("<b>Refresh (s):</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
-        out.print("<button type=\"submit\">Enable</button>\n");
+        out.print("<b>");
+        // We have intl defined when this is included, but not when compiled standalone.
+        // Not that we really need it standalone, but I can't figure out how to keep
+        // this from being compiled by JspC in the build file.
+        out.print(net.i2p.router.web.Messages.getString("Refresh (s)", net.i2p.I2PAppContext.getGlobalContext()));
+        out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
+        out.print("<button type=\"submit\" value=\"Enable\" >");
+        // ditto
+        out.print(net.i2p.router.web.Messages.getString("Enable", net.i2p.I2PAppContext.getGlobalContext()));
+        out.print("</button>\n");
         out.print("</form></div></div>\n");
     }
 %>

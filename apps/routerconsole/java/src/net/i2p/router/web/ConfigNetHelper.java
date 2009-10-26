@@ -36,7 +36,7 @@ public class ConfigNetHelper extends HelperBase {
     public String getUdpAddress() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return "unknown";
+            return _("unknown");
         UDPAddress ua = new UDPAddress(addr);
         return ua.toString();
     }
@@ -44,20 +44,20 @@ public class ConfigNetHelper extends HelperBase {
     public String getUdpIP() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return "unknown";
+            return _("unknown");
         UDPAddress ua = new UDPAddress(addr);
         if (ua.getHost() == null)
-            return "unknown";
+            return _("unknown");
         return ua.getHost();
     }
 
     public String getUdpPort() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return "unknown";
+            return _("unknown");
         UDPAddress ua = new UDPAddress(addr);
         if (ua.getPort() <= 0)
-            return "unknown";
+            return _("unknown");
         return "" + ua.getPort();
     }
 

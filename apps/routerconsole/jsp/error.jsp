@@ -16,11 +16,6 @@
 <%@include file="css.jsp" %>
 <%=intl.title("Page Not Found")%>
 </head><body>
-<%
-if (System.getProperty("router.consoleNonce") == null) {
-    System.setProperty("router.consoleNonce", new java.util.Random().nextLong() + "");
-}
-%>
 <%@include file="summary.jsp" %>
 <h1><%=ERROR_CODE%> <%=ERROR_MESSAGE%></h1>
 <div class="sorry" id="warning">

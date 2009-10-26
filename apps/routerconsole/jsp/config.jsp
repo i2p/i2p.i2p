@@ -54,12 +54,20 @@
 </td></tr></table></p></div></p>
  <% int share = nethelper.getShareBandwidth();
     if (share < 12) {
-        out.print("<p><b>"+intl._("NOTE")+"</b>: You have configured I2P to share only " + share + "KBps. ");
+        out.print("<p><b>");
+        out.print(intl._("NOTE"));
+        out.print("</b>: ");
+        out.print(intl._("You have configured I2P to share only {0} KBps.", share));
+        out.print("\n");
+
         out.print(intl._("I2P requires at least 12KBps to enable sharing. "));
         out.print(intl._("Please enable sharing (participating in tunnels) by configuring more bandwidth. "));
         out.print(intl._("It improves your anonymity by creating cover traffic, and helps the network.")+"</p>");
     } else {
-        out.print("<p>" + intl._("You have configured I2P to share") + "<b> " + share + "KBps</b>. ");
+        out.print("<p>");
+        out.print(intl._("You have configured I2P to share {0} KBps.", share));
+        out.print("\n");
+
         out.print(intl._("The higher the share bandwidth the more you improve your anonymity and help the network.")+"</p><hr>");
     }
  %>
@@ -76,7 +84,8 @@
  <br>
 -->
  <h3><%=intl._("IP and Transport Configuration")%></h3><p>
- <b><%=intl._("The default settings will work for most people.")%> There is <a href="#chelp">help below</a>.</b>
+ <b><%=intl._("The default settings will work for most people.")%>
+ <a href="#chelp"><%=intl._("There is help below.")%></a></b>
  </p><p><b><%=intl._("UPnP Configuration")%>:</b><br>
     <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> />
     <%=intl._("Enable UPnP to open firewall ports")%> - <a href="peers.jsp#upnp"><%=intl._("UPnP status")%></a>
@@ -169,18 +178,18 @@
 <li class="tidylist"><%=intl._("Multiple firewall/routers in the internet connection path")%>
 <li class="tidylist"><%=intl._("UPnP device change, reset, or address change")%>
 </ul></p><p>
- Reviewing the <a href="peers.jsp#upnp">UPnP status</a> may help.
+<a href="peers.jsp#upnp"><%=intl._("Review the UPnP status here.")%></a>
 <%=intl._("UPnP may be enabled or disabled above, but a change requires a router restart to take effect.")%></p>
 <p><%=intl._("Hostnames entered above will be published in the network database.")%>
-    They are <b>not private</b>.
-    Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.
+    <%=intl._("They are <b>not private</b>.")%>
+    <%=intl._("Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.")%>
     <%=intl._("If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially.")%>
     <%=intl._("When in doubt, leave the settings at the defaults.")%>
 </p>
 <h3><a name="help"><%=intl._("Reachability Help")%>:</a></h3><p>
  <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port (generally 8887) is forwarded for both UDP and TCP.")%>
  <%=intl._("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>
- If there is an error, the <a href="logs.jsp">logs</a> may also help diagnose the problem.
+ <%=intl._("If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem.")%>
  <ul>
 <li class="tidylist"><b><%=intl._("OK")%></b> - 
      <%=intl._("Your UDP port does not appear to be firewalled.")%>

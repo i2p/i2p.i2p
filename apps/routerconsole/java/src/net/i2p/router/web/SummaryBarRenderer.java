@@ -289,7 +289,7 @@ public class SummaryBarRenderer {
                 String uri = _helper.getRequestURI();
                 buf.append("<form action=\"").append(uri).append("\" method=\"GET\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" >Reseed</button></form>\n");
+                buf.append("<button type=\"submit\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form>\n");
             }
             anotherLine = true;
         }

@@ -51,7 +51,9 @@ public class ConfigUpdateHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if (_action != null && _action.equals(_("Check for updates"))) {
+        if (_action == null)
+            return;
+        if (_action.equals(_("Check for updates"))) {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
             fetcher.fetchNews();
             if (fetcher.shouldFetchUnsigned())
@@ -63,6 +65,7 @@ public class ConfigUpdateHandler extends FormHandler {
                     addFormNotice(_("Update available, click button on left to download"));
             } else
                 addFormNotice(_("No update available"));
+            return;
         }
 
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {

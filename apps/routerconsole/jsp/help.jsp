@@ -1,7 +1,11 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
+<%
+  /*
+   *   Do not tag this file for translation - copy it to help_xx.jsp and translate inline.
+   */
+%>
 <html><head><title>I2P Router Console - help</title>
 <%@include file="css.jsp" %>
 </head><body>

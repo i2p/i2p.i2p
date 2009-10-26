@@ -3,6 +3,8 @@
  * USE CAUTION WHEN EDITING
  * Trailing whitespace OR NEWLINE on the last line will cause
  * IllegalStateExceptions !!!
+ *
+ * Do not tag this file for translation.
  */
 
 String uri = request.getRequestURI();

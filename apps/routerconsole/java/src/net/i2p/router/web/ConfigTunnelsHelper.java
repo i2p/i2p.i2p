@@ -8,8 +8,13 @@ import net.i2p.data.Destination;
 import net.i2p.router.TunnelPoolSettings;
 
 public class ConfigTunnelsHelper extends HelperBase {
+    static final String HOP = _x("hop");
+    static final String TUNNEL = _x("tunnel");
+    /** dummies for translation */
+    static final String HOPS = _x("hops");
+    static final String TUNNELS = _x("tunnels");
+
     public ConfigTunnelsHelper() {}
-    
     
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);
@@ -74,7 +79,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">" + _("PERFORMANCE WARNING - Settings include high tunnel quantities.") + "</font></th></tr>");
 
-buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\">&nbsp;&nbsp;" + _("Inbound") + "</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\">&nbsp;&nbsp;" + _("Outbound") + "</th></tr>\n");
+        buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\">&nbsp;&nbsp;" + _("Inbound") + "</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\">&nbsp;&nbsp;" + _("Outbound") + "</th></tr>\n");
 
 //        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
@@ -82,16 +87,16 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Depth") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthInbound\">\n");
         int now = in.getLength();
-        renderOptions(buf, 0, MAX_LENGTH, now, "", _("hop"));
+        renderOptions(buf, 0, MAX_LENGTH, now, "", HOP);
         if (now > MAX_LENGTH)
-            renderOptions(buf, now, now, now, "", _("hop"));
+            renderOptions(buf, now, now, now, "", HOP);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthOutbound\">\n");
         now = out.getLength();
-        renderOptions(buf, 0, MAX_LENGTH, now, "", _("hop"));
+        renderOptions(buf, 0, MAX_LENGTH, now, "", HOP);
         if (now > MAX_LENGTH)
-            renderOptions(buf, now, now, now, "", _("hop"));
+            renderOptions(buf, now, now, now, "", HOP);
         buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
@@ -99,40 +104,40 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Randomization") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".varianceInbound\">\n");
         now = in.getLengthVariance();
-        renderOptions(buf, 0, 0, now, "", _("hop"));
-        renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", _("hop"));
-        renderOptions(buf, MIN_NEG_VARIANCE, -1, now, "+/- 0", _("hop"));
+        renderOptions(buf, 0, 0, now, "", HOP);
+        renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", HOP);
+        renderOptions(buf, MIN_NEG_VARIANCE, -1, now, "+/- 0", HOP);
         if (now > MAX_VARIANCE)
-            renderOptions(buf, now, now, now, "+ 0-", _("hop"));
+            renderOptions(buf, now, now, now, "+ 0-", HOP);
         else if (now < MIN_NEG_VARIANCE)
-            renderOptions(buf, now, now, now, "+/- 0", _("hop"));
+            renderOptions(buf, now, now, now, "+/- 0", HOP);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".varianceOutbound\">\n");
         now = out.getLengthVariance();
-        renderOptions(buf, 0, 0, now, "", _("hop"));
-        renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", _("hop"));
-        renderOptions(buf, MIN_NEG_VARIANCE, -1, now, "+/- 0", _("hop"));
+        renderOptions(buf, 0, 0, now, "", HOP);
+        renderOptions(buf, 1, MAX_VARIANCE, now, "+ 0-", HOP);
+        renderOptions(buf, MIN_NEG_VARIANCE, -1, now, "+/- 0", HOP);
         if (now > MAX_VARIANCE)
-            renderOptions(buf, now, now, now, "+ 0-", _("hop"));
+            renderOptions(buf, now, now, now, "+ 0-", HOP);
         else if (now < MIN_NEG_VARIANCE)
-            renderOptions(buf, now, now, now, "+/- 0", _("hop"));
+            renderOptions(buf, now, now, now, "+/- 0", HOP);
         buf.append("</select></td>\n");
 
         // tunnel quantity
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Quantity") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityInbound\">\n");
         now = in.getQuantity();
-        renderOptions(buf, 1, MAX_QUANTITY, now, "", _("tunnel"));
+        renderOptions(buf, 1, MAX_QUANTITY, now, "", TUNNEL);
         if (now > MAX_QUANTITY)
-            renderOptions(buf, now, now, now, "", _("tunnel"));
+            renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityOutbound\">\n");
         now = out.getQuantity();
-        renderOptions(buf, 1, MAX_QUANTITY, now, "", _("tunnel"));
+        renderOptions(buf, 1, MAX_QUANTITY, now, "", TUNNEL);
         if (now > MAX_QUANTITY)
-            renderOptions(buf, now, now, now, "", _("tunnel"));
+            renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
@@ -140,16 +145,16 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
         buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Backup quantity") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupInbound\">\n");
         now = in.getBackupQuantity();
-        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", _("tunnel"));
+        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", TUNNEL);
         if (now > MAX_BACKUP_QUANTITY)
-            renderOptions(buf, now, now, now, "", _("tunnel"));
+            renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
 
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupOutbound\">\n");
         now = out.getBackupQuantity();
-        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", _("tunnel"));
+        renderOptions(buf, 0, MAX_BACKUP_QUANTITY, now, "", TUNNEL);
         if (now > MAX_BACKUP_QUANTITY)
-            renderOptions(buf, now, now, now, "", _("tunnel"));
+            renderOptions(buf, now, now, now, "", TUNNEL);
         buf.append("</select></td>\n");
         buf.append("</tr>\n");
 
@@ -191,9 +196,13 @@ buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append("selected=\"true\" ");
-            buf.append(">").append(prefix).append(i).append(' ').append(name);
+            String pname;
+            // pluralize and then translate
             if (i != 1 && i != -1)
-                buf.append('s');
+                pname = name + 's';
+            else
+                pname = name;
+            buf.append(">").append(prefix).append(i).append(' ').append(_(pname));
             buf.append("</option>\n");
         }
     }

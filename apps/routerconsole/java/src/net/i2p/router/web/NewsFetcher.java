@@ -74,10 +74,20 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public String unsignedUpdateVersion() { return _unsignedUpdateVersion; }
 
     public String status() {
+         StringBuilder buf = new StringBuilder(128);
          long now = _context.clock().now();
-         return
-             (_lastUpdated > 0 ? "News last updated " + DataHelper.formatDuration(now - _lastUpdated) + " ago" : "") +
-             (_lastFetch > _lastUpdated ? "; last checked " + DataHelper.formatDuration(now - _lastFetch) + " ago." : "");
+         if (_lastUpdated > 0) {
+             buf.append(Messages.getString("News last updated {0} ago.",
+                                           DataHelper.formatDuration(now - _lastUpdated),
+                                           _context))
+                .append('\n');
+         }
+         if (_lastFetch > _lastUpdated) {
+             buf.append(Messages.getString("News last checked {0} ago.",
+                                           DataHelper.formatDuration(now - _lastFetch),
+                                           _context));
+         }
+         return buf.toString();
     }
     
     public void run() {

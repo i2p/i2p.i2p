@@ -1,3 +1,14 @@
+2009-10-26 zzz
+    * Console:
+      - Add parameterized tag
+      - Don't save config when checking for updates on configupdate.jsp
+      - Refactor confignav.jsp to java and tag
+      - Start tagging profiles.jsp
+      - Rework ConfigRestartBean and tag
+      - More tag fixups
+      - Add lang=xx for testing
+      - Add file for additional tagged strings
+
 2009-10-23 zzz
     * Certificate: Fix the (apparently unused) readBytes(byte[], int) method
       for a null certificate - http://zzz.i2p/topics/388 - thanks HungryHobo

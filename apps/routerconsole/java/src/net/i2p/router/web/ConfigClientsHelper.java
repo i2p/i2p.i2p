@@ -51,9 +51,9 @@ public class ConfigClientsHelper extends HelperBase {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
                 link += name + "/";
-            buf.append("<a href=\"").append(link).append("\">").append(name).append("</a>");
+            buf.append("<a href=\"").append(link).append("\">").append(_(name)).append("</a>");
         } else {
-            buf.append(name);
+            buf.append(_(name));
         }
         buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {

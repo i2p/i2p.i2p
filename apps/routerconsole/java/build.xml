@@ -101,6 +101,13 @@
         <delete file="../jsp/web-out.xml" />
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
+
+        <!-- TODO: Don't compile the following jsps, which should be used only as includes:
+           -  summary.jsp, summarynoframe.jsp, css.jsp, confignav.jsp
+           -  Is here a JspC command line switch for that?
+           -  Or should we move them to a separate directory?
+          -->
+
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
         <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
             <classpath>
