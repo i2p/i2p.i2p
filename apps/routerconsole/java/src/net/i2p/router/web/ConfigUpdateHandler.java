@@ -51,25 +51,25 @@ public class ConfigUpdateHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if (_action != null && _action.startsWith("Check")) {
+        if (_action != null && _action.equals(_("Check for updates"))) {
             NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
             fetcher.fetchNews();
             if (fetcher.shouldFetchUnsigned())
                 fetcher.fetchUnsignedHead();
             if (fetcher.updateAvailable() || fetcher.unsignedUpdateAvailable()) {
                 if ( (_updatePolicy == null) || (!_updatePolicy.equals("notify")) )
-                    addFormNotice("Update available, attempting to download now");
+                    addFormNotice(_("Update available, attempting to download now"));
                 else
-                    addFormNotice("Update available, click button on left to download");
+                    addFormNotice(_("Update available, click button on left to download"));
             } else
-                addFormNotice("No update available");
+                addFormNotice(_("No update available"));
         }
 
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
             String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_NEWS_URL, _newsURL);
-                addFormNotice("Updating news URL to " + _newsURL);
+                addFormNotice(_("Updating news URL to") + " " + _newsURL);
             }
         }
         
@@ -77,7 +77,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldHost = _context.router().getConfigSetting(PROP_PROXY_HOST);
             if ( (oldHost == null) || (!_proxyHost.equals(oldHost)) ) {
                 _context.router().setConfigSetting(PROP_PROXY_HOST, _proxyHost);
-                addFormNotice("Updating proxy host to " + _proxyHost);
+                addFormNotice(_("Updating proxy host to") + " " + _proxyHost);
             }
         }
         
@@ -85,7 +85,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
             if ( (oldPort == null) || (!_proxyPort.equals(oldPort)) ) {
                 _context.router().setConfigSetting(PROP_PROXY_PORT, _proxyPort);
-                addFormNotice("Updating proxy port to " + _proxyPort);
+                addFormNotice(_("Updating proxy port to") + " " + _proxyPort);
             }
         }
         
@@ -98,14 +98,14 @@ public class ConfigUpdateHandler extends FormHandler {
             try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
             _context.router().setConfigSetting(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
-            addFormNotice("Updating refresh frequency to " + DataHelper.formatDuration(_refreshFrequency));
+            addFormNotice(_("Updating refresh frequency to") + " " + DataHelper.formatDuration(_refreshFrequency));
         }
 
         if ( (_updatePolicy != null) && (_updatePolicy.length() > 0) ) {
             String oldPolicy = _context.router().getConfigSetting(PROP_UPDATE_POLICY);
             if ( (oldPolicy == null) || (!_updatePolicy.equals(oldPolicy)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_POLICY, _updatePolicy);
-                addFormNotice("Updating update policy to " + _updatePolicy);
+                addFormNotice(_("Updating update policy to") + " " + _updatePolicy);
             }
         }
 
@@ -114,7 +114,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_URL, _updateURL);
-                addFormNotice("Updating update URLs.");
+                addFormNotice(_("Updating update URLs."));
             }
         }
 
@@ -122,7 +122,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldKeys = new TrustedUpdate(_context).getTrustedKeysString();
             if ( (oldKeys == null) || (!_trustedKeys.equals(oldKeys)) ) {
                 _context.router().setConfigSetting(PROP_TRUSTED_KEYS, _trustedKeys);
-                addFormNotice("Updating trusted keys.");
+                addFormNotice(_("Updating trusted keys."));
             }
         }
         
@@ -130,7 +130,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldURL = _context.router().getConfigSetting(PROP_ZIP_URL);
             if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_ZIP_URL, _zipURL);
-                addFormNotice("Updating unsigned update URL to " + _zipURL);
+                addFormNotice(_("Updating unsigned update URL to") + " " + _zipURL);
             }
         }
         

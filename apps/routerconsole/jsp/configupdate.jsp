@@ -30,7 +30,7 @@
       <div class="wideload"><table border="0" cellspacing="5">
         <tr><td colspan="2"></tr>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("News &amp; I2P Updates")%>:</b></td>
-          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" value="Check for updates" />
+          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" value="<%=intl._("Check for updates")%>" />
             <% } %></td></tr>
         <tr><td colspan="2"><br></td></tr>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("News URL")%>:</b></td>
@@ -55,6 +55,6 @@
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td>
         </tr><tr class="tablefooter"><td colspan="2">
         <div class="formaction">
-            <input type="submit" name="action" value="Save" />
-            <input type="reset" value="Cancel" />
+            <input type="submit" name="action" value="<%=intl._("Save")%>" />
+            <input type="reset" value="<%=intl._("Cancel")%>" />
         </div></td></tr></table></div></form></div></div></body></html>

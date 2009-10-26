@@ -64,7 +64,7 @@
     }
  %>
 <div class="formaction">
-<input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /></div>
+<input type="submit" name="save" value="<%=intl._("Save changes")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" /></div>
  <!--
  <b>Enable load testing: </b>
 <input type="checkbox" class="optbox" name="enableloadtesting" value="true" <jsp:getProperty name="nethelper" property="enableLoadTesting" /> />
@@ -95,7 +95,7 @@
     <input name ="udpHost1" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" />
     <% String[] ips = nethelper.getAddresses();
        if (ips.length > 0) {
-           out.print(" " + intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"true\">Select Interface</option>\n");
+           out.print(" " + intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"true\">"+intl._("Select Interface")+"</option>\n");
            for (int i = 0; i < ips.length; i++) {
                out.print("<option value=\"");
                out.print(ips[i]);
@@ -145,7 +145,7 @@
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" /><br>
  </p><p><b><%=intl._("Note")%>: <%=intl._("Changing these settings will restart your router.")%></b></p>
 <hr><div class="formaction">
- <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" />
+ <input type="submit" name="save" value="<%=intl._("Save changes")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" />
 </div><h3><a name="chelp"><%=intl._("Configuration Help")%>:</a></h3><div align="justify"><p>
  <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port (generally 8887) is forwarded for both UDP and TCP.")%>
  </p><p>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-24 10:45+0000\n"
+"POT-Creation-Date: 2009-10-25 17:07+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -78,470 +78,487 @@ msgid ""
 "the network."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:375
-msgid "IP and Transport Configuration"
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:373
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:502
+#: src/net/i2p/router/web/ConfigNetHandler.java:47
+#: src/net/i2p/router/web/ConfigNetHandler.java:249
+msgid "Save changes"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:377
-msgid "The default settings will work for most people."
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:375
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:504
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:390
+msgid "Cancel"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:379
-msgid "UPnP Configuration"
+msgid "IP and Transport Configuration"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:381
+msgid "The default settings will work for most people."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:383
-msgid "Enable UPnP to open firewall ports"
-msgstr ""
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:385
-msgid "UPnP status"
+msgid "UPnP Configuration"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:387
-msgid "IP Configuration"
+msgid "Enable UPnP to open firewall ports"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:389
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:445
-msgid "Externally reachable hostname or IP address"
+msgid "UPnP status"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:391
+msgid "IP Configuration"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:393
-msgid "Use all auto-detect methods"
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:449
+msgid "Externally reachable hostname or IP address"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:397
-msgid "Disable UPnP IP address detection"
+msgid "Use all auto-detect methods"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:401
-msgid "Ignore local interface IP address"
+msgid "Disable UPnP IP address detection"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:405
-msgid "Use SSU IP address detection only"
+msgid "Ignore local interface IP address"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:409
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:463
+msgid "Use SSU IP address detection only"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:413
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:467
 msgid "Specify hostname or IP"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:415
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:419
+msgid "Select Interface"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:419
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:356
 msgid "or"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:429
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:433
 msgid "Hidden mode - do not publish IP"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:431
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:435
 msgid "(prevents participating traffic)"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:433
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:437
 msgid "UDP Configuration:"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:435
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:439
 msgid "UDP port:"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:443
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:447
 msgid "TCP Configuration"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:449
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:453
 msgid "Use auto-detected IP address"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:451
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:483
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:455
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:487
 msgid "currently"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:455
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:459
 msgid "if we are not firewalled"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:459
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:463
 msgid "Always use auto-detected IP address (Not firewalled)"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:469
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:473
 msgid "Disable inbound (Firewalled)"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:473
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:477
 msgid "Completely disable"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:475
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:479
 msgid ""
 "(select only if behind a firewall that throttles or blocks outbound TCP)"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:477
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:481
 msgid "Externally reachable TCP port"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:481
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:485
 msgid "Use the same port configured for UDP"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:489
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:493
 msgid "Specify Port"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:493
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:497
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:358
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:363
 msgid "Note"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:496
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:500
 msgid "Changing these settings will restart your router."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:498
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:506
 msgid "Configuration Help"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:500
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:508
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:544
 msgid ""
 "While I2P will work fine behind most firewalls, your speeds and network "
 "integration will generally improve if the I2P port (generally 8887) is "
 "forwarded for both UDP and TCP."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:502
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:510
 msgid ""
 "If you can, please poke a hole in your firewall to allow unsolicited UDP and "
 "TCP packets to reach you."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:504
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:512
 msgid ""
 "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole "
 "punching with \"SSU introductions\" to relay traffic."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:506
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:514
 msgid ""
 "Most of the options above are for special situations, for example where UPnP "
 "does not work correctly, or a firewall not under your control is doing harm."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:508
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:516
 msgid "Certain firewalls such as symmetric NATs may not work well with I2P."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:510
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:518
 msgid ""
 "UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect "
 "the external IP address and forward ports."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:512
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:520
 msgid "UPnP support is beta, and may not work for any number of reasons"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:514
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:522
 msgid "No UPnP-compatible device present"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:516
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:524
 msgid "UPnP disabled on the device"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:518
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:526
 msgid "Software firewall interference with UPnP"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:520
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:528
 msgid "Bugs in the device's UPnP implementation"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:522
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:530
 msgid "Multiple firewall/routers in the internet connection path"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:524
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:532
 msgid "UPnP device change, reset, or address change"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:526
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:534
 msgid ""
 "UPnP may be enabled or disabled above, but a change requires a router "
 "restart to take effect."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:528
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
 msgid "Hostnames entered above will be published in the network database."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:530
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
 msgid ""
 "If you specify the wrong IP address or hostname, or do not properly "
 "configure your NAT or firewall, your network performance will degrade "
 "substantially."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:532
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:540
 msgid "When in doubt, leave the settings at the defaults."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:534
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:542
 msgid "Reachability Help"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:539
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:547
 msgid ""
 "If you think you have opened up your firewall and I2P still thinks you are "
 "firewalled, remember that you may have multiple firewalls, for example both "
 "software packages and external hardware routers."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:541
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:549
 msgid "OK"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:543
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:551
 msgid "Your UDP port does not appear to be firewalled."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:545
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:553
 msgid "Firewalled"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:547
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:555
 msgid "Your UDP port appears to be firewalled."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:549
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
 msgid ""
 "As the firewall detection methods are not 100% reliable, this may "
 "occasionally be displayed in error."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:551
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
 msgid ""
 "However, if it appears consistently, you should check whether both your "
 "external and internal firewalls are open on port 8887."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:553
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:561
 msgid ""
 "I2P will work fine when firewalled, there is no reason for concern. When "
 "firewalled, the router uses \"introducers\" to relay inbound connections."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:555
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:563
 msgid ""
 "However, you will get more participating traffic and help the network more "
 "if you can open your firewall(s)."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:565
 msgid ""
 "If you think you have already done so, remember that you may have both a "
 "hardware and a software firewall, or be behind an additional, institutional "
 "firewall you cannot control."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:567
 msgid ""
 "Also, some routers cannot correctly forward both TCP and UDP on a single "
 "port, or may have other limitations or bugs that prevent them from passing "
 "traffic through to I2P."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:561
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:569
 msgid "Testing"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:563
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:571
 msgid "The router is currently testing whether your UDP port is firewalled."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:565
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:573
 msgid "Hidden"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:567
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:575
 msgid ""
 "The router is not configured to publish its address, therefore it does not "
 "expect incoming connections."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:569
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:577
 msgid "WARN - Firewalled and Fast"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:571
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:579
 msgid ""
 "You have configured I2P to share more than 128KBps of bandwidth, but you are "
 "firewalled."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:573
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:581
 msgid ""
 "While I2P will work fine in this configuration, if you really have over "
 "128KBps of bandwidth to share, it will be much more helpful to the network "
 "if you open your firewall."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:575
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:583
 msgid "WARN - Firewalled and Floodfill"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:577
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:585
 msgid ""
 "You have configured I2P to be a floodfill router, but you are firewalled."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:579
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:587
 msgid ""
 "For best participation as a floodfill router, you should open your firewall."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:581
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:589
 msgid "WARN - Firewalled with Inbound TCP Enabled"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:583
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:591
 msgid ""
 "You have configured inbound TCP, however your UDP port is firewalled, and "
 "therefore it is likely that your TCP port is firewalled as well."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:585
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:593
 msgid ""
 "If your TCP port is firewalled with inbound TCP enabled, routers will not be "
 "able to contact you via TCP, which will hurt the network."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:587
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:595
 msgid "Please open your firewall or disable inbound TCP above."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:589
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:597
 msgid "WARN - Firewalled with UDP Disabled"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:591
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:599
 msgid "You have configured inbound TCP, however you have disabled UDP."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:593
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:601
 msgid ""
 "You appear to be firewalled on TCP, therefore your router cannot accept "
 "inbound connections."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:595
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:603
 msgid "Please open your firewall or enable UDP."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:597
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:605
 msgid "ERR - Clock Skew"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:599
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:607
 msgid ""
 "Your system's clock is skewed, which will make it difficult to participate "
 "in the network."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:601
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:609
 msgid "Correct your clock setting if this error persists."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:603
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:611
 msgid "ERR - Private TCP Address"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:605
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:613
 msgid ""
 "You must never advertise an unroutable IP address such as 127.0.0.1 or "
 "192.168.1.1 as your external address."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:607
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:615
 msgid "Correct the address or disable inbound TCP above."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:609
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:617
 msgid "ERR - SymmetricNAT"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:611
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:619
 msgid "I2P detected that you are firewalled by a Symmetric NAT."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:613
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:621
 msgid ""
 "I2P does not work well behind this type of firewall. You will probably not "
 "be able to accept inbound connections, which will limit your participation "
 "in the network."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:615
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:623
 msgid ""
 "ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config "
 "and restart"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:617
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:625
 msgid "I2P was unable to bind to port 8887 or other configured port."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:619
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:627
 msgid ""
 "Check to see if another program is using port 8887. If so, stop that program "
 "or configure I2P to use a different port."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:621
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:629
 msgid ""
 "This may be a transient error, if the other program is no longer using the "
 "port."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:623
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:631
 msgid "However, a restart is always required after this error."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:625
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:633
 msgid "ERR - UDP Disabled and Inbound TCP host/port not set"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:627
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:635
 msgid ""
 "You have not configured inbound TCP with a hostname and port above, however "
 "you have disabled UDP."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:629
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:637
 msgid "Therefore your router cannot accept inbound connections."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:631
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:639
 msgid "Please configure a TCP host and port above or enable UDP."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:633
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:641
 msgid "ERR - Client Manager I2CP Error - check logs"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:635
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:643
 msgid "This is usually due to a port 7654 conflict. Check the logs to verify."
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:637
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:645
 msgid ""
 "Do you have another I2P instance running? Stop the conflicting program and "
 "restart I2P."
@@ -1017,44 +1034,53 @@ msgstr ""
 msgid "Update In Progress"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:346
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:344
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:54
+msgid "Check for updates"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:348
 msgid "News URL"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:352
 msgid "Refresh frequency"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:354
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:356
 msgid "Update policy"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:358
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:360
 msgid "Update through the eepProxy?"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:362
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:364
 msgid "eepProxy host"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:366
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:368
 msgid "eepProxy port"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:370
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:372
 msgid "Update URLs"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:374
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:376
 msgid "Trusted keys"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:378
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:380
 msgid "Update with unsigned development builds?"
 msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:382
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:384
 msgid "Unsigned Build URL"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:388
+msgid "Save"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:117
@@ -1158,6 +1184,237 @@ msgstr ""
 msgid "I2P Tunnel Summary"
 msgstr ""
 
+#: src/net/i2p/router/web/ConfigClientsHelper.java:17
+msgid "Class and arguments"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:17
+#: src/net/i2p/router/web/SummaryBarRenderer.java:359
+msgid "Client"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:17
+#: src/net/i2p/router/web/ConfigClientsHelper.java:33
+msgid "Run at Startup?"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:17
+#: src/net/i2p/router/web/ConfigClientsHelper.java:33
+msgid "Start Now"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:33
+msgid "Description"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:33
+msgid "WebApp"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigClientsHelper.java:66
+msgid "Start"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:119
+msgid "Rechecking router reachability..."
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:148
+msgid "Updating IP address"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:166
+msgid "Disabling TCP completely"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:170
+msgid "Updating inbound TCP address to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:174
+msgid "Disabling inbound TCP"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:176
+msgid "Updating inbound TCP address to auto"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:185
+msgid "Updating inbound TCP port to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:188
+msgid "Updating inbound TCP port to auto"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:200
+msgid "Updating UDP port from"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:200
+msgid "to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:216
+msgid "Gracefully restarting into Hidden Router Mode"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:218
+msgid "Gracefully restarting to exit Hidden Router Mode"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:227
+msgid "Enabling UPnP, restart required to take effect"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:229
+msgid "Disabling UPnP, restart required to take effect"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:235
+msgid "Requiring SSU introduers"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:251
+msgid "Configuration saved successfully"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:253
+msgid ""
+"Error saving the configuration (applied but not saved) - please see the "
+"error logs"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:293
+msgid "Updating bandwidth share percentage"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHandler.java:363
+msgid "Updated bandwidth limits"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:53
+msgid "Shutdown gracefully"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:56
+msgid "Graceful shutdown initiated"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:57
+msgid "Shutdown immediately"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:60
+msgid "Shutdown immediately!  boom bye bye bad bwoy"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:61
+msgid "Cancel graceful shutdown"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:63
+msgid "Graceful shutdown cancelled"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:64
+msgid "Graceful restart"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:67
+msgid "Graceful restart requested"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:68
+msgid "Hard restart"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:71
+msgid "Hard restart requested"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:72
+msgid "Rekey and Restart"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:73
+msgid "Rekeying after graceful restart"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:76
+msgid "Rekey and Shutdown"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:77
+msgid "Rekeying after graceful shutdown"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:80
+msgid "Run I2P on startup"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:82
+msgid "Don't run I2P on startup"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:91
+msgid "Show systray icon"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:96
+msgid "System tray icon enabled."
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:98
+#: src/net/i2p/router/web/ConfigServiceHandler.java:110
+msgid "System tray icon feature not supported on this platform. Sorry!"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:101
+#: src/net/i2p/router/web/ConfigServiceHandler.java:113
+msgid "Warning: unable to contact the systray manager"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:103
+msgid "Hide systray icon"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:108
+msgid "System tray icon disabled."
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:115
+msgid "View console on startup"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:117
+msgid "Console is to be shown on startup"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:118
+msgid "Do not view console on startup"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:120
+msgid "Console is not to be shown on startup"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:129
+msgid "Service installed"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:131
+msgid "Warning: unable to install the service"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:137
+msgid "Service removed"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigServiceHandler.java:139
+msgid "Warning: unable to remove the service"
+msgstr ""
+
 #: src/net/i2p/router/web/ConfigUIHelper.java:6
 msgid "classic"
 msgstr ""
@@ -1194,8 +1451,71 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:61
+msgid "Update available, attempting to download now"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:63
+msgid "Update available, click button on left to download"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:65
+msgid "No update available"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:72
+msgid "Updating news URL to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:80
+msgid "Updating proxy host to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:88
+msgid "Updating proxy port to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:101
+msgid "Updating refresh frequency to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:108
+msgid "Updating update policy to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:117
+msgid "Updating update URLs."
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:125
+msgid "Updating trusted keys."
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHandler.java:133
+msgid "Updating unsigned update URL to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:75
+msgid "Never"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:77
+msgid "Every"
+msgstr ""
+
 #: src/net/i2p/router/web/ConfigUpdateHelper.java:90
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:92
 msgid "Notify only"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:95
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:97
+msgid "Download and verify only"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:101
+#: src/net/i2p/router/web/ConfigUpdateHelper.java:103
+msgid "Download, verify, and restart"
 msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:42
@@ -1409,10 +1729,6 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:351
 msgid "Exploratory"
-msgstr ""
-
-#: src/net/i2p/router/web/SummaryBarRenderer.java:359
-msgid "Client"
 msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:367

@@ -44,7 +44,7 @@ public class ConfigNetHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        if (_saveRequested || ( (_action != null) && ("Save changes".equals(_action)) )) {
+        if (_saveRequested || ( (_action != null) && (_("Save changes").equals(_action)) )) {
             saveChanges();
         } else if (_recheckReachabilityRequested) {
             recheckReachability();
@@ -116,7 +116,7 @@ public class ConfigNetHandler extends FormHandler {
     
     private void recheckReachability() {
         _context.commSystem().recheckReachability();
-        addFormNotice("Rechecking router reachability...");
+        addFormNotice(_("Rechecking router reachability..."));
     }
     
     /**
@@ -145,7 +145,7 @@ public class ConfigNetHandler extends FormHandler {
                 // Todo: Catch local IPs right here rather than complaining later
                 _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
                 if ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost))) {
-                   addFormNotice("Updating IP address");
+                   addFormNotice(_("Updating IP address"));
                    restartRequired = true;
                 }
             }
@@ -163,17 +163,17 @@ public class ConfigNetHandler extends FormHandler {
 
             if ((!oldAutoHost.equals(_ntcpAutoIP)) || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
                 if ("disabled".equals(_ntcpAutoIP)) {
-                    addFormNotice("Disabling TCP completely");
+                    addFormNotice(_("Disabling TCP completely"));
                 } else if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
                     // Todo: Catch local IPs right here rather than complaining later
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
-                    addFormNotice("Updating inbound TCP address to " + _ntcpHostname);
+                    addFormNotice(_("Updating inbound TCP address to") + " " + _ntcpHostname);
                 } else {
                     _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
                     if ("false".equals(_ntcpAutoIP))
-                        addFormNotice("Disabling inbound TCP");
+                        addFormNotice(_("Disabling inbound TCP"));
                     else
-                        addFormNotice("Updating inbound TCP address to auto"); // true or always
+                        addFormNotice(_("Updating inbound TCP address to auto")); // true or always
                 }
                 _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
                 _context.router().setConfigSetting(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
@@ -182,10 +182,10 @@ public class ConfigNetHandler extends FormHandler {
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
                 if (_ntcpPort.length() > 0 && !_ntcpAutoPort) {
                     _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
-                    addFormNotice("Updating inbound TCP port to " + _ntcpPort);
+                    addFormNotice(_("Updating inbound TCP port to") + " " + _ntcpPort);
                 } else {
                     _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
-                    addFormNotice("Updating inbound TCP port to auto");
+                    addFormNotice(_("Updating inbound TCP port to auto"));
                 }
                 _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "" + _ntcpAutoPort);
                 restartRequired = true;
@@ -197,7 +197,7 @@ public class ConfigNetHandler extends FormHandler {
                 if (!oldPort.equals(_udpPort)) {
                     _context.router().setConfigSetting(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
                     _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
-                    addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
+                    addFormNotice(_("Updating UDP port from") + " " + oldPort + " " + _("to") + " " + _udpPort);
                     restartRequired = true;
                 }
             }
@@ -213,9 +213,9 @@ public class ConfigNetHandler extends FormHandler {
             if (switchRequired) {
                 _context.router().setConfigSetting(PROP_HIDDEN, "" + _hiddenMode);
                 if (_hiddenMode)
-                    addFormError("Gracefully restarting into Hidden Router Mode");
+                    addFormError(_("Gracefully restarting into Hidden Router Mode"));
                 else
-                    addFormError("Gracefully restarting to exit Hidden Router Mode");
+                    addFormError(_("Gracefully restarting to exit Hidden Router Mode"));
             }
 
             _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
@@ -224,15 +224,15 @@ public class ConfigNetHandler extends FormHandler {
                 _upnp) {
                 // This is minor, don't set restartRequired
                 if (_upnp)
-                    addFormNotice("Enabling UPnP, restart required to take effect");
+                    addFormNotice(_("Enabling UPnP, restart required to take effect"));
                 else
-                    addFormNotice("Disabling UPnP, restart required to take effect");
+                    addFormNotice(_("Disabling UPnP, restart required to take effect"));
             }
             _context.router().setConfigSetting(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
 
             if (_requireIntroductions) {
                 _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
-                addFormNotice("Requiring SSU introduers");
+                addFormNotice(_("Requiring SSU introduers"));
             } else {
                 _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
             }
@@ -246,11 +246,11 @@ public class ConfigNetHandler extends FormHandler {
         }
         
         boolean saved = _context.router().saveConfig();
-        if ( (_action != null) && ("Save changes".equals(_action)) ) {
+        if ( (_action != null) && (_("Save changes").equals(_action)) ) {
             if (saved) 
-                addFormNotice("Configuration saved successfully");
+                addFormNotice(_("Configuration saved successfully"));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs"));
         }
         
         if (switchRequired) {
@@ -290,7 +290,7 @@ public class ConfigNetHandler extends FormHandler {
             String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
             if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
                 _context.router().setConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
-                addFormNotice("Updating bandwidth share percentage");
+                addFormNotice(_("Updating bandwidth share percentage"));
                 updated = true;
             }
         }
@@ -360,7 +360,7 @@ public class ConfigNetHandler extends FormHandler {
         
         if (updated && !_ratesOnly) {
             _context.bandwidthLimiter().reinitialize();
-            addFormNotice("Updated bandwidth limits");
+            addFormNotice(_("Updated bandwidth limits"));
         }
     }
 }

@@ -50,36 +50,36 @@ public class ConfigServiceHandler extends FormHandler {
     protected void processForm() {
         if (_action == null) return;
         
-        if ("Shutdown gracefully".equals(_action)) {
+        if (_("Shutdown gracefully").equals(_action)) {
             _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully();
-            addFormNotice("Graceful shutdown initiated");
-        } else if ("Shutdown immediately".equals(_action)) {
+            addFormNotice(_("Graceful shutdown initiated"));
+        } else if (_("Shutdown immediately").equals(_action)) {
             _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
             _context.router().shutdown(Router.EXIT_HARD);
-            addFormNotice("Shutdown immediately!  boom bye bye bad bwoy");
-        } else if ("Cancel graceful shutdown".equals(_action)) {
+            addFormNotice(_("Shutdown immediately!  boom bye bye bad bwoy"));
+        } else if (_("Cancel graceful shutdown").equals(_action)) {
             _context.router().cancelGracefulShutdown();
-            addFormNotice("Graceful shutdown cancelled");
-        } else if ("Graceful restart".equals(_action)) {
+            addFormNotice(_("Graceful shutdown cancelled"));
+        } else if (_("Graceful restart").equals(_action)) {
             _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            addFormNotice("Graceful restart requested");
-        } else if ("Hard restart".equals(_action)) {
+            addFormNotice(_("Graceful restart requested"));
+        } else if (_("Hard restart").equals(_action)) {
             _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
-            addFormNotice("Hard restart requested");
-        } else if ("Rekey and Restart".equals(_action)) {
-            addFormNotice("Rekeying after graceful restart");
+            addFormNotice(_("Hard restart requested"));
+        } else if (_("Rekey and Restart").equals(_action)) {
+            addFormNotice(_("Rekeying after graceful restart"));
             _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-        } else if ("Rekey and Shutdown".equals(_action)) {
-            addFormNotice("Rekeying after graceful shutdown");
+        } else if (_("Rekey and Shutdown").equals(_action)) {
+            addFormNotice(_("Rekeying after graceful shutdown"));
             _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
-        } else if ("Run I2P on startup".equals(_action)) {
+        } else if (_("Run I2P on startup").equals(_action)) {
             installService();
-        } else if ("Don't run I2P on startup".equals(_action)) {
+        } else if (_("Don't run I2P on startup").equals(_action)) {
             uninstallService();
         } else if ("Dump threads".equals(_action)) {
             try {
@@ -88,36 +88,36 @@ public class ConfigServiceHandler extends FormHandler {
                 addFormError("Warning: unable to contact the service manager - " + t.getMessage());
             }
             addFormNotice("Threads dumped to wrapper.log");
-        } else if ("Show systray icon".equals(_action)) {
+        } else if (_("Show systray icon").equals(_action)) {
             try {
                 SysTray tray = SysTray.getInstance();
                 if (tray != null) {
                     tray.show();
-                    addFormNotice("System tray icon enabled.");
+                    addFormNotice(_("System tray icon enabled."));
                 } else {
-                    addFormNotice("System tray icon feature not supported on this platform. Sorry!");
+                    addFormNotice(_("System tray icon feature not supported on this platform. Sorry!"));
                 }
             } catch (Throwable t) {
-                addFormError("Warning: unable to contact the systray manager - " + t.getMessage());
+                addFormError(_("Warning: unable to contact the systray manager") + " - " + t.getMessage());
             }
-        } else if ("Hide systray icon".equals(_action)) {
+        } else if (_("Hide systray icon").equals(_action)) {
             try {
                 SysTray tray = SysTray.getInstance();
                 if (tray != null) {
                     tray.hide();
-                    addFormNotice("System tray icon disabled.");
+                    addFormNotice(_("System tray icon disabled."));
                 } else {
-                    addFormNotice("System tray icon feature not supported on this platform. Sorry!");
+                    addFormNotice(_("System tray icon feature not supported on this platform. Sorry!"));
                 }
             } catch (Throwable t) {
-                addFormError("Warning: unable to contact the systray manager - " + t.getMessage());
+                addFormError(_("Warning: unable to contact the systray manager") + " - " + t.getMessage());
             }
-        } else if ("View console on startup".equals(_action)) {
+        } else if (_("View console on startup").equals(_action)) {
             browseOnStartup(true);
-            addFormNotice("Console is to be shown on startup");
-        } else if ("Do not view console on startup".equals(_action)) {
+            addFormNotice(_("Console is to be shown on startup"));
+        } else if (_("Do not view console on startup").equals(_action)) {
             browseOnStartup(false);
-            addFormNotice("Console is not to be shown on startup");
+            addFormNotice(_("Console is not to be shown on startup"));
         } else {
             //addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }
@@ -126,17 +126,17 @@ public class ConfigServiceHandler extends FormHandler {
     private void installService() {
         try { 
             Runtime.getRuntime().exec("install_i2p_service_winnt.bat");
-            addFormNotice("Service installed");
+            addFormNotice(_("Service installed"));
         } catch (IOException ioe) {
-            addFormError("Warning: unable to install the service - " + ioe.getMessage());
+            addFormError(_("Warning: unable to install the service") + " - " + ioe.getMessage());
         }
     }
     private void uninstallService() {
         try { 
             Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");
-            addFormNotice("Service removed");
+            addFormNotice(_("Service removed"));
         } catch (IOException ioe) {
-            addFormError("Warning: unable to remove the service - " + ioe.getMessage());
+            addFormError(_("Warning: unable to remove the service") + " - " + ioe.getMessage());
         }
     }
 
