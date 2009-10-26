@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -51,6 +52,34 @@ public class Messages {
             return bundle.getString(key);
         } catch (MissingResourceException e) {
             return key;
+        }
+    }
+
+    /**
+     *  translate a string with a parameter
+     *  This is a lot more expensive than getString(s, ctx), so use sparingly.
+     *
+     *  @param s string to be translated containing {0}
+     *    The {0} will be replaced by the parameter.
+     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *  @param o parameter, not translated.
+     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    Do not double the single quotes in the parameter.
+     *    Use autoboxing to call with ints, longs, floats, etc.
+     */
+    public static String getString(String s, Object o, I2PAppContext ctx) {
+        String x = getString(s, ctx);
+        Object[] oArray = new Object[1];
+        oArray[0] = o;
+        try {
+            MessageFormat fmt = new MessageFormat(x, new Locale(getLanguage(ctx)));
+            return fmt.format(oArray, new StringBuffer(), null).toString();
+        } catch (IllegalArgumentException iae) {
+            System.err.println("Bad format: orig: \"" + s +
+                               "\" trans: \"" + x +
+                               "\" param: \"" + o +
+                               "\" lang: " + getLanguage(ctx));
+            return "FIXME: " + x + ' ' + o;
         }
     }
 

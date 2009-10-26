@@ -60,16 +60,18 @@ class ProfileOrganizerRenderer {
         int integrated = 0;
         int failing = 0;
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<h2>Peer Profiles</h2>\n");
-        buf.append("<p>Showing ").append(order.size()).append(" recent profiles, hiding ").append(peers.size()-order.size()).append(" older profiles</p>");
-        buf.append("<table>" +
+        buf.append("<h2>Peer Profiles</h2>\n<p>");
+        buf.append(_("Showing {0} recent profiles.", order.size())).append('\n');
+        buf.append(_("Hiding {0} older profiles.", peers.size()-order.size()));
+        buf.append("</p>" +
+                   "<table>" +
                    "<tr>" +
-                   "<th>Peer</th>" +
-                   "<th>Groups (Caps)</th>" +
-                   "<th>Speed</th>" +
-                   "<th>Capacity</th>" +
-                   "<th>Integration</th>" +
-                   "<th>Status</th>" +
+                   "<th>").append(_("Peer")).append("</th>" +
+                   "<th>").append(_("Groups (Caps)")).append("</th>" +
+                   "<th>").append(_("Speed")).append("</th>" +
+                   "<th>").append(_("Capacity")).append("</th>" +
+                   "<th>").append(_("Integration")).append("</th>" +
+                   "<th>").append(_("Status")).append("</th>" +
                    "<th>&nbsp;</th>" +
                    "</tr>");
         int prevTier = 1;
@@ -323,5 +325,21 @@ class ProfileOrganizerRenderer {
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /**
+     *  translate a string with a parameter
+     *  This is a lot more expensive than _(s), so use sparingly.
+     *
+     *  @param s string to be translated containing {0}
+     *    The {0} will be replaced by the parameter.
+     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *  @param o parameter, not translated.
+     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    Do not double the single quotes in the parameter.
+     *    Use autoboxing to call with ints, longs, floats, etc.
+     */
+    public String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 }
