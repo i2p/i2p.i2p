@@ -31,16 +31,16 @@ public class ConfigKeyringHandler extends FormHandler {
                 } catch (DataFormatException dfe) {}
                 if (h != null && h.getData() != null && sk.getData() != null) {
                     _context.keyRing().put(h, sk);
-                    addFormNotice("Key for " + h.toBase64() + " added to keyring");
+                    addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("added to keyring"));
                 } else {
                     addFormError(_("Invalid destination or key"));
                 }
             } else {  // Delete
                 if (h != null && h.getData() != null) {
                     if (_context.keyRing().remove(h) != null)
-                        addFormNotice("Key for " + h.toBase64() + " removed from keyring");
+                        addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("removed from keyring"));
                     else
-                        addFormNotice("Key for " + h.toBase64() + " not found in keyring");
+                        addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("not found in keyring"));
                 } else {
                     addFormError(_("Invalid destination"));
                 }

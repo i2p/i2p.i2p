@@ -39,5 +39,5 @@
  <%=intl._("Note")%>: <%=intl._("Exploratory tunnel setting changes are stored in the router.config file.")%>
  <%=intl._("Client tunnel changes are temporary and are not saved.")%>
 <%=intl._("To make permanent client tunnel changes see the")%> <a href="i2ptunnel/index.jsp"><%=intl._("i2ptunnel page")%></a>.
- <hr><div class="formaction"><input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" /></div>
+ <hr><div class="formaction"><input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" /></div>
  </form></p></div></div></div></body></html>

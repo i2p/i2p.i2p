@@ -55,10 +55,10 @@ public class StatsGenerator {
         buf.append("</select> <input type=\"submit\" value=\"GO\" />");
         buf.append("</form>");
         
-        buf.append("Statistics gathered during this router's uptime (");
+        buf.append(_("Statistics gathered during this router's uptime")).append(" (");
         long uptime = _context.router().getUptime();
         buf.append(DataHelper.formatDuration(uptime));
-        buf.append(").  The data gathered is quantized over a 1 minute period, so should just be used as an estimate.");
+        buf.append(").  ").append( _("The data gathered is quantized over a 1 minute period, so should just be used as an estimate."));
 
         out.write(buf.toString());
         buf.setLength(0);

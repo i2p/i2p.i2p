@@ -32,7 +32,7 @@ public class ConfigTunnelsHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { 
-        if ( (moo != null) && (moo.equals("Save changes")) )
+        if ( (moo != null) && (moo.equals(_("Save changes"))) )
             _shouldSave = true; 
     }
     

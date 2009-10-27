@@ -212,8 +212,8 @@ public class TunnelRenderer {
         }
         if (live <= 0)
             out.write("<div class=\"statusnotes\"><center><b>" + _("No tunnels; waiting for the grace period to end.") + "</center></b></div>\n");
-        out.write("<div class=\"statusnotes\"><center><b>Lifetime bandwidth usage: " + DataHelper.formatSize(processedIn*1024) + "B in, " +
-                  DataHelper.formatSize(processedOut*1024) + "B out</b></center></div>");
+        out.write("<div class=\"statusnotes\"><center><b>" + _("Lifetime bandwidth usage") + ": " + DataHelper.formatSize(processedIn*1024) + "B " + _("in") + ", " +
+                  DataHelper.formatSize(processedOut*1024) + "B " + _("out") + "</b></center></div>");
     }
     
     private void renderPeers(Writer out) throws IOException {
@@ -231,7 +231,7 @@ public class TunnelRenderer {
         Collections.sort(peerList, new HashComparator());
 
         out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + ":</h2>\n");
-        out.write("<table><tr><th>Peer</th><th>Expl. + Client</th><th>% of total</th><th>Part. from + to</th><th>% of total</th></tr>\n");
+        out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Expl. + Client") + "</th><th>" + _("% of total") + "</th><th>" + _("Part. from + to") + "</th><th>" + _("% of total") + "</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr> <td class=\"cells\" align=\"center\">");
              out.write(netDbLink(h));
