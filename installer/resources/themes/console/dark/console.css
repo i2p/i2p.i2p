@@ -141,14 +141,15 @@ div.routersummary h4 {
      border: 0;
      border-bottom: 0 !important;
      font-size: 8.5pt;
-     letter-spacing: 0.03em;
+     letter-spacing: 0.02em;
      margin: -7px -9px -10px -9px !important;
-     padding: 1px 3px 4px 3px;
+     padding: 2px 3px 5px 3px;
      background: #005;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      background-image: -moz-linear-gradient(top, bottom, from(#001), to(#005), color-stop(10%, #005), color-stop(100%, #004));
+     line-height: 100%;
 }
 
 div.routersummary table {
@@ -210,6 +211,7 @@ div routersummary hr:last-child {
 div.tunnels {
      padding-top: 3px !important;
      margin-left: -2px;
+     text-align: center;
 }
 
 div.tunnels table {
@@ -218,6 +220,9 @@ div.tunnels table {
 
 div.tunnels td {
      padding: 1px 2px 1px 2px;
+}
+div.tunnels td:first-child {
+     width: 16px;
 }
 
 div.warning {
@@ -316,11 +321,17 @@ div.news h4 {
      border-bottom: 1px;
      border-bottom-style: dotted;
      border-bottom-color: #99f;
-     padding: 0 0 5px 0;
+     padding: 0 0 0px 0;
      margin: 5px 0 10px 0;
      font-size: 10pt;
      opacity: 0.8;
      text-transform: capitalize;
+}
+
+div.news h4:first-child {
+     background: url('../images/itoopbullet.png');
+     background-repeat: no-repeat;
+     background-position: right;   
 }
 
 div.news p {
