@@ -347,6 +347,7 @@ div.news li {
      padding: 3px 5px 5px 0;
      font-size: 10pt;
      color: #540;
+     text-transform: capitalize;
 }
 
 div.news p {
