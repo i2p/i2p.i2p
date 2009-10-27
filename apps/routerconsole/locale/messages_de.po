@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-27 08:10+0000\n"
+"POT-Creation-Date: 2009-10-27 12:45+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -419,6 +419,7 @@ msgid ""
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:534
+#: src/net/i2p/router/web/SummaryHelper.java:103
 msgid "OK"
 msgstr ""
 
@@ -427,6 +428,7 @@ msgid "Your UDP port does not appear to be firewalled."
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
+#: src/net/i2p/router/web/SummaryHelper.java:114
 msgid "Firewalled"
 msgstr ""
 
@@ -473,6 +475,7 @@ msgid ""
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:554
+#: src/net/i2p/router/web/SummaryHelper.java:127
 msgid "Testing"
 msgstr ""
 
@@ -482,6 +485,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:558
 #: src/net/i2p/router/web/NetDbRenderer.java:237
+#: src/net/i2p/router/web/SummaryHelper.java:96
 msgid "Hidden"
 msgstr ""
 
@@ -1431,6 +1435,7 @@ msgstr ""
 #: src/net/i2p/router/web/ConfigClientsHandler.java:85
 #: src/net/i2p/router/web/ConfigClientsHelper.java:17
 #: src/net/i2p/router/web/SummaryBarRenderer.java:359
+#: src/net/i2p/router/web/SummaryHelper.java:371
 msgid "Client"
 msgstr ""
 
@@ -2120,6 +2125,7 @@ msgstr ""
 
 #: src/net/i2p/router/web/NetDbRenderer.java:237
 #: src/net/i2p/router/web/NetDbRenderer.java:239
+#: src/net/i2p/router/web/SummaryHelper.java:385
 msgid "ago"
 msgstr ""
 
@@ -2395,6 +2401,89 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Backlog"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:73
+msgid "skew"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:92
+msgid "ERR-Client Manager I2CP Error - check logs"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:94
+msgid "ERR-ClockSkew"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:104
+msgid "ERR-Private TCP Address"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:106
+msgid "ERR-SymmetricNAT"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:109
+msgid "WARN-Firewalled with Inbound TCP Enabled"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:111
+msgid "WARN-Firewalled and Floodfill"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:113
+msgid "WARN-Firewalled and Fast"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:116
+msgid ""
+"ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and "
+"restart"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:123
+msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:125
+msgid "WARN-Firewalled with UDP Disabled"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:360
+msgid "Add/remove/edit &amp; control your client and server tunnels"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:360
+msgid "Local Destinations"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:369
+msgid "Server"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:373
+msgid "Show tunnels"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:384
+msgid "Leases expired"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:384
+#: src/net/i2p/router/web/SummaryHelper.java:385
+msgid "Rebuilding"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:388
+msgid "Ready"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:392
+msgid "Building"
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryHelper.java:392
+msgid "Building tunnels"
 msgstr ""
 
 #: src/net/i2p/router/web/TunnelRenderer.java:40
