@@ -363,7 +363,7 @@ msgstr "上面输入的主机名称将在网络数据库(NetDB)中发布。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:516
 msgid "They are <b>not private</b>."
-msgstr "他们并非<b>私有地址</b>。"
+msgstr "他们并<b>非私有地址</b>。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:518
 msgid "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1."
@@ -393,7 +393,7 @@ msgstr "如果存在错误，<a href=\"logs.jsp\">日志</a>可以帮助您诊�
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:534
 #: src/net/i2p/router/web/SummaryHelper.java:103
 msgid "OK"
-msgstr ""
+msgstr "正常"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
 msgid "Your UDP port does not appear to be firewalled."
@@ -402,11 +402,11 @@ msgstr "您的UDP端口似乎一切正常。"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
 #: src/net/i2p/router/web/SummaryHelper.java:114
 msgid "Firewalled"
-msgstr "防火墙阻挡(Firewalled)"
+msgstr "防火墙限制"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:540
 msgid "Your UDP port appears to be firewalled."
-msgstr "您的UDP端口似乎因防火墙而连接受阻。"
+msgstr "您的UDP端口似乎因防火墙而连接受限。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:542
 msgid "As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error."
@@ -435,7 +435,7 @@ msgstr "当然，某些路由器可能无法正确映射同时使用TCP和UDP协
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:554
 #: src/net/i2p/router/web/SummaryHelper.java:127
 msgid "Testing"
-msgstr "测试中(Testing)"
+msgstr "测试中"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:556
 msgid "The router is currently testing whether your UDP port is firewalled."
@@ -445,7 +445,7 @@ msgstr "路由器正在测试您的UDP端口是否被防火墙阻挡。"
 #: src/net/i2p/router/web/NetDbRenderer.java:237
 #: src/net/i2p/router/web/SummaryHelper.java:96
 msgid "Hidden"
-msgstr "隐藏(Hidden)"
+msgstr "隐身"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:560
 msgid "The router is not configured to publish its address, therefore it does not expect incoming connections."
@@ -453,7 +453,7 @@ msgstr "路由器被设置为禁止发布IP地址，因此并不需要入站连�
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:562
 msgid "WARN - Firewalled and Fast"
-msgstr ""
+msgstr "警告 - 快速节点，因防火墙受限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:564
 msgid "You have configured I2P to share more than 128KBps of bandwidth, but you are firewalled."
@@ -465,7 +465,7 @@ msgstr "尽管在此种配置情况下I2P可以正常工作，但如果您的确
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:568
 msgid "WARN - Firewalled and Floodfill"
-msgstr ""
+msgstr "警告 - 种子节点，因防火墙受限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:570
 msgid "You have configured I2P to be a floodfill router, but you are firewalled."
@@ -478,7 +478,7 @@ msgstr "为了种子路由能够更好的参与到I2P网络中，请您的防火
 # 暂不翻译方便反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:574
 msgid "WARN - Firewalled with Inbound TCP Enabled"
-msgstr ""
+msgstr "警告 - 入站TCP开启，但因防火墙受限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:576
 msgid "You have configured inbound TCP, however your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well."
@@ -495,7 +495,7 @@ msgstr "请打开您的防火墙端口或禁用上面的入站TCP连接。"
 # 暂不翻译
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:582
 msgid "WARN - Firewalled with UDP Disabled"
-msgstr ""
+msgstr "警告 - 因防火墙受限，且UDP被禁用"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:584
 msgid "You have configured inbound TCP, however you have disabled UDP."
@@ -512,7 +512,7 @@ msgstr "请打开防火墙端口或启用UDP。"
 # 暂不翻译，方便错误反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:590
 msgid "ERR - Clock Skew"
-msgstr ""
+msgstr "错误 - 系统时滞"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:592
 msgid "Your system's clock is skewed, which will make it difficult to participate in the network."
@@ -525,7 +525,7 @@ msgstr "如果错误持续，请校对您的系统时间。"
 # 暂不翻译，方便错误反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:596
 msgid "ERR - Private TCP Address"
-msgstr ""
+msgstr "错误 - 私有TCP地址"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:598
 msgid "You must never advertise an unroutable IP address such as 127.0.0.1 or 192.168.1.1 as your external address."
@@ -538,7 +538,7 @@ msgstr "正确设置IP地址或禁用上面的入站TCP连接。"
 # 暂不翻译，方便错误反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:602
 msgid "ERR - SymmetricNAT"
-msgstr ""
+msgstr "错误 - SymmetricNAT"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:604
 msgid "I2P detected that you are firewalled by a Symmetric NAT."
@@ -551,7 +551,7 @@ msgstr "I2P无法与此类防火墙很好的并存。您可能无法接收入站
 # 暂不翻译，方便问题反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:608
 msgid "ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
-msgstr ""
+msgstr "错误 - UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口 并重启程序"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:610
 msgid "I2P was unable to bind to port 8887 or other configured port."
@@ -572,7 +572,7 @@ msgstr "然而，发生此错误后一般需要重启程序才能解决。"
 # 暂不翻译，方便错误反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:618
 msgid "ERR - UDP Disabled and Inbound TCP host/port not set"
-msgstr ""
+msgstr "错误 - UDP已禁用，且TCP入站主机与端口未设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:620
 msgid "You have not configured inbound TCP with a hostname and port above, however you have disabled UDP."
@@ -589,7 +589,7 @@ msgstr "请在前面设置TCP主机和端口或启用UDP"
 # 错误提示暂不翻译，以便错误反馈。
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:626
 msgid "ERR - Client Manager I2CP Error - check logs"
-msgstr ""
+msgstr "错误 - 客户程序管理器 I2CP 错误 - 请看日志"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:628
 msgid "This is usually due to a port 7654 conflict. Check the logs to verify."
@@ -1051,7 +1051,7 @@ msgstr "匿名性需要以性能为代价。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:312
 msgid "Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 hops, 3 hops + 0-2 hops), or a high quantity + backup quantity, may severely reduce performance or reliability."
-msgstr "长于3个跳点(hops)的隧道(例如 2hops + 0-2hops，3 hops + 0-1 hops, 3 hops + 0-2 hops)，或高质量+备用质量(higg + backup),可能降低性能和稳定性。"
+msgstr "长于3个跳点的隧道(例如 2跳点 + 0-2跳点，3跳点 + 0-1跳点, 3跳点 + 0-2跳点)，或大量常规+大量备用,可能降低性能和稳定性。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:315
 msgid "High CPU and/or high outbound bandwidth usage may result."
@@ -1704,7 +1704,7 @@ msgstr "性能警告 - 设置中包括长隧道"
 
 #: src/net/i2p/router/web/ConfigTunnelsHelper.java:80
 msgid "PERFORMANCE WARNING - Settings include high tunnel quantities."
-msgstr "性能警告 - 设置中包括高质量隧道"
+msgstr "性能警告 - 设置中包括大量隧道"
 
 #: src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "Inbound"
@@ -1724,11 +1724,11 @@ msgstr "随机"
 
 #: src/net/i2p/router/web/ConfigTunnelsHelper.java:128
 msgid "Quantity"
-msgstr "质量"
+msgstr "数量"
 
 #: src/net/i2p/router/web/ConfigTunnelsHelper.java:145
 msgid "Backup quantity"
-msgstr "备用质量"
+msgstr "备用数量"
 
 #: src/net/i2p/router/web/ConfigTunnelsHelper.java:167
 msgid "Inbound options"
@@ -2276,43 +2276,43 @@ msgstr "时滞"
 
 #: src/net/i2p/router/web/SummaryHelper.java:92
 msgid "ERR-Client Manager I2CP Error - check logs"
-msgstr ""
+msgstr "错误-客户程序管理器I2CP错误 - 请看日志"
 
 #: src/net/i2p/router/web/SummaryHelper.java:94
 msgid "ERR-ClockSkew"
-msgstr ""
+msgstr "错误-系统时滞"
 
 #: src/net/i2p/router/web/SummaryHelper.java:104
 msgid "ERR-Private TCP Address"
-msgstr ""
+msgstr "错误-TCP私有地址"
 
 #: src/net/i2p/router/web/SummaryHelper.java:106
 msgid "ERR-SymmetricNAT"
-msgstr ""
+msgstr "错误-SymmeticNAT"
 
 #: src/net/i2p/router/web/SummaryHelper.java:109
 msgid "WARN-Firewalled with Inbound TCP Enabled"
-msgstr ""
+msgstr "警告-入站TCP开启但因防火墙受限"
 
 #: src/net/i2p/router/web/SummaryHelper.java:111
 msgid "WARN-Firewalled and Floodfill"
-msgstr ""
+msgstr "警告-种子节点因防火墙受限"
 
 #: src/net/i2p/router/web/SummaryHelper.java:113
 msgid "WARN-Firewalled and Fast"
-msgstr ""
+msgstr "警告-快速节点因防火墙受限"
 
 #: src/net/i2p/router/web/SummaryHelper.java:116
 msgid "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
-msgstr ""
+msgstr "错误-UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口并重启程序"
 
 #: src/net/i2p/router/web/SummaryHelper.java:123
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
-msgstr ""
+msgstr "错误-UDP已禁用且TCP入站主机与端口未设置"
 
 #: src/net/i2p/router/web/SummaryHelper.java:125
 msgid "WARN-Firewalled with UDP Disabled"
-msgstr ""
+msgstr "警告-因防火墙受限且UDP被禁用"
 
 #: src/net/i2p/router/web/SummaryHelper.java:360
 msgid "Add/remove/edit &amp; control your client and server tunnels"
