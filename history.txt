@@ -1,3 +1,16 @@
+2009-10-28 zzz
+    * Console:
+      - Rewrite TrustedUpdate version comparator, use for netdb version table
+        so 0.7.10 will be sorted correctly
+      - Reduce netdb.jsp memory usage
+      - More tagging fixups
+      - configclients.jsp fixup for "Web console"
+      - Remove limiter status from peers.jsp
+      - Fix UPnP status header
+    * NetDb:
+      - Generate new RI immediately at startup
+      - Try again to not publish RI until we have been up a few minutes
+
 2009-10-26 zzz
     * Console:
       - Add parameterized tag

@@ -25,7 +25,8 @@ public class PeerHelper extends HelperBase {
     public String getPeerSummary() {
         try {
             _context.commSystem().renderStatusHTML(_out, _urlBase, _sortFlags);
-            _context.bandwidthLimiter().renderStatusHTML(_out);
+            // boring and not worth translating
+            //_context.bandwidthLimiter().renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

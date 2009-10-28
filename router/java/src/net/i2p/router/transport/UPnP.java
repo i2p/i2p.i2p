@@ -454,7 +454,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	/** warning - slow */
 	public String renderStatusHTML() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("<a name=\"upnp\"></a><b>UPnP Status:</b><br>");
+		sb.append("<h3><a name=\"upnp\"></a>UPnP Status</h3>");
 		
 		if(isDisabled) {
 			sb.append("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?");
