@@ -77,7 +77,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
         if (_context.router().isHidden()) return; // DE-nied!
         super.publish(localRouterInfo);
-        sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
+        if (_context.router().getUptime() > PUBLISH_JOB_DELAY)
+            sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
     }
     
     @Override

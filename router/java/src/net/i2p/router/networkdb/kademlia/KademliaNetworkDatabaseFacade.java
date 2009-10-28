@@ -127,7 +127,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
-    private final static long PUBLISH_JOB_DELAY = 5*60*1000l;
+    /** this needs to be long enough to give us time to start up,
+        but less than 20m (when we start accepting tunnels and could be a IBGW) */
+    protected final static long PUBLISH_JOB_DELAY = 5*60*1000l;
 
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -283,15 +285,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // periodically update and resign the router's 'published date', which basically
         // serves as a version
         Job plrij = new PublishLocalRouterInfoJob(_context);
-        plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
+        // do not delay this, as this creates the RI too, and we need a good local routerinfo right away
+        //plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
         _context.jobQueue().addJob(plrij);
-        try {
-            publish(ri);
-        } catch (IllegalArgumentException iae) {
-            _context.router().rebuildRouterInfo(true);
-            //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
-            //_context.router().rebuildNewIdentity();
-        }
+
+        // plrij calls publish() for us
+        //try {
+        //    publish(ri);
+        //} catch (IllegalArgumentException iae) {
+        //    _context.router().rebuildRouterInfo(true);
+        //    //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
+        //    //_context.router().rebuildNewIdentity();
+        //}
     }
     
     protected void createHandlers() {
@@ -520,6 +525,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     /**
+     * Stores to local db only.
+     * Overridden in FNDF to actually send to the floodfills.
      * @throws IllegalArgumentException if the local router info is invalid
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
