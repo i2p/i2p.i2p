@@ -19,7 +19,8 @@ public class ConfigClientsHelper extends HelperBase {
         List clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = (ClientAppConfig) clients.get(cur);
-            renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled, "webConsole".equals(ca.clientName),
+            renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
+                       "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        ca.className + ((ca.args != null) ? " " + ca.args : ""));
         }
         

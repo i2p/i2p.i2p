@@ -31,9 +31,14 @@ public class ConfigClientsHandler extends FormHandler {
     protected void processForm() {
         if (_action.equals(_("Save Client Configuration"))) {
             saveClientChanges();
-        } else if (_action.equals(_("Save WebApp Configuration"))) {
+            return;
+        }
+        if (_action.equals(_("Save WebApp Configuration"))) {
             saveWebAppChanges();
-        } else if (_action.startsWith("Start ")) {
+            return;
+        }
+        // value
+        if (_action.startsWith("Start ")) {
             String app = _action.substring(6);
             int appnum = -1;
             try {
@@ -43,10 +48,14 @@ public class ConfigClientsHandler extends FormHandler {
                 startClient(appnum);
             else
                 startWebApp(app);
-        } else if (_action.toLowerCase().startsWith("Start<span class=hide> ") &&
+            return;
+        }
+        // label (IE)
+        String xStart = _("Start");
+        if (_action.toLowerCase().startsWith(xStart + "<span class=hide> ") &&
                    _action.toLowerCase().endsWith("</span>")) {
             // IE sucks
-            String app = _action.substring(23, _action.length() - 7);
+            String app = _action.substring(xStart.length() + 18, _action.length() - 7);
             int appnum = -1;
             try {
                 appnum = Integer.parseInt(app);
@@ -56,7 +65,7 @@ public class ConfigClientsHandler extends FormHandler {
             else
                 startWebApp(app);
         } else {
-            addFormError(_("Unsupported") + " " + _action + ".");
+            addFormError(_("Unsupported") + ' ' + _action + '.');
         }
     }
     
@@ -67,7 +76,7 @@ public class ConfigClientsHandler extends FormHandler {
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = (ClientAppConfig) clients.get(cur);
             Object val = _settings.get(cur + ".enabled");
-            if (! "webConsole".equals(ca.clientName))
+            if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
                 ca.disabled = val == null;
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);
@@ -82,7 +91,7 @@ public class ConfigClientsHandler extends FormHandler {
         }
         ClientAppConfig ca = (ClientAppConfig) clients.get(i);
         LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), configClient_log);
-        addFormNotice(_("Client") + " " + ca.clientName + " " + _("started") + ".");
+        addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("started") + '.');
     }
 
     private void saveWebAppChanges() {
@@ -117,9 +126,9 @@ public class ConfigClientsHandler extends FormHandler {
                         path = new File(path, app + ".war");
                         s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
                         // no passwords... initialize(wac);
-                        addFormNotice("WebApp <a href=\"/" + app + "/\">" + app + "</a> " + _("started") + ".");
+                        addFormNotice(_("WebApp") + " <a href=\"/" + app + "/\">" + _(app) + "</a> " + _("started") + '.');
                     } catch (Exception ioe) {
-                        addFormError(_("Failed to start") + " " + app + " " + ioe + ".");
+                        addFormError(_("Failed to start") + ' ' + _(app) + " " + ioe + '.');
                     }
                     return;
                 }

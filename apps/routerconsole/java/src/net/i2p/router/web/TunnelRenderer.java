@@ -50,13 +50,14 @@ public class TunnelRenderer {
             TunnelPool outPool = null;
             in = clientInboundPools.get(client);
             outPool = clientOutboundPools.get(client);
+            // TODO the following code is duplicated in SummaryHelper
             String name = (in != null ? in.getSettings().getDestinationNickname() : null);
             if ( (name == null) && (outPool != null) )
                 name = outPool.getSettings().getDestinationNickname();
             if (name == null)
                 name = client.toBase64().substring(0,4);
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
-                      + "\" ></a>" + _("Client tunnels for") + " " + name);
+                      + "\" ></a>" + _("Client tunnels for") + ' ' + _(name));
             if (_context.clientManager().isLocal(client))
                 out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">" + _("config") + "</a>):</h2>\n");
             else
@@ -68,7 +69,7 @@ public class TunnelRenderer {
         Collections.sort(participating, new TunnelComparator());
         out.write("<h2><a name=\"participating\"></a>" + _("Participating tunnels") + ":</h2><table>\n");
         out.write("<tr><th>" + _("Receive on") + "</th><th>" + _("From") + "</th><th>"
-                  + "" + _("Send on") + "</th><th>" + _("To") + "</th><th>" + _("Expiration") + "</th>"
+                  + _("Send on") + "</th><th>" + _("To") + "</th><th>" + _("Expiration") + "</th>"
                   + "<th>" + _("Usage") + "</th><th>" + _("Rate") + "</th><th>" + _("Role") + "</th></tr>\n");
         long processed = 0;
         RateStat rs = _context.statManager().getRate("tunnel.participatingMessageCount");

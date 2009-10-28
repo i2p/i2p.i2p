@@ -132,7 +132,9 @@ public class ConfigTunnelsHandler extends FormHandler {
         }
         
         if (updated > 0)
-            addFormNotice("Updated settings for " + updated + " pools.");
+            // the count isn't really correct anyway, since we don't check for actual changes
+            //addFormNotice("Updated settings for " + updated + " pools.");
+            addFormNotice(_("Updated settings for all pools."));
         
         if (saveRequired) {
             boolean saved = _context.router().saveConfig();

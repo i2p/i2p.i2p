@@ -339,7 +339,7 @@ class ProfileOrganizerRenderer {
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
-    public String _(String s, Object o) {
+    private String _(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 }

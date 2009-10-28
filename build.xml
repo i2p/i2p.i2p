@@ -58,11 +58,11 @@
     <target name="builddepSmall">
         <ant dir="core/java/" target="jar" />
         <ant dir="router/java/" target="jar" />
+        <ant dir="apps/systray/java/" target="jar" />
+        <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="apps/ministreaming/java/" target="jar" />
         <ant dir="apps/streaming/java/" target="jar" />
         <ant dir="apps/i2ptunnel/java/" target="jar" />
-        <ant dir="apps/systray/java/" target="jar" />
-        <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="apps/addressbook/" target="war" />
     </target>
     <target name="buildrouter">

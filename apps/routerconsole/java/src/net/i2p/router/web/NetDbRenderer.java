@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -131,14 +132,9 @@ public class NetDbRenderer {
     }
 
     public void renderStatusHTML(Writer out, boolean full) throws IOException {
-        int size = _context.netDb().getKnownRouters() * 512;
-        if (full)
-            size *= 4;
-        StringBuilder buf = new StringBuilder(size);
         out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View") + " LeaseSets</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
-            buf.append("" + _("Not initialized") + "\n");
-            out.write(buf.toString());
+            out.write(_("Not initialized"));
             out.flush();
             return;
         }
@@ -146,11 +142,12 @@ public class NetDbRenderer {
         Hash us = _context.routerHash();
         out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb.jsp");
         if (full)
-            out.write("#routers\" >" + _("view without") + "");
+            out.write("#routers\" >" + _("view without"));
         else
-            out.write("?f=1#routers\" >" + _("view with") + "");
-        out.write(" " + _("stats") + "</a>)</h3>\n");
+            out.write("?f=1#routers\" >" + _("view with"));
+        out.write(' ' + _("stats") + "</a>)</h3>\n");
         
+        StringBuilder buf = new StringBuilder(8192);
         RouterInfo ourInfo = _context.router().getRouterInfo();
         renderRouterInfo(buf, ourInfo, true, true);
         out.write(buf.toString());
@@ -181,7 +178,7 @@ public class NetDbRenderer {
         buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td>");
         List<String> versionList = new ArrayList(versions.objects());
         if (versionList.size() > 0) {
-            Collections.sort(versionList, Collections.reverseOrder());
+            Collections.sort(versionList, Collections.reverseOrder(new TrustedUpdate.VersionComparator()));
             buf.append("<table>\n");
             buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {

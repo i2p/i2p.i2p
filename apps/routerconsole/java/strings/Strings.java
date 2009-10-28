@@ -25,5 +25,15 @@ class Dummy {
         _("My eepsite web server");
         _("Browser launch at startup");
         _("BOB application bridge");
+
+        // tunnel nicknames, taken from i2ptunnel.config so they will display
+        // nicely under 'local destinations' in the summary bar
+        // note that if the wording changes in i2ptunnel.config, we have to
+        // keep the old string here as well for existing installs
+        _("shared clients");
+        _("IRC proxy");
+        _("eepsite");
+        // hardcoded in i2psnark
+        _("I2PSnark");
     }
 }

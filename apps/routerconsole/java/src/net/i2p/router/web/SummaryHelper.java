@@ -396,18 +396,21 @@ public class SummaryHelper extends HelperBase {
         return buf.toString();
     }
     
+    /** compare translated nicknames - put "shared clients" first in the sort */
     private class AlphaComparator implements Comparator {
         public int compare(Object lhs, Object rhs) {
             String lname = getName((Destination)lhs);
             String rname = getName((Destination)rhs);
-            if (lname.equals("shared clients"))
+            String xsc = _("shared clients");
+            if (lname.equals(xsc))
                 return -1;
-            if (rname.equals("shared clients"))
+            if (rname.equals(xsc))
                 return 1;
             return Collator.getInstance().compare(lname, rname);
         }
     }
 
+    /** translate here so collation works above */
     private String getName(Destination d) {
         TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(d.calculateHash());
         String name = (in != null ? in.getDestinationNickname() : null);
@@ -416,6 +419,10 @@ public class SummaryHelper extends HelperBase {
             name = (out != null ? out.getDestinationNickname() : null);
             if (name == null)
                 name = d.calculateHash().toBase64().substring(0,6);
+            else
+                name = _(name);
+        } else {
+            name = _(name);
         }
         return name;
     }

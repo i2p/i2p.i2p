@@ -98,11 +98,11 @@ public class ConfigRestartBean {
         return Long.MAX_VALUE/2;  // summaryframe.jsp adds a safety factor so we don't want to overflow...
     }
 
-    public static String _(String s, RouterContext ctx) {
+    private static String _(String s, RouterContext ctx) {
         return Messages.getString(s, ctx);
     }
 
-    public static String _(String s, Object o, RouterContext ctx) {
+    private static String _(String s, Object o, RouterContext ctx) {
         return Messages.getString(s, o, ctx);
     }
 }
