@@ -849,7 +849,7 @@ msgstr "关闭路由器"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:286
 msgid "Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes."
-msgstr "平滑关闭(Graceful Shutdown)让路由器在关闭前完成已达成的任务，但这可能需要花费几分钟的时间。"
+msgstr "平滑关闭让路由器在关闭前完成已达成的任务，但这可能需要花费几分钟的时间。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:288
 msgid "If you need to kill the router immediately, that option is available as well."
@@ -1561,7 +1561,7 @@ msgstr "重启"
 
 #: src/net/i2p/router/web/ConfigRestartBean.java:45
 msgid "Shutdown"
-msgstr "关闭"
+msgstr "关　闭"
 
 #: src/net/i2p/router/web/ConfigRestartBean.java:56
 msgid "Shutdown imminent"
@@ -2216,7 +2216,7 @@ msgstr "检查NAT/防火墙"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:292
 msgid "Reseed"
-msgstr "搜索节点启动网络"
+msgstr "补种(搜索节点启动网络)"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:309
 msgid "Configure router bandwidth allocation"
