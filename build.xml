@@ -8,6 +8,7 @@
     -->
 
     <!-- You probably don't want to change anything from here down -->
+    <target name="help" depends="all" />
     <target name="all" >
         <echo message="Useful targets: " />
         <echo message="  pkg:       distclean then package everything up (installer, clean tarball, update tarball)" />

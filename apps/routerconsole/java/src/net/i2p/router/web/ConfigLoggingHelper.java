@@ -48,30 +48,21 @@ public class ConfigLoggingHelper extends HelperBase {
         buf.append("<i>Valid levels are DEBUG, INFO, WARN, ERROR, CRIT</i>\n");
         return buf.toString();
     }
+
+    private static String[] levels = { _x("CRIT"), _x("ERROR"), _x("WARN"), _x("INFO"), _x("DEBUG") };
+
     public String getDefaultLogLevelBox() {
         String cur = _context.logManager().getDefaultLimit();
         StringBuilder buf = new StringBuilder(128);
         buf.append("<select name=\"defaultloglevel\">\n");
         
-        buf.append("<option value=\"DEBUG\" ");
-        if ("DEBUG".equals(cur)) buf.append(" selected=\"true\" ");
-        buf.append(">DEBUG</option>\n");
-        
-        buf.append("<option value=\"INFO\" ");
-        if ("INFO".equals(cur)) buf.append(" selected=\"true\" ");
-        buf.append(">INFO</option>\n");
-        
-        buf.append("<option value=\"WARN\" ");
-        if ("WARN".equals(cur)) buf.append(" selected=\"true\" ");
-        buf.append(">WARN</option>\n");
-        
-        buf.append("<option value=\"ERROR\" ");
-        if ("ERROR".equals(cur)) buf.append(" selected=\"true\" ");
-        buf.append(">ERROR</option>\n");
-        
-        buf.append("<option value=\"CRIT\" ");
-        if ("CRIT".equals(cur)) buf.append(" selected=\"true\" ");
-        buf.append(">CRIT</option>\n");
+        for (int i = 0; i < levels.length; i++) {
+            String l = levels[i];
+            buf.append("<option value=\"").append(l).append("\" ");
+            if (l.equals(cur))
+                buf.append(" selected=\"true\" ");
+            buf.append('>').append(_(l)).append("</option>\n");
+        }        
         
         buf.append("</select>\n");
         return buf.toString();

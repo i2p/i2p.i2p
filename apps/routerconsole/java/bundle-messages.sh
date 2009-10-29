@@ -16,7 +16,9 @@ do
 
 	# make list of java files newer than the .po file
 	find src ../jsp/WEB-INF strings -name *.java -newer $i > $TMPFILE
-	if [ -s build/obj/net/i2p/router/web/messages_$LG.class -a ! -s $TMPFILE ]
+	if [ -s build/obj/net/i2p/router/web/messages_$LG.class -a \
+	     build/obj/net/i2p/router/web/messages_$LG.class -nt $i -a \
+	     ! -s $TMPFILE ]
 	then
 		continue
 	fi

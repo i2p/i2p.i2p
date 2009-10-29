@@ -71,7 +71,7 @@ public class NetDbRenderer {
                 }
             }
             if (notFound)
-                buf.append(_("Router") + " ").append(routerPrefix).append(" " + _("not found in network database") );
+                buf.append(_("Router") + ' ').append(routerPrefix).append(' ' + _("not found in network database") );
         }
         out.write(buf.toString());
         out.flush();
@@ -93,19 +93,19 @@ public class NetDbRenderer {
             LeaseSet ls = (LeaseSet)iter.next();
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
-            buf.append("<b>LeaseSet: ").append(key.toBase64());
+            buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64());
             if (_context.clientManager().isLocal(dest)) {
                 buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))
-                    buf.append(_("Unpublished") + " ");
-                buf.append(_("Destination") + " ");
+                    buf.append(_("Unpublished") + ' ');
+                buf.append(_("Destination") + ' ');
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
             } else {
-                buf.append(" (" + _("Destination") + " ");
+                buf.append(" (" + _("Destination") + ' ');
                 String host = _context.namingService().reverseLookup(dest);
                 if (host != null)
                     buf.append(host);
@@ -115,13 +115,13 @@ public class NetDbRenderer {
             buf.append(")</b><br>\n");
             long exp = ls.getEarliestLeaseDate()-now;
             if (exp > 0)
-                buf.append("Expires in ").append(DataHelper.formatDuration(exp)).append("<br>\n");
+                buf.append(_("Expires in {0}", DataHelper.formatDuration(exp))).append("<br>\n");
             else
-                buf.append("Expired ").append(DataHelper.formatDuration(0-exp)).append(" ago<br>\n");
+                buf.append(_("Expired {0} ago", DataHelper.formatDuration(0-exp))).append("<br>\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
-                buf.append("Lease ").append(i + 1).append(": " + _("Gateway") + " ");
+                buf.append(_("Lease")).append(' ').append(i + 1).append(": " + _("Gateway") + ' ');
                 buf.append(_context.commSystem().renderPeerHTML(ls.getLease(i).getGateway()));
-                buf.append(" " + _("Tunnel") + " ").append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
+                buf.append(' ' + _("Tunnel") + ' ').append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
             }
             buf.append("<hr>\n");
             out.write(buf.toString());
@@ -225,7 +225,7 @@ public class NetDbRenderer {
             if (full) {
                 buf.append("[<a href=\"netdb.jsp\" >Back</a>]</th></tr><td>\n");
             } else {
-                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>]</th></tr><td>\n");
+                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><td>\n");
             }
         }
         
@@ -268,5 +268,21 @@ public class NetDbRenderer {
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /**
+     *  translate a string with a parameter
+     *  This is a lot more expensive than _(s), so use sparingly.
+     *
+     *  @param s string to be translated containing {0}
+     *    The {0} will be replaced by the parameter.
+     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *  @param o parameter, not translated.
+     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    Do not double the single quotes in the parameter.
+     *    Use autoboxing to call with ints, longs, floats, etc.
+     */
+    private String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 }

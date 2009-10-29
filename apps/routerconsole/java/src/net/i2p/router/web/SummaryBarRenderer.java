@@ -37,7 +37,7 @@ public class SummaryBarRenderer {
             buf.append(linkhelper.getContent());
         } else {
             buf.append("<h3><a href=\"/configclients.jsp\" target=\"_top\" title=\"")
-               .append("Configure startup of clients and webapps (services); manually start dormant services")
+               .append(_("Configure startup of clients and webapps (services); manually start dormant services"))
                .append("\">")
                .append(_("I2P Services"))
                .append("</a></h3>\n" +
