@@ -110,7 +110,7 @@ class ProfileOrganizerRenderer {
             switch (tier) {
                 case 1: buf.append(_("Fast, High Capacity")); break;
                 case 2: buf.append(_("High Capacity")); break;
-                case 3: buf.append(_("Not Failing")); break;
+                case 3: buf.append(_("Standard")); break;
                 default: buf.append(_("Failing")); break;
             }
             if (isIntegrated) buf.append(", ").append(_("Integrated"));

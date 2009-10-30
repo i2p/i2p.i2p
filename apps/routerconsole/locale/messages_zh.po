@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-29 06:03+0000\n"
+"POT-Creation-Date: 2009-10-30 14:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -139,6 +139,7 @@ msgstr "共享的带宽越多，您的匿名性越强同时能帮助网络成长
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:347
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:478
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:333
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:373
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:341
 #: src/net/i2p/router/web/ConfigNetHandler.java:47
 #: src/net/i2p/router/web/ConfigNetHandler.java:249
@@ -151,6 +152,7 @@ msgstr "保存修改"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:324
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:335
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:375
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:343
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:323
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:356
@@ -1029,7 +1031,7 @@ msgstr "日志"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:330
 msgid "Graph"
-msgstr "统计图"
+msgstr "图表"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:369
 msgid "Advanced filter"
@@ -1194,7 +1196,7 @@ msgstr "未找到"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:106
 msgid "graphs"
-msgstr "统计图"
+msgstr "图表"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:228
 msgid "I2P Performance Graphs"
@@ -1659,6 +1661,14 @@ msgstr "服务已卸载"
 msgid "Warning: unable to remove the service"
 msgstr "警告：无法卸载服务"
 
+#: src/net/i2p/router/web/ConfigStatsHandler.java:118
+msgid "Stat filter and location updated successfully to"
+msgstr "统计数据过滤器及位置成功更新至"
+
+#: src/net/i2p/router/web/ConfigStatsHandler.java:120
+msgid "Failed to update the stat filter and location"
+msgstr "统计数据过滤器及地址更新失败"
+
 #: src/net/i2p/router/web/ConfigTunnelsHandler.java:137
 msgid "Updated settings for all pools."
 msgstr "隧道池更新完毕"
@@ -2033,12 +2043,12 @@ msgstr "节点信息"
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:64
 #, java-format
 msgid "Showing {0} recent profiles."
-msgstr "显示最近{0}的节点信息"
+msgstr "显示最近 {0} 个节点信息"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:65
 #, java-format
 msgid "Hiding {0} older profiles."
-msgstr "隐藏 {0} 前的信息。"
+msgstr "隐藏 {0} 个较旧的信息。"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:70
 msgid "Groups (Caps)"
@@ -2062,13 +2072,13 @@ msgid "High Capacity"
 msgstr "高容"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:113
-msgid "Not Failing"
-msgstr ""
+msgid "Standard"
+msgstr "标准"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:114
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:148
 msgid "Failing"
-msgstr ""
+msgstr "失败"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:116
 #: src/net/i2p/router/web/SummaryBarRenderer.java:249
@@ -2093,7 +2103,7 @@ msgstr "种子节点与整合节点"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:230
 msgid "Thresholds:"
-msgstr ""
+msgstr "临界值:"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:234
 msgid "Definitions"
@@ -2247,7 +2257,7 @@ msgstr "路由性能统计图"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:118
 msgid "Graphs"
-msgstr "统计图"
+msgstr "图表"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:122
 msgid "Textual router performance statistics"
@@ -2640,6 +2650,8 @@ msgstr "匿名主页(eepiste)"
 msgid "I2PSnark"
 msgstr "I2P Snark(匿名BT客户端)"
 
+#~ msgid "Not Failing"
+#~ msgstr "标准"
 #~ msgid ""
 #~ "If you want the router to restart itself after shutting down, you can "
 #~ "choose one of the following.  This is useful in some situations - for "
