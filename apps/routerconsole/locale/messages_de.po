@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-29 06:03+0000\n"
+"POT-Creation-Date: 2009-10-30 14:00+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -145,6 +145,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:347
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:478
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:333
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:373
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:341
 #: src/net/i2p/router/web/ConfigNetHandler.java:47
 #: src/net/i2p/router/web/ConfigNetHandler.java:249
@@ -157,6 +158,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:324
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:335
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:375
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:343
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:323
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:356
@@ -1787,6 +1789,14 @@ msgstr ""
 msgid "Warning: unable to remove the service"
 msgstr ""
 
+#: src/net/i2p/router/web/ConfigStatsHandler.java:118
+msgid "Stat filter and location updated successfully to"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigStatsHandler.java:120
+msgid "Failed to update the stat filter and location"
+msgstr ""
+
 #: src/net/i2p/router/web/ConfigTunnelsHandler.java:137
 msgid "Updated settings for all pools."
 msgstr ""
@@ -2192,7 +2202,7 @@ msgid "High Capacity"
 msgstr ""
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:113
-msgid "Not Failing"
+msgid "Standard"
 msgstr ""
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:114
