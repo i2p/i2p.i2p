@@ -12,6 +12,6 @@
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="profilesHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="profilesHelper" property="profileSummary" />
- <a name="shitlist"> </a>
+ <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
 <hr></div></div></body></html>

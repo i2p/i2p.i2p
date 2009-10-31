@@ -1,3 +1,11 @@
+2009-10-31 zzz
+    * Console:
+      - More tagging
+      - Show user-installed themes on configui.jsp
+      - Fix reseed button spacing
+    * GraphHelper cleanup
+    * Susidns: add link to subscription faq
+
 2009-10-29 zzz
     * Console tag fixes, bundle script fix
     * Add help target to build.xml

@@ -253,7 +253,8 @@ public class Shitlist {
 
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h2>Banned Peers</h2>");
+        // move to the jsp
+        //buf.append("<h2>Banned Peers</h2>");
         Map<Hash, Entry> entries = new TreeMap(new HashComparator());
         
         entries.putAll(_entries);

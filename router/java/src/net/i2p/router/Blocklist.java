@@ -757,7 +757,8 @@ public class Blocklist {
 
     /** write directly to the stream so we don't OOM on a huge list */
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h2>Banned IPs</h2>");
+        // move to the jsp
+        //out.write("<h2>Banned IPs</h2>");
         Set singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
         if (singles.size() > 0) {

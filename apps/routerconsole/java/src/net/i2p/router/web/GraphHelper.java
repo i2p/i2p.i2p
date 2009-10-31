@@ -119,18 +119,9 @@ public class GraphHelper extends HelperBase {
         }
         return ""; 
     }
-    public String getPeerSummary() {
-        try {
-            _context.commSystem().renderStatusHTML(_out);
-            _context.bandwidthLimiter().renderStatusHTML(_out);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        return "";
-    }
-}
 
-class AlphaComparator implements Comparator {
+/** inner class, don't bother reindenting */
+private static class AlphaComparator implements Comparator {
     public int compare(Object lhs, Object rhs) {
         SummaryListener l = (SummaryListener)lhs;
         SummaryListener r = (SummaryListener)rhs;
@@ -138,4 +129,6 @@ class AlphaComparator implements Comparator {
         String rName = r.getRate().getRateStat().getName() + "." + r.getRate().getPeriod();
         return lName.compareTo(rName);
     }
+}
+
 }

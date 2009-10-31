@@ -8,7 +8,7 @@ package dummy;
  */
 class Dummy {
     void dummy {
-        // wars
+        // wars for ConfigClientsHelper
         _("addressbook");
         _("i2psnark");
         _("i2ptunnel");
@@ -16,7 +16,7 @@ class Dummy {
         _("susidns");
         _("routerconsole");
 
-        // clients, taken from clients.config
+        // clients, taken from clients.config, for ConfigClientsHelper
         // note that if the wording changes in clients.config, we have to
         // keep the old string here as well for existing installs
         _("Web console");
@@ -35,5 +35,10 @@ class Dummy {
         _("eepsite");
         // hardcoded in i2psnark
         _("I2PSnark");
+
+        // standard themes for ConfigUIHelper
+        _("classic");
+        _("dark");
+        _("light");
     }
 }
