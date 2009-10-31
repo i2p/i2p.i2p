@@ -272,7 +272,7 @@ public class ConfigNetHandler extends FormHandler {
 
             // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
             // But it would be hard to get right, so just do a restart.
-            addFormError("Gracefully restarting I2P to change published router address");
+            addFormError(_("Gracefully restarting I2P to change published router address"));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
         }
     }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-30 14:00+0000\n"
+"POT-Creation-Date: 2009-10-31 17:00+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -1523,6 +1523,26 @@ msgstr ""
 msgid "Invalid destination"
 msgstr ""
 
+#: src/net/i2p/router/web/ConfigLoggingHelper.java:52
+msgid "CRIT"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigLoggingHelper.java:52
+msgid "DEBUG"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigLoggingHelper.java:52
+msgid "ERROR"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigLoggingHelper.java:52
+msgid "INFO"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigLoggingHelper.java:52
+msgid "WARN"
+msgstr ""
+
 #: src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "Network"
 msgstr ""
@@ -1631,6 +1651,10 @@ msgstr ""
 msgid "Requiring SSU introduers"
 msgstr ""
 
+#: src/net/i2p/router/web/ConfigNetHandler.java:275
+msgid "Gracefully restarting I2P to change published router address"
+msgstr ""
+
 #: src/net/i2p/router/web/ConfigNetHandler.java:293
 msgid "Updating bandwidth share percentage"
 msgstr ""
@@ -1645,6 +1669,10 @@ msgstr ""
 #: src/net/i2p/router/web/ConfigNetHelper.java:57
 #: src/net/i2p/router/web/ConfigNetHelper.java:60
 msgid "unknown"
+msgstr ""
+
+#: src/net/i2p/router/web/ConfigNetHelper.java:165
+msgid "bits per second"
 msgstr ""
 
 #: src/net/i2p/router/web/ConfigPeerHandler.java:24
@@ -2073,6 +2101,10 @@ msgstr ""
 msgid "View"
 msgstr ""
 
+#: src/net/i2p/router/web/NetDbRenderer.java:96
+msgid "LeaseSet"
+msgstr ""
+
 #: src/net/i2p/router/web/NetDbRenderer.java:98
 msgid "Local"
 msgstr ""
@@ -2086,9 +2118,23 @@ msgstr ""
 msgid "Destination"
 msgstr ""
 
+#: src/net/i2p/router/web/NetDbRenderer.java:118
+#, java-format
+msgid "Expires in {0}"
+msgstr ""
+
+#: src/net/i2p/router/web/NetDbRenderer.java:120
+#, java-format
+msgid "Expired {0} ago"
+msgstr ""
+
 #: src/net/i2p/router/web/NetDbRenderer.java:122
 #: src/net/i2p/router/web/TunnelRenderer.java:156
 msgid "Gateway"
+msgstr ""
+
+#: src/net/i2p/router/web/NetDbRenderer.java:122
+msgid "Lease"
 msgstr ""
 
 #: src/net/i2p/router/web/NetDbRenderer.java:124
@@ -2135,6 +2181,10 @@ msgstr ""
 
 #: src/net/i2p/router/web/NetDbRenderer.java:224
 msgid "Peer info for"
+msgstr ""
+
+#: src/net/i2p/router/web/NetDbRenderer.java:228
+msgid "Full entry"
 msgstr ""
 
 #: src/net/i2p/router/web/NetDbRenderer.java:234
@@ -2297,6 +2347,12 @@ msgstr ""
 msgid ""
 "The data gathered is quantized over a 1 minute period, so should just be "
 "used as an estimate."
+msgstr ""
+
+#: src/net/i2p/router/web/SummaryBarRenderer.java:40
+msgid ""
+"Configure startup of clients and webapps (services); manually start dormant "
+"services"
 msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:42
