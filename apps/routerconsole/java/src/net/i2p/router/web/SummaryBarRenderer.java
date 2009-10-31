@@ -143,7 +143,7 @@ public class SummaryBarRenderer {
            .append(_("never reveal it to anyone"))
            .append("\" href=\"netdb.jsp?r=.\" target=\"_top\">")
            .append(_("Local Identity"))
-           .append("<a></h4><hr>\n" +
+           .append("</a></h4><hr>\n" +
 
                    "<table><tr><td align=\"left\">" +
                    "<b>")
