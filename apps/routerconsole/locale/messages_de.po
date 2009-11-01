@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-31 17:00+0000\n"
+"POT-Creation-Date: 2009-11-01 02:59+0000\n"
 "PO-Revision-Date: 2009-10-19 12:50+0000\n"
 "Last-Translator: foo <foo@bar>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -926,6 +926,15 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:342
 msgid "Adjust peer bonuses"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:344
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:249
+msgid "Banned Peers"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:366
+msgid "Banned IPs"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:106
@@ -1922,39 +1931,27 @@ msgstr ""
 msgid "Refresh the page to view."
 msgstr ""
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:6
-msgid "classic"
-msgstr ""
-
-#: src/net/i2p/router/web/ConfigUIHelper.java:6
-msgid "dark"
-msgstr ""
-
-#: src/net/i2p/router/web/ConfigUIHelper.java:6
-msgid "light"
-msgstr ""
-
-#: src/net/i2p/router/web/ConfigUIHelper.java:21
+#: src/net/i2p/router/web/ConfigUIHelper.java:40
 msgid "English"
 msgstr ""
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:21
+#: src/net/i2p/router/web/ConfigUIHelper.java:40
 msgid "French"
 msgstr ""
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:21
+#: src/net/i2p/router/web/ConfigUIHelper.java:40
 msgid "German"
 msgstr ""
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:22
+#: src/net/i2p/router/web/ConfigUIHelper.java:41
 msgid "Chinese"
 msgstr ""
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:22
+#: src/net/i2p/router/web/ConfigUIHelper.java:41
 msgid "Dutch"
 msgstr ""
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:22
+#: src/net/i2p/router/web/ConfigUIHelper.java:41
 msgid "Swedish"
 msgstr ""
 
@@ -2840,4 +2837,16 @@ msgstr ""
 
 #: strings/Strings.java:37
 msgid "I2PSnark"
+msgstr ""
+
+#: strings/Strings.java:40
+msgid "classic"
+msgstr ""
+
+#: strings/Strings.java:41
+msgid "dark"
+msgstr ""
+
+#: strings/Strings.java:42
+msgid "light"
 msgstr ""
