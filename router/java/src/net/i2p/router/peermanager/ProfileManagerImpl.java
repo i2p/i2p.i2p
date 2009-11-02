@@ -39,7 +39,7 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastSendSuccessful(_context.clock().now());
-        data.getSendSuccessSize().addData(bytesSent, msToSend);
+        //data.getSendSuccessSize().addData(bytesSent, msToSend);
     }
     
     /**
@@ -169,11 +169,14 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that the peer was able to return the valid data for a db lookup
      *
+     * This will force creation of DB stats
      */
     public void dbLookupSuccessful(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
+        if (!data.getIsExpandedDB())
+            data.expandDBProfile();
         data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
         DBHistory hist = data.getDBHistory();
         hist.lookupSuccessful();
@@ -183,10 +186,13 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that the peer was unable to reply to a db lookup - either with data or with
      * a lookupReply redirecting the user elsewhere
      *
+     * This will force creation of DB stats
      */
     public void dbLookupFailed(Hash peer) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
+        if (!data.getIsExpandedDB())
+            data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
         hist.lookupFailed();
     }
@@ -203,6 +209,8 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
+        if (!data.getIsExpandedDB())
+            return;
         data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
         data.getDbIntroduction().addData(newPeers, responseTimeMs);
         DBHistory hist = data.getDBHistory();
@@ -217,6 +225,8 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
+        if (!data.getIsExpandedDB())
+            return;
         DBHistory hist = data.getDBHistory();
         hist.lookupReceived();
     }
@@ -229,6 +239,8 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
+        if (!data.getIsExpandedDB())
+            return;
         DBHistory hist = data.getDBHistory();
         hist.unpromptedStoreReceived(wasNewKey);
     }
@@ -242,8 +254,10 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         long now = _context.clock().now();
-        data.setLastSendSuccessful(now);
         data.setLastHeardFrom(now);
+        if (!data.getIsExpandedDB())
+            return;
+        data.setLastSendSuccessful(now);
         // we could do things like update some sort of "how many successful stores we've sent them"...
         // naah.. dont really care now
     }
@@ -279,7 +293,7 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
-        data.getReceiveSize().addData(bytesRead, msToReceive);
+        //data.getReceiveSize().addData(bytesRead, msToReceive);
     }
     
     private PeerProfile getProfile(Hash peer) {

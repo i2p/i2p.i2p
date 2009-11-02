@@ -891,12 +891,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public int getPeerTimeout(Hash peer) {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         double responseTime = MAX_PER_PEER_TIMEOUT;
-        if (prof != null)
+        if (prof != null && prof.getIsExpandedDB()) {
             responseTime = prof.getDbResponseTime().getLifetimeAverageValue();
-        if (responseTime < MIN_PER_PEER_TIMEOUT)
-            responseTime = MIN_PER_PEER_TIMEOUT;
-        else if (responseTime > MAX_PER_PEER_TIMEOUT)
-            responseTime = MAX_PER_PEER_TIMEOUT;
+            if (responseTime < MIN_PER_PEER_TIMEOUT)
+                responseTime = MIN_PER_PEER_TIMEOUT;
+            else if (responseTime > MAX_PER_PEER_TIMEOUT)
+                responseTime = MAX_PER_PEER_TIMEOUT;
+        }
         return 4 * (int)responseTime;  // give it up to 4x the average response time
     }
 

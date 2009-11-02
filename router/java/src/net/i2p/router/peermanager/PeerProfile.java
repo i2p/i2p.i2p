@@ -36,8 +36,8 @@ public class PeerProfile {
     private long _lastHeardFrom;
     private double _tunnelTestResponseTimeAvg;
     // periodic rates
-    private RateStat _sendSuccessSize = null;
-    private RateStat _receiveSize = null;
+    //private RateStat _sendSuccessSize = null;
+    //private RateStat _receiveSize = null;
     private RateStat _dbResponseTime = null;
     private RateStat _tunnelCreateResponseTime = null;
     private RateStat _tunnelTestResponseTime = null;
@@ -56,6 +56,7 @@ public class PeerProfile {
     private DBHistory _dbHistory;
     // does this peer profile contain expanded data, or just the basics?
     private boolean _expanded;
+    private boolean _expandedDB;
     private int _consecutiveShitlists;
     
     public PeerProfile(RouterContext context, Hash peer) {
@@ -72,6 +73,8 @@ public class PeerProfile {
         _consecutiveShitlists = 0;
         _tunnelTestResponseTimeAvg = 0.0d;
         _peer = peer;
+        // this is always true, and there are several places in the router that will NPE
+        // if it is false, so all need to be fixed before we can have non-expanded profiles
         if (expand)
             expandProfile();
     }
@@ -87,6 +90,7 @@ public class PeerProfile {
      *
      */
     public boolean getIsExpanded() { return _expanded; }
+    public boolean getIsExpandedDB() { return _expandedDB; }
     
     public int incrementShitlists() { return _consecutiveShitlists++; }
     public void unshitlist() { _consecutiveShitlists = 0; }
@@ -107,18 +111,25 @@ public class PeerProfile {
      *
      * Note: this appears to be the only use for these two RateStats.
      *
+     * Update: Rewritten so we can get rid of the two RateStats.
+     *         This also helps by not having it depend on coalesce boundaries.
+     *
      * @param period must be one of the periods in the RateStat constructors below
      *        (5*60*1000 or 60*60*1000)
      */
     public boolean getIsActive(long period) {
-        if ( (getSendSuccessSize().getRate(period).getCurrentEventCount() > 0) ||
-             (getSendSuccessSize().getRate(period).getLastEventCount() > 0) ||
-             (getReceiveSize().getRate(period).getCurrentEventCount() > 0) ||
-             (getReceiveSize().getRate(period).getLastEventCount() > 0) ||
-             _context.commSystem().isEstablished(_peer) )
-            return true;
-        else
-            return false;
+        //if ( (getSendSuccessSize().getRate(period).getCurrentEventCount() > 0) ||
+        //     (getSendSuccessSize().getRate(period).getLastEventCount() > 0) ||
+        //     (getReceiveSize().getRate(period).getCurrentEventCount() > 0) ||
+        //     (getReceiveSize().getRate(period).getLastEventCount() > 0) ||
+        //     _context.commSystem().isEstablished(_peer) )
+        //    return true;
+        //else
+        //    return false;
+        long before = _context.clock().now() - period;
+        return getLastHeardFrom() < before ||
+               getLastSendSuccessful() < before ||
+             _context.commSystem().isEstablished(_peer);
     }
     
     
@@ -142,25 +153,31 @@ public class PeerProfile {
     public long getLastHeardFrom() { return _lastHeardFrom; }
     public void setLastHeardFrom(long when) { _lastHeardFrom = when; }
     
-    /** history of tunnel activity with the peer */
+    /** history of tunnel activity with the peer
+        Warning - may return null if !getIsExpanded() */
     public TunnelHistory getTunnelHistory() { return _tunnelHistory; }
     public void setTunnelHistory(TunnelHistory history) { _tunnelHistory = history; }
     
-    /** history of db activity with the peer */
+    /** history of db activity with the peer
+        Warning - may return null if !getIsExpandedDB() */
     public DBHistory getDBHistory() { return _dbHistory; }
     public void setDBHistory(DBHistory hist) { _dbHistory = hist; }
     
     /** how large successfully sent messages are, calculated over a 1 minute, 1 hour, and 1 day period */
-    public RateStat getSendSuccessSize() { return _sendSuccessSize; }
+    //public RateStat getSendSuccessSize() { return _sendSuccessSize; }
     /** how large received messages are, calculated over a 1 minute, 1 hour, and 1 day period */
-    public RateStat getReceiveSize() { return _receiveSize; }
-    /** how long it takes to get a db response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period */
+    //public RateStat getReceiveSize() { return _receiveSize; }
+    /** how long it takes to get a db response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period
+        Warning - may return null if !getIsExpandedDB() */
     public RateStat getDbResponseTime() { return _dbResponseTime; }
-    /** how long it takes to get a tunnel create response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period */
+    /** how long it takes to get a tunnel create response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period
+        Warning - may return null if !getIsExpanded() */
     public RateStat getTunnelCreateResponseTime() { return _tunnelCreateResponseTime; }
-    /** how long it takes to successfully test a tunnel this peer participates in (in milliseconds), calculated over a 10 minute, 1 hour, and 1 day period */
+    /** how long it takes to successfully test a tunnel this peer participates in (in milliseconds), calculated over a 10 minute, 1 hour, and 1 day period
+        Warning - may return null if !getIsExpanded() */
     public RateStat getTunnelTestResponseTime() { return _tunnelTestResponseTime; }
-    /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period */
+    /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period
+        Warning - may return null if !getIsExpandedDB() */
     public RateStat getDbIntroduction() { return _dbIntroduction; }
     
     /**
@@ -327,10 +344,12 @@ public class PeerProfile {
      * extensive stats on them, call this to discard excess data points.  Specifically,
      * this drops the rates, the tunnelHistory, and the dbHistory.
      *
+     * UNUSED for now, will cause NPEs elsewhere
      */
+/*****
     public void shrinkProfile() {
-        _sendSuccessSize = null;
-        _receiveSize = null;
+        //_sendSuccessSize = null;
+        //_receiveSize = null;
         _dbResponseTime = null;
         _tunnelCreateResponseTime = null;
         _tunnelTestResponseTime = null;
@@ -339,7 +358,9 @@ public class PeerProfile {
         _dbHistory = null;
         
         _expanded = false;
+        _expandedDB = false;
     }
+******/
     
     /**
      * When the given peer is performing well enough that we want to keep detailed
@@ -350,32 +371,43 @@ public class PeerProfile {
      */
     public void expandProfile() {
         String group = (null == _peer ? "profileUnknown" : _peer.toBase64().substring(0,6));
-        if (_sendSuccessSize == null)
-            _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", group, new long[] { 5*60*1000l, 60*60*1000l });
-        if (_receiveSize == null)
-            _receiveSize = new RateStat("receiveSize", "How large received messages are", group, new long[] { 5*60*1000l, 60*60*1000l } );
-        if (_dbResponseTime == null)
-            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        //if (_sendSuccessSize == null)
+        //    _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", group, new long[] { 5*60*1000l, 60*60*1000l });
+        //if (_receiveSize == null)
+        //    _receiveSize = new RateStat("receiveSize", "How large received messages are", group, new long[] { 5*60*1000l, 60*60*1000l } );
         if (_tunnelCreateResponseTime == null)
             _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelTestResponseTime == null)
             _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 } );
-        if (_dbIntroduction == null)
-            _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", group, new long[] { 60*60*1000l, 6*60*60*1000l, 24*60*60*1000l });
 
         if (_tunnelHistory == null)
             _tunnelHistory = new TunnelHistory(_context, group);
+
+        //_sendSuccessSize.setStatLog(_context.statManager().getStatLog());
+        //_receiveSize.setStatLog(_context.statManager().getStatLog());
+        _tunnelCreateResponseTime.setStatLog(_context.statManager().getStatLog());
+        _tunnelTestResponseTime.setStatLog(_context.statManager().getStatLog());
+        _expanded = true;
+    }
+
+    /**
+     * For floodfills
+     */
+    public synchronized void expandDBProfile() {
+        String group = (null == _peer ? "profileUnknown" : _peer.toBase64().substring(0,6));
+        if (_dbResponseTime == null)
+            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_dbIntroduction == null)
+            _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", group, new long[] { 60*60*1000l, 6*60*60*1000l, 24*60*60*1000l });
+
         if (_dbHistory == null)
             _dbHistory = new DBHistory(_context, group);
 
-        _sendSuccessSize.setStatLog(_context.statManager().getStatLog());
-        _receiveSize.setStatLog(_context.statManager().getStatLog());
         _dbResponseTime.setStatLog(_context.statManager().getStatLog());
-        _tunnelCreateResponseTime.setStatLog(_context.statManager().getStatLog());
-        _tunnelTestResponseTime.setStatLog(_context.statManager().getStatLog());
         _dbIntroduction.setStatLog(_context.statManager().getStatLog());
-        _expanded = true;
+        _expandedDB = true;
     }
+
     /** once a day, on average, cut the measured throughtput values in half */
     /** let's try once an hour times 3/4 */
     private static final int DROP_PERIOD_MINUTES = 60;
@@ -419,14 +451,16 @@ public class PeerProfile {
     /** update the stats and rates (this should be called once a minute) */
     public void coalesceStats() {
         if (!_expanded) return;
-        _dbIntroduction.coalesceStats();
-        _dbResponseTime.coalesceStats();
-        _receiveSize.coalesceStats();
-        _sendSuccessSize.coalesceStats();
+        //_receiveSize.coalesceStats();
+        //_sendSuccessSize.coalesceStats();
         _tunnelCreateResponseTime.coalesceStats();
         _tunnelTestResponseTime.coalesceStats();
-        _dbHistory.coalesceStats();
         _tunnelHistory.coalesceStats();
+        if (_expandedDB) {
+            _dbIntroduction.coalesceStats();
+            _dbResponseTime.coalesceStats();
+            _dbHistory.coalesceStats();
+        }
         
         coalesceThroughput();
         

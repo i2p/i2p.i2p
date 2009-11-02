@@ -105,6 +105,9 @@ class ProfileOrganizerRenderer {
             
             buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
+            // debug
+            //if(prof.getIsExpandedDB())
+            //   buf.append(" ** ");
             buf.append("</td><td align=\"center\">");
             
             switch (tier) {
@@ -156,7 +159,8 @@ class ProfileOrganizerRenderer {
                     buf.append(' ').append(fails).append('/').append(total).append(" ").append(_("Test Fails"));
             }
             buf.append("&nbsp;</td>");
-            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
+               .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
             buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
@@ -223,6 +227,8 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreOld()).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
+            } else {
+                buf.append("<td align=\"right\">n/a<td align=\"right\">n/a<td align=\"right\">n/a<td align=\"right\">n/a<td align=\"right\">n/a<td align=\"right\">n/a");
             }
         }
         buf.append("</table>");
