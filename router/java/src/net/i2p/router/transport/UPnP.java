@@ -636,25 +636,20 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		}
 
 		public void run() {
+			HashMap<ForwardPort, ForwardPortStatus> map = new HashMap(1);
 			for(ForwardPort port : portsToForwardNow) {
 				String proto = protoToString(port.protocol);
+				map.clear();
+				ForwardPortStatus fps;
 				if (proto.length() <= 1) {
-					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-					map.put(port, new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber));
-					forwardCallback.portForwardStatus(map);
-					continue;
-				}
-				if(tryAddMapping(proto, port.portNumber, port.name, port)) {
-					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-					map.put(port, new ForwardPortStatus(ForwardPortStatus.MAYBE_SUCCESS, "Port apparently forwarded by UPnP", port.portNumber));
-					forwardCallback.portForwardStatus(map);
-					continue;
+					fps = new ForwardPortStatus(ForwardPortStatus.DEFINITE_FAILURE, "Protocol not supported", port.portNumber);
+				} else if(tryAddMapping(proto, port.portNumber, port.name, port)) {
+					fps = new ForwardPortStatus(ForwardPortStatus.MAYBE_SUCCESS, "Port apparently forwarded by UPnP", port.portNumber);
 				} else {
-					HashMap<ForwardPort, ForwardPortStatus> map = new HashMap<ForwardPort, ForwardPortStatus>();
-					map.put(port, new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber));
-					forwardCallback.portForwardStatus(map);
-					continue;
+					fps = new ForwardPortStatus(ForwardPortStatus.PROBABLE_FAILURE, "UPnP port forwarding apparently failed", port.portNumber);
 				}
+				map.put(port, fps);
+				forwardCallback.portForwardStatus(map);
 			}
 		}
 	}
