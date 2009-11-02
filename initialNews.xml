@@ -11,10 +11,6 @@ While you are waiting, please <b>adjust your bandwidth settings</b> on the
 <a href="config.jsp">configuration page</a>.
 </li>
 <li>
-If you can, open up <b>port 8887</b> on your firewall, then <b>enable inbound TCP</b> on the
-<a href="config.jsp">configuration page</a>.
-</li>
-<li>
 Once you have a "shared clients" destination listed on the left,
 please <b>check out</b> our
 <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
@@ -33,9 +29,6 @@ Bitte noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router  
 <li>
 Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
 <a href="config.jsp">Einstellungsseite</a> an.
-</li>
-<li>
-Bitte &ouml;ffne sobald m&ouml;glich  den <b>Port 8887</b> in deiner Firewall, aktiviere danach den <b>eingehenden TCP Verkehr</b> auf der <a href="config.jsp">Einstellungsseite</a>.
 </li>
 <li>
 Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.

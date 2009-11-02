@@ -100,6 +100,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
+    /** now unused, we pick a random port */
     public static final int DEFAULT_INTERNAL_PORT = 8887;
     /** since fixed port defaults to true, this doesnt do anything at the moment.
      *  We should have an exception if it matches the existing low port. */
@@ -137,6 +138,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
     /** do we allow direct SSU connections, sans introducers?  */
     public static final String PROP_ALLOW_DIRECT = "i2np.udp.allowDirect";
+    /** this is rarely if ever used, default is to bind to wildcard address */
     public static final String PROP_BIND_INTERFACE = "i2np.udp.bindInterface";
         
     /** how many relays offered to us will we use at a time? */
@@ -226,40 +228,41 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
         
         rebuildExternalAddress();
-        
-        int port = -1;
-        if (_externalListenPort <= 0) {
-            // no explicit external port, so lets try an internal one
-            port = _context.getProperty(PROP_INTERNAL_PORT, DEFAULT_INTERNAL_PORT);
-            // attempt to use it as our external port - this will be overridden by
-            // externalAddressReceived(...)
-            _context.router().setConfigSetting(PROP_EXTERNAL_PORT, port+"");
-            _context.router().saveConfig();
-        } else {
-            port = _externalListenPort;
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Binding to the explicitly specified external port: " + port);
-        }
-        if (_endpoint == null) {
-            String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
-            InetAddress bindToAddr = null;
-            if (bindTo != null) {
-                try {
-                    bindToAddr = InetAddress.getByName(bindTo);
-                } catch (UnknownHostException uhe) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Invalid SSU bind interface specified [" + bindTo + "]", uhe);
-                    bindToAddr = null;
-                }
-            }
+
+        // bind host
+        String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
+        InetAddress bindToAddr = null;
+        if (bindTo != null) {
             try {
-                _endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
-            } catch (SocketException se) {
-                if (_log.shouldLog(Log.CRIT))
-                    _log.log(Log.CRIT, "Unable to listen on the UDP port (" + port + ")", se);
+                bindToAddr = InetAddress.getByName(bindTo);
+            } catch (UnknownHostException uhe) {
+                _log.log(Log.CRIT, "Invalid SSU bind interface specified [" + bindTo + "]", uhe);
+                setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
                 return;
             }
+        }
+        
+        // Requested bind port
+        // This may be -1 or may not be honored if busy,
+        // we will check below after starting up the endpoint.
+        int port;
+        int oldIPort = _context.getProperty(PROP_INTERNAL_PORT, -1);
+        int oldEPort = _context.getProperty(PROP_EXTERNAL_PORT, -1);
+        if (_externalListenPort <= 0) {
+            // no explicit external port, so lets try an internal one
+            if (oldIPort > 0)
+                port = oldIPort;
+            else
+                port = oldEPort;
         } else {
+            port = _externalListenPort;
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Binding to the port: " + port);
+        if (_endpoint == null) {
+            _endpoint = new UDPEndpoint(_context, this, port, bindToAddr);
+        } else {
+            // todo, set bind address too
             _endpoint.setListenPort(port);
         }
         
@@ -278,7 +281,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_flooder == null)
             _flooder = new UDPFlooder(_context, this);
         
+        // Startup the endpoint with the requested port, check the actual port, and
+        // take action if it failed or was different than requested or it needs to be saved
         _endpoint.startup();
+        int newPort = _endpoint.getListenPort();
+        _externalListenPort = newPort;
+        if (newPort <= 0) {
+            _log.log(Log.CRIT, "Unable to open UDP port");
+            setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+            return;
+        }
+        if (newPort != port || newPort != oldIPort || newPort != oldEPort) {
+            // attempt to use it as our external port - this will be overridden by
+            // externalAddressReceived(...)
+            _context.router().setConfigSetting(PROP_INTERNAL_PORT, newPort+"");
+            _context.router().setConfigSetting(PROP_EXTERNAL_PORT, newPort+"");
+            _context.router().saveConfig();
+        }
+
         _establisher.startup();
         _handler.startup();
         _fragments.startup();
@@ -321,11 +341,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int getLocalPort() { return _externalListenPort; }
     public InetAddress getLocalAddress() { return _externalListenHost; }
     public int getExternalPort() { return _externalListenPort; }
+
+    /**
+     *  _externalListenPort should always be set (by startup()) before this is called,
+     *  so the returned value should be > 0
+     */
     @Override
     public int getRequestedPort() {
         if (_externalListenPort > 0)
             return _externalListenPort;
-        return _context.getProperty(PROP_INTERNAL_PORT, DEFAULT_INTERNAL_PORT);
+        return _context.getProperty(PROP_INTERNAL_PORT, -1);
     }
 
     /**
@@ -2003,6 +2028,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("      <td align=\"center\"><b>").append(resentTotal);
         buf.append("</b></td> <td align=\"center\"><b>").append(dupRecvTotal).append("</b></td>\n");
         buf.append(" </tr></table></div>\n");
+
+      /*****
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         // NPE here early
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();
@@ -2012,6 +2039,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         double bwResent = (nondupSent <= 0 ? 0d : ((((double)resentTotal)*averagePacketSize) / nondupSent));
         buf.append("<h3>Percentage of bytes retransmitted (lifetime): ").append(formatPct(bwResent));
         buf.append("</h3><i>(Includes retransmission required by packet loss)</i>\n");
+      *****/
+
         out.write(buf.toString());
         buf.setLength(0);
         out.write(KEY);
