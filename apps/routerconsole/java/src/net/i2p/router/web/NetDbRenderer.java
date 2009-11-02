@@ -244,7 +244,7 @@ public class NetDbRenderer {
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
-            buf.append(DataHelper.stripHTML(addr.getTransportStyle())).append(": ");
+            buf.append("<b>").append(DataHelper.stripHTML(addr.getTransportStyle())).append("</b>: ");
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);
