@@ -33,7 +33,8 @@ public class ConfigRestartBean {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
                 //ctx.router().shutdown(Router.EXIT_HARD); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD); // give the UI time to respond
-            } else if ("cancelShutdown".equals(action) || _("Cancel shutdown", ctx).equals(action)) {
+            } else if ("cancelShutdown".equals(action) || _("Cancel shutdown", ctx).equals(action) ||
+                       _("Cancel restart", ctx).equals(action)) {
                 ctx.router().cancelGracefulShutdown();
             } else if ("restartImmediate".equals(action) || _("Restart immediately", ctx).equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
