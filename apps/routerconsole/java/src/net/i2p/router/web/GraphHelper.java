@@ -113,7 +113,7 @@ public class GraphHelper extends HelperBase {
                        + "\"> " + _("pixels") + ", " + _("height") + ": <input size=\"4\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\"> " + _("pixels") + "<br>\n");
             _out.write(_("Refresh delay") + ": <select name=\"refreshDelay\"><option value=\"60\">1 " + _("minute") + "</option><option value=\"120\">2 " + _("minutes") + "</option><option value=\"300\">5 " + _("minutes") + "</option><option value=\"600\">10 " + _("minutes") + "</option><option value=\"1800\">30 " + _("minutes") + "</option><option value=\"3600\">1 " + _("hour") + "</option><option value=\"-1\">" + _("Never") + "</option></select><br>\n");
-            _out.write("<hr><div class=\"formaction\"><input type=\"submit\" value=\"Redraw\"></div></form>");
+            _out.write("<hr><div class=\"formaction\"><input type=\"submit\" value=\"" + _("Redraw") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

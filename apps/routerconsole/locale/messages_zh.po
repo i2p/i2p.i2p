@@ -2250,7 +2250,7 @@ msgstr "内置的匿名Web服务器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:68
 msgid "Webserver"
-msgstr "匿名主页"
+msgstr "匿名主页服务器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:72
 msgid "Configure I2P Router"
@@ -2695,7 +2695,7 @@ msgstr "IRC 代理"
 
 #: strings/Strings.java:35
 msgid "eepsite"
-msgstr "匿名主页(eepiste)"
+msgstr "匿名网站"
 
 #: strings/Strings.java:37
 msgid "I2PSnark"
