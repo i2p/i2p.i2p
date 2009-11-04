@@ -34,7 +34,7 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final int DEFAULT_MAX_TUNNELS = 2500;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
-    private static final int DEFAULT_MAX_PROCESSINGTIME = 1500;
+    private static final int DEFAULT_MAX_PROCESSINGTIME = 1250;
 
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
@@ -137,7 +137,7 @@ class RouterThrottleImpl implements RouterThrottle {
                     _log.warn("Refusing tunnel request due to sendProcessingTime of " + avgSendProcessingTime
                             + " ms over the last two minutes, which is too much.");
                 }
-                setTunnelStatus("Rejecting tunnels: congestion");
+                setTunnelStatus("Rejecting tunnels: High message delay");
                 return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
             }
         }
