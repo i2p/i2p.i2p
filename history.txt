@@ -1,3 +1,6 @@
+2009-11-04 sponge
+    * Fixups to Slackware scripts
+
 2009-10-31 zzz
     * Console:
       - More tagging
