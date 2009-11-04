@@ -291,7 +291,8 @@
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
-        <copy file="initialNews.xml" tofile="pkg-temp/docs/news.xml" />
+        <!-- overwrite the news put in by the updater -->
+        <copy file="installer/resources/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
         <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
@@ -351,7 +352,7 @@
             <fileset  dir="installer/resources/themes/console/images/" />
         </copy>          
         <copy todir="pkg-temp/docs/" >
-          <fileset dir="." includes="readme*.html" />
+          <fileset dir="installer/resources/readme/" includes="readme*.html" />
         </copy>
     </target>
 
@@ -398,7 +399,8 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
-        <copy file="news.xml" todir="pkg-temp/docs/" />
+        <!-- may be pointless now, people with split directories will never see this -->
+        <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
     </target>
     <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
@@ -574,9 +576,9 @@
         <exec executable="ls">
             <arg value="-l" />
             <arg value="history.txt" />
-            <arg value="initialNews.xml" />
+            <arg value="installer/resources/initialNews.xml" />
             <arg value="installer/install.xml" />
-            <arg value="news.xml" />
+            <arg value="installer/resources/news.xml" />
 	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
 	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
