@@ -104,7 +104,7 @@
     <input name ="udpHost1" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" />
     <% String[] ips = nethelper.getAddresses();
        if (ips.length > 0) {
-           out.print(" " + intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"true\">"+intl._("Select Interface")+"</option>\n");
+           out.print(intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"true\">"+intl._("Select Interface")+"</option>\n");
            for (int i = 0; i < ips.length; i++) {
                out.print("<option value=\"");
                out.print(ips[i]);
@@ -156,7 +156,7 @@
 <hr><div class="formaction">
  <input type="submit" name="save" value="<%=intl._("Save changes")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" />
 </div><h3><a name="chelp"><%=intl._("Configuration Help")%>:</a></h3><div align="justify"><p>
- <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port (generally 8887) is forwarded for both UDP and TCP.")%>
+ <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
  </p><p>
  <%=intl._("If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you.")%>
    <%=intl._("If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic.")%>
@@ -187,7 +187,7 @@
     <%=intl._("When in doubt, leave the settings at the defaults.")%>
 </p>
 <h3><a name="help"><%=intl._("Reachability Help")%>:</a></h3><p>
- <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port (generally 8887) is forwarded for both UDP and TCP.")%>
+ <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
  <%=intl._("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>
  <%=intl._("If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem.")%>
  <ul>
@@ -196,7 +196,7 @@
 <li class="tidylist"><b><%=intl._("Firewalled")%></b> - 
      <%=intl._("Your UDP port appears to be firewalled.")%>
      <%=intl._("As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error.")%>
-     <%=intl._("However, if it appears consistently, you should check whether both your external and internal firewalls are open on port 8887.")%> 
+     <%=intl._("However, if it appears consistently, you should check whether both your external and internal firewalls are open for your port.")%> 
      <%=intl._("I2P will work fine when firewalled, there is no reason for concern. When firewalled, the router uses \"introducers\" to relay inbound connections.")%>
      <%=intl._("However, you will get more participating traffic and help the network more if you can open your firewall(s).")%>
      <%=intl._("If you think you have already done so, remember that you may have both a hardware and a software firewall, or be behind an additional, institutional firewall you cannot control.")%>
@@ -230,7 +230,7 @@
      <%=intl._("I2P does not work well behind this type of firewall. You will probably not be able to accept inbound connections, which will limit your participation in the network.")%>
 <li class="tidylist"><b><%=intl._("ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart")%></b> -
      <%=intl._("I2P was unable to bind to port 8887 or other configured port.")%>
-     <%=intl._("Check to see if another program is using port 8887. If so, stop that program or configure I2P to use a different port.")%> 
+     <%=intl._("Check to see if another program is using the configured port. If so, stop that program or configure I2P to use a different port.")%> 
      <%=intl._("This may be a transient error, if the other program is no longer using the port.")%> 
      <%=intl._("However, a restart is always required after this error.")%>
 <li class="tidylist"><b><%=intl._("ERR - UDP Disabled and Inbound TCP host/port not set")%></b> -

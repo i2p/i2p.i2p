@@ -241,7 +241,7 @@ public class ProfileOrganizer {
      */
     public boolean peerSendsBadReplies(Hash peer) {
         PeerProfile profile = getProfile(peer);
-        if (profile != null) {
+        if (profile != null && profile.getIsExpandedDB()) {
             RateStat invalidReplyRateStat = profile.getDBHistory().getInvalidReplyRate();
             Rate invalidReplyRate = invalidReplyRateStat.getRate(30*60*1000l);
             if ( (invalidReplyRate.getCurrentTotalValue() > MAX_BAD_REPLIES_PER_HOUR) ||

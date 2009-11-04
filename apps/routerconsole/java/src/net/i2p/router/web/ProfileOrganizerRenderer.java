@@ -105,6 +105,9 @@ class ProfileOrganizerRenderer {
             
             buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
+            // debug
+            //if(prof.getIsExpandedDB())
+            //   buf.append(" ** ");
             buf.append("</td><td align=\"center\">");
             
             switch (tier) {
@@ -145,18 +148,19 @@ class ProfileOrganizerRenderer {
             buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
             buf.append("</td><td align=\"center\">");
             if (_context.shitlist().isShitlisted(peer)) buf.append(_("Banned"));
-            if (prof.getIsFailing()) buf.append(" ").append(_("Failing"));
-            if (_context.commSystem().wasUnreachable(peer)) buf.append(" ").append(_("Unreachable"));
+            if (prof.getIsFailing()) buf.append(' ').append(_("Failing"));
+            if (_context.commSystem().wasUnreachable(peer)) buf.append(' ').append(_("Unreachable"));
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
             long fails = failed.getCurrentEventCount() + failed.getLastEventCount();
             if (fails > 0) {
                 Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
                 long total = fails + accepted.getCurrentEventCount() + accepted.getLastEventCount();
                 if (total / fails <= 10)   // hide if < 10%
-                    buf.append(' ').append(fails).append('/').append(total).append(" ").append(_("Test Fails"));
+                    buf.append(' ').append(fails).append('/').append(total).append(' ').append(_("Test Fails"));
             }
             buf.append("&nbsp;</td>");
-            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
+               .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
             buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
@@ -223,14 +227,20 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreOld()).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
+            } else {
+                for (int i = 0; i < 6; i++)
+                    buf.append("<td align=\"right\">").append(_(NA));
             }
         }
         buf.append("</table>");
 
         buf.append("<h3>").append(_("Thresholds:")).append("</h3>");
-        buf.append("<p><b>").append(_("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br>");
-        buf.append("<b>").append(_("Capacity")).append(":</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br>");
-        buf.append("<b>").append(_("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)</p>");
+        buf.append("<p><b>").append(_("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold()))
+           .append(" (").append(fast).append(' ').append(_("fast peers")).append(")<br>");
+        buf.append("<b>").append(_("Capacity")).append(":</b> ").append(num(_organizer.getCapacityThreshold()))
+           .append(" (").append(reliable).append(' ').append(_("high capacity peers")).append(")<br>");
+        buf.append("<b>").append(_("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold()))
+           .append(" (").append(integrated).append(' ').append(_(" well integrated peers")).append(")</p>");
         buf.append("<h3>").append(_("Definitions")).append(":</h3><ul>");
                    buf.append("<li><b>").append(_("groups")).append("</b>: ").append(_("as determined by the profile organizer")).append("</li>");
                    buf.append("<li><b>").append(_("caps")).append("</b>: ").append(_("capabilities in the netDb, not used to determine profiles")).append("</li>");
@@ -295,29 +305,29 @@ class ProfileOrganizerRenderer {
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
-    private final static String na = "n/a";
+    private final static String NA = HelperBase._x("n/a");
 
-    private static String avg (PeerProfile prof, long rate) {
+    private String avg (PeerProfile prof, long rate) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
-                return na;
+                return _(NA);
             Rate r = rs.getRate(rate);
             if (r == null)
-                return na;
+                return _(NA);
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             if (c == 0)
-                return na;
+                return _(NA);
             double d = r.getCurrentTotalValue() + r.getLastTotalValue();
             return Math.round(d/c) + "ms";
     }
 
-    private static String davg (DBHistory dbh, long rate) {
+    private String davg (DBHistory dbh, long rate) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
-                return na;
+                return _(NA);
             Rate r = rs.getRate(rate);
             if (r == null)
-                return na;
+                return _(NA);
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             return "" + c;
     }

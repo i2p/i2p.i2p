@@ -84,8 +84,8 @@ public class NetDbRenderer {
     public void renderLeaseSetHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
-        buf.append("<a href=\"netdb.jsp\">" + _("View") + " RouterInfo</a>");
-        buf.append("<h3>LeaseSets</h3>\n");
+        buf.append("<a href=\"netdb.jsp\">" + _("View RouterInfo") + "</a>");
+        buf.append("<h3>").append(_("LeaseSets")).append("</h3>\n");
         Set leases = new TreeSet(new LeaseSetComparator());
         leases.addAll(_context.netDb().getLeases());
         long now = _context.clock().now();
@@ -132,7 +132,7 @@ public class NetDbRenderer {
     }
 
     public void renderStatusHTML(Writer out, boolean full) throws IOException {
-        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View") + " LeaseSets</a>)</h2>\n");
+        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View LeaseSets") + "</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
             out.write(_("Not initialized"));
             out.flush();
@@ -244,7 +244,7 @@ public class NetDbRenderer {
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
-            buf.append(DataHelper.stripHTML(addr.getTransportStyle())).append(": ");
+            buf.append("<b>").append(DataHelper.stripHTML(addr.getTransportStyle())).append("</b>: ");
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);

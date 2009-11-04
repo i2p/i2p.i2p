@@ -128,17 +128,19 @@ class ProfilePersistenceHelper {
         
         out.write(buf.toString().getBytes());
         
-        profile.getTunnelHistory().store(out);
-        profile.getDBHistory().store(out);
-        
         if (profile.getIsExpanded()) {
             // only write out expanded data if, uh, we've got it
-            profile.getDbIntroduction().store(out, "dbIntroduction");
-            profile.getDbResponseTime().store(out, "dbResponseTime");
-            profile.getReceiveSize().store(out, "receiveSize");
-            profile.getSendSuccessSize().store(out, "sendSuccessSize");
+            profile.getTunnelHistory().store(out);
+            //profile.getReceiveSize().store(out, "receiveSize");
+            //profile.getSendSuccessSize().store(out, "sendSuccessSize");
             profile.getTunnelCreateResponseTime().store(out, "tunnelCreateResponseTime");
             profile.getTunnelTestResponseTime().store(out, "tunnelTestResponseTime");
+        }
+
+        if (profile.getIsExpandedDB()) {
+            profile.getDBHistory().store(out);
+            profile.getDbIntroduction().store(out, "dbIntroduction");
+            profile.getDbResponseTime().store(out, "dbResponseTime");
         }
     }
     
@@ -211,12 +213,22 @@ class ProfilePersistenceHelper {
             profile.setPeakTunnel1mThroughputKBps(getDouble(props, "tunnelPeakTunnel1mThroughput"));
             
             profile.getTunnelHistory().load(props);
-            profile.getDBHistory().load(props);
-            
-            profile.getDbIntroduction().load(props, "dbIntroduction", true);
-            profile.getDbResponseTime().load(props, "dbResponseTime", true);
-            profile.getReceiveSize().load(props, "receiveSize", true);
-            profile.getSendSuccessSize().load(props, "sendSuccessSize", true);
+
+            // In the interest of keeping the in-memory profiles small,
+            // don't load the DB info at all unless there is something interesting there
+            // (i.e. floodfills)
+            // It seems like we do one or two lookups as a part of handshaking?
+            // Not sure, to be researched.
+            if (getLong(props, "dbHistory.successfulLookups") > 1 ||
+                getLong(props, "dbHistory.failedlLokups") > 1) {
+                profile.expandDBProfile();
+                profile.getDBHistory().load(props);
+                profile.getDbIntroduction().load(props, "dbIntroduction", true);
+                profile.getDbResponseTime().load(props, "dbResponseTime", true);
+            }
+
+            //profile.getReceiveSize().load(props, "receiveSize", true);
+            //profile.getSendSuccessSize().load(props, "sendSuccessSize", true);
             profile.getTunnelCreateResponseTime().load(props, "tunnelCreateResponseTime", true);
             profile.getTunnelTestResponseTime().load(props, "tunnelTestResponseTime", true);
             
