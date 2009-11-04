@@ -1,3 +1,19 @@
+2009-11-04 zzz
+    * Build:
+      - Move some files to installer/resources
+      - Fix initialNews.xml in install package
+    * Console: More tagging
+    * NetDb: Reduce routerinfo expiration slightly
+    * Profiles:
+      - Remove the almost-unused send and receive size RateStats;
+        this also reduces the effective time for isActive()
+      - Only store DB history on-demand to save space;
+        fix up resulting NPEs
+      - Savings: ~2MB heap
+    * Throttle: Reduce max msg delay to 1250ms (was 1500)
+    * UDP: Pick a random port on first install or bind failure -
+      No more port 8887 to prevent easy state-level blocking
+
 2009-11-04 sponge
     * Fixups to Slackware scripts
 
