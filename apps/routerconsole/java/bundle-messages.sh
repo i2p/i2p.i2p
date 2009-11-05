@@ -38,7 +38,7 @@ do
 	# To start a new translation, copy the header from an old translation to the new .po file,
 	# then ant distclean updater.
 	find src ../jsp/WEB-INF strings -name *.java > $TMPFILE
-	xgettext -f $TMPFILE -F -L java \
+	xgettext -f $TMPFILE -F -L java --from-code=UTF-8 \
                  --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
                  --keyword=handler._ --keyword=formhandler._ \
                  --keyword=net.i2p.router.web.Messages.getString \
