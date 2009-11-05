@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-01 03:00+0000\n"
+"POT-Creation-Date: 2009-11-05 00:36+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -300,8 +300,8 @@ msgstr "设置帮助"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:484
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:526
-msgid "While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port (generally 8887) is forwarded for both UDP and TCP."
-msgstr "I2P可以与大多数防火墙共存，如果I2P端口(通常为8887)进行了UDP/TCP映射，您的速度和网络整合度会逐渐提升。"
+msgid "While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP."
+msgstr "I2P可以与大多数防火墙共存，如果I2P端口(第一次安装时随机选择)进行了UDP/TCP映射，您的速度和网络整合度会逐渐提升。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:486
 msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
@@ -415,8 +415,8 @@ msgid "As the firewall detection methods are not 100% reliable, this may occasio
 msgstr "由于防火墙检测方法并非100%可靠，有时也可能错误地显示此此提示。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:544
-msgid "However, if it appears consistently, you should check whether both your external and internal firewalls are open on port 8887."
-msgstr "然而，如果总是出现此提示，您应检查外部或内部防火墙是否打开了8887(或用户指定的)端口。"
+msgid "However, if it appears consistently, you should check whether both your external and internal firewalls are open for your port."
+msgstr "然而，如果总是出现此提示，您应检查外部或内部防火墙是否打开了I2P端口。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:546
 msgid "I2P will work fine when firewalled, there is no reason for concern. When firewalled, the router uses \"introducers\" to relay inbound connections."
@@ -560,8 +560,8 @@ msgid "I2P was unable to bind to port 8887 or other configured port."
 msgstr "I2P无法绑定到端口8887或其他指定的端口上。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:612
-msgid "Check to see if another program is using port 8887. If so, stop that program or configure I2P to use a different port."
-msgstr "检查是否有其他程序正在使用8887端口，如果是，关闭此程序或设置I2P使用不同的端口。"
+msgid "Check to see if another program is using the configured port. If so, stop that program or configure I2P to use a different port."
+msgstr "检查是否有其他程序正在使用了I2P的端口，如果是，关闭此程序或设置I2P使用不同的端口。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:614
 msgid "This may be a transient error, if the other program is no longer using the port."
@@ -825,13 +825,13 @@ msgstr "节点信息页面"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:334
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:71
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:231
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:238
 msgid "Speed"
 msgstr "速度"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:338
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:72
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:232
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:240
 msgid "Capacity"
 msgstr "容量"
 
@@ -1594,28 +1594,32 @@ msgstr "容量值无效"
 msgid "Cancel shutdown"
 msgstr "取消关闭"
 
-#: src/net/i2p/router/web/ConfigRestartBean.java:38
+#: src/net/i2p/router/web/ConfigRestartBean.java:37
+msgid "Cancel restart"
+msgstr "取消重启"
+
+#: src/net/i2p/router/web/ConfigRestartBean.java:39
 msgid "Restart immediately"
 msgstr "立刻重启"
 
-#: src/net/i2p/router/web/ConfigRestartBean.java:42
+#: src/net/i2p/router/web/ConfigRestartBean.java:43
 msgid "Restart"
 msgstr "重 启"
 
-#: src/net/i2p/router/web/ConfigRestartBean.java:45
+#: src/net/i2p/router/web/ConfigRestartBean.java:46
 msgid "Shutdown"
 msgstr "关　闭"
 
-#: src/net/i2p/router/web/ConfigRestartBean.java:56
+#: src/net/i2p/router/web/ConfigRestartBean.java:57
 msgid "Shutdown imminent"
 msgstr "立刻关闭"
 
-#: src/net/i2p/router/web/ConfigRestartBean.java:59
+#: src/net/i2p/router/web/ConfigRestartBean.java:60
 #, java-format
 msgid "Shutdown in {0}"
 msgstr "{0} 后退出"
 
-#: src/net/i2p/router/web/ConfigRestartBean.java:64
+#: src/net/i2p/router/web/ConfigRestartBean.java:65
 #, java-format
 msgid "Restart in {0}"
 msgstr "{0} 后重启"
@@ -1801,27 +1805,27 @@ msgstr "主题设置已保存。"
 msgid "Refresh the page to view."
 msgstr "刷新页面后查看。"
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:40
+#: src/net/i2p/router/web/ConfigUIHelper.java:41
 msgid "English"
 msgstr "英语"
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:40
+#: src/net/i2p/router/web/ConfigUIHelper.java:41
 msgid "French"
 msgstr "法语"
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:40
+#: src/net/i2p/router/web/ConfigUIHelper.java:41
 msgid "German"
 msgstr "德语"
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:41
+#: src/net/i2p/router/web/ConfigUIHelper.java:42
 msgid "Chinese"
 msgstr "中文"
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:41
+#: src/net/i2p/router/web/ConfigUIHelper.java:42
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: src/net/i2p/router/web/ConfigUIHelper.java:41
+#: src/net/i2p/router/web/ConfigUIHelper.java:42
 msgid "Swedish"
 msgstr "瑞士语"
 
@@ -1946,6 +1950,10 @@ msgstr "分钟"
 msgid "minutes"
 msgstr "分钟"
 
+#: src/net/i2p/router/web/GraphHelper.java:116
+msgid "Redraw"
+msgstr "重绘"
+
 #: src/net/i2p/router/web/NetDbRenderer.java:59
 msgid "Network Database RouterInfo Lookup"
 msgstr "网络数据库 RouterInfo 检索"
@@ -1964,9 +1972,12 @@ msgid "Network Database Contents"
 msgstr "网络数据库内容"
 
 #: src/net/i2p/router/web/NetDbRenderer.java:87
-#: src/net/i2p/router/web/NetDbRenderer.java:135
-msgid "View"
-msgstr "查看"
+msgid "View RouterInfo"
+msgstr "浏览 RouterInfo"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:88
+msgid "LeaseSets"
+msgstr "赁集(LeaseSet)"
 
 #: src/net/i2p/router/web/NetDbRenderer.java:96
 msgid "LeaseSet"
@@ -2007,6 +2018,10 @@ msgstr "租赁"
 #: src/net/i2p/router/web/NetDbRenderer.java:124
 msgid "Tunnel"
 msgstr "隧道"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:135
+msgid "View LeaseSets"
+msgstr "查看赁集(LeaseSet)"
 
 #: src/net/i2p/router/web/NetDbRenderer.java:137
 msgid "Not initialized"
@@ -2102,7 +2117,7 @@ msgid "Groups (Caps)"
 msgstr "组(容量)"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:73
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:233
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:242
 msgid "Integration"
 msgstr "整合"
 
@@ -2110,99 +2125,119 @@ msgstr "整合"
 msgid "Status"
 msgstr "状态"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:111
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:114
 msgid "Fast, High Capacity"
 msgstr "高速，高容"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:112
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:115
 msgid "High Capacity"
 msgstr "高容"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:113
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:116
 msgid "Standard"
 msgstr "标准"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:114
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:148
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:117
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:151
 msgid "Failing"
 msgstr "失败"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:116
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:119
 #: src/net/i2p/router/web/SummaryBarRenderer.java:249
 msgid "Integrated"
 msgstr "已整合节点"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:147
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:150
 msgid "Banned"
 msgstr "已封锁"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:149
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:152
 msgid "Unreachable"
 msgstr "不可达"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:156
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:159
 msgid "Test Fails"
 msgstr "测试失败"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:168
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:163
+msgid "profile"
+msgstr "节点信息"
+
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:172
 msgid "Floodfill and Integrated Peers"
 msgstr "种子节点与整合节点"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:230
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:237
 msgid "Thresholds:"
 msgstr "临界值:"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:234
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:239
+msgid "fast peers"
+msgstr "高速节点"
+
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:241
+msgid "high capacity peers"
+msgstr "高容节点"
+
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:243
+msgid " well integrated peers"
+msgstr "整合节点"
+
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:244
 msgid "Definitions"
 msgstr "定义"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:235
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:245
 msgid "as determined by the profile organizer"
 msgstr "由节点描述信息管理器决定"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:235
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:245
 msgid "groups"
 msgstr "分组"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:236
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:246
 msgid "capabilities in the netDb, not used to determine profiles"
 msgstr "netDb中的容量，与描述信息无关。"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:236
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:246
 msgid "caps"
 msgstr "容量"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:237
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:247
 msgid "peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel"
 msgstr "该节点一分钟由单一隧道通过的数据峰值(byte/s)。"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:237
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:247
 msgid "speed"
 msgstr "速度"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:238
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:248
 msgid "capacity"
 msgstr "容量"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:238
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:248
 msgid "how many tunnels can we ask them to join in an hour?"
 msgstr "一小时内路由可以邀请加入的隧道总量"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:239
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:249
 msgid "how many new peers have they told us about lately?"
 msgstr "最近获知的新节点"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:239
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:249
 msgid "integration"
 msgstr "整合"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:240
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:250
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
 msgstr "是否节点被封禁，不可达，或在隧道测试中失败？"
 
-#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:240
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:250
 msgid "status"
 msgstr "状态"
+
+#: src/net/i2p/router/web/ProfileOrganizerRenderer.java:308
+msgid "n/a"
+msgstr ""
 
 #: src/net/i2p/router/web/StatsGenerator.java:58
 msgid "Statistics gathered during this router's uptime"
@@ -2250,7 +2285,7 @@ msgstr "内置的匿名Web服务器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:68
 msgid "Webserver"
-msgstr "匿名主页服务器"
+msgstr "匿名网站服务器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:72
 msgid "Configure I2P Router"
@@ -2320,7 +2355,7 @@ msgstr "I2P路由帮助"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:136
 msgid "General"
-msgstr "功能概述"
+msgstr "功能概况"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:139
 msgid "Your unique I2P router identity is"
@@ -2713,6 +2748,8 @@ msgstr "暗色调"
 msgid "light"
 msgstr "亮色调"
 
+#~ msgid "View"
+#~ msgstr "查看"
 #~ msgid "Not Failing"
 #~ msgstr "标准"
 #~ msgid ""
