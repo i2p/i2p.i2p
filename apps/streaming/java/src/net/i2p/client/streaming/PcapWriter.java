@@ -58,6 +58,20 @@ public class PcapWriter {
     /** max # of streaming lib payload bytes to dump */
     private static final int MAX_PAYLOAD_BYTES = 10;
 
+    /** options - give our custom ones some mnemonics */
+    private static final int MAX_OPTION_LEN = 40;
+    private static final byte OPTION_END = 0;
+    private static final byte OPTION_MSS = 2;
+    private static final byte OPTION_PING = 6;
+    private static final byte OPTION_PONG = 7;
+    private static final byte OPTION_SIGREQ = 0x55;
+    private static final byte OPTION_SIG = 0x56;
+    private static final byte OPTION_RDELAY = (byte) 0xde;
+    private static final byte OPTION_ODELAY = (byte) 0xd0;
+    private static final byte OPTION_FROM = (byte) 0xf0;
+    private static final byte OPTION_NACK = (byte) 0xac;
+
+
     private FileOutputStream _fos;
     private I2PAppContext _context;
 
@@ -100,6 +114,31 @@ public class PcapWriter {
         Connection con = pkt.getConnection();
         int includeLen = Math.min(MAX_PAYLOAD_BYTES, pkt.getPayloadSize());
 
+        // option block
+        Options opts = new Options();
+        if (pkt.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED))
+            opts.add(OPTION_MSS, 2, pkt.getOptionalMaxSize());
+        if (pkt.isFlagSet(Packet.FLAG_DELAY_REQUESTED))
+            opts.add(OPTION_ODELAY, 2, pkt.getOptionalDelay());
+        if (pkt.getResendDelay() > 0)
+            opts.add(OPTION_RDELAY, 1, pkt.getResendDelay());
+        if (pkt.isFlagSet(Packet.FLAG_SIGNATURE_REQUESTED))
+            opts.add(OPTION_SIGREQ);
+        if (pkt.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
+            opts.add(OPTION_SIG);
+        if (pkt.isFlagSet(Packet.FLAG_FROM_INCLUDED))
+            opts.add(OPTION_FROM);
+        if (pkt.isFlagSet(Packet.FLAG_ECHO)) {
+            if (pkt.getSendStreamId() > 0)
+                opts.add(OPTION_PING);
+            else
+                opts.add(OPTION_PONG);
+        }
+        if (pkt.getNacks() != null)
+            opts.add(OPTION_NACK, 1, pkt.getNacks().length);
+        int optLen = opts.size();
+        byte options[] = opts.getData();
+
         // PCAP Header
         long now;
         if (isInbound)
@@ -108,15 +147,15 @@ public class PcapWriter {
             now = pkt.getLastSend();
         DataHelper.writeLong(fos, 4, now / 1000);
         DataHelper.writeLong(fos, 4, 1000 * (now % 1000));
-        DataHelper.writeLong(fos, 4, 54 + includeLen);   // 14 MAC + 20 IP + 20 TCP
-        DataHelper.writeLong(fos, 4, 58 + pkt.getPayloadSize()); // 54 + MAC checksum
+        DataHelper.writeLong(fos, 4, 54 + optLen + includeLen);   // 14 MAC + 20 IP + 20 TCP
+        DataHelper.writeLong(fos, 4, 58 + optLen + pkt.getPayloadSize()); // 54 + MAC checksum
 
         // MAC Header 14 bytes
         fos.write(MAC_HEADER);
 
         // IP 20 bytes total
         // IP Header 12 bytes
-        int length = 20 + 20 + pkt.getPayloadSize();
+        int length = 20 + 20 + optLen + pkt.getPayloadSize();
         fos.write(IP_HEADER_1);
         DataHelper.writeLong(fos, 2, length);  // total IP length
         fos.write(IP_HEADER_2);
@@ -200,12 +239,9 @@ public class PcapWriter {
             flags |= 0x04;
         if (!pkt.isFlagSet(Packet.FLAG_NO_ACK))
             flags |= 0x10;
-        // delay request -> ECE, not a perfect match, but ok for now
-        if (pkt.isFlagSet(Packet.FLAG_DELAY_REQUESTED))
-            flags |= 0x40;
-        //if (pkt.isFlagSet(FLAG_DELAY_REQUESTED))
-        //    foo;
-        DataHelper.writeLong(fos, 1, 0x50); // 5 32-byte words
+        // offset byte
+        int osb = (5 + (optLen / 4)) << 4;
+        DataHelper.writeLong(fos, 1, osb); // 5 + optLen/4 32-byte words
         DataHelper.writeLong(fos, 1, flags);
 
         // window size 2 bytes
@@ -236,6 +272,10 @@ public class PcapWriter {
 
         // checksum and urgent pointer 4 bytes
         DataHelper.writeLong(fos, 4, 0);
+
+        // TCP option block
+        if (optLen > 0)
+            fos.write(options, 0, optLen);
 
         // some data
         if (includeLen > 0)
@@ -268,6 +308,38 @@ public class PcapWriter {
         lowest++;
         // just in case
         return Math.max(0, lowest);
+    }
+
+    private static class Options {
+        byte[] _b;
+        int _len;
+        public Options() {
+            _b = new byte[MAX_OPTION_LEN];
+        }
+
+        /** 40 bytes long, caller must use size() to get actual size */
+        public byte[] getData() { return _b; }
+        /** rounded to next 4 bytes */
+        public int size() { return ((_len + 3) / 4) * 4; }
+
+        public void add(byte type) {
+             add(type, 0, 0);
+        }
+
+        public void add(byte type, int datalen, int data) {
+            // no room? drop silently
+            if (_len + datalen + 2 > MAX_OPTION_LEN)
+                return;
+            _b[_len++] = type;
+            _b[_len++] = (byte) (datalen + 2);
+            if (datalen > 0) {
+                for (int i = datalen - 1; i >= 0; i--)
+                    _b[_len++] = (byte) ((data >> (i * 8)) & 0xff);
+            }
+            // end-of-options mark
+            if (_len < MAX_OPTION_LEN)
+                _b[_len] = OPTION_END;
+        }
     }
 
     /** one's complement 2-byte checksum update */
