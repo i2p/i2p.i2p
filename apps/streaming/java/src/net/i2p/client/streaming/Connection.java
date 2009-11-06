@@ -73,6 +73,8 @@ public class Connection {
     private int _randomWait;
     
     private long _lifetimeBytesSent;
+    /** TBD for tcpdump-compatible ack output */
+    private long _lowestBytesAckedThrough;
     private long _lifetimeBytesReceived;
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;
@@ -742,7 +744,9 @@ public class Connection {
     
     public long getCongestionWindowEnd() { return _congestionWindowEnd; }
     public void setCongestionWindowEnd(long endMsg) { _congestionWindowEnd = endMsg; }
+    /** @return the highest outbound packet we have recieved an ack for */
     public long getHighestAckedThrough() { return _highestAckedThrough; }
+    /** @deprecated unused */
     public void setHighestAckedThrough(long msgNum) { _highestAckedThrough = msgNum; }
     
     public long getLastActivityOn() {

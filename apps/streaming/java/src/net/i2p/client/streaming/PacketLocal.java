@@ -1,5 +1,6 @@
 package net.i2p.client.streaming;
 
+import java.io.IOException;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -28,6 +29,9 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private volatile int _nackCount;
     private volatile boolean _retransmitted;
     private SimpleTimer2.TimedEvent _resendEvent;
+    private static final Object initLock = new Object();
+    private static boolean _initialized;
+    private static PcapWriter _pcapWriter;
     
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
@@ -42,6 +46,12 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         _cancelledOn = -1;
         _nackCount = 0;
         _retransmitted = false;
+        synchronized(initLock) {
+            if (!_initialized) {
+                initPcap();
+                _initialized = true;
+            }
+        }
     }
     
     public Destination getTo() { return _to; }
@@ -139,6 +149,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public int getNumSends() { return _numSends; }
     public long getLastSend() { return _lastSend; }
     public Connection getConnection() { return _connection; }
+    /** used to set the rcvd conn after the fact for incoming syn replies */
+    public void setConnection(Connection con) { _connection = con; }
 
     public void incrementNACKs() { 
         int cnt = ++_nackCount;
@@ -242,4 +254,28 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public boolean writeAccepted() { return _acceptedOn > 0 && _cancelledOn <= 0; }
     public boolean writeFailed() { return _cancelledOn > 0; }
     public boolean writeSuccessful() { return _ackOn > 0 && _cancelledOn <= 0; }
+
+    static final String PCAP = "foo.pcap";
+    private void initPcap() {
+        try {
+            _pcapWriter = new PcapWriter(_context, PCAP);
+        } catch (IOException ioe) {
+           System.err.println("pcap init ioe: " + ioe);
+        }
+    }
+
+    /** Generate a pcap/tcpdump-compatible format,
+     *  so we can use standard debugging tools.
+     */
+    public void logTCPDump(boolean isInbound) {
+        if (!_log.shouldLog(Log.INFO)) return;
+        _log.info(toString());
+        if (_pcapWriter != null) {
+            try {
+                _pcapWriter.write(this, isInbound);
+            } catch (IOException ioe) {
+               _log.warn("pcap write ioe: " + ioe);
+            }
+        }
+    }
 }

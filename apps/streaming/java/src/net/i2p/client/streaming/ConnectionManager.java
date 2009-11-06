@@ -176,6 +176,9 @@ public class ConnectionManager {
         }
         
         con.setReceiveStreamId(receiveId);
+        // finally, we know enough that we can log the packet with the conn filled in
+        ((PacketLocal)synPacket).setConnection(con);
+        ((PacketLocal)synPacket).logTCPDump(true);
         try {
             con.getPacketHandler().receivePacket(synPacket, con);
         } catch (I2PException ie) {
