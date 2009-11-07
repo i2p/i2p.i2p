@@ -171,28 +171,24 @@ class ProfileOrganizerRenderer {
 
         buf.append("<h2>").append(_("Floodfill and Integrated Peers")).append("</h2>\n");
         buf.append("<table>");
-                   buf.append("<tr>");
-                   buf.append("<th class=\"smallhead\">Peer</th>");
-                   buf.append("<th class=\"smallhead\">Caps</th>");
-                   buf.append("<th class=\"smallhead\">Integ. Value</th>");
-                   buf.append("<th class=\"smallhead\">Last Heard About</th>");
-                   buf.append("<th class=\"smallhead\">Last Heard From</th>");
-//                   "<th class=\"smallhead\">Last Successful Send</th>" +
-                   buf.append("<th class=\"smallhead\">Last Good Send</th>");        
-//                   "<th class=\"smallhead\">Last Failed Send</th>" +
-                   buf.append("<th class=\"smallhead\">Last Bad Send</th>");
-                   buf.append("<th class=\"smallhead\">10m Resp. Time</th>");
-                   buf.append("<th class=\"smallhead\">1h Resp. Time</th>");
-                   buf.append("<th class=\"smallhead\">1d Resp. Time</th>");
-//                   "<th class=\"smallhead\">Successful Lookups</th>" + 
-                   buf.append("<th class=\"smallhead\">Good Lookups</th>"); 
-//                   "<th>Failed Lookups</th>" +
-                   buf.append("<th class=\"smallhead\">Bad Lookups</th>");        
-                   buf.append("<th class=\"smallhead\">New Stores</th>");
-                   buf.append("<th class=\"smallhead\">Old Stores</th>");
-                   buf.append("<th class=\"smallhead\">1h Fail Rate</th>");
-                   buf.append("<th class=\"smallhead\">1d Fail Rate</th>");
-                   buf.append("</tr>");
+        buf.append("<tr>");
+        buf.append("<th class=\"smallhead\">").append(_("Peer")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Caps")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Integ. Value")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Heard About")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Heard From")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Good Send")).append("</th>");        
+        buf.append("<th class=\"smallhead\">").append(_("Last Bad Send")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("10m Resp. Time")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1h Resp. Time")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1d Resp. Time")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Good Lookup")).append("</th>"); 
+        buf.append("<th class=\"smallhead\">").append(_("Last Bad Lookup")).append("</th>");        
+        buf.append("<th class=\"smallhead\">").append(_("Last Good Store")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Bad Store")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1h Fail Rate")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
+        buf.append("</tr>");
         for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
@@ -221,10 +217,14 @@ class ProfileOrganizerRenderer {
             buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l)).append("</td>");
             DBHistory dbh = prof.getDBHistory();
             if (dbh != null) {
-                buf.append("<td align=\"right\">").append(dbh.getSuccessfulLookups()).append("</td>");
-                buf.append("<td align=\"right\">").append(dbh.getFailedLookups()).append("</td>");
-                buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreNew()).append("</td>");
-                buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreOld()).append("</td>");
+                time = now - dbh.getLastLookupSuccessful();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                time = now - dbh.getLastLookupFailed();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                time = now - dbh.getLastStoreSuccessful();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                time = now - dbh.getLastStoreFailed();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
             } else {
@@ -242,13 +242,13 @@ class ProfileOrganizerRenderer {
         buf.append("<b>").append(_("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold()))
            .append(" (").append(integrated).append(' ').append(_(" well integrated peers")).append(")</p>");
         buf.append("<h3>").append(_("Definitions")).append(":</h3><ul>");
-                   buf.append("<li><b>").append(_("groups")).append("</b>: ").append(_("as determined by the profile organizer")).append("</li>");
-                   buf.append("<li><b>").append(_("caps")).append("</b>: ").append(_("capabilities in the netDb, not used to determine profiles")).append("</li>");
-                   buf.append("<li><b>").append(_("speed")).append("</b>: ").append(_("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel")).append("</li>");
-                   buf.append("<li><b>").append(_("capacity")).append("</b>: ").append(_("how many tunnels can we ask them to join in an hour?")).append("</li>");
-                   buf.append("<li><b>").append(_("integration")).append("</b>: ").append(_("how many new peers have they told us about lately?")).append("</li>");
-                   buf.append("<li><b>").append(_("status")).append("</b>: ").append(_("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
-                   buf.append("</ul></i>");
+        buf.append("<li><b>").append(_("groups")).append("</b>: ").append(_("as determined by the profile organizer")).append("</li>");
+        buf.append("<li><b>").append(_("caps")).append("</b>: ").append(_("capabilities in the netDb, not used to determine profiles")).append("</li>");
+        buf.append("<li><b>").append(_("speed")).append("</b>: ").append(_("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel")).append("</li>");
+        buf.append("<li><b>").append(_("capacity")).append("</b>: ").append(_("how many tunnels can we ask them to join in an hour?")).append("</li>");
+        buf.append("<li><b>").append(_("integration")).append("</b>: ").append(_("how many new peers have they told us about lately?")).append("</li>");
+        buf.append("<li><b>").append(_("status")).append("</b>: ").append(_("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
+        buf.append("</ul></i>");
         out.write(buf.toString());
         out.flush();
     }

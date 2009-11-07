@@ -77,10 +77,6 @@ public class NetDbRenderer {
         out.flush();
     }
 
-    public void renderStatusHTML(Writer out) throws IOException {
-        renderStatusHTML(out, true);
-    }
-
     public void renderLeaseSetHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
@@ -131,7 +127,10 @@ public class NetDbRenderer {
         out.flush();
     }
 
-    public void renderStatusHTML(Writer out, boolean full) throws IOException {
+    /**
+     *  @param mode 0: our info and charts only; 1: full routerinfos and charts; 2: abbreviated routerinfos and charts
+     */
+    public void renderStatusHTML(Writer out, int mode) throws IOException {
         out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View LeaseSets") + "</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
             out.write(_("Not initialized"));
@@ -139,13 +138,16 @@ public class NetDbRenderer {
             return;
         }
         
+        boolean full = mode == 1;
+        boolean shortStats = mode == 2;
+        boolean showStats = full || shortStats;
         Hash us = _context.routerHash();
         out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb.jsp");
-        if (full)
-            out.write("#routers\" >" + _("view without"));
+        if (full || !showStats)
+            out.write("?f=2#routers\" >" + _("Show all routers"));
         else
-            out.write("?f=1#routers\" >" + _("view with"));
-        out.write(' ' + _("stats") + "</a>)</h3>\n");
+            out.write("?f=1#routers\" >" + _("Show all routers with full stats"));
+        out.write("</a>)</h3>\n");
         
         StringBuilder buf = new StringBuilder(8192);
         RouterInfo ourInfo = _context.router().getRouterInfo();
@@ -163,9 +165,11 @@ public class NetDbRenderer {
             Hash key = ri.getIdentity().getHash();
             boolean isUs = key.equals(us);
             if (!isUs) {
-                renderRouterInfo(buf, ri, false, full);
-                out.write(buf.toString());
-                buf.setLength(0);
+                if (showStats) {
+                    renderRouterInfo(buf, ri, false, full);
+                    out.write(buf.toString());
+                    buf.setLength(0);
+                }
                 String routerVersion = ri.getOption("router.version");
                 if (routerVersion != null)
                     versions.increment(routerVersion);
@@ -194,14 +198,14 @@ public class NetDbRenderer {
             
         List<String> countryList = new ArrayList(countries.objects());
         if (countryList.size() > 0) {
-            Collections.sort(countryList);
+            Collections.sort(countryList, new CountryComparator());
             buf.append("<table>\n");
             buf.append("<tr><th align=\"left\">" + _("Country") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
-                buf.append(_context.commSystem().getCountryName(country));
+                buf.append(_(_context.commSystem().getCountryName(country)));
                 buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
@@ -211,6 +215,14 @@ public class NetDbRenderer {
         out.flush();
     }
     
+    /** sort by translated country name */
+    private class CountryComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return _(_context.commSystem().getCountryName((String)l))
+                    .compareTo(_(_context.commSystem().getCountryName((String)r)));
+        }
+    }
+
     /**
      *  Be careful to use stripHTML for any displayed routerInfo data
      *  to prevent vulnerabilities

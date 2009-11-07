@@ -8,9 +8,9 @@ Deploy the Jetty archive, a clean checkout lacks it
 
 Change revision in:
 	history.txt
-	initialNews.xml
+	installer/resources/initialNews.xml
 	installer/install.xml
-	news.xml
+	installer/resources/news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
 		(change to BUILD = 0 and EXTRA = "")
 	core/java/src/net/i2p/CoreVersion.java
@@ -22,6 +22,8 @@ Review the complete diff from the last release:
 Verify that no untrusted revisions were inadvertently
 blessed by a trusted party:
         mtn log --brief --no-graph --to t:i2p-0.7.(xx-1) | cut -d ' ' -f 2- | sort
+
+NOTE: Most tasks below here are now automated by 'ant release'
 
 Build and tag:
 	ant pkg
@@ -60,16 +62,18 @@ Generate PGP signatures:
 	gpg -b i2pupdate-0.7.xx.zip
 	gpg -b i2pupdate.sud
 
+(end of tasks automated by 'ant release')
+
 Distribute files to download locations and to www.i2p2.i2p
 
 Website files to change:
 	Sync with mtn.i2p2.i2p
 	announcements.html
-	announcements_de.html
-	download.html (change SHA256s)
-	download_de.html (change SHA256s)
+	announcements_*.html
+	download.html (change version numbers and SHA256s)
+	download_*.html (change version numbers and SHA256s)
 	index.html
-	index_de.html
+	index_*.html
 	hosts.txt (copy from mtn)
         release-x.y.z.html (new)
 	Sync with mtn.i2p2.i2p
