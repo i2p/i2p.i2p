@@ -118,7 +118,7 @@ public class ConfigStatsHandler extends FormHandler {
             addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
         else
             addFormError(_("Failed to update the stat filter and location"));
-        addFormNotice("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>");
+        addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));
     }
     
 }
