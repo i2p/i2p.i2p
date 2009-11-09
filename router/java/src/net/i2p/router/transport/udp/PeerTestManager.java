@@ -163,7 +163,24 @@ class PeerTestManager {
         if (_currentTestComplete)
             return;
         if ( (DataHelper.eq(from.getIP(), test.getBobIP().getAddress())) && (from.getPort() == test.getBobPort()) ) {
-            byte ip[] = new byte[testInfo.readIPSize()];
+            // The reply is from Bob
+
+            int ipSize = testInfo.readIPSize();
+            if (ipSize != 4 && ipSize != 16) {
+                // There appears to be a bug where Bob is sending us a zero-length IP.
+                // We could proceed without setting the IP, but then when Charlie
+                // sends us his message, we will think we are behind a symmetric NAT
+                // because the Bob and Charlie IPs won't match.
+                // So for now we just return and pretend we didn't hear from Bob at all.
+                // Which is essentially what catching the uhe below did,
+                // but without the error message to the log.
+                // To do: fix the bug.
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Bad IP length " + ipSize +
+                               " from bob's reply: " + from + ", " + testInfo);
+                return;
+            }
+            byte ip[] = new byte[ipSize];
             testInfo.readIP(ip, 0);
             try {
                 InetAddress addr = InetAddress.getByAddress(ip);
@@ -177,10 +194,12 @@ class PeerTestManager {
                     testComplete(false);
             } catch (UnknownHostException uhe) {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to get our IP (length " + ip.length +
+                    _log.error("Unable to get our IP (length " + ipSize +
                                ") from bob's reply: " + from + ", " + testInfo, uhe);
             }
         } else {
+            // The reply is from Charlie
+
             PeerState charlieSession = _transport.getPeerState(from);
             long recentBegin = _context.clock().now() - CHARLIE_RECENT_PERIOD;
             if ( (charlieSession != null) && 

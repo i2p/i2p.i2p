@@ -82,6 +82,8 @@ public class UDPEndpoint {
 ********/
     
     /** 8998 is monotone, and 32000 is the wrapper, so let's stay between those */
+    public static final String PROP_MIN_PORT = "i2np.udp.minPort";
+    public static final String PROP_MAX_PORT = "i2np.udp.maxPort";
     private static final int MIN_RANDOM_PORT = 9111;
     private static final int MAX_RANDOM_PORT = 31777;
     private static final int MAX_PORT_RETRIES = 20;
@@ -100,7 +102,9 @@ public class UDPEndpoint {
              if (port <= 0) {
                  // try random ports rather than just do new DatagramSocket()
                  // so we stay out of the way of other I2P stuff
-                 port = MIN_RANDOM_PORT + _context.random().nextInt(MAX_RANDOM_PORT - MIN_RANDOM_PORT);
+                 int minPort = _context.getProperty(PROP_MIN_PORT, MIN_RANDOM_PORT);
+                 int maxPort = _context.getProperty(PROP_MAX_PORT, MAX_RANDOM_PORT);
+                 port = minPort + _context.random().nextInt(maxPort - minPort);
              }
              try {
                  if (_bindAddress == null)
