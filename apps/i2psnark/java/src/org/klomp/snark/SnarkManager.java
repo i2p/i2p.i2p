@@ -552,11 +552,15 @@ public class SnarkManager implements Snark.CompleteListener {
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
             return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it!";
+        } else if ( (files == null) && (info.getName().endsWith(".torrent")) ) {
+            return "Torrent file " + info.getName() + " cannot end in '.torrent', deleting it!";
         } else if (info.getPieces() <= 0) {
             return "No pieces in " + info.getName() + "?  deleting it!";
+        } else if (info.getPieces() > Storage.MAX_PIECES) {
+            return "Too many pieces in " + info.getName() + ", limit is " + Storage.MAX_PIECES + ", deleting it!";
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
             return "Pieces are too large in " + info.getName() + " (" + DataHelper.formatSize(info.getPieceLength(0)) +
-                   "B), deleting it.";
+                   "B, limit is " + DataHelper.formatSize(Storage.MAX_PIECE_SIZE) + "B), deleting it.";
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
