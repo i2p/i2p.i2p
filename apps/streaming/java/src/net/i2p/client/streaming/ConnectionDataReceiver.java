@@ -170,7 +170,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         packet.setOptionalDelay(choke);
         if (choke > 0)
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
-        packet.setResendDelay(con.getOptions().getResendDelay());
+        // bugfix release 0.7.8, we weren't dividing by 1000
+        packet.setResendDelay(con.getOptions().getResendDelay() / 1000);
         
         if (con.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, true);

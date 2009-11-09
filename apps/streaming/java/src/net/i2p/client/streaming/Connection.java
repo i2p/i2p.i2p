@@ -1105,7 +1105,8 @@ public class Connection {
                 if (choke > 0)
                     _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
-                _packet.setResendDelay(getOptions().getResendDelay());
+                // bugfix release 0.7.8, we weren't dividing by 1000
+                _packet.setResendDelay(getOptions().getResendDelay() / 1000);
                 if (_packet.getReceiveStreamId() <= 0)
                     _packet.setReceiveStreamId(_receiveStreamId);
                 if (_packet.getSendStreamId() <= 0)
