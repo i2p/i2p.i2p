@@ -157,6 +157,7 @@ public class NetDbRenderer {
         
         ObjectCounter<String> versions = new ObjectCounter();
         ObjectCounter<String> countries = new ObjectCounter();
+        int[] transportCount = new int[8];
         
         Set routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
@@ -176,10 +177,12 @@ public class NetDbRenderer {
                 String country = _context.commSystem().getCountry(key);
                 if(country != null)
                     countries.increment(country);
+                transportCount[classifyTransports(ri)]++;
             }
         }
             
-        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td>");
+        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">").append(_("Network Database Router Statistics")).append("</th><tr><td>");
+        // versions table
         List<String> versionList = new ArrayList(versions.objects());
         if (versionList.size() > 0) {
             Collections.sort(versionList, Collections.reverseOrder(new TrustedUpdate.VersionComparator()));
@@ -196,6 +199,22 @@ public class NetDbRenderer {
         out.write(buf.toString());
         buf.setLength(0);
             
+        // transports table
+        buf.append("<table>\n");
+        buf.append("<tr><th align=\"left\">" + _("Addresses") + "</th><th>" + _("Count") + "</th></tr>\n");
+        for (int i = 0; i < 8; i++) {
+            int num = transportCount[i];
+            if (num > 0) {
+                buf.append("<tr><td>").append(_(TNAMES[i]));
+                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
+            }
+        }
+        buf.append("</table>\n");
+        buf.append("</td><td>");
+        out.write(buf.toString());
+        buf.setLength(0);
+
+        // country table
         List<String> countryList = new ArrayList(countries.objects());
         if (countryList.size() > 0) {
             Collections.sort(countryList, new CountryComparator());
@@ -210,6 +229,7 @@ public class NetDbRenderer {
             }
             buf.append("</table>\n");
         }
+
         buf.append("</td></tr></table>");
         out.write(buf.toString());
         out.flush();
@@ -277,9 +297,40 @@ public class NetDbRenderer {
         buf.append("</td></tr>\n");
     }
 
+    private static final int SSU = 1;
+    private static final int SSUI = 2;
+    private static final int NTCP = 4;
+    private static final String[] TNAMES = { _x("Hidden or starting up"), _x("SSU"), _x("SSU with introducers"), "",
+                                  _x("NTCP"), _x("NTCP and SSU"), _x("NTCP and SSU with introducers"), "" };
+    /**
+     *  what transport types
+     */
+    private int classifyTransports(RouterInfo info) {
+        int rv = 0;
+        String hash = info.getIdentity().getHash().toBase64();
+        for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
+            RouterAddress addr = (RouterAddress)iter.next();
+            String style = addr.getTransportStyle();
+            if (style.equals("NTCP")) {
+                rv |= NTCP;
+            } else if (style.equals("SSU")) {
+                if (addr.getOptions().getProperty("iport0") != null)
+                    rv |= SSUI;
+                else
+                    rv |= SSU;
+            }
+        }
+        return rv;
+    }
+
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /** tag only */
+    private static final String _x(String s) {
+        return s;
     }
 
     /**
