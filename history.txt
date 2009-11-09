@@ -1,3 +1,7 @@
+2009-11-09
+    * New midnight blue lightweight theme; supports IE and provisions its own console_big.css
+    * Streamlining and honing of console_big.css
+
 2009-11-08 zzz
     * Console:
       - countries.txt: Convert to mixed case, include in update
