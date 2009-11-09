@@ -118,7 +118,7 @@ public class SummaryBarRenderer {
                .append(_("Graphs"))
                .append("</a>\n" +
 
-                       "<a href=\"oldstats.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"stats.jsp\" target=\"_top\" title=\"")
                .append(_("Textual router performance statistics"))
                .append("\">")
                .append(_("Stats"))

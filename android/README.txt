@@ -1,8 +1,12 @@
-These instructions are for the 1.5 SDK.
+These instructions are for the 1.5 Android SDK.
 The build file is not compatible with the 1.1 SDK any more.
+1.6 and 2.0 SDKs are untested.
 
 #Unzip the android SDK in ../../
 #So then the android tools will be in ../../android-sdk-linux_x86-1.5_r2/tools/
+
+# create a file local.properties with the following line:
+# sdk-location=/path/to/your/android-sdk-linux_x86-1.5_r2
 
 #then build the android apk file:
 ant debug

@@ -8,6 +8,20 @@ CLASS=net.i2p.router.web.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC
 
+#
+# generate strings/Countries.java from ../../../installer/resources/countries.txt
+#
+CFILE=../../../installer/resources/countries.txt
+JFILE=build/Countries.java
+if [ $CFILE -nt $JFILE -o ! -s $JFILE ]
+then
+	mkdir -p build
+        echo '// Automatically generated pseudo-java for xgettext - do not edit' > $JFILE
+	echo '// Translators may wish to translate a few of these, do not bother to translate all of them!!' >> $JFILE
+	sed 's/..,\(..*\)/_("\1");/' $CFILE >> $JFILE
+fi
+
+JPATHS="src ../jsp/WEB-INF strings $JFILE"
 for i in ../locale/messages_*.po
 do
 	# get language
@@ -15,7 +29,7 @@ do
 	LG=${LG%.po}
 
 	# make list of java files newer than the .po file
-	find src ../jsp/WEB-INF strings -name *.java -newer $i > $TMPFILE
+	find $JPATHS -name *.java -newer $i > $TMPFILE
 	if [ -s build/obj/net/i2p/router/web/messages_$LG.class -a \
 	     build/obj/net/i2p/router/web/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
@@ -37,7 +51,7 @@ do
 	# In a jsp, you must use a helper or handler that has the context set.
 	# To start a new translation, copy the header from an old translation to the new .po file,
 	# then ant distclean updater.
-	find src ../jsp/WEB-INF strings -name *.java > $TMPFILE
+	find $JPATHS -name *.java > $TMPFILE
 	xgettext -f $TMPFILE -F -L java --from-code=UTF-8 \
                  --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
                  --keyword=handler._ --keyword=formhandler._ \

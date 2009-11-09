@@ -329,6 +329,7 @@ class BuildHandler {
         }
     }
     
+    /** @return handle time or -1 */
     private long handleRequest(BuildMessageState state) {
         long timeSinceReceived = System.currentTimeMillis()-state.recvTime;
         if (_log.shouldLog(Log.DEBUG))

@@ -26,6 +26,10 @@ public class DBHistory {
     private long _lookupsReceived;
     private long _avgDelayBetweenLookupsReceived;
     private long _lastLookupReceived;
+    private long _lastLookupSuccessful;
+    private long _lastLookupFailed;
+    private long _lastStoreSuccessful;
+    private long _lastStoreFailed;
     private long _unpromptedDbStoreNew;
     private long _unpromptedDbStoreOld;
     private String _statGroup;
@@ -50,24 +54,47 @@ public class DBHistory {
         createRates(statGroup);
     }
     
-    /** how many times we have sent them a db lookup and received the value back from them */
+    /** how many times we have sent them a db lookup and received the value back from them
+     *  @deprecated unused
+     */
     public long getSuccessfulLookups() { return _successfulLookups; }
-    /** how many times we have sent them a db lookup and not received the value or a lookup reply */
+    /** how many times we have sent them a db lookup and not received the value or a lookup reply
+     *  @deprecated unused
+     */
     public long getFailedLookups() { return _failedLookups; }
-    /** how many peers that we have never seen before did lookups provide us with? */
+    /** how many peers that we have never seen before did lookups provide us with?
+     *  @deprecated unused
+     */
     public long getLookupReplyNew() { return _lookupReplyNew; }
-    /** how many peers that we have already seen did lookups provide us with? */
+    /** how many peers that we have already seen did lookups provide us with?
+     *  @deprecated unused
+     */
     public long getLookupReplyOld() { return _lookupReplyOld; }
-    /** how many peers that we explicitly asked the peer not to send us did they reply with? */
+    /** how many peers that we explicitly asked the peer not to send us did they reply with?
+     *  @deprecated unused
+     */
     public long getLookupReplyDuplicate() { return _lookupReplyDuplicate; }
-    /** how many peers that were incorrectly formatted / expired / otherwise illegal did lookups provide us with? */
+    /** how many peers that were incorrectly formatted / expired / otherwise illegal did lookups provide us with?
+     *  @deprecated unused
+     */
     public long getLookupReplyInvalid() { return _lookupReplyInvalid; }
-    /** how many lookups this peer has sent us? */
+    /** how many lookups this peer has sent us?
+     *  @deprecated unused
+     */
     public long getLookupsReceived() { return _lookupsReceived; }
-    /** how frequently do they send us lookup requests? */
+    /** how frequently do they send us lookup requests?
+     *  @deprecated unused
+     */
     public long getAvgDelayBetweenLookupsReceived() { return _avgDelayBetweenLookupsReceived; }
-    /** when did they last send us a request? */
+    /** when did they last send us a request?
+     *  @deprecated unused
+     */
     public long getLastLookupReceived() { return _lastLookupReceived; }
+    public long getLastLookupSuccessful() { return _lastLookupSuccessful; }
+    public long getLastLookupFailed() { return _lastLookupFailed; }
+    public long getLastStoreSuccessful() { return _lastStoreSuccessful; }
+    public long getLastStoreFailed() { return _lastStoreFailed; }
+
     /** how many times have they sent us data we didn't ask for and that we've never seen? */
     public long getUnpromptedDbStoreNew() { return _unpromptedDbStoreNew; }
     /** how many times have they sent us data we didn't ask for but that we have seen? */
@@ -87,14 +114,37 @@ public class DBHistory {
      */
     public void lookupSuccessful() {
         _successfulLookups++;
+        _lastLookupSuccessful = _context.clock().now();
     }
+
     /**
      * Note that the peer failed to respond to the db lookup in any way
      */
     public void lookupFailed() {
         _failedLookups++;
         _failedLookupRate.addData(1, 0);
+        _lastLookupFailed = _context.clock().now();
     }
+
+    /**
+     * Note that we successfully stored to a floodfill peer and verified the result
+     * by asking another floodfill peer
+     *
+     */
+    public void storeSuccessful() {
+        _lastStoreSuccessful = _context.clock().now();
+    }
+
+    /**
+     * Note that floodfill verify failed
+     */
+    public void storeFailed() {
+        // Fixme, redefined this to include both lookup and store fails,
+        // need to fix the javadocs
+        _failedLookupRate.addData(1, 0);
+        _lastStoreFailed = _context.clock().now();
+    }
+
     /**
      * Receive a lookup reply from the peer, where they gave us the specified info
      *
@@ -186,7 +236,7 @@ public class DBHistory {
         _invalidReplyRate.store(out, "dbHistory.invalidReplyRate");
     }
     
-    private void add(StringBuilder buf, String name, long val, String description) {
+    private static void add(StringBuilder buf, String name, long val, String description) {
         buf.append("# ").append(name.toUpperCase()).append(NL).append("# ").append(description).append(NL);
         buf.append("dbHistory.").append(name).append('=').append(val).append(NL).append(NL);
     }
@@ -224,8 +274,8 @@ public class DBHistory {
             _failedLookupRate = new RateStat("dbHistory.failedLookupRate", "How often does this peer to respond to a lookup?", statGroup, new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         if (_invalidReplyRate == null)
             _invalidReplyRate = new RateStat("dbHistory.invalidReplyRate", "How often does this peer give us a bad (nonexistant, forged, etc) peer?", statGroup, new long[] { 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-            _failedLookupRate.setStatLog(_context.statManager().getStatLog());
-            _invalidReplyRate.setStatLog(_context.statManager().getStatLog());
+        _failedLookupRate.setStatLog(_context.statManager().getStatLog());
+        _invalidReplyRate.setStatLog(_context.statManager().getStatLog());
     }
     
     private final static long getLong(Properties props, String key) {

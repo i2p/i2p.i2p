@@ -1,3 +1,16 @@
+2009-11-08 zzz
+    * Console:
+      - countries.txt: Convert to mixed case, include in update
+      - netdb.jsp: Hide all routers by default, sort and tag country names
+      - oldstats.jsp: Move to stats.jsp
+      - profiles.jsp: Show new DBH times instead of counts
+    * Profiles:
+      - Track last good and bad lookup times
+        and last good and bad store times,
+        to prep for floodfill changes
+      - Don't reset last-heard-about at router startup
+    * Checklist and Android readme fixups
+
 2009-11-04 zzz
     * Build:
       - Move some files to installer/resources

@@ -249,15 +249,18 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that we've confirmed a successful send of db data to the peer (though we haven't
      * necessarily requested it again from them, so they /might/ be lying)
      *
+     * This will force creation of DB stats
      */
     public void dbStoreSent(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         long now = _context.clock().now();
         data.setLastHeardFrom(now);
-        if (!data.getIsExpandedDB())
-            return;
         data.setLastSendSuccessful(now);
+        if (!data.getIsExpandedDB())
+            data.expandDBProfile();
+        DBHistory hist = data.getDBHistory();
+        hist.storeSuccessful();
         // we could do things like update some sort of "how many successful stores we've sent them"...
         // naah.. dont really care now
     }
@@ -266,8 +269,15 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that we were unable to confirm a successful send of db data to
      * the peer, at least not within our timeout period
      *
+     * This will force creation of DB stats
      */
     public void dbStoreFailed(Hash peer) {
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        if (!data.getIsExpandedDB())
+            data.expandDBProfile();
+        DBHistory hist = data.getDBHistory();
+        hist.storeSuccessful();
         // we could do things like update some sort of "how many successful stores we've
         // failed to send them"...
     }

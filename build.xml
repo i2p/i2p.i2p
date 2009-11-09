@@ -410,6 +410,8 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+        <!-- decapitalized the file in 0.7.8 -->
+        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
