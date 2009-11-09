@@ -1,125 +1,38 @@
-/* Classic Theme: Larger fontsize override for sidepanel to accomodate foreign charactersets */
+/* Classic & Midnight Themes */
+/* Larger fontsize override for sidepanel to accomodate foreign charactersets */
 
 /* sidepanel */
 
-div.routersummaryouter {
-     float: left; 
-     width: 200px;
-     margin: 0;
-     padding: 0;
-     border: 0;
-     clear: left; /* fixes a bug in Opera */
-}
-
 div.routersummary {
-     background: #ddf;
-     width: 185px;
-     color: inherit;
-     margin: 0;
-     padding: 10px 1px 7px 1px;
-     text-align: center !important;
-     border: 5px solid #bbf;
-     font-size: 9.5pt;
-     word-wrap: break-word;
      font: 9.5pt/125%;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
-}
-
-div.routersummary input[type=text] {
-     text-align: right !important;
-}
-
-div.routersummary hr {
-     color: #eef;
-     background: #eef;
-     height: 2px;
-     border-bottom: 1px solid #eef;
-     margin: 8px 1px 7px 1px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
 }
 
 div.routersummary h3 {
-     border: 0px solid #f00;
      font-size: 12.5pt;
-     letter-spacing: 0.05em;
-     margin: -7px 1px -7px 1px;
-     padding: 4px 0;
-     background: #c5d5fb;
-     text-transform: uppercase;
 }
 
 div.routersummary h4 {
-     border: 0px solid #f00;
-     border-bottom: 0 !important;
      font-size: 11.5pt;
-     letter-spacing: 0.05em;
-     margin: -7px 1px -7px 1px !important;
-     padding: 2px 3px 5px 3px;
-     background: #c1d1f7;
-     text-transform: capitalize;
-     text-decoration: none !important;
-     color: #2b2;
 }
 
 div.routersummary table {
-     border: 0;
-     text-align: center !important;
-     margin: -5px 4px -5px 3px;
-     width: 180px !important;
-     overflow: hidden;
      font-size: 8.5pt;
-     padding: 0 -10px;
-     background-image: none !important;
-     background-color: transparent !important;
 }
 
-div.routersummary table a:link {
+div.routersummary table a:link, div.routersummary table a:visited {
      font-size: 10.5pt;
 }     
 
-div.routersummary tr {
-     background-image: none !important;
-     background-color: transparent !important;
-     border: 0 !important;
+div.tunnels a{
+     font-size: 8pt !important;
 }
 
-div.tunnels table{
-     margin: 0 !important;
+/* global overrides */
+
+a, b {
+    font-weight: normal !important;
 }
 
-.tunnels tr {
-     padding: 2px 0 !important;
-     margin-left: -7px !important;
+body {
+     font: 10pt/140% "Bitstream Vera Sans", Verdana, Helvetica, Sans, sans-serif;
 }
-     
-div.routersummary form {
-     margin-top: -6px !important;
-     margin-bottom: -4px !important;     
-}
-
-div.refresh {
-     margin-top: 10px !important;
-     margin-bottom: 10px !important;
-     padding: 2px 0 !important;
-}
-
-div.routersummary p {
-     padding: 0;
-}     
-
-div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.2);
-}
-
-div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
-     color: #f60;
-}
-
-div.routersummary td {
-     padding: 0 4px;
-     background-image: none !important;
-     border: 0 !important;
-}
-
-
