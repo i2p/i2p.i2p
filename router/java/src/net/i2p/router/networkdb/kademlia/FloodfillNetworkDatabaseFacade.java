@@ -179,8 +179,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             return false;
     }
 
-    public List getKnownRouterData() {
-        List rv = new ArrayList();
+    public List<RouterInfo> getKnownRouterData() {
+        List<RouterInfo> rv = new ArrayList();
         DataStore ds = getDataStore();
         if (ds != null) {
             Set keys = ds.getKeys();
@@ -188,7 +188,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
                     Object o = getDataStore().get((Hash)iter.next());
                     if (o instanceof RouterInfo)
-                        rv.add(o);
+                        rv.add((RouterInfo)o);
                 }
             }
         }
@@ -237,7 +237,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      * Ok, the initial set of searches to the floodfill peers timed out, lets fall back on the
      * wider kademlia-style searches
      */
-    void searchFull(Hash key, List onFind, List onFailed, long timeoutMs, boolean isLease) {
+    void searchFull(Hash key, List<Job> onFind, List<Job> onFailed, long timeoutMs, boolean isLease) {
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
         
         Job find = null;
@@ -245,13 +245,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         if (onFind != null) {
             synchronized (onFind) {
                 if (onFind.size() > 0)
-                    find = (Job)onFind.remove(0);
+                    find = onFind.remove(0);
             } 
         }
         if (onFailed != null) {
             synchronized (onFailed) {
                 if (onFailed.size() > 0)
-                    fail = (Job)onFailed.remove(0);
+                    fail = onFailed.remove(0);
             }
         }
         SearchJob job = super.search(key, find, fail, timeoutMs, isLease);
@@ -260,14 +260,14 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                 _log.info("Floodfill search timed out for " + key.toBase64() + ", falling back on normal search (#" 
                           + job.getJobId() + ") with " + timeoutMs + " remaining");
             long expiration = timeoutMs + _context.clock().now();
-            List removed = null;
+            List<Job> removed = null;
             if (onFind != null) {
                 synchronized (onFind) {
                     removed = new ArrayList(onFind);
                     onFind.clear();
                 }
                 for (int i = 0; i < removed.size(); i++)
-                    job.addDeferred((Job)removed.get(i), null, expiration, isLease);
+                    job.addDeferred(removed.get(i), null, expiration, isLease);
                 removed = null;
             }
             if (onFailed != null) {
@@ -276,7 +276,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
                     onFailed.clear();
                 }
                 for (int i = 0; i < removed.size(); i++)
-                    job.addDeferred(null, (Job)removed.get(i), expiration, isLease);
+                    job.addDeferred(null, removed.get(i), expiration, isLease);
                 removed = null;
             }
         }
@@ -287,8 +287,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     
     /** list of the Hashes of currently known floodfill peers;
       * Returned list will not include our own hash.
+      *  List is not sorted and not shuffled.
       */
-    public List getFloodfillPeers() {
+    public List<Hash> getFloodfillPeers() {
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         return sel.selectFloodfillParticipants(getKBuckets());
     }

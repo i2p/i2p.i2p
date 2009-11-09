@@ -22,12 +22,19 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
+/**
+ *  This is where we implement semi-Kademlia with the floodfills, by
+ *  selecting floodfills closest to a given key for
+ *  searches and stores.
+ *
+ */
 class FloodfillPeerSelector extends PeerSelector {
     public FloodfillPeerSelector(RouterContext ctx) { super(ctx); }
     
     /**
      * Pick out peers with the floodfill capacity set, returning them first, but then
      * after they're complete, sort via kademlia.
+     * Puts the floodfill peers that are directly connected first in the list.
      *
      * @return List of Hash for the peers selected
      */
@@ -36,6 +43,13 @@ class FloodfillPeerSelector extends PeerSelector {
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, true);
     }
 
+    /**
+     * Pick out peers with the floodfill capacity set, returning them first, but then
+     * after they're complete, sort via kademlia.
+     * Does not prefer the floodfill peers that are directly connected.
+     *
+     * @return List of Hash for the peers selected
+     */
     @Override
     public List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, false);
@@ -58,7 +72,7 @@ class FloodfillPeerSelector extends PeerSelector {
     
     /**
      *  @return all floodfills not shitlisted forever. list will not include our own hash
-     *
+     *  List is not sorted and not shuffled.
      */
     public List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
         if (kbuckets == null) return new ArrayList();
@@ -69,6 +83,7 @@ class FloodfillPeerSelector extends PeerSelector {
     
     /**
      *  @return all floodfills not shitlisted foreverx
+     *  @param key the routing key
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
      */
@@ -104,7 +119,13 @@ class FloodfillPeerSelector extends PeerSelector {
             _matches = 0;
             _wanted = wanted;
         }
+
+        /**
+         *  @return unsorted list of all with the 'f' mark in their netdb
+         *          except for shitlisted ones.
+         */
         public List<Hash> getFloodfillParticipants() { return _floodfillMatches; }
+
         private static final int EXTRA_MATCHES = 100;
         public void add(Hash entry) {
             //if (_context.profileOrganizer().isFailing(entry))
@@ -144,6 +165,14 @@ class FloodfillPeerSelector extends PeerSelector {
             return get(howMany, false);
         }
 
+        /**
+         *  @return list of all with the 'f' mark in their netdb except for shitlisted ones.
+         *  The list is in 3 groups - unsorted (shuffled) within each group.
+         *  Group 1: If preferConnected = true, the peers we are directly
+         *           connected to, that meet the group 2 criteria
+         *  Group 2: Netdb published less than 3h ago, no bad send in last 30m.
+         *  Group 3: All others
+         */
         public List<Hash> get(int howMany, boolean preferConnected) {
             Collections.shuffle(_floodfillMatches, _context.random());
             List<Hash> rv = new ArrayList(howMany);
