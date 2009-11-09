@@ -33,8 +33,13 @@ class Dummy {
         _("shared clients");
         _("IRC proxy");
         _("eepsite");
+        // older names for pre-0.7.4 installs
+        _("eepProxy");
+        _("ircProxy");
         // hardcoded in i2psnark
         _("I2PSnark");
+        // hardcoded in iMule?
+        _("iMule");
 
         // standard themes for ConfigUIHelper
         _("classic");
