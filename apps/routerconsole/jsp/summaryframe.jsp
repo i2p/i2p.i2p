@@ -53,7 +53,7 @@
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
-        out.print("<hr><div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"GET\">\n");
+        out.print("<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"GET\">\n");
         if ("0".equals(d)) {
             out.print("<b>");
             out.print(intl._("Refresh (s)"));
@@ -68,7 +68,7 @@
             out.print(intl._("Disable {0}s Refresh", d));
             out.print("</button></div>\n");
         }
-        out.print("</form><hr>\n");
+        out.print("</form>\n");
     }
 %>
 </div></body></html>
