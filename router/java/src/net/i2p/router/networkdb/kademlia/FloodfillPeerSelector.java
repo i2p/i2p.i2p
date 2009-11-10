@@ -129,20 +129,28 @@ class FloodfillPeerSelector extends PeerSelector {
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 if (prof != null && prof.getDBHistory() != null
-                    && now - prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
-                    && now - prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD) {
+                    && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
+                    && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD) {
                     // good
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Good: " + entry);
                     rv.add(entry);
                     found++;
                 } else if (prof != null && prof.getDBHistory() != null
-                           && now - prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
-                           && now - prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK) {
+                           && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
+                           && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("OK: " + entry);
                     okff.add(entry);
                 } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Bad: " + entry);
                     badff.add(entry);
                 }
             }
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Good: " + rv + " OK: " + okff + " Bad: " + badff);
 
         // Put the ok floodfills after the good floodfills
         for (int i = 0; found < howMany && i < okff.size(); i++) {
