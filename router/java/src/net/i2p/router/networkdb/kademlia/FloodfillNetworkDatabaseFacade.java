@@ -67,7 +67,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new FloodfillDatabaseStoreMessageHandler(_context, this));
     }
     
-    private static final long PUBLISH_TIMEOUT = 30*1000;
+    /**
+     *  This maybe could be shorter than RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT,
+     *  because we are sending direct, but unresponsive floodfills may take a while due to timeouts.
+     */
+    static final long PUBLISH_TIMEOUT = 90*1000;
     
     /**
      * @throws IllegalArgumentException if the local router info is invalid

@@ -176,14 +176,19 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         public void setMessage(I2NPMessage message) { _message = message; }
     }
     
-    /** the netDb store failed to verify, so resend it to a random floodfill peer */
+    /**
+     *  the netDb store failed to verify, so resend it to a random floodfill peer
+     *  Fixme - this can loop for a long time - do we need a token or counter
+     *  so we don't have multiple verify jobs?
+     */
     private void resend() {
-        DataStructure ds = null;
-        ds = _facade.lookupLeaseSetLocally(_key);
-        if (ds == null)
+        DataStructure ds;
+        if (_isRouterInfo)
             ds = _facade.lookupRouterInfoLocally(_key);
+        else
+            ds = _facade.lookupLeaseSetLocally(_key);
         if (ds != null)
-            _facade.sendStore(_key, ds, null, null, VERIFY_TIMEOUT, null);
+            _facade.sendStore(_key, ds, null, null, FloodfillNetworkDatabaseFacade.PUBLISH_TIMEOUT, null);
     }
     
     private class VerifyTimeoutJob extends JobImpl {
@@ -197,6 +202,8 @@ public class FloodfillVerifyStoreJob extends JobImpl {
             if (_sentTo != null)
                 getContext().profileManager().dbStoreFailed(_sentTo);
             getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime, 0);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Verify timed out");
             resend(); 
         }
     }

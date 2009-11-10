@@ -109,9 +109,13 @@ class StoreJob extends JobImpl {
         }
         if (isExpired()) {
             _state.complete(true);
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Expired: " + _timeoutMs);
             fail();
         } else if (_state.getAttempted().size() > MAX_PEERS_SENT) {
             _state.complete(true);
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Max sent");
             fail();
         } else {
             //if (_log.shouldLog(Log.INFO))
@@ -147,10 +151,11 @@ class StoreJob extends JobImpl {
         // the network to scale.
         // Perhaps the ultimate solution is to send RouterInfos through a lease also.
         List<Hash> closestHashes;
-        if (_state.getData() instanceof RouterInfo) 
-            closestHashes = getMostReliableRouters(_state.getTarget(), toCheck, _state.getAttempted());
-        else
-            closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        //if (_state.getData() instanceof RouterInfo) 
+        //    closestHashes = getMostReliableRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        //else
+        //    closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
+        closestHashes = getClosestFloodfillRouters(_state.getTarget(), toCheck, _state.getAttempted());
         if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
             if (_state.getPending().size() <= 0) {
                 if (_log.shouldLog(Log.INFO))
@@ -217,6 +222,7 @@ class StoreJob extends JobImpl {
      *
      * @return ordered list of Hash objects
      */
+/*****
     private List<Hash> getClosestRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         //if (_log.shouldLog(Log.DEBUG))
@@ -226,13 +232,27 @@ class StoreJob extends JobImpl {
         if (ks == null) return new ArrayList();
         return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, ks);
     }
+*****/
 
+    /** used for routerinfo stores, prefers those already connected */
+/*****
     private List<Hash> getMostReliableRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         KBucketSet ks = _facade.getKBuckets();
         if (ks == null) return new ArrayList();
         return _peerSelector.selectMostReliablePeers(rkey, numClosest, alreadyChecked, ks);
     }
+*****/
+
+    private List<Hash> getClosestFloodfillRouters(Hash key, int numClosest, Set<Hash> alreadyChecked) {
+        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
+        KBucketSet ks = _facade.getKBuckets();
+        if (ks == null) return new ArrayList();
+        return ((FloodfillPeerSelector)_peerSelector).selectFloodfillParticipants(rkey, numClosest, alreadyChecked, ks);
+    }
+
+    /** limit expiration for direct sends */
+    private static final int MAX_DIRECT_EXPIRATION = 15*1000;
 
     /**
      * Send a store to the given peer through a garlic route, including a reply 
@@ -242,9 +262,11 @@ class StoreJob extends JobImpl {
     private void sendStore(RouterInfo router, int responseTime) {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         msg.setKey(_state.getTarget());
-        if (_state.getData() instanceof RouterInfo) 
+        if (_state.getData() instanceof RouterInfo) {
             msg.setRouterInfo((RouterInfo)_state.getData());
-        else if (_state.getData() instanceof LeaseSet) 
+            if (responseTime > MAX_DIRECT_EXPIRATION)
+                responseTime = MAX_DIRECT_EXPIRATION;
+        } else if (_state.getData() instanceof LeaseSet) 
             msg.setLeaseSet((LeaseSet)_state.getData());
         else
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
@@ -255,10 +277,10 @@ class StoreJob extends JobImpl {
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getJobId() + ": Dont send store to ourselves - why did we try?");
             return;
-        } else {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug(getJobId() + ": Send store to " + router.getIdentity().getHash().toBase64());
         }
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": Send store timeout is " + responseTime);
 
         sendStore(msg, router, getContext().clock().now() + responseTime);
     }
@@ -269,7 +291,6 @@ class StoreJob extends JobImpl {
             sendStoreThroughGarlic(msg, peer, expiration);
         } else {
             getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
-            // todo - shorter expiration for direct?
             sendDirect(msg, peer, expiration);
         }
     }

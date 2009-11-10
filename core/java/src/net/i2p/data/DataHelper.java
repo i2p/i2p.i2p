@@ -722,6 +722,7 @@ public class DataHelper {
         return true;
     }
     
+    /** treat bytes as unsigned */
     public final static int compareTo(byte lhs[], byte rhs[]) {
         if ((rhs == null) && (lhs == null)) return 0;
         if (lhs == null) return -1;
@@ -729,9 +730,9 @@ public class DataHelper {
         if (rhs.length < lhs.length) return 1;
         if (rhs.length > lhs.length) return -1;
         for (int i = 0; i < rhs.length; i++) {
-            if (rhs[i] > lhs[i])
+            if ((rhs[i] & 0xff) > (lhs[i] & 0xff))
                 return -1;
-            else if (rhs[i] < lhs[i]) return 1;
+            else if ((rhs[i] & 0xff) < (lhs[i] & 0xff)) return 1;
         }
         return 0;
     }

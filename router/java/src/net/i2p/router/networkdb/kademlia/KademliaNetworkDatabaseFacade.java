@@ -513,7 +513,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         // Don't spam the floodfills. In addition, always delay a few seconds since there may
         // be another leaseset change coming along momentarily.
-        long nextTime = Math.max(j.lastPublished() + j.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
+        long nextTime = Math.max(j.lastPublished() + RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
         j.getTiming().setStartAfter(nextTime);
         _context.jobQueue().addJob(j);
     }
@@ -885,20 +885,28 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** smallest allowed period */
-    private static final int MIN_PER_PEER_TIMEOUT = 5*1000;
-    private static final int MAX_PER_PEER_TIMEOUT = 10*1000;
-    
+    private static final int MIN_PER_PEER_TIMEOUT = 2*1000;
+    /**
+     *  We want FNDF.PUBLISH_TIMEOUT and RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT
+     *  to be greater than MAX_PER_PEER_TIMEOUT * TIMEOUT_MULTIPLIER by a factor of at least
+     *  3 or 4, to allow at least that many peers to be attempted for a store.
+     */
+    private static final int MAX_PER_PEER_TIMEOUT = 7*1000;
+    private static final int TIMEOUT_MULTIPLIER = 3;
+
+    /** todo: does this need more tuning? */
     public int getPeerTimeout(Hash peer) {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         double responseTime = MAX_PER_PEER_TIMEOUT;
         if (prof != null && prof.getIsExpandedDB()) {
-            responseTime = prof.getDbResponseTime().getLifetimeAverageValue();
-            if (responseTime < MIN_PER_PEER_TIMEOUT)
-                responseTime = MIN_PER_PEER_TIMEOUT;
-            else if (responseTime > MAX_PER_PEER_TIMEOUT)
+            responseTime = prof.getDbResponseTime().getRate(24*60*60*1000l).getAverageValue();
+            // if 0 then there is no data, set to max.
+            if (responseTime <= 0 || responseTime > MAX_PER_PEER_TIMEOUT)
                 responseTime = MAX_PER_PEER_TIMEOUT;
+            else if (responseTime < MIN_PER_PEER_TIMEOUT)
+                responseTime = MIN_PER_PEER_TIMEOUT;
         }
-        return 4 * (int)responseTime;  // give it up to 4x the average response time
+        return TIMEOUT_MULTIPLIER * (int)responseTime;  // give it up to 3x the average response time
     }
 
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
