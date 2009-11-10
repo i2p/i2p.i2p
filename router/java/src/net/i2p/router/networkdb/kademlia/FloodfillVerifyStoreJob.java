@@ -1,7 +1,8 @@
 package net.i2p.router.networkdb.kademlia;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
@@ -83,16 +84,20 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         getContext().tunnelDispatcher().dispatchOutbound(lookup, outTunnel.getSendTunnelId(0), _target);
     }
     
-    /** todo pick one close to the key */
+    /**
+     *  Pick a responsive floodfill close to the key, but not the one we sent to
+     */
     private Hash pickTarget() {
-        FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
-        List<Hash> peers = sel.selectFloodfillParticipants(_facade.getKBuckets());
-        Collections.shuffle(peers, getContext().random());
-        for (int i = 0; i < peers.size(); i++) {
-            Hash rv = peers.get(i);
-            if (!rv.equals(_sentTo))
-                return rv;
+        Set<Hash> ignore = null;
+        if (_sentTo != null) {
+            ignore = new HashSet(1);
+            ignore.add(_sentTo);
         }
+        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
+        FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
+        List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, ignore, _facade.getKBuckets());
+        if (peers.size() > 0)
+            return peers.get(0);
         
         if (_log.shouldLog(Log.WARN))
             _log.warn("No other peers to verify floodfill with, using the one we sent to");
