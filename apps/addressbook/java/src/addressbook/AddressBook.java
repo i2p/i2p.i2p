@@ -193,7 +193,8 @@ public class AddressBook {
                 (! host.endsWith(".router.i2p")) &&
                 (! host.endsWith(".console.i2p")) &&
 
-		((dest.length() == MIN_DEST_LENGTH && dest.endsWith("AAAA")) ||
+                // null cert ends with AAAA but other zero-length certs would be AA
+		((dest.length() == MIN_DEST_LENGTH && dest.endsWith("AA")) ||
 		 (dest.length() > MIN_DEST_LENGTH && dest.length() <= MAX_DEST_LENGTH)) &&
                 dest.replaceAll("[a-zA-Z0-9~-]", "").length() == 0
                 ;	
