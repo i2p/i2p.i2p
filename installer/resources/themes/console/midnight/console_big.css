@@ -29,7 +29,12 @@ div.routersummary table a:link, div.routersummary table a:visited {
 }
 
 div.tunnels a{
-     font-size: 8pt !important;
+     font-size: 9pt !important;
+}
+
+div.tunnels table{
+     margin: -2px -0px -4px 2px !important;
+     width: 185px;
 }
 
 /* global overrides */
@@ -54,8 +59,4 @@ div.joblog li i {
 b, div.joblog b {
     color: #ee8;
     font-size: 110%;
-}
-
-table code {
-     font-size: 120%;
 }
