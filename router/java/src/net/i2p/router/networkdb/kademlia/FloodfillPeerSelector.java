@@ -129,14 +129,14 @@ class FloodfillPeerSelector extends PeerSelector {
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 if (prof != null && prof.getDBHistory() != null
-                    && now - prof.getDBHistory().getLastStoreFailed() > NO_FAIL_STORE_GOOD
-                    && now - prof.getDBHistory().getLastLookupFailed() > NO_FAIL_LOOKUP_GOOD) {
+                    && now - prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
+                    && now - prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD) {
                     // good
                     rv.add(entry);
                     found++;
                 } else if (prof != null && prof.getDBHistory() != null
-                           && now - prof.getDBHistory().getLastStoreFailed() > NO_FAIL_STORE_OK
-                           && now - prof.getDBHistory().getLastLookupFailed() > NO_FAIL_LOOKUP_OK) {
+                           && now - prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
+                           && now - prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK) {
                     okff.add(entry);
                 } else {
                     badff.add(entry);
