@@ -347,6 +347,10 @@
         <copy todir="pkg-temp/docs/themes/console/light/" >
             <fileset  dir="installer/resources/themes/console/light/" />
         </copy>
+         <!-- Add midnight theme -->
+        <copy todir="pkg-temp/docs/themes/console/midnight/" >
+            <fileset  dir="installer/resources/themes/console/midnight/" />
+        </copy>        
         <!-- Add shared images.. these are subject to flux and change! -->
         <copy todir="pkg-temp/docs/themes/console/images/" >
             <fileset  dir="installer/resources/themes/console/images/" />

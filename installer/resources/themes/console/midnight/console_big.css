@@ -1,5 +1,5 @@
-/* I2P Theme: I2P Classic Theme Override */
-/* Description: Larger fontsize override for console to accomodate foreign charactersets */
+/* I2P Theme: I2P Classic & Midnight Theme Override */
+/* I2P Description: Larger fontsize override for sidepanel to accomodate foreign charactersets */
 /* Author: Dr|Z3d */
 
 
@@ -20,7 +20,7 @@ div.routersummary h4 {
 
 div.routersummary table {
      font-size: 9pt;
-     margin: -5px 0px -5px -1px;
+     margin: -5px 0px -5px 1px;
      width: 188px !important;
 }
 
@@ -28,27 +28,15 @@ div.routersummary table a:link, div.routersummary table a:visited {
      font-size: 10.5pt;
 }
 
-div.tunnels a {
+div.tunnels a{
      font-size: 9pt !important;
 }
 
-div.tunnels table {
-     width: 186px !important;
-     text-align: center;
-     margin: -4px 1px !important;
+div.tunnels table{
+     margin: -2px -0px -4px 2px !important;
+     width: 185px;
 }
 
-div.tunnels td:first-child, div.tunnels td:last-child  {
-     width: 16px;
-}
-
-div.tunnels td:last-child {
-     text-align: left;
-}
-
-div.tunnels td {
-     padding: 0 2px;
-}
 /* global overrides */
 
 a, b, div.routersummary h3 a, div.routersummary h4 {
@@ -69,10 +57,6 @@ div.joblog li i {
 }
 
 b, div.joblog b {
-    color: #003;
+    color: #ee8;
     font-size: 110%;
-}
-
-table code {
-     font-size: 120%;
 }
