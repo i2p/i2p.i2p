@@ -269,6 +269,7 @@ class StoreJob extends JobImpl {
             sendStoreThroughGarlic(msg, peer, expiration);
         } else {
             getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
+            // todo - shorter expiration for direct?
             sendDirect(msg, peer, expiration);
         }
     }
@@ -298,6 +299,7 @@ class StoreJob extends JobImpl {
         m.setPriority(STORE_PRIORITY);
         m.setReplySelector(selector);
         m.setTarget(peer);
+        getContext().messageRegistry().registerPending(m);
         getContext().commSystem().processMessage(m);
     }
     
@@ -324,8 +326,8 @@ class StoreJob extends JobImpl {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug(getJobId() + ": Sending tunnel message out " + outTunnelId + " to " 
             //               + peer.getIdentity().getHash().toBase64());
-            TunnelId targetTunnelId = null; // not needed
-            Job onSend = null; // not wanted
+            //TunnelId targetTunnelId = null; // not needed
+            //Job onSend = null; // not wanted
         
             SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, msg.getMessageSize());
             FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
@@ -426,7 +428,7 @@ class StoreJob extends JobImpl {
             
             sendNext();
         }
-        public String getName() { return "Kademlia Store Peer Failed"; }
+        public String getName() { return "Kademlia Store Send Failed"; }
     }
 
     /**

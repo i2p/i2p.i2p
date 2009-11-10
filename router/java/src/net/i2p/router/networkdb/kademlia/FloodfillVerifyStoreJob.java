@@ -26,6 +26,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     private Log _log;
     private Hash _key;
     private Hash _target;
+    private Hash _sentTo;
     private FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
     private long _sendTime;
@@ -34,12 +35,16 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     
     private static final int VERIFY_TIMEOUT = 10*1000;
     
-    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo, FloodfillNetworkDatabaseFacade facade) {
+    /**
+     *  @param sentTo who to give the credit or blame to, can be null
+     */
+    public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo, Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         _key = key;
         _published = published;
         _isRouterInfo = isRouterInfo;
         _log = ctx.logManager().getLog(getClass());
+        _sentTo = sentTo;
         _facade = facade;
         // wait 10 seconds before trying to verify the store
         getTiming().setStartAfter(ctx.clock().now() + VERIFY_TIMEOUT);
@@ -70,22 +75,28 @@ public class FloodfillVerifyStoreJob extends JobImpl {
             return;
         }
         
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
         _sendTime = getContext().clock().now();
         _expiration = _sendTime + VERIFY_TIMEOUT;
         getContext().messageRegistry().registerPending(new VerifyReplySelector(), new VerifyReplyJob(getContext()), new VerifyTimeoutJob(getContext()), VERIFY_TIMEOUT);
         getContext().tunnelDispatcher().dispatchOutbound(lookup, outTunnel.getSendTunnelId(0), _target);
     }
     
+    /** todo pick one close to the key */
     private Hash pickTarget() {
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
-        List peers = sel.selectFloodfillParticipants(_facade.getKBuckets());
+        List<Hash> peers = sel.selectFloodfillParticipants(_facade.getKBuckets());
         Collections.shuffle(peers, getContext().random());
-        if (peers.size() > 0)
-            return (Hash)peers.get(0);
+        for (int i = 0; i < peers.size(); i++) {
+            Hash rv = peers.get(i);
+            if (!rv.equals(_sentTo))
+                return rv;
+        }
         
         if (_log.shouldLog(Log.WARN))
-            _log.warn("No peers to verify floodfill with");
-        return null;
+            _log.warn("No other peers to verify floodfill with, using the one we sent to");
+        return _sentTo;
     }
     
     private DatabaseLookupMessage buildLookup() {
@@ -140,7 +151,11 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 if (success) {
                     // store ok, w00t!
                     getContext().profileManager().dbLookupSuccessful(_target, delay);
+                    if (_sentTo != null)
+                        getContext().profileManager().dbStoreSuccessful(_sentTo);
                     getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Verify success");
                     return;
                 }
                 if (_log.shouldLog(Log.WARN))
@@ -149,8 +164,12 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 // assume 0 old, all new, 0 invalid, 0 dup
                 getContext().profileManager().dbLookupReply(_target,  0,
                                 ((DatabaseSearchReplyMessage)_message).getNumReplies(), 0, 0, delay);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Verify failed - DSRM");
             }
             // store failed, boo, hiss!
+            if (_sentTo != null)
+                getContext().profileManager().dbStoreFailed(_sentTo);
             getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
             resend();
         }        
@@ -173,7 +192,10 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         }
         public String getName() { return "Floodfill verification timeout"; }
         public void runJob() { 
+            // don't know who to blame (we could have gotten a DSRM) so blame both
             getContext().profileManager().dbLookupFailed(_target);
+            if (_sentTo != null)
+                getContext().profileManager().dbStoreFailed(_sentTo);
             getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime, 0);
             resend(); 
         }

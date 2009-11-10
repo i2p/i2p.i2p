@@ -89,6 +89,7 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that a router explicitly rejected joining a tunnel.  
      *
+     * @param responseTimeMs ignored
      * @param severity how much the peer doesnt want to participate in the 
      *                 tunnel (large == more severe)
      */
@@ -249,9 +250,30 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that we've confirmed a successful send of db data to the peer (though we haven't
      * necessarily requested it again from them, so they /might/ be lying)
      *
-     * This will force creation of DB stats
+     * This is not really interesting, since they could be lying, so we do not
+     * increment any DB stats at all. On verify, call dbStoreSuccessful().
+     *
+     * @param responseTimeMs ignored
      */
     public void dbStoreSent(Hash peer, long responseTimeMs) {
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        long now = _context.clock().now();
+        data.setLastHeardFrom(now);
+        data.setLastSendSuccessful(now);
+        //if (!data.getIsExpandedDB())
+        //    data.expandDBProfile();
+        //DBHistory hist = data.getDBHistory();
+        //hist.storeSuccessful();
+    }
+    
+    /**
+     * Note that we've verified a successful send of db data to the floodfill peer
+     * by querying another floodfill.
+     *
+     * This will force creation of DB stats
+     */
+    public void dbStoreSuccessful(Hash peer) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         long now = _context.clock().now();
@@ -261,8 +283,6 @@ public class ProfileManagerImpl implements ProfileManager {
             data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
         hist.storeSuccessful();
-        // we could do things like update some sort of "how many successful stores we've sent them"...
-        // naah.. dont really care now
     }
     
     /**
@@ -277,7 +297,7 @@ public class ProfileManagerImpl implements ProfileManager {
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
-        hist.storeSuccessful();
+        hist.storeFailed();
         // we could do things like update some sort of "how many successful stores we've
         // failed to send them"...
     }

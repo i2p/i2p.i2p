@@ -11,6 +11,9 @@ import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
+/**
+ *  Todo: remove exploratory
+ */
 class StoreState {
     private RouterContext _context;
     private Hash _key;
@@ -63,6 +66,7 @@ class StoreState {
             return (Set<Hash>)_successfulPeers.clone(); 
         }
     }
+    /** @deprecated unused */
     public Set<Hash> getSuccessfulExploratory() { 
         synchronized (_successfulExploratoryPeers) {
             return (Set<Hash>)_successfulExploratoryPeers.clone(); 
@@ -124,6 +128,7 @@ class StoreState {
         return rv;
     }
 
+    /** @deprecated unused */
     public long confirmedExploratory(Hash peer) {
         long rv = -1;
         synchronized (_pendingPeers) {
