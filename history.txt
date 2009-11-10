@@ -1,8 +1,56 @@
+2009-11-11 zzz
+    * Addressbook, NamingService: Allow 516 byte dests
+      that end with AA but not AAAA, so we can permit
+      non-null zero-length certs.
+    * Console:
+      - Tag tunnel status
+      - Add transport table to netdb.jsp
+    * i2psnark:
+      - Reject torrents with too many pieces
+      - Reject torrents with a single file named *.torrent
+      - Increase max piece size to 2MB (was 1MB), but reduce
+        max number of connections to lessen ooms
+    * Netdb FloodOnlySearchJob:
+      - Fix up field hiding and duplicate overrides
+      - Other javadoc and java 5 improvements
+    * Netdb StoreJob, FloodfillVerifyStoreJob:
+      - Fix bug where reply selector wasn't registered for
+        routerinfo stores, so we didn't get stats, and
+        we kept retrying. This also prevented verification
+        and profile updates for routerinfo stores.
+        This bug was introduced 4 years ago by the change to
+        store routerinfos directly.
+      - Add dbStoreSuccessful() to profile, and have FVSJ
+        call it or dbStoreFailed() as appropriate to give
+        credit or blame to the floodfill we stored to.
+      - Don't let FVSJ verify using the peer we stored to
+    * Netdb Stores:
+      - Floodfill rework part 2 of N:
+        Store and verify closest to the key, subject to
+        last-failed lookup and store stats.
+      - DataHelper: Fix broken byte[] compareTo() used by XORComparator,
+        was not doing unsigned comparisons!
+      - FloodfillPeerSelector: Use standard XORComparator
+        now that it works, instead of messing with BigInteger
+      - FloodfillVerifyStoreJob: Set correct timeout for
+        requeued store job (was only 10s)
+      - KNDF: Rework getPeerTimout() to use 1 day averages,
+        and lower the min, max, and multiplication factor.
+      - Publish jobs: Lengthen timeout to 90s (was 30s for
+        routerinfos and 60s for leasesets)
+      - StoreJob: Limit max peer timeout to 15s for direct stores
+    * Streaming: Fix unused resend delay field in the packet header,
+      it is defined as seconds and we were not dividing by 1000,
+      so we were truncating 1000 to one byte which equals 232.
+    * UDP:
+      - Better handle a test reply from bob with a 0-length IP
+      - Add config options for min and max random port
+
 2009-11-09 dr|z3d
     * New midnight blue lightweight theme; supports IE and provisions its own console_big.css
     * Streamlining and honing of console_big.css
 
-2009-11-08 zzz
+2009-11-07 zzz
     * Console:
       - countries.txt: Convert to mixed case, include in update
       - netdb.jsp: Hide all routers by default, sort and tag country names
