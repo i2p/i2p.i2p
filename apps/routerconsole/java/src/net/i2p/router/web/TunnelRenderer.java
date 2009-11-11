@@ -37,7 +37,7 @@ public class TunnelRenderer {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _("Exploratory tunnels") + " (<a href=\"/configtunnels.jsp#exploratory\">" + _("config") + "</a>):</h2>\n");
+        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _("Exploratory tunnels") + " (<a href=\"/configtunnels.jsp#exploratory\">" + _("configure") + "</a>)</h2>\n");
         renderPool(out, _context.tunnelManager().getInboundExploratoryPool(), _context.tunnelManager().getOutboundExploratoryPool());
         
         List<Hash> destinations = null;
@@ -59,15 +59,15 @@ public class TunnelRenderer {
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
                       + "\" ></a>" + _("Client tunnels for") + ' ' + _(name));
             if (_context.clientManager().isLocal(client))
-                out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">" + _("config") + "</a>):</h2>\n");
+                out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">" + _("configure") + "</a>)</h2>\n");
             else
-                out.write(" (dead):</h2>\n");
+                out.write(" (" + _("dead") + ")</h2>\n");
             renderPool(out, in, outPool);
         }
         
         List participating = _context.tunnelDispatcher().listParticipatingTunnels();
         Collections.sort(participating, new TunnelComparator());
-        out.write("<h2><a name=\"participating\"></a>" + _("Participating tunnels") + ":</h2><table>\n");
+        out.write("<h2><a name=\"participating\"></a>" + _("Participating tunnels") + "</h2><table>\n");
         out.write("<tr><th>" + _("Receive on") + "</th><th>" + _("From") + "</th><th>"
                   + _("Send on") + "</th><th>" + _("To") + "</th><th>" + _("Expiration") + "</th>"
                   + "<th>" + _("Usage") + "</th><th>" + _("Rate") + "</th><th>" + _("Role") + "</th></tr>\n");
@@ -104,7 +104,7 @@ public class TunnelRenderer {
             if (timeLeft > 0)
                 out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration(timeLeft) + "</td>");
             else
-                out.write(" <td class=\"cells\" align=\"center\">(grace period)</td>");
+                out.write(" <td class=\"cells\" align=\"center\">(" + _("grace period") + ")</td>");
             out.write(" <td class=\"cells\" align=\"center\">" + cfg.getProcessedMessagesCount() + "KB</td>");
             int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
             if (lifetime <= 0)
@@ -231,7 +231,7 @@ public class TunnelRenderer {
         List<Hash> peerList = new ArrayList(peers);
         Collections.sort(peerList, new HashComparator());
 
-        out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + ":</h2>\n");
+        out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + "</h2>\n");
         out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Expl. + Client") + "</th><th>" + _("% of total") + "</th><th>" + _("Part. from + to") + "</th><th>" + _("% of total") + "</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr> <td class=\"cells\" align=\"center\">");
