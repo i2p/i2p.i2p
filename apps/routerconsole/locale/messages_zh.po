@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-08 02:16+0000\n"
+"POT-Creation-Date: 2009-11-11 11:09+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -17,6 +17,66 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 "X-Poedit-Country: CHINA\n"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:91
+msgid "Rejecting tunnels: Shutting down"
+msgstr "拒绝共享：准备退出"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:140
+msgid "Rejecting tunnels: High message delay"
+msgstr "拒绝共享：高消息延迟"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:176
+msgid "Rejecting most tunnels: High number of requests"
+msgstr "收紧共享：高请求量"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:232
+msgid "Rejecting tunnels: Limit reached"
+msgstr "拒绝共享：隧道数限额"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:300
+msgid "Rejecting tunnels: Bandwidth limit"
+msgstr "拒绝共享：带宽限额"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:370
+msgid "Rejecting most tunnels: Bandwidth limit"
+msgstr "收紧共享：带宽限额"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:374
+msgid "Accepting most tunnels"
+msgstr "接收多数隧道"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:376
+msgid "Accepting tunnels"
+msgstr "接收共享隧道"
+
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:486
+msgid "Rejecting tunnels"
+msgstr "拒绝参与共享隧道"
+
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:128
+msgid "Dropping tunnel requests: Too slow"
+msgstr "忽略共享请求：速度太慢"
+
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:340
+msgid "Dropping tunnel requests: Overloaded"
+msgstr "忽略共享请求：路由过载"
+
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:499
+msgid "Rejecting tunnels: Request overload"
+msgstr "拒绝共享：请求过多"
+
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:524
+msgid "Rejecting tunnels: Connection limit"
+msgstr "拒绝共享：连接受限"
+
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:725
+msgid "Dropping tunnel requests: High load"
+msgstr "忽略共享请求：高负载"
+
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:734
+msgid "Dropping tunnel requests: Queue time"
+msgstr "忽略共享请求：队列积压"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:106
 msgid "config networking"
@@ -446,7 +506,7 @@ msgid "The router is currently testing whether your UDP port is firewalled."
 msgstr "路由器正在测试您的UDP端口是否被防火墙阻挡。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:558
-#: src/net/i2p/router/web/NetDbRenderer.java:246
+#: src/net/i2p/router/web/NetDbRenderer.java:266
 #: src/net/i2p/router/web/SummaryHelper.java:96
 msgid "Hidden"
 msgstr "隐身"
@@ -1754,7 +1814,7 @@ msgid "Kazakhstan"
 msgstr "哈萨克斯坦"
 
 #: build/Countries.java:121
-msgid "Lao People'S Democratic Republic"
+msgid "Lao People's Democratic Republic"
 msgstr "老挝"
 
 #: build/Countries.java:122
@@ -2390,7 +2450,7 @@ msgid "Peers"
 msgstr "节点"
 
 #: src/net/i2p/router/web/ConfigNavHelper.java:19
-#: src/net/i2p/router/web/NetDbRenderer.java:268
+#: src/net/i2p/router/web/NetDbRenderer.java:288
 #: src/net/i2p/router/web/SummaryBarRenderer.java:124
 msgid "Stats"
 msgstr "统计数据"
@@ -2971,50 +3031,83 @@ msgstr "显示所有路由器"
 msgid "Show all routers with full stats"
 msgstr "显示所有路由及统计"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:187
-#: src/net/i2p/router/web/NetDbRenderer.java:203
+#: src/net/i2p/router/web/NetDbRenderer.java:184
+msgid "Network Database Router Statistics"
+msgstr "NetDb路由器统计"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:190
+#: src/net/i2p/router/web/NetDbRenderer.java:204
+#: src/net/i2p/router/web/NetDbRenderer.java:222
 msgid "Count"
 msgstr "计数"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:187
+#: src/net/i2p/router/web/NetDbRenderer.java:190
 #: src/net/i2p/router/web/SummaryBarRenderer.java:150
 msgid "Version"
 msgstr "版本"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:203
+#: src/net/i2p/router/web/NetDbRenderer.java:204
+msgid "Addresses"
+msgstr "地址"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:222
 msgid "Country"
 msgstr "国家"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:234
+#: src/net/i2p/router/web/NetDbRenderer.java:254
 msgid "Our info"
 msgstr "我方信息"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:236
+#: src/net/i2p/router/web/NetDbRenderer.java:256
 msgid "Peer info for"
 msgstr "节点信息"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:240
+#: src/net/i2p/router/web/NetDbRenderer.java:260
 msgid "Full entry"
 msgstr "完整项"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:246
+#: src/net/i2p/router/web/NetDbRenderer.java:266
 msgid "Updated"
 msgstr "已更新"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:246
-#: src/net/i2p/router/web/NetDbRenderer.java:248
+#: src/net/i2p/router/web/NetDbRenderer.java:266
+#: src/net/i2p/router/web/NetDbRenderer.java:268
 #: src/net/i2p/router/web/SummaryHelper.java:385
 msgid "ago"
 msgstr "前"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:248
-#: src/net/i2p/router/web/NetDbRenderer.java:250
+#: src/net/i2p/router/web/NetDbRenderer.java:268
+#: src/net/i2p/router/web/NetDbRenderer.java:270
 msgid "Published"
 msgstr "发布"
 
-#: src/net/i2p/router/web/NetDbRenderer.java:251
+#: src/net/i2p/router/web/NetDbRenderer.java:271
 msgid "Address(es)"
 msgstr "地址"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:303
+msgid "Hidden or starting up"
+msgstr "隐身或正在启动"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:303
+msgid "SSU"
+msgstr ""
+
+#: src/net/i2p/router/web/NetDbRenderer.java:303
+msgid "SSU with introducers"
+msgstr "使用中介的SSU连接"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:304
+msgid "NTCP"
+msgstr ""
+
+#: src/net/i2p/router/web/NetDbRenderer.java:304
+msgid "NTCP and SSU"
+msgstr "NTCP 与 SSU"
+
+#: src/net/i2p/router/web/NetDbRenderer.java:304
+msgid "NTCP and SSU with introducers"
+msgstr "使用中介的NTCP与SSU连接"
 
 #: src/net/i2p/router/web/NewsFetcher.java:80
 #, java-format
@@ -3721,18 +3814,30 @@ msgid "eepsite"
 msgstr "匿名网站"
 
 #: strings/Strings.java:37
+msgid "eepProxy"
+msgstr "I2P代理"
+
+#: strings/Strings.java:38
+msgid "ircProxy"
+msgstr "IRC代理"
+
+#: strings/Strings.java:40
 msgid "I2PSnark"
 msgstr "I2P Snark"
 
-#: strings/Strings.java:40
+#: strings/Strings.java:42
+msgid "iMule"
+msgstr ""
+
+#: strings/Strings.java:45
 msgid "classic"
 msgstr "经典"
 
-#: strings/Strings.java:41
+#: strings/Strings.java:46
 msgid "dark"
 msgstr "暗色调"
 
-#: strings/Strings.java:42
+#: strings/Strings.java:47
 msgid "light"
 msgstr "亮色调"
 
