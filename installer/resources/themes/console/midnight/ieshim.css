@@ -1,5 +1,5 @@
 /* I2P Theme: Midnight - IE Override */
-/* I2P Description: Minimalist Midnight Blue, based on Classic theme.*/
+/* Description: Minimalist Midnight Blue, based on Classic theme.*/
 /* Author: Dr|Z3d */
 
 /* Welcome to the wonderful world of kludgey IE fixes */
@@ -91,9 +91,9 @@ div.news {
 }
 
 div.news hr {
-     color: #bbf;
-     background: #bbf;
-     height: 3px;
+     color: #99f;
+     background: #99f;
+     height: 1px;
      border: 0px;
      margin: 0 -10px 0 -13px !important;
 }     
@@ -101,7 +101,7 @@ div.news hr {
 div.routersummary {
      color: #001;
      padding-left: 0px;
-     border-left: 5px solid #bbf;
+     border-left: 5px solid #000;
      text-align: center !important;
      overflow: hidden; /* prevents IE from borking the sidepanel */
 }
@@ -116,36 +116,32 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #eef;
-     background: #eef;
-     height: 2px;
-     border-bottom: 1px solid #eef;
+     color: #99f;
+     background: #99f;
+     height: 1px;
+     border-bottom: 1px solid #99f;
      margin: 8px 1px 7px 1px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
 }
 
 div.routersummary h3 {
-     border: 0px solid #f00;
+     border: 0;
      text-align: center !important;
      font-size: 9pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px;
      padding: 5px 0px 5px 0px;
-     background: #c5d5fb;
      text-transform: uppercase;
 }
 
 div.routersummary h4 {
-     border: 0px solid #f00;
+     border: 0;
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px !important;
      padding: 2px 3px 3px 3px;
-     background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
-     color: #2b2;
      text-align: center !important;
 }
 
@@ -178,36 +174,10 @@ div.routersummary p {
      padding: 0;
 }     
 
-/*
-div.routersummary img {
-     margin: 5px -10px -5px -10px;
-     overflow: hidden;
-}     
-*/
-
-div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
-}
-
-div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
-     color: #f60;
-}
-
 div.routersummary td {
      padding: 2px 4px;
      background-image: none !important;
      border: 0 !important;
-}
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
-}
-
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
 }
 
 div.news li {
@@ -249,8 +219,7 @@ input {
 div.graphspanel img {
      border: 1px solid #99f;
      margin: 6px 0 !important;
-     background: #ddf;
-     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
+     background: #001;
 }
 
 div.graphspanel hr {

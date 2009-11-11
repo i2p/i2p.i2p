@@ -4,7 +4,7 @@
 
 
 body {
-     margin: 2px 0 0 2px;
+     margin: 2px 0 0 5px;
      padding: 0;
      text-align: left;
      background: #000;
@@ -148,10 +148,19 @@ div.routersummaryouter {
      clear: left; /* fixes a bug in Opera */
 }
 
-div.routersummary { background: #00000A; width: 190px; color: inherit; margin: 0; 
-padding: 10px 1px 7px 1px; text-align: center !important; border: 1px solid 
-#99f; font-size: 9pt; word-wrap: break-word; font: 9pt/125%; -moz-box-shadow: 
-inset 0px 0px 0px 1px #00000A; }
+div.routersummary { 
+     background: #00000A; 
+     width: 190px; 
+     color: inherit; 
+     margin: 0; 
+     padding: 10px 1px 7px 1px; 
+     text-align: center !important; 
+     border: 1px solid #99f; 
+     font-size: 9pt; 
+     word-wrap: break-word; 
+     font: 9pt/125%; 
+     -moz-box-shadow: inset 0px 0px 0px 1px #00000A; 
+}
 
 div.routersummary input[type=text] {
      text-align: right !important;
@@ -163,7 +172,6 @@ div.routersummary hr {
      height: 1px;
      border-bottom: 0px solid #99f;
      margin: 8px -1px 7px -1px;
-/*     -moz-box-shadow: inset 0px 1px 1px 1px #99f;*/
 }
 
 div.routersummary h3 {
@@ -176,7 +184,7 @@ div.routersummary h3 {
      text-transform: uppercase;
 }
 
-div.routersummary h3 a {
+div.routersummary h3 a, div.routersummary h4 a {
      text-decoration: none;
      line-height: 105%;
 }
@@ -218,8 +226,9 @@ div.routersummary tr {
 }
 
 div.tunnels table{
-     margin: -2px 0 -4px -4px !important;
-     text-align: right !important;
+     margin: -2px 0px -4px 2px !important;
+     text-align: center !important;
+     width: 186px;
 }
 
 .tunnels tr {
@@ -227,11 +236,14 @@ div.tunnels table{
 }
 
 .tunnels td:first-child {
+     width: 16px;
      padding-right: 2px;
 }
 
 .tunnels td:last-child {
      width: 16px;
+     text-align: right;
+     margin-right: -2px;
 }     
      
 div.routersummary form {
@@ -488,7 +500,7 @@ h1 {
      line-height: 93%;
      text-transform: uppercase;
      letter-spacing: 0.3em;
-     background: #001;
+     background: #000008;
      min-width: 600px;
      -moz-box-shadow: inset 0px 0px 4px 2px #00000A;
      line-height: 100%;
@@ -497,16 +509,17 @@ h1 {
 
 h2 {
      font-size: 14pt;
-     padding: 5px 10px 10px 10px;
-     border: 1px solid #99f;
+     padding: 10px 10px 10px 10px;
+     border: 1px solid #77f;
      border-top: 1px solid #99f;
+     border-left: 1px solid #99f;
      letter-spacing: 0.04em;
-     background: #000008;
+     background: #00000A;
 }
 
 h3 {
      font-size: 12pt;
-     padding: 0 10px 10px 10px;
+     padding: 0 0px 5px 0px;
      border-bottom: 1px solid #99f;
      border-top: 0px solid #99f;
      letter-spacing: 0.04em;
@@ -692,7 +705,7 @@ p {
 }
 
 .langbox {
-     margin: 15px -20px 0px 5px;
+     margin: 17px -20px 0px 5px;
      color: #eef;
      font-size: 7pt;
      width: 220px;
@@ -709,6 +722,7 @@ p {
      padding-bottom: -2px;
      text-align: justify;
      margin-top: 5px !important;
+     margin-left:5px !important;     
 }
 
 .links li {
@@ -814,4 +828,8 @@ div.graphspanel form:last-child {
 div.graphspanel h3 {
      text-align: left;
      margin: 10px 20px 10px 20px;
+}
+
+table code {
+     font-size: 8.5pt;
 }
