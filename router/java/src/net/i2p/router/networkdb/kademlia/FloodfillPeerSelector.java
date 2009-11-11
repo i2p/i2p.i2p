@@ -85,24 +85,31 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     /**
+     *  Sort the floodfills. The challenge here is to keep the good ones
+     *  at the front and the bad ones at the back. If they are all good or bad,
+     *  searches and stores won't work well.
+     *
      *  @return all floodfills not shitlisted foreverx
      *  @param key the routing key
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
      *  The list is in 3 groups - sorted by routing key within each group.
-     *  Group 1: No store or lookup failure in last 15 minutes
-     *  Group 2: No store or lookup failure in last 3 minutes
+     *  Group 1: No store or lookup failure in a long time
+     *  Group 2: No store or lookup failure in a little while or
+     *           success newer than failure
      *  Group 3: All others
      */
     public List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
          return selectFloodfillParticipants(key, maxNumRouters, null, kbuckets);
     }
 
-    /** 1.5 * PublishLocalRouterInfoJob.PUBLISH_DELAY */
-    private static final int NO_FAIL_STORE_OK = 30*60*1000;
+    /** .75 * PublishLocalRouterInfoJob.PUBLISH_DELAY */
+    private static final int NO_FAIL_STORE_OK = 15*60*1000;
     private static final int NO_FAIL_STORE_GOOD = NO_FAIL_STORE_OK * 2;
+    /** this must be longer than the max streaming timeout (60s) */
     private static final int NO_FAIL_LOOKUP_OK = 5*60*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
+    private static final int MAX_GOOD_RESP_TIME = 5*1000;
 
     public List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);
@@ -110,8 +117,8 @@ class FloodfillPeerSelector extends PeerSelector {
         sorted.addAll(ffs);
 
         List<Hash> rv = new ArrayList(howMany);
-        List<Hash> okff = new ArrayList(howMany);
-        List<Hash> badff = new ArrayList(howMany);
+        List<Hash> okff = new ArrayList(ffs.size());
+        List<Hash> badff = new ArrayList(ffs.size());
         int found = 0;
         long now = _context.clock().now();
 
@@ -125,10 +132,11 @@ class FloodfillPeerSelector extends PeerSelector {
             if (info != null && now - info.getPublished() > 3*60*60*1000) {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Skipping, published a while ago: " + entry);
+                    _log.debug("Old: " + entry);
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 if (prof != null && prof.getDBHistory() != null
+                    && ((int) prof.getDbResponseTime().getRate(10*60*1000).getAverageValue()) < MAX_GOOD_RESP_TIME
                     && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
                     && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD) {
                     // good
@@ -137,8 +145,10 @@ class FloodfillPeerSelector extends PeerSelector {
                     rv.add(entry);
                     found++;
                 } else if (prof != null && prof.getDBHistory() != null
-                           && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
-                           && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK) {
+                           && (prof.getDBHistory().getLastStoreFailed() <= prof.getDBHistory().getLastStoreSuccessful()
+                               || prof.getDBHistory().getLastLookupFailed() <= prof.getDBHistory().getLastLookupSuccessful()
+                               || (prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
+                                   && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK))) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("OK: " + entry);
                     okff.add(entry);
@@ -149,8 +159,8 @@ class FloodfillPeerSelector extends PeerSelector {
                 }
             }
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Good: " + rv + " OK: " + okff + " Bad: " + badff);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Good: " + rv + " OK: " + okff + " Bad: " + badff);
 
         // Put the ok floodfills after the good floodfills
         for (int i = 0; found < howMany && i < okff.size(); i++) {
