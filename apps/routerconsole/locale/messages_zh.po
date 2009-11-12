@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-11 11:09+0000\n"
+"POT-Creation-Date: 2009-11-12 06:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -17,6 +17,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 "X-Poedit-Country: CHINA\n"
+
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:117
+#, java-format
+msgid "Banned by router hash: {0}"
+msgstr "按路由器指纹封杀：{0}"
+
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:119
+msgid "Banned by router hash"
+msgstr "路由指纹封锁"
+
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:664
+msgid "IP banned"
+msgstr "IP封锁"
+
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:734
+#, java-format
+msgid "IP banned by blocklist.txt entry {0}"
+msgstr "按IP黑名单blocklist.txt封杀的节点{0}"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:91
 msgid "Rejecting tunnels: Shutting down"
@@ -53,6 +71,20 @@ msgstr "接收共享隧道"
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:486
 msgid "Rejecting tunnels"
 msgstr "拒绝参与共享隧道"
+
+#: ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java:70
+msgid "No transports (hidden or starting up?)"
+msgstr "无数据传输(隐身或正在启动)"
+
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:450
+msgid "Unreachable on any transport"
+msgstr "各协议均不可达"
+
+#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:373
+#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:578
+#, java-format
+msgid "Excessive clock skew: {0}"
+msgstr "严重时滞:{0}"
 
 #: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:128
 msgid "Dropping tunnel requests: Too slow"
@@ -836,7 +868,7 @@ msgstr "(建议不要使用 DEBUG 或 INFO 作为默认等级,他们会明显降
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:329
 msgid "Log level overrides"
-msgstr "等级外日志项目"
+msgstr "等级外<br>日志项目"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:106
 msgid "config peers"
@@ -856,7 +888,7 @@ msgstr "路由器Key(见NetDB)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:310
 msgid "Manually Ban / Unban a Peer"
-msgstr "手动封锁/解封某个节点"
+msgstr "手动封杀/解封某个节点"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:312
 msgid "Banning will prevent the participation of this peer in tunnels you create."
@@ -865,7 +897,7 @@ msgstr "封锁将阻止节点参与您的隧道创建"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:314
 #: src/net/i2p/router/web/ConfigPeerHandler.java:20
 msgid "Ban peer until restart"
-msgstr "封锁节点直到重启"
+msgstr "封杀节点直到重启"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:316
 #: src/net/i2p/router/web/ConfigPeerHandler.java:28
@@ -2543,6 +2575,11 @@ msgstr "未知"
 msgid "bits per second"
 msgstr "比特/秒"
 
+#: src/net/i2p/router/web/ConfigPeerHandler.java:23
+#, java-format
+msgid "Manually banned via {0}"
+msgstr "通过{0}手动封锁"
+
 #: src/net/i2p/router/web/ConfigPeerHandler.java:24
 #: src/net/i2p/router/web/ConfigPeerHandler.java:33
 #: src/net/i2p/router/web/ConfigPeerHandler.java:35
@@ -3249,8 +3286,8 @@ msgid "1d Fail Rate"
 msgstr "1d失败率"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:237
-msgid "Thresholds:"
-msgstr "临界值:"
+msgid "Thresholds"
+msgstr "临界值"
 
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:239
 msgid "fast peers"
@@ -3319,6 +3356,20 @@ msgstr "状态"
 #: src/net/i2p/router/web/ProfileOrganizerRenderer.java:308
 msgid "n/a"
 msgstr ""
+
+#: src/net/i2p/router/web/ShitlistRenderer.java:57
+#, java-format
+msgid "Temporary ban expiring in {0}"
+msgstr "临时封锁{0}后解除"
+
+#: src/net/i2p/router/web/ShitlistRenderer.java:59
+#, java-format
+msgid "Banned until restart or in {0}"
+msgstr "封锁直到重启或{0}后"
+
+#: src/net/i2p/router/web/ShitlistRenderer.java:71
+msgid "unban now"
+msgstr "立即解封"
 
 #: src/net/i2p/router/web/StatsGenerator.java:58
 msgid "Statistics gathered during this router's uptime"
@@ -3638,8 +3689,12 @@ msgstr "共享客户端"
 
 #: src/net/i2p/router/web/TunnelRenderer.java:40
 #: src/net/i2p/router/web/TunnelRenderer.java:62
-msgid "config"
+msgid "configure"
 msgstr "设置"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:64
+msgid "dead"
+msgstr "失效"
 
 #: src/net/i2p/router/web/TunnelRenderer.java:70
 msgid "Participating tunnels"
@@ -3677,6 +3732,10 @@ msgstr "职能"
 #: src/net/i2p/router/web/TunnelRenderer.java:156
 msgid "Usage"
 msgstr "使用情况"
+
+#: src/net/i2p/router/web/TunnelRenderer.java:107
+msgid "grace period"
+msgstr "过渡期"
 
 #: src/net/i2p/router/web/TunnelRenderer.java:117
 msgid "Outbound Endpoint"
@@ -3819,7 +3878,7 @@ msgstr "I2P代理"
 
 #: strings/Strings.java:38
 msgid "ircProxy"
-msgstr "IRC代理"
+msgstr "I2P聊天室"
 
 #: strings/Strings.java:40
 msgid "I2PSnark"
