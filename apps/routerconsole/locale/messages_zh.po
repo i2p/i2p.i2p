@@ -1219,15 +1219,15 @@ msgstr "升级策略"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:326
 msgid "Update through the eepProxy?"
-msgstr "通过eepProxy更新?"
+msgstr "通过I2P代理更新?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:330
 msgid "eepProxy host"
-msgstr "eepProxy主机"
+msgstr "I2P代理主机"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:334
 msgid "eepProxy port"
-msgstr "eepProxy端口"
+msgstr "I2P代理端口"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:338
 msgid "Update URLs"
@@ -3366,7 +3366,7 @@ msgstr "内置的匿名Web服务器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:68
 msgid "Webserver"
-msgstr "匿名网站服务器"
+msgstr "匿名主页服务器"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:72
 msgid "Configure I2P Router"
@@ -3795,7 +3795,7 @@ msgstr "程序隧道"
 
 #: strings/Strings.java:25
 msgid "My eepsite web server"
-msgstr "我的匿名Web服务器"
+msgstr "匿名主页服务器"
 
 #: strings/Strings.java:26
 msgid "Browser launch at startup"
@@ -3807,7 +3807,7 @@ msgstr "BOB 协议桥"
 
 #: strings/Strings.java:34
 msgid "IRC proxy"
-msgstr "IRC 代理"
+msgstr "I2P聊天室"
 
 #: strings/Strings.java:35
 msgid "eepsite"
