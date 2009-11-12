@@ -107,29 +107,38 @@ div.warning hr {
 }
 
 div.warning h3 {
+     border: 0;
      border-bottom: 1px solid #fb7;
      padding-bottom: 10px;
+     padding-left: 0;
+     font-variant: small-caps; 
+     text-transform: capitalize; 
+     font-size: 12.5pt;
 }
 
 /* console error messages */
 
 div.sorry {
-     padding: 20px;
+     padding: 20px 20px 20px 70px;
      background: #003;
-     margin: -2px 1px 0 200px;
+     margin: 0 5px 0 200px;
      border: 1px solid #99f;
+     border-top: 0;
      text-align: justify;
      -moz-box-shadow: inset 0px 0px 0px 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
      color: #eef;
+     background-image: url("../images/errortriangle.png");
+     background-position: 15px center;
+     background-repeat: no-repeat;
 }
 
 div.sorry hr {
-     color: #eef;
-     background: #eef;
+     color: #99f;
+     background: #99f;
      height: 1px;
-     border: 1px solid #99f;
+     border: 0;
      margin: 10px 0;
 }
 
@@ -536,9 +545,10 @@ h2 {
 
 h3 {
      font-size: 11pt;
-     padding: 0 0px 5px 0px;
-     border-bottom: 1px solid #99f;
-     border-top: 0px solid #99f;
+     padding: 5px;
+     border: 1px solid #99f;
+     border-right: 1px solid #77f;
+     border-bottom: 1px solid #77f;
      letter-spacing: 0.04em;
      margin-bottom: 10px;
      font-weight: bold !important;
