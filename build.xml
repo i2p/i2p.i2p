@@ -333,7 +333,7 @@
         -->
         <!-- Since the logo moved, we have to update the error pages -->
         <copy todir="pkg-temp/docs/" >
-          <fileset dir="installer/resources/" includes="*-header.ht" />
+          <fileset dir="installer/resources/proxy" />
         </copy>
         <!-- make a "classic" theme -->
         <copy todir="pkg-temp/docs/themes/console/classic/" >
@@ -372,7 +372,7 @@
     <target name="prepconsoleDocs" depends="prepgeoupdate">
         <copy todir="pkg-temp/docs/" >
           <fileset dir="." includes="readme*.html" />
-          <fileset dir="installer/resources/" includes="*-header.ht" />
+          <fileset dir="installer/resources/proxy" />
         </copy>
     </target>
     <target name="consoleDocs" depends="deletepkg-temp, prepconsoleDocs">

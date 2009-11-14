@@ -1,3 +1,13 @@
+2009-11-14 zzz
+    * HTTP Proxy:
+      - Add support for error page translations
+      - Add support for external pages for all errors
+      - Fix lack of \r in error page headers
+      - HTML transitional fixes
+      - Cleanups
+    * UDP PeerTestManager: Throw in some synchronization to
+      try to fix stuck tests
+
 2009-11-11 zzz
     * Console: Some colon cleansing
     * FloodfillPeerSelector: Adjustments
