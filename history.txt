@@ -1,3 +1,9 @@
+2009-11-16 zzz
+    * addressbook: Move class to net.i2p.addressbook
+    * build: Take two test scripts out of the installer
+    * i2psnark: Bye TPB
+    * Shitlist: Fix bug from two checkins ago, all were forever
+
 2009-11-14 zzz
     * HTTP Proxy:
       - Add support for error page translations
