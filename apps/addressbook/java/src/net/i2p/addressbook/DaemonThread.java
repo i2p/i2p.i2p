@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package addressbook;
+package net.i2p.addressbook;
 
 /**
  * A thread that waits five minutes, then runs the addressbook daemon.  

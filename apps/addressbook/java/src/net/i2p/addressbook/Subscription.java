@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package addressbook;
+package net.i2p.addressbook;
 
 /**
  * A subscription to a remote address book.

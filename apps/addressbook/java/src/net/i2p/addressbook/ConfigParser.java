@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package addressbook;
+package net.i2p.addressbook;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
