@@ -119,7 +119,7 @@ public class Shitlist {
         return shitlistRouter(peer, reason, reasonCode, null, true);
     }
     public boolean shitlistRouter(Hash peer, String reason, String transport, boolean forever) {
-        return shitlistRouter(peer, reason, null, null, true);
+        return shitlistRouter(peer, reason, null, transport, forever);
     }
     private boolean shitlistRouter(Hash peer, String reason, String reasonCode, String transport, boolean forever) {
         if (peer == null) {
