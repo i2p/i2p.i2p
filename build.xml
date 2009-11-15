@@ -286,8 +286,10 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
+        <!-- test classes aren't in the jars anymore
         <copy file="core/perl/i2pbench.sh" todir="pkg-temp/scripts/" />
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
+        -->
         <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
              and uncomment the following -->
         <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
