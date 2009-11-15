@@ -201,7 +201,7 @@ public class NetDbRenderer {
             
         // transports table
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"left\">" + _("Addresses") + "</th><th>" + _("Count") + "</th></tr>\n");
+        buf.append("<tr><th align=\"left\">" + _("Transports") + "</th><th>" + _("Count") + "</th></tr>\n");
         for (int i = 0; i < 8; i++) {
             int num = transportCount[i];
             if (num > 0) {
