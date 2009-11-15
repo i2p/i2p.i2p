@@ -1366,7 +1366,7 @@ msgstr "I2P 网络节点信息"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:105
 msgid "statistics"
-msgstr "统计数据"
+msgstr "统计"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/stats_jsp.java:242
 msgid "I2P Router Statistics"
@@ -2485,7 +2485,7 @@ msgstr "节点"
 #: src/net/i2p/router/web/NetDbRenderer.java:288
 #: src/net/i2p/router/web/SummaryBarRenderer.java:124
 msgid "Stats"
-msgstr "统计数据"
+msgstr "统计"
 
 #: src/net/i2p/router/web/ConfigNavHelper.java:20
 msgid "Advanced"
