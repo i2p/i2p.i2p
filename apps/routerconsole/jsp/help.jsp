@@ -19,7 +19,7 @@ help with other aspects of the project, please see the documentation for
 <ul class="links">
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ on www.i2p2.i2p</a>
 <li class="tidylist"><a href="http://www.i2p2.i2p/faq_de.html">Deutsch FAQ</a>.</ul>
-</p><p>You may also try the <a href="http://forum.i2p/">I2P forum</a>
+<br>You may also try the <a href="http://forum.i2p/">I2P forum</a>
 or IRC.</p>
 
 <h2>Summary Bar Information</h2><p>
