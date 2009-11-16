@@ -2059,7 +2059,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    private static final String KEY = "<h3>Definitions:</h3><div class=\"configure\">" +
+    private static final String KEY = "<h3>Definitions</h3><div class=\"configure\">" +
         "<p><b id=\"def.peer\">Peer</b>: the remote peer.<br>\n" +
         "<b id=\"def.dir\">Dir</b>: v means they offer to introduce us, ^ means we offer to introduce them.<br>\n" +
         "<b id=\"def.idle\">Idle</b>: the idle time is how long since a packet has been received or sent.<br>\n" +

@@ -24,7 +24,12 @@ fi
 # list specific files in router/ here, so we don't scan the whole tree
 ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
-   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java"
+   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
+   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
+   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
+   ../../../router/java/src/net/i2p/router/Blocklist.java \
+   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java"
+
 JPATHS="src ../jsp/WEB-INF strings $JFILE $ROUTERFILES"
 for i in ../locale/messages_*.po
 do

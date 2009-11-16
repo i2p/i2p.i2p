@@ -201,7 +201,7 @@ public class NetDbRenderer {
             
         // transports table
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"left\">" + _("Addresses") + "</th><th>" + _("Count") + "</th></tr>\n");
+        buf.append("<tr><th align=\"left\">" + _("Transports") + "</th><th>" + _("Count") + "</th></tr>\n");
         for (int i = 0; i < 8; i++) {
             int num = transportCount[i];
             if (num > 0) {
@@ -276,7 +276,7 @@ public class NetDbRenderer {
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
-            buf.append("<b>").append(DataHelper.stripHTML(addr.getTransportStyle())).append("</b>: ");
+            buf.append("<b>").append(DataHelper.stripHTML(addr.getTransportStyle())).append(":</b> ");
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);

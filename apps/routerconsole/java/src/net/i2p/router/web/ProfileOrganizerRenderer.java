@@ -234,14 +234,14 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<h3>").append(_("Thresholds:")).append("</h3>");
+        buf.append("<h3>").append(_("Thresholds")).append("</h3>");
         buf.append("<p><b>").append(_("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold()))
            .append(" (").append(fast).append(' ').append(_("fast peers")).append(")<br>");
         buf.append("<b>").append(_("Capacity")).append(":</b> ").append(num(_organizer.getCapacityThreshold()))
            .append(" (").append(reliable).append(' ').append(_("high capacity peers")).append(")<br>");
         buf.append("<b>").append(_("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold()))
            .append(" (").append(integrated).append(' ').append(_(" well integrated peers")).append(")</p>");
-        buf.append("<h3>").append(_("Definitions")).append(":</h3><ul>");
+        buf.append("<h3>").append(_("Definitions")).append("</h3><ul>");
         buf.append("<li><b>").append(_("groups")).append("</b>: ").append(_("as determined by the profile organizer")).append("</li>");
         buf.append("<li><b>").append(_("caps")).append("</b>: ").append(_("capabilities in the netDb, not used to determine profiles")).append("</li>");
         buf.append("<li><b>").append(_("speed")).append("</b>: ").append(_("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel")).append("</li>");

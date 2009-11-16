@@ -43,7 +43,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             String prefix = dest.calculateHash().toBase64().substring(0,4);
             buf.append("<input type=\"hidden\" name=\"pool.").append(cur).append("\" value=\"");
             buf.append(dest.calculateHash().toBase64()).append("\" >");    
-            renderForm(buf, cur, prefix, _("Client tunnels for") + " " + name, in, out);
+            renderForm(buf, cur, prefix, _("Client tunnels for") + " " + _(name), in, out);
             cur++;
         }
         

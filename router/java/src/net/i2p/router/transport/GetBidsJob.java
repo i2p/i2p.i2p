@@ -67,7 +67,7 @@ public class GetBidsJob extends JobImpl {
             if (failedCount == 0) {
                 context.statManager().addRateData("transport.bidFailNoTransports", msg.getLifetime(), 0);
                 // This used to be "no common transports" but it is almost always no transports at all
-                context.shitlist().shitlistRouter(to, "No transports (hidden or starting up?)");
+                context.shitlist().shitlistRouter(to, _x("No transports (hidden or starting up?)"));
             } else if (failedCount >= facade.getTransportCount()) {
                 context.statManager().addRateData("transport.bidFailAllTransports", msg.getLifetime(), 0);
                 // fail after all transports were unsuccessful
@@ -97,5 +97,15 @@ public class GetBidsJob extends JobImpl {
         context.profileManager().messageFailed(msg.getTarget().getIdentity().getHash());
         
         msg.discardData();
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
     }
 }

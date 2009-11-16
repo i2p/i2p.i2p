@@ -505,7 +505,6 @@ public class I2PSnarkServlet extends HttpServlet {
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = snark.meta.getAnnounce();
         if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
-            announce.startsWith("http://4svjpPox") || announce.startsWith("http://tracker.thepiratebay.i2p/") ||
             announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/")) {
             Map trackers = _manager.getTrackers();
             for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
@@ -513,8 +512,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 String name = (String)entry.getKey();
                 String baseURL = (String)entry.getValue();
                 if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
-                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
-                      (announce.startsWith("http://4svjpPox") && baseURL.startsWith("http://thepiratebay.i2p/"))))
+                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
                     continue;
                 int e = baseURL.indexOf('=');
                 if (e < 0)

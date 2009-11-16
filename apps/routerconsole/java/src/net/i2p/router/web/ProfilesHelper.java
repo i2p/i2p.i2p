@@ -20,7 +20,8 @@ public class ProfilesHelper extends HelperBase {
     /** @return empty string, writes directly to _out */
     public String getShitlistSummary() {
         try {
-            _context.shitlist().renderStatusHTML(_out);
+            ShitlistRenderer rend = new ShitlistRenderer(_context);
+            rend.renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

@@ -1,3 +1,26 @@
+2009-11-16 zzz
+    * addressbook: Move class to net.i2p.addressbook
+    * build: Take two test scripts out of the installer
+    * i2psnark: Bye TPB
+    * Shitlist: Fix bug from two checkins ago, all were forever
+
+2009-11-14 zzz
+    * HTTP Proxy:
+      - Add support for error page translations
+      - Add support for external pages for all errors
+      - Fix lack of \r in error page headers
+      - HTML transitional fixes
+      - Cleanups
+    * UDP PeerTestManager: Throw in some synchronization to
+      try to fix stuck tests
+
+2009-11-11 zzz
+    * Console: Some colon cleansing
+    * FloodfillPeerSelector: Adjustments
+    * Shitlist: Move HTML renderer to router console,
+      add cause parameter for ease of translation,
+      tag all causes
+
 2009-11-11 zzz
     * Addressbook, NamingService: Allow 516 byte dests
       that end with AA but not AAAA, so we can permit
