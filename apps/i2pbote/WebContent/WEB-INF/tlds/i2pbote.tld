@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
+ 
+<tlib-version>1.0</tlib-version>
+<short-name>i2pbote</short-name>
+<uri>I2pBoteTags</uri>
+
+<tag>
+    <name>sendEmail</name>
+    <tag-class>i2p.bote.web.SendEmailTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+        <name>recipient</name>
+        <rtexprvalue>true</rtexprvalue>
+        <required>true</required>
+    </attribute>
+    <attribute>
+        <name>message</name>
+        <rtexprvalue>true</rtexprvalue>
+        <required>true</required>
+    </attribute>
+</tag>
+
+<tag>
+    <name>checkForMail</name>
+    <tag-class>i2p.bote.web.CheckMailTag</tag-class>
+    <body-content>empty</body-content>
+</tag>
+
+<tag>
+    <name>numDhtPeers</name>
+    <tag-class>i2p.bote.web.PrintNumDhtPeersTag</tag-class>
+    <body-content>empty</body-content>
+</tag>
+
+<tag>
+    <name>numRelayPeers</name>
+    <tag-class>i2p.bote.web.PrintNumRelayPeersTag</tag-class>
+    <body-content>empty</body-content>
+</tag>
+
+<function>
+    <name>getIdentities</name>
+    <function-class>i2p.bote.web.JSPHelper</function-class>
+    <function-signature>
+        i2p.bote.Identities getIdentities()
+    </function-signature>
+</function>
+
+<function>
+    <name>saveIdentity</name>
+    <function-class>i2p.bote.web.JSPHelper</function-class>
+    <function-signature>
+        boolean saveIdentity(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+    </function-signature>
+</function>
+    
+<function>
+    <name>deleteIdentity</name>
+    <function-class>i2p.bote.web.JSPHelper</function-class>
+    <function-signature>
+        boolean deleteIdentity(java.lang.String)
+    </function-signature>
+</function>
+
+<function>
+    <name>isCheckingForMail</name>
+    <function-class>i2p.bote.web.JSPHelper</function-class>
+    <function-signature>
+        boolean isCheckingForMail()
+    </function-signature>
+</function>
+
+<function>
+    <name>getMailFolder</name>
+    <function-class>i2p.bote.web.JSPHelper</function-class>
+    <function-signature>
+        i2p.bote.EmailFolder getMailFolder(java.lang.String)
+    </function-signature>
+</function>
+
+</taglib>
