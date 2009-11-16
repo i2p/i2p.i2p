@@ -1,0 +1,18 @@
+I2P-Bote
+--------
+
+This file explains how to use I2P-Bote. For technical documentation, see techdoc.txt.
+
+1. To install the app, [TODO]
+
+2. Set up an email address [TODO]
+
+3. Send a test email to yourself [TODO]
+
+4. Checking for email
+
+When you view your inbox through the web interface or click the "Get Mail" button on your email
+client, two things happen: New downloaded emails are shown, if there are any, and the I2P-Bote
+network is contacted to see if more emails are waiting to be downloaded.
+
+5. The Configuration File

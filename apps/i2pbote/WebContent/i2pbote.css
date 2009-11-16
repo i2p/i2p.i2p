@@ -1,0 +1,318 @@
+/* Based on the router console css */
+
+body {
+     margin: 15px 0 0 10px;
+     padding: 0em;
+     text-align: center;
+     background: #eef;
+     color: #000;
+     font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+}
+
+.titlebar {
+    width: 800px;
+    margin: 0px 20px 20px 240px;
+    background-color: #fff;
+    color: #310;
+    padding: 0 15px 15px 25px;
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid #001;
+    text-align: center;
+    -moz-box-shadow: inset 0px 0px 1px 0px #002;
+    white-space: normal;
+    background: #ddf url('images/lightbluetile.png');
+    opacity: 1.0;
+}
+
+.title {
+    font: normal bold 20pt/120% 'Lucida Sans Unicode', 'Bitstream Vera Sans', Verdana, Tahoma, Helvetica, sans-serif;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    text-shadow: 0px 0px 1px rgba(0, 0, 148, 0.9);
+}
+
+.subtitle {
+    font-size: 8pt;
+    color: #cf0606;
+    letter-spacing: 5pt;
+    text-shadow: 0px 0px 1px rgba(148, 0, 0, 0.9);
+}
+
+.checkmail {
+    font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    color: #555;
+}
+
+.menubox {
+    float: left;
+    width: 175px;
+    margin: 0px 0px 10px 10px;
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #000033;
+    background: #ddf url('images/lightbluetile.png');
+    color: #000;
+    font-size: 8pt;
+    clear: left;
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+.menubox a:link, .menubox a:visited {
+    text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
+}
+
+.menubox a:hover {
+    text-shadow: 0px 0px 0.5px rgba(255, 255, 255, 0.7);
+    color: #f60;
+}
+
+.menubox h2 {
+    font-size: 12pt;
+    color: #001;
+    letter-spacing: 0.05em;
+    text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
+    wordwrap: none;
+}
+
+.main {
+    width: 800px;
+    margin: 0px 20px 20px 240px;
+    padding: 0 15px 15px 25px;
+    background: #eef;
+    font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    text-align: left;
+    color: #001;
+    border: 1px solid #000033;
+    background: #ddf url('images/lightbluetile.png');
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-shadow: inset 0px 0px 1px 0px #002;
+}
+
+.infoMessage {
+    margin: 0px 20px 5px 240px;
+    text-align: left;
+    color: green;
+}
+    
+.errorMessage {
+    margin: 0px 20px 5px 240px;
+    text-align: left;
+    color: red;
+}
+    
+img {
+    border: none;
+}
+
+a:active {
+    color: #900;
+}
+
+a:link {
+    color: #007;
+    text-decoration: none;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+a:visited {
+    color: #606;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #f60;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+a:active {
+    color: #f93;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+button, button:visited {
+    font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    border: 1px outset #999;
+    padding: 1px 3px;
+    background: #ddf !important;
+    text-decoration: none;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    margin: 0 1px;
+    text-align: center;
+    min-width: 80px;
+    -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+    color: #006;
+}
+
+button:hover {
+    border: 1px solid #f60;
+    background: #f60 !important;
+    color: #fff;
+    -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+}
+
+button:active {
+    border: 1px solid #f60;
+    background: #001 !important;
+    color: #f60;
+    -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+.underline {
+    border-bottom: 1px solid #000022;
+    padding: 5px 0px 5px 0px;
+    margin: 0px 0px 10px 0px;
+}
+
+input {
+    background: #eef;
+    color: #001;
+    margin: 5px 10px 5px 10px;
+    padding: 4px 2px;
+    font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    border: 1px solid #001;
+    text-decoration: none;
+    min-width: 110px;
+}
+
+input, input:visited {
+    border: 1px outset #999;
+    background: #ddf;
+    color: #001;
+    margin: 5px;
+    font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    padding: 1px 2px;
+    text-decoration: none;
+    min-width: 110px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+    color: #006;
+    opacity: 0.9;
+}
+
+input:hover {
+    background: #f60;
+    color: #fff;
+    border: 1px solid #f60;
+    opacity: 1.0;
+    -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+}
+
+input:active {
+    background: #002;
+    color: #f60;
+    border: 1px solid #f60;
+    opacity: 1.0;
+    -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+}
+
+input[type=text] {
+    width: 100%;
+    background: #eef;
+    color: #001;
+    margin: 5px;
+    padding: 5px;
+    font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    border: 1px solid #001;
+    text-decoration: none;
+}
+
+input checkbox {
+    border: 0 !important;
+}
+
+textarea {
+    width: 100%;
+    padding: 5px;
+    margin: 5px;
+    background: #eef;
+    color: #003;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+    min-height: 100px;
+    border: 1px solid #001;
+}
+
+submit {
+    background: #f00;
+    color: #eef;
+    margin: 10px 2px 10px 0;
+    padding: 2px;
+    font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    font-weight: bold;
+    border: 1px solid #001;
+    text-decoration: none;
+}
+
+select {
+    background: #eef;
+    color: #003;
+    padding: 2px;
+    margin: 5px;
+    border: 1px solid #001;
+    font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    text-align: left !important;
+}
+
+.identities table {
+    table-layout: fixed;
+    width: 800px;
+}
+
+.identities td, .identities th {
+    vertical-align: top;
+    padding: 0px 30px 0px 0px;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.ellipsis
+{
+    line-height: 1.2em;
+    height: 1.2em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    -o-text-overflow: ellipsis;
+    -moz-binding: url(moz_fix2.xml#ellipsis);
+}
+
+.moz-ellipsis > DIV:first-child
+{
+    float: left;
+    margin-right: -26px;
+}
+
+.moz-ellipsis > DIV + DIV
+{
+    float: right;
+    margin-top: -1.2em;
+    background: url('images/lightbluefade.png');
+    padding-left: 26px;
+}
+
+.moz-ellipsis > DIV + DIV::after
+{
+    background: url('images/lightbluetile.png');
+    content: '...';
+}
