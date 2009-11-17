@@ -535,9 +535,6 @@ h2 {
      border-top: 1px solid #99f;
      border-left: 1px solid #99f;
      background: #000008;
-     background-image: url("images/h2bg.png"); 
-     background-repeat: no-repeat; 
-     background-position: right center;
      font-variant: small-caps; 
      text-transform: capitalize; 
      letter-spacing: 0.07em;
@@ -557,6 +554,12 @@ h3 {
 
 h3 a {
      font-weight: bold !important;
+}
+
+h2, h3 {
+     background-image: url("images/h2bg.png"); 
+     background-repeat: no-repeat; 
+     background-position: right center;
 }
 
 .proxyfooter{
@@ -592,6 +595,7 @@ th {
      padding: 8px 2px;
      text-align: center;
      border-bottom: 1px solid #99f;
+     font-size: 8pt !important;
 }
 
 tt {

@@ -23,9 +23,12 @@ class Dummy {
         _("SAM application bridge");
         _("Application tunnels");
         _("My eepsite web server");
+        _("I2P webserver (eepsite)");        
         _("Browser launch at startup");
         _("BOB application bridge");
-
+        _("I2P Router Console");
+        _("Open Router Console in web browser at startup");        
+        
         // tunnel nicknames, taken from i2ptunnel.config so they will display
         // nicely under 'local destinations' in the summary bar
         // note that if the wording changes in i2ptunnel.config, we have to
@@ -33,6 +36,8 @@ class Dummy {
         _("shared clients");
         _("IRC proxy");
         _("eepsite");
+        _("I2P webserver");
+        _("HTTP Proxy");        
         // older names for pre-0.7.4 installs
         _("eepProxy");
         _("ircProxy");
@@ -41,9 +46,11 @@ class Dummy {
         // hardcoded in iMule?
         _("iMule");
 
+
         // standard themes for ConfigUIHelper
         _("classic");
         _("dark");
         _("light");
+        _("midnight");        
     }
 }
