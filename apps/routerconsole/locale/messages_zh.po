@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-12 06:00+0000\n"
+"POT-Creation-Date: 2009-11-15 11:20+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -78,7 +78,7 @@ msgstr "无数据传输(隐身或正在启动)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:450
 msgid "Unreachable on any transport"
-msgstr "各协议均不可达"
+msgstr "各传输方式均不可达"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:373
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:578
@@ -3084,8 +3084,8 @@ msgid "Version"
 msgstr "版本"
 
 #: src/net/i2p/router/web/NetDbRenderer.java:204
-msgid "Addresses"
-msgstr "地址"
+msgid "Transports"
+msgstr "传输"
 
 #: src/net/i2p/router/web/NetDbRenderer.java:222
 msgid "Country"
@@ -3900,6 +3900,8 @@ msgstr "暗色调"
 msgid "light"
 msgstr "亮色调"
 
+#~ msgid "Addresses"
+#~ msgstr "地址"
 #~ msgid "view without"
 #~ msgstr "查看不含"
 #~ msgid "view with"
