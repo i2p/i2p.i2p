@@ -9,9 +9,9 @@
 ## need to cd into our orignal path - where we call sh.exe from.
 
 cd $CALLFROM
-echo $PWD
+## echo $PWD
 
 ## except this everything is the same with bundle-message.sh
 ## walking - public domain :-D
 
-source bundle-messages.sh
+source bundle-messages.sh $PARAS
