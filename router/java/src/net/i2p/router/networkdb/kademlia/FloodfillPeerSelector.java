@@ -299,4 +299,16 @@ class FloodfillPeerSelector extends PeerSelector {
         }
         public int size() { return _matches; }
     }
+    
+    /**
+     * Floodfill peers only. Used only by HandleDatabaseLookupMessageJob to populate the DSRM.
+     *
+     * @param key the original key (NOT the routing key)
+     * @return List of Hash for the peers selected, ordered
+     */
+    @Override
+    public List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
+        return selectFloodfillParticipants(rkey, maxNumRouters, peersToIgnore, kbuckets);
+    }
 }
