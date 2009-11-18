@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-15 11:20+0000\n"
+"POT-Creation-Date: 2009-11-18 10:04+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: \n"
@@ -1313,6 +1313,7 @@ msgstr "主页"
 #: src/net/i2p/router/web/CSSHelper.java:41
 #: src/net/i2p/router/web/SummaryBarRenderer.java:26
 #: src/net/i2p/router/web/SummaryBarRenderer.java:28
+#: strings/Strings.java:29
 msgid "I2P Router Console"
 msgstr "I2P 路由控制台"
 
@@ -3683,7 +3684,7 @@ msgid "Building tunnels"
 msgstr "正在隧道创建"
 
 #: src/net/i2p/router/web/SummaryHelper.java:404
-#: strings/Strings.java:33
+#: strings/Strings.java:36
 msgid "shared clients"
 msgstr "共享客户端"
 
@@ -3857,48 +3858,68 @@ msgid "My eepsite web server"
 msgstr "匿名主页服务器"
 
 #: strings/Strings.java:26
+msgid "I2P webserver (eepsite)"
+msgstr "匿名主页服务器(eepsite)"
+
+#: strings/Strings.java:27
 msgid "Browser launch at startup"
 msgstr "路由器启动时运行浏览器"
 
-#: strings/Strings.java:27
+#: strings/Strings.java:28
 msgid "BOB application bridge"
 msgstr "BOB 协议桥"
 
-#: strings/Strings.java:34
+#: strings/Strings.java:30
+msgid "Open Router Console in web browser at startup"
+msgstr "路由启动时打开控制台"
+
+#: strings/Strings.java:37
 msgid "IRC proxy"
 msgstr "I2P聊天室"
 
-#: strings/Strings.java:35
+#: strings/Strings.java:38
 msgid "eepsite"
 msgstr "匿名网站"
 
-#: strings/Strings.java:37
+#: strings/Strings.java:39
+msgid "I2P webserver"
+msgstr "匿名主页服务器"
+
+#: strings/Strings.java:40
+msgid "HTTP Proxy"
+msgstr "HTTP 代理"
+
+#: strings/Strings.java:42
 msgid "eepProxy"
 msgstr "I2P代理"
 
-#: strings/Strings.java:38
+#: strings/Strings.java:43
 msgid "ircProxy"
 msgstr "I2P聊天室"
 
-#: strings/Strings.java:40
+#: strings/Strings.java:45
 msgid "I2PSnark"
 msgstr "I2P Snark"
 
-#: strings/Strings.java:42
+#: strings/Strings.java:47
 msgid "iMule"
 msgstr ""
 
-#: strings/Strings.java:45
+#: strings/Strings.java:51
 msgid "classic"
 msgstr "经典"
 
-#: strings/Strings.java:46
+#: strings/Strings.java:52
 msgid "dark"
 msgstr "暗色调"
 
-#: strings/Strings.java:47
+#: strings/Strings.java:53
 msgid "light"
 msgstr "亮色调"
+
+#: strings/Strings.java:54
+msgid "midnight"
+msgstr "午夜"
 
 #~ msgid "Addresses"
 #~ msgstr "地址"
