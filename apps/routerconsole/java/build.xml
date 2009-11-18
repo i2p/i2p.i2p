@@ -89,6 +89,24 @@
         <!-- jar again to get the latest messages_*.class files -->
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
+    <target name="poupdate" depends="compile">
+        <ant target="war" />
+        <!-- Update the messages_*.po files.
+             We need to supply the bat file for windows, and then change the fail property to true -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
+            <arg value="/c" />
+            <arg value="bundle-messages.bat" />
+            <arg value="-p" />
+        </exec>
+    </target>
     <target name="war" depends="precompilejsp">
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"

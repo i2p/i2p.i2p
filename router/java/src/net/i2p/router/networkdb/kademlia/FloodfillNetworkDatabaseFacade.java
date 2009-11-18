@@ -99,7 +99,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
-    private static final int MAX_TO_FLOOD = 9;
+    private static final int MAX_TO_FLOOD = 7;
 
     /**
      *  Send to a subset of all floodfill peers.
@@ -139,6 +139,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             m.setPriority(FLOOD_PRIORITY);
             m.setTarget(target);
             m.setExpiration(_context.clock().now()+FLOOD_TIMEOUT);
+            // note send failure but don't give credit on success
+            // might need to change this
+            Job floodFail = new FloodFailedJob(_context, peer);
+            m.setOnFailedSendJob(floodFail);
             _context.commSystem().processMessage(m);
             flooded++;
             if (_log.shouldLog(Log.INFO))
@@ -147,6 +151,20 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Flooded the data to " + flooded + " of " + peers.size() + " peers");
+    }
+
+    /** note in the profile that the store failed */
+    private static class FloodFailedJob extends JobImpl {
+        private Hash _peer;
+    
+        public FloodFailedJob(RouterContext ctx, Hash peer) {
+            super(ctx);
+            _peer = peer;
+        }
+        public String getName() { return "Flood failed"; }
+        public void runJob() {
+            getContext().profileManager().dbStoreFailed(_peer);
+        }
     }
 
     private static final int FLOOD_PRIORITY = 200;
