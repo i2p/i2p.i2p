@@ -1,3 +1,13 @@
+2009-11-18 zzz
+    * Build: Don't update the po files by default, add new
+      target "poupdate" to do that.
+    * Netdb:
+      - Floodfill rework part 3 of N: Send closest-to-the-key
+        in DSRM replies
+      - Adjust criteria for following DSRM
+      - Note failed floods in the profile
+      - Reduce max flood
+
 2009-11-16 zzz
     * addressbook: Move class to net.i2p.addressbook
     * build: Take two test scripts out of the installer
