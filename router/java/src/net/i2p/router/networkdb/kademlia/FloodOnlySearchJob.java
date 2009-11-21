@@ -68,12 +68,29 @@ class FloodOnlySearchJob extends FloodSearchJob {
     public long getCreated() { return _created; }
     public boolean shouldProcessDSRM() { return _shouldProcessDSRM; }
     private static final int CONCURRENT_SEARCHES = 2;
+    private static final int MIN_FOR_NO_DSRM = 4;
+
     @Override
     public void runJob() {
         // pick some floodfill peers and send out the searches
-        List floodfillPeers = _facade.getFloodfillPeers();
-        if (floodfillPeers.size() <= 3)
-            _shouldProcessDSRM = true;
+        // old
+        //List<Hash> floodfillPeers = _facade.getFloodfillPeers();
+        // new
+        List<Hash> floodfillPeers;
+        KBucketSet ks = _facade.getKBuckets();
+        if (ks != null) {
+            Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
+            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(rkey, MIN_FOR_NO_DSRM, ks);
+        } else {
+            floodfillPeers = Collections.EMPTY_LIST;
+        }
+
+        // If we dont know enough floodfills,
+        // or the global network routing key just changed (which is set at statrtup,
+        // so this includes the first few minutes of uptime)
+        _shouldProcessDSRM = floodfillPeers.size() < MIN_FOR_NO_DSRM ||
+                             getContext().routingKeyGenerator().getLastChanged() > getContext().clock().now() - 30*60*1000;
+
         if (floodfillPeers.size() <= 0) {
             // ask anybody, they may not return the answer but they will return a few ff peers we can go look up,
             // so this situation should be temporary
@@ -86,10 +103,12 @@ class FloodOnlySearchJob extends FloodSearchJob {
                 failed();
                 return;
             }
+            Collections.shuffle(floodfillPeers, getContext().random());
         }
         OutNetMessage out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
         synchronized (_out) { _out.add(out); }
 
+/********
         // We need to randomize our ff selection, else we stay with the same ones since
         // getFloodfillPeers() is sorted by closest distance. Always using the same
         // ones didn't help reliability.
@@ -124,6 +143,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         } else {
             _shouldProcessDSRM = true;
         }
+********/
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
         for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {

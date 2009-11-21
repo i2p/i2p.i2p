@@ -52,6 +52,7 @@ public class RoutingKeyGenerator {
     }
     
     private byte _currentModData[];
+    private long _lastChanged;
 
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd");
@@ -60,8 +61,13 @@ public class RoutingKeyGenerator {
         return _currentModData;
     }
 
+    public long getLastChanged() {
+        return _lastChanged;
+    }
+
     public void setModData(byte modData[]) {
         _currentModData = modData;
+        _lastChanged = _context.clock().now();
     }
 
     /**

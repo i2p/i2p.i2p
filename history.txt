@@ -1,3 +1,14 @@
+2009-11-21 zzz
+    * Netdb Floodfill rework part 4 of N:
+      - Search closest-to-the-key
+      - Put closest-to-the-key in explore don't-include-list
+      - Use facade's peer selector for exploration rather than
+        instantiating a new one
+      - Adjust response time limit
+    * netdb.jsp: Add popups on flags
+    * Routerconsole build: rename include files so they aren't
+      compiled and bundled separately (~15KB)
+
 2009-11-18 zzz
     * Build: Don't update the po files by default, add new
       target "poupdate" to do that.
