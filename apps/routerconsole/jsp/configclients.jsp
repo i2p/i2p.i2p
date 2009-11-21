@@ -3,7 +3,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <%=intl.title("config clients")%>
 <style type='text/css'>
 button span.hide{
@@ -11,13 +11,13 @@ button span.hide{
 }
 </style></head><body>
 
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <h1><%=intl._("I2P Client Configuration")%></h1>
 <div class="main" id="main">
- <%@include file="confignav.jsp" %>
+ <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

@@ -3,11 +3,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <%=intl.title("config UI")%>
 </head><body>
 
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigUIHelper" id="uihelper" scope="request" />
 <jsp:setProperty name="uihelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
@@ -15,7 +15,7 @@
 <h1><%=uihelper._("I2P UI Configuration")%></h1>
 <div class="main" id="main">
 
- <%@include file="confignav.jsp" %>
+ <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigUIHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />

@@ -3,7 +3,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <%=intl.title("config stats")%>
 <script type="text/javascript">
 function init()
@@ -52,10 +52,10 @@ function toggleAll(category)
 }
 </script>
 </head><body onLoad="init();">
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Stats Configuration")%></h1>
 <div class="main" id="main">
- <%@include file="confignav.jsp" %>
+ <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

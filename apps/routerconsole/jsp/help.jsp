@@ -7,9 +7,9 @@
    */
 %>
 <html><head><title>I2P Router Console - help</title>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 </head><body>
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 <h1>I2P Router Help & Support</h1>
 <div class="main" id="main"><p>
 If you'd like to help improve or translate the documentation, or

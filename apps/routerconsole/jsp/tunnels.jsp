@@ -3,10 +3,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <%=intl.title("tunnel summary")%>
 </head><body>
-<%@include file="summary.jsp" %><h1><%=intl._("I2P Tunnel Summary")%></h1>
+<%@include file="summary.jsi" %><h1><%=intl._("I2P Tunnel Summary")%></h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.TunnelHelper" id="tunnelHelper" scope="request" />
  <jsp:setProperty name="tunnelHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

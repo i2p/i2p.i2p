@@ -7,9 +7,9 @@
    */
 %>
 <html><head><title>I2P Router Console - internals</title>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 </head><body>
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="conhelper" scope="request" />
 <jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <jsp:setProperty name="conhelper" property="writer" value="<%=out%>" />

@@ -3,17 +3,17 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <%=intl.title("config tunnels")%>
 </head><body>
 
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
 <jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <h1><%=intl._("I2P Tunnel Configuration")%></h1>
 <div class="main" id="main">
- <%@include file="confignav.jsp" %>
+ <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="formhandler" property="shouldsave" value="<%=request.getParameter("shouldsave")%>" />

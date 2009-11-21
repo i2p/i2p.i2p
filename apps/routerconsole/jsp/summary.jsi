@@ -14,7 +14,7 @@
         out.print("<iframe src=\"summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\">\n");
 %>
 <div class="routersummary">
-<%@include file="summarynoframe.jsp" %>
+<%@include file="summarynoframe.jsi" %>
 <%
     // d defined above
     if (!"0".equals(d)) {

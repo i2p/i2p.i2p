@@ -7,9 +7,9 @@
    */
 %>
 <html><head><title>I2P Router Console - Debug</title>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 </head><body>
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 <h1>Router SKM</h1>
 <div class="main" id="main">
 <%

@@ -110,7 +110,7 @@
     <target name="war" depends="precompilejsp">
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, web-fragment.xml">
+             basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml">
         </war>
     </target>
     <target name="precompilejsp" unless="precompilejsp.uptodate">
@@ -120,13 +120,35 @@
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
 
-        <!-- TODO: Don't compile the following jsps, which should be used only as includes:
-           -  summary.jsp, summarynoframe.jsp, css.jsp, confignav.jsp
-           -  Is here a JspC command line switch for that?
-           -  Or should we move them to a separate directory?
-          -->
-
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
+        <!--
+           **     Usage: jspc <options> <jsp files>
+           **     where jsp files is
+           **         -webapp <dir>      A directory containing a web-app, whose JSP pages
+           **                            will be processed recursively
+           **     or any number of
+           **         <file>             A file to be parsed as a JSP page
+           **     where options include:
+           **         -help              Print this help message
+           **         -v                 Verbose mode
+           **         -d <dir>           Output Directory (default -Djava.io.tmpdir)
+           **         -l                 Outputs the name of the JSP page upon failure
+           **         -s                 Outputs the name of the JSP page upon success
+           **         -p <name>          Name of target package (default org.apache.jsp)
+           **         -c <name>          Name of target class name (only applies to first JSP page)
+           **         -mapped            Generates separate write() calls for each HTML line in the JSP
+           **         -die[#]            Generates an error return code (#) on fatal errors (default 1)
+           **         -uribase <dir>     The uri directory compilations should be relative to
+           **                            (default "/")
+           **         -uriroot <dir>     Same as -webapp
+           **         -compile           Compiles generated servlets
+           **         -webinc <file>     Creates a partial servlet mappings in the file
+           **         -webxml <file>     Creates a complete web.xml in the file
+           **         -ieplugin <clsid>  Java Plugin classid for Internet Explorer
+           **         -classpath <path>  Overrides java.class.path system property
+           **         -xpoweredBy        Add X-Powered-By response header
+           **         -trimSpaces        Trim spaces in template text between actions, directives
+        -->
         <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />

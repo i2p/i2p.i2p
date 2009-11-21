@@ -8,7 +8,7 @@
  */
 %>
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <title>Summary Bar</title>
 <%
     // try hard to avoid an error page in the iframe after shutdown
@@ -25,7 +25,7 @@
         } else {
             System.setProperty("routerconsole.summaryRefresh", d);
         }
-        // we probably don't get here if d == "0" since caught in summary.jsp, but just
+        // we probably don't get here if d == "0" since caught in summary.jsi, but just
         // to be sure...
         if (!"0".equals(d)) {
             // doesn't work for restart or shutdown with no expl. tunnels,
@@ -49,7 +49,7 @@
     }
 %>
 </head><body style="margin: 0;"><div class="routersummary">
-<%@include file="summarynoframe.jsp" %>
+<%@include file="summarynoframe.jsi" %>
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {

@@ -3,10 +3,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <%=intl.title("logs")%>
 </head><body>
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Router Logs")%></h1>
 <div class="main" id="main">
  <div class="joblog"><h3><%=intl._("I2P Version & Running Environment")%></h3><a name="version"> </a>
