@@ -25,6 +25,8 @@ import net.i2p.util.Log;
  *
  * NOTE: Unused directly - see FloodOnlySearchJob extension which overrides almost everything.
  * TODO: Comment out or delete what we don't use here.
+ *
+ * Note that this does NOT extend SearchJob.
  */
 public class FloodSearchJob extends JobImpl {
     protected Log _log;

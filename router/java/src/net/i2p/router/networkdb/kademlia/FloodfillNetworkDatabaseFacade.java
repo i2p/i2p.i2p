@@ -258,6 +258,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     /**
      * Ok, the initial set of searches to the floodfill peers timed out, lets fall back on the
      * wider kademlia-style searches
+     *
+     * Unused - called only by FloodSearchJob which is overridden - don't use this.
      */
     void searchFull(Hash key, List<Job> onFind, List<Job> onFailed, long timeoutMs, boolean isLease) {
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }

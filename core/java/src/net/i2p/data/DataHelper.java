@@ -109,6 +109,8 @@ public class DataHelper {
     }
 
     /**
+     * Writes the props to the stream, sorted by property name.
+     *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
      * Re-enable it so we can pass UTF-8 tunnel names through the I2CP SessionConfig.
@@ -145,6 +147,11 @@ public class DataHelper {
         }
     }
     
+    /*
+     * Reads the props from the byte array
+     * @param props returned OrderedProperties (sorted by property name)
+     * @return new offset
+     */
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
         if (props != null) {
             OrderedProperties p = new OrderedProperties();
@@ -174,6 +181,11 @@ public class DataHelper {
         }
     }
     
+    /**
+     * Writes the props to the byte array, not sorted
+     * (unless the target param is an OrderedProperties)
+     * @return new offset
+     */
     public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
@@ -196,6 +208,10 @@ public class DataHelper {
         return offset + size;
     }
 
+    /**
+     * Writes the props to returned byte array, not sorted
+     * (unless the opts param is an OrderedProperties)
+     */
     public static byte[] toProperties(Properties opts) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
@@ -209,8 +225,8 @@ public class DataHelper {
     }
     
     /**
-     * Pretty print the mapping
-     *
+     * Pretty print the mapping, unsorted
+     * (unless the options param is an OrderedProperties)
      */
     public static String toString(Properties options) {
         StringBuilder buf = new StringBuilder();
@@ -278,6 +294,7 @@ public class DataHelper {
     }
     
     /**
+     * Writes the props to the file, unsorted.
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
      */
     public static void storeProps(Properties props, File file) throws IOException {

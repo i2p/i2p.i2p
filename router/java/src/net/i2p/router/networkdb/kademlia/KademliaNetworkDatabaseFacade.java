@@ -827,6 +827,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * will fire the appropriate jobs on success or timeout (or if the kademlia search completes
      * without any match)
      *
+     * Unused - called only by FNDF.searchFull() from FloodSearchJob which is overridden - don't use this.
      */
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         if (!_initialized) return null;
