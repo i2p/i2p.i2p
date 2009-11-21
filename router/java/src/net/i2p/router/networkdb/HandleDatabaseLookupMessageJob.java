@@ -142,9 +142,15 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 }
             } else {
                 // not found locally - return closest peer routerInfo structs
+                Set dontInclude = _message.getDontIncludePeers();
+                // TODO: Honor flag to exclude all floodfills
+                //if (dontInclude.contains(Hash.FAKE_HASH)) {
+                //    dontInclude = new HashSet(dontInclude);
+                //    dontInclude.addAll( pfffft );
+                //}
                 Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
                                                                         MAX_ROUTERS_RETURNED, 
-                                                                        _message.getDontIncludePeers());
+                                                                        dontInclude);
 
                 // ERR: see above
                 // // Remove hidden nodes from set..
@@ -182,7 +188,6 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     }
     
     private boolean weAreClosest(Set routerInfoSet) {
-        boolean weAreClosest = false;
         for (Iterator iter = routerInfoSet.iterator(); iter.hasNext(); ) {
             RouterInfo cur = (RouterInfo)iter.next();
             if (cur.getIdentity().calculateHash().equals(getContext().routerHash())) {

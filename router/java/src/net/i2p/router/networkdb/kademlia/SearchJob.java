@@ -33,9 +33,12 @@ import net.i2p.util.Log;
  * Search for a particular key iteratively until we either find a value or we 
  * run out of peers
  *
+ * Note that this is rarely if ever used directly, and is primary used by the ExploreJob extension.
+ * FloodOnlySearchJob and FloodSearchJob do not extend this.
+ * It also does not update peer profile stats.
  */
 class SearchJob extends JobImpl {
-    private Log _log;
+    protected Log _log;
     protected KademliaNetworkDatabaseFacade _facade;
     private SearchState _state;
     private Job _onSuccess;
