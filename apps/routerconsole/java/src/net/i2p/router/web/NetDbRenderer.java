@@ -262,16 +262,21 @@ public class NetDbRenderer {
         }
         
         long age = _context.clock().now() - info.getPublished();
-        if (isUs && _context.router().isHidden())
-            buf.append("<b>" + _("Hidden") + ", " + _("Updated") + ":</b> ").append(DataHelper.formatDuration(age)).append(" " + _("ago") + "<br>\n");
-        else if (age > 0)
-            buf.append("<b>" + _("Published") + ":</b> ").append(DataHelper.formatDuration(age)).append(" " + _("ago") + "<br>\n");
-        else
+        if (isUs && _context.router().isHidden()) {
+            buf.append("<b>").append(_("Hidden")).append(", ").append(_("Updated")).append(":</b> ")
+               .append(_("{0} ago", DataHelper.formatDuration(age))).append("<br>\n");
+        } else if (age > 0) {
+            buf.append("<b>").append(_("Published")).append(":</b> ")
+               .append(_("{0} ago", DataHelper.formatDuration(age))).append("<br>\n");
+        } else {
+            // shouldnt happen
             buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
+        }
         buf.append("<b>" + _("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
-            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append('\"');
+            buf.append(" title=\"").append(_(_context.commSystem().getCountryName(country))).append('\"');
             buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
