@@ -182,6 +182,7 @@ public class Hash extends DataStructureImpl {
         return _base64ed;
     }
     
+/********
     public static void main(String args[]) {
         testFill();
         testOverflow();
@@ -273,4 +274,5 @@ public class Hash extends DataStructureImpl {
         }
         _log.debug("Fill check test passed");
     }
+*********/
 }
