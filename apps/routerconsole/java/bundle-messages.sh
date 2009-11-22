@@ -22,7 +22,8 @@ fi
 # generate strings/Countries.java from ../../../installer/resources/countries.txt
 #
 CFILE=../../../installer/resources/countries.txt
-JFILE=build/Countries.java
+# add ../java/ so the refs will work in the po file
+JFILE=../java/build/Countries.java
 if [ $CFILE -nt $JFILE -o ! -s $JFILE ]
 then
 	mkdir -p build
@@ -40,7 +41,8 @@ ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/Blocklist.java \
    ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java"
 
-JPATHS="src ../jsp/WEB-INF strings $JFILE $ROUTERFILES"
+# add ../java/ so the refs will work in the po file
+JPATHS="../java/src ../jsp/WEB-INF ../java/strings $JFILE $ROUTERFILES"
 for i in ../locale/messages_*.po
 do
 	# get language
