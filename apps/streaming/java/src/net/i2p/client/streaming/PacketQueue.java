@@ -150,6 +150,7 @@ public class PacketQueue {
             Connection c = packet.getConnection();
             String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
             _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+            ((PacketLocal)packet).logTCPDump(false);
         }
         
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
