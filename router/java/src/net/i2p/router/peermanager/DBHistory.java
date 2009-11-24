@@ -114,6 +114,7 @@ public class DBHistory {
      */
     public void lookupSuccessful() {
         _successfulLookups++;
+        _failedLookupRate.addData(0, 0);
         _lastLookupSuccessful = _context.clock().now();
     }
 
@@ -132,6 +133,9 @@ public class DBHistory {
      *
      */
     public void storeSuccessful() {
+        // Fixme, redefined this to include both lookup and store fails,
+        // need to fix the javadocs
+        _failedLookupRate.addData(0, 0);
         _lastStoreSuccessful = _context.clock().now();
     }
 

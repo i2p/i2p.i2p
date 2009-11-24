@@ -32,7 +32,7 @@ class ProfileOrganizerRenderer {
         _organizer = organizer;
         _comparator = new ProfileComparator();
     }
-    public void renderStatusHTML(Writer out) throws IOException {
+    public void renderStatusHTML(Writer out, boolean full) throws IOException {
         Set peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
@@ -40,6 +40,8 @@ class ProfileOrganizerRenderer {
         
         TreeSet order = new TreeSet(_comparator);
         TreeSet integratedPeers = new TreeSet(_comparator);
+        int older = 0;
+        int standard = 0;
         for (Iterator iter = peers.iterator(); iter.hasNext();) {
             Hash peer = (Hash)iter.next();
             if (_organizer.getUs().equals(peer)) continue;
@@ -51,7 +53,14 @@ class ProfileOrganizerRenderer {
                 if (info != null && info.getCapabilities().indexOf("f") >= 0)
                     integratedPeers.add(prof);
             }
-            if (prof.getLastSendSuccessful() <= hideBefore) continue;
+            if (prof.getLastSendSuccessful() <= hideBefore) {
+                older++;
+                continue;
+            }
+            if ((!full) && !_organizer.isHighCapacity(peer)) {
+                standard++;
+                continue;
+            }
             order.add(prof);
         }
         
@@ -62,7 +71,10 @@ class ProfileOrganizerRenderer {
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
         buf.append(_("Showing {0} recent profiles.", order.size())).append('\n');
-        buf.append(_("Hiding {0} older profiles.", peers.size()-order.size()));
+        if (older > 0)
+            buf.append(_("Hiding {0} older profiles.", older)).append('\n');
+        if (standard > 0)
+            buf.append("<a href=\"/profiles.jsp?f=1\">").append(_("Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
                    buf.append("<table>");
                    buf.append("<tr>");
@@ -169,7 +181,7 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<h2>").append(_("Floodfill and Integrated Peers")).append("</h2>\n");
+        buf.append("<h2><a name=\"flood\"></a>").append(_("Floodfill and Integrated Peers")).append("</h2>\n");
         buf.append("<table>");
         buf.append("<tr>");
         buf.append("<th class=\"smallhead\">").append(_("Peer")).append("</th>");
@@ -231,6 +243,7 @@ class ProfileOrganizerRenderer {
                 for (int i = 0; i < 6; i++)
                     buf.append("<td align=\"right\">").append(_(NA));
             }
+            buf.append("</tr>\n");
         }
         buf.append("</table>");
 
@@ -324,12 +337,15 @@ class ProfileOrganizerRenderer {
     private String davg (DBHistory dbh, long rate) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
-                return _(NA);
+                return "0%";
             Rate r = rs.getRate(rate);
             if (r == null)
-                return _(NA);
+                return "0%";
             long c = r.getCurrentEventCount() + r.getLastEventCount();
-            return "" + c;
+            if (c <= 0)
+                return "0%";
+            double avg = 0.5 + 100 * (r.getCurrentTotalValue() + r.getLastTotalValue()) / c;
+            return ((int) avg) + "%";
     }
 
     /** translate a string */
