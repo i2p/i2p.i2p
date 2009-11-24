@@ -131,11 +131,14 @@ public class ConnectionPacketHandler {
             isNew = false;
         }
         
-        if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("seq=0 && size=" + packet.getPayloadSize() + ": isNew? " + isNew 
-                           + " packet: " + packet + " con: " + con);
-        }
+        //if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
+        //    if (_log.shouldLog(Log.DEBUG))
+        //        _log.debug("seq=0 && size=" + packet.getPayloadSize() + ": isNew? " + isNew 
+        //                   + " packet: " + packet + " con: " + con);
+        //}
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug((isNew ? "New" : "Dup or ack-only") + " inbound packet on " + con + ": " + packet);
 
         // close *after* receiving the data, as well as after verifying the signatures / etc
         if (packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
@@ -151,7 +154,9 @@ public class ConnectionPacketHandler {
             if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED) && (packet.getOptionalDelay() <= 0) ) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Scheduling immediate ack for " + packet);
-                con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+                //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+                // honor request "almost" immediately
+                con.setNextSendTime(_context.clock().now() + 250);
             } else {
                 int delay = con.getOptions().getSendAckDelay();
                 if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
@@ -222,6 +227,10 @@ public class ConnectionPacketHandler {
         //    con.fastRetransmit();
     }
     
+    /**
+     * Process the acks in a received packet, and adjust our window and RTT
+     * @return are we congested?
+     */
     private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew, boolean choke) {
         if (ackThrough < 0) return false;
         //if ( (nacks != null) && (nacks.length > 0) )
@@ -287,7 +296,7 @@ public class ConnectionPacketHandler {
         return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0), choke);
     }
     
-    
+    /** @return are we congested? */
     private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked, boolean choke) {
         boolean congested = false;
         if ( (!isNew) && (sequenceNum > 0) ) {
