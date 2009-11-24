@@ -1,4 +1,22 @@
+2009-11-24 zzz
+    * DataStructures: Remove unused Logs
+    * OrderedProperties: Simplify, use in i2psnark
+    * Profiles: Record successes in the DB fail rate
+      too, so we can calculate a percentage
+    * profiles.jsp:
+      - Change fail rate from count to percent
+      - Hide standard profiles by default
+    * Streaming:
+      - When an "immediate" ack is requested, do it within
+        250 ms (was 2000)
+      - Request immediate acks when < 1/3 of window remains,
+        or when < 3 packets remain in window,
+        and every 8 packets (was when < 2 packets in window remain)
+      - Change requested delay to RTT/2 (was RTO/2)
+      - Log cleanup and javadoc
+
 2009-11-21 zzz
+    * GeoIP: Update to Nov 17 2009 data
     * Netdb Floodfill rework part 4 of N:
       - Search closest-to-the-key
       - Put closest-to-the-key in explore don't-include-list
