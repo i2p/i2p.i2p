@@ -20,6 +20,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Manage multiple snarks
@@ -126,7 +127,7 @@ public class SnarkManager implements Snark.CompleteListener {
     /** null to set initial defaults */
     public void loadConfig(String filename) {
         if (_config == null)
-            _config = new Properties();
+            _config = new OrderedProperties();
         if (filename != null) {
             File cfg = new File(filename);
             if (!cfg.isAbsolute())
