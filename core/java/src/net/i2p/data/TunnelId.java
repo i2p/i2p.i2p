@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines the tunnel ID that messages are passed through on a set of routers.
  * This is not globally unique, but must be unique on each router making up
@@ -23,7 +21,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class TunnelId extends DataStructureImpl {
-    private final static Log _log = new Log(TunnelId.class);
     private long _tunnelId;
     private int _type;
     

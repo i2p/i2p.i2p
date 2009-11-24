@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 public class Address extends DataStructureImpl {
-    private final static Log _log = new Log(Address.class);
     private String _hostname;
     private Destination _destination;
     

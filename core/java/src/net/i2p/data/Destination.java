@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines an end point in the I2P network.  The Destination may move around
  * in the network, but messages sent to the Destination will find it
@@ -23,7 +21,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class Destination extends DataStructureImpl {
-    protected final static Log _log = new Log(Destination.class);
     protected Certificate _certificate;
     protected SigningPublicKey _signingKey;
     protected PublicKey _publicKey;

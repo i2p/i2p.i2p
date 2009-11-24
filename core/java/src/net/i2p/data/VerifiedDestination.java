@@ -13,8 +13,6 @@ import java.security.NoSuchAlgorithmException;
 
 import com.nettgryppa.security.HashCash;
 
-import net.i2p.util.Log;
-
 /**
  * Extend Destination with methods to verify its Certificate.
  * The router does not check Certificates, it doesn't care.
@@ -26,7 +24,6 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class VerifiedDestination extends Destination {
-    protected final static Log _log = new Log(Destination.class);
 
     public VerifiedDestination() {
         super();

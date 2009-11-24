@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines the SessionKey as defined by the I2P data structure spec.
  * A session key is 32byte Integer. 
@@ -22,7 +20,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class SessionKey extends DataStructureImpl {
-    private final static Log _log = new Log(SessionKey.class);
     private byte[] _data;
     private Object _preparedKey;
 

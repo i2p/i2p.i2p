@@ -294,7 +294,7 @@ public class DataHelper {
     }
     
     /**
-     * Writes the props to the file, unsorted.
+     * Writes the props to the file, unsorted (unless props is an OrderedProperties)
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
      */
     public static void storeProps(Properties props, File file) throws IOException {

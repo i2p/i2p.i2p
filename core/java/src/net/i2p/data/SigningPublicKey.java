@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines the SigningPublicKey as defined by the I2P data structure spec.
  * A public key is 256byte Integer. The public key represents only the 
@@ -24,7 +22,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class SigningPublicKey extends DataStructureImpl {
-    private final static Log _log = new Log(SigningPublicKey.class);
     private byte[] _data;
 
     public final static int KEYSIZE_BYTES = 128;

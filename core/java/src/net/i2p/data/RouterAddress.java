@@ -16,15 +16,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 
-import net.i2p.util.Log;
-
 /**
  * Defines a method of communicating with a router
  *
  * @author jrandom
  */
 public class RouterAddress extends DataStructureImpl {
-    private final static Log _log = new Log(RouterAddress.class);
     private int _cost;
     private Date _expiration;
     private String _transportStyle;
