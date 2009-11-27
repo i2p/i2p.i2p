@@ -32,6 +32,7 @@ public class Hash extends DataStructureImpl {
     private volatile String _stringified;
     private volatile String _base64ed;
     private /* FIXME final FIXME */ Map _xorCache;
+    private int _cachedHashCode;
 
     public final static int HASH_LENGTH = 32;
     public final static Hash FAKE_HASH = new Hash(new byte[HASH_LENGTH]);
@@ -54,6 +55,7 @@ public class Hash extends DataStructureImpl {
         _data = data;
         _stringified = null;
         _base64ed = null;
+        _cachedHashCode = calcHashCode();
     }
 
     /**
@@ -133,6 +135,7 @@ public class Hash extends DataStructureImpl {
         _base64ed = null;
         int read = read(in, _data);
         if (read != HASH_LENGTH) throw new DataFormatException("Not enough bytes to read the hash");
+        _cachedHashCode = calcHashCode();
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -150,6 +153,11 @@ public class Hash extends DataStructureImpl {
     /** a Hash is a hash, so just use the first 4 bytes for speed */
     @Override
     public int hashCode() {
+        return _cachedHashCode;
+    }
+
+    /** a Hash is a hash, so just use the first 4 bytes for speed */
+    private int calcHashCode() {
         int rv = 0;
         if (_data != null) {
             for (int i = 0; i < 4; i++)
