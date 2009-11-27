@@ -56,19 +56,19 @@ interface KBucket {
      * Retrieve all routing table entries stored in the bucket
      * @return set of Hash structures
      */
-    public Set getEntries();
+    public Set<Hash> getEntries();
     /**
      * Retrieve hashes stored in the bucket, excluding the ones specified 
      * @return set of Hash structures
      */
-    public Set getEntries(Set toIgnoreHashes);
+    public Set<Hash> getEntries(Set<Hash> toIgnoreHashes);
     public void getEntries(SelectionCollector collector);
     
     /**
      * Fill the bucket with entries
      * @param entries set of Hash structures
      */
-    public void setEntries(Set entries);
+    public void setEntries(Set<Hash> entries);
 
     /** 
      * Generate a random key that would go inside this bucket

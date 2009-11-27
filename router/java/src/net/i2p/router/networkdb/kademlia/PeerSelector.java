@@ -121,8 +121,9 @@ public class PeerSelector {
             _matches = 0;
         }
         public void add(Hash entry) {
-            if (_context.profileOrganizer().isFailing(entry))
-                return;
+            // deadlock seen here, and we don't mark profiles failing anymore
+            //if (_context.profileOrganizer().isFailing(entry))
+            //    return;
             if (_toIgnore.contains(entry))
                 return;
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
