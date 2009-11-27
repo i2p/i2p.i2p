@@ -37,7 +37,7 @@ public class SummaryBarRenderer {
             buf.append(linkhelper.getContent());
         } else {
             buf.append("<h3><a href=\"/configclients.jsp\" target=\"_top\" title=\"")
-               .append("Configure startup of clients and webapps (services); manually start dormant services")
+               .append(_("Configure startup of clients and webapps (services); manually start dormant services"))
                .append("\">")
                .append(_("I2P Services"))
                .append("</a></h3>\n" +
@@ -118,7 +118,7 @@ public class SummaryBarRenderer {
                .append(_("Graphs"))
                .append("</a>\n" +
 
-                       "<a href=\"oldstats.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"stats.jsp\" target=\"_top\" title=\"")
                .append(_("Textual router performance statistics"))
                .append("\">")
                .append(_("Stats"))
@@ -143,7 +143,7 @@ public class SummaryBarRenderer {
            .append(_("never reveal it to anyone"))
            .append("\" href=\"netdb.jsp?r=.\" target=\"_top\">")
            .append(_("Local Identity"))
-           .append("<a></h4><hr>\n" +
+           .append("</a></h4><hr>\n" +
 
                    "<table><tr><td align=\"left\">" +
                    "<b>")
@@ -287,9 +287,9 @@ public class SummaryBarRenderer {
                 if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<form action=\"").append(uri).append("\" method=\"GET\">\n");
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"GET\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" >Reseed</button></form>\n");
+                buf.append("<button type=\"submit\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
             }
             anotherLine = true;
         }
@@ -401,7 +401,7 @@ public class SummaryBarRenderer {
            .append("</td></tr>\n" +
 
                    "</table><hr><h4>")
-           .append(_helper.getTunnelStatus())
+           .append(_(_helper.getTunnelStatus()))
            .append("</h4><hr>\n")
            .append(_helper.getDestinations());
 

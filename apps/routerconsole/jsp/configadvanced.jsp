@@ -2,19 +2,20 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config advanced</title>
-<%@include file="css.jsp" %>
+<html><head>
+<%@include file="css.jsi" %>
+<%=intl.title("config advanced")%>
 </head><body>
 
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHelper" id="advancedhelper" scope="request" />
 <jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
-<h1>I2P Advanced Configuration</h1>
+<h1><%=intl._("I2P Advanced Configuration")%></h1>
 <div class="main" id="main">
 
- <%@include file="confignav.jsp" %>
+ <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="*" />
@@ -28,10 +29,10 @@
     System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
- <h3>Advanced I2P Configuration</h3>
+ <h3><%=intl._("Advanced I2P Configuration")%></h3>
  <textarea rows="32" cols="60" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
       <div class="formaction">
-        <input type="submit" name="shouldsave" value="Apply" />
-        <input type="reset" value="Cancel" /><br>
- <b>NOTE:</b> Some changes may require a restart to take effect.
+        <input type="submit" name="shouldsave" value="<%=intl._("Apply")%>" />
+        <input type="reset" value="<%=intl._("Cancel")%>" /><br>
+ <b><%=intl._("NOTE")%>:</b> <%=intl._("Some changes may require a restart to take effect.")%>
  </div></form></div></div></div></body></html>

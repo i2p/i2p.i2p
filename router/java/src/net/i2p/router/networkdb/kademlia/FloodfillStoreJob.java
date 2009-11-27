@@ -8,6 +8,8 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.i2p.data.DataStructure;
@@ -55,16 +57,20 @@ class FloodfillStoreJob extends StoreJob {
             // Get the time stamp from the data we sent, so the Verify job can meke sure that
             // it finds something stamped with that time or newer.
             long published = 0;
-            boolean isRouterInfo = false;
             DataStructure data = _state.getData();
-            if (data instanceof RouterInfo) {
+            boolean isRouterInfo = data instanceof RouterInfo;
+            if (isRouterInfo) {
                 published = ((RouterInfo) data).getPublished();
-                isRouterInfo = true;
             } else if (data instanceof LeaseSet) {
                 published = ((LeaseSet) data).getEarliestLeaseDate();
             }
+            // we should always have exactly one successful entry
+            Hash sentTo = null;
+            try {
+                sentTo = _state.getSuccessful().iterator().next();
+            } catch (NoSuchElementException nsee) {}
             getContext().jobQueue().addJob(new FloodfillVerifyStoreJob(getContext(), _state.getTarget(),
-                                                                       published, isRouterInfo, _facade));
+                                                                       published, isRouterInfo, sentTo, _facade));
         }
     }
     

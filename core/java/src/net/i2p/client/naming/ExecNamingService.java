@@ -112,7 +112,7 @@ public class ExecNamingService extends NamingService {
             if (key.startsWith(hostname + "="))   // strip hostname=
                 key = key.substring(hostname.length() + 1); 
             key = key.substring(0, DEST_SIZE);    // catch IndexOutOfBounds exception below
-            if (!key.endsWith("AAAA")) {
+            if (!key.endsWith("AA")) {
                 _log.error("Invalid key: " + command);
                 return null;
             }

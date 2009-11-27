@@ -8,26 +8,36 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.stat.Rate;
 import net.i2p.util.Log;
 
+/**
+ *  This is where we implement semi-Kademlia with the floodfills, by
+ *  selecting floodfills closest to a given key for
+ *  searches and stores.
+ *
+ *  Warning - most methods taking a key as an argument require the
+ *            routing key, not the original key.
+ *
+ */
 class FloodfillPeerSelector extends PeerSelector {
     public FloodfillPeerSelector(RouterContext ctx) { super(ctx); }
     
     /**
      * Pick out peers with the floodfill capacity set, returning them first, but then
      * after they're complete, sort via kademlia.
+     * Puts the floodfill peers that are directly connected first in the list.
      *
      * @return List of Hash for the peers selected
      */
@@ -36,6 +46,13 @@ class FloodfillPeerSelector extends PeerSelector {
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, true);
     }
 
+    /**
+     * Pick out peers with the floodfill capacity set, returning them first, but then
+     * after they're complete, sort via kademlia.
+     * Does not prefer the floodfill peers that are directly connected.
+     *
+     * @return List of Hash for the peers selected
+     */
     @Override
     public List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, false);
@@ -58,39 +75,117 @@ class FloodfillPeerSelector extends PeerSelector {
     
     /**
      *  @return all floodfills not shitlisted forever. list will not include our own hash
-     *
+     *  List is not sorted and not shuffled.
      */
     public List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
+         return selectFloodfillParticipants(null, kbuckets);
+    }
+
+    public List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet kbuckets) {
         if (kbuckets == null) return new ArrayList();
-        FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, null, 0);
+        FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, toIgnore, 0);
         kbuckets.getAll(matches);
         return matches.getFloodfillParticipants();
     }
     
     /**
+     *  Sort the floodfills. The challenge here is to keep the good ones
+     *  at the front and the bad ones at the back. If they are all good or bad,
+     *  searches and stores won't work well.
+     *
      *  @return all floodfills not shitlisted foreverx
+     *  @param key the routing key
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
+     *  The list is in 3 groups - sorted by routing key within each group.
+     *  Group 1: No store or lookup failure in a long time
+     *  Group 2: No store or lookup failure in a little while or
+     *           success newer than failure
+     *  Group 3: All others
      */
     public List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
-        List<Hash> ffs = selectFloodfillParticipants(kbuckets);
-        if (ffs.size() <= maxNumRouters)
-            return ffs; // unsorted
-        TreeMap<BigInteger, Hash> sorted = new TreeMap();
-        for (int i = 0; i < ffs.size(); i++) {
-            Hash h = ffs.get(i);
-            BigInteger diff = getDistance(key, h);
-            sorted.put(diff, h);
+         return selectFloodfillParticipants(key, maxNumRouters, null, kbuckets);
+    }
+
+    /** .75 * PublishLocalRouterInfoJob.PUBLISH_DELAY */
+    private static final int NO_FAIL_STORE_OK = 15*60*1000;
+    private static final int NO_FAIL_STORE_GOOD = NO_FAIL_STORE_OK * 2;
+    /** this must be longer than the max streaming timeout (60s) */
+    private static final int NO_FAIL_LOOKUP_OK = 5*60*1000;
+    private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
+    private static final int MAX_GOOD_RESP_TIME = 5*1000;
+
+    public List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
+        List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);
+        TreeSet<Hash> sorted = new TreeSet(new XORComparator(key));
+        sorted.addAll(ffs);
+
+        List<Hash> rv = new ArrayList(howMany);
+        List<Hash> okff = new ArrayList(ffs.size());
+        List<Hash> badff = new ArrayList(ffs.size());
+        int found = 0;
+        long now = _context.clock().now();
+
+        // split sorted list into 3 sorted lists
+        for (int i = 0; found < howMany && i < ffs.size(); i++) {
+            Hash entry = sorted.first();
+            sorted.remove(entry);
+            if (entry == null)
+                break;  // shouldn't happen
+            RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
+            if (info != null && now - info.getPublished() > 3*60*60*1000) {
+                badff.add(entry);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Old: " + entry);
+            } else {
+                PeerProfile prof = _context.profileOrganizer().getProfile(entry);
+                double maxGoodRespTime = MAX_GOOD_RESP_TIME;
+                Rate tunnelTestTime = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
+                if (tunnelTestTime != null && tunnelTestTime.getAverageValue() > 500)
+                    maxGoodRespTime = 2 * tunnelTestTime.getAverageValue();
+                if (prof != null && prof.getDBHistory() != null
+                    && prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
+                    && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
+                    && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD) {
+                    // good
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Good: " + entry);
+                    rv.add(entry);
+                    found++;
+                } else if (prof != null && prof.getDBHistory() != null
+                           && (prof.getDBHistory().getLastStoreFailed() <= prof.getDBHistory().getLastStoreSuccessful()
+                               || prof.getDBHistory().getLastLookupFailed() <= prof.getDBHistory().getLastLookupSuccessful()
+                               || (prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
+                                   && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK))) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("OK: " + entry);
+                    okff.add(entry);
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Bad: " + entry);
+                    badff.add(entry);
+                }
+            }
         }
-        List<Hash> rv = new ArrayList(maxNumRouters);
-        for (int i = 0; i < maxNumRouters; i++) {
-            rv.add(sorted.remove(sorted.firstKey()));
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Good: " + rv + " OK: " + okff + " Bad: " + badff);
+
+        // Put the ok floodfills after the good floodfills
+        for (int i = 0; found < howMany && i < okff.size(); i++) {
+            rv.add(okff.get(i));
+            found++;
         }
+        // Put the "bad" floodfills after the ok floodfills
+        for (int i = 0; found < howMany && i < badff.size(); i++) {
+            rv.add(badff.get(i));
+            found++;
+        }
+
         return rv;
     }
     
     private class FloodfillSelectionCollector implements SelectionCollector {
-        private TreeMap<BigInteger, Hash> _sorted;
+        private TreeSet<Hash> _sorted;
         private List<Hash>  _floodfillMatches;
         private Hash _key;
         private Set<Hash>  _toIgnore;
@@ -98,13 +193,19 @@ class FloodfillPeerSelector extends PeerSelector {
         private int _wanted;
         public FloodfillSelectionCollector(Hash key, Set<Hash> toIgnore, int wanted) {
             _key = key;
-            _sorted = new TreeMap();
+            _sorted = new TreeSet(new XORComparator(key));
             _floodfillMatches = new ArrayList(8);
             _toIgnore = toIgnore;
             _matches = 0;
             _wanted = wanted;
         }
+
+        /**
+         *  @return unsorted list of all with the 'f' mark in their netdb
+         *          except for shitlisted ones.
+         */
         public List<Hash> getFloodfillParticipants() { return _floodfillMatches; }
+
         private static final int EXTRA_MATCHES = 100;
         public void add(Hash entry) {
             //if (_context.profileOrganizer().isFailing(entry))
@@ -131,8 +232,7 @@ class FloodfillPeerSelector extends PeerSelector {
                 // So we keep going for a while. This, together with periodically shuffling the
                 // KBucket (see KBucketImpl.add()) makes exploration work well.
                 if ( (!SearchJob.onlyQueryFloodfillPeers(_context)) && (_wanted + EXTRA_MATCHES > _matches) && (_key != null) ) {
-                    BigInteger diff = getDistance(_key, entry);
-                    _sorted.put(diff, entry);
+                    _sorted.add(entry);
                 } else {
                     return;
                 }
@@ -144,6 +244,14 @@ class FloodfillPeerSelector extends PeerSelector {
             return get(howMany, false);
         }
 
+        /**
+         *  @return list of all with the 'f' mark in their netdb except for shitlisted ones.
+         *  The list is in 3 groups - unsorted (shuffled) within each group.
+         *  Group 1: If preferConnected = true, the peers we are directly
+         *           connected to, that meet the group 2 criteria
+         *  Group 2: Netdb published less than 3h ago, no bad send in last 30m.
+         *  Group 3: All others
+         */
         public List<Hash> get(int howMany, boolean preferConnected) {
             Collections.shuffle(_floodfillMatches, _context.random());
             List<Hash> rv = new ArrayList(howMany);
@@ -187,13 +295,28 @@ class FloodfillPeerSelector extends PeerSelector {
                 rv.add(badff.get(i));
                 found++;
             }
+            // are we corrupting _sorted here?
             for (int i = rv.size(); i < howMany; i++) {
                 if (_sorted.size() <= 0)
                     break;
-                rv.add(_sorted.remove(_sorted.firstKey()));
+                Hash entry = _sorted.first();
+                rv.add(entry);
+                _sorted.remove(entry);
             }
             return rv;
         }
         public int size() { return _matches; }
+    }
+    
+    /**
+     * Floodfill peers only. Used only by HandleDatabaseLookupMessageJob to populate the DSRM.
+     *
+     * @param key the original key (NOT the routing key)
+     * @return List of Hash for the peers selected, ordered
+     */
+    @Override
+    public List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
+        return selectFloodfillParticipants(rkey, maxNumRouters, peersToIgnore, kbuckets);
     }
 }

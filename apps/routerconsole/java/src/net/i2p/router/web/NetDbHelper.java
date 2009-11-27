@@ -7,13 +7,17 @@ import java.io.OutputStreamWriter;
 
 public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
-    private boolean _full = false;
+    private int _full;
     private boolean _lease = false;
     
     public NetDbHelper() {}
     
     public void setRouter(String r) { _routerPrefix = r; }
-    public void setFull(String f) { _full = "1".equals(f); }
+    public void setFull(String f) {
+        try {
+            _full = Integer.parseInt(f);
+        } catch (NumberFormatException nfe) {}
+    }
     public void setLease(String l) { _lease = "1".equals(l); }
     
     public String getNetDbSummary() {

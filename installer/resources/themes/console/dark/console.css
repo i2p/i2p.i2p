@@ -124,10 +124,10 @@ div.routersummary hr {
 
 div.routersummary h3 {
      border: 0;
-     font-size: 10pt;
+     font-size: 9.5pt;
      letter-spacing: 0.04em;
-     margin: -7px -9px -10px -9px;
-     padding: 3px 0px 5px 0px;
+     margin: -7px -9px -8px -9px;
+     padding: 2px 0 3px 0 !important;
      background: #007;
      text-transform: uppercase;
      -moz-border-radius: 0;
@@ -141,7 +141,7 @@ div.routersummary h4 {
      border: 0;
      border-bottom: 0 !important;
      font-size: 8.5pt;
-     letter-spacing: 0.03em;
+     letter-spacing: 0.02em;
      margin: -7px -9px -10px -9px !important;
      padding: 2px 3px 5px 3px;
      background: #005;
@@ -149,16 +149,17 @@ div.routersummary h4 {
      text-decoration: none !important;
      color: #2b2;
      background-image: -moz-linear-gradient(top, bottom, from(#001), to(#005), color-stop(10%, #005), color-stop(100%, #004));
+     line-height: 100%;
 }
 
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -1px -4px -4px -4px;
+     margin: -5px -4px -5px -5px !important;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0px -10px;
+     padding: 0 -10px;
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -170,12 +171,22 @@ div.routersummary tr {
 }
 
 div.routersummary form {
-     margin-top: 8px;
+     margin: -6px 0 -7px;
+}
+
+div.routersummary form:first-child {
+     margin: 6px 0 -4px 0 !important;
 }
 
 div.routersummary p {
      padding: 0;
 }     
+
+div.refresh {
+     margin-top: -10px !important;
+     margin-bottom: -4px !important;
+     padding: 2px 0 0px 0 !important;
+}
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 0px 0px 1px rgba(192, 192, 255, 0.5);
@@ -187,20 +198,31 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 2px 4px;
+     padding: 0px 2px 0px 2px;
      background-image: none !important;
      border: 0 !important;
 }
 
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
+div routersummary hr:last-child {
+     margin-top: 5px;
+     margin-bottom: -5px !important;
 }
 
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
+div.tunnels {
+     padding-top: 3px !important;
+     margin-left: -2px;
+     text-align: center;
+}
+
+div.tunnels table {
+     margin: -3px 0 !important;
+}
+
+div.tunnels td {
+     padding: 1px 2px 1px 2px;
+}
+div.tunnels td:first-child {
+     width: 16px;
 }
 
 div.warning {
@@ -214,8 +236,8 @@ div.warning {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      text-align: justify;
-     background-image:url("images/errortriangle.png");
-     background-position:15px center;
+     background-image:url("../images/itoopie_sm.png");
+     background-position:10px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f00;
@@ -269,16 +291,17 @@ div.main textarea {
 
 div.news {
      margin: 15px 15px 15px 220px;
-     padding: 20px 30px 20px 30px;
+     padding: 5px 30px 10px 30px;
      border: 1px solid #99f;
      background: #004;
      background-image: -moz-linear-gradient(top, bottom, from(#003), to(#005), color-stop(30%, #003), color-stop(100%, #001));
 /*     background: #003 url("images/darkbluetile.png");*/
-     color: #eef;
+     color: #aaf;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     text-align: justify;
+     font-size: 7.5pt;
+     text-align: right;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -287,11 +310,39 @@ div.news {
 div.news li {
      text-align: justify;
      list-style: url('images/info_dark.png');
-     margin: 0 10px 0 30px;
-     padding: 5px;
+     margin: 0 10px 0 20px;
+     padding: 5px 5px 5px 0;
      vertical-align: middle;
      word-wrap: break-word;
+     color: #99f;
 }
+
+div.news h4 {
+     border-bottom: 1px;
+     border-bottom-style: dotted;
+     border-bottom-color: #99f;
+     padding: 0 0 0px 0;
+     margin: 5px 0 10px 0;
+     font-size: 10pt;
+     opacity: 0.8;
+     text-transform: capitalize;
+}
+
+div.news h4:first-child {
+     background: url('../images/itoopbullet.png');
+     background-repeat: no-repeat;
+     background-position: right;   
+}
+
+div.news p {
+     margin-top: -5px;
+     font-size: 8.5pt;
+     color: #eef;
+}
+
+div.news hr {
+     margin: -2px 0 5px 0;
+}     
 
 div.confignav {
      padding: 15px 10px !important;
@@ -301,7 +352,7 @@ div.confignav {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #99f;
-     font-size: 10pt !important;
+     font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
@@ -486,6 +537,14 @@ div.main li {
      text-align: justify !important;
 }
 
+.tidylist:first-child {
+     padding-top: 5px;
+}
+
+.tidylist:last-child {
+     padding-bottom: 5px;
+}
+
 ol {
      display: inline;
      margin: 1px 0 0 0;
@@ -493,7 +552,7 @@ ol {
 }
 
 ul {
-     display: inline;
+/*     display: inline; */
      margin: 0;
      padding: 0;
 }
@@ -511,7 +570,7 @@ a:link, h2 a:link{
 }
 
 a:visited{
-     color: #7bb;
+     color: #77f;
      text-decoration: none;
      font-weight: bold;     
      word-wrap: break-word;
@@ -525,10 +584,14 @@ a:hover{
 }
 
 .links {
-     list-style-image: url("images/link_dark.png");
-     margin: 0 5px 0 0px;
-     padding: 0px 5px;
+     padding-bottom: -2px;
      text-align: justify;
+     margin-top: 10px;
+     margin-bottom: -10px;
+}
+
+.links li {
+     list-style-image: url("../images/link_dark.png") !important;
 }
 
 p {
@@ -574,7 +637,7 @@ h2 {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      vertical-align: middle;
-     margin: 15px 0 15px 0 !important;
+     margin: 15px 0 12px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -594,12 +657,11 @@ h3 {
      border: 1px solid #99f;
      border-left: 5px solid #99f;
      padding: 3px 5px 3px 5px;
-/*     margin: 20px 0 15px 0;*/
+     margin: 12px 0 10px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      background: #002;
-/*     background: url(images/lightbluebg.png);*/
 }
 
 h4 {
@@ -674,6 +736,11 @@ hr {
      height: 1px;
      border: 0px solid #99f;
      margin: 10px 0;
+}
+
+hr:last-child {
+     margin-top: 20px;
+     margin-bottom: 20px;
 }
 
 sidebarlogo {
@@ -792,8 +859,8 @@ form {}
      color: #eef;
      text-align: center;
      border: 1px solid #99f !important;
-     border-top: 0px !important;
-     margin: -5px 0 5px 0; 
+/*     border-top: 0px !important;*/
+     margin: -3px 0 5px 0; 
      padding: 7px;
      background: #004;
      -moz-box-shadow: inset 0px 0px 0px 1px #009;
@@ -801,7 +868,7 @@ form {}
      box-shadow: inset 0px 0px 0px 1px #009;
 }
 
-.joblog {
+div.joblog {
      margin: 	15px 0 15px 0;
      padding: 5px 20px 10px 20px !important;
      border: 1px solid #99f;
@@ -811,7 +878,7 @@ form {}
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     text-align: justify;
+     text-align: justify !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #eef;
      -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
      box-shadow: inset 0px 0px 1px 0px #eef;
@@ -820,16 +887,33 @@ form {}
  
  div.joblog:li {
      word-wrap: break-word !important;
-     text-align: justify;
+     text-align: justify !important;
+     line-height: 80% !important;
 }
 
- .joblog:ul {
+div.joblog:ul {
      word-wrap: break-word !important;
      text-align: justify;
 }
 
+div.joblog li:first-child {
+     margin-top: 10px;
+}
+
+div.joblog li:last-child {
+     margin-bottom: 0;
+}
+
 div.joblog form:first-child {
      margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 130%;
 }
 
 .smallhead {

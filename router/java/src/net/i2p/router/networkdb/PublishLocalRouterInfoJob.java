@@ -21,11 +21,15 @@ import net.i2p.util.Log;
 
 /**
  * Publish the local router's RouterInfo periodically
- *
+ * NOTE - this also creates and signs the RI
  */
 public class PublishLocalRouterInfoJob extends JobImpl {
     private Log _log;
     final static long PUBLISH_DELAY = 20*60*1000;
+    /** this needs to be long enough to give us time to start up,
+        but less than 20m (when we start accepting tunnels and could be a IBGW) */
+    final static long FIRST_TIME_DELAY = 8*60*1000;
+    boolean _notFirstTime;
     
     public PublishLocalRouterInfoJob(RouterContext ctx) {
         super(ctx);
@@ -67,6 +71,11 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         } catch (DataFormatException dfe) {
             _log.error("Error signing the updated local router info!", dfe);
         }
-        requeue((PUBLISH_DELAY/2) + getContext().random().nextInt((int)PUBLISH_DELAY));
+        if (_notFirstTime) {
+            requeue((PUBLISH_DELAY/2) + getContext().random().nextInt((int)PUBLISH_DELAY));
+        } else {
+            requeue(FIRST_TIME_DELAY);
+            _notFirstTime = true;
+        }
     }
 }

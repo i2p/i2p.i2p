@@ -368,8 +368,9 @@ public class EstablishState {
                 if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
                     _transport.markReachable(_con.getRemotePeer().calculateHash(), false);
-                    _context.shitlist().shitlistRouter(_con.getRemotePeer().calculateHash(),
-                                                       "Excessive clock skew: " + DataHelper.formatDuration(diff));
+                    _context.shitlist().shitlistRouter(DataHelper.formatDuration(diff),
+                                                       _con.getRemotePeer().calculateHash(),
+                                                       _x("Excessive clock skew: {0}"));
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
@@ -572,7 +573,9 @@ public class EstablishState {
                 if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
                     _transport.markReachable(alice.calculateHash(), true);
-                    _context.shitlist().shitlistRouter(alice.calculateHash(), "Clock skew of " + diff + " ms");
+                    _context.shitlist().shitlistRouter(DataHelper.formatDuration(diff),
+                                                       alice.calculateHash(),
+                                                       _x("Excessive clock skew: {0}"));
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
@@ -923,4 +926,15 @@ public class EstablishState {
             e.printStackTrace();
         }
     }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
+    }
+
 }

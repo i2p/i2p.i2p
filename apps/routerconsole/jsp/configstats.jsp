@@ -2,8 +2,9 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - config stats</title>
-<%@include file="css.jsp" %>
+<html><head>
+<%@include file="css.jsi" %>
+<%=intl.title("config stats")%>
 <script type="text/javascript">
 function init()
 {
@@ -51,10 +52,10 @@ function toggleAll(category)
 }
 </script>
 </head><body onLoad="init();">
-<%@include file="summary.jsp" %>
-<h1>I2P Stats Configuration</h1>
+<%@include file="summary.jsi" %>
+<h1><%=intl._("I2P Stats Configuration")%></h1>
 <div class="main" id="main">
- <%@include file="confignav.jsp" %>
+ <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
@@ -70,25 +71,25 @@ function toggleAll(category)
     System.setProperty("net.i2p.router.web.ConfigStatsHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="action" value="foo" />
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
- <h3>Configure I2P Stat Collection</h3>
- Enable full stats?
+ <h3><%=intl._("Configure I2P Stat Collection")%></h3>
+ <p><%=intl._("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
- (change requires restart to take effect)<br>
- Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br>
- Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br>
+ (<%=intl._("change requires restart to take effect")%>)<br>
+ <%=intl._("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br>
+<%=intl._("Filter")%>: (<a href="javascript: void(null);" onclick="toggleAll('*')"><%=intl._("toggle all")%></a>)<br></p>
  <div class="wideload">
- <table>
+ <p><table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
  <tr class="tablefooter">
      <td align="left" colspan="3">
      <b><%=statshelper.getCurrentGroupName()%></b>
-     (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)
+     (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._("toggle all")%></a>)
      </td></tr>
  <tr class="tablefooter">
-    <td align="center"><b>Log</b></td>
-    <td align="center"><b>Graph</b></td>
+    <td align="center"><b><%=intl._("Log")%></b></td>
+    <td align="center"><b><%=intl._("Graph")%></b></td>
     <td></td></tr>
         <%
      } // end iterating over required groups for the current stat %>
@@ -105,7 +106,7 @@ function toggleAll(category)
     } // end iterating over all stats %>
  <tr><td colspan="3"></td></tr>
  <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" /></td>
-     <td colspan="2">Advanced filter:
+     <td colspan="2"><%=intl._("Advanced filter")%>:
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
-     <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="Save changes" /><input type="reset" value="Cancel" /></td></tr>
- </table></div></form></div></div></body></html>
+     <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" /><input type="reset" value="<%=intl._("Cancel")%>" /></td></tr>
+ </table></p></div></form></div></div></body></html>

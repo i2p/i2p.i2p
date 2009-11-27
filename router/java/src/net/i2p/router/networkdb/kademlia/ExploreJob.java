@@ -26,15 +26,11 @@ import net.i2p.util.Log;
  *
  */
 class ExploreJob extends SearchJob {
-    private Log _log;
-    private PeerSelector _peerSelector;
+    private FloodfillPeerSelector _peerSelector;
     
     /** how long each exploration should run for
      *  The exploration won't "succeed" so we make it long so we query several peers */
     private static final long MAX_EXPLORE_TIME = 15*1000;
-    
-    /** how many of the peers closest to the key being explored do we want to explicitly say "dont send me this"? */
-    private static final int NUM_CLOSEST_TO_IGNORE = 3;
     
     /** how many peers to explore through concurrently */
     private static final int EXPLORE_BREDTH = 1;
@@ -58,7 +54,7 @@ class ExploreJob extends SearchJob {
         // attempting to send that lease a message!
         super(context, facade, key, null, null, MAX_EXPLORE_TIME, false, false);
         _log = context.logManager().getLog(ExploreJob.class);
-        _peerSelector = new PeerSelector(context);
+        _peerSelector = (FloodfillPeerSelector) (_facade.getPeerSelector());
     }
     
     /**
@@ -89,11 +85,22 @@ class ExploreJob extends SearchJob {
         msg.setReplyTunnel(replyTunnelId);
         
         int available = MAX_CLOSEST - msg.getDontIncludePeers().size();
-        if (available > 0) {
-            List peers = ((FloodfillNetworkDatabaseFacade)_facade).getFloodfillPeers();
+        // TODO: add this once ../HTLMJ handles it
+        //if (available > 0) {
+        //    // add a flag to say this is an exploration and we don't want floodfills in the responses
+        //    if (msg.getDontIncludePeers().add(Hash.FAKE_HASH))
+        //        available--;
+        //}
+        KBucketSet ks = _facade.getKBuckets();
+        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());
+        // in a few releases, we can (and should) remove this,
+        // as routers will honor the above flag, and we want the table to include
+        // only non-floodfills.
+        if (available > 0 && ks != null) {
+            List peers = _peerSelector.selectFloodfillParticipants(rkey, available, ks);
             int len = peers.size();
             if (len > 0)
-                msg.getDontIncludePeers().addAll(peers.subList(0, Math.min(available, len)));
+                msg.getDontIncludePeers().addAll(peers);
         }
         
         available = MAX_CLOSEST - msg.getDontIncludePeers().size();
@@ -104,7 +111,7 @@ class ExploreJob extends SearchJob {
             // We're just exploring, but this could give things away, and tie our exploratory tunnels to our router,
             // so let's not put our hash in there.
             Set dontInclude = new HashSet(msg.getDontIncludePeers());
-            List peers = _peerSelector.selectNearestExplicit(getState().getTarget(), available, dontInclude, getFacade().getKBuckets());
+            List peers = _peerSelector.selectNearestExplicit(rkey, available, dontInclude, ks);
             msg.getDontIncludePeers().addAll(peers);
         }
         
@@ -118,7 +125,7 @@ class ExploreJob extends SearchJob {
     @Override
     protected int getBredth() { return EXPLORE_BREDTH; }
     
-    
+
     /**
      * We've gotten a search reply that contained the specified
      * number of peers that we didn't know about before.

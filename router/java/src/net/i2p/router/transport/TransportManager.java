@@ -447,7 +447,7 @@ public class TransportManager implements TransportEventListener {
             // Don't shitlist if we aren't talking to anybody, as we may have a network connection issue
             if (unreachableTransports >= _transports.size() && countActivePeers() > 0) {
                 _context.statManager().addRateData("transport.shitlistOnUnreachable", msg.getLifetime(), msg.getLifetime());
-                _context.shitlist().shitlistRouter(peer, "Unreachable on any transport");
+                _context.shitlist().shitlistRouter(peer, _x("Unreachable on any transport"));
             }
         } else if (rv == null) {
             _context.statManager().addRateData("transport.noBidsYetNotAllUnreachable", unreachableTransports, msg.getLifetime());
@@ -493,7 +493,7 @@ public class TransportManager implements TransportEventListener {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h3>Router Transport Addresses:</h3><pre>\n");
+        buf.append("<h3>Router Transport Addresses</h3><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             if (t.getCurrentAddress() != null)
@@ -508,4 +508,15 @@ public class TransportManager implements TransportEventListener {
         buf.append("</p>\n");
         out.flush();
     }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
+    }
+
 }

@@ -189,9 +189,9 @@ public class Connection {
                                        + _activeResends + "), waiting " + timeLeft);
                         try { _outboundPackets.wait(Math.min(timeLeft,250l)); } catch (InterruptedException ie) { if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends +")"); return false;}
                     } else {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
-                                       + "), waiting indefinitely");
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
+                        //               + "), waiting indefinitely");
                         try { _outboundPackets.wait(250); } catch (InterruptedException ie) {if (_log.shouldLog(Log.DEBUG)) _log.debug("InterruptedException while Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends + ")"); return false;} //10*1000
                     }
                 } else {
@@ -297,37 +297,48 @@ public class Connection {
                 
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
             ackOnly = true;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("No resend for " + packet);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("No resend for " + packet);
         } else {
-            int remaining = 0;
+            int windowSize;
+            int remaining;
             synchronized (_outboundPackets) {
                 _outboundPackets.put(new Long(packet.getSequenceNum()), packet);
-                remaining = _options.getWindowSize() - _outboundPackets.size() ;
+                windowSize = _options.getWindowSize();
+                remaining = windowSize - _outboundPackets.size() ;
                 _outboundPackets.notifyAll();
             }
-            if (remaining < 0) 
-                remaining = 0;
-            if (packet.isFlagSet(Packet.FLAG_CLOSE) || (remaining < 2)) {
+            // the other end has no idea what our window size is, so
+            // help him out by requesting acks below the 1/3 point,
+            // if remaining < 3, and every 8 minimum.
+            if (packet.isFlagSet(Packet.FLAG_CLOSE) ||
+                (remaining < (windowSize + 2) / 3) ||
+                (remaining < 3) ||
+                (packet.getSequenceNum() % 8 == 0)) {
                 packet.setOptionalDelay(0);
                 packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Requesting no ack delay for packet " + packet);
             } else {
-                int delay = _options.getRTO() / 2;
+                // This is somewhat of a waste of time, unless the RTT < 4000,
+                // since the other end limits it to getSendAckDelay()
+                // which is always 2000, but it's good for diagnostics to see what the other end thinks
+                // the RTT is.
+                int delay = _options.getRTT() / 2;
                 packet.setOptionalDelay(delay);
                 if (delay > 0)
                     packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
             }
+            // WHY always set?
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
             long timeout = _options.getRTO();
             if (timeout > MAX_RESEND_DELAY)
                 timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Resend in " + timeout + " for " + packet, new Exception("Sent by"));
+                _log.debug("Resend in " + timeout + " for " + packet);
 
             // schedules itself
             ResendPacketEvent rpe = new ResendPacketEvent(packet, timeout);
@@ -370,6 +381,10 @@ public class Connection {
     }
 *********/
     
+    /**
+     *  Process the acks and nacks received in a packet
+     *  @return List of packets acked or null
+     */
     List ackPackets(long ackThrough, long nacks[]) {
         if (ackThrough < _highestAckedThrough) {
             // dupack which won't tell us anything
@@ -685,6 +700,14 @@ public class Connection {
      * @return the next time the scheduler will want to send a packet, or -1 if never.
      */
     public long getNextSendTime() { return _nextSendTime; }
+
+    /**
+     *  If the next send time is currently >= 0 (i.e. not "never"),
+     *  this may make the next time sooner but will not make it later.
+     *  If the next send time is currently < 0 (i.e. "never"),
+     *  this will set it to the time specified, but not later than
+     *  options.getSendAckDelay() from now (2000 ms)
+     */
     public void setNextSendTime(long when) { 
         if (_nextSendTime >= 0) {
             if (when < _nextSendTime)
@@ -699,12 +722,12 @@ public class Connection {
                 _nextSendTime = max;
         }
         
-        if (_log.shouldLog(Log.DEBUG) && false) {
-            if (_nextSendTime <= 0) 
-                _log.debug("set next send time to an unknown time", new Exception(toString()));
-            else
-                _log.debug("set next send time to " + (_nextSendTime-_context.clock().now()) + "ms from now", new Exception(toString()));
-        }
+        //if (_log.shouldLog(Log.DEBUG) && false) {
+        //    if (_nextSendTime <= 0) 
+        //        _log.debug("set next send time to an unknown time", new Exception(toString()));
+        //    else
+        //        _log.debug("set next send time to " + (_nextSendTime-_context.clock().now()) + "ms from now", new Exception(toString()));
+        //}
     }
     
     /** how many packets have we sent and the other side has ACKed?
@@ -742,7 +765,9 @@ public class Connection {
     
     public long getCongestionWindowEnd() { return _congestionWindowEnd; }
     public void setCongestionWindowEnd(long endMsg) { _congestionWindowEnd = endMsg; }
+    /** @return the highest outbound packet we have recieved an ack for */
     public long getHighestAckedThrough() { return _highestAckedThrough; }
+    /** @deprecated unused */
     public void setHighestAckedThrough(long msgNum) { _highestAckedThrough = msgNum; }
     
     public long getLastActivityOn() {
@@ -835,8 +860,8 @@ public class Connection {
         }
         long howLong = _options.getInactivityTimeout();
         howLong += _randomWait; // randomize it a bit, so both sides don't do it at once
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Resetting the inactivity timer to " + howLong, new Exception(toString()));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Resetting the inactivity timer to " + howLong);
         // this will get rescheduled, and rescheduled, and rescheduled...
         _activityTimer.reschedule(howLong, false); // use the later of current and previous timeout
     }
@@ -1087,6 +1112,8 @@ public class Connection {
                     // we want to resend this packet, but there are already active
                     // resends in the air and we dont want to make a bad situation 
                     // worse.  wait another second
+                    // BUG? seq# = 0, activeResends = 0, loop forever - why?
+                    // also seen with seq# > 0. Is the _activeResends count reliable?
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Delaying resend of " + _packet + " as there are " 
                                   + _activeResends + " active resends already in play");
@@ -1104,8 +1131,10 @@ public class Connection {
                 _packet.setOptionalDelay(choke);
                 if (choke > 0)
                     _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                // this seems unnecessary to send the MSS again:
                 _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
-                _packet.setResendDelay(getOptions().getResendDelay());
+                // bugfix release 0.7.8, we weren't dividing by 1000
+                _packet.setResendDelay(getOptions().getResendDelay() / 1000);
                 if (_packet.getReceiveStreamId() <= 0)
                     _packet.setReceiveStreamId(_receiveStreamId);
                 if (_packet.getSendStreamId() <= 0)

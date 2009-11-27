@@ -42,7 +42,7 @@ import net.i2p.util.Log;
  * <li>{@link #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
  * <li>{@link #FLAG_PROFILE_INTERACTIVE}: no option data</li>
  * <li>{@link #FLAG_ECHO}: no option data</li>
- * <li>{@link #FLAG_NO_ACK}: no option data</li>
+ * <li>{@link #FLAG_NO_ACK}: no option data - this appears to be unused, we always ack, even for the first packet</li>
  * </ol>
  *
  * <p>If the signature is included, it uses the Destination's DSA key 
@@ -216,9 +216,21 @@ public class Packet {
      * resending this packet (if it hasn't yet been ACKed).  The 
      * value is seconds since the packet was created.
      *
+     * Unused.
+     * Broken before release 0.7.8
+     * Not to be used without sanitizing for huge values.
+     * Setters from options did not divide by 1000, and the options default
+     * is 1000, so the value sent in the 1-byte field was always
+     * 1000 & 0xff = 0xe8 = 232
+     *
      * @return Delay before resending a packet in seconds.
      */
     public int getResendDelay() { return _resendDelay; }
+    /**
+     *  Unused.
+     *  Broken before release 0.7.8
+     *  See above
+     */
     public void setResendDelay(int numSeconds) { _resendDelay = numSeconds; }
     
     public static final int MAX_PAYLOAD_SIZE = 32*1024;

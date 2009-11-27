@@ -111,11 +111,13 @@ public class Blocklist {
             }
             for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash) iter.next();
-                String reason = "Banned by router hash";
+                String reason;
                 String comment = (String) _peerBlocklist.get(peer);
                 if (comment != null)
-                    reason = reason + ": " + comment;
-                _context.shitlist().shitlistRouterForever(peer, reason);
+                    reason = _x("Banned by router hash: {0}");
+                else
+                    reason = _x("Banned by router hash");
+                _context.shitlist().shitlistRouterForever(peer, reason, comment);
             }
             _peerBlocklist = null;
 
@@ -659,7 +661,7 @@ public class Blocklist {
      */
     public void shitlist(Hash peer) {
         // Temporary reason, until the job finishes
-        _context.shitlist().shitlistRouterForever(peer, "IP Banned");
+        _context.shitlist().shitlistRouterForever(peer, _x("IP banned"));
         if (! "true".equals( _context.getProperty(PROP_BLOCKLIST_DETAIL, "true")))
             return;
         boolean shouldRunJob;
@@ -729,16 +731,17 @@ public class Blocklist {
                     }
                     if (match(ipint, toEntry(e.ip1, e.ip2))) {
                         try { in.close(); } catch (IOException ioe) {}
-                        String reason = "IP ";
-                        for (int i = 0; i < 4; i++) {
-                            reason = reason + (ip[i] & 0xff);
-                            if (i != 3)
-                                reason = reason + '.';
-                        }
-                        reason = reason + " banned by " + BLOCKLIST_FILE_DEFAULT + " entry \"" + buf + "\"";
+                        String reason = _x("IP banned by blocklist.txt entry {0}");
+                        // only one translate parameter for now
+                        //for (int i = 0; i < 4; i++) {
+                        //    reason = reason + (ip[i] & 0xff);
+                        //    if (i != 3)
+                        //        reason = reason + '.';
+                        //}
+                        //reason = reason + " banned by " + BLOCKLIST_FILE_DEFAULT + " entry \"" + buf + "\"";
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Shitlisting " + peer + " " + reason);
-                        _context.shitlist().shitlistRouterForever(peer, reason);
+                        _context.shitlist().shitlistRouterForever(peer, reason, buf.toString());
                         return;
                     }
                     buf.setLength(0);
@@ -757,7 +760,8 @@ public class Blocklist {
 
     /** write directly to the stream so we don't OOM on a huge list */
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h2>Banned IPs</h2>");
+        // move to the jsp
+        //out.write("<h2>Banned IPs</h2>");
         Set singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
         if (singles.size() > 0) {
@@ -788,6 +792,16 @@ public class Blocklist {
             out.write("<br><i>No blocklist file entries.</i>");
         }
         out.flush();
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
     }
 
     public static void main(String args[]) {

@@ -14,12 +14,13 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm1() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">Client</th><th>Run at Startup?</th><th>Start Now</th><th align=\"left\">Class and arguments</th></tr>\n");
+        buf.append("<tr><th align=\"right\">" + _("Client") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Start Now") + "</th><th align=\"left\">" + _("Class and arguments") + "</th></tr>\n");
         
         List clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = (ClientAppConfig) clients.get(cur);
-            renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled, "webConsole".equals(ca.clientName),
+            renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
+                       "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        ca.className + ((ca.args != null) ? " " + ca.args : ""));
         }
         
@@ -30,7 +31,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">WebApp</th><th>Run at Startup?</th><th>Start Now</th><th align=\"left\">Description</th></tr>\n");
+        buf.append("<tr><th align=\"right\">" + _("WebApp") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Start Now") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set keys = new TreeSet(props.keySet());
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
@@ -51,9 +52,9 @@ public class ConfigClientsHelper extends HelperBase {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
                 link += name + "/";
-            buf.append("<a href=\"").append(link).append("\">").append(name).append("</a>");
+            buf.append("<a href=\"").append(link).append("\">").append(_(name)).append("</a>");
         } else {
-            buf.append(name);
+            buf.append(_(name));
         }
         buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {
@@ -63,7 +64,7 @@ public class ConfigClientsHelper extends HelperBase {
         }
         buf.append("/></td><td align=\"center\" width=\"15%\">");
         if (!enabled) {
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >Start<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
         }
         buf.append("</td><td align=\"left\" width=\"50%\">").append(desc).append("</td></tr>\n");
     }

@@ -37,40 +37,25 @@ import net.i2p.util.Log;
  *
  */
 class FloodOnlySearchJob extends FloodSearchJob {
-    protected Log _log;
-    private FloodfillNetworkDatabaseFacade _facade;
-    protected Hash _key;
-    private final List _onFind;
-    private final List _onFailed;
-    private long _expiration;
-    protected int _timeoutMs;
-    private long _origExpiration;
-    private boolean _isLease;
     protected volatile int _lookupsRemaining;
     private volatile boolean _dead;
     private long _created;
     private boolean _shouldProcessDSRM;
-    private final HashSet _unheardFrom;
+    private final HashSet<Hash> _unheardFrom;
     
-    protected final List _out;
+    private final List<OutNetMessage> _out;
     protected MessageSelector _replySelector;
     protected ReplyJob _onReply;
     protected Job _onTimeout;
+
     public FloodOnlySearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx, facade, key, onFind, onFailed, timeoutMs, isLease);
+        // these override the settings in super
         _log = ctx.logManager().getLog(FloodOnlySearchJob.class);
-        _facade = facade;
-        _key = key;
-        _onFind = new ArrayList();
-        _onFind.add(onFind);
-        _onFailed = new ArrayList();
-        _onFailed.add(onFailed);
         _timeoutMs = Math.min(timeoutMs, SearchJob.PER_FLOODFILL_PEER_TIMEOUT);
         _expiration = _timeoutMs + ctx.clock().now();
         _origExpiration = _timeoutMs + ctx.clock().now();
-        _isLease = isLease;
-        _lookupsRemaining = 0;
-        _dead = false;
+        // do we need a synchronizedList, since we synch on _out everywhere below...
         _out = Collections.synchronizedList(new ArrayList(2));
         _unheardFrom = new HashSet(CONCURRENT_SEARCHES);
         _replySelector = new FloodOnlyLookupSelector(getContext(), this);
@@ -79,26 +64,33 @@ class FloodOnlySearchJob extends FloodSearchJob {
         _created = System.currentTimeMillis();
         _shouldProcessDSRM = false;
     }
-    @Override
-    void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
-        if (_dead) {
-            getContext().jobQueue().addJob(onFailed);
-        } else {
-            if (onFind != null) synchronized (_onFind) { _onFind.add(onFind); }
-            if (onFailed != null) synchronized (_onFailed) { _onFailed.add(onFailed); }
-        }
-    }
-    @Override
-    public long getExpiration() { return _expiration; }
+
     public long getCreated() { return _created; }
     public boolean shouldProcessDSRM() { return _shouldProcessDSRM; }
     private static final int CONCURRENT_SEARCHES = 2;
+    private static final int MIN_FOR_NO_DSRM = 4;
+
     @Override
     public void runJob() {
         // pick some floodfill peers and send out the searches
-        List floodfillPeers = _facade.getFloodfillPeers();
-        if (floodfillPeers.size() <= 3)
-            _shouldProcessDSRM = true;
+        // old
+        //List<Hash> floodfillPeers = _facade.getFloodfillPeers();
+        // new
+        List<Hash> floodfillPeers;
+        KBucketSet ks = _facade.getKBuckets();
+        if (ks != null) {
+            Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
+            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(rkey, MIN_FOR_NO_DSRM, ks);
+        } else {
+            floodfillPeers = Collections.EMPTY_LIST;
+        }
+
+        // If we dont know enough floodfills,
+        // or the global network routing key just changed (which is set at statrtup,
+        // so this includes the first few minutes of uptime)
+        _shouldProcessDSRM = floodfillPeers.size() < MIN_FOR_NO_DSRM ||
+                             getContext().routingKeyGenerator().getLastChanged() > getContext().clock().now() - 30*60*1000;
+
         if (floodfillPeers.size() <= 0) {
             // ask anybody, they may not return the answer but they will return a few ff peers we can go look up,
             // so this situation should be temporary
@@ -111,10 +103,12 @@ class FloodOnlySearchJob extends FloodSearchJob {
                 failed();
                 return;
             }
+            Collections.shuffle(floodfillPeers, getContext().random());
         }
         OutNetMessage out = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
         synchronized (_out) { _out.add(out); }
 
+/********
         // We need to randomize our ff selection, else we stay with the same ones since
         // getFloodfillPeers() is sorted by closest distance. Always using the same
         // ones didn't help reliability.
@@ -149,6 +143,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         } else {
             _shouldProcessDSRM = true;
         }
+********/
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
         for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
@@ -188,12 +183,6 @@ class FloodOnlySearchJob extends FloodSearchJob {
     @Override
     public String getName() { return "NetDb flood search (phase 1)"; }
     
-    @Override
-    Hash getKey() { return _key; }
-    @Override
-    void decrementRemaining() { if (_lookupsRemaining > 0) _lookupsRemaining--; }
-    @Override
-    int getLookupsRemaining() { return _lookupsRemaining; }
     /** Note that we heard from the peer */
     void decrementRemaining(Hash peer) {
         decrementRemaining();
@@ -218,8 +207,8 @@ class FloodOnlySearchJob extends FloodSearchJob {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " failed with " + timeRemaining + " remaining after " + (System.currentTimeMillis()-_created));
         synchronized(_unheardFrom) {
-            for (Iterator iter = _unheardFrom.iterator(); iter.hasNext(); ) 
-                getContext().profileManager().dbLookupFailed((Hash) iter.next());
+            for (Iterator<Hash> iter = _unheardFrom.iterator(); iter.hasNext(); ) 
+                getContext().profileManager().dbLookupFailed(iter.next());
         }
         _facade.complete(_key);
         getContext().statManager().addRateData("netDb.failedTime", System.currentTimeMillis()-_created, System.currentTimeMillis()-_created);
@@ -248,7 +237,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         // StoreJob also calls dbStoreSent() which updates the lastHeardFrom timer - this also helps.
         synchronized(_unheardFrom) {
             if (_unheardFrom.size() == 1) {
-                Hash peer = (Hash) _unheardFrom.iterator().next();
+                Hash peer = _unheardFrom.iterator().next();
                 getContext().profileManager().dbLookupSuccessful(peer, System.currentTimeMillis()-_created);
             }
         }

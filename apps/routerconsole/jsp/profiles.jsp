@@ -2,16 +2,17 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<html><head><title>I2P Router Console - peer profiles</title>
-<%@include file="css.jsp" %>
-</head><body><%@include file="summary.jsp" %>
-<h1>I2P Network Peer Profiles</h1>
+<html><head>
+<%@include file="css.jsi" %>
+<%=intl.title("peer profiles")%>
+</head><body><%@include file="summary.jsi" %>
+<h1><%=intl._("I2P Network Peer Profiles")%></h1>
 <div class="main" id="main"><div class="wideload">
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="profilesHelper" property="writer" value="<%=out%>" />
+ <jsp:setProperty name="profilesHelper" property="full" value="<%=request.getParameter("f")%>" />
  <jsp:getProperty name="profilesHelper" property="profileSummary" />
- <br>
- <a name="shitlist"> </a>
+ <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
-</div></div></body></html>
+<hr></div></div></body></html>

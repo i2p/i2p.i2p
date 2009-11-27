@@ -125,7 +125,7 @@ class BuildHandler {
                     } while (_inboundBuildMessages.size() > 0);
                     
                     if (dropExpired > 0)
-                        _context.throttle().setTunnelStatus("Dropping tunnel requests: Too slow");
+                        _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Too slow"));
 
                     // now pull off the oldest requests first (we're doing a tail-drop
                     // when adding)
@@ -329,6 +329,7 @@ class BuildHandler {
         }
     }
     
+    /** @return handle time or -1 */
     private long handleRequest(BuildMessageState state) {
         long timeSinceReceived = System.currentTimeMillis()-state.recvTime;
         if (_log.shouldLog(Log.DEBUG))
@@ -336,7 +337,7 @@ class BuildHandler {
         
         if (timeSinceReceived > (BuildRequestor.REQUEST_TIMEOUT*3)) {
             // don't even bother, since we are so overloaded locally
-            _context.throttle().setTunnelStatus("Dropping tunnel requests: Overloaded");
+            _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Overloaded"));
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
                            + ", since we received it a long time ago: " + timeSinceReceived);
@@ -495,7 +496,7 @@ class BuildHandler {
             pDrop = (float)Math.pow(pDrop, 16);
             if (_context.random().nextFloat() < pDrop) { // || (proactiveDrops > MAX_PROACTIVE_DROPS) ) ) {
                 _context.statManager().addRateData("tunnel.rejectOverloaded", recvDelay, proactiveDrops);
-                _context.throttle().setTunnelStatus("Rejecting tunnels: Request overload");
+                _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Request overload"));
                 if (true || (proactiveDrops < MAX_PROACTIVE_DROPS*2))
                     response = TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
                 else
@@ -520,7 +521,7 @@ class BuildHandler {
             (ri == null || ri.getBandwidthTier().charAt(0) != 'O') &&
             ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
              (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
-                _context.throttle().setTunnelStatus("Rejecting tunnels: Connection limit");
+                _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
@@ -721,7 +722,7 @@ class BuildHandler {
                             }
                         }
                         if (dropped > 0) {
-                            _context.throttle().setTunnelStatus("Dropping tunnel requests: High load");
+                            _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: High load"));
                             // if the queue is backlogged, stop adding new messages
                             _context.statManager().addRateData("tunnel.dropLoadBacklog", _inboundBuildMessages.size(), _inboundBuildMessages.size());
                         } else {
@@ -730,7 +731,7 @@ class BuildHandler {
                             pDrop = (float)Math.pow(pDrop, 16); // steeeep
                             float f = _context.random().nextFloat();
                             if ( (pDrop > f) && (allowProactiveDrop()) ) {
-                                _context.throttle().setTunnelStatus("Dropping tunnel requests: Queue time");
+                                _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Queue time"));
                                 _context.statManager().addRateData("tunnel.dropLoadProactive", queueTime, _inboundBuildMessages.size());
                             } else {
                                 _inboundBuildMessages.add(new BuildMessageState(receivedMessage, from, fromHash));
@@ -858,5 +859,15 @@ class BuildHandler {
             // static, no _log
             //_log.error("Cant contact next hop for " + _cfg);
         }
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
     }
 }

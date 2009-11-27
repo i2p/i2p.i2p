@@ -90,7 +90,9 @@ class TransientDataStore implements DataStore {
         DataStructure old = null;
         old = _data.put(key, data);
         if (data instanceof RouterInfo) {
-            _context.profileManager().heardAbout(key);
+            // Don't do this here so we don't reset it at router startup;
+            // the StoreMessageJob calls this
+            //_context.profileManager().heardAbout(key);
             RouterInfo ri = (RouterInfo)data;
             if (old != null) {
                 RouterInfo ori = (RouterInfo)old;

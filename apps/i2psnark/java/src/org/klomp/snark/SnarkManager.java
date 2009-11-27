@@ -20,6 +20,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Manage multiple snarks
@@ -126,7 +127,7 @@ public class SnarkManager implements Snark.CompleteListener {
     /** null to set initial defaults */
     public void loadConfig(String filename) {
         if (_config == null)
-            _config = new Properties();
+            _config = new OrderedProperties();
         if (filename != null) {
             File cfg = new File(filename);
             if (!cfg.isAbsolute())
@@ -552,11 +553,15 @@ public class SnarkManager implements Snark.CompleteListener {
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
             return "Too many files in " + info.getName() + " (" + files.size() + "), deleting it!";
+        } else if ( (files == null) && (info.getName().endsWith(".torrent")) ) {
+            return "Torrent file " + info.getName() + " cannot end in '.torrent', deleting it!";
         } else if (info.getPieces() <= 0) {
             return "No pieces in " + info.getName() + "?  deleting it!";
+        } else if (info.getPieces() > Storage.MAX_PIECES) {
+            return "Too many pieces in " + info.getName() + ", limit is " + Storage.MAX_PIECES + ", deleting it!";
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
             return "Pieces are too large in " + info.getName() + " (" + DataHelper.formatSize(info.getPieceLength(0)) +
-                   "B), deleting it.";
+                   "B, limit is " + DataHelper.formatSize(Storage.MAX_PIECE_SIZE) + "B), deleting it.";
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
@@ -710,7 +715,6 @@ public class SnarkManager implements Snark.CompleteListener {
        "POSTMAN", "http://tracker2.postman.i2p/announce.php=http://tracker2.postman.i2p/"
        ,"WELTERDE", "http://tracker.welterde.i2p/a=http://tracker.welterde.i2p/stats?mode=top5"
        , "CRSTRACK", "http://b4G9sCdtfvccMAXh~SaZrPqVQNyGQbhbYMbw6supq2XGzbjU4NcOmjFI0vxQ8w1L05twmkOvg5QERcX6Mi8NQrWnR0stLExu2LucUXg1aYjnggxIR8TIOGygZVIMV3STKH4UQXD--wz0BUrqaLxPhrm2Eh9Hwc8TdB6Na4ShQUq5Xm8D4elzNUVdpM~RtChEyJWuQvoGAHY3ppX-EJJLkiSr1t77neS4Lc-KofMVmgI9a2tSSpNAagBiNI6Ak9L1T0F9uxeDfEG9bBSQPNMOSUbAoEcNxtt7xOW~cNOAyMyGydwPMnrQ5kIYPY8Pd3XudEko970vE0D6gO19yoBMJpKx6Dh50DGgybLQ9CpRaynh2zPULTHxm8rneOGRcQo8D3mE7FQ92m54~SvfjXjD2TwAVGI~ae~n9HDxt8uxOecAAvjjJ3TD4XM63Q9TmB38RmGNzNLDBQMEmJFpqQU8YeuhnS54IVdUoVQFqui5SfDeLXlSkh4vYoMU66pvBfWbAAAA.i2p/tracker/announce.php=http://crstrack.i2p/tracker/"
-       , "ThePirateBay", "http://tracker.thepiratebay.i2p/announce=http://thepiratebay.i2p/"
     };
     
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */

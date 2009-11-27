@@ -196,9 +196,14 @@ public class FileUtil {
      * Read in the last few lines of a (newline delimited) textfile, or null if
      * the file doesn't exist.  
      *
+     * Warning - this inefficiently allocates a StringBuilder of size maxNumLines*80,
+     *           so don't make it too big.
+     * Warning - converts \r\n to \n
+     *
      * @param startAtBeginning if true, read the first maxNumLines, otherwise read
      *                         the last maxNumLines
      * @param maxNumLines max number of lines (or -1 for unlimited)
+     * @return string or null; does not throw IOException.
      *
      */
     public static String readTextFile(String filename, int maxNumLines, boolean startAtBeginning) {

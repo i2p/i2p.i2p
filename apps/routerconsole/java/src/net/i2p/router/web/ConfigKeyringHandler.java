@@ -15,12 +15,12 @@ public class ConfigKeyringHandler extends FormHandler {
     @Override
     protected void processForm() {
         if (_action == null) return;
-        boolean adding = _action.startsWith("Add");
-        if (adding || _action.startsWith("Delete")) {
+        boolean adding = _action.equals(_("Add key"));
+        if (adding || _action.equals(_("Delete key"))) {
             if (_peer == null)
-                addFormError("You must enter a destination");
+                addFormError(_("You must enter a destination"));
             if (_key == null && adding)
-                addFormError("You must enter a key");
+                addFormError(_("You must enter a key"));
             if (_peer == null || (_key == null && adding))
                 return;
             Hash h = ConvertToHash.getHash(_peer);
@@ -31,22 +31,22 @@ public class ConfigKeyringHandler extends FormHandler {
                 } catch (DataFormatException dfe) {}
                 if (h != null && h.getData() != null && sk.getData() != null) {
                     _context.keyRing().put(h, sk);
-                    addFormNotice("Key for " + h.toBase64() + " added to keyring");
+                    addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("added to keyring"));
                 } else {
-                    addFormError("Invalid destination or key");
+                    addFormError(_("Invalid destination or key"));
                 }
             } else {  // Delete
                 if (h != null && h.getData() != null) {
                     if (_context.keyRing().remove(h) != null)
-                        addFormNotice("Key for " + h.toBase64() + " removed from keyring");
+                        addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("removed from keyring"));
                     else
-                        addFormNotice("Key for " + h.toBase64() + " not found in keyring");
+                        addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("not found in keyring"));
                 } else {
-                    addFormError("Invalid destination");
+                    addFormError(_("Invalid destination"));
                 }
             }
         } else {
-            addFormError("Unsupported");
+            addFormError(_("Unsupported"));
         }
     }
 

@@ -9,6 +9,22 @@ i2p_stop() {
  /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory stop )"
 }
 
+i2p_restart() {
+ /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory restart)"
+}
+
+i2p_status() {
+ /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory status )"
+}
+
+i2p_console() {
+ /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory console )"
+}
+
+i2p_dump() {
+ /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory dump )"
+}
+
 case "$1" in
 'start')
   i2p_start
@@ -17,11 +33,19 @@ case "$1" in
   i2p_stop
   ;;
 'restart')
-  i2p_stop
-  i2p_start
+  i2p_restart
+  ;;
+'status')
+  i2p_status
+  ;;
+'console')
+  i2p_console
+  ;;
+'dump')
+  i2p_dump
   ;;
 *)
-  echo "usage $0 start|stop|restart"
+  echo "usage $0 start|stop|restart|status|console|dump"
   ;;
 esac
 

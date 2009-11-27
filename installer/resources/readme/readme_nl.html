@@ -1,0 +1,61 @@
+<div align="right">
+<div class="langbox" align="right"><a href="/index.jsp?lang=en"><img src="/flags.jsp?c=us" title="English" alt="English"></a> <a href="/index.jsp?lang=zh"><img src="/flags.jsp?c=cn" title="Chinese" alt="Chinese"></a> <a href="/index.jsp?lang=de"><img src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> <a href="/index.jsp?lang=fr"><img src="/flags.jsp?c=fr" title="Fran&ccedil;ais" alt="Fran&ccedil;ais"></a> <a href="/index.jsp?lang=nl"><img src="/flags.jsp?c=nl" title="Nederlands" alt="Nederlands"></a> <a href="/index.jsp?lang=sv"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a></div>
+</div>
+<div class="welcome"><h2>Welkom bij I2P!</h2></div>
+<p>Als je net I2P opgestart hebt, zullen de 'Active:' (Actieve) getallen aan de linkerkant in de komende minuten stijgen, en je zal een "Shared clients" (Gedeelde clients) lokale bestemming zien staan aan de linkerkant (indien niet, <a href=#trouble>zie hieronder</a>). Eenmaal je deze bestemming ziet, kan je:</p>
+<ul>
+ <li><b>surfen naar "eepsites"</b> - op I2P zijn er anonieme websites - stel je browser in om de <b>HTTP proxy op 127.0.0.1, poort 4444</b> te gebruiken, en surf vervolgens naar een eepsite:<br>
+     <ul class="links">
+         <li><a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p</a> en
+             <a href="http://perv.i2p/stats.cgi">perv.i2p</a>: sites die lijsten bijhouden van actieve eepsites</li>
+         <li><a href="http://forum.i2p/">forum.i2p</a>: een beveiligde en anonieme verbinding naar <a href="http://forum.i2p2.de/">forum.i2p2.de</a></li>
+         <li><a href="http://www.i2p2.i2p/">www.i2p2.i2p</a> en de kopie <a href="http://i2p-projekt.i2p">i2p-projekt.i2p</a>:
+              beveiligde en anonieme verbindingen naar <a href="http://www.i2p2.de/">www.i2p2.de</a></li>
+         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>: een anoniem gehoste zoekmachine voor eepsites</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>: ugha's eepsite, een wiki die door iedereen aangepast kan worden, met veel links</li>
+         <li><a href="http://fproxy.tino.i2p">fproxy.tino.i2p</a>: proxy naar het Freenet-netwerk</li>
+         <li><a href="http://echelon.i2p">echelon.i2p</a>: software 
+        archive and information for I2P</li>
+	       <li><a href="http://paste.i2p2.i2p">paste.i2p2.i2p</a>: anonieme Pastebin</li>         
+     </ul><br>
+     Er zijn nog veel meer eepsites - volg gewoon de links vanaf diegene die je ziet. Voeg de beste toe aan je favorieten, en bezoek ze regelmatig!</li>
+<ul><li class="tidylist"><b>surfen op het web</b> - er is momenteel een HTTP "outproxy" in I2P, vastgehaakt aan je eigen HTTP proxy op poort 4444 - stel eenvoudigweg de proxy van je browser in om deze te gebruiken (zoals hierboven voor eepsites) en ga naar een willekeurige normale URL - je verzoeken voor websites worden rondgestuurd via het I2P-network.</li>
+ <li class="tidylist"><b>bestanden versturen</b> - er is een geintegreerde <a href="i2psnark/">aangepaste versie</a> van de
+     <a href="http://www.klomp.org/snark/">Snark</a> <a href="http://www.bittorrent.com/">BitTorrent</a>
+     client.</li>
+ <li class="tidylist"><b>anonieme e-mail gebruiken</b> - postman heeft een e-mailsysteem gecreerd, compatibel met normale e-mail
+     clients (POP3 / SMTP) dat toelaat e-mail binnen I2P evenals e-mail van en naar het gewone internet te versturen.
+     Maak je eigen account op <a href="http://hq.postman.i2p/">hq.postman.i2p</a>.
+     In i2p zit een gebundelde <a href="/susimail/susimail">susimail</a>,
+     een webgebaseerde anonimiteits-georienteerde pop3/smtp-client ingesteld om postman zijn e-mailservices te gebruiken.</li>
+ <li class="tidylist"><b>anoniem chatten</b> - start je eigen IRC-client op en verbind met
+     de server op <b>127.0.0.1 poort 6668</b>.  Dit wijst naar een of twee anoniem gehoste
+     IRC servers, maar zowel jij als zei weten niet waar de andere is.</li>
+ <li class="tidylist"><b>anoniem bloggen</b> - neem een kijkje bij <a href="http://syndie.i2p2.de/">Syndie</a></li>
+ <li class="tidylist">en veel meer</li>
+</ul>
+
+<h2>Wil je je eigen eepsite?</h2>
+
+<p>We hebben aan I2P software toegevoegd om je je eigen eepsite te laten hosten - een
+<a href="http://jetty.mortbay.org/">Jetty</a> webserver, die luistert op
+<a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.  Plaats gewoonweg je bestanden in
+de <code>eepsite/docroot/</code> map (of plaats standaard JSP/Servlet <code>.war</code>
+bestanden onder <code>eepsite/webapps</code>, of standaard CGI scripts onder <code>eepsite/cgi-bin</code>) 
+en ze zullen verschijnen. Na een <a href="/i2ptunnel/">eepsite tunnel</a> opgestart te hebben die er naar wijst,
+zal je eepsite zichtbaar zijn voor anderen.
+Gedetailleerde instructies voor het starten van je eepsite staan op
+<a href="http://127.0.0.1:7658/">je tijdelijke eepsite-pagina</a>.
+</p>
+
+<h2><a name="trouble">Problemen</a></h2>
+
+<p>Wees geduldig - I2P kan wat langzaam zijn bij het opstarten, omdat het nog andere gebruikers zoekt.
+Als, na 30 minuten, je Active: (Actieve) verbonden/recent verbonden aantallen lager zijn dan 10 verbonden gebruikers,
+zou je best poort 8887 op je firewall openen voor een betere verbinding.
+Als je in het geheel geen eepsites kan zien (zelfs <a href="http://www.i2p2.i2p/">www.i2p2.i2p</a> niet),
+controleer dan nog eens of de proxy van je browser op 127.0.0.1 poort 4444 staat.
+Je zou best ook de informatie controleren op de
+<a href="http://www.i2p2.i2p/">I2P website</a>, of plaats een bericht op het
+<a href="http://forum.i2p/">I2P discussie forum</a>, of kom langs bij #i2p of
+#i2p-chat op IRC bij de kanalen <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, irc.postman.i2p of irc.freshcoffee.i2p (ze linken allemaal door naar elkaar).</p><hr />

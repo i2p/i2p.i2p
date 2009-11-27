@@ -32,7 +32,7 @@ class ProfileOrganizerRenderer {
         _organizer = organizer;
         _comparator = new ProfileComparator();
     }
-    public void renderStatusHTML(Writer out) throws IOException {
+    public void renderStatusHTML(Writer out, boolean full) throws IOException {
         Set peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
@@ -40,6 +40,8 @@ class ProfileOrganizerRenderer {
         
         TreeSet order = new TreeSet(_comparator);
         TreeSet integratedPeers = new TreeSet(_comparator);
+        int older = 0;
+        int standard = 0;
         for (Iterator iter = peers.iterator(); iter.hasNext();) {
             Hash peer = (Hash)iter.next();
             if (_organizer.getUs().equals(peer)) continue;
@@ -51,7 +53,14 @@ class ProfileOrganizerRenderer {
                 if (info != null && info.getCapabilities().indexOf("f") >= 0)
                     integratedPeers.add(prof);
             }
-            if (prof.getLastSendSuccessful() <= hideBefore) continue;
+            if (prof.getLastSendSuccessful() <= hideBefore) {
+                older++;
+                continue;
+            }
+            if ((!full) && !_organizer.isHighCapacity(peer)) {
+                standard++;
+                continue;
+            }
             order.add(prof);
         }
         
@@ -60,20 +69,23 @@ class ProfileOrganizerRenderer {
         int integrated = 0;
         int failing = 0;
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<h2>Peer Profiles</h2>\n<p>");
+        buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
         buf.append(_("Showing {0} recent profiles.", order.size())).append('\n');
-        buf.append(_("Hiding {0} older profiles.", peers.size()-order.size()));
-        buf.append("</p>" +
-                   "<table>" +
-                   "<tr>" +
-                   "<th>").append(_("Peer")).append("</th>" +
-                   "<th>").append(_("Groups (Caps)")).append("</th>" +
-                   "<th>").append(_("Speed")).append("</th>" +
-                   "<th>").append(_("Capacity")).append("</th>" +
-                   "<th>").append(_("Integration")).append("</th>" +
-                   "<th>").append(_("Status")).append("</th>" +
-                   "<th>&nbsp;</th>" +
-                   "</tr>");
+        if (older > 0)
+            buf.append(_("Hiding {0} older profiles.", older)).append('\n');
+        if (standard > 0)
+            buf.append("<a href=\"/profiles.jsp?f=1\">").append(_("Hiding {0} standard profiles.", standard)).append("</a>\n");
+        buf.append("</p>");
+                   buf.append("<table>");
+                   buf.append("<tr>");
+                   buf.append("<th>").append(_("Peer")).append("</th>");
+                   buf.append("<th>").append(_("Groups (Caps)")).append("</th>");
+                   buf.append("<th>").append(_("Speed")).append("</th>");
+                   buf.append("<th>").append(_("Capacity")).append("</th>");
+                   buf.append("<th>").append(_("Integration")).append("</th>");
+                   buf.append("<th>").append(_("Status")).append("</th>");
+                   buf.append("<th>&nbsp;</th>");
+                   buf.append("</tr>");
         int prevTier = 1;
         for (Iterator iter = order.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
@@ -105,15 +117,18 @@ class ProfileOrganizerRenderer {
             
             buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
+            // debug
+            //if(prof.getIsExpandedDB())
+            //   buf.append(" ** ");
             buf.append("</td><td align=\"center\">");
             
             switch (tier) {
-                case 1: buf.append("Fast, High Capacity"); break;
-                case 2: buf.append("High Capacity"); break;
-                case 3: buf.append("Not Failing"); break;
-                default: buf.append("Failing"); break;
+                case 1: buf.append(_("Fast, High Capacity")); break;
+                case 2: buf.append(_("High Capacity")); break;
+                case 3: buf.append(_("Standard")); break;
+                default: buf.append(_("Failing")); break;
             }
-            if (isIntegrated) buf.append(", Integrated");
+            if (isIntegrated) buf.append(", ").append(_("Integrated"));
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null) {
                 // prevent HTML injection in the caps and version
@@ -144,19 +159,20 @@ class ProfileOrganizerRenderer {
             }
             buf.append("</td><td align=\"right\">").append(num(prof.getIntegrationValue()));
             buf.append("</td><td align=\"center\">");
-            if (_context.shitlist().isShitlisted(peer)) buf.append("Banned");
-            if (prof.getIsFailing()) buf.append(" Failing");
-            if (_context.commSystem().wasUnreachable(peer)) buf.append(" Unreachable");
+            if (_context.shitlist().isShitlisted(peer)) buf.append(_("Banned"));
+            if (prof.getIsFailing()) buf.append(' ').append(_("Failing"));
+            if (_context.commSystem().wasUnreachable(peer)) buf.append(' ').append(_("Unreachable"));
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
             long fails = failed.getCurrentEventCount() + failed.getLastEventCount();
             if (fails > 0) {
                 Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
                 long total = fails + accepted.getCurrentEventCount() + accepted.getLastEventCount();
                 if (total / fails <= 10)   // hide if < 10%
-                    buf.append(' ').append(fails).append('/').append(total).append(" Test Fails");
+                    buf.append(' ').append(fails).append('/').append(total).append(' ').append(_("Test Fails"));
             }
             buf.append("&nbsp;</td>");
-            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=").append(peer.toBase64().substring(0,6)).append("\">profile</a>");
+            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
+               .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
             buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
@@ -165,30 +181,26 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<h2>Floodfill and Integrated Peers</h2>\n" +
-                   "<table>" +
-                   "<tr>" +
-                   "<th class=\"smallhead\">Peer</th>" +
-                   "<th class=\"smallhead\">Caps</th>" +
-                   "<th class=\"smallhead\">Integ. Value</th>" +
-                   "<th class=\"smallhead\">Last Heard About</th>" +
-                   "<th class=\"smallhead\">Last Heard From</th>" +
-//                   "<th class=\"smallhead\">Last Successful Send</th>" +
-                   "<th class=\"smallhead\">Last Good Send</th>" +        
-//                   "<th class=\"smallhead\">Last Failed Send</th>" +
-                   "<th class=\"smallhead\">Last Bad Send</th>" +
-                   "<th class=\"smallhead\">10m Resp. Time</th>" +
-                   "<th class=\"smallhead\">1h Resp. Time</th>" +
-                   "<th class=\"smallhead\">1d Resp. Time</th>" +
-//                   "<th class=\"smallhead\">Successful Lookups</th>" + 
-                   "<th class=\"smallhead\">Good Lookups</th>" + 
-//                   "<th>Failed Lookups</th>" +
-                   "<th class=\"smallhead\">Bad Lookups</th>" +        
-                   "<th class=\"smallhead\">New Stores</th>" +
-                   "<th class=\"smallhead\">Old Stores</th>" +
-                   "<th class=\"smallhead\">1h Fail Rate</th>" +
-                   "<th class=\"smallhead\">1d Fail Rate</th>" +
-                   "</tr>");
+        buf.append("<h2><a name=\"flood\"></a>").append(_("Floodfill and Integrated Peers")).append("</h2>\n");
+        buf.append("<table>");
+        buf.append("<tr>");
+        buf.append("<th class=\"smallhead\">").append(_("Peer")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Caps")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Integ. Value")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Heard About")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Heard From")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Good Send")).append("</th>");        
+        buf.append("<th class=\"smallhead\">").append(_("Last Bad Send")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("10m Resp. Time")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1h Resp. Time")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1d Resp. Time")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Good Lookup")).append("</th>"); 
+        buf.append("<th class=\"smallhead\">").append(_("Last Bad Lookup")).append("</th>");        
+        buf.append("<th class=\"smallhead\">").append(_("Last Good Store")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("Last Bad Store")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1h Fail Rate")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
+        buf.append("</tr>");
         for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
             PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
@@ -217,28 +229,39 @@ class ProfileOrganizerRenderer {
             buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l)).append("</td>");
             DBHistory dbh = prof.getDBHistory();
             if (dbh != null) {
-                buf.append("<td align=\"right\">").append(dbh.getSuccessfulLookups()).append("</td>");
-                buf.append("<td align=\"right\">").append(dbh.getFailedLookups()).append("</td>");
-                buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreNew()).append("</td>");
-                buf.append("<td align=\"right\">").append(dbh.getUnpromptedDbStoreOld()).append("</td>");
+                time = now - dbh.getLastLookupSuccessful();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                time = now - dbh.getLastLookupFailed();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                time = now - dbh.getLastStoreSuccessful();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                time = now - dbh.getLastStoreFailed();
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
+            } else {
+                for (int i = 0; i < 6; i++)
+                    buf.append("<td align=\"right\">").append(_(NA));
             }
+            buf.append("</tr>\n");
         }
         buf.append("</table>");
 
-        buf.append("<h3>Thresholds:</h3>");
-        buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br>");
-        buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br>");
-        buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)");
-        buf.append("<h3>Definitions:</h3><ul>" +
-                   "<li><b>groups</b>: as determined by the profile organizer</li>" +
-                   "<li><b>caps</b>: capabilities in the netDb, not used to determine profiles</li>" +
-                   "<li><b>speed</b>: peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel</li>" +
-                   "<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>" +
-                   "<li><b>integration</b>: how many new peers have they told us about lately?</li>" +
-                   "<li><b>status</b>: is the peer banned, or unreachable, or failing tunnel tests?</li>" +
-                   "</ul></i>");
+        buf.append("<h3>").append(_("Thresholds")).append("</h3>");
+        buf.append("<p><b>").append(_("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold()))
+           .append(" (").append(fast).append(' ').append(_("fast peers")).append(")<br>");
+        buf.append("<b>").append(_("Capacity")).append(":</b> ").append(num(_organizer.getCapacityThreshold()))
+           .append(" (").append(reliable).append(' ').append(_("high capacity peers")).append(")<br>");
+        buf.append("<b>").append(_("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold()))
+           .append(" (").append(integrated).append(' ').append(_(" well integrated peers")).append(")</p>");
+        buf.append("<h3>").append(_("Definitions")).append("</h3><ul>");
+        buf.append("<li><b>").append(_("groups")).append("</b>: ").append(_("as determined by the profile organizer")).append("</li>");
+        buf.append("<li><b>").append(_("caps")).append("</b>: ").append(_("capabilities in the netDb, not used to determine profiles")).append("</li>");
+        buf.append("<li><b>").append(_("speed")).append("</b>: ").append(_("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel")).append("</li>");
+        buf.append("<li><b>").append(_("capacity")).append("</b>: ").append(_("how many tunnels can we ask them to join in an hour?")).append("</li>");
+        buf.append("<li><b>").append(_("integration")).append("</b>: ").append(_("how many new peers have they told us about lately?")).append("</li>");
+        buf.append("<li><b>").append(_("status")).append("</b>: ").append(_("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
+        buf.append("</ul></i>");
         out.write(buf.toString());
         out.flush();
     }
@@ -295,31 +318,34 @@ class ProfileOrganizerRenderer {
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
-    private final static String na = "n/a";
+    private final static String NA = HelperBase._x("n/a");
 
-    private static String avg (PeerProfile prof, long rate) {
+    private String avg (PeerProfile prof, long rate) {
             RateStat rs = prof.getDbResponseTime();
             if (rs == null)
-                return na;
+                return _(NA);
             Rate r = rs.getRate(rate);
             if (r == null)
-                return na;
+                return _(NA);
             long c = r.getCurrentEventCount() + r.getLastEventCount();
             if (c == 0)
-                return na;
+                return _(NA);
             double d = r.getCurrentTotalValue() + r.getLastTotalValue();
             return Math.round(d/c) + "ms";
     }
 
-    private static String davg (DBHistory dbh, long rate) {
+    private String davg (DBHistory dbh, long rate) {
             RateStat rs = dbh.getFailedLookupRate();
             if (rs == null)
-                return na;
+                return "0%";
             Rate r = rs.getRate(rate);
             if (r == null)
-                return na;
+                return "0%";
             long c = r.getCurrentEventCount() + r.getLastEventCount();
-            return "" + c;
+            if (c <= 0)
+                return "0%";
+            double avg = 0.5 + 100 * (r.getCurrentTotalValue() + r.getLastTotalValue()) / c;
+            return ((int) avg) + "%";
     }
 
     /** translate a string */
@@ -339,7 +365,7 @@ class ProfileOrganizerRenderer {
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */
-    public String _(String s, Object o) {
+    private String _(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 }

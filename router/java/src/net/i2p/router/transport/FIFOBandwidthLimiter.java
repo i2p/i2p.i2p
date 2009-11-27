@@ -618,7 +618,9 @@ public class FIFOBandwidthLimiter {
         }
     }
     
+    /** @deprecated not worth translating */
     public void renderStatusHTML(Writer out) throws IOException {
+/*******
         long now = now();
         StringBuilder buf = new StringBuilder(4096);
         buf.append("<h3><b id=\"bwlim\">Limiter Status:</b></h3>").append(getStatus().toString()).append("\n");
@@ -648,6 +650,7 @@ public class FIFOBandwidthLimiter {
         buf.append("</ol></li></ul><hr>\n");
         out.write(buf.toString());
         out.flush();
+******/
     }
     
     private static long __requestId = 0;

@@ -1,0 +1,42 @@
+<i2p.news date="$Date: 2009-10-12 00:00:00 $">
+ <i2p.release version="0.7.7" date="2009/10/12" minVersion="0.6"/>
+<h4>Congratulations on getting I2P installed!</h4>
+<ul>
+<li>
+<b>Welcome to I2P!</b>
+Please <b>have patience</b> as I2P boots up and finds peers.
+</li>
+<li>
+While you are waiting, please <b>adjust your bandwidth settings</b> on the
+<a href="config.jsp">configuration page</a>.
+</li>
+<li>
+Once you have a "shared clients" destination listed on the left,
+please <b>check out</b> our
+<a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+</li>
+<li>
+Point your IRC client to <b>localhost:6668</b> and say hi to us on #i2p.
+</li>
+</ul>
+<br>
+<h4>Gratulation zur erfolgreichen Installation von I2P!</h4>
+<ul>
+<li>
+<b>Willkommen bei I2P!</b>
+Bitte noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router  findet.
+</li>
+<li>
+Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
+<a href="config.jsp">Einstellungsseite</a> an.
+</li>
+<li>
+Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
+</li>
+<li>
+Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal #i2p.
+</li>
+</ul>
+
+</i2p.news>
+

@@ -1,10 +1,15 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%
+  /*
+   *   Do not tag this file for translation.
+   */
+%>
 <html><head><title>I2P Router Console - Debug</title>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 </head><body>
-<%@include file="summary.jsp" %>
+<%@include file="summary.jsi" %>
 <h1>Router SKM</h1>
 <div class="main" id="main">
 <%

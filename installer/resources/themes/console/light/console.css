@@ -119,12 +119,17 @@ div.routersummary hr {
      -moz-box-shadow: inset 0px 1px 1px 1px #001;
 }
 
+div routersummary hr:last-child {
+     margin-top: 5px;
+     margin-bottom: -5px !important;
+}
+
 div.routersummary h3 {
      border: 0;
-     font-size: 10pt;
+     font-size: 9.5pt;
      letter-spacing: 0.04em;
      margin: -7px -9px -7px -9px;
-     padding: 5px 0px 5px 0px;
+     padding: 1px 0;
      background: #c5d5fb;
      text-transform: uppercase;
      background-image: -moz-linear-gradient(top, bottom, from(#ddf), to(#c5d5fb), color-stop(25%, #c5d5fb), color-stop(100%, #ddf));
@@ -136,7 +141,7 @@ div.routersummary h4 {
      font-size: 8.5pt;
      letter-spacing: 0.02em;
      margin: -7px -9px -7px -9px !important;
-     padding: 2px 3px 3px 3px;
+     padding: 0px 3px 1px 3px;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -146,7 +151,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -2px -4px;
+     margin: -7px -5px -6px -5px;
      width: 185px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -161,13 +166,35 @@ div.routersummary tr {
      border: 0 !important;
 }
 
+div.tunnels {
+     margin-top: 6px !important;
+     margin-left: -2px !important;
+     margin-bottom: 3px !important;
+     padding-top: 3px !important;
+}
+
+.tunnels tr {
+     padding: 4px 0 !important;
+}
+
 div.routersummary form {
-     margin-top: 8px;
+     margin: -6px 0 -5px 0;
+}
+
+div.routersummary form:last-child {
+     margin: 0 !important;
+     padding: 0;
 }
 
 div.routersummary p {
      padding: 0;
 }     
+
+div.refresh {
+     margin-top: -6px !important;
+     margin-bottom: 0px !important;
+     padding: 2px 0 0px 0 !important;
+}
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
@@ -179,26 +206,16 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 2px 4px;
+     padding: 1px 3px;
      background-image: none !important;
      border: 0 !important;
-}
-
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
-}
-
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
 }
 
 /* proxy error messages */
 
 div.warning {
      margin: 5px 20px 10px 240px;
-     padding: 0px 25px 20px 75px;
+     padding: 5px 25px 20px 75px;
      background: #fff;
      border: 1px solid #002;
      text-align: left;
@@ -207,11 +224,12 @@ div.warning {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      text-align: justify;
-     background-image:url("images/errortriangle.png");
-     background-position:15px center;
+     background-image:url("../images/itoopie_sm.png");     
+     background-position:10px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 1px 0px #d00;
      word-wrap: break-word;
+     min-width: 400px;
 }
 
 /* console error messages */
@@ -260,6 +278,10 @@ div.main hr, hr {
      margin: 10px 0;
 }
 
+hr:last-child {
+     margin-top: 20px !important;
+}
+
 div.main textarea {
      background: #eef;
      color: #001;
@@ -268,16 +290,22 @@ div.main textarea {
 
 div.news {
      margin: 0px 15px 10px 220px;
-     padding: 10px 25px 15px 25px;
+     padding: 10px 25px 7px 25px;
      border: 1px solid #003;
      color: #410;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     text-align: justify !important;
+     text-align: right !important;
+     font-size: 7pt;
      line-height: 140%;
      background: #fea url('images/sandtile.png');
      -moz-box-shadow: inset 0px 0px 1px 0px #410;
+}
+
+div.news p {
+     font-size: 8.5pt;
+     text-align: justify !important;
 }
 
 div.news a:link{
@@ -303,13 +331,13 @@ div.news hr{
      background: #410;
      height: 1px;
      border: 0px solid #410;
-     margin: 10px 0;
+     margin: 10px 0 5px;
 }
 
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: 0 0 20px 0 !important;
+     margin: 10px 0 20px 0 !important;
      padding: 5px 0;
      vertical-align: bottom;
      border: 1px solid #410;
@@ -320,7 +348,7 @@ div.news li {
      -khtml-border-radius: 0 4px 4px 0;
      background: #fb1;
      font-size: 10pt;
-     opacity: 0.8;
+     opacity: 0.7;
 }
 
 div.news h4 {
@@ -338,7 +366,7 @@ div.confignav {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #000022;
-     font-size: 10pt !important;
+     font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
@@ -508,8 +536,19 @@ div.main li {
      word-wrap: break-word;
 }
 
+div.main li:first-child {
+     margin-top: 10px;
+}
 .tidylist {
      text-align: justify !important;
+}
+
+.tidylist li:first-child {
+     margin-top: -10px !important;
+}
+
+.tidylist:last-child {
+     padding-bottom: 5px;
 }
 
 ol {
@@ -520,7 +559,7 @@ ol {
 
 ul {
      display: inline;
-     margin: 5px 0;
+     margin: 0;
      padding: 0;
 }
 
@@ -530,14 +569,14 @@ code {
 }
 
 a:link{
-     color: #007;
+     color: #008;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #606;
+     color: #004;
      text-decoration: none;
      font-weight: bold;
 }
@@ -554,10 +593,23 @@ a:active{
      font-weight: bold;
 }
 
-.links {
-     list-style: url(images/link.png);
-     margin: 10px 5px 0 0px;
-     padding: 10px 20px 10px 30px;
+.links li {
+     list-style: url(../images/link.png) !important;
+     padding-bottom: -2px;
+     text-align: justify;
+     line-height: 120% !important;
+}
+
+.links li:first-child {
+     padding-top: 0 !important;
+}
+
+.links li:last-child {
+     padding-bottom: -15px !important;
+}
+
+.links ul {
+     margin-top: -5px !important;
 }
 
 p {
@@ -595,7 +647,7 @@ h2 {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     margin: 15px 0px 15px 0 !important;
+     margin: 15px 0px 12px 0 !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
 }
@@ -612,7 +664,7 @@ h3 {
      border: 1px solid #002;
      border-left: 5px solid #002;
      padding: 3px 5px 3px 5px;
-     margin: 15px 0 15px 0;
+     margin: 12px 0 12px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
@@ -803,7 +855,7 @@ form {}
      background: #bcf;
      -moz-box-shadow: inset 0px 0px 2px 1px #eef;
 }
-
+/*
 .joblog {
      margin: 15px 0;
      padding: 10px 20px !important;
@@ -829,6 +881,59 @@ form {}
 
 .joblog table {
      margin-top: 10px;
+}
+*/
+
+div.joblog {
+     margin: 15px 0;
+     padding: 10px 20px !important;
+     border: 1px solid #003;
+     background-color: #004;
+     background: #ddf url('images/lightbluetile.png');
+     color: #001;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     text-align: justify;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     overflow: auto;
+ }
+ 
+ div.joblog:ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+     line-height: 100% !important;
+}
+
+ div.joblog:li {
+     word-wrap: break-word !important;
+     text-align: justify !important;
+     line-height: 80% !important;
+     padding: 0;
+}
+
+div.joblog li:first-child {
+     margin-top: 10px;
+
+}
+div.joblog li:last-child {
+     margin-bottom: 5px;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+}
+
+div.joblog p {
+     line-height: 130%;
+}
+
+div.joblog hr {
+     margin: 15px 0;
 }
 
 .smallhead {

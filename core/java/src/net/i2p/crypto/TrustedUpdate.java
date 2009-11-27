@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.StringTokenizer;
 
 import net.i2p.CoreVersion;
@@ -183,42 +184,50 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      *         version, otherwise <code>false</code>.
      */
     public static final boolean needsUpdate(String currentVersion, String newVersion) {
-        StringTokenizer newVersionTokens = new StringTokenizer(sanitize(newVersion), ".");
-        StringTokenizer currentVersionTokens = new StringTokenizer(sanitize(currentVersion), ".");
-
-        while (newVersionTokens.hasMoreTokens() && currentVersionTokens.hasMoreTokens()) {
-            String newNumber = newVersionTokens.nextToken();
-            String currentNumber = currentVersionTokens.nextToken();
-
-            switch (compare(newNumber, currentNumber)) {
-                case -1: // newNumber is smaller
-                    return false;
-                case 0: // eq
-                    break;
-                case 1: // newNumber is larger
-                    return true;
-            }
-        }
-
-        if (newVersionTokens.hasMoreTokens() && !currentVersionTokens.hasMoreTokens())
-            return true;
-
-        return false;
+        return (new VersionComparator()).compare(currentVersion, newVersion) < 0;
     }
 
-    private static final int compare(String lop, String rop) {
-        try {
-            int left = Integer.parseInt(lop);
-            int right = Integer.parseInt(rop);
-
-            if (left < right) 
-                return -1;
-            else if (left == right)
+    /**
+     * Compares versions.
+     * Characters other than [0-9.] are ignored.
+     */
+    public static class VersionComparator implements Comparator<String> {
+        /** l and r non-null */
+        public int compare(String l, String r) {
+            // try it the easy way first
+            if (l.equals(r))
                 return 0;
-            else
+            StringTokenizer lTokens = new StringTokenizer(sanitize(l), ".");
+            StringTokenizer rTokens = new StringTokenizer(sanitize(r), ".");
+
+            while (lTokens.hasMoreTokens() && rTokens.hasMoreTokens()) {
+                String lNumber = lTokens.nextToken();
+                String rNumber = rTokens.nextToken();
+                int diff = intCompare(lNumber, rNumber);
+                if (diff != 0)
+                    return diff;
+            }
+
+            if (lTokens.hasMoreTokens() && !rTokens.hasMoreTokens())
                 return 1;
-        } catch (NumberFormatException nfe) {
+            if (rTokens.hasMoreTokens() && !lTokens.hasMoreTokens())
+                return -1;
             return 0;
+        }
+
+        private static final int intCompare(String lop, String rop) {
+            int left, right;
+            try {
+                left = Integer.parseInt(lop);
+            } catch (NumberFormatException nfe) {
+                return -1;
+            }
+            try {
+                right = Integer.parseInt(rop);
+            } catch (NumberFormatException nfe) {
+                return 1;
+            }
+            return left - right;
         }
     }
 

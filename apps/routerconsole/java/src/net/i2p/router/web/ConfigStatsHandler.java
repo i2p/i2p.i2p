@@ -115,10 +115,10 @@ public class ConfigStatsHandler extends FormHandler {
         _context.router().setConfigSetting(StatManager.PROP_STAT_FULL, "" + _isFull);
         boolean ok = _context.router().saveConfig();
         if (ok) 
-            addFormNotice("Stat filter and location updated successfully to: " + stats.toString());
+            addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
         else
-            addFormError("Failed to update the stat filter and location");
-        addFormNotice("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>");
+            addFormError(_("Failed to update the stat filter and location"));
+        addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));
     }
     
 }

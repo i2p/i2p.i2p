@@ -23,19 +23,24 @@ import net.i2p.util.Log;
  * the normal (kademlia) channels.  This should cut down on spurious lookups caused
  * by simple delays in responses from floodfill peers
  *
+ * NOTE: Unused directly - see FloodOnlySearchJob extension which overrides almost everything.
+ * TODO: Comment out or delete what we don't use here.
+ *
+ * Note that this does NOT extend SearchJob.
  */
 public class FloodSearchJob extends JobImpl {
-    private Log _log;
-    private FloodfillNetworkDatabaseFacade _facade;
-    private Hash _key;
-    private final List _onFind;
-    private final List _onFailed;
-    private long _expiration;
-    private int _timeoutMs;
-    private long _origExpiration;
-    private boolean _isLease;
-    private volatile int _lookupsRemaining;
-    private volatile boolean _dead;
+    protected Log _log;
+    protected FloodfillNetworkDatabaseFacade _facade;
+    protected Hash _key;
+    protected final List<Job> _onFind;
+    protected final List<Job> _onFailed;
+    protected long _expiration;
+    protected int _timeoutMs;
+    protected long _origExpiration;
+    protected boolean _isLease;
+    protected volatile int _lookupsRemaining;
+    protected volatile boolean _dead;
+
     public FloodSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx);
         _log = ctx.logManager().getLog(FloodSearchJob.class);
@@ -86,13 +91,13 @@ public class FloodSearchJob extends JobImpl {
             TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
             if ( (replyTunnel == null) || (outTunnel == null) ) {
                 _dead = true;
-                List removed = null;
+                List<Job> removed = null;
                 synchronized (_onFailed) {
                     removed = new ArrayList(_onFailed);
                     _onFailed.clear();
                 }
                 while (removed.size() > 0)
-                    getContext().jobQueue().addJob((Job)removed.remove(0));
+                    getContext().jobQueue().addJob(removed.remove(0));
                 getContext().messageRegistry().unregisterPending(out);
                 return;
             }
@@ -117,9 +122,9 @@ public class FloodSearchJob extends JobImpl {
     }
     public String getName() { return "NetDb search (phase 1)"; }
     
-    Hash getKey() { return _key; }
-    void decrementRemaining() { _lookupsRemaining--; }
-    int getLookupsRemaining() { return _lookupsRemaining; }
+    protected Hash getKey() { return _key; }
+    protected void decrementRemaining() { if (_lookupsRemaining > 0) _lookupsRemaining--; }
+    protected int getLookupsRemaining() { return _lookupsRemaining; }
     
     void failed() {
         if (_dead) return;
@@ -130,13 +135,13 @@ public class FloodSearchJob extends JobImpl {
         if (timeRemaining > 0) {
             _facade.searchFull(_key, _onFind, _onFailed, timeRemaining, _isLease);
         } else {
-            List removed = null;
+            List<Job> removed = null;
             synchronized (_onFailed) {
                 removed = new ArrayList(_onFailed);
                 _onFailed.clear();
             }
             while (removed.size() > 0)
-                getContext().jobQueue().addJob((Job)removed.remove(0));
+                getContext().jobQueue().addJob(removed.remove(0));
         }
     }
     void success() {
@@ -145,13 +150,13 @@ public class FloodSearchJob extends JobImpl {
             _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " successful");
         _dead = true;
         _facade.complete(_key);
-        List removed = null;
+        List<Job> removed = null;
         synchronized (_onFind) {
             removed = new ArrayList(_onFind);
             _onFind.clear();
         }
         while (removed.size() > 0)
-            getContext().jobQueue().addJob((Job)removed.remove(0));
+            getContext().jobQueue().addJob(removed.remove(0));
     }
 
     private static class FloodLookupTimeoutJob extends JobImpl {

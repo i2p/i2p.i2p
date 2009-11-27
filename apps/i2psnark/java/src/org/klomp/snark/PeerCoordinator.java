@@ -236,10 +236,21 @@ public class PeerCoordinator implements PeerListener
   {
     synchronized(peers)
       {
-        return !halted && peers.size() < _util.getMaxConnections();
+        return !halted && peers.size() < getMaxConnections();
       }
   }
   
+  /** reduce max if huge pieces to keep from ooming */
+  private int getMaxConnections() {
+    int size = metainfo.getPieceLength(0);
+    int max = _util.getMaxConnections();
+    if (size <= 1024*1024)
+      return max;
+    if (size <= 2*1024*1024)
+      return (max + 1) / 2;
+    return (max + 3) / 4;
+  }
+
   public boolean halted() { return halted; }
 
   public void halt()
@@ -294,7 +305,7 @@ public class PeerCoordinator implements PeerListener
             peer.disconnect(false); // Don't deregister this connection/peer.
           }
         // This is already checked in addPeer() but we could have gone over the limit since then
-        else if (peers.size() >= _util.getMaxConnections())
+        else if (peers.size() >= getMaxConnections())
           {
             if (_log.shouldLog(Log.WARN))
               _log.warn("Already at MAX_CONNECTIONS in connected() with peer: " + peer);
@@ -350,7 +361,7 @@ public class PeerCoordinator implements PeerListener
         peersize = peers.size();
         // This isn't a strict limit, as we may have several pending connections;
         // thus there is an additional check in connected()
-        need_more = (!peer.isConnected()) && peersize < _util.getMaxConnections();
+        need_more = (!peer.isConnected()) && peersize < getMaxConnections();
         // Check if we already have this peer before we build the connection
         Peer old = peerIDInList(peer.getPeerID(), peers);
         need_more = need_more && ((old == null) || (old.getInactiveTime() > 8*60*1000));
@@ -378,7 +389,7 @@ public class PeerCoordinator implements PeerListener
       if (peer.isConnected())
         _log.info("Add peer already connected: " + peer);
       else
-        _log.info("Connections: " + peersize + "/" + _util.getMaxConnections()
+        _log.info("Connections: " + peersize + "/" + getMaxConnections()
                   + " not accepting extra peer: " + peer);
     }
     return false;

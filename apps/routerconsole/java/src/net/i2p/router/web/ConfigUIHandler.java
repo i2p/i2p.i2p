@@ -17,16 +17,23 @@ public class ConfigUIHandler extends FormHandler {
         _config = val;
     }
     
+    /** note - lang change is handled in CSSHelper but we still need to save it here */
     private void saveChanges() {
         if (_config == null)
             return;
+        String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         if (_config.equals("default")) // obsolete
             _context.router().removeConfigSetting(CSSHelper.PROP_THEME_NAME);
         else
             _context.router().setConfigSetting(CSSHelper.PROP_THEME_NAME, _config);
-        if (_context.router().saveConfig()) 
-            addFormNotice("Theme change saved. <a href=\"configui.jsp\">Refresh the page</a> to view.");
-        else
-            addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs.");
+        if (_context.router().saveConfig()) {
+            if (!oldTheme.equals(_config))
+                addFormNotice(_("Theme change saved.") +
+                              " <a href=\"configui.jsp\">" +
+                              _("Refresh the page to view.") +
+                              "</a>");
+        } else {
+            addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+        }
     }
 }

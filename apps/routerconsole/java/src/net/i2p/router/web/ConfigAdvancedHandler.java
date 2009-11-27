@@ -13,7 +13,7 @@ import java.util.Iterator;
  *
  */
 public class ConfigAdvancedHandler extends FormHandler {
-    private boolean _forceRestart;
+    //private boolean _forceRestart;
     private boolean _shouldSave;
     private String _config;
     
@@ -27,7 +27,7 @@ public class ConfigAdvancedHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { _shouldSave = true; }
-    public void setRestart(String moo) { _forceRestart = true; }
+    //public void setRestart(String moo) { _forceRestart = true; }
     
     public void setConfig(String val) {
         _config = val;
@@ -54,7 +54,7 @@ public class ConfigAdvancedHandler extends FormHandler {
                     unsetKeys.remove(key);
                 }
             } catch (IOException ioe) {
-                addFormError("Error updating the configuration (IOERROR) - please see the error logs");
+                addFormError(_("Error updating the configuration - please see the error logs"));
                 return;
             }
 
@@ -66,15 +66,15 @@ public class ConfigAdvancedHandler extends FormHandler {
 
             boolean saved = _context.router().saveConfig();
             if (saved) 
-                addFormNotice("Configuration saved successfully");
+                addFormNotice(_("Configuration saved successfully"));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs"));
             
-            if (_forceRestart) {
-                addFormNotice("Performing a soft restart");
-                _context.router().restart();
-                addFormNotice("Soft restart complete");
-            }
+            //if (_forceRestart) {
+            //    addFormNotice("Performing a soft restart");
+            //    _context.router().restart();
+            //    addFormNotice("Soft restart complete");
+            //}
         }
     }
 }

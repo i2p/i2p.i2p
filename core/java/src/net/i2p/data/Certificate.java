@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines a certificate that can be attached to various I2P structures, such
  * as RouterIdentity and Destination, allowing routers and clients to help
@@ -23,10 +21,11 @@ import net.i2p.util.Log;
  * certificate authority, though that use probably isn't appropriate for an
  * anonymous network ;)
  *
+ * Todo: Properly support multiple certificates
+ *
  * @author jrandom
  */
 public class Certificate extends DataStructureImpl {
-    private final static Log _log = new Log(Certificate.class);
     private int _type;
     private byte[] _payload;
 

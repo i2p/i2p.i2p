@@ -1,3 +1,251 @@
+2009-11-24 zzz
+    * DataStructures: Remove unused Logs
+    * OrderedProperties: Simplify, use in i2psnark
+    * Profiles: Record successes in the DB fail rate
+      too, so we can calculate a percentage
+    * profiles.jsp:
+      - Change fail rate from count to percent
+      - Hide standard profiles by default
+    * Streaming:
+      - When an "immediate" ack is requested, do it within
+        250 ms (was 2000)
+      - Request immediate acks when < 1/3 of window remains,
+        or when < 3 packets remain in window,
+        and every 8 packets (was when < 2 packets in window remain)
+      - Change requested delay to RTT/2 (was RTO/2)
+      - Log cleanup and javadoc
+
+2009-11-21 zzz
+    * GeoIP: Update to Nov 17 2009 data
+    * Netdb Floodfill rework part 4 of N:
+      - Search closest-to-the-key
+      - Put closest-to-the-key in explore don't-include-list
+      - Use facade's peer selector for exploration rather than
+        instantiating a new one
+      - Adjust response time limit
+    * netdb.jsp: Add popups on flags
+    * Routerconsole build: rename include files so they aren't
+      compiled and bundled separately (~15KB)
+
+2009-11-18 zzz
+    * Build: Don't update the po files by default, add new
+      target "poupdate" to do that.
+    * Netdb:
+      - Floodfill rework part 3 of N: Send closest-to-the-key
+        in DSRM replies
+      - Adjust criteria for following DSRM
+      - Note failed floods in the profile
+      - Reduce max flood
+
+2009-11-16 zzz
+    * addressbook: Move class to net.i2p.addressbook
+    * build: Take two test scripts out of the installer
+    * i2psnark: Bye TPB
+    * Shitlist: Fix bug from two checkins ago, all were forever
+
+2009-11-14 zzz
+    * HTTP Proxy:
+      - Add support for error page translations
+      - Add support for external pages for all errors
+      - Fix lack of \r in error page headers
+      - HTML transitional fixes
+      - Cleanups
+    * UDP PeerTestManager: Throw in some synchronization to
+      try to fix stuck tests
+
+2009-11-11 zzz
+    * Console: Some colon cleansing
+    * FloodfillPeerSelector: Adjustments
+    * Shitlist: Move HTML renderer to router console,
+      add cause parameter for ease of translation,
+      tag all causes
+
+2009-11-11 zzz
+    * Addressbook, NamingService: Allow 516 byte dests
+      that end with AA but not AAAA, so we can permit
+      non-null zero-length certs.
+    * Console:
+      - Tag tunnel status
+      - Add transport table to netdb.jsp
+    * i2psnark:
+      - Reject torrents with too many pieces
+      - Reject torrents with a single file named *.torrent
+      - Increase max piece size to 2MB (was 1MB), but reduce
+        max number of connections to lessen ooms
+    * Netdb FloodOnlySearchJob:
+      - Fix up field hiding and duplicate overrides
+      - Other javadoc and java 5 improvements
+    * Netdb StoreJob, FloodfillVerifyStoreJob:
+      - Fix bug where reply selector wasn't registered for
+        routerinfo stores, so we didn't get stats, and
+        we kept retrying. This also prevented verification
+        and profile updates for routerinfo stores.
+        This bug was introduced 4 years ago by the change to
+        store routerinfos directly.
+      - Add dbStoreSuccessful() to profile, and have FVSJ
+        call it or dbStoreFailed() as appropriate to give
+        credit or blame to the floodfill we stored to.
+      - Don't let FVSJ verify using the peer we stored to
+    * Netdb Stores:
+      - Floodfill rework part 2 of N:
+        Store and verify closest to the key, subject to
+        last-failed lookup and store stats.
+      - DataHelper: Fix broken byte[] compareTo() used by XORComparator,
+        was not doing unsigned comparisons!
+      - FloodfillPeerSelector: Use standard XORComparator
+        now that it works, instead of messing with BigInteger
+      - FloodfillVerifyStoreJob: Set correct timeout for
+        requeued store job (was only 10s)
+      - KNDF: Rework getPeerTimout() to use 1 day averages,
+        and lower the min, max, and multiplication factor.
+      - Publish jobs: Lengthen timeout to 90s (was 30s for
+        routerinfos and 60s for leasesets)
+      - StoreJob: Limit max peer timeout to 15s for direct stores
+    * Streaming: Fix unused resend delay field in the packet header,
+      it is defined as seconds and we were not dividing by 1000,
+      so we were truncating 1000 to one byte which equals 232.
+    * UDP:
+      - Better handle a test reply from bob with a 0-length IP
+      - Add config options for min and max random port
+
+2009-11-09 dr|z3d
+    * New midnight blue lightweight theme; supports IE and provisions its own console_big.css
+    * Streamlining and honing of console_big.css
+
+2009-11-07 zzz
+    * Console:
+      - countries.txt: Convert to mixed case, include in update
+      - netdb.jsp: Hide all routers by default, sort and tag country names
+      - oldstats.jsp: Move to stats.jsp
+      - profiles.jsp: Show new DBH times instead of counts
+    * Profiles:
+      - Track last good and bad lookup times
+        and last good and bad store times,
+        to prep for floodfill changes
+      - Don't reset last-heard-about at router startup
+    * Checklist and Android readme fixups
+
+2009-11-04 zzz
+    * Build:
+      - Move some files to installer/resources
+      - Fix initialNews.xml in install package
+    * Console: More tagging
+    * NetDb: Reduce routerinfo expiration slightly
+    * Profiles:
+      - Remove the almost-unused send and receive size RateStats;
+        this also reduces the effective time for isActive()
+      - Only store DB history on-demand to save space;
+        fix up resulting NPEs
+      - Savings: ~2MB heap
+    * Throttle: Reduce max msg delay to 1250ms (was 1500)
+    * UDP: Pick a random port on first install or bind failure -
+      No more port 8887 to prevent easy state-level blocking
+
+2009-11-04 sponge
+    * Fixups to Slackware scripts
+
+2009-10-31 zzz
+    * Console:
+      - More tagging
+      - Show user-installed themes on configui.jsp
+      - Fix reseed button spacing
+    * GraphHelper cleanup
+    * Susidns: add link to subscription faq
+
+2009-10-29 zzz
+    * Console tag fixes, bundle script fix
+    * Add help target to build.xml
+
+2009-10-28 zzz
+    * Console:
+      - Rewrite TrustedUpdate version comparator, use for netdb version table
+        so 0.7.10 will be sorted correctly
+      - Reduce netdb.jsp memory usage
+      - More tagging fixups
+      - configclients.jsp fixup for "Web console"
+      - Remove limiter status from peers.jsp
+      - Fix UPnP status header
+    * NetDb:
+      - Generate new RI immediately at startup
+      - Try again to not publish RI until we have been up a few minutes
+
+2009-10-26 zzz
+    * Console:
+      - Add parameterized tag
+      - Don't save config when checking for updates on configupdate.jsp
+      - Refactor confignav.jsp to java and tag
+      - Start tagging profiles.jsp
+      - Rework ConfigRestartBean and tag
+      - More tag fixups
+      - Add lang=xx for testing
+      - Add file for additional tagged strings
+
+2009-10-23 zzz
+    * Certificate: Fix the (apparently unused) readBytes(byte[], int) method
+      for a null certificate - http://zzz.i2p/topics/388 - thanks HungryHobo
+    * Console:
+      - Don't hide link to configui.jsp for IE any more
+      - Add lang selection on configui.jsp
+      - Tag strings in configui.jsp
+      - Load console_big.css if lang == zh
+      - Add _x() tag for static iniitializers
+      - HTML transitional input tags
+      - Rename cssHelper to intl for ease of tagging
+    * Update: Better error message when .sud file not found or truncated
+      http://forum.i2p/viewtopic.php?t=3979
+      The bug with the file going to the wrong place was fixed a couple months ago.
+
+2009-10-21 dr|z3d
+    * Enhance index.jsp with "paperclips" for the main links
+    * Tighten sidepanel layout to gain us some vertical screen real estate
+    * Update news.xml with the correct link for Chinese translation page
+
+2009-10-20 zzz
+    * I2NP: Remove old TunnelCreateMessage and TunnelCreateStatusMessage
+    * Logger: Don't kill the whole JVM if we can't open the log file
+    * MessageHistory: Cleanups
+    * NetDb: Move renderStatusHTML to routerconsole
+    * Router Console translation infrastructure:
+      - Persistent lang setting with routerconsole.lang=xx
+      - Loading any page with ?lang=xx changes the persistent setting
+      - Add a custom Jetty handler to load foo_xx.jsp if it
+        exists for language xx. This is for jsp files with lots
+        of text in them. Otherwise use inline translate methods.
+        Not for included jsps.
+      - Add a script to create and update messages_xx.po translation
+        files, and create ResourceBundles from them
+      - Add class to translate strings from cached ResourceBundles
+      - Add translate wrappers to HelperBase, FormHandler, and *Renderer,
+        so calls can be made from both jsp and java files
+      - Add example translations on configupdate.jsp - two in
+        the jsp itself and one in the helper.
+      - This is for strings in routerconsole only. Will be expanded
+        to other webapps and the router later.
+    * summarynoframe.jsp:
+      - Refactor to SummaryBarRenderer (saves 100KB)
+      - Add translate tags
+      - Use context RNG for nonces
+      - Transitional HTML style for input tags
+    * TunnelDispatcher: Drop messages that expire far in the future
+    * TunnelPoolManager: Move renderStatusHTML to routerconsole
+
+2009-10-16 dr|z3d
+    * Extensive UI whitespace cleanups and positional finessing.
+
+2009-10-16 zzz
+    * Crypto: Two more test classes out of the lib
+    * FloodfillMonitor: Slow down the volunteers again
+    * i2psnark: Add TPB tracker
+    * NetDb: Rework part 1 of N:
+      - Flood only to those closest to the key
+      - Java 5 fixups
+    * oldconsole.jsp: Remove almost all of it, add lines for tino
+    * ProfileOrganizerRenderer:
+      - Move to routerconsole
+      - Write directly to Writer for speed
+    * Router: Add router.hideFloodfillParticipant option for testing
+    * StatisticsManager: Cleanup after release
+
 * 2009-10-12  0.7.7 released
 
 2009-10-11 zzz

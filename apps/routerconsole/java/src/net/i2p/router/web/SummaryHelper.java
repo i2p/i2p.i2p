@@ -70,7 +70,7 @@ public class SummaryHelper extends HelperBase {
         long diff = Math.abs(ms);
         if (diff < 3000)
             return "";
-        return " (" + DataHelper.formatDuration(diff) + " skew)";
+        return " (" + DataHelper.formatDuration(diff) + " " + _("skew") + ")";
     }
     
     public boolean allowReseed() {
@@ -89,42 +89,42 @@ public class SummaryHelper extends HelperBase {
     private String reachability() {
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
-            return "ERR-Client Manager I2CP Error - check logs";  // not a router problem but the user should know
+            return _("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
         if (!_context.clock().getUpdatedSuccessfully())
-            return "ERR-ClockSkew";
+            return _("ERR-ClockSkew");
         if (_context.router().isHidden())
-            return "Hidden";
+            return _("Hidden");
 
         int status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
                 RouterAddress ra = _context.router().getRouterInfo().getTargetAddress("NTCP");
                 if (ra == null || (new NTCPAddress(ra)).isPubliclyRoutable())
-                    return "OK";
-                return "ERR-Private TCP Address";
+                    return _("OK");
+                return _("ERR-Private TCP Address");
             case CommSystemFacade.STATUS_DIFFERENT:
-                return "ERR-SymmetricNAT";
+                return _("ERR-SymmetricNAT");
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 if (_context.router().getRouterInfo().getTargetAddress("NTCP") != null)
-                    return "WARN-Firewalled with Inbound TCP Enabled";
+                    return _("WARN-Firewalled with Inbound TCP Enabled");
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
-                    return "WARN-Firewalled and Floodfill";
+                    return _("WARN-Firewalled and Floodfill");
                 if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
-                    return "WARN-Firewalled and Fast";
-                return "Firewalled";
+                    return _("WARN-Firewalled and Fast");
+                return _("Firewalled");
             case CommSystemFacade.STATUS_HOSED:
-                return "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart";
+                return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 ra = _context.router().getRouterInfo().getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
-                        return "ERR-UDP Disabled and Inbound TCP host/port not set";
+                        return _("ERR-UDP Disabled and Inbound TCP host/port not set");
                     else
-                        return "WARN-Firewalled with UDP Disabled";
+                        return _("WARN-Firewalled with UDP Disabled");
                 }
-                return "Testing";
+                return _("Testing");
         }
     }
     
@@ -357,7 +357,7 @@ public class SummaryHelper extends HelperBase {
         Collections.sort(clients, new AlphaComparator());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"Add/remove/edit &amp; control your client and server tunnels (local destinations).\"  title=\"View existing tunnels and tunnel build status.\">Local destinations</a></h3><hr><table>");
+        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\"><table>");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
@@ -366,11 +366,11 @@ public class SummaryHelper extends HelperBase {
             
             buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
             if (_context.clientManager().shouldPublishLeaseSet(h))
-                buf.append("server.png\" alt=\"Server\" title=\"Server\">");
+                buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
             else
-                buf.append("client.png\" alt=\"Client\" title=\"Client\">");
+                buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
             buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
-            buf.append("\" target=\"_top\" title=\"Show tunnels\">");
+            buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
             if (name.length() < 16)
                 buf.append(name);
             else
@@ -381,33 +381,36 @@ public class SummaryHelper extends HelperBase {
                 long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                 if (timeToExpire < 0) {
                     // red or yellow light                 
-                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Rebuilding&hellip;\" title=\"Leases expired ").append(DataHelper.formatDuration(0-timeToExpire));
-                    buf.append(" ago. Rebuilding&hellip;\"></td></tr>\n");                    
+                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration(0-timeToExpire));
+                    buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
                 } else {
                     // green light 
-                    buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"Ready\"></td></tr>\n");
+                    buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_("Ready")).append("\"></td></tr>\n");
                 }
             } else {
                 // yellow light
-                buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"Building&hellip;\" title=\"Tunnel building in progress&hellip;\"></td></tr>\n");
+                buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Building")).append("&hellip;\" title=\"").append(_("Building tunnels")).append("&hellip;\"></td></tr>\n");
             }
         }
-        buf.append("</table><hr>\n");
+        buf.append("</table></div><hr>\n");
         return buf.toString();
     }
     
+    /** compare translated nicknames - put "shared clients" first in the sort */
     private class AlphaComparator implements Comparator {
         public int compare(Object lhs, Object rhs) {
             String lname = getName((Destination)lhs);
             String rname = getName((Destination)rhs);
-            if (lname.equals("shared clients"))
+            String xsc = _("shared clients");
+            if (lname.equals(xsc))
                 return -1;
-            if (rname.equals("shared clients"))
+            if (rname.equals(xsc))
                 return 1;
             return Collator.getInstance().compare(lname, rname);
         }
     }
 
+    /** translate here so collation works above */
     private String getName(Destination d) {
         TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(d.calculateHash());
         String name = (in != null ? in.getDestinationNickname() : null);
@@ -416,6 +419,10 @@ public class SummaryHelper extends HelperBase {
             name = (out != null ? out.getDestinationNickname() : null);
             if (name == null)
                 name = d.calculateHash().toBase64().substring(0,6);
+            else
+                name = _(name);
+        } else {
+            name = _(name);
         }
         return name;
     }

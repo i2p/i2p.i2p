@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -55,7 +56,7 @@ public class NetDbRenderer {
 
     public void renderRouterInfoHTML(Writer out, String routerPrefix) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h2>Network Database RouterInfo Lookup</h2>\n");
+        buf.append("<h2>" + _("Network Database RouterInfo Lookup") + "</h2>\n");
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
@@ -70,21 +71,17 @@ public class NetDbRenderer {
                 }
             }
             if (notFound)
-                buf.append("Router ").append(routerPrefix).append(" not found in network database");
+                buf.append(_("Router") + ' ').append(routerPrefix).append(' ' + _("not found in network database") );
         }
         out.write(buf.toString());
         out.flush();
     }
 
-    public void renderStatusHTML(Writer out) throws IOException {
-        renderStatusHTML(out, true);
-    }
-
     public void renderLeaseSetHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h2>Network Database Contents</h2>\n");
-        buf.append("<a href=\"netdb.jsp\">View RouterInfo</a>");
-        buf.append("<h3>LeaseSets</h3>\n");
+        buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
+        buf.append("<a href=\"netdb.jsp\">" + _("View RouterInfo") + "</a>");
+        buf.append("<h3>").append(_("LeaseSets")).append("</h3>\n");
         Set leases = new TreeSet(new LeaseSetComparator());
         leases.addAll(_context.netDb().getLeases());
         long now = _context.clock().now();
@@ -92,19 +89,19 @@ public class NetDbRenderer {
             LeaseSet ls = (LeaseSet)iter.next();
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
-            buf.append("<b>LeaseSet: ").append(key.toBase64());
+            buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64());
             if (_context.clientManager().isLocal(dest)) {
-                buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">Local</a> ");
+                buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))
-                    buf.append("Unpublished ");
-                buf.append("Destination ");
+                    buf.append(_("Unpublished") + ' ');
+                buf.append(_("Destination") + ' ');
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
             } else {
-                buf.append(" (Destination ");
+                buf.append(" (" + _("Destination") + ' ');
                 String host = _context.namingService().reverseLookup(dest);
                 if (host != null)
                     buf.append(host);
@@ -114,13 +111,13 @@ public class NetDbRenderer {
             buf.append(")</b><br>\n");
             long exp = ls.getEarliestLeaseDate()-now;
             if (exp > 0)
-                buf.append("Expires in ").append(DataHelper.formatDuration(exp)).append("<br>\n");
+                buf.append(_("Expires in {0}", DataHelper.formatDuration(exp))).append("<br>\n");
             else
-                buf.append("Expired ").append(DataHelper.formatDuration(0-exp)).append(" ago<br>\n");
+                buf.append(_("Expired {0} ago", DataHelper.formatDuration(0-exp))).append("<br>\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
-                buf.append("Lease ").append(i + 1).append(": Gateway ");
+                buf.append(_("Lease")).append(' ').append(i + 1).append(": " + _("Gateway") + ' ');
                 buf.append(_context.commSystem().renderPeerHTML(ls.getLease(i).getGateway()));
-                buf.append(" Tunnel ").append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
+                buf.append(' ' + _("Tunnel") + ' ').append(ls.getLease(i).getTunnelId().getTunnelId()).append("<br>\n");
             }
             buf.append("<hr>\n");
             out.write(buf.toString());
@@ -130,27 +127,29 @@ public class NetDbRenderer {
         out.flush();
     }
 
-    public void renderStatusHTML(Writer out, boolean full) throws IOException {
-        int size = _context.netDb().getKnownRouters() * 512;
-        if (full)
-            size *= 4;
-        StringBuilder buf = new StringBuilder(size);
-        out.write("<h2>Network Database Contents (<a href=\"netdb.jsp?l=1\">View LeaseSets</a>)</h2>\n");
+    /**
+     *  @param mode 0: our info and charts only; 1: full routerinfos and charts; 2: abbreviated routerinfos and charts
+     */
+    public void renderStatusHTML(Writer out, int mode) throws IOException {
+        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View LeaseSets") + "</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
-            buf.append("Not initialized\n");
-            out.write(buf.toString());
+            out.write(_("Not initialized"));
             out.flush();
             return;
         }
         
+        boolean full = mode == 1;
+        boolean shortStats = mode == 2;
+        boolean showStats = full || shortStats;
         Hash us = _context.routerHash();
-        out.write("<a name=\"routers\" ></a><h3>Routers (<a href=\"netdb.jsp");
-        if (full)
-            out.write("#routers\" >view without");
+        out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb.jsp");
+        if (full || !showStats)
+            out.write("?f=2#routers\" >" + _("Show all routers"));
         else
-            out.write("?f=1#routers\" >view with");
-        out.write(" stats</a>)</h3>\n");
+            out.write("?f=1#routers\" >" + _("Show all routers with full stats"));
+        out.write("</a>)</h3>\n");
         
+        StringBuilder buf = new StringBuilder(8192);
         RouterInfo ourInfo = _context.router().getRouterInfo();
         renderRouterInfo(buf, ourInfo, true, true);
         out.write(buf.toString());
@@ -158,6 +157,7 @@ public class NetDbRenderer {
         
         ObjectCounter<String> versions = new ObjectCounter();
         ObjectCounter<String> countries = new ObjectCounter();
+        int[] transportCount = new int[8];
         
         Set routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
@@ -166,24 +166,28 @@ public class NetDbRenderer {
             Hash key = ri.getIdentity().getHash();
             boolean isUs = key.equals(us);
             if (!isUs) {
-                renderRouterInfo(buf, ri, false, full);
-                out.write(buf.toString());
-                buf.setLength(0);
+                if (showStats) {
+                    renderRouterInfo(buf, ri, false, full);
+                    out.write(buf.toString());
+                    buf.setLength(0);
+                }
                 String routerVersion = ri.getOption("router.version");
                 if (routerVersion != null)
                     versions.increment(routerVersion);
                 String country = _context.commSystem().getCountry(key);
                 if(country != null)
                     countries.increment(country);
+                transportCount[classifyTransports(ri)]++;
             }
         }
             
-        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><td>");
+        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">").append(_("Network Database Router Statistics")).append("</th><tr><td>");
+        // versions table
         List<String> versionList = new ArrayList(versions.objects());
         if (versionList.size() > 0) {
-            Collections.sort(versionList, Collections.reverseOrder());
+            Collections.sort(versionList, Collections.reverseOrder(new TrustedUpdate.VersionComparator()));
             buf.append("<table>\n");
-            buf.append("<tr><th>Version</th><th>Count</th></tr>\n");
+            buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
                 buf.append("<tr><td align=\"center\">").append(DataHelper.stripHTML(routerVersion));
@@ -195,25 +199,50 @@ public class NetDbRenderer {
         out.write(buf.toString());
         buf.setLength(0);
             
+        // transports table
+        buf.append("<table>\n");
+        buf.append("<tr><th align=\"left\">" + _("Transports") + "</th><th>" + _("Count") + "</th></tr>\n");
+        for (int i = 0; i < 8; i++) {
+            int num = transportCount[i];
+            if (num > 0) {
+                buf.append("<tr><td>").append(_(TNAMES[i]));
+                buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
+            }
+        }
+        buf.append("</table>\n");
+        buf.append("</td><td>");
+        out.write(buf.toString());
+        buf.setLength(0);
+
+        // country table
         List<String> countryList = new ArrayList(countries.objects());
         if (countryList.size() > 0) {
-            Collections.sort(countryList);
+            Collections.sort(countryList, new CountryComparator());
             buf.append("<table>\n");
-            buf.append("<tr><th align=\"left\">Country</th><th>Count</th></tr>\n");
+            buf.append("<tr><th align=\"left\">" + _("Country") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
                 buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
-                buf.append(_context.commSystem().getCountryName(country));
+                buf.append(_(_context.commSystem().getCountryName(country)));
                 buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
             buf.append("</table>\n");
         }
+
         buf.append("</td></tr></table>");
         out.write(buf.toString());
         out.flush();
     }
     
+    /** sort by translated country name */
+    private class CountryComparator implements Comparator {
+         public int compare(Object l, Object r) {
+             return _(_context.commSystem().getCountryName((String)l))
+                    .compareTo(_(_context.commSystem().getCountryName((String)r)));
+        }
+    }
+
     /**
      *  Be careful to use stripHTML for any displayed routerInfo data
      *  to prevent vulnerabilities
@@ -222,32 +251,37 @@ public class NetDbRenderer {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<table><tr><th><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>Our info: ").append(hash).append("</b></th></tr><tr><td>\n");
+            buf.append("<a name=\"our-info\" ></a><b>" + _("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
         } else {
-            buf.append("<b>Peer info for:</b> ").append(hash).append("\n");
+            buf.append("<b>" + _("Peer info for") + ":</b> ").append(hash).append("\n");
             if (full) {
                 buf.append("[<a href=\"netdb.jsp\" >Back</a>]</th></tr><td>\n");
             } else {
-                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >Full entry</a>]</th></tr><td>\n");
+                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><td>\n");
             }
         }
         
         long age = _context.clock().now() - info.getPublished();
-        if (isUs && _context.router().isHidden())
-            buf.append("<b>Hidden, Updated:</b> ").append(DataHelper.formatDuration(age)).append(" ago<br>\n");
-        else if (age > 0)
-            buf.append("<b>Published:</b> ").append(DataHelper.formatDuration(age)).append(" ago<br>\n");
-        else
-            buf.append("<b>Published:</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
-        buf.append("<b>Address(es):</b> ");
+        if (isUs && _context.router().isHidden()) {
+            buf.append("<b>").append(_("Hidden")).append(", ").append(_("Updated")).append(":</b> ")
+               .append(_("{0} ago", DataHelper.formatDuration(age))).append("<br>\n");
+        } else if (age > 0) {
+            buf.append("<b>").append(_("Published")).append(":</b> ")
+               .append(_("{0} ago", DataHelper.formatDuration(age))).append("<br>\n");
+        } else {
+            // shouldnt happen
+            buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
+        }
+        buf.append("<b>" + _("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
-            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append('\"');
+            buf.append(" title=\"").append(_(_context.commSystem().getCountryName(country))).append('\"');
             buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
-            buf.append(DataHelper.stripHTML(addr.getTransportStyle())).append(": ");
+            buf.append("<b>").append(DataHelper.stripHTML(addr.getTransportStyle())).append(":</b> ");
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);
@@ -256,7 +290,7 @@ public class NetDbRenderer {
         }
         buf.append("</td></tr>\n");
         if (full) {
-            buf.append("<tr><td>Stats: <br><code>\n");
+            buf.append("<tr><td>" + _("Stats") + ": <br><code>\n");
             for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 String val = info.getOption(key);
@@ -268,8 +302,55 @@ public class NetDbRenderer {
         buf.append("</td></tr>\n");
     }
 
+    private static final int SSU = 1;
+    private static final int SSUI = 2;
+    private static final int NTCP = 4;
+    private static final String[] TNAMES = { _x("Hidden or starting up"), _x("SSU"), _x("SSU with introducers"), "",
+                                  _x("NTCP"), _x("NTCP and SSU"), _x("NTCP and SSU with introducers"), "" };
+    /**
+     *  what transport types
+     */
+    private int classifyTransports(RouterInfo info) {
+        int rv = 0;
+        String hash = info.getIdentity().getHash().toBase64();
+        for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
+            RouterAddress addr = (RouterAddress)iter.next();
+            String style = addr.getTransportStyle();
+            if (style.equals("NTCP")) {
+                rv |= NTCP;
+            } else if (style.equals("SSU")) {
+                if (addr.getOptions().getProperty("iport0") != null)
+                    rv |= SSUI;
+                else
+                    rv |= SSU;
+            }
+        }
+        return rv;
+    }
+
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /** tag only */
+    private static final String _x(String s) {
+        return s;
+    }
+
+    /**
+     *  translate a string with a parameter
+     *  This is a lot more expensive than _(s), so use sparingly.
+     *
+     *  @param s string to be translated containing {0}
+     *    The {0} will be replaced by the parameter.
+     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *  @param o parameter, not translated.
+     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    Do not double the single quotes in the parameter.
+     *    Use autoboxing to call with ints, longs, floats, etc.
+     */
+    private String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 }

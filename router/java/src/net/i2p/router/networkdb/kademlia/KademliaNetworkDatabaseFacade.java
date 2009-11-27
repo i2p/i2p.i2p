@@ -127,7 +127,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
-    private final static long PUBLISH_JOB_DELAY = 5*60*1000l;
+    /** this needs to be long enough to give us time to start up,
+        but less than 20m (when we start accepting tunnels and could be a IBGW) */
+    protected final static long PUBLISH_JOB_DELAY = 5*60*1000l;
 
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -283,15 +285,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // periodically update and resign the router's 'published date', which basically
         // serves as a version
         Job plrij = new PublishLocalRouterInfoJob(_context);
-        plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
+        // do not delay this, as this creates the RI too, and we need a good local routerinfo right away
+        //plrij.getTiming().setStartAfter(_context.clock().now() + PUBLISH_JOB_DELAY);
         _context.jobQueue().addJob(plrij);
-        try {
-            publish(ri);
-        } catch (IllegalArgumentException iae) {
-            _context.router().rebuildRouterInfo(true);
-            //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
-            //_context.router().rebuildNewIdentity();
-        }
+
+        // plrij calls publish() for us
+        //try {
+        //    publish(ri);
+        //} catch (IllegalArgumentException iae) {
+        //    _context.router().rebuildRouterInfo(true);
+        //    //_log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
+        //    //_context.router().rebuildNewIdentity();
+        //}
     }
     
     protected void createHandlers() {
@@ -508,7 +513,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         // Don't spam the floodfills. In addition, always delay a few seconds since there may
         // be another leaseset change coming along momentarily.
-        long nextTime = Math.max(j.lastPublished() + j.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
+        long nextTime = Math.max(j.lastPublished() + RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
         j.getTiming().setStartAfter(nextTime);
         _context.jobQueue().addJob(j);
     }
@@ -520,6 +525,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     /**
+     * Stores to local db only.
+     * Overridden in FNDF to actually send to the floodfills.
      * @throws IllegalArgumentException if the local router info is invalid
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
@@ -652,7 +659,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
         boolean upLongEnough = _context.router().getUptime() > 60*60*1000;
-        // Once we're over 150 routers, reduce the expiration time down from the default,
+        // Once we're over 120 routers, reduce the expiration time down from the default,
         // as a crude way of limiting memory usage.
         // i.e. at 300 routers the expiration time will be about half the default, etc.
         // And if we're floodfill, we can keep the expiration really short, since
@@ -666,7 +673,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // _kb.size() includes leasesets but that's ok
             adjustedExpiration = Math.min(ROUTER_INFO_EXPIRATION,
                                           ROUTER_INFO_EXPIRATION_MIN +
-                                          ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * 150 / (_kb.size() + 1)));
+                                          ((ROUTER_INFO_EXPIRATION - ROUTER_INFO_EXPIRATION_MIN) * 120 / (_kb.size() + 1)));
 
         if (!key.equals(routerInfo.getIdentity().getHash())) {
             if (_log.shouldLog(Log.WARN))
@@ -820,6 +827,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * will fire the appropriate jobs on success or timeout (or if the kademlia search completes
      * without any match)
      *
+     * Unused - called only by FNDF.searchFull() from FloodSearchJob which is overridden - don't use this.
      */
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         if (!_initialized) return null;
@@ -878,19 +886,28 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** smallest allowed period */
-    private static final int MIN_PER_PEER_TIMEOUT = 5*1000;
-    private static final int MAX_PER_PEER_TIMEOUT = 10*1000;
-    
+    private static final int MIN_PER_PEER_TIMEOUT = 2*1000;
+    /**
+     *  We want FNDF.PUBLISH_TIMEOUT and RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT
+     *  to be greater than MAX_PER_PEER_TIMEOUT * TIMEOUT_MULTIPLIER by a factor of at least
+     *  3 or 4, to allow at least that many peers to be attempted for a store.
+     */
+    private static final int MAX_PER_PEER_TIMEOUT = 7*1000;
+    private static final int TIMEOUT_MULTIPLIER = 3;
+
+    /** todo: does this need more tuning? */
     public int getPeerTimeout(Hash peer) {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         double responseTime = MAX_PER_PEER_TIMEOUT;
-        if (prof != null)
-            responseTime = prof.getDbResponseTime().getLifetimeAverageValue();
-        if (responseTime < MIN_PER_PEER_TIMEOUT)
-            responseTime = MIN_PER_PEER_TIMEOUT;
-        else if (responseTime > MAX_PER_PEER_TIMEOUT)
-            responseTime = MAX_PER_PEER_TIMEOUT;
-        return 4 * (int)responseTime;  // give it up to 4x the average response time
+        if (prof != null && prof.getIsExpandedDB()) {
+            responseTime = prof.getDbResponseTime().getRate(24*60*60*1000l).getAverageValue();
+            // if 0 then there is no data, set to max.
+            if (responseTime <= 0 || responseTime > MAX_PER_PEER_TIMEOUT)
+                responseTime = MAX_PER_PEER_TIMEOUT;
+            else if (responseTime < MIN_PER_PEER_TIMEOUT)
+                responseTime = MIN_PER_PEER_TIMEOUT;
+        }
+        return TIMEOUT_MULTIPLIER * (int)responseTime;  // give it up to 3x the average response time
     }
 
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {

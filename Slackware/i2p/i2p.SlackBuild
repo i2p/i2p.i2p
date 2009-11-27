@@ -1,27 +1,34 @@
 #!/bin/sh
-# Heavily based on the Slackware 12.1 SlackBuild
-# Slackware build script for i2p
-
+#
+# Heavily based on the Slackware 12.2 SlackBuild
+# Slackware build script for I2P
+#
 # PLEASE READ THIS:
-# Probably you will never have to update i2p packages with upgradepkg,
-# just because i2p have an auto-update function.
-# How to start i2p:
-# After installpkg command, doinst.sh will execute a postinstallation script
-# needed by i2p. After that you have to chmod +x /etc/rc.d/rc.i2p and start
-# i2p service with /etc/rc.d/rc.i2p start.
-# Now tell your browser to user this proxy: localhost on port 4444 and open
-# this page: http://localhost:7657/index.jsp
-# Here you can configure i2p, watch network status and navigate anonimously.
-# It's suggested to subscribe to various dns host, like i2host.i2p
-# For any additional information, visit i2host.i2p and forum.i2p
+# Probably you will never have to update I2P packages with upgradepkg,
+# just because I2P has an auto-update function.
+# Really you should not ever use any "upgrade" method.
+#
+# The correct way to upgrade is to: 
+# 1: install the upgrade
+# 2: remove the old package
+#
+# It is a terrible shame that upgradepkg doesn't do this, infact, 
+# it would actually be the correct way for *any* package!
+#
+#
 
 BUILD=1sponge
-
-# put here installation dir, without first and last /
-# eg: usr/local
 INSTALL_DIR=opt
 NAME=i2p
 ARCH=noarch
+
+# Less than slackware 13?
+SLKPLT=$(cat /etc/slackware-version | sed -re "s/(Slackware )([0-9]*)(.*)/\2/")
+if [ $SLKPLT -lt 13 ] ; then
+	EXT=tgz
+else
+	EXT=txz
+fi
 
 
 #
@@ -117,7 +124,7 @@ cd $PKG
 # requiredbuilder fucks up REALLY bad, and thinks java is perl?!
 # It also did not catch the shell requirements! BOOOOOOOOOOO! HISSSSSSSS!
 #
-#requiredbuilder -v -y -s $CWD $PKG
+# requiredbuilder -v -y -s $CWD $PKG
 #
 cat $CWD/slack-required > $PKG/install/slack-required
-makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.tgz
+makepkg -l y -c n $CWD/${NAME}-$VERSION-$ARCH-$BUILD.$EXT

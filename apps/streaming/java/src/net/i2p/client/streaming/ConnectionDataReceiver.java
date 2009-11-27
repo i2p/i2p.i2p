@@ -166,11 +166,13 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         packet.setReceiveStreamId(con.getReceiveStreamId());
         
         con.getInputStream().updateAcks(packet);
+        // note that the optional delay is usually rewritten in Connection.sendPacket()
         int choke = con.getOptions().getChoke();
         packet.setOptionalDelay(choke);
         if (choke > 0)
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
-        packet.setResendDelay(con.getOptions().getResendDelay());
+        // bugfix release 0.7.8, we weren't dividing by 1000
+        packet.setResendDelay(con.getOptions().getResendDelay() / 1000);
         
         if (con.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, true);
@@ -196,12 +198,9 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             ( (size > 0) || (con.getUnackedPacketsSent() <= 0) || (packet.getSequenceNum() > 0) ) ) {
             packet.setFlag(Packet.FLAG_CLOSE);
             con.setCloseSentOn(_context.clock().now());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Closed is set for a new packet on " + con + ": " + packet);
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Closed is not set for a new packet on " + _connection + ": " + packet);
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("New outbound packet on " + _connection + ": " + packet);
         return packet;
     }
 

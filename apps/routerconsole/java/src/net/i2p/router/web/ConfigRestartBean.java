@@ -1,7 +1,5 @@
 package net.i2p.router.web;
 
-import java.util.StringTokenizer;
-
 import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -11,6 +9,12 @@ import net.i2p.router.RouterContext;
  *
  */
 public class ConfigRestartBean {
+    /** all these are tagged below so no need to _x them here */
+    static final String[] SET1 = {"shutdownImmediate", "Shutdown immediately", "cancelShutdown", "Cancel shutdown"};
+    static final String[] SET2 = {"restartImmediate", "Restart immediately", "cancelShutdown", "Cancel restart"};
+    static final String[] SET3 = {"restart", "Restart", "shutdown", "Shutdown"};
+    static final String[] SET4 = {"shutdown", "Shutdown"};
+
     public static String getNonce() { 
         RouterContext ctx = ContextHelper.getContext(null);
         String nonce = System.getProperty("console.nonce");
@@ -25,20 +29,21 @@ public class ConfigRestartBean {
         String systemNonce = getNonce();
         if ( (nonce != null) && (systemNonce.equals(nonce)) && (action != null) ) {
             // Normal browsers send value, IE sends button label
-            if ("shutdownImmediate".equals(action) || "Shutdown immediately".equals(action)) {
+            if ("shutdownImmediate".equals(action) || _("Shutdown immediately", ctx).equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
                 //ctx.router().shutdown(Router.EXIT_HARD); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD); // give the UI time to respond
-            } else if ("cancelShutdown".equals(action) || "Cancel shutdown".equals(action)) {
+            } else if ("cancelShutdown".equals(action) || _("Cancel shutdown", ctx).equals(action) ||
+                       _("Cancel restart", ctx).equals(action)) {
                 ctx.router().cancelGracefulShutdown();
-            } else if ("restartImmediate".equals(action) || "Restart immediately".equals(action)) {
+            } else if ("restartImmediate".equals(action) || _("Restart immediately", ctx).equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
                 //ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART); // give the UI time to respond
-            } else if ("restart".equalsIgnoreCase(action)) {
+            } else if ("restart".equals(action) || _("Restart", ctx).equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
                 ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            } else if ("shutdown".equalsIgnoreCase(action)) {
+            } else if ("shutdown".equals(action) || _("Shutdown", ctx).equals(action)) {
                 ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
                 ctx.router().shutdownGracefully();
             }
@@ -47,38 +52,35 @@ public class ConfigRestartBean {
         boolean shuttingDown = isShuttingDown(ctx);
         boolean restarting = isRestarting(ctx);
         long timeRemaining = ctx.router().getShutdownTimeRemaining();
-        if (shuttingDown) {
-            if (timeRemaining <= 0) {
-                return "<center><b>Shutdown imminent</b></center>";
-            } else {
-                return "<center><b>Shutdown in " + DataHelper.formatDuration(timeRemaining) + "</b></center><br>"
-                     + buttons(urlBase, systemNonce, "shutdownImmediate,Shutdown immediately,cancelShutdown,Cancel shutdown");
-            }
+        StringBuilder buf = new StringBuilder(128);
+        if ((shuttingDown || restarting) && timeRemaining <= 0) {
+            buf.append("<center><b>").append(_("Shutdown imminent", ctx)).append("</b></center>");
+        } else if (shuttingDown) {
+            buf.append("<center><b>");
+            buf.append(_("Shutdown in {0}", DataHelper.formatDuration(timeRemaining), ctx));
+            buf.append("</b></center><br>");
+            buttons(ctx, buf, urlBase, systemNonce, SET1);
         } else if (restarting) {
-            if (timeRemaining <= 0) {
-                return "<center><b>Restart imminent</b></center>";
-            } else {
-                return "<center><b>Restart in " + DataHelper.formatDuration(timeRemaining) + "</b></center><br>"
-                     + buttons(urlBase, systemNonce, "restartImmediate,Restart immediately,cancelShutdown,Cancel restart");
-            }
+            buf.append("<center><b>");
+            buf.append(_("Restart in {0}", DataHelper.formatDuration(timeRemaining), ctx));
+            buf.append("</b></center><br>");
+            buttons(ctx, buf, urlBase, systemNonce, SET2);
         } else {
             if (System.getProperty("wrapper.version") != null)
-                return buttons(urlBase, systemNonce, "restart,Restart,shutdown,Shutdown");
+                buttons(ctx, buf, urlBase, systemNonce, SET3);
             else
-                return buttons(urlBase, systemNonce, "shutdown,Shutdown");
+                buttons(ctx, buf, urlBase, systemNonce, SET4);
         }
+        return buf.toString();
     }
     
     /** @param s value,label,... pairs */
-    private static String buttons(String url, String nonce, String s) {
-        StringBuilder buf = new StringBuilder(128);
-        StringTokenizer tok = new StringTokenizer(s, ",");
+    private static void buttons(RouterContext ctx, StringBuilder buf, String url, String nonce, String[] s) {
         buf.append("<form action=\"").append(url).append("\" method=\"GET\">\n");
         buf.append("<input type=\"hidden\" name=\"consoleNonce\" value=\"").append(nonce).append("\" >\n");
-        while (tok.hasMoreTokens())
-            buf.append("<button type=\"submit\" name=\"action\" value=\"").append(tok.nextToken()).append("\" >").append(tok.nextToken()).append("</button>\n");
+        for (int i = 0; i < s.length; i+= 2)
+            buf.append("<button type=\"submit\" name=\"action\" value=\"").append(s[i]).append("\" >").append(_(s[i+1], ctx)).append("</button>\n");
         buf.append("</form>\n");
-        return buf.toString();
     }
 
     private static boolean isShuttingDown(RouterContext ctx) {
@@ -96,4 +98,13 @@ public class ConfigRestartBean {
             return ctx.router().getShutdownTimeRemaining();
         return Long.MAX_VALUE/2;  // summaryframe.jsp adds a safety factor so we don't want to overflow...
     }
+
+    private static String _(String s, RouterContext ctx) {
+        return Messages.getString(s, ctx);
+    }
+
+    private static String _(String s, Object o, RouterContext ctx) {
+        return Messages.getString(s, o, ctx);
+    }
 }
+

@@ -10,7 +10,6 @@ package net.i2p.data;
  */
 
 import net.i2p.I2PException;
-import net.i2p.util.Log;
 
 /**
  * Thrown when the data was not available to read or write a DataStructure
@@ -18,7 +17,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DataFormatException extends I2PException {
-    private final static Log _log = new Log(DataFormatException.class);
 
     public DataFormatException(String msg, Throwable t) {
         super(msg, t);

@@ -694,15 +694,15 @@ public class JobQueue {
             JobStats stats = (JobStats)iter.next();
             buf.append("<tr>");
             buf.append("<td><b>").append(stats.getName()).append("</b></td>");
-            buf.append("<td>").append(stats.getRuns()).append("</td>");
-            buf.append("<td>").append(stats.getTotalTime()).append("</td>");
-            buf.append("<td>").append(stats.getAvgTime()).append("</td>");
-            buf.append("<td>").append(stats.getMaxTime()).append("</td>");
-            buf.append("<td>").append(stats.getMinTime()).append("</td>");
-            buf.append("<td>").append(stats.getTotalPendingTime()).append("</td>");
-            buf.append("<td>").append(stats.getAvgPendingTime()).append("</td>");
-            buf.append("<td>").append(stats.getMaxPendingTime()).append("</td>");
-            buf.append("<td>").append(stats.getMinPendingTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getRuns()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getTotalTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getAvgTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getMaxTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getMinTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getTotalPendingTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getAvgPendingTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getMaxPendingTime()).append("</td>");
+            buf.append("<td align=\"right\">").append(stats.getMinPendingTime()).append("</td>");
             buf.append("</tr>\n");
             totRuns += stats.getRuns();
             totExecTime += stats.getTotalTime();
@@ -726,15 +726,15 @@ public class JobQueue {
 
         buf.append("<tr class=\"tablefooter\">");
         buf.append("<td><b>").append("SUMMARY").append("</b></td>");
-        buf.append("<td>").append(totRuns).append("</td>");
-        buf.append("<td>").append(totExecTime).append("</td>");
-        buf.append("<td>").append(avgExecTime).append("</td>");
-        buf.append("<td>").append(maxExecTime).append("</td>");
-        buf.append("<td>").append(minExecTime).append("</td>");
-        buf.append("<td>").append(totPendingTime).append("</td>");
-        buf.append("<td>").append(avgPendingTime).append("</td>");
-        buf.append("<td>").append(maxPendingTime).append("</td>");
-        buf.append("<td>").append(minPendingTime).append("</td>");
+        buf.append("<td align=\"right\">").append(totRuns).append("</td>");
+        buf.append("<td align=\"right\">").append(totExecTime).append("</td>");
+        buf.append("<td align=\"right\">").append(avgExecTime).append("</td>");
+        buf.append("<td align=\"right\">").append(maxExecTime).append("</td>");
+        buf.append("<td align=\"right\">").append(minExecTime).append("</td>");
+        buf.append("<td align=\"right\">").append(totPendingTime).append("</td>");
+        buf.append("<td align=\"right\">").append(avgPendingTime).append("</td>");
+        buf.append("<td align=\"right\">").append(maxPendingTime).append("</td>");
+        buf.append("<td align=\"right\">").append(minPendingTime).append("</td>");
         buf.append("</tr></table></div>\n");
     }
 }

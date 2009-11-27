@@ -8,7 +8,7 @@
  */
 %>
 <html><head>
-<%@include file="css.jsp" %>
+<%@include file="css.jsi" %>
 <title>Summary Bar</title>
 <%
     // try hard to avoid an error page in the iframe after shutdown
@@ -25,7 +25,7 @@
         } else {
             System.setProperty("routerconsole.summaryRefresh", d);
         }
-        // we probably don't get here if d == "0" since caught in summary.jsp, but just
+        // we probably don't get here if d == "0" since caught in summary.jsi, but just
         // to be sure...
         if (!"0".equals(d)) {
             // doesn't work for restart or shutdown with no expl. tunnels,
@@ -49,20 +49,26 @@
     }
 %>
 </head><body style="margin: 0;"><div class="routersummary">
-<%@include file="summarynoframe.jsp" %>
+<%@include file="summarynoframe.jsi" %>
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
-        out.print("<hr><form action=\"summaryframe.jsp\" method=\"GET\">\n");
+        out.print("<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"GET\">\n");
         if ("0".equals(d)) {
-            out.print("<b>Refresh (s):<b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" align=\"right\" />\n");
-            out.print("<button type=\"submit\">Enable</button>\n");
+            out.print("<b>");
+            out.print(intl._("Refresh (s)"));
+            out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
+            out.print("<button type=\"submit\" value=\"Enable\" >");
+            out.print(intl._("Enable"));
+            out.print("</button></div>\n");
         } else {
             // this will load in the iframe but subsequent pages will not have the iframe
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" />\n");
-            out.print("<button type=\"submit\">Disable " + d + "s Refresh</button>\n");
+            out.print("<button type=\"submit\" value=\"Disable\" >");
+            out.print(intl._("Disable {0}s Refresh", d));
+            out.print("</button></div>\n");
         }
-        out.print("</form><hr>\n");
+        out.print("</form>\n");
     }
 %>
 </div></body></html>
