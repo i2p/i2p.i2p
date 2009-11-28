@@ -16,6 +16,9 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
+/**
+ *  @deprecated unused
+ */
 public class FilesystemAddressDB extends AddressDB {
 
     public final static String PROP_ADDRESS_DIR = "i2p.addressdir";

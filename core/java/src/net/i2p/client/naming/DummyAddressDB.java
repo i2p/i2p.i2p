@@ -5,6 +5,9 @@ import java.util.Collection;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Address;
 
+/**
+ *  @deprecated unused
+ */
 public class DummyAddressDB extends AddressDB {
 
     public DummyAddressDB(I2PAppContext context) {

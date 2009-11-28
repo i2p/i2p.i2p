@@ -27,9 +27,4 @@ class DummyNamingService extends NamingService {
     public Destination lookup(String hostname) {
         return lookupBase64(hostname);
     }
-    
-    @Override
-    public String reverseLookup(Destination dest) {
-        return null;
-    }
 }

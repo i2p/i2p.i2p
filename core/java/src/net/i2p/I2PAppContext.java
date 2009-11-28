@@ -432,12 +432,14 @@ public class I2PAppContext {
         }
     }
     
+    /** @deprecated unused */
     public PetNameDB petnameDb() {
         if (!_petnameDbInitialized)
             initializePetnameDb();
         return _petnameDb;
     }
 
+    /** @deprecated unused */
     private void initializePetnameDb() {
         synchronized (this) {
             if (_petnameDb == null) {

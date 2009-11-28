@@ -7,7 +7,7 @@ import java.util.StringTokenizer;
 import net.i2p.data.DataHelper;
 
 /**
- *
+ *  deprecated unused but can be instantiated through I2PAppContext
  */
 public class PetName {
     private String _name;

@@ -7,6 +7,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Address;
 import net.i2p.util.Log;
 
+/**
+ *  @deprecated unused
+ */
 public abstract class AddressDB {
     
     private final static Log _log = new Log(NamingService.class);
