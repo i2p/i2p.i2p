@@ -128,7 +128,19 @@ public class SubscriptionsBean
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
 				if( action.compareToIgnoreCase( "save") == 0 ) {
 					save();
-					message = "Subscriptions saved.";
+					String nonce = System.getProperty("addressbook.nonce");
+					if (nonce != null) {	
+						// Yes this is a hack.
+						// No it doesn't work on a text-mode browser.
+						// Fetching from the addressbook servlet
+						// with the correct parameters will kick off a
+						// config reload and fetch.
+						message = "Subscriptions saved, updating addressbook from subscription sources now." +
+						          "<img height=\"1\" width=\"1\" alt=\"\" " +
+						          "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
+					} else {
+						message = "Subscriptions saved.";
+					}
 				}
 				else if( action.compareToIgnoreCase( "reload") == 0 ) {
 					reload();
