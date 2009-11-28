@@ -1,3 +1,7 @@
+2009-11-28 sponge
+    * Improvement to BOB's TCPio to hopefully lower load average. It seems
+      to be helping a little when stress-tested with Robert.
+
 2009-11-24 zzz
     * DataStructures: Remove unused Logs
     * OrderedProperties: Simplify, use in i2psnark
