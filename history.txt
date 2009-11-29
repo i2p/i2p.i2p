@@ -1,3 +1,7 @@
+2009-11-29 sponge
+    * net.i2p.router.transport.udp deadwood code cleanup.
+    * documented rare NPE in InboundEstablishState.java.
+
 2009-11-28 sponge
     * Improvement to BOB's TCPio to hopefully lower load average. It seems
       to be helping a little when stress-tested with Robert.

@@ -28,7 +28,7 @@ public class UDPReceiver {
     private boolean _keepRunning;
     private Runner _runner;
     private UDPTransport _transport;
-    private static int __id;
+    // private static int __id;
     private int _id;
     
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {

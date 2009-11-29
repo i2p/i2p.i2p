@@ -4,7 +4,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 

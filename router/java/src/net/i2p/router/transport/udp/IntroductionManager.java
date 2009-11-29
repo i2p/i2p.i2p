@@ -157,8 +157,7 @@ public class IntroductionManager {
         return found;
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
+    void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
         if (_log.shouldLog(Log.INFO))
@@ -167,8 +166,7 @@ public class IntroductionManager {
         _transport.send(_builder.buildHolePunch(reader));
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
+    void receiveRelayRequest(RemoteHostId alice, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;
         long tag = reader.getRelayRequestReader().readTag();

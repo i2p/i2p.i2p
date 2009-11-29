@@ -32,7 +32,7 @@ public class OutboundMessageState {
     private long _nextSendTime;
     private int _pushCount;
     private short _maxSends;
-    private int _nextSendFragment;
+    // private int _nextSendFragment;
     
     public static final int MAX_MSG_SIZE = 32 * 1024;
     /** is this enough for a high-bandwidth router? */
@@ -45,7 +45,7 @@ public class OutboundMessageState {
         _log = _context.logManager().getLog(OutboundMessageState.class);
         _pushCount = 0;
         _maxSends = 0;
-        _nextSendFragment = 0;
+        // _nextSendFragment = 0;
     }
     
     public boolean initialize(OutNetMessage msg) {

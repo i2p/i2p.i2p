@@ -3,7 +3,6 @@ package net.i2p.router.transport.udp;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -545,8 +544,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
      */
-    /* FIXME Exporting non-public type through public API FIXME */
-    public PeerState getPeerState(RemoteHostId hostInfo) {
+    PeerState getPeerState(RemoteHostId hostInfo) {
         synchronized (_peersByRemoteHost) {
             return (PeerState)_peersByRemoteHost.get(hostInfo);
         }
@@ -783,8 +781,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
+    boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
     
     void dropPeer(Hash peer, boolean shouldShitlist, String why) {
         PeerState state = getPeerState(peer);
@@ -2235,8 +2232,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testEvent.runTest();
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public PeerState pickTestPeer(RemoteHostId dontInclude) {
+    PeerState pickTestPeer(RemoteHostId dontInclude) {
         List peers = null;
         synchronized (_peersByIdent) {
             peers = new ArrayList(_peersByIdent.values());
