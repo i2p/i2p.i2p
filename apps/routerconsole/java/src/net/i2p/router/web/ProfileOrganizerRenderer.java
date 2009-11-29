@@ -46,13 +46,13 @@ class ProfileOrganizerRenderer {
             Hash peer = (Hash)iter.next();
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
-            if (_organizer.isWellIntegrated(peer)) {
-                integratedPeers.add(prof);
-            } else {
+            //if (_organizer.isWellIntegrated(peer)) {
+            //    integratedPeers.add(prof);
+            //} else {
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null && info.getCapabilities().indexOf("f") >= 0)
                     integratedPeers.add(prof);
-            }
+            //}
             if (prof.getLastSendSuccessful() <= hideBefore) {
                 older++;
                 continue;
