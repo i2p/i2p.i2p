@@ -21,6 +21,8 @@
 
 package net.i2p.addressbook;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Random;
 
 import javax.servlet.ServletConfig;
@@ -39,8 +41,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 public class Servlet extends HttpServlet {
-    private Thread _thread;
-    private String _nonce;
+    private Thread thread;
+    private String nonce;
     private static final String PROP_NONCE = "addressbook.nonce";
 
     /**
@@ -50,14 +52,17 @@ public class Servlet extends HttpServlet {
      * (non-Javadoc)
      * see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
      */
-    public void service(HttpServletRequest request, HttpServletResponse response) {
+    public void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //System.err.println("Got request nonce = " + request.getParameter("nonce"));
-        if (_thread != null && request.getParameter("wakeup") != null &&
-            _nonce != null && _nonce.equals(request.getParameter("nonce"))) {
+        if (this.thread != null && request.getParameter("wakeup") != null &&
+            this.nonce != null && this.nonce.equals(request.getParameter("nonce"))) {
             //System.err.println("Sending interrupt");
-            _thread.interrupt();
+            this.thread.interrupt();
+            // no output
+        } else {
+            PrintWriter out = response.getWriter();
+            out.write("I2P addressbook OK");
         }
-        // no output
     }
 
     /* (non-Javadoc)
@@ -70,15 +75,15 @@ public class Servlet extends HttpServlet {
         } catch (ServletException exp) {
             System.err.println("Addressbook init exception: " + exp);
         }
-        _nonce = "" + Math.abs((new Random()).nextLong());
+        this.nonce = "" + Math.abs((new Random()).nextLong());
         // put the nonce where susidns can get it
-        System.setProperty(PROP_NONCE, _nonce);
+        System.setProperty(PROP_NONCE, this.nonce);
         String[] args = new String[1];
         args[0] = config.getInitParameter("home");
-        _thread = new DaemonThread(args);
-        _thread.setDaemon(true);
-        _thread.setName("Addressbook");
-        _thread.start();
+        this.thread = new DaemonThread(args);
+        this.thread.setDaemon(true);
+        this.thread.setName("Addressbook");
+        this.thread.start();
         System.out.println("INFO: Starting Addressbook " + Daemon.VERSION);
         //System.out.println("INFO: config root under " + args[0]);
     }

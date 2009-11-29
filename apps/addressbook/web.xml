@@ -16,7 +16,7 @@
 
     <servlet-mapping> 
       <servlet-name>addressbook</servlet-name>
-      <url-pattern>/</url-pattern>
+      <url-pattern>*</url-pattern>
     </servlet-mapping>
 
 </web-app>
