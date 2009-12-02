@@ -496,9 +496,14 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(statusString + "</td>\n\t");
         out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
-        if (remaining == 0)
+        if (remaining == 0) {
             out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
-                      + "\" title=\"View file\">");
+                      + "\" title=\"");
+            if (snark.meta.getFiles() != null)
+                out.write("View files\">");
+            else
+                out.write("Open file\">");
+        }
         out.write(filename);
         if (remaining == 0)
             out.write("</a>");
