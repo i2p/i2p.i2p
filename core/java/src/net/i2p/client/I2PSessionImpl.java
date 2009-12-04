@@ -39,6 +39,7 @@ import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.util.I2PThread;
+import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -268,12 +269,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             
         long startConnect = _context.clock().now();
         try {
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "connect begin to " + _hostname + ":" + _portNum);
-            _socket = new Socket(_hostname, _portNum);
+            // If we are in the router JVM, connect using the interal pseudo-socket
+            _socket = InternalSocket.getSocket(_hostname, _portNum);
             // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
             _out = _socket.getOutputStream();
             synchronized (_out) {
                 _out.write(I2PClient.PROTOCOL_BYTE);
+                _out.flush();
             }
             InputStream in = _socket.getInputStream();
             _reader = new I2CPMessageReader(in, this);

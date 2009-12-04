@@ -24,14 +24,14 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class ClientListenerRunner implements Runnable {
-    private Log _log;
-    private RouterContext _context;
-    private ClientManager _manager;
-    private ServerSocket _socket;
-    private int _port;
+    protected Log _log;
+    protected RouterContext _context;
+    protected ClientManager _manager;
+    protected ServerSocket _socket;
+    protected int _port;
     private boolean _bindAllInterfaces;
-    private boolean _running;
-    private boolean _listening;
+    protected boolean _running;
+    protected boolean _listening;
     
     public static final String BIND_ALL_INTERFACES = "i2cp.tcp.bindAllInterfaces";
 
@@ -91,7 +91,9 @@ public class ClientListenerRunner implements Runnable {
                         } else {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Refused connection from " + socket.getInetAddress());
-                            socket.close();
+                            try {
+                                socket.close();
+                            } catch (IOException ioe) {}
                         }
                     } catch (IOException ioe) {
                         if (_context.router().isAlive()) 
@@ -132,7 +134,7 @@ public class ClientListenerRunner implements Runnable {
     /** give the i2cp client 5 seconds to show that they're really i2cp clients */
     private final static int CONNECT_TIMEOUT = 5*1000;
     
-    private boolean validate(Socket socket) {
+    protected boolean validate(Socket socket) {
         try {
             socket.setSoTimeout(CONNECT_TIMEOUT);
             int read = socket.getInputStream().read();
@@ -150,7 +152,7 @@ public class ClientListenerRunner implements Runnable {
      * Handle the connection by passing it off to a {@link ClientConnectionRunner ClientConnectionRunner}
      *
      */
-    protected void runConnection(Socket socket) throws IOException {
+    protected void runConnection(Socket socket) {
         ClientConnectionRunner runner = new ClientConnectionRunner(_context, _manager, socket);
         _manager.registerConnection(runner);
     }

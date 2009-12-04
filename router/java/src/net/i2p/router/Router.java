@@ -200,6 +200,9 @@ public class Router {
         // overwrite an existing running router's jar files. Other than ours.
         installUpdates();
 
+        // Apps may use this as an easy way to determine if they are in the router JVM
+        System.setProperty("router.version", RouterVersion.VERSION);
+
         // NOW we start all the activity
         _context.initAll();
 
