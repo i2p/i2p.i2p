@@ -1,3 +1,8 @@
+2009-12-04 zzz
+    * Console: Close up some possible XSS (thanks Pragmatk)
+    * i2psnark: Config cleanup, more HTML transitional fixes
+    * readme*.html: Point to translated pages on www.i2p2.i2p
+
 2009-11-29 zzz
     * config.jsp: Comment out unused stuff better
     * profiles.jsp: Hide non-ff from ff table
