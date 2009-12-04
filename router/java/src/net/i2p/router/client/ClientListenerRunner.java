@@ -9,6 +9,7 @@ package net.i2p.router.client;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -133,20 +134,24 @@ public class ClientListenerRunner implements Runnable {
     
     /** give the i2cp client 5 seconds to show that they're really i2cp clients */
     private final static int CONNECT_TIMEOUT = 5*1000;
-    
+
+    /**
+     *  Verify the first byte.
+     *  The InternalSocket doesn't support SoTimeout, so use available()
+     *  instead to prevent hanging.
+     */
     protected boolean validate(Socket socket) {
         try {
-            socket.setSoTimeout(CONNECT_TIMEOUT);
-            int read = socket.getInputStream().read();
-            if (read != I2PClient.PROTOCOL_BYTE)
-                return false;
-            socket.setSoTimeout(0);
-            return true;
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Peer did not authenticate themselves as I2CP quickly enough, dropping");
-            return false;
-        }
+            InputStream is = socket.getInputStream();
+            for (int i = 0; i < 20; i++) {
+                if (is.available() > 0)
+                    return is.read() == I2PClient.PROTOCOL_BYTE;
+                try { Thread.sleep(250); } catch (InterruptedException ie) {}
+            }
+        } catch (IOException ioe) {}
+        if (_log.shouldLog(Log.WARN))
+             _log.warn("Peer did not authenticate themselves as I2CP quickly enough, dropping");
+        return false;
     }
     /**
      * Handle the connection by passing it off to a {@link ClientConnectionRunner ClientConnectionRunner}
