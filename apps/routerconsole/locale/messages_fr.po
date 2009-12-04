@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-01 02:59+0000\n"
-"PO-Revision-Date: 2009-11-30 21:35+0100\n"
+"PO-Revision-Date: 2009-12-04 22:22+0100\n"
 "Last-Translator: \n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -2319,7 +2319,7 @@ msgstr "L'identité unique de votre routeur est"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:143
 msgid "never reveal it to anyone"
-msgstr "révéler jamais à personne"
+msgstr "ne jamais la révéler à personne"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:145
 msgid "Local Identity"
@@ -2379,15 +2379,15 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:311
 msgid "Bandwidth in/out"
-msgstr "Bande passante entrant/sortant"
+msgstr "Bande passante entrante/sortante"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:328
 msgid "Total"
-msgstr ""
+msgstr "Totale"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:336
 msgid "Used"
-msgstr "Utilisé"
+msgstr "Utilisée"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:346
 msgid "Tunnels in/out"
