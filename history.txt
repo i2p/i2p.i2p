@@ -1,3 +1,7 @@
+2009-12-05 zzz
+    * Build: Fix poupdate dependency
+    * Console: Add Russian option
+
 2009-12-05 sponge
     * BOB: fix a critical bug causing ghosts on probes
       and remove unused code.
