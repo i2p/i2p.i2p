@@ -60,18 +60,7 @@ public class I2Plistener implements Runnable {
 		this._log = _log;
 		this.socketManager = S;
 		this.serverSocket = SS;
-//		tgwatch = 1;
 		this.lives = lives;
-	}
-
-	private void rlock() throws Exception {
-		database.getReadLock();
-		info.getReadLock();
-	}
-
-	private void runlock() throws Exception {
-		database.releaseReadLock();
-		info.releaseReadLock();
 	}
 
 	/**
@@ -83,34 +72,31 @@ public class I2Plistener implements Runnable {
 		I2PSocket sessSocket = null;
 		int conn = 0;
 		try {
-			die:
-			{
-				try {
-					serverSocket.setSoTimeout(50);
+			try {
+				serverSocket.setSoTimeout(50);
 
-					while (lives.get()) {
-						try {
-							sessSocket = serverSocket.accept();
-							g = true;
-						} catch (ConnectException ce) {
-							g = false;
-						} catch (SocketTimeoutException ste) {
-							g = false;
-						}
-						if (g) {
-							g = false;
-							conn++;
-							// toss the connection to a new thread.
-							I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database, lives);
-							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " I2PtoTCP " + conn);
-							t.start();
-						}
-
+				while (lives.get()) {
+					try {
+						sessSocket = serverSocket.accept();
+						g = true;
+					} catch (ConnectException ce) {
+						g = false;
+					} catch (SocketTimeoutException ste) {
+						g = false;
 					}
-				} catch (I2PException e) {
-					// bad shit
-					System.out.println("Exception " + e);
+					if (g) {
+						g = false;
+						conn++;
+						// toss the connection to a new thread.
+						I2PtoTCP conn_c = new I2PtoTCP(sessSocket, info, database, lives);
+						Thread t = new Thread(conn_c, Thread.currentThread().getName() + " I2PtoTCP " + conn);
+						t.start();
+					}
+
 				}
+			} catch (I2PException e) {
+				// bad shit
+				System.out.println("Exception " + e);
 			}
 		} finally {
 			try {

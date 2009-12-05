@@ -104,10 +104,10 @@ public class MUXlisten implements Runnable {
 			this.database.releaseReadLock();
 			this.info.releaseReadLock();
 
-			socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
 			if (this.come_in) {
 				this.listener = new ServerSocket(port, backlog, host);
 			}
+			socketManager = I2PSocketManagerFactory.createManager(prikey, Q);
 		// I2PException, IOException, RuntimeException
 		// To bad we can't just catch and enumerate....
 		// } catch (I2PException e) {
@@ -141,8 +141,6 @@ public class MUXlisten implements Runnable {
 			this.info.add("STARTING", new Boolean(false));
 			this.info.releaseWriteLock();
 			this.database.releaseWriteLock();
-			// throw new Exception(e);
-			// Debugging, I guess.
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}

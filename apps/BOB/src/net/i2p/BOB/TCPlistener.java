@@ -64,16 +64,6 @@ public class TCPlistener implements Runnable {
 		this.lives = lives;
 	}
 
-	private void rlock() throws Exception {
-		database.getReadLock();
-		info.getReadLock();
-	}
-
-	private void runlock() throws Exception {
-		database.releaseReadLock();
-		info.releaseReadLock();
-	}
-
 	/**
 	 * Simply listen on TCP port, and thread connections
 	 *
@@ -81,30 +71,27 @@ public class TCPlistener implements Runnable {
 	public void run() {
 		boolean g = false;
 		int conn = 0;
+		Socket server = null;
 		try {
-			die:
-			{
-				try {
-					Socket server = new Socket();
-					listener.setSoTimeout(50); // We don't block, we cycle and check.
-					while (lives.get()) {
-						try {
-							server = listener.accept();
-							g = true;
-						} catch (SocketTimeoutException ste) {
-							g = false;
-						}
-						if (g) {
-							conn++;
-							// toss the connection to a new thread.
-							TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database, lives);
-							Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
-							t.start();
-							g = false;
-						}
+			try {
+				listener.setSoTimeout(50); // We don't block, we cycle and check.
+				while (lives.get()) {
+					try {
+						server = listener.accept();
+						g = true;
+					} catch (SocketTimeoutException ste) {
+						g = false;
 					}
-				} catch (IOException ioe) {
+					if (g) {
+						conn++;
+						// toss the connection to a new thread.
+						TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database, lives);
+						Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
+						t.start();
+						g = false;
+					}
 				}
+			} catch (IOException ioe) {
 			}
 		} finally {
 			try {
