@@ -1,3 +1,7 @@
+2009-12-05 sponge
+    * BOB: fix a critical bug causing ghosts on probes
+      and remove unused code.
+
 2009-12-04 zzz
     * Console: Close up some possible XSS (thanks Pragmatk)
     * i2psnark: Config cleanup, more HTML transitional fixes
