@@ -1,3 +1,7 @@
+2009-12-06 zzz
+    * netdb.jsp: Fix bug caused by XSS fix
+    * Translations: drop ru until after release
+
 2009-12-05 zzz
     * Build: Fix poupdate dependency
     * Console: Add Russian option

@@ -14,7 +14,8 @@ public class NetDbHelper extends HelperBase {
     public NetDbHelper() {}
     
     public void setRouter(String r) {
-        _routerPrefix = DataHelper.stripHTML(r);  // XSS
+        if (r != null)
+            _routerPrefix = DataHelper.stripHTML(r);  // XSS
     }
 
     public void setFull(String f) {
