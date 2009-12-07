@@ -84,7 +84,7 @@ public class ConfigTunnelsHelper extends HelperBase {
 //        buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
         
         // tunnel depth
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Depth") + ":</td>\n");
+        buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Length") + ":</td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthInbound\">\n");
         int now = in.getLength();
         renderOptions(buf, 0, MAX_LENGTH, now, "", HOP);

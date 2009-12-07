@@ -14,7 +14,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 public class I2Ping extends I2PTunnelTask implements Runnable {
@@ -59,7 +59,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
                 sockMgr = I2PTunnelClient.getSocketManager(tunnel);
             }
         }
-        Thread t = new I2PThread(this);
+        Thread t = new I2PAppThread(this);
         t.setName("Client");
         t.start();
         open = true;
@@ -188,7 +188,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
         }
     }
 
-    public class PingHandler extends I2PThread {
+    public class PingHandler extends I2PAppThread {
         private String destination;
 
         public PingHandler(String dest) {

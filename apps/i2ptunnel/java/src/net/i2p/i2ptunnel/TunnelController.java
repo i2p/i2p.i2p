@@ -16,7 +16,7 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base32;
 import net.i2p.data.Destination;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -106,7 +106,7 @@ public class TunnelController implements Logging {
     public void startTunnelBackground() {
         if (_running) return;
         _starting = true;
-        new I2PThread(new Runnable() { public void run() { startTunnel(); } }).start();
+        new I2PAppThread(new Runnable() { public void run() { startTunnel(); } }).start();
     }
     
     /**

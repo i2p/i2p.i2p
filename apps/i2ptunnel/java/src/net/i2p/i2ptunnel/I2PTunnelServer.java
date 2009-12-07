@@ -24,7 +24,7 @@ import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.Base64;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
@@ -132,7 +132,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      *
      */
     public void startRunning() {
-        Thread t = new I2PThread(this);
+        Thread t = new I2PAppThread(this);
         t.setName("Server " + (++__serverId));
         t.start();
     }
@@ -204,7 +204,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             I2PServerSocket i2pS_S = sockMgr.getServerSocket();
             int handlers = getHandlerCount();
             for (int i = 0; i < handlers; i++) {
-                I2PThread handler = new I2PThread(new Handler(i2pS_S), "Handle Server " + i);
+                I2PAppThread handler = new I2PAppThread(new Handler(i2pS_S), "Handle Server " + i);
                 handler.start();
             }
         } else {
@@ -213,7 +213,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 try {
                     final I2PSocket i2ps = i2pS_S.accept();
                     if (i2ps == null) throw new I2PException("I2PServerSocket closed");
-                    new I2PThread(new Runnable() { public void run() { blockingHandle(i2ps); } }).start();
+                    new I2PAppThread(new Runnable() { public void run() { blockingHandle(i2ps); } }).start();
                 } catch (I2PException ipe) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Error accepting - KILLING THE TUNNEL SERVER", ipe);

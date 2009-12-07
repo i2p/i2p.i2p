@@ -172,9 +172,9 @@
             </div>
             <div id="depthField" class="rowItem">
                 <label for="tunnelDepth" accesskey="t">
-                    Dep<span class="accessKey">t</span>h:
+                    Leng<span class="accessKey">t</span>h:
                 </label>
-                <select id="tunnelDepth" name="tunnelDepth" title="Depth of each Tunnel" class="selectbox">
+                <select id="tunnelDepth" name="tunnelDepth" title="Length of each Tunnel" class="selectbox">
                     <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 2);
                   %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>>0 hop tunnel (low anonymity, low latency)</option>
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>>1 hop tunnel (medium anonymity, medium latency)</option>

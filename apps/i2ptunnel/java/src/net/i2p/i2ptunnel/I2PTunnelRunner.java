@@ -16,10 +16,10 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Clock;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
-public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorListener {
+public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErrorListener {
     private final static Log _log = new Log(I2PTunnelRunner.class);
 
     private static volatile long __runnerId;
@@ -222,7 +222,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         }
     }
     
-    private class StreamForwarder extends I2PThread {
+    private class StreamForwarder extends I2PAppThread {
 
         InputStream in;
         OutputStream out;

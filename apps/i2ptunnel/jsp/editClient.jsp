@@ -205,9 +205,9 @@
             </div>
             <div id="depthField" class="rowItem">
                 <label for="tunnelDepth" accesskey="t">
-                    Dep<span class="accessKey">t</span>h:
+                    Leng<span class="accessKey">t</span>h:
                 </label>
-                <select id="tunnelDepth" name="tunnelDepth" title="Depth of each Tunnel" class="selectbox">
+                <select id="tunnelDepth" name="tunnelDepth" title="Length of each Tunnel" class="selectbox">
                     <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 2);
                   %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>>0 hop tunnel (low anonymity, low latency)</option>
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>>1 hop tunnel (medium anonymity, medium latency)</option>
@@ -222,7 +222,7 @@
                 <label for="tunnelVariance" accesskey="v">
                     <span class="accessKey">V</span>ariance:
                 </label>
-                <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Depth" class="selectbox">
+                <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Length" class="selectbox">
                     <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
                   %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>>0 hop variance (no randomisation, consistant performance)</option>
                     <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>>+ 0-1 hop variance (medium additive randomisation, subtractive performance)</option>

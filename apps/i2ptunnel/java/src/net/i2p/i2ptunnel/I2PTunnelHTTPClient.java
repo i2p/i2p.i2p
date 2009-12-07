@@ -233,6 +233,29 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         return opts;
     }
 
+    private InternalSocketRunner isr;
+
+    /**
+     * Actually start working on incoming connections.
+     * Overridden to start an internal socket too.
+     *
+     */
+    @Override
+    public void startRunning() {
+        super.startRunning();
+        this.isr = new InternalSocketRunner(this);
+    }
+
+    /**
+     * Overridden to close internal socket too.
+     */
+    public boolean close(boolean forced) {
+        boolean rv = super.close(forced);
+        if (this.isr != null)
+            this.isr.stopRunning();
+        return rv;
+    }
+
     private static final boolean DEFAULT_GZIP = true;
     // all default to false
     public static final String PROP_REFERER = "i2ptunnel.httpclient.sendReferer";

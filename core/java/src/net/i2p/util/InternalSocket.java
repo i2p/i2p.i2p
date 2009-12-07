@@ -63,11 +63,22 @@ public class InternalSocket extends Socket {
     @Override
     public void close() {
         try {
-            if (_is != null) _is.close();
+            if (_is != null) {
+                _is.close();
+                _is = null;
+            }
         } catch (IOException ie) {}
         try {
-            if (_os != null) _os.close();
+            if (_os != null) {
+                _os.close();
+                _os = null;
+            }
         } catch (IOException ie) {}
+    }
+
+    @Override
+    public boolean isClosed() {
+        return _is == null || _os == null;
     }
 
     @Override
@@ -179,11 +190,6 @@ public class InternalSocket extends Socket {
     /** @deprecated unsupported */
     @Override
     public boolean isBound() {
-        throw new IllegalArgumentException("unsupported");
-    }
-    /** @deprecated unsupported */
-    @Override
-    public boolean isClosed() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
