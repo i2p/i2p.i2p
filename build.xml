@@ -287,7 +287,8 @@
         </copy>
         <copy file="hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
-        <copy file="history.txt" todir="pkg-temp/" />
+        <!-- overwrite the truncated history put in by the updater -->
+        <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
         <!-- test classes aren't in the jars anymore
@@ -409,6 +410,15 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
+        <!-- the following overwrites history.txt on unix to shrink the update file -->
+        <exec executable="head" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt">
+            <arg value="-n" />
+            <arg value="1500" />
+            <arg value="history.txt" />
+        </exec>
+        <exec executable="echo" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt" append="true">
+            <arg value="EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
+        </exec>
         <!-- may be pointless now, people with split directories will never see this -->
         <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
     </target>
