@@ -1,42 +1,36 @@
 <i2p.news date="$Date: 2009-12-08 00:00:00 $">
 <i2p.release version="0.7.8" date="2009/12/08" minVersion="0.6"/>
-<h4>Congratulations on getting I2P installed!</h4>
-<ul>
-<li>
+<h4><ul><li>Congratulations on getting I2P installed!</li></ul></h4>
+<p>
 <b>Welcome to I2P!</b>
 Please <b>have patience</b> as I2P boots up and finds peers.
-</li>
-<li>
+</p>
+<p>
 While you are waiting, please <b>adjust your bandwidth settings</b> on the
 <a href="config.jsp">configuration page</a>.
-</li>
-<li>
+</p>
+<p>
 Once you have a "shared clients" destination listed on the left,
 please <b>check out</b> our
 <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
-</li>
-<li>
+</p>
+<p>
 Point your IRC client to <b>localhost:6668</b> and say hi to us on #i2p.
-</li>
-</ul>
-<br>
-<h4>Gratulation zur erfolgreichen Installation von I2P!</h4>
-<ul>
-<li>
+</p>
+<h4><ul><li>Gratulation zur erfolgreichen Installation von I2P!</li></ul></h4>
+<p>
 <b>Willkommen bei I2P!</b>
 Bitte noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router  findet.
-</li>
-<li>
+</p>
+<p>
 Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
 <a href="config.jsp">Einstellungsseite</a> an.
-</li>
-<li>
+</p>
+<p>
 Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
-</li>
-<li>
+</p>
+<p>
 Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal #i2p.
-</li>
-</ul>
-
+</p>
 </i2p.news>
 
