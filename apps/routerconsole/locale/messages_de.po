@@ -3126,7 +3126,7 @@ msgstr "Falls es Dir möglich ist, richte bitte deine Firewall so ein, das die T
 msgid ""
 "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole "
 "punching with \"SSU introductions\" to relay traffic."
-msgstr "Falls es dir nicht möglich ist hat I2P UPnP (Universelles Plug and Play) Unterstützung und UDP Weiterleitung mit Hilfe der \"SSU Hilsfrouter\" eingebaut.""
+msgstr "Falls es dir nicht möglich ist hat I2P UPnP (Universelles Plug and Play) Unterstützung und UDP Weiterleitung mit Hilfe der \"SSU Hilsfrouter\" eingebaut."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:506
 msgid ""

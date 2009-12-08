@@ -742,7 +742,7 @@ p {
      color: #eef;
      font-size: 7pt;
      width: 220px;
-     text-align: center;
+     text-align: right;
      float: right;
      valign: middle;
 }
