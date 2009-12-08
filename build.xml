@@ -205,6 +205,7 @@
         <ant dir="apps/susidns/src/" target="distclean" />
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
+        <ant dir="apps/jetty/" target="distclean" />
         <delete>
             <fileset dir="." includes="**/*.class" />
             <fileset dir="." includes="**/*.java~" />
@@ -285,7 +286,7 @@
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
-        <copy file="hosts.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
         <!-- overwrite the truncated history put in by the updater -->
         <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
