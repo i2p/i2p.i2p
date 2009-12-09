@@ -1,0 +1,186 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the i2psnark package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P i2psnark\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-09 20:35+0000\n"
+"PO-Revision-Date: 2009-10-19 12:50+0000\n"
+"Last-Translator: foo <foo@bar>\n"
+"Language-Team: foo <foo@bar>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:86
+msgid "I2PSnark - Anonymous BitTorrent Client"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:95
+msgid "Refresh page"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:97
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:649
+msgid "I2PSnark"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:123
+msgid "Status"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:130
+msgid "Hide Peers"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:132
+msgid "Show Peers"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:136
+msgid "Torrent"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:138
+msgid "ETA"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:140
+msgid "Downloaded"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:142
+msgid "Uploaded"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:144
+msgid "Down Rate"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:146
+msgid "Up Rate"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:153
+msgid "Stop all torrents and the I2P tunnel"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:155
+msgid "Stop All"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:160
+msgid "Start all torrents and the I2P tunnel"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:162
+msgid "Start All"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:179
+msgid "No torrents loaded."
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:510
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:514
+msgid "Seeding"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:512
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:521
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:523
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:527
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:529
+msgid "peers"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:516
+msgid "Complete"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:519
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:523
+msgid "OK"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:525
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:529
+msgid "Stalled"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
+msgid "No Peers"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:533
+msgid "Stopped"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:546
+msgid "View files"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:548
+msgid "Open file"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:573
+msgid "Details"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:607
+msgid "Stop the torrent"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:609
+msgid "Stop"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:615
+msgid "Start the torrent"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:617
+msgid "Start"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:622
+msgid "Remove the torrent from the active list, deleting the .torrent file"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:624
+msgid "Remove"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:628
+msgid "Delete the .torrent file and the associated data file(s)"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:630
+msgid "Delete"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:673
+msgid "Seed"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:691
+msgid "Uninteresting"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:693
+msgid "Choked"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:707
+msgid "Uninterested"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:709
+msgid "Choking"
+msgstr ""

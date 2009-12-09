@@ -80,13 +80,23 @@ public class I2PSnarkServlet extends HttpServlet {
         }
 
         PrintWriter out = resp.getWriter();
-        out.write(HEADER_BEGIN);
+        out.write("<html>\n" +
+                  "<head>\n" +
+                  "<title>");
+        out.write(_("I2PSnark - Anonymous BitTorrent Client"));
+        out.write("</title>\n");
+                                         
         // we want it to go to the base URI so we don't refresh with some funky action= value
         out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
         out.write("<center>");
-        out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"Refresh page\" class=\"snarkRefresh\">I2PSnark</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
+        out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"");
+        out.write(_("Refresh page"));
+        out.write("\" class=\"snarkRefresh\">");
+        out.write(_("I2PSnark"));
+        out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
+
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -110,22 +120,50 @@ public class I2PSnarkServlet extends HttpServlet {
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
         out.write(TABLE_HEADER);
+        out.write(_("Status"));
+        out.write("</th>\n");
         if (_manager.util().connected() && snarks.size() > 0) {
+            out.write("(<a href=\"");
+            out.write(req.getRequestURI());
+            out.write("\">");
             if (peerParam != null)
-                out.write("(<a href=\"" + req.getRequestURI() + "\">Hide Peers</a>)<br>\n");
+                out.write(_("Hide Peers"));
             else
-                out.write("(<a href=\"" + req.getRequestURI() + "?p=1" + "\">Show Peers</a>)<br>\n");
+                out.write(_("Show Peers"));
+            out.write("</a>)<br>\n");
         }
-        out.write(TABLE_HEADER2);
+        out.write("<th align=\"left\">");
+        out.write(_("Torrent"));
+        out.write("</th>\n<th align=\"center\">");
+        out.write(_("ETA"));
+        out.write("</th>\n<th align=\"right\">");
+        out.write(_("Downloaded"));
+        out.write("</th>\n<th align=\"right\">");
+        out.write(_("Uploaded"));
+        out.write("</th>\n<th align=\"right\">");
+        out.write(_("Down Rate"));
+        out.write("</th>\n<th align=\"right\">");
+        out.write(_("Up Rate"));
+        out.write("</th>\n");
+    
         out.write("<th align=\"center\">");
-        if (_manager.util().connected())
+        if (_manager.util().connected()) {
             out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
-                      "\" title=\"Stop all torrents and the I2P tunnel\">Stop All</a>");
-        else if (snarks.size() > 0)
+                      "\" title=\"");
+            out.write(_("Stop all torrents and the I2P tunnel"));
+            out.write("\">");
+            out.write(_("Stop All"));
+            out.write("</a>");
+        } else if (snarks.size() > 0) {
             out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
-                      "\" title=\"Start all torrents and the I2P tunnel\">Start All</a>");
-        else
+                      "\" title=\"");
+            out.write(_("Start all torrents and the I2P tunnel"));
+            out.write("\">");
+            out.write(_("Start All"));
+            out.write("</a>");
+        } else {
             out.write("&nbsp;");
+        }
         out.write("</th></tr></thead>\n");
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
@@ -133,8 +171,13 @@ public class I2PSnarkServlet extends HttpServlet {
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.meta.getInfoHash()).equals(peerParam);
             displaySnark(out, snark, uri, i, stats, showPeers, showDebug);
         }
+
         if (snarks.size() <= 0) {
-            out.write(TABLE_EMPTY);
+            out.write("<tr class=\"snarkTorrentEven\">" +
+                      "<td class=\"snarkTorrentEven\" align=\"center\"" +
+                      " colspan=\"8\"><i>");
+            out.write(_("No torrents loaded."));
+            out.write("</i></td></tr>\n");
         } else if (snarks.size() > 1) {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"2\">Totals (" +
@@ -464,30 +507,30 @@ public class I2PSnarkServlet extends HttpServlet {
             }
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "Seeding (" +
-                               curPeers + "/" + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">peers</a>)";
+                statusString = _("Seeding") + " (" +
+                               curPeers + '/' + knownPeers +
+                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
             else if (isRunning)
-                statusString = "Seeding (" + curPeers + "/" + knownPeers + " peers)";
+                statusString = _("Seeding") + " (" + curPeers + "/" + knownPeers + ' ' + ("peers") + ')';
             else
-                statusString = "Complete";
+                statusString = _("Complete");
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
-                statusString = "OK (" +
+                statusString = _("OK") + " (" +
                                curPeers + "/" + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">peers</a>)";
+                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
             else if (isRunning && curPeers > 0 && downBps > 0)
-                statusString = "OK (" + curPeers + "/" + knownPeers + " peers)";
+                statusString = _("OK") + " (" + curPeers + "/" + knownPeers + ' ' + _("peers") + ')';
             else if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "Stalled (" +
-                               curPeers + "/" + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">peers</a>)";
+                statusString = _("Stalled") + " (" +
+                               curPeers + '/' + knownPeers +
+                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
             else if (isRunning && curPeers > 0)
-                statusString = "Stalled (" + curPeers + "/" + knownPeers + " peers)";
+                statusString = _("Stalled") + " (" + curPeers + '/' + knownPeers + ' ' + _("peers") + ')';
             else if (isRunning)
-                statusString = "No Peers (0/" + knownPeers + ")";
+                statusString = _("No Peers") + " (0/" + knownPeers + ')';
             else
-                statusString = "Stopped";
+                statusString = _("Stopped");
         }
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
@@ -500,9 +543,10 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
                       + "\" title=\"");
             if (snark.meta.getFiles() != null)
-                out.write("View files\">");
+                out.write(_("View files"));
             else
-                out.write("Open file\">");
+                out.write(_("Open file"));
+            out.write("\">");
         }
         out.write(filename);
         if (remaining == 0)
@@ -525,7 +569,9 @@ public class I2PSnarkServlet extends HttpServlet {
                 baseURL = baseURL.substring(e + 1);
                 out.write("&nbsp;&nbsp;&nbsp;[<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
-                out.write("\" title=\"" + name + " Tracker\">Details</a>]");
+                out.write("\" title=\"" + name + " Tracker\">");
+                out.write(_("Details"));
+                out.write("</a>]");
                 break;
             }
         }
@@ -557,17 +603,35 @@ public class I2PSnarkServlet extends HttpServlet {
             parameters = parameters + "&p=1";
         if (isRunning) {
             out.write("<a href=\"" + uri + "?action=Stop" + parameters
-                      + "\" title=\"Stop the torrent\">Stop</a>");
+                      + "\" title=\"");
+            out.write(_("Stop the torrent"));
+            out.write("\">");
+            out.write(_("Stop"));
+            out.write("</a>");
         } else {
-            if (isValid)
+            if (isValid) {
                 out.write("<a href=\"" + uri + "?action=Start" + parameters
-                          + "\" title=\"Start the torrent\">Start</a> ");
+                          + "\" title=\"");
+                out.write(_("Start the torrent"));
+                out.write("\">");
+                out.write(_("Start"));
+                out.write("</a>\n");
+            }
             out.write("<a href=\"" + uri + "?action=Remove" + parameters
-                      + "\" title=\"Remove the torrent from the active list, deleting the .torrent file\">Remove</a><br>");
+                      + "\" title=\"");
+            out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
+            out.write("\">");
+            out.write(_("Remove"));
+            out.write("</a><br>");
             out.write("<a href=\"" + uri + "?action=Delete" + parameters
-                      + "\" title=\"Delete the .torrent file and the associated data file(s)\">Delete</a> ");
+                      + "\" title=\"");
+            out.write(_("Delete the .torrent file and the associated data file(s)"));
+            out.write("\">");
+            out.write(_("Delete"));
+            out.write("</a>");
         }
         out.write("</td>\n</tr>\n");
+
         if(showPeers && isRunning && curPeers > 0) {
             List peers = snark.coordinator.peerList();
             Iterator it = peers.iterator();
@@ -578,11 +642,11 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("<tr class=\"" + rowClass + "\">");
                 out.write("<td align=\"center\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
-                out.write("<td align=\"left\" class=\"snarkTorrentStatus " + rowClass + "\">");
+                out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 String ch = peer.toString().substring(0, 4);
                 String client;
                 if ("AwMD".equals(ch))
-                    client = "I2PSnark";
+                    client = _("I2PSnark");
                 else if ("BFJT".equals(ch))
                     client = "I2PRufus";
                 else if ("TTMt".equals(ch))
@@ -606,7 +670,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 float pct = (float) (100.0 * (float) peer.completed() / snark.meta.getPieces());
                 if (pct == 100.0)
-                    out.write("Seed");
+                    out.write(_("Seed"));
                 else {
                     String ps = String.valueOf(pct);
                     if (ps.length() > 5)
@@ -624,9 +688,10 @@ public class I2PSnarkServlet extends HttpServlet {
                     } else {
                         out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInteresting())
-                            out.write("Uninteresting\">");
+                            out.write(_("Uninteresting"));
                         else
-                            out.write("Choked\">");
+                            out.write(_("Choked"));
+                        out.write("\">");
                         out.write(formatSize(peer.getDownloadRate()) + "ps</a></font>");
                     }
                 }
@@ -639,9 +704,10 @@ public class I2PSnarkServlet extends HttpServlet {
                     } else {
                         out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInterested())
-                            out.write("Uninterested\">");
+                            out.write(_("Uninterested"));
                         else
-                            out.write("Choking\">");
+                            out.write(_("Choking"));
+                        out.write("\">");
                         out.write(formatSize(peer.getUploadRate()) + "ps</a></font>");
                     }
                 }
@@ -779,6 +845,14 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("</form></div>");
     }
     
+    private String _(String s) {
+        return _manager.util().getString(s);
+    }
+
+    private String _(String s, Object o) {
+        return _manager.util().getString(s, o);
+    }
+
     // rounding makes us look faster :)
     private String formatSize(long bytes) {
         if (bytes < 5*1024)
@@ -791,28 +865,12 @@ public class I2PSnarkServlet extends HttpServlet {
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "GB";
     }
     
-    private static final String HEADER_BEGIN = "<html>\n" +
-                                               "<head>\n" +
-                                               "<title>I2PSnark - Anonymous BitTorrent Client</title>\n";
-                                         
     private static final String HEADER = "<link href=\"../themes/console/snark.css\" rel=\"stylesheet\" type=\"text/css\" />";
                                        
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
                                                "<thead>\n" +
-                                               "<tr><th align=\"center\">Status \n";
-
-    private static final String TABLE_HEADER2 = "</th>\n" +
-                                               "    <th align=\"left\">Torrent</th>\n" +
-                                               "    <th align=\"center\">ETA</th>\n" +
-                                               "    <th align=\"right\">Downloaded</th>\n" +
-                                               "    <th align=\"right\">Uploaded</th>\n" +
-                                               "    <th align=\"right\">Down Rate</th>\n" +
-                                               "    <th align=\"right\">Up Rate</th>\n";
-    
-   private static final String TABLE_EMPTY  = "<tr class=\"snarkTorrentEven\">" +
-                                              "<td class=\"snarkTorrentEven\" align=\"center\"" +
-                                              "    colspan=\"8\"><i>No torrents loaded.</i></td></tr>\n";
+                                               "<tr><th align=\"center\">";
 
     private static final String TABLE_FOOTER = "</table></div>\n";
     

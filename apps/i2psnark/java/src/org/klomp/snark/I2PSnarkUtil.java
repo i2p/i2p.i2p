@@ -28,6 +28,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.Translate;
 
 /**
  * I2P specific helpers for I2PSnark
@@ -401,5 +402,28 @@ public class I2PSnarkUtil {
                 _log.debug(msg, t);
                 break;
         }
+    }
+
+    private static final String BUNDLE_NAME = "org.klomp.snark.messages";
+
+    /** lang in routerconsole.lang property, else current locale */
+    public String getString(String key) {
+        return Translate.getString(key, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  translate a string with a parameter
+     *  This is a lot more expensive than getString(s, ctx), so use sparingly.
+     *
+     *  @param s string to be translated containing {0}
+     *    The {0} will be replaced by the parameter.
+     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *  @param o parameter, not translated.
+     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    Do not double the single quotes in the parameter.
+     *    Use autoboxing to call with ints, longs, floats, etc.
+     */
+    public String getString(String s, Object o) {
+        return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 }
