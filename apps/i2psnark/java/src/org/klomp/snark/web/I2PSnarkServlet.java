@@ -180,10 +180,14 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("</i></td></tr>\n");
         } else if (snarks.size() > 1) {
             out.write("<tfoot><tr>\n" +
-                      "    <th align=\"left\" colspan=\"2\">Totals (" +
-                      snarks.size() + " torrents, " +
-                      DataHelper.formatSize(stats[5]) + "B, " +
-                      stats[4] + " connected peers)</th>\n" +
+                      "    <th align=\"left\" colspan=\"2\">");
+            out.write(_("Totals"));
+            out.write(" {");
+            out.write(_("{0} torrents", snarks.size()));
+            out.write(", ");
+            out.write(DataHelper.formatSize(stats[5]) + "B, ");
+            out.write(_("{0} connected peers", stats[4]));
+            out.write(")</th>\n" +
                       "    <th>&nbsp;</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[1]) + "</th>\n" +
