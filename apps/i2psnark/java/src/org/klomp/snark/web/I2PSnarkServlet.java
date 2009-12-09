@@ -217,7 +217,7 @@ public class I2PSnarkServlet extends HttpServlet {
             if ( (newFile != null) && (newFile.trim().length() > 0) )
                 f = new File(newFile.trim());
             if ( (f != null) && (!f.exists()) ) {
-                _manager.addMessage("Torrent file " + newFile +" does not exist");
+                _manager.addMessage(_("Torrent file {0} does not exist", newFile));
             }
             if ( (f != null) && (f.exists()) ) {
                 File local = new File(_manager.getDataDir(), f.getName());
@@ -227,16 +227,16 @@ public class I2PSnarkServlet extends HttpServlet {
                     
                     if (local.exists()) {
                         if (_manager.getTorrent(canonical) != null)
-                            _manager.addMessage("Torrent already running: " + newFile);
+                            _manager.addMessage(_("Torrent already running: {0}", newFile));
                         else
-                            _manager.addMessage("Torrent already in the queue: " + newFile);
+                            _manager.addMessage(_("Torrent already in the queue: {0}", newFile));
                     } else {
                         boolean ok = FileUtil.copy(f.getAbsolutePath(), local.getAbsolutePath(), true);
                         if (ok) {
-                            _manager.addMessage("Copying torrent to " + local.getAbsolutePath());
+                            _manager.addMessage(_("Copying torrent to {0}", local.getAbsolutePath()));
                             _manager.addTorrent(canonical);
                         } else {
-                            _manager.addMessage("Unable to copy the torrent to " + local.getAbsolutePath() + " from " + f.getAbsolutePath());
+                            _manager.addMessage(_("Unable to copy the torrent to {0}", local.getAbsolutePath()) + ' ' + _("from {0}", f.getAbsolutePath()));
                         }
                     }
                 } catch (IOException ioe) {
@@ -244,11 +244,11 @@ public class I2PSnarkServlet extends HttpServlet {
                 }
             } else if (newURL != null) {
                 if (newURL.startsWith("http://")) {
-                    _manager.addMessage("Fetching " + newURL);
+                    _manager.addMessage(_("Fetching {0}", newURL));
                     I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
                     fetch.start();
                 } else {
-                    _manager.addMessage("Invalid URL - must start with http://");
+                    _manager.addMessage(_("Invalid URL - must start with http://"));
                 }
             } else {
                 // no file or URL specified
@@ -278,7 +278,7 @@ public class I2PSnarkServlet extends HttpServlet {
                         Snark snark = _manager.getTorrent(name);
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
                             snark.startTorrent();
-                            _manager.addMessage("Starting up torrent " + name);
+                            _manager.addMessage(_("Starting up torrent {0}", name));
                             break;
                         }
                     }
@@ -298,7 +298,7 @@ public class I2PSnarkServlet extends HttpServlet {
                             // yeah, need to, otherwise it'll get autoadded again (at the moment
                             File f = new File(name);
                             f.delete();
-                            _manager.addMessage("Torrent file deleted: " + f.getAbsolutePath());
+                            _manager.addMessage(_("Torrent file deleted: {0}", f.getAbsolutePath()));
                             break;
                         }
                     }
@@ -316,15 +316,15 @@ public class I2PSnarkServlet extends HttpServlet {
                             _manager.stopTorrent(name, true);
                             File f = new File(name);
                             f.delete();
-                            _manager.addMessage("Torrent file deleted: " + f.getAbsolutePath());
+                            _manager.addMessage(_("Torrent file deleted: {0}", f.getAbsolutePath()));
                             List files = snark.meta.getFiles();
                             String dataFile = snark.meta.getName();
                             f = new File(_manager.getDataDir(), dataFile);
                             if (files == null) { // single file torrent
                                 if (f.delete())
-                                    _manager.addMessage("Data file deleted: " + f.getAbsolutePath());
+                                    _manager.addMessage(_("Data file deleted: {0}", f.getAbsolutePath()));
                                 else
-                                    _manager.addMessage("Data file could not be deleted: " + f.getAbsolutePath());
+                                    _manager.addMessage(_("Data file could not be deleted: {0}", f.getAbsolutePath()));
                                 break;
                             }
                             for (int i = 0; i < files.size(); i++) { // pass 1 delete files
@@ -332,9 +332,9 @@ public class I2PSnarkServlet extends HttpServlet {
                                 // each of those lists just contain a single file afaict...
                                 File df = Storage.getFileFromNames(f, (List) files.get(i));
                                 if (df.delete())
-                                    _manager.addMessage("Data file deleted: " + df.getAbsolutePath());
+                                    _manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
                                 else
-                                    _manager.addMessage("Data file could not be deleted: " + df.getAbsolutePath());
+                                    _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
                             }
                             for (int i = files.size() - 1; i >= 0; i--) { // pass 2 delete dirs - not foolproof,
                                                                           // we could sort and do a strict bottom-up
@@ -343,7 +343,7 @@ public class I2PSnarkServlet extends HttpServlet {
                                 if (df == null || !df.exists())
                                     continue;
                                 if(df.delete())
-                                    _manager.addMessage("Data dir deleted: " + df.getAbsolutePath());
+                                    _manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
                             }
                             break;
                         }
@@ -374,7 +374,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     announceURL = announceURLOther;
 
                 if (announceURL == null || announceURL.length() <= 0)
-                    _manager.addMessage("Error creating torrent - you must select a tracker");
+                    _manager.addMessage(_("Error creating torrent - you must select a tracker"));
                 else if (baseFile.exists()) {
                     try {
                         Storage s = new Storage(_manager.util(), baseFile, announceURL, null);
@@ -389,21 +389,21 @@ public class I2PSnarkServlet extends HttpServlet {
                         FileOutputStream out = new FileOutputStream(torrentFile);
                         out.write(info.getTorrentData());
                         out.close();
-                        _manager.addMessage("Torrent created for " + baseFile.getName() + ": " + torrentFile.getAbsolutePath());
+                        _manager.addMessage(_("Torrent created for {0}", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
                         // now fire it up, but don't automatically seed it
                         _manager.addTorrent(torrentFile.getCanonicalPath(), true);
-                        _manager.addMessage("Many I2P trackers require you to register new torrents before seeding - please do so before starting " + baseFile.getName());
+                        _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting {0}", baseFile.getName()));
                     } catch (IOException ioe) {
-                        _manager.addMessage("Error creating a torrent for " + baseFile.getAbsolutePath() + ": " + ioe.getMessage());
+                        _manager.addMessage(_("Error creating a torrent for {0}", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
                     }
                 } else {
-                    _manager.addMessage("Cannot create a torrent for the nonexistent data: " + baseFile.getAbsolutePath());
+                    _manager.addMessage(_("Cannot create a torrent for the nonexistent data: {0}", baseFile.getAbsolutePath()));
                 }
             } else {
-                _manager.addMessage("Error creating torrent - you must enter a file or directory");
+                _manager.addMessage(_("Error creating torrent - you must enter a file or directory"));
             }
         } else if ("StopAll".equals(action)) {
-            _manager.addMessage("Stopping all torrents and closing the I2P tunnel.");
+            _manager.addMessage(_("Stopping all torrents and closing the I2P tunnel."));
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
@@ -412,10 +412,10 @@ public class I2PSnarkServlet extends HttpServlet {
             }
             if (_manager.util().connected()) {
                 _manager.util().disconnect();
-                _manager.addMessage("I2P tunnel closed.");
+                _manager.addMessage(_("I2P tunnel closed."));
             }
         } else if ("StartAll".equals(action)) {
-            _manager.addMessage("Opening the I2P tunnel and starting all torrents.");
+            _manager.addMessage(_("Opening the I2P tunnel and starting all torrents."));
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
@@ -492,18 +492,18 @@ public class I2PSnarkServlet extends HttpServlet {
             knownPeers = snark.coordinator.trackerSeenPeers;
         }
         
-        String statusString = "Unknown";
+        String statusString = _("Unknown");
         if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<a title=\"" + err + "\">TrackerErr</a> (" +
+                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + "</a> (" +
                                curPeers + "/" + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">peers</a>)";
+                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
             else if (isRunning)
-                statusString = "<a title=\"" + err + "\">TrackerErr (" + curPeers + "/" + knownPeers + " peers)";
+                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + " (" + curPeers + '/' + knownPeers + ' ' + _("peers") + ')';
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
-                statusString = "TrackerErr<br>(" + err + ")";
+                statusString = _("TrackerErr") + "<br>(" + err + ")";
             }
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
@@ -569,7 +569,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 baseURL = baseURL.substring(e + 1);
                 out.write("&nbsp;&nbsp;&nbsp;[<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
-                out.write("\" title=\"" + name + " Tracker\">");
+                out.write("\" title=\"" + name + ' ' + _("Tracker") + "\">");
                 out.write(_("Details"));
                 out.write("</a>]");
                 break;
@@ -890,7 +890,7 @@ private static class FetchAndAdd implements Runnable {
         File file = _manager.util().get(_url, false, 3);
         try {
             if ( (file != null) && (file.exists()) && (file.length() > 0) ) {
-                _manager.addMessage("Torrent fetched from " + _url);
+                _manager.addMessage(_("Torrent fetched from {0}", _url));
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
@@ -909,25 +909,30 @@ private static class FetchAndAdd implements Runnable {
 
                     if (torrentFile.exists()) {
                         if (_manager.getTorrent(canonical) != null)
-                            _manager.addMessage("Torrent already running: " + name);
+                            _manager.addMessage(_("Torrent already running: {0}", name));
                         else
-                            _manager.addMessage("Torrent already in the queue: " + name);
+                            _manager.addMessage(_("Torrent already in the queue: {0}", name));
                     } else {
                         FileUtil.copy(file.getAbsolutePath(), canonical, true);
                         _manager.addTorrent(canonical);
                     }
                 } catch (IOException ioe) {
-                    _manager.addMessage("Torrent at " + _url + " was not valid: " + ioe.getMessage());
+                    _manager.addMessage(_("Torrent at {0} was not valid", _url) + ": " + ioe.getMessage());
                 } finally {
                     try { in.close(); } catch (IOException ioe) {}
                 }
             } else {
-                _manager.addMessage("Torrent was not retrieved from " + _url);
+                _manager.addMessage(_("Torrent was not retrieved from {0}", _url));
             }
         } finally {
             if (file != null) file.delete();
         }
     }
+
+    private String _(String s, String o) {
+        return _manager.util().getString(s, o);
+    }
+
 }
 
 }
