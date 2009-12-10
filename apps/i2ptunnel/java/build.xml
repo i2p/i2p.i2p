@@ -42,12 +42,49 @@
             </manifest>
         </jar>
         <ant target="war" />
+        <ant target="bundle" />
+        <!-- jar again to get the latest messages_*.class files -->
+        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
+
+    <target name="bundle" depends="compile, precompilejsp">
+        <!-- Update the messages_*.po files.
+             We need to supply the bat file for windows, and then change the fail property to true -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="false" >
+            <arg value="/c" />
+            <arg value="bundle-messages.bat" />
+        </exec>
+    </target>
+
+    <target name="poupdate" depends="compile, precompilejsp">
+        <!-- Update the messages_*.po files. -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
+            <arg value="/c" />
+            <arg value="bundle-messages.bat" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
     <target name="war" depends="precompilejsp"> 
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, **/*.java, *.jsp">
         </war>
     </target>
+
     <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
@@ -113,11 +150,7 @@
         <delete file="../jsp/web-out.xml" />
     </target>
     <target name="cleandep" depends="clean">
-	<!-- ministreaming will clean core -->
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
     <target name="distclean" depends="clean">
-	<!-- ministreaming will clean core -->
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
 </project>
