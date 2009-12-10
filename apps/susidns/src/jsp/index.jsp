@@ -26,10 +26,11 @@
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
+<jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>introduction - susidns v${version.version}</title>
+<title><%=intl._("Introduction - SusiDNS")%> v${version.version}</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>

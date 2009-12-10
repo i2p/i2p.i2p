@@ -61,7 +61,7 @@
         <srcfiles dir= "." includes="jsp/*.jsp, WEB-INF/web-template.xml"/>
     </uptodate>
 
-    <target name="all" depends="compile,precompilejsp,war"/> 
+    <target name="all" depends="compile,precompilejsp,bundle,war"/> 
     <target name="war"> 
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
@@ -75,6 +75,39 @@
         	</fileset>
         </war>
     </target>
+
+    <target name="bundle" depends="compile, precompilejsp">
+        <!-- Update the messages_*.po files.
+             We need to supply the bat file for windows, and then change the fail property to true -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="false" >
+            <arg value="/c" />
+            <arg value="bundle-messages.bat" />
+        </exec>
+    </target>
+
+    <target name="poupdate" depends="compile, precompilejsp">
+        <!-- Update the messages_*.po files.  -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
+            <arg value="/c" />
+            <arg value="bundle-messages.bat" />
+            <arg value="-p" />
+        </exec>
+    </target>
+
     <target name="clean">
       <delete file="susidns.war" />
       <delete>
