@@ -95,7 +95,9 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(_("Refresh page"));
         out.write("\" class=\"snarkRefresh\">");
         out.write(_("I2PSnark"));
-        out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">Forum</a>\n");
+        out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
+        out.write(_("Forum"));
+        out.write("</a>\n");
 
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
@@ -664,7 +666,7 @@ public class I2PSnarkServlet extends HttpServlet {
                 else if ("VUZP".equals(ch))
                     client = "Robert";
                 else
-                    client = "Unknown (" + ch + ')';
+                    client = _("Unknown") + " (" + ch + ')';
                 out.write(client + "&nbsp;&nbsp;" + peer.toString().substring(5, 9));
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
@@ -735,13 +737,21 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">Add Torrent</span><br>\n");
-        out.write("From URL&nbsp;: <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" > \n");
+        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
+        out.write(_("Add Torrent"));
+        out.write("</span><br>\n");
+        out.write(_("From URL"));
+        out.write(": <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" > \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
-        out.write("<input type=\"submit\" value=\"Add torrent\" name=\"action\" ><br>\n");
-        out.write("<span class=\"snarkAddInfo\">Alternately, you can copy .torrent files to " + _manager.getDataDir().getAbsolutePath() + "<br>\n");
-        out.write("Removing that .torrent file will cause the torrent to stop.<br></span>\n");
+        out.write("<input type=\"submit\" value=\"");
+        out.write(_("Add torrent"));
+        out.write("\" name=\"action\" ><br>\n");
+        out.write("<span class=\"snarkAddInfo\">");
+        out.write(_("Alternately, you can copy .torrent files to {0} .", _manager.getDataDir().getAbsolutePath()));
+        out.write("<br>\n");
+        out.write(_("Removing that .torrent file will cause the torrent to stop."));
+        out.write("<br></span>\n");
         out.write("</form>\n</span></div>");  
     }
     
@@ -755,12 +765,20 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<span class=\"snarkConfigTitle\">Create Torrent</span><br>\n");
+        out.write("<span class=\"snarkConfigTitle\">");
+        out.write(_("Create Torrent"));
+        out.write("</span><br>\n");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
-        out.write("Data to seed: " + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
+        out.write(_("Data to seed"));
+        out.write(": " + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
                   + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
-                  + "\" title=\"File to seed (must be within the specified path)\" ><br>\n");
-        out.write("Tracker: <select name=\"announceURL\"><option value=\"\">Select a tracker</option>\n");
+                  + "\" title=\"");
+        out.write(_("File to seed (must be within the specified path)"));
+        out.write("\" ><br>\n");
+        out.write(_("Tracker"));
+        out.write(": <select name=\"announceURL\"><option value=\"\">");
+        out.write(_("Select a tracker"));
+        out.write("</option>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -772,9 +790,14 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
-        out.write("or <input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
-                  "title=\"Custom tracker URL\" > ");
-        out.write("<input type=\"submit\" value=\"Create torrent\" name=\"action\" >\n");
+        out.write(_("or"));
+        out.write(" <input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
+                  "title=\"");
+        out.write(_("Custom tracker URL"));
+        out.write("\" > ");
+        out.write("<input type=\"submit\" value=\"");
+        out.write(_("Create torrent"));
+        out.write("\" name=\"action\" >\n");
         out.write("</form>\n</span></div>");        
     }
     
@@ -789,12 +812,26 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<span class=\"snarkConfigTitle\">Configuration</span><br>\n");
-        out.write("<table border=\"0\"><tr><td>Data directory: <td><input type=\"text\" size=\"50\" name=\"dataDir\" value=\"" + dataDir + "\" ");
-        out.write("title=\"Directory to store torrents and data\" disabled=\"true\" ><br><i>(Edit i2psnark.config and restart to change)</i><br>\n");
-        out.write("<tr><td>Auto start: <td><input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" " 
+        out.write("<span class=\"snarkConfigTitle\">");
+        out.write(_("Configuration"));
+        out.write("</span><br>\n");
+        out.write("<table border=\"0\"><tr><td>");
+        out.write(_("Data directory"));
+        out.write(": <td><input type=\"text\" size=\"50\" name=\"dataDir\" value=\"" + dataDir + "\" ");
+        out.write("title=\"");
+        out.write(_("Directory to store torrents and data"));
+        out.write("\" disabled=\"true\" ><br><i>(");
+        out.write(_("Edit i2psnark.config and restart to change"));
+        out.write(")</i><br>\n");
+
+        out.write("<tr><td>");
+        out.write(_("Auto start"));
+        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
-                  + "title=\"If true, automatically start torrents that are added\" >");
+                  + "title=\"");
+        out.write(_("If checked, automatically start torrents that are added"));
+        out.write("\" >");
+
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
         //Auto stop: <input type="checkbox" name="autoStop" value="true" title="If true, automatically stop torrents that are removed from the data directory" />
         //out.write("<br>\n");
@@ -814,15 +851,33 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<option value=\"150\">150%</option>\n\t");
         out.write("</select><br>\n");
 */
-        out.write("<tr><td>Total uploader limit: <td><input type=\"text\" name=\"upLimit\" value=\""
-                  + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" > peers<br>\n");
-        out.write("<tr><td>Up bandwidth limit: <td><input type=\"text\" name=\"upBW\" value=\""
-                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>(Half <a href=\"/config.jsp\" target=\"blank\">available bandwidth</a> recommended.)</i><br>\n");
+        out.write("<tr><td>");
+        out.write(_("Total uploader limit"));
+        out.write(": <td><input type=\"text\" name=\"upLimit\" value=\""
+                  + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" > ");
+        out.write(_("peers"));
+        out.write("<br>\n");
+
+        out.write("<tr><td>");
+        out.write(_("Up bandwidth limit"));
+        out.write(": <td><input type=\"text\" name=\"upBW\" value=\""
+                  + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>(");
+        out.write(_("Half available bandwidth< recommended."));
+        out.write(" <a href=\"/config.jsp\" target=\"blank\">");
+        out.write(_("Configure"));
+        out.write("</a>)</i><br>\n");
         
-        out.write("<tr><td>Use open trackers also: <td><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
+        out.write("<tr><td>");
+        out.write(_("Use open trackers also"));
+        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
-                  + "title=\"If true, uses open trackers in addition\" > ");
-        out.write("<tr><td>Open tracker announce URLs: <td><input type=\"text\" name=\"openTrackers\" value=\""
+                  + "title=\"");
+        out.write(_("If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"));
+        out.write("\" > ");
+
+        out.write("<tr><td>");
+        out.write(_("Open tracker announce URLs"));
+        out.write(": <td><input type=\"text\" name=\"openTrackers\" value=\""
                   + openTrackers + "\" size=\"50\" ><br>\n");
 
         //out.write("\n");
@@ -830,10 +885,17 @@ public class I2PSnarkServlet extends HttpServlet {
         //          + _manager.util().getEepProxyHost() + "\" size=\"15\" /> ");
         //out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
         //          + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br>\n");
-        out.write("<tr><td>I2CP host: <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
+
+        out.write("<tr><td>");
+        out.write(_("I2CP host"));
+        out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
                   + _manager.util().getI2CPHost() + "\" size=\"15\" > ");
-        out.write("<tr><td>I2CP port: <td><input type=\"text\" name=\"i2cpPort\" value=\"" +
+
+        out.write("<tr><td>");
+        out.write(_("I2CP port"));
+        out.write(": <td><input type=\"text\" name=\"i2cpPort\" value=\"" +
                   + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
+
         StringBuilder opts = new StringBuilder(64);
         Map options = new TreeMap(_manager.util().getI2CPOptions());
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
@@ -842,9 +904,14 @@ public class I2PSnarkServlet extends HttpServlet {
             String val = (String)entry.getValue();
             opts.append(key).append('=').append(val).append(' ');
         }
-        out.write("<tr><td>I2CP options: <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" >"
+        out.write("<tr><td>");
+        out.write(_("I2CP options"));
+        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" >"
                   + opts.toString() + "</textarea><br>\n");
-        out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"Save configuration\" name=\"action\" >\n");
+
+        out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
+        out.write(_("Save configuration"));
+        out.write("\" name=\"action\" >\n");
         out.write("</table></span>\n");
         out.write("</form></div>");
     }
