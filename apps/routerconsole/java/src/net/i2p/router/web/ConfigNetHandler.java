@@ -232,7 +232,7 @@ public class ConfigNetHandler extends FormHandler {
 
             if (_requireIntroductions) {
                 _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
-                addFormNotice(_("Requiring SSU introduers"));
+                addFormNotice(_("Requiring SSU introducers"));
             } else {
                 _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
             }

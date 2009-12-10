@@ -47,7 +47,7 @@ div.logo hr {
      background: #99f;
      height: 1px;
      border: 0px solid #99f;
-     margin: 8px -3px;
+     margin: 8px -5px;
 }
 
 div.logo a:link, div.logo a:visited {
@@ -103,7 +103,7 @@ div.warning hr {
      background: #fb7;
      height: 1px;
      border: 0px solid #fb7;
-     margin: 10px 0 5px 0;
+     margin: 10px 0;
 }
 
 div.warning h3 {
@@ -114,6 +114,7 @@ div.warning h3 {
      font-variant: small-caps; 
      text-transform: capitalize; 
      font-size: 12.5pt;
+     background: none;
 }
 
 /* console error messages */
@@ -220,7 +221,7 @@ div.routersummary table {
      border: 0;
      text-align: center !important;
      margin: -5px 0px -5px 2px;
-     width: 185px !important;
+     width: 186px !important;
      overflow: hidden;
      font-size: 8pt;
      padding: 0 -12px;
@@ -257,6 +258,7 @@ div.tunnels table{
      width: 16px;
      text-align: right;
      margin-right: -2px;
+     padding-right: 0;
 }     
      
 div.routersummary form {
@@ -564,7 +566,7 @@ h2, h3 {
 
 .proxyfooter{
      font-size: 7pt;
-     display: none !important;
+     display: none !important; 
 }
 
 table {
@@ -859,5 +861,13 @@ div.graphspanel h3 {
 }
 
 table code {
+     font-size: 8.5pt;
+}
+
+table li:last-child{
+     margin-bottom: 15px;
+}
+
+table ul {
      font-size: 8.5pt;
 }

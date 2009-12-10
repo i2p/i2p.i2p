@@ -24,7 +24,7 @@
 
  <% String peer = "";
     if (request.getParameter("peer") != null)
-        peer = request.getParameter("peer");
+        peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
  %>
  <div class="configure">
  <form action="configpeer.jsp" method="POST">

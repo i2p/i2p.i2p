@@ -26,7 +26,7 @@ public class OutboundMessageFragments {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;
-    private ActiveThrottle _throttle; // LINT not used ??
+    // private ActiveThrottle _throttle; // LINT not used ??
     /** peers we are actively sending messages to */
     private final List _activePeers;
     private boolean _alive;
@@ -34,8 +34,8 @@ public class OutboundMessageFragments {
     private int _nextPeer;
     private PacketBuilder _builder;
     /** if we can handle more messages explicitly, set this to true */
-    private boolean _allowExcess; // LINT not used??
-    private volatile long _packetsRetransmitted; // LINT not used??
+    // private boolean _allowExcess; // LINT not used??
+    // private volatile long _packetsRetransmitted; // LINT not used??
 
     // private static final int MAX_ACTIVE = 64; // not used.
     // don't send a packet more than 10 times
@@ -45,12 +45,12 @@ public class OutboundMessageFragments {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundMessageFragments.class);
         _transport = transport;
-        _throttle = throttle;
+        // _throttle = throttle;
         _activePeers = new ArrayList(256);
         _nextPeer = 0;
         _builder = new PacketBuilder(ctx, transport);
         _alive = true;
-        _allowExcess = false;
+        // _allowExcess = false;
         _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendConfirmTime", "How long it takes to send a message and get the ACK", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendConfirmFragments", "How many fragments are included in a fully ACKed message", "udp", UDPTransport.RATES);
@@ -376,7 +376,7 @@ public class OutboundMessageFragments {
             if (state.getPushCount() > 1) {
                 int toSend = fragments-sparseCount;
                 peer.messageRetransmitted(toSend);
-                _packetsRetransmitted += toSend; // lifetime for the transport
+                // _packetsRetransmitted += toSend; // lifetime for the transport
                 _context.statManager().addRateData("udp.peerPacketsRetransmitted", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
                 _context.statManager().addRateData("udp.packetsRetransmitted", state.getLifetime(), peer.getPacketsTransmitted());
                 if (_log.shouldLog(Log.INFO))

@@ -268,6 +268,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         OutputStream out = null;
         String targetRequest = null;
         boolean usingWWWProxy = false;
+        boolean usingInternalServer = false;
         String currentProxy = null;
         long requestId = ++__requestId;
         try {
@@ -294,6 +295,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
                     method = line.substring(0, pos);
+                    // TODO use Java URL class to make all this simpler and more robust
                     String request = line.substring(pos + 1);
                     if (request.startsWith("/") && getTunnel().getClientOptions().getProperty("i2ptunnel.noproxy") != null) {
                         request = "http://i2p" + request;
@@ -339,8 +341,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                     }
                     
-                    // Quick hack for foo.bar.i2p
-                    if (host.toLowerCase().endsWith(".i2p")) {
+                    if (host.toLowerCase().equals("proxy.i2p")) {
+                        // so we don't do any naming service lookups
+                        destination = "proxy.i2p";
+                        usingInternalServer = true;
+                    } else if (host.toLowerCase().endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
                         // Host becomes the destination key
@@ -477,15 +482,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                         destination = request.substring(0, pos);
                         line = method + " " + request.substring(pos);
-                    }
+                    }   // end host name processing
 
-                    boolean isValid = usingWWWProxy || isSupportedAddress(host, protocol);
+                    boolean isValid = usingWWWProxy || usingInternalServer || isSupportedAddress(host, protocol);
                     if (!isValid) {
                         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix(requestId) + "notValid(" + host + ")");
                         method = null;
                         destination = null;
                         break;
-                    } else if (!usingWWWProxy) {
+                    } else if ((!usingWWWProxy) && (!usingInternalServer)) {
                         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix(requestId) + "host=getHostName(" + destination + ")");
                         host = getHostName(destination); // hide original host
                     }
@@ -496,7 +501,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         _log.debug(getPrefix(requestId) + "HOST  :" + host + ":");
                         _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
                     }
-                    
+
+                    // end first line processing
+
                 } else {
                     if (lowercaseLine.startsWith("host: ") && !usingWWWProxy) {
                         line = "Host: " + host;
@@ -528,14 +535,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         continue; // completely strip the line
                     }
                 }
-                
+
                 if (line.length() == 0) {
                     
                     String ok = getTunnel().getClientOptions().getProperty("i2ptunnel.gzip");
                     boolean gzip = DEFAULT_GZIP;
                     if (ok != null)
                         gzip = Boolean.valueOf(ok).booleanValue();
-                    if (gzip) {
+                    if (gzip && !usingInternalServer) {
                         // according to rfc2616 s14.3, this *should* force identity, even if
                         // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
                         // seems to work.
@@ -549,7 +556,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 } else {
                     newRequest.append(line).append("\r\n"); // HTTP spec
                 }
-            }
+            } // end header processing
+
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
 
@@ -571,7 +579,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             
             // Serve local proxy files (images, css linked from error pages)
             // Ignore all the headers
-            if (destination.equals("proxy.i2p")) {
+            if (usingInternalServer) {
                 serveLocalFile(out, method, targetRequest);
                 s.close();
                 return;

@@ -1,3 +1,41 @@
+* 2009-12-08  0.7.8 released
+
+2009-12-08 zzz
+    * Misc. cleanups after review, prep for release
+
+2009-12-06 zzz
+    * netdb.jsp: Fix bug caused by XSS fix
+    * Translations: drop ru until after release
+
+2009-12-05 zzz
+    * Build: Fix poupdate dependency
+    * Console: Add Russian option
+
+2009-12-05 sponge
+    * BOB: fix a critical bug causing ghosts on probes
+      and remove unused code.
+
+2009-12-04 zzz
+    * Console: Close up some possible XSS (thanks Pragmatk)
+    * i2psnark: Config cleanup, more HTML transitional fixes
+    * readme*.html: Point to translated pages on www.i2p2.i2p
+
+2009-11-29 zzz
+    * config.jsp: Comment out unused stuff better
+    * profiles.jsp: Hide non-ff from ff table
+    * HTTP Proxy: Don't send proxy.i2p to the naming service,
+      it was making the error pages load slowly
+    * SOCKS Proxy: Fix an error message
+    * Transport: Fix the default inbound burst
+
+2009-11-29 sponge
+    * net.i2p.router.transport.udp deadwood code cleanup.
+    * documented rare NPE in InboundEstablishState.java.
+
+2009-11-28 sponge
+    * Improvement to BOB's TCPio to hopefully lower load average. It seems
+      to be helping a little when stress-tested with Robert.
+
 2009-11-24 zzz
     * DataStructures: Remove unused Logs
     * OrderedProperties: Simplify, use in i2psnark

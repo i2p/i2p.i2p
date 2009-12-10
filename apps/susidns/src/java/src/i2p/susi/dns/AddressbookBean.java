@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
+
 public class AddressbookBean
 {
 	private String book, action, serial, lastSerial, filter, search, hostname, destination;
@@ -140,7 +142,7 @@ public class AddressbookBean
 		return book;
 	}
 	public void setBook(String book) {
-		this.book = book;
+		this.book = DataHelper.stripHTML(book);  // XSS
 	}
 	public String getSerial() {
 		lastSerial = "" + Math.random();
@@ -326,7 +328,7 @@ public class AddressbookBean
 		return destination;
 	}
 	public void setDestination(String destination) {
-		this.destination = destination;
+		this.destination = DataHelper.stripHTML(destination);  // XSS
 	}
 	public String getHostname() {
 		return hostname;
@@ -338,7 +340,7 @@ public class AddressbookBean
 		deletionMarks.addLast( name );
 	}
 	public void setHostname(String hostname) {
-		this.hostname = hostname;
+		this.hostname = DataHelper.stripHTML(hostname);  // XSS
 	}
 	private int getBeginInt() {
 		return Math.max(0, Math.min(entries.length - 1, beginIndex));

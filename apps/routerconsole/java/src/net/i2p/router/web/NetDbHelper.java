@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import net.i2p.data.DataHelper;
 
 public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
@@ -12,7 +13,11 @@ public class NetDbHelper extends HelperBase {
     
     public NetDbHelper() {}
     
-    public void setRouter(String r) { _routerPrefix = r; }
+    public void setRouter(String r) {
+        if (r != null)
+            _routerPrefix = DataHelper.stripHTML(r);  // XSS
+    }
+
     public void setFull(String f) {
         try {
             _full = Integer.parseInt(f);
