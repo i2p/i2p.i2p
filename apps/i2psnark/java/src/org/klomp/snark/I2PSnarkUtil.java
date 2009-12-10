@@ -404,7 +404,7 @@ public class I2PSnarkUtil {
         }
     }
 
-    private static final String BUNDLE_NAME = "org.klomp.snark.messages";
+    private static final String BUNDLE_NAME = "org.klomp.snark.web.messages";
 
     /** lang in routerconsole.lang property, else current locale */
     public String getString(String key) {

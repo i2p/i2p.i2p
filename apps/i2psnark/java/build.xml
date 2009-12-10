@@ -36,8 +36,8 @@
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="builddep, compile, bundle">
-        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class">
+    <target name="jar" depends="builddep, compile">
+        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
@@ -51,7 +51,7 @@
       -  So we must continue to duplicate everything in the war.
           <classes dir="./build/obj" includes="**/I2PSnarkServlet*.class" />
      -->
-    <target name="war" depends="jar"> 
+    <target name="war" depends="jar, bundle"> 
         <war destfile="../i2psnark.war" webxml="../web.xml">
           <classes dir="./build/obj" includes="**/*.class" excludes="**/RunStandalone.class" />
         </war>
@@ -127,9 +127,7 @@
         <delete dir="./dist" />
     </target>
     <target name="cleandep" depends="clean">
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
     <target name="distclean" depends="clean">
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
 </project>

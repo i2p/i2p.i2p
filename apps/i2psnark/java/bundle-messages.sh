@@ -9,7 +9,7 @@
 #
 # zzz - public domain
 #
-CLASS=org.klomp.snark.messages
+CLASS=org.klomp.snark.web.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC
 
@@ -32,8 +32,8 @@ do
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
 
-	if [ -s build/obj/org/klomp/snark/messages_$LG.class -a \
-	     build/obj/org/klomp/snark/messages_$LG.class -nt $i -a \
+	if [ -s build/obj/org/klomp/snark/web/messages_$LG.class -a \
+	     build/obj/org/klomp/snark/web/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue

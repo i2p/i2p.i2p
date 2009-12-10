@@ -32,8 +32,8 @@ do
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
 
-	if [ -s build/obj/net/i2p/i2ptunnel/messages_$LG.class -a \
-	     build/obj/net/i2p/i2ptunnel/messages_$LG.class -nt $i -a \
+	if [ -s build/obj/net/i2p/i2ptunnel/web/messages_$LG.class -a \
+	     build/obj/net/i2p/i2ptunnel/web/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue
