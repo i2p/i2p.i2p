@@ -426,4 +426,9 @@ public class I2PSnarkUtil {
     public String getString(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
+
+    /** {0} and {1} */
+    public String getString(String s, Object o, Object o2) {
+        return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
+    }
 }

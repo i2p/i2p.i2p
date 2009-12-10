@@ -215,7 +215,7 @@ public class I2PSnarkServlet extends HttpServlet {
         String action = req.getParameter("action");
         if (action == null) {
             // noop
-        } else if ("Add torrent".equals(action)) {
+        } else if (_("Add torrent").equals(action)) {
             String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
             // NOTE - newFile currently disabled in HTML form - see below
@@ -259,7 +259,7 @@ public class I2PSnarkServlet extends HttpServlet {
             } else {
                 // no file or URL specified
             }
-        } else if ("Stop".equals(action)) {
+        } else if (_("Stop").equals(action)) {
             String torrent = req.getParameter("torrent");
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
@@ -274,7 +274,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     }
                 }
             }
-        } else if ("Start".equals(action)) {
+        } else if (_("Start").equals(action)) {
             String torrent = req.getParameter("torrent");
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
@@ -356,7 +356,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     }
                 }
             }
-        } else if ("Save configuration".equals(action)) {
+        } else if (_("Save configuration").equals(action)) {
             String dataDir = req.getParameter("dataDir");
             boolean autoStart = req.getParameter("autoStart") != null;
             String seedPct = req.getParameter("seedPct");
@@ -370,7 +370,7 @@ public class I2PSnarkServlet extends HttpServlet {
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
             String openTrackers = req.getParameter("openTrackers");
             _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
-        } else if ("Create torrent".equals(action)) {
+        } else if (_("Create torrent").equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(_manager.getDataDir(), baseData);
@@ -395,12 +395,12 @@ public class I2PSnarkServlet extends HttpServlet {
                         FileOutputStream out = new FileOutputStream(torrentFile);
                         out.write(info.getTorrentData());
                         out.close();
-                        _manager.addMessage(_("Torrent created for {0}", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
+                        _manager.addMessage(_("Torrent created for \"{0}\"", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
                         // now fire it up, but don't automatically seed it
                         _manager.addTorrent(torrentFile.getCanonicalPath(), true);
-                        _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting {0}", baseFile.getName()));
+                        _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
                     } catch (IOException ioe) {
-                        _manager.addMessage(_("Error creating a torrent for {0}", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
+                        _manager.addMessage(_("Error creating a torrent for \"{0}\"", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
                     }
                 } else {
                     _manager.addMessage(_("Cannot create a torrent for the nonexistent data: {0}", baseFile.getAbsolutePath()));
@@ -739,19 +739,19 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write(_("Add Torrent"));
-        out.write("</span><br>\n");
+        out.write("</span><br>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
-        out.write(": <input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" > \n");
+        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" > \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
-        out.write("<input type=\"submit\" value=\"");
+        out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Add torrent"));
         out.write("\" name=\"action\" ><br>\n");
-        out.write("<span class=\"snarkAddInfo\">");
-        out.write(_("Alternately, you can copy .torrent files to {0} .", _manager.getDataDir().getAbsolutePath()));
-        out.write("<br>\n");
-        out.write(_("Removing that .torrent file will cause the torrent to stop."));
-        out.write("<br></span>\n");
+        out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
+        out.write(_("Alternately, you can copy .torrent files to the directory {0}.", _manager.getDataDir().getAbsolutePath()));
+        out.write("\n");
+        out.write(_("Removing a .torrent file will cause the torrent to stop."));
+        out.write("<br></span></table>\n");
         out.write("</form>\n</span></div>");  
     }
     
@@ -767,16 +767,16 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write(_("Create Torrent"));
-        out.write("</span><br>\n");
+        out.write("</span><br>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
-        out.write(": " + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
+        out.write(":<td>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
                   + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
                   + "\" title=\"");
-        out.write(_("File to seed (must be within the specified path)"));
-        out.write("\" ><br>\n");
+        out.write(_("File or directory to seed (must be within the specified path)"));
+        out.write("\" ><tr><td>\n");
         out.write(_("Tracker"));
-        out.write(": <select name=\"announceURL\"><option value=\"\">");
+        out.write(":<td><select name=\"announceURL\"><option value=\"\">");
         out.write(_("Select a tracker"));
         out.write("</option>\n");
         Map trackers = _manager.getTrackers();
@@ -791,13 +791,13 @@ public class I2PSnarkServlet extends HttpServlet {
         }
         out.write("</select>\n");
         out.write(_("or"));
-        out.write(" <input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
+        out.write("<tr><td>&nbsp;<td><input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
                   "title=\"");
-        out.write(_("Custom tracker URL"));
+        out.write(_("Specify custom tracker announce URL"));
         out.write("\" > ");
-        out.write("<input type=\"submit\" value=\"");
+        out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Create torrent"));
-        out.write("\" name=\"action\" >\n");
+        out.write("\" name=\"action\" ></table>\n");
         out.write("</form>\n</span></div>");        
     }
     
@@ -862,9 +862,9 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write(_("Up bandwidth limit"));
         out.write(": <td><input type=\"text\" name=\"upBW\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>(");
-        out.write(_("Half available bandwidth< recommended."));
+        out.write(_("Half available bandwidth recommended."));
         out.write(" <a href=\"/config.jsp\" target=\"blank\">");
-        out.write(_("Configure"));
+        out.write(_("View or change router bandwidth"));
         out.write("</a>)</i><br>\n");
         
         out.write("<tr><td>");
@@ -916,10 +916,12 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("</form></div>");
     }
     
+    /** translate */
     private String _(String s) {
         return _manager.util().getString(s);
     }
 
+    /** translate */
     private String _(String s, Object o) {
         return _manager.util().getString(s, o);
     }
