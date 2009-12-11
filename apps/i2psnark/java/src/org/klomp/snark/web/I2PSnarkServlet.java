@@ -123,18 +123,19 @@ public class I2PSnarkServlet extends HttpServlet {
         String uri = req.getRequestURI();
         out.write(TABLE_HEADER);
         out.write(_("Status"));
-        out.write("</th>\n");
         if (_manager.util().connected() && snarks.size() > 0) {
-            out.write("(<a href=\"");
+            out.write(" (<a href=\"");
             out.write(req.getRequestURI());
-            out.write("\">");
-            if (peerParam != null)
+            if (peerParam != null) {
+                out.write("\">");
                 out.write(_("Hide Peers"));
-            else
+            } else {
+                out.write("?p=1\">");
                 out.write(_("Show Peers"));
+            }
             out.write("</a>)<br>\n");
         }
-        out.write("<th align=\"left\">");
+        out.write("</th>\n<th align=\"left\">");
         out.write(_("Torrent"));
         out.write("</th>\n<th align=\"center\">");
         out.write(_("ETA"));
