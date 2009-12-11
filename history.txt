@@ -1,3 +1,44 @@
+2009-12-11 zzz
+    * Addressbook, susidns: Rework addressbook into a
+      HttpServlet, so susidns can kick it when the subscription
+      list changes
+    * Build: Truncate the history in the updater (-80KB)
+    * Console:
+      - Add a nicer handler for missing webapps
+      - Restore the restart message
+      - Change "depth" to "length"
+    * Data: Cache the Hash hashcode
+    * EepGet: Use InternalSocket if available
+    * Fragmenter: Pull the new comments, new stats, and
+      debug log fix from i2p.i2p.zzz.batch in - but not the
+      batching mods, which need a fresh look.
+    * I2CP: Implement an internal "socket" class that
+      allows clients in the same JVM to connect to the
+      router without going through the kernel
+    * I2NP: Drop unused classes
+    * i2psnark:
+      - Translation support
+      - Tweak torrent name popup
+    * I2PTunnel:
+      - Translation support
+      - Switch all I2PThreads to I2PAppThreads
+      - Run an InternalSocket as well for the HTTP Proxy
+    * Naming Services:
+      - New EepGetAndAddNamingService that appends new
+        hosts to hosts.txt
+      - Move default reverseLookup to base class
+      - Deprecate unused services
+    * NetDb:
+      - Switch from ArrayList to ConcurrentHashSet in
+        KBucketImpl to reduce chance of deadlock;
+        remove periodic shuffling of the bucket,
+        needs to be addressed elsewhere
+    * SusiDNS:
+      - Translation support
+      - Remove jsp's from the war
+    * Translation: Move code from routerconsole to core,
+      to support translation of other webapps
+
 * 2009-12-08  0.7.8 released
 
 2009-12-08 zzz
