@@ -528,6 +528,9 @@ public class TunnelDispatcher implements Service {
         long tooOld = tooYoung - 9*60*1000;
         for (int i = 0; i < size; i++) {
             HopConfig cfg = participating.get(i);
+            // rare NPE seen here, guess CHS.values() isn't atomic?
+            if (cfg == null)
+                continue;
             long c = cfg.getRecentMessagesCount();
             bw += c;
             bwOut += cfg.getRecentSentMessagesCount();
