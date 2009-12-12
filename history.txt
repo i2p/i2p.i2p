@@ -1,3 +1,6 @@
+2009-12-12 zzz
+    * Disable InternalSockets until it's fixed
+
 2009-12-11 zzz
     * Addressbook, susidns: Rework addressbook into a
       HttpServlet, so susidns can kick it when the subscription
