@@ -23,6 +23,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.pool.TunnelPool;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.stat.RateStat;
 import net.i2p.util.ObjectCounter;
 
@@ -229,7 +230,7 @@ public class TunnelRenderer {
         Set<Hash> peers = new HashSet(lc.objects());
         peers.addAll(pc.objects());
         List<Hash> peerList = new ArrayList(peers);
-        Collections.sort(peerList, new HashComparator());
+        Collections.sort(peerList, new CountryComparator(this._context.commSystem()));
 
         out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + "</h2>\n");
         out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Expl. + Client") + "</th><th>" + _("% of total") + "</th><th>" + _("Part. from + to") + "</th><th>" + _("% of total") + "</th></tr>\n");
@@ -294,6 +295,22 @@ public class TunnelRenderer {
          public int compare(Object l, Object r) {
              return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
         }
+    }
+    
+    private static class CountryComparator implements Comparator<Hash> {
+        public CountryComparator(CommSystemFacade comm) {
+            this.comm = comm;
+        }
+        public int compare(Hash l, Hash r) {
+            // get both countries
+            String lc = this.comm.getCountry(l);
+            String rc = this.comm.getCountry(r);
+            
+            // let String handle the rest
+            return lc.compareTo(rc);
+        }
+        
+        private CommSystemFacade comm;
     }
 
     private String getCapacity(Hash peer) {
