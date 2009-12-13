@@ -1,6 +1,7 @@
 2009-12-12 zzz
     * Disable InternalSockets until it's fixed
     * Sort peers on tunnels.jsp by country
+    * fix NPE in ^^
 
 2009-12-11 zzz
     * Addressbook, susidns: Rework addressbook into a
