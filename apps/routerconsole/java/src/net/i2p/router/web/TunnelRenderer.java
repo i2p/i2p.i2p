@@ -306,6 +306,10 @@ public class TunnelRenderer {
             String lc = this.comm.getCountry(l);
             String rc = this.comm.getCountry(r);
             
+            // make them non-null
+            lc = (lc == null) ? "zzzz" : lc;
+            rc = (rc == null) ? "zzzz" : rc;
+            
             // let String handle the rest
             return lc.compareTo(rc);
         }
