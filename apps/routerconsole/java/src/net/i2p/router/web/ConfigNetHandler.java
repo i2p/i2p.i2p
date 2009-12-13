@@ -256,24 +256,26 @@ public class ConfigNetHandler extends FormHandler {
         if (switchRequired) {
             hiddenSwitch();
         } else if (restartRequired) {
-            // Wow this dumps all conns immediately and really isn't nice
-            //addFormNotice("Performing a soft restart");
-            //_context.router().restart();
-            //addFormNotice("Soft restart complete");
+            if (System.getProperty("wrapper.version") == null) {
+                // Wow this dumps all conns immediately and really isn't nice
+                addFormNotice("Performing a soft restart");
+                _context.router().restart();
+                addFormNotice("Soft restart complete");
 
-            // Most of the time we aren't changing addresses, just enabling or disabling
-            // things, so let's try just a new routerInfo and see how that works.
-            // Maybe we should restart if we change addresses though?
-            // No, this doesn't work well, really need to call SSU Transport externalAddressReceived(),
-            // but that's hard to get to, and doesn't handle port changes, etc.
-            // So don't do this...
-            //_context.router().rebuildRouterInfo();
-            //addFormNotice("Router Info rebuilt");
-
-            // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
-            // But it would be hard to get right, so just do a restart.
-            addFormError(_("Gracefully restarting I2P to change published router address"));
-            _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+                // Most of the time we aren't changing addresses, just enabling or disabling
+                // things, so let's try just a new routerInfo and see how that works.
+                // Maybe we should restart if we change addresses though?
+                // No, this doesn't work well, really need to call SSU Transport externalAddressReceived(),
+                // but that's hard to get to, and doesn't handle port changes, etc.
+                // So don't do this...
+                //_context.router().rebuildRouterInfo();
+                //addFormNotice("Router Info rebuilt");
+            } else {
+                // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
+                // But it would be hard to get right, so just do a restart.
+                addFormError(_("Gracefully restarting I2P to change published router address"));
+                _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+            }
         }
     }
 

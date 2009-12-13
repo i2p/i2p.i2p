@@ -518,7 +518,7 @@ public class I2PSnarkServlet extends HttpServlet {
                                curPeers + '/' + knownPeers +
                                " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
             else if (isRunning)
-                statusString = _("Seeding") + " (" + curPeers + "/" + knownPeers + ' ' + ("peers") + ')';
+                statusString = _("Seeding") + " (" + curPeers + "/" + knownPeers + ' ' + _("peers") + ')';
             else
                 statusString = _("Complete");
         } else {
@@ -695,9 +695,9 @@ public class I2PSnarkServlet extends HttpServlet {
                     } else {
                         out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInteresting())
-                            out.write(_("Uninteresting"));
+                            out.write(_("Uninteresting (The peer has no pieces we need)"));
                         else
-                            out.write(_("Choked"));
+                            out.write(_("Choked (The peer is not allowing us to request pieces)"));
                         out.write("\">");
                         out.write(formatSize(peer.getDownloadRate()) + "ps</a></font>");
                     }
@@ -711,9 +711,9 @@ public class I2PSnarkServlet extends HttpServlet {
                     } else {
                         out.write("<font color=#a00000><a title=\"");
                         if (!peer.isInterested())
-                            out.write(_("Uninterested"));
+                            out.write(_("Uninterested (We have no pieces the peer needs)"));
                         else
-                            out.write(_("Choking"));
+                            out.write(_("Choking (We are not allowing the peer to request pieces)"));
                         out.write("\">");
                         out.write(formatSize(peer.getUploadRate()) + "ps</a></font>");
                     }

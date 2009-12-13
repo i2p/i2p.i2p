@@ -112,9 +112,8 @@ public abstract class Translate {
         ResourceBundle rv = _bundles.get(key);
         if (rv == null && !_missing.contains(key)) {
             try {
-                // Would it be faster to specify a class loader?
-                // No matter we only do this once per lang.
-                rv = ResourceBundle.getBundle(bun, new Locale(lang));
+                // We must specify the class loader so that a webapp can find the bundle in the .war
+                rv = ResourceBundle.getBundle(bun, new Locale(lang), Thread.currentThread().getContextClassLoader());
                 if (rv != null)
                     _bundles.put(key, rv);
             } catch (MissingResourceException e) {
