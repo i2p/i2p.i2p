@@ -23,6 +23,7 @@
  * $Revision: 1.2 $
  */
 %>
+<%@page pageEncoding="UTF-8"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -31,6 +32,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>subscriptions - susidns v${version.version}</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
