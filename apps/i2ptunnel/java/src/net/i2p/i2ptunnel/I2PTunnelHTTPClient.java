@@ -261,6 +261,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     public static final String PROP_REFERER = "i2ptunnel.httpclient.sendReferer";
     public static final String PROP_USER_AGENT = "i2ptunnel.httpclient.sendUserAgent";
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
+    public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
     
     private static long __requestId = 0;
     protected void clientConnectionRun(Socket s) {
@@ -591,7 +592,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
                 byte[] header;
-                boolean showAddrHelper = false;
+                String jumpServers = null;
                 if (usingWWWProxy)
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 else if(ahelper != 0)
@@ -600,9 +601,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     header = getErrorPage("dnf", ERR_DESTINATION_UNKNOWN);
                 else {
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
-                    showAddrHelper = true;
+                    jumpServers = getTunnel().getClientOptions().getProperty(PROP_JUMP_SERVERS);
+                    if (jumpServers == null)
+                        jumpServers = DEFAULT_JUMP_SERVERS;
                 }
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination, showAddrHelper);
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination, jumpServers);
                 s.close();
                 return;
             }
@@ -757,15 +760,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
     
-    private static String jumpServers[] = {
-                                           "http://i2host.i2p/cgi-bin/i2hostjump?",
-                                           // "http://orion.i2p/jump/",
-                                           "http://stats.i2p/cgi-bin/jump.cgi?a=",
-                                           // "http://trevorreznik.i2p/cgi-bin/jump.php?hostname=",
-                                           "http://i2jump.i2p/"
-                                          };
+    private static String DEFAULT_JUMP_SERVERS =
+                                           "http://i2host.i2p/cgi-bin/i2hostjump?," +
+                                           "http://stats.i2p/cgi-bin/jump.cgi?a=," +
+                                           "http://i2jump.i2p/";
+
+    /**
+     *  @param jumpServers comma- or space-separated list, or null
+     */
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
-                                          boolean usingWWWProxy, String wwwProxy, boolean showAddrHelper) throws IOException {
+                                          boolean usingWWWProxy, String wwwProxy, String jumpServers) throws IOException {
         if (out != null) {
             out.write(errMessage);
             if (targetRequest != null) {
@@ -781,12 +785,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 out.write(uri.getBytes());
                 out.write("</a>".getBytes());
                 if (usingWWWProxy) out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
-                if (showAddrHelper) {
+                if (jumpServers != null && jumpServers.length() > 0) {
                     // Fixme untranslated
                     out.write("<br><br>Click a link below to look for an address helper by using a \"jump\" service:<br>".getBytes());
-                    for (int i = 0; i < jumpServers.length; i++) {
+
+                    StringTokenizer tok = new StringTokenizer(jumpServers, ", ");
+                    while (tok.hasMoreTokens()) {
+                        String jurl = tok.nextToken();
+                        if (!jurl.startsWith("http://"))
+                            continue;
                         // Skip jump servers we don't know
-                        String jumphost = jumpServers[i].substring(7);  // "http://"
+                        String jumphost = jurl.substring(7);  // "http://"
                         jumphost = jumphost.substring(0, jumphost.indexOf('/'));
                         try {
                             Destination dest = I2PTunnel.destFromName(jumphost);
@@ -796,10 +805,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
 
                         out.write("<br><a href=\"".getBytes());
-                        out.write(jumpServers[i].getBytes());
+                        out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("\">".getBytes());
-                        out.write(jumpServers[i].getBytes());
+                        out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("</a>".getBytes());
                     }
@@ -823,7 +832,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     header = getErrorPage(I2PAppContext.getGlobalContext(), "dnfp", ERR_DESTINATION_UNKNOWN);
                 else
                     header = getErrorPage(I2PAppContext.getGlobalContext(), "dnf", ERR_DESTINATION_UNKNOWN);
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, false);
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, null);
             } catch (IOException ioe) {
                 // static
                 //_log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);
