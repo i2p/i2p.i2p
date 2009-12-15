@@ -452,7 +452,8 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
                 fileOutputStream.write(buffer, 0, bytesRead);
         } catch (IOException ioe) {
-            return "I/O Exception during file extraction";
+            // probably permissions or disk full, so bring the message out to the console
+            return "Error copying update: " + ioe;
         } finally {
             if (fileInputStream != null)
                 try {
