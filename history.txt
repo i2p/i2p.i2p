@@ -1,3 +1,11 @@
+2009-12-15 zzz
+    * HTTP Proxy: Make jump server list configurable
+    * i2psnark: Fix stop/start, cleanups
+    * i2ptunnel: Fix bundle location
+    * susidns: UTF-8 fixes
+    * TunnelManager: Fix a locking bug
+    * Update: Improve error message
+
 2009-12-13 zzz
     * Find ResourceBundles in wars
     * Fix restart from config.jsp if no wrapper

@@ -76,7 +76,7 @@ do
 	echo "Generating ${CLASS}_$LG ResourceBundle..."
 
 	# convert to class files in build/obj
-	msgfmt --java -r $CLASS -l $LG -d build/obj $i
+	msgfmt --java --statistics -r $CLASS -l $LG -d ../jsp/WEB-INF/classes $i
 	if [ $? -ne 0 ]
 	then
 		echo 'Warning - msgfmt failed, not updating translations'

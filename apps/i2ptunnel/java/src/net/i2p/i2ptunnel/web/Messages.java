@@ -7,7 +7,7 @@ import net.i2p.util.Translate;
  * Translate strings for this package.
  */
 public class Messages {
-    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.messages";
+    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.web.messages";
     private final I2PAppContext _context;
 
     public Messages() {
