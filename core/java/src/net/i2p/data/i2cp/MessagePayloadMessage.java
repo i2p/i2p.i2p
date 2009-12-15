@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Payload;
-import net.i2p.util.Log;
 
 /**
  * Defines the payload message a router sends to the client
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class MessagePayloadMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(MessagePayloadMessage.class);
     public final static int MESSAGE_TYPE = 31;
     private long _sessionId;
     private long _messageId;

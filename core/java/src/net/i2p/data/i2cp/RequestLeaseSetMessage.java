@@ -20,7 +20,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when destroying
@@ -29,7 +28,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class RequestLeaseSetMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(RequestLeaseSetMessage.class);
     public final static int MESSAGE_TYPE = 21;
     private SessionId _sessionId;
     private List _endpoints;

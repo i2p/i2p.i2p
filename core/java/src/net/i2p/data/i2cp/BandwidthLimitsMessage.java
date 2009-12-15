@@ -11,7 +11,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Tell the other side the limits
@@ -19,7 +18,6 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class BandwidthLimitsMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(BandwidthLimitsMessage.class);
     public final static int MESSAGE_TYPE = 23;
     private static final int LIMITS = 16;
     private int[] data;

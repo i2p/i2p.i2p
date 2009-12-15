@@ -18,7 +18,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Payload;
-import net.i2p.util.Log;
 
 /**
  * Same as SendMessageMessage, but with an expiration to be passed to the router
@@ -26,7 +25,6 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class SendMessageExpiresMessage extends SendMessageMessage {
-    private final static Log _log = new Log(SendMessageExpiresMessage.class);
     /* FIXME hides another field FIXME */
     public final static int MESSAGE_TYPE = 36;
     private SessionId _sessionId;

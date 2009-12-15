@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Defines the base message implementation.
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPMessage {
-    private final static Log _log = new Log(I2CPMessageImpl.class);
 
     public I2CPMessageImpl() { // nop
     }

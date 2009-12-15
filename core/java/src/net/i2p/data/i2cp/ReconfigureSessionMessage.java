@@ -15,7 +15,6 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class ReconfigureSessionMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(ReconfigureSessionMessage.class);
     public final static int MESSAGE_TYPE = 2;
     private SessionId _sessionId;
     private SessionConfig _sessionConfig;

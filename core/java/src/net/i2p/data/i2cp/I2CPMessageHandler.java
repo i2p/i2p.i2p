@@ -15,14 +15,12 @@ import java.io.InputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Handle messages from the server for the client or vice versa
  *
  */
 public class I2CPMessageHandler {
-    private final static Log _log = new Log(I2CPMessageHandler.class);
 
     /**
      * Read an I2CPMessage from the stream and return the fully populated object.

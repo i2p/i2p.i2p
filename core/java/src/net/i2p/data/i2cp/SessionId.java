@@ -1,5 +1,4 @@
 package net.i2p.data.i2cp;
-
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -16,7 +15,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Defines the token passed between the router and client to associate messages
@@ -25,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class SessionId extends DataStructureImpl {
-    private final static Log _log = new Log(SessionId.class);
     private int _sessionId;
 
     public SessionId() {
