@@ -28,12 +28,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
 <jsp:useBean id="subs" class="i2p.susi.dns.SubscriptionsBean" scope="session" />
+<jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="subs" property="*" />
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>subscriptions - susidns v${version.version}</title>
+<title><%=intl._("subscriptions")%> - susidns v${version.version}</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
@@ -42,14 +43,15 @@
 <img src="images/logo.png" alt="susidns logo" border="0"/>
 </div><hr>
 <div id="navi">
-<p>addressbooks
-<a href="addressbook.jsp?book=master">master</a> |
-<a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> |
-<a href="addressbook.jsp?book=private">private</a> *
-subscriptions *
-<a href="config.jsp">configuration</a> *
-<a href="index.jsp">overview</a>
+<p>
+<%=intl._("addressbooks")%>
+<a href="addressbook.jsp?book=private"><%=intl._("private")%></a> |
+<a href="addressbook.jsp?book=master"><%=intl._("master")%></a> |
+<a href="addressbook.jsp?book=router"><%=intl._("router")%></a> |
+<a href="addressbook.jsp?book=published"><%=intl._("published")%></a> *
+<%=intl._("subscriptions")%> *
+<a href="config.jsp"><%=intl._("configuration")%></a> *
+<a href="index.jsp"><%=intl._("overview")%></a>
 </p>
 </div><hr>
 <div id="headline">
@@ -67,13 +69,13 @@ subscriptions *
 </div>
 </form>
 <div id="help">
-<h3>Explanation</h3>
 <p class="help">
-The subscription file contains a list of (i2p) URLs. The addressbook application
-regularly (once per hour) checks this list for new eepsites. Those URLs simply contain the published hosts.txt
-file of other people. The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.
-So it is a good idea to add additional subscriptions to sites that have the latest addresses.
-<a href="http://www.i2p2.i2p/faq.html#subscriptions">See the FAQ for a list of subscription URLs.</a>
+<%=intl._("The subscription file contains a list of i2p URLs.")%>
+<%=intl._("The addressbook application regularly checks this list for new eepsites.")%>
+<%=intl._("Those URLs refer to published hosts.txt files.")%>
+<%=intl._("The default subscription is the hosts.txt from www.i2p2.i2p, which is updated infrequently.")%>
+<%=intl._("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
+<a href="http://www.i2p2.i2p/faq.html#subscriptions"><%=intl._("See the FAQ for a list of subscription URLs.")%></a>
 </p>
 </div><hr>
 <div id="footer">

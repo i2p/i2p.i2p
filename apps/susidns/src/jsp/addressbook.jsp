@@ -28,6 +28,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
 <jsp:useBean id="book" class="i2p.susi.dns.AddressbookBean" scope="session" />
+<jsp:useBean id="intl" class="i2p.susi.dns.Messages" scope="application" />
 <jsp:setProperty name="book" property="*" />
 <jsp:setProperty name="book" property="resetDeletionMarks" value="1"/>
 <c:forEach items="${paramValues.checked}" var="checked">
@@ -37,7 +38,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>${book.book} addressbook - susidns v${version.version}</title>
+<title>${book.book} <%=intl._("addressbook")%> - susidns v${version.version}</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
@@ -47,19 +48,20 @@
 </div>
 <hr>
 <div id="navi">
-<p>addressbooks
-<a href="addressbook.jsp?book=master&filter=none&begin=0&end=99">master</a> |
-<a href="addressbook.jsp?book=router&filter=none&begin=0&end=99">router</a> |
-<a href="addressbook.jsp?book=published&filter=none&begin=0&end=99">published</a> |
-<a href="addressbook.jsp?book=private&filter=none&begin=0&end=99">private</a> *
-<a href="subscriptions.jsp">subscriptions</a> *
-<a href="config.jsp">configuration</a> *
-<a href="index.jsp">overview</a>
+<p>
+<%=intl._("addressbooks")%>
+<a href="addressbook.jsp?book=private&filter=none&begin=0&end=99"><%=intl._("private")%></a> |
+<a href="addressbook.jsp?book=master&filter=none&begin=0&end=99"><%=intl._("master")%></a> |
+<a href="addressbook.jsp?book=router&filter=none&begin=0&end=99"><%=intl._("router")%></a> |
+<a href="addressbook.jsp?book=published&filter=none&begin=0&end=99"><%=intl._("published")%></a> *
+<a href="subscriptions.jsp"><%=intl._("subscriptions")%></a> *
+<a href="config.jsp"><%=intl._("configuration")%></a> *
+<a href="index.jsp"><%=intl._("overview")%></a>
 </p>
 </div>
 <hr>
 <div id="headline">
-<h3>${book.book} addressbook at ${book.fileName}</h3>
+<h3><%=intl._(book.getBook())%> <%=intl._("addressbook")%>: ${book.fileName}</h3>
 </div>
 
 <div id="messages">${book.messages}</div>
@@ -68,7 +70,7 @@
 
 <c:if test="${book.notEmpty}">
 <div id="filter">
-<p>Filter:
+<p><%=intl._("Filter")%>:
 <a href="addressbook.jsp?filter=a&begin=0&end=99">a</a>
 <a href="addressbook.jsp?filter=b&begin=0&end=99">b</a>
 <a href="addressbook.jsp?filter=c&begin=0&end=99">c</a> 
@@ -96,10 +98,10 @@
 <a href="addressbook.jsp?filter=y&begin=0&end=99">y</a>
 <a href="addressbook.jsp?filter=z&begin=0&end=99">z</a>
 <a href="addressbook.jsp?filter=0-9&begin=0&end=99">0-9</a>
-<a href="addressbook.jsp?filter=none&begin=0&end=99">all</a></p>
+<a href="addressbook.jsp?filter=none&begin=0&end=99"><%=intl._("all")%></a></p>
 <c:if test="${book.hasFilter}">
-<p>Current filter: ${book.filter}
-(<a href="addressbook.jsp?filter=none&begin=0&end=99">clear filter</a>)</p>
+<p><%=intl._("Current filter")%>: ${book.filter}
+(<a href="addressbook.jsp?filter=none&begin=0&end=99"><%=intl._("clear filter")%></a>)</p>
 </c:if>
 </div>
 
@@ -108,7 +110,7 @@
 <input type="hidden" name="end" value="99">
 <div id="search">
 <table><tr>
-<td class="search">Search: <input type="text" name="search" value="${book.search}" size="20" ></td>
+<td class="search"><%=intl._("Search")%>: <input type="text" name="search" value="${book.search}" size="20" ></td>
 <td class="search"><input type="image" src="images/search.png" name="submitsearch" value="search" alt="Search" ></td>
 </tr>
 </table>
@@ -133,17 +135,17 @@
 <th>&nbsp;</th>
 </c:if>
 
-<th>Name</th>
-<th>Destination</th>
+<th><%=intl._("Name")%></th>
+<th><%=intl._("Destination")%></th>
 </tr>
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
 <c:forEach items="${book.entries}" var="addr" begin="${book.begin}" end="${book.end}">
 <tr class="list${book.trClass}">
 <c:if test="${book.master || book.router || book.published || book.private}">
-<td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" alt="Mark for deletion"></td>
+<td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
 </c:if>
 <td class="names"><a href="http://${addr.name}/">${addr.name}</a> -
-<span class="addrhlpr"><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}">(addrhlpr)</a></span>
+<span class="addrhlpr">(<a href="http://${addr.name}/?i2paddresshelper=${addr.destination}"><%=intl._("address helper link")%></a>)</span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
@@ -162,15 +164,15 @@
 
 <c:if test="${book.isEmpty}">
 <div id="book">
-<p class="book">The ${book.book} addressbook is empty.</p>
+<p class="book"><%=intl._("This addressbook is empty.")%></p>
 </div>
 </c:if>
 
 <div id="add">
 <p class="add">
-<h3>Add new destination:</h3>
-<b>Hostname:</b> <input type="text" name="hostname" value="${book.hostname}" size="20">
-<b>Destination:</b> <textarea name="destination" rows="1" style="height: 3em;" cols="40" wrap="off" >${book.destination}</textarea><br/>
+<h3><%=intl._("Add new destination")%>:</h3>
+<b><%=intl._("Hostname")%>:</b> <input type="text" name="hostname" value="${book.hostname}" size="20">
+<b><%=intl._("Destination")%>:</b> <textarea name="destination" rows="1" style="height: 3em;" cols="40" wrap="off" >${book.destination}</textarea><br/>
 </p><p>
 <input type="image" name="action" value="add" src="images/add.png" alt="Add destination" >
 </p>

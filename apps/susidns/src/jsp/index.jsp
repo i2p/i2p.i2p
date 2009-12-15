@@ -32,7 +32,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title><%=intl._("Introduction - SusiDNS")%> v${version.version}</title>
+<title><%=intl._("Introduction")%> - SusiDNS v${version.version}</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
@@ -42,40 +42,40 @@
 </div>
 <hr>
 <div id="navi">
-<p>addressbooks
-<a href="addressbook.jsp?book=master">master</a> |
-<a href="addressbook.jsp?book=router">router</a> |
-<a href="addressbook.jsp?book=published">published</a> |
-<a href="addressbook.jsp?book=private">private</a> *
-<a href="subscriptions.jsp">subscriptions</a> *
-<a href="config.jsp">configuration</a> *
-overview
+<p>
+<%=intl._("addressbooks")%>
+<a href="addressbook.jsp?book=private"><%=intl._("private")%></a> |
+<a href="addressbook.jsp?book=master"><%=intl._("master")%></a> |
+<a href="addressbook.jsp?book=router"><%=intl._("router")%></a> |
+<a href="addressbook.jsp?book=published"><%=intl._("published")%></a> *
+<a href="subscriptions.jsp"><%=intl._("subscriptions")%></a> *
+<a href="config.jsp"><%=intl._("configuration")%></a> *
+<%=intl._("overview")%>
 </p>
 </div>
 <hr>
 <div id="content">
-<h3>Huh? what addressbook?</h3>
+<h3><%=intl._("What is the addressbook?")%></h3>
 <p>
-The addressbook application is part of your i2p installation. It regularly updates your hosts.txt file
-from distributed sources. It keeps your hosts.txt up to date, so it can automatically add
-eepsites announced on other sites if you subscribe to those sites' addressbooks.
+<%=intl._("The addressbook application is part of your i2p installation.")%>
+<%=intl._("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
 </p>
 <p>
-(To speak the truth: In its default configuration the addressbook does not poll
-additional sites, but www.i2p2.i2p only. Subscribing to additional sites is an easy task,
-just add them to your <a href="subscriptions.jsp">subscriptions</a> file.)
+<%=intl._("In the default configuration, the addressbook is only subscribed to www.i2p2.i2p.")%>
+<%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions.jsp\">subscriptions</a> file.")%>
 </p>
-<p>If you have questions about naming in i2p, there is an excellent <a href="http://forum.i2p/viewtopic.php?t=134">introduction</a>
-from duck in the forum and <a href="http://www.i2p2.i2p/naming.html">additional information on www.i2p2.i2p</a>.</p>
-<h3>How does the addressbook work?</h3>
-<p>The addressbook application regularly (normally once per hour) polls your subscriptions and merges their content
-into your so-called router addressbook (normally your plain hosts.txt). Then it merges your so-called master addressbook (normally
-your userhosts.txt) into the router addressbook as well. If configured, the router addressbook is now written to the published addressbook, 
-which is a publicly available copy of your hosts.txt somewhere in your eepsite's document root.
+<p>
+<%=intl._("For more information on naming in i2p, see <a href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>.")%>
+</p>
+<h3><%=intl._("How does the addressbook work?")%></h3>
+<p>
+<%=intl._("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" addressbook, stored in the hosts.txt file.")%>
+<%=intl._("Then it merges your \"master\" addressbook (userhosts.txt) into the router addressbook as well.")%>
+<%=intl._("If configured, the router addressbook is now written to the \"published\" addressbook, which will be publicly available if you are running an eepsite.")%>
 </p><p>
-The router also uses a private addressbook (privatehosts.txt, not shown in the picture), which is not merged or published.
-Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others.
-The private addressbook can also be used for aliases of hosts in your other addressbooks.
+<%=intl._("The router also uses a private addressbook (privatehosts.txt, not shown in the picture), which is not merged or published.")%>
+<%=intl._("Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others.")%>
+<%=intl._("The private addressbook can also be used for aliases of hosts in your other addressbooks.")%>
 </p>
 <p><center><img src="images/how.png" border="0" alt="addressbook working scheme" title="How the addressbook works" class="illustrate" /></center></p>
 </div>	
