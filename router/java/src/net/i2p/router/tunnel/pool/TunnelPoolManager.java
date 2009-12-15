@@ -175,7 +175,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public int getOutboundClientTunnelCount() { 
         int count = 0;
         List destinations = null;
-        synchronized (_clientInboundPools) {
+        synchronized (_clientOutboundPools) {
             destinations = new ArrayList(_clientOutboundPools.keySet());
         }
         for (int i = 0; i < destinations.size(); i++) {

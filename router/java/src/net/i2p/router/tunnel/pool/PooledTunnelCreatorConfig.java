@@ -83,7 +83,9 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public void setTestJob(TestJob job) { _testJob = job; }
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
-    // Fix memory leaks caused by references if you need to use pairedTunnel
+    /**
+     * @deprecated Fix memory leaks caused by references if you need to use pairedTunnel
+     */
     public void setPairedTunnel(TunnelInfo tunnel) { /* _pairedTunnel = tunnel; */}
     // public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
 }

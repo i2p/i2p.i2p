@@ -491,7 +491,7 @@ public abstract class TunnelPeerSelector {
      *  Now:
      *     d((H(l+h), h) - d(H(r+h), h)
      */
-    private class HashComparator implements Comparator {
+    private static class HashComparator implements Comparator {
         private Hash _hash;
 
         private HashComparator(Hash h) {

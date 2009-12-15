@@ -109,7 +109,7 @@ class BuildRequestor {
             return;
         }
         
-        cfg.setPairedTunnel(pairedTunnel);
+        //cfg.setPairedTunnel(pairedTunnel);
         
         long beforeDispatch = System.currentTimeMillis();
         if (cfg.isInbound()) {
