@@ -185,7 +185,7 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"2\">");
             out.write(_("Totals"));
-            out.write(" {");
+            out.write(" (");
             out.write(_("{0} torrents", snarks.size()));
             out.write(", ");
             out.write(DataHelper.formatSize(stats[5]) + "B, ");
@@ -216,7 +216,7 @@ public class I2PSnarkServlet extends HttpServlet {
         String action = req.getParameter("action");
         if (action == null) {
             // noop
-        } else if (_("Add torrent").equals(action)) {
+        } else if ("Add".equals(action)) {
             String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
             // NOTE - newFile currently disabled in HTML form - see below
@@ -260,7 +260,7 @@ public class I2PSnarkServlet extends HttpServlet {
             } else {
                 // no file or URL specified
             }
-        } else if (_("Stop").equals(action)) {
+        } else if ("Stop".equals(action)) {
             String torrent = req.getParameter("torrent");
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
@@ -275,7 +275,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     }
                 }
             }
-        } else if (_("Start").equals(action)) {
+        } else if ("Start".equals(action)) {
             String torrent = req.getParameter("torrent");
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
@@ -357,7 +357,7 @@ public class I2PSnarkServlet extends HttpServlet {
                     }
                 }
             }
-        } else if (_("Save configuration").equals(action)) {
+        } else if ("Save".equals(action)) {
             String dataDir = req.getParameter("dataDir");
             boolean autoStart = req.getParameter("autoStart") != null;
             String seedPct = req.getParameter("seedPct");
@@ -371,7 +371,7 @@ public class I2PSnarkServlet extends HttpServlet {
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
             String openTrackers = req.getParameter("openTrackers");
             _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
-        } else if (_("Create torrent").equals(action)) {
+        } else if ("Create".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(_manager.getDataDir(), baseData);
@@ -738,6 +738,7 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
+        out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write(_("Add Torrent"));
         out.write("</span><br>\n<table border=\"0\"><tr><td>");
@@ -747,7 +748,7 @@ public class I2PSnarkServlet extends HttpServlet {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Add torrent"));
-        out.write("\" name=\"action\" ><br>\n");
+        out.write("\" name=\"foo\" ><br>\n");
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
         out.write(_("Alternately, you can copy .torrent files to the directory {0}.", _manager.getDataDir().getAbsolutePath()));
         out.write("\n");
@@ -766,6 +767,7 @@ public class I2PSnarkServlet extends HttpServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
+        out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write(_("Create Torrent"));
         out.write("</span><br>\n<table border=\"0\"><tr><td>");
@@ -798,7 +800,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("\" > ");
         out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Create torrent"));
-        out.write("\" name=\"action\" ></table>\n");
+        out.write("\" name=\"foo\" ></table>\n");
         out.write("</form>\n</span></div>");        
     }
     
@@ -813,6 +815,7 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
+        out.write("<input type=\"hidden\" name=\"action\" value=\"Save\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write(_("Configuration"));
         out.write("</span><br>\n");
@@ -912,7 +915,7 @@ public class I2PSnarkServlet extends HttpServlet {
 
         out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Save configuration"));
-        out.write("\" name=\"action\" >\n");
+        out.write("\" name=\"foo\" >\n");
         out.write("</table></span>\n");
         out.write("</form></div>");
     }
@@ -970,6 +973,7 @@ private static class FetchAndAdd implements Runnable {
                     in = new FileInputStream(file);
                     MetaInfo info = new MetaInfo(in);
                     String name = info.getName();
+                    name = DataHelper.stripHTML(name);  // XSS
                     name = name.replace('/', '_');
                     name = name.replace('\\', '_');
                     name = name.replace('&', '+');
