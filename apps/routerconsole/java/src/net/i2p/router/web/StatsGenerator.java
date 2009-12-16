@@ -88,7 +88,7 @@ public class StatsGenerator {
                 out.write(buf.toString());
                 buf.setLength(0);
             }
-            out.write("</ul><br>");
+            out.write("</ul><br>\n");
         }
         out.flush();
     }
@@ -124,9 +124,9 @@ public class StatsGenerator {
             buf.append(" using the lifetime of ");
             buf.append(curFreq.getEventCount());
             buf.append(" events)");
-            buf.append("<br>");
+            buf.append("<br>\n");
         }
-        buf.append("<br>");
+        buf.append("<br>\n");
     }
     
     private void renderRate(String name, StringBuilder buf) {
@@ -138,7 +138,7 @@ public class StatsGenerator {
             buf.append("</i><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
-            buf.append("No lifetime events<br>");
+            buf.append("No lifetime events<br>\n");
             return;
         }
         long now = _context.clock().now();
@@ -210,7 +210,7 @@ public class StatsGenerator {
                 buf.append("&amp;format=xml\" title=\"Dump stat history as XML\">XML</a>");
                 buf.append(" in a format <a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool\">RRDTool</a> understands)");
             }
-            buf.append("</li>");
+            buf.append("</li>\n");
         }
         // Display the strict average
         buf.append("<li><b>lifetime average value:</b> ");
@@ -219,7 +219,7 @@ public class StatsGenerator {
         buf.append(rate.getLifetimeEventCount());
         buf.append(" events<br></li>");
         buf.append("</ul>");
-        buf.append("<br>");
+        buf.append("<br>\n");
     }
     
     private static void renderPeriod(StringBuilder buf, long period, String name) {
