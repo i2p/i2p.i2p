@@ -31,9 +31,8 @@ do
 		# make list of java files newer than the .po file
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
-
-	if [ -s build/obj/net/i2p/i2ptunnel/web/messages_$LG.class -a \
-	     build/obj/net/i2p/i2ptunnel/web/messages_$LG.class -nt $i -a \
+	if [ -s ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web/messages_$LG.class -a \
+	     ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue
