@@ -32,7 +32,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title><%=intl._("Introduction")%> - SusiDNS v${version.version}</title>
+<title><%=intl._("Introduction")%> - SusiDNS</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>

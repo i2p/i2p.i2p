@@ -19,19 +19,15 @@ public class Messages {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
-    /**
-     *  translate a string with a parameter
-     *  This is a lot more expensive than getString(s, ctx), so use sparingly.
-     *
-     *  @param s string to be translated containing {0}
-     *    The {0} will be replaced by the parameter.
-     *    Single quotes must be doubled, i.e. ' -> '' in the string.
-     *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
-     *    Do not double the single quotes in the parameter.
-     *    Use autoboxing to call with ints, longs, floats, etc.
-     */
-    public String _(String s, Object o) {
-        return Translate.getString(s, o, _context, BUNDLE_NAME);
+    public static String getString(String s) {
+        return Translate.getString(s, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
+    }
+
+    public static String getString(String s, Object o) {
+        return Translate.getString(s, o, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
+    }
+
+    public static String getString(String s, Object o, Object o2) {
+        return Translate.getString(s, o, o2, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 }

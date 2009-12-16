@@ -38,7 +38,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>${book.book} <%=intl._("addressbook")%> - susidns v${version.version}</title>
+<title>${book.book} <%=intl._("addressbook")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
@@ -111,7 +111,7 @@
 <div id="search">
 <table><tr>
 <td class="search"><%=intl._("Search")%>: <input type="text" name="search" value="${book.search}" size="20" ></td>
-<td class="search"><input type="image" src="images/search.png" name="submitsearch" value="search" alt="Search" ></td>
+<td class="search"><input type="submit" name="submitsearch" value="<%=intl._("Search")%>" ></td>
 </tr>
 </table>
 </div>
@@ -155,7 +155,7 @@
 
 <c:if test="${book.master || book.router || book.published || book.private}">
 <div id="buttons">
-<p class="buttons"><input type="image" name="action" value="delete" src="images/delete.png" alt="Delete checked" >
+<p class="buttons"><input type="submit" name="action" value="<%=intl._("Delete")%>" >
 </p>
 </div>
 </c:if>
@@ -174,7 +174,7 @@
 <b><%=intl._("Hostname")%>:</b> <input type="text" name="hostname" value="${book.hostname}" size="20">
 <b><%=intl._("Destination")%>:</b> <textarea name="destination" rows="1" style="height: 3em;" cols="40" wrap="off" >${book.destination}</textarea><br/>
 </p><p>
-<input type="image" name="action" value="add" src="images/add.png" alt="Add destination" >
+<input type="submit" name="action" value="<%=intl._("Add")%>" >
 </p>
 </div>
 

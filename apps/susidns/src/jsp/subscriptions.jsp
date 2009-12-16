@@ -34,7 +34,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title><%=intl._("subscriptions")%> - susidns v${version.version}</title>
+<title><%=intl._("subscriptions")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
@@ -64,8 +64,8 @@
 <textarea name="content" rows="10" cols="80">${subs.content}</textarea>
 </div>
 <div id="buttons">
-<input type="image" src="images/save.png" name="action" value="save" alt="Save Subscriptions" >
-<input type="image" src="images/reload.png" name="action" value="reload" alt="Reload Subscriptions" >
+<input type="submit" name="action" value="<%=intl._("Save")%>" >
+<input type="submit" name="action" value="<%=intl._("Reload")%>" >
 </div>
 </form>
 <div id="help">

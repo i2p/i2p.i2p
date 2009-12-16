@@ -126,7 +126,7 @@ public class SubscriptionsBean
 		String message = "";
 		if( action != null ) {
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
-				if( action.compareToIgnoreCase( "save") == 0 ) {
+				if (action.equals(_("Save"))) {
 					save();
 					String nonce = System.getProperty("addressbook.nonce");
 					if (nonce != null) {	
@@ -135,20 +135,19 @@ public class SubscriptionsBean
 						// Fetching from the addressbook servlet
 						// with the correct parameters will kick off a
 						// config reload and fetch.
-						message = "Subscriptions saved, updating addressbook from subscription sources now." +
+						message = _("Subscriptions saved, updating addressbook from subscription sources now.") +
 						          "<img height=\"1\" width=\"1\" alt=\"\" " +
 						          "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
 					} else {
-						message = "Subscriptions saved.";
+						message = _("Subscriptions saved.");
 					}
-				}
-				else if( action.compareToIgnoreCase( "reload") == 0 ) {
+				} else if (action.equals(_("Reload"))) {
 					reload();
-					message = "Subscriptions reloaded.";
+					message = _("Subscriptions reloaded.");
 				}
 			}			
 			else {
-				message = "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
 			}
 		}
 		if( message.length() > 0 )
@@ -182,5 +181,10 @@ public class SubscriptionsBean
 		reload();
 		
 		return content;
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
 	}
 }
