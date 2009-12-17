@@ -176,7 +176,7 @@ public class SummaryBarRenderer {
 
         if (_helper.updateAvailable() || _helper.unsignedUpdateAvailable()) {
             // display all the time so we display the final failure message
-            buf.append("<br>").append(UpdateHandler.getStatus());
+            buf.append(UpdateHandler.getStatus());
             if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress"))) {
                 // nothing
             } else if(
@@ -191,7 +191,7 @@ public class SummaryBarRenderer {
                     System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<form action=\"").append(uri).append("\" method=\"GET\">\n");
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"GET\">\n");
                 buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
                 if (_helper.updateAvailable()) {
                     buf.append("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >")
