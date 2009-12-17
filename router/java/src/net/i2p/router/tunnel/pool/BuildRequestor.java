@@ -29,7 +29,17 @@ class BuildRequestor {
             ORDER.add(Integer.valueOf(i));
     }
     private static final int PRIORITY = 500;
-    static final int REQUEST_TIMEOUT = 10*1000;
+    /**
+     *  At 10 seconds, we were receiving about 20% of replies after expiration
+     *  Todo: make this variable on a per-request basis, to account for tunnel length,
+     *  expl. vs. client, uptime, and network conditions.
+     *  Put the expiration in the PTCC.
+     *
+     *  Also, perhaps, save the PTCC even after expiration for an extended time,
+     *  so can we use a successfully built tunnel anyway.
+     *
+     */
+    static final int REQUEST_TIMEOUT = 13*1000;
     
     private static boolean usePairedTunnels(RouterContext ctx) {
         String val = ctx.getProperty("router.usePairedTunnels");
@@ -113,19 +123,20 @@ class BuildRequestor {
         
         long beforeDispatch = System.currentTimeMillis();
         if (cfg.isInbound()) {
-            if (log.shouldLog(Log.DEBUG))
-                log.debug("Sending the tunnel build request " + msg.getUniqueId() + " out the tunnel " + pairedTunnel + " to " 
+            if (log.shouldLog(Log.INFO))
+                log.info("Sending the tunnel build request " + msg.getUniqueId() + " out the tunnel " + pairedTunnel + " to " 
                           + cfg.getPeer(0).toBase64() + " for " + cfg + " waiting for the reply of "
                           + cfg.getReplyMessageId());
             // send it out a tunnel targetting the first hop
             ctx.tunnelDispatcher().dispatchOutbound(msg, pairedTunnel.getSendTunnelId(0), cfg.getPeer(0));
         } else {
-            if (log.shouldLog(Log.DEBUG))
-                log.debug("Sending the tunnel build request directly to " + cfg.getPeer(1).toBase64() 
+            if (log.shouldLog(Log.INFO))
+                log.info("Sending the tunnel build request directly to " + cfg.getPeer(1).toBase64() 
                           + " for " + cfg + " waiting for the reply of " + cfg.getReplyMessageId() 
                           + " with msgId=" + msg.getUniqueId());
             // send it directly to the first hop
             OutNetMessage outMsg = new OutNetMessage(ctx);
+            // Todo: add some fuzz to the expiration to make it harder to guess how many hops?
             outMsg.setExpiration(msg.getMessageExpiration());
             outMsg.setMessage(msg);
             outMsg.setPriority(PRIORITY);
@@ -190,7 +201,7 @@ class BuildRequestor {
                 }
             }
             if (log.shouldLog(Log.DEBUG))
-                log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " has key " + key + " for " + cfg);
+                log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " has key " + key);
             gen.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel, ctx, key);
         }
         gen.layeredEncrypt(ctx, msg, cfg, order);

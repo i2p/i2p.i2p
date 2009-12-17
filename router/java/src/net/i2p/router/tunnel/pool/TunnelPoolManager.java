@@ -250,6 +250,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         startup();
     }
         
+    /**
+     *  Used only at session startup.
+     *  Do not use to change settings.
+     */
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Building tunnels for the client " + client.calculateHash().toBase64() + ": " + settings);
