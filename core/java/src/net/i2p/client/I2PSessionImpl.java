@@ -73,6 +73,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected Socket _socket;
     /** reader that always searches for messages */
     protected I2CPMessageReader _reader;
+    /** writer message queue */
+    protected ClientWriterRunner _writer;
     /** where we pipe our messages */
     protected /* FIXME final FIXME */OutputStream _out;
 
@@ -277,11 +279,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _out.write(I2PClient.PROTOCOL_BYTE);
                 _out.flush();
             }
+            _writer = new ClientWriterRunner(_out, this);
             InputStream in = _socket.getInputStream();
             _reader = new I2CPMessageReader(in, this);
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
             _reader.startReading();
-
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
             sendMessage(new GetDateMessage());
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After getDate / begin waiting for a response");
@@ -543,34 +545,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws I2PSessionException if the message is malformed or there is an error writing it out
      */
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        if (isClosed()) throw new I2PSessionException("Already closed");
-
-        long beforeSync = _context.clock().now();
-        long inSync = 0;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync to write");
-        try {
-            synchronized (_out) {
-                inSync = _context.clock().now();
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("before writeMessage");
-                message.writeMessage(_out);
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("after writeMessage");
-                _out.flush();
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("after flush");
-            }
-        } catch (I2CPMessageException ime) {
-            throw new I2PSessionException(getPrefix() + "Error writing out the message", ime);
-        } catch (IOException ioe) {
-            throw new I2PSessionException(getPrefix() + "Error writing out the message", ioe);
-        }
-        long afterSync = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug(getPrefix() + "Message written out and flushed w/ " 
-                       + (inSync-beforeSync) + "ms to sync and "
-                       + (afterSync-inSync) + "ms to send");
+        if (isClosed() || _writer == null)
+            throw new I2PSessionException("Already closed");
+        _writer.addMessage(message);
     }
 
     /**
      * Pass off the error to the listener
+     * Misspelled, oh well.
      */
     void propogateError(String msg, Throwable error) {
         if (_log.shouldLog(Log.ERROR)) 
@@ -629,8 +611,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private void closeSocket() {
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Closing the socket", new Exception("closeSocket"));
         _closed = true;
-        if (_reader != null) _reader.stopReading();
-        _reader = null;
+        if (_reader != null) {
+            _reader.stopReading();
+            _reader = null;
+        }
+        if (_writer != null) {
+            _writer.stopWriting();
+            _writer = null;
+        }
 
         if (_socket != null) {
             try {

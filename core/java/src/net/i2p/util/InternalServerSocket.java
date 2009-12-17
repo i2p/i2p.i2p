@@ -21,6 +21,11 @@ import net.i2p.I2PAppContext;
  *  A simple in-JVM ServerSocket using Piped Streams.
  *  We use port numbers just like regular sockets.
  *  Can only be connected by InternalSocket.
+ *
+ *  Warning - this uses Piped Streams, which don't like multiple writers from threads
+ *  that may vanish. If you do use multipe writers,
+ *  you may get intermittent 'write end dead' or 'pipe broken' IOExceptions on the reader side.
+ *  See http://techtavern.wordpress.com/2008/07/16/whats-this-ioexception-write-end-dead/
  */
 public class InternalServerSocket extends ServerSocket {
     private static final ConcurrentHashMap<Integer, InternalServerSocket> _sockets = new ConcurrentHashMap(4);
