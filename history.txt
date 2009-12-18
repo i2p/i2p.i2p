@@ -5,6 +5,10 @@
       - Reenable InternalSockets
     * i2ptunnel: Fix bundle script
     * InNetMessagePool: Cleanup
+    * Log:
+      - Close old file on rotate
+      - Buffer writes
+      - Write in UTF-8
     * SusiDNS:
       - Remove untranslatable button images (-15KB)
       - Tag buttons and messages

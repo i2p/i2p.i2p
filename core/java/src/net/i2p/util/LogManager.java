@@ -641,6 +641,7 @@ public class LogManager {
     public void shutdown() {
         _log.log(Log.WARN, "Shutting down logger");
         _writer.flushRecords(false);
+        _writer.stopWriting();
     }
 
     private static int __id = 0;

@@ -9,10 +9,13 @@ package net.i2p.util;
  *
  */
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -28,7 +31,7 @@ class LogWriter implements Runnable {
     private final static long CONFIG_READ_ITERVAL = 10 * 1000;
     private long _lastReadConfig = 0;
     private long _numBytesInCurrentFile = 0;
-    private OutputStream _currentOut; // = System.out
+    private Writer _currentOut;
     private int _rotationNum = -1;
     private String _logFilenamePattern;
     private File _currentFile;
@@ -56,11 +59,12 @@ class LogWriter implements Runnable {
                 flushRecords();
                 rereadConfig();
             }
-            System.err.println("Done writing");
+            //System.err.println("Done writing");
         } catch (Exception e) {
             System.err.println("Error writing the logs: " + e.getMessage());
             e.printStackTrace();
         }
+        closeFile();
     }
 
     public void flushRecords() { flushRecords(true); }
@@ -124,12 +128,10 @@ class LogWriter implements Runnable {
         if (val == null) return;
         if (_currentOut == null) rotateFile();
 
-        byte b[] = new byte[val.length()];
-        for (int i = 0; i < b.length; i++)
-            b[i] = (byte)val.charAt(i);
         try {
-            _currentOut.write(b);
-            _numBytesInCurrentFile += b.length;
+            _currentOut.write(val);
+            // may be a little off if a lot of multi-byte chars, but unlikely
+            _numBytesInCurrentFile += val.length();
         } catch (Throwable t) {
             System.err.println("Error writing record, disk full?");
             t.printStackTrace();
@@ -162,11 +164,21 @@ class LogWriter implements Runnable {
                 //System.exit(0);
             }
         }
+        closeFile();
         try {
-            _currentOut = new FileOutputStream(f);
+            _currentOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
         } catch (IOException ioe) {
             System.err.println("Error rotating into [" + f.getAbsolutePath() + "]");
             ioe.printStackTrace();
+        }
+    }
+
+    private void closeFile() {
+        Writer out = _currentOut;
+        if (out != null) {
+            try {
+                out.close();
+            } catch (IOException ioe) {}
         }
     }
 
