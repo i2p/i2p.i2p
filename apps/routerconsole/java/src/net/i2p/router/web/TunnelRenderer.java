@@ -233,7 +233,7 @@ public class TunnelRenderer {
         Collections.sort(peerList, new CountryComparator(this._context.commSystem()));
 
         out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + "</h2>\n");
-        out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Expl. + Client") + "</th><th>" + _("% of total") + "</th><th>" + _("Part. from + to") + "</th><th>" + _("% of total") + "</th></tr>\n");
+        out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Our Tunnels") + "</th><th>" + _("% of total") + "</th><th>" + _("Participating Tunnels") + "</th><th>" + _("% of total") + "</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr> <td class=\"cells\" align=\"center\">");
              out.write(netDbLink(h));
@@ -251,7 +251,7 @@ public class TunnelRenderer {
                  out.write('0');
              out.write('\n');
         }
-        out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>" + _("Tunnels") + "</b> <td align=\"center\"><b>" + tunnelCount);
+        out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>" + _("Totals") + "</b> <td align=\"center\"><b>" + tunnelCount);
         out.write("</b> <td>&nbsp;</td> <td align=\"center\"><b>" + partCount);
         out.write("</b> <td>&nbsp;</td></tr></table></div>\n");
     }
