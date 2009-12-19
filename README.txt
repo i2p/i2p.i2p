@@ -1,11 +1,13 @@
 Prerequisites to build from source:
 	Java SDK (preferably Sun) 1.5.0 or higher (1.6 recommended)
 	Apache Ant 1.7.0 or higher
+	Optional, For multilanguage support: The xgettext, msgfmt, and msgmerge tools installed
+	from the GNU gettext package http://www.gnu.org/software/gettext/
 
 To build:
 	ant pkg
 	Run 'ant' with no arguments to see other build options.
-	See http://www.i2p2.de/download.html for installation instructions.
+	See INSTALL.txt or http://www.i2p2.de/download.html for installation instructions.
 
 Documentation:
 	http://www.i2p2.de/
