@@ -97,10 +97,10 @@ public class ProfileOrganizer {
         _log = context.logManager().getLog(ProfileOrganizer.class);
         _comp = new InverseCapacityComparator();
         _fastPeers = new HashMap(16);
-        _highCapacityPeers = new HashMap(16);
+        _highCapacityPeers = new HashMap(32);
         _wellIntegratedPeers = new HashMap(16);
-        _notFailingPeers = new HashMap(64);
-        _notFailingPeersList = new ArrayList(64);
+        _notFailingPeers = new HashMap(256);
+        _notFailingPeersList = new ArrayList(256);
         _failingPeers = new HashMap(16);
         _strictCapacityOrder = new TreeSet(_comp);
         _thresholdSpeedValue = 0.0d;
@@ -113,6 +113,8 @@ public class ProfileOrganizer {
         _context.statManager().createRateStat("peer.profileThresholdTime", "How long the reorg takes determining the tier thresholds", "Peers", new long[] { 10*60*1000 });
         _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 10*60*1000 });
         _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 10*60*1000 });
+        // used in DBHistory
+        _context.statManager().createRateStat("peer.failedLookupRate", "DB Lookup fail rate", "Peers", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
     private void getReadLock() {
