@@ -179,7 +179,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             if (get.fetch()) {
                 String lastmod = get.getLastModified();
                 if (lastmod != null) {
-                    if (!(_context instanceof RouterContext)) return;
+                    if (!(_context.isRouterContext())) return;
                     long modtime = parse822Date(lastmod);
                     if (modtime <= 0) return;
                     String lastUpdate = _context.getProperty(UpdateHandler.PROP_LAST_UPDATE_TIME);
@@ -310,7 +310,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Policy requests update, so we update");
             UpdateHandler handler = null;
-            if (_context instanceof RouterContext) {
+            if (_context.isRouterContext()) {
                 handler = new UpdateHandler((RouterContext)_context);
             } else {
                 List contexts = RouterContext.listContexts();

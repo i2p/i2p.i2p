@@ -379,4 +379,12 @@ public class RouterContext extends I2PAppContext {
         }
     }
     
+    /**
+     *  Use this instead of context instanceof RouterContext
+     *  @return true
+     *  @since 0.7.9
+     */
+    public boolean isRouterContext() {
+        return true;
+    }
 }
