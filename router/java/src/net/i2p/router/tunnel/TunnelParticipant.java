@@ -101,8 +101,11 @@ public class TunnelParticipant {
         }
     }
     
+/****
     private int _periodMessagesTransferred;
     private long _lastCoallesced = System.currentTimeMillis();
+****/
+
     /** 
      * take note that the peers specified were able to push us data.  hmm, is this safe?
      * this could be easily gamed to get us to rank some peer of their choosing as quite
