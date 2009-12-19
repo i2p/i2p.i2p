@@ -170,6 +170,7 @@ public class RateStat {
         }
     }
 
+/*********
     public static void main(String args[]) {
         RateStat rs = new RateStat("moo", "moo moo moo", "cow trueisms", new long[] { 60 * 1000, 60 * 60 * 1000,
                                                                                      24 * 60 * 60 * 1000});
@@ -206,4 +207,5 @@ public class RateStat {
         } catch (InterruptedException ie) { // nop
         }
     }
+*********/
 }
