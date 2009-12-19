@@ -11,9 +11,9 @@ import net.i2p.router.RouterContext;
  *
  */
 public class BatchedRouterPreprocessor extends BatchedPreprocessor {
-    private RouterContext _routerContext;
+    protected RouterContext _routerContext;
     private TunnelCreatorConfig _config;
-    private HopConfig _hopConfig;
+    protected HopConfig _hopConfig;
     
     /** 
      * How frequently should we flush non-full messages, in milliseconds

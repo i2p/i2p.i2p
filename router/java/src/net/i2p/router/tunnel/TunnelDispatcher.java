@@ -131,17 +131,20 @@ public class TunnelDispatcher implements Service {
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
     }
 
+    /** for IBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(HopConfig cfg) {
-        if (true)
-            return new BatchedRouterPreprocessor(_context, cfg); 
-        else
-            return new TrivialRouterPreprocessor(_context); 
+        //if (true)
+            return new DroppingBatchedRouterPreprocessor(_context, cfg); 
+        //else
+        //    return new TrivialRouterPreprocessor(_context); 
     }
+
+    /** for OBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(TunnelCreatorConfig cfg) {
-        if (true)
+        //if (true)
             return new BatchedRouterPreprocessor(_context, cfg); 
-        else
-            return new TrivialRouterPreprocessor(_context); 
+        //else
+        //    return new TrivialRouterPreprocessor(_context); 
     }
     
     /**

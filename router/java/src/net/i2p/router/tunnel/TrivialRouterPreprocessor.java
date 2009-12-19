@@ -7,6 +7,7 @@ import net.i2p.router.RouterContext;
 /** 
  * Minor extension to track fragmentation
  *
+ * @deprecated unused
  */
 public class TrivialRouterPreprocessor extends TrivialPreprocessor {
     private RouterContext _routerContext;

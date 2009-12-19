@@ -154,12 +154,14 @@ public class TunnelGateway {
         
     public interface QueuePreprocessor {
         /** 
+         * Caller must synchronize on the list!
+         *
          * @param pending list of Pending objects for messages either unsent
          *                or partly sent.  This list should be update with any
          *                values removed (the preprocessor owns the lock)
          * @return true if we should delay before preprocessing again 
          */
-        public boolean preprocessQueue(List pending, Sender sender, Receiver receiver);
+        public boolean preprocessQueue(List<Pending> pending, Sender sender, Receiver receiver);
         
         /** how long do we want to wait before flushing */
         public long getDelayAmount();

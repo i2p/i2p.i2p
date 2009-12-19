@@ -3,11 +3,11 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -19,8 +19,8 @@ import net.i2p.util.Log;
  *
  */
 public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
-    protected I2PAppContext _context;
-    private Log _log;
+    protected RouterContext _context;
+    protected Log _log;
     
     public static final int PREPROCESSED_SIZE = 1024;
     protected static final int IV_SIZE = HopProcessor.IV_LENGTH;
@@ -28,7 +28,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
     protected static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
     
-    public TrivialPreprocessor(I2PAppContext ctx) {
+    public TrivialPreprocessor(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(TrivialPreprocessor.class);
     }
@@ -41,7 +41,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * a delayed flush to clear them
      *
      */
-    public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+    public boolean preprocessQueue(List<TunnelGateway.Pending> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
         long begin = System.currentTimeMillis();
         StringBuilder buf = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -49,7 +49,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
             buf.append("Trivial preprocessing of ").append(pending.size()).append(" ");
         }
         while (pending.size() > 0) {
-            TunnelGateway.Pending msg = (TunnelGateway.Pending)pending.remove(0);
+            TunnelGateway.Pending msg = pending.remove(0);
             long beforePreproc = System.currentTimeMillis();
             byte preprocessed[][] = preprocess(msg);
             long afterPreproc = System.currentTimeMillis();

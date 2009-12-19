@@ -79,8 +79,9 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public TunnelPool getTunnelPool() { return _pool; }
     
 
-    /* FIXME Exporting non-public type through public API FIXME */
-    public void setTestJob(TestJob job) { _testJob = job; }
+    /** @deprecated unused, which makes _testJob unused - why is it here */
+    void setTestJob(TestJob job) { _testJob = job; }
+    /** does nothing, to be deprecated */
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
     /**

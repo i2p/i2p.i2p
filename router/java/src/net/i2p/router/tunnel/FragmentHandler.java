@@ -30,9 +30,9 @@ fragments it across the necessary number of 1KB tunnel messages, and decides how
 each I2NP message should be handled by the tunnel endpoint, encoding that
 data into the raw tunnel payload:</p>
 <ul>
-<li>the first 4 bytes of the SHA256 of the remaining preprocessed data concatenated 
-    with the IV, using the IV as will be seen on the tunnel endpoint (for
-    outbound tunnels) or the IV as was seen on the tunnel gateway (for inbound
+<li>the first 4 bytes of the SHA256 of (the remaining preprocessed data concatenated 
+    with the IV), using the IV as will be seen on the tunnel endpoint (for
+    outbound tunnels), or the IV as was seen on the tunnel gateway (for inbound
     tunnels) (see below for IV processing).</li>
 <li>0 or more bytes containing random nonzero integers</li>
 <li>1 byte containing 0x00</li>
@@ -208,7 +208,7 @@ public class FragmentHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("cannot verify, going past the end [off=" 
                               + offset + " len=" + length + " paddingEnd=" 
-                              + paddingEnd + " data:\n"
+                              + paddingEnd + " data: "
                               + Base64.encode(preprocessed, offset, length));
                 return false;
             }
@@ -232,7 +232,7 @@ public class FragmentHandler {
                 _log.warn("Corrupt tunnel message - verification fails: " + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
                            + " != " + Base64.encode(v.getData(), 0, 4));
                 _log.warn("No matching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
-                           + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd
+                           + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd + ' '
                            + Base64.encode(preprocessed, offset, length));
             }
         }
