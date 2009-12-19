@@ -22,6 +22,11 @@
  *  
  * $Revision: 1.1 $
  */
+
+    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+    if (request.getCharacterEncoding() == null)
+        request.setCharacterEncoding("UTF-8");
+
 %>
 <%@page pageEncoding="UTF-8"%>
 <%@ page contentType="text/html" %>
