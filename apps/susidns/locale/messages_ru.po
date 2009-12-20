@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-12-19 11:30+0000\n"
-"PO-Revision-Date: 2009-12-19 17:47+0000\n"
+"PO-Revision-Date: 2009-12-20 07:03+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -93,7 +93,7 @@ msgstr "ОШИБКА: Не удалось сохранить файл адрес
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:148
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:150
 msgid "Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit."
-msgstr "Форма не принята, скорее всего это произошло из-за того что Вы нажимали кнопку \"Назад\" или \"Обновить\" в браузере. Пожалуйста заполните форму заново."
+msgstr "Форма не принята, скорее всего это произошло из-за того, что Вы нажимали кнопку \"Назад\" или \"Обновить\" в браузере. Пожалуйста, заполните форму заново."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:139
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
@@ -223,7 +223,7 @@ msgstr "Пометить для удаления"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:274
 msgid "address helper link"
-msgstr "ссылка с адресным помощником"
+msgstr "addresshelper-ссылка"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:338
 msgid "This addressbook is empty."
@@ -259,7 +259,7 @@ msgstr "Когда Вы публикуете свою адресную книг�
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:137
 msgid "Use the private addressbook for private destinations, these are not published."
-msgstr "Пользуйтесь «приватной» адресной книгой для адресов которые Вы не хотите публиковать."
+msgstr "Пользуйтесь «приватной» адресной книгой для адресов, которые Вы не хотите публиковать."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:139
 msgid "Options"
@@ -323,7 +323,7 @@ msgstr "Что такое адресная книга?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:106
 msgid "The addressbook application is part of your i2p installation."
-msgstr "Адресная книга это приложение в составе Вашего I2P маршрутизатора."
+msgstr "Адресная книга — это приложение в составе Вашего I2P маршрутизатора."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:108
 msgid "It regularly updates your hosts.txt file from distributed sources or \"subscriptions\"."
@@ -347,15 +347,15 @@ msgstr "Как работает адресная книга?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:118
 msgid "The addressbook application regularly polls your subscriptions and merges their content into your \"router\" addressbook, stored in the hosts.txt file."
-msgstr "Адресная книга периодически опрашивает Ваши подписки и добавляет их содежримое в Вашу «маршрутизаторную» адресную книгу, которая хранится в файле hosts.txt."
+msgstr "Адресная книга периодически опрашивает Ваши подписки и добавляет их содержимое в Вашу «маршрутизаторную» адресную книгу, которая хранится в файле hosts.txt."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:120
 msgid "Then it merges your \"master\" addressbook (userhosts.txt) into the router addressbook as well."
-msgstr "После этого туда также добавляется содержимое Вашей «основной» адресной книги (userhosts.txt). "
+msgstr "После этого туда добавляется содержимое Вашей «основной» адресной книги (userhosts.txt)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:122
 msgid "If configured, the router addressbook is now written to the \"published\" addressbook, which will be publicly available if you are running an eepsite."
-msgstr "Если разрешена публикация, то «маршрутизаторная» адресная книга копируется в «публикуемую» адресную книгу, которая будет доступна публично, если у Вас запущен Ваш I2P-сайт."
+msgstr "Если разрешена публикация, то «маршрутизаторная» адресная книга копируется в «публикуемую» адресную книгу. «Публикуемая» адресная книга доступна публично, если у Вас запущен Ваш I2P-сайт."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:124
 msgid "The router also uses a private addressbook (privatehosts.txt, not shown in the picture), which is not merged or published."
@@ -363,7 +363,7 @@ msgstr "Маршрутизатор также использует приват�
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:126
 msgid "Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others."
-msgstr "Таким образом Вы можете пользоваться адресами из этой адресной книги не раскрывая другим её содержимое."
+msgstr "Таким образом Вы можете пользоваться адресами из этой адресной книги, не раскрывая другим её содержимое."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:128
 msgid "The private addressbook can also be used for aliases of hosts in your other addressbooks."
