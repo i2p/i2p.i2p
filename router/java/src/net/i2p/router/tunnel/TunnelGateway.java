@@ -154,12 +154,18 @@ public class TunnelGateway {
         
     public interface QueuePreprocessor {
         /** 
+         * Caller must synchronize on the list!
+         *
          * @param pending list of Pending objects for messages either unsent
          *                or partly sent.  This list should be update with any
          *                values removed (the preprocessor owns the lock)
+         *                Messages are not removed from the list until actually sent.
+         *                The status of unsent and partially-sent messages is stored in
+         *                the Pending structure.
+         *
          * @return true if we should delay before preprocessing again 
          */
-        public boolean preprocessQueue(List pending, Sender sender, Receiver receiver);
+        public boolean preprocessQueue(List<Pending> pending, Sender sender, Receiver receiver);
         
         /** how long do we want to wait before flushing */
         public long getDelayAmount();
@@ -173,6 +179,9 @@ public class TunnelGateway {
         public long receiveEncrypted(byte encrypted[]);
     }
     
+    /**
+     *  Stores all the state for an unsent or partially-sent message
+     */
     public static class Pending {
         protected Hash _toRouter;
         protected TunnelId _toTunnel;
@@ -182,7 +191,7 @@ public class TunnelGateway {
         protected int _offset;
         protected int _fragmentNumber;
         protected long _created;
-        private List _messageIds;
+        private List<Long> _messageIds;
         
         public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) { 
             this(message, toRouter, toTunnel, System.currentTimeMillis()); 
@@ -222,7 +231,7 @@ public class TunnelGateway {
                 _messageIds.add(new Long(id));
             }
         }
-        public List getMessageIds() { 
+        public List<Long> getMessageIds() { 
             synchronized (Pending.this) { 
                 if (_messageIds != null)
                     return new ArrayList(_messageIds); 
@@ -231,6 +240,8 @@ public class TunnelGateway {
             } 
         }
     }
+
+    /** Extend for debugging */
     class PendingImpl extends Pending {
         public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
             super(message, toRouter, toTunnel, _context.clock().now());

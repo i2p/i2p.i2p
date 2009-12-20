@@ -41,6 +41,7 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.FileUtil;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -201,6 +202,8 @@ public class Router {
         installUpdates();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
+        // But context.isRouterContext() is even easier...
+        // Both of these as of 0.7.9
         System.setProperty("router.version", RouterVersion.VERSION);
 
         // NOW we start all the activity
@@ -228,14 +231,10 @@ public class Router {
             }
         };
         _shutdownHook = new ShutdownHook(_context);
-        _gracefulShutdownDetector = new I2PThread(new GracefulShutdown());
-        _gracefulShutdownDetector.setDaemon(true);
-        _gracefulShutdownDetector.setName("Graceful shutdown hook");
+        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(), "Graceful shutdown hook", true);
         _gracefulShutdownDetector.start();
         
-        I2PThread watchdog = new I2PThread(new RouterWatchdog(_context));
-        watchdog.setName("RouterWatchdog");
-        watchdog.setDaemon(true);
+        Thread watchdog = new I2PAppThread(new RouterWatchdog(_context), "RouterWatchdog", true);
         watchdog.start();
         
     }
@@ -339,7 +338,7 @@ public class Router {
         long waited = System.currentTimeMillis() - before;
         if (_log.shouldLog(Log.INFO))
             _log.info("Waited " + waited + "ms to initialize");
-        
+
         _context.jobQueue().addJob(new StartupJob(_context));
     }
     

@@ -22,6 +22,65 @@ import net.i2p.util.SimpleTimer;
  * I2NPMessages when they arrive, and dropping fragments if they take too long
  * to arrive.
  *
+ * From tunnel-alt.html:
+
+<p>When the gateway wants to deliver data through the tunnel, it first
+gathers zero or more <a href="i2np.html">I2NP</a> messages, selects how much padding will be used, 
+fragments it across the necessary number of 1KB tunnel messages, and decides how
+each I2NP message should be handled by the tunnel endpoint, encoding that
+data into the raw tunnel payload:</p>
+<ul>
+<li>the first 4 bytes of the SHA256 of (the remaining preprocessed data concatenated 
+    with the IV), using the IV as will be seen on the tunnel endpoint (for
+    outbound tunnels), or the IV as was seen on the tunnel gateway (for inbound
+    tunnels) (see below for IV processing).</li>
+<li>0 or more bytes containing random nonzero integers</li>
+<li>1 byte containing 0x00</li>
+<li>a series of zero or more { instructions, message } pairs</li>
+</ul>
+
+<p>The instructions are encoded with a single control byte, followed by any
+necessary additional information.  The first bit in that control byte determines
+how the remainder of the header is interpreted - if it is not set, the message 
+is either not fragmented or this is the first fragment in the message.  If it is
+set, this is a follow on fragment.</p>
+
+<p>With the first bit being 0, the instructions are:</p>
+<ul>
+<li>1 byte control byte:<pre>
+      bit 0: is follow on fragment?  (1 = true, 0 = false, must be 0)
+   bits 1-2: delivery type
+             (0x0 = LOCAL, 0x01 = TUNNEL, 0x02 = ROUTER)
+      bit 3: delay included?  (1 = true, 0 = false)
+      bit 4: fragmented?  (1 = true, 0 = false)
+      bit 5: extended options?  (1 = true, 0 = false)
+   bits 6-7: reserved</pre></li>
+<li>if the delivery type was TUNNEL, a 4 byte tunnel ID</li>
+<li>if the delivery type was TUNNEL or ROUTER, a 32 byte router hash</li>
+<li>if the delay included flag is true, a 1 byte value:<pre>
+      bit 0: type (0 = strict, 1 = randomized)
+   bits 1-7: delay exponent (2^value minutes)</pre></li>
+<li>if the fragmented flag is true, a 4 byte message ID</li>
+<li>if the extended options flag is true:<pre>
+   = a 1 byte option size (in bytes)
+   = that many bytes</pre></li>
+<li>2 byte size of the I2NP message or this fragment</li>
+</ul>
+
+<p>If the first bit being 1, the instructions are:</p>
+<ul>
+<li>1 byte control byte:<pre>
+      bit 0: is follow on fragment?  (1 = true, 0 = false, must be 1)
+   bits 1-6: fragment number
+      bit 7: is last? (1 = true, 0 = false)</pre></li>
+<li>4 byte message ID (same one defined in the first fragment)</li>
+<li>2 byte size of this fragment</li>
+</ul>
+
+<p>The I2NP message is encoded in its standard form, and the 
+preprocessed payload must be padded to a multiple of 16 bytes.</p>
+
+ *
  */
 public class FragmentHandler {
     private I2PAppContext _context;
@@ -149,7 +208,7 @@ public class FragmentHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("cannot verify, going past the end [off=" 
                               + offset + " len=" + length + " paddingEnd=" 
-                              + paddingEnd + " data:\n"
+                              + paddingEnd + " data: "
                               + Base64.encode(preprocessed, offset, length));
                 return false;
             }
@@ -165,20 +224,18 @@ public class FragmentHandler {
             _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
         
         Hash v = _context.sha().calculateHash(preV, 0, validLength);
+        _validateCache.release(ba);
         
-        //Hash v = _context.sha().calculateHash(preV, 0, validLength);
         boolean eq = DataHelper.eq(v.getData(), 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
         if (!eq) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Corrupt tunnel message - verification fails: \n" + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
-                           + "\n" + Base64.encode(v.getData(), 0, 4));
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("nomatching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1) + "\n" 
-                           + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Corrupt tunnel message - verification fails: " + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
+                           + " != " + Base64.encode(v.getData(), 0, 4));
+                _log.warn("No matching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
+                           + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd + ' '
                            + Base64.encode(preprocessed, offset, length));
+            }
         }
-        
-        _validateCache.release(ba);
         
         if (eq) {
             int excessPadding = paddingEnd - (HopProcessor.IV_LENGTH + 4 + 1);

@@ -722,4 +722,11 @@ public class I2PAppContext {
         return new HashSet(_shutdownTasks);
     }
     
+    /**
+     *  Use this instead of context instanceof RouterContext
+     *  @since 0.7.9
+     */
+    public boolean isRouterContext() {
+        return false;
+    }
 }

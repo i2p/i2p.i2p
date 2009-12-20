@@ -54,9 +54,7 @@ class BuildExecutor implements Runnable {
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
-        @SuppressWarnings("static-access")
-        /* FIXME Accessing static field "BW_CAPABILITY_CHARS" FIXME */
-        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS;
+        String bwTiers = RouterInfo.BW_CAPABILITY_CHARS;
         // For each bandwidth tier, create tunnel build agree/reject/expire stats
         for (int i = 0; i < bwTiers.length(); i++) {
             String bwTier = String.valueOf(bwTiers.charAt(i));
