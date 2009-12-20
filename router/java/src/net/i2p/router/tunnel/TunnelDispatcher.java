@@ -134,7 +134,7 @@ public class TunnelDispatcher implements Service {
     /** for IBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(HopConfig cfg) {
         //if (true)
-            return new DroppingBatchedRouterPreprocessor(_context, cfg); 
+            return new BatchedRouterPreprocessor(_context, cfg); 
         //else
         //    return new TrivialRouterPreprocessor(_context); 
     }
