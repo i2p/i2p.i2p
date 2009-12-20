@@ -17,7 +17,7 @@ public class TrivialRouterPreprocessor extends TrivialPreprocessor {
         _routerContext = ctx;
     }
 
-    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds) {
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds) {
         _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, null);
     }
 }

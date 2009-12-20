@@ -79,7 +79,7 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     }
     
     @Override
-    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds, String msg) {
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {
         if (_config != null)
             _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _config, msg);
         else

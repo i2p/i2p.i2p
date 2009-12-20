@@ -84,7 +84,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         return false;
     }
     
-    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds, String msg) {}
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {}
     
     private byte[][] preprocess(TunnelGateway.Pending msg) {
         List fragments = new ArrayList(1);
