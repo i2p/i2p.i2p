@@ -1,3 +1,24 @@
+2009-12-20 zzz
+    * Console:
+      - Fix status to show a disconnected network error rather than
+        clock skew or UDP error when disconnected
+      - Use peer clock skew rather than clock offset for determining
+        whether to display clock skew error
+      - tunnels.jsp: Clarify tunnel table headings
+    * Contexts: Add isRouterContext() method
+    * Profile, DBHistory:
+      - Tweak the rate periods
+      - Add a global fail rate stat
+      - Increase the HashMap sizes
+    * Router: Move some more threads to I2PAppThread so an OOM won't
+      crash the router
+    * Timestamper: Reduce delays (cuts 10s out of router startup)
+    * Transport: Rework peer clock skew method to always return a value
+    * Tunnels:
+      - Reduce the drop probability for TunnelBuildMessages at the OBEP
+      - Schedule outbound startup instead of hanging the thread for 3s
+      - Cleanup preprocessor code, add comments
+
 2009-12-18 zzz
     * Console: Fix spacing in update section
     * I2CP:
