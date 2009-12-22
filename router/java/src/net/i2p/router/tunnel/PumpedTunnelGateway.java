@@ -3,14 +3,16 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
+ * This is used for all gateways with more than zero hops.
+ *
  * Serve as the gatekeeper for a tunnel, accepting messages, coallescing and/or
  * fragmenting them before wrapping them up for tunnel delivery. The flow here
  * is: <ol>
@@ -32,7 +34,7 @@ import net.i2p.util.Log;
  *
  */
 public class PumpedTunnelGateway extends TunnelGateway {
-    private final List _prequeue;
+    private final List<Pending> _prequeue;
     private TunnelGatewayPumper _pumper;
     
     /**
@@ -43,7 +45,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public PumpedTunnelGateway(I2PAppContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
+    public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
         super(context, preprocessor, sender, receiver);
         _prequeue = new ArrayList(4);
         _pumper = pumper;
@@ -78,7 +80,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * go quickly, rather than blocking its callers on potentially substantial
      * processing.
      */
-    void pump(List queueBuf) {
+    void pump(List<Pending> queueBuf) {
         synchronized (_prequeue) {
             if (_prequeue.size() > 0) {
                 queueBuf.addAll(_prequeue);
@@ -88,7 +90,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
             }
         }
         long startAdd = System.currentTimeMillis();
-        long beforeLock = System.currentTimeMillis();
+        long beforeLock = startAdd;
         long afterAdded = -1;
         boolean delayedFlush = false;
         long delayAmount = -1;
@@ -108,7 +110,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
             
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
-                Pending m = (Pending)_queue.get(i);
+                Pending m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);

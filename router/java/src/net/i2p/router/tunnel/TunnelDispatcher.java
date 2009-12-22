@@ -240,7 +240,7 @@ public class TunnelDispatcher implements Service {
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
         //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
-        TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
+        TunnelGateway gw = new ThrottledPumpedTunnelGateway(_context, preproc, sender, receiver, _pumper, cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         _inboundGateways.put(recvId, gw);
         _participatingConfig.put(recvId, cfg);

@@ -3,12 +3,12 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -34,9 +34,9 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class TunnelGateway {
-    protected I2PAppContext _context;
+    protected RouterContext _context;
     protected Log _log;
-    protected final List _queue;
+    protected final List<Pending> _queue;
     protected QueuePreprocessor _preprocessor;
     protected Sender _sender;
     protected Receiver _receiver;
@@ -53,7 +53,7 @@ public class TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public TunnelGateway(I2PAppContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
+    public TunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
         _context = context;
         _log = context.logManager().getLog(getClass());
         _queue = new ArrayList(4);
@@ -110,7 +110,7 @@ public class TunnelGateway {
             
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
-                Pending m = (Pending)_queue.get(i);
+                Pending m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);
@@ -280,11 +280,11 @@ public class TunnelGateway {
             long beforeLock = _context.clock().now();
             long afterChecked = -1;
             long delayAmount = -1;
-            if (_queue.size() > 10000) // stay out of the synchronized block
-                System.out.println("foo!");
+            //if (_queue.size() > 10000) // stay out of the synchronized block
+            //    System.out.println("foo!");
             synchronized (_queue) {
-                if (_queue.size() > 10000) // stay in the synchronized block
-                    System.out.println("foo!");
+                //if (_queue.size() > 10000) // stay in the synchronized block
+                //    System.out.println("foo!");
                 afterChecked = _context.clock().now();
                 if (_queue.size() > 0) {
                     if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )

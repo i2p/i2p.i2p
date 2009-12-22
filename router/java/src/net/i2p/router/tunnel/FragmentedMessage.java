@@ -21,6 +21,8 @@ import net.i2p.util.SimpleTimer;
  * Gather fragments of I2NPMessages at a tunnel endpoint, making them available 
  * for reading when complete.
  *
+ * Warning - this is all unsynchronized here - receivers must implement synchronization
+ *
  */
 public class FragmentedMessage {
     private I2PAppContext _context;
@@ -282,7 +284,7 @@ public class FragmentedMessage {
             if (ba != null)
                 buf.append(i).append(":").append(ba.getValid()).append(" bytes ");
             else
-                buf.append(i).append(": missing ");
+                buf.append(i).append(":missing ");
         }
         buf.append(" highest received: ").append(_highFragmentNum);
         buf.append(" last received? ").append(_lastReceived);

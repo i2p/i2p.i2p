@@ -1,3 +1,13 @@
+2009-12-22 zzz
+    * Tunnels:
+      - Do RED dropping before the IBGW fragmenter, not after
+      - Change batch time to 250ms for IBGWs (was 100ms)
+      - Change batch time to 150ms for exploratory OBGWs (was 100ms)
+      - Start a new message in the fragmenter if almost full
+      - Fix a major, longstanding synchronization bug in the FragmentHandler
+        which led to corrupt messages at the endpoints
+      - More cleanups and comments
+
 2009-12-20 zzz
     * Console:
       - Fix status to show a disconnected network error rather than

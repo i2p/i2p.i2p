@@ -17,6 +17,7 @@ import net.i2p.util.Log;
  * each of those out.  This does not coallesce message fragments or delay for more
  * optimal throughput.
  *
+ * See FragmentHandler Javadoc for tunnel message fragment format
  */
 public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected RouterContext _context;
@@ -175,6 +176,8 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         //_log.debug("# pad bytes:  " + numPadBytes + " payloadLength: " + payloadLength + " instructions: " + instructionsLength);
 
         int paddingRemaining = numPadBytes;
+        // FIXME inefficient, waste of 3/4 of the entropy
+        // Should get a byte array of random, change all the zeros to something else, and ArrayCopy
         while (paddingRemaining > 0) {
             byte b = (byte)(_context.random().nextInt() & 0xFF);
             if (b != 0x00) {
@@ -196,7 +199,11 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     private static final byte MASK_TYPE = FragmentHandler.MASK_TYPE;
     /** is this the first of a fragmented message? */
     private static final byte MASK_FRAGMENTED = FragmentHandler.MASK_FRAGMENTED;
-    /** are there follow up headers? */
+
+    /**
+     *  are there follow up headers?
+     *  @deprecated unimplemented
+     */
     private static final byte MASK_EXTENDED = FragmentHandler.MASK_EXTENDED;
     private static final byte MASK_TUNNEL = (byte)(FragmentHandler.TYPE_TUNNEL << 5);
     private static final byte MASK_ROUTER = (byte)(FragmentHandler.TYPE_ROUTER << 5);
@@ -311,19 +318,30 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         return offset;
     }
 
+    /**
+     *  @return generally 3 or 35 or 39 for first fragment, 7 for subsequent fragments.
+     *
+     *  Does NOT include 4 for the message ID if the message will be fragmented;
+     *  call getInstructionAugmentationSize() for that.
+     */
     protected int getInstructionsSize(TunnelGateway.Pending msg) {
         if (msg.getFragmentNumber() > 0) 
             return 7;
+        // control byte
         int header = 1;
+        // tunnel ID
         if (msg.getToTunnel() != null)
             header += 4;
+        // router hash
         if (msg.getToRouter() != null)
             header += 32;
+        // size
         header += 2;
         
         return header;
     }
     
+    /** @return 0 or 4 */
     protected int getInstructionAugmentationSize(TunnelGateway.Pending msg, int offset, int instructionsSize) {
         int payloadLength = msg.getData().length - msg.getOffset();
         if (offset + payloadLength + instructionsSize + IV_SIZE + 1 + 4 > PREPROCESSED_SIZE) {
