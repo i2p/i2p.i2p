@@ -43,7 +43,7 @@ public class PacketPusher implements Runnable {
                     }
                 }
             } catch (Exception e) {
-                _log.log(Log.CRIT, "Error pushing", e);
+                _log.error("SSU Output Queue Error", e);
             }
         }
     }

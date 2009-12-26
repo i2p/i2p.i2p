@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.util.Arrays;
+import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -33,6 +34,9 @@ public class OutboundMessageState {
     private int _pushCount;
     private short _maxSends;
     // private int _nextSendFragment;
+    /** for tracking use-after-free bugs */
+    private boolean _released;
+    private Exception _releasedBy;
     
     public static final int MAX_MSG_SIZE = 32 * 1024;
     /** is this enough for a high-bandwidth router? */
@@ -116,13 +120,22 @@ public class OutboundMessageState {
         } catch (IllegalStateException ise) {
             _cache.release(_messageBuf);
             _messageBuf = null;
+            _released = true;
             return false;
         }
     }
     
-    public void releaseResources() { 
-        if (_messageBuf != null)
+    /**
+     *  This is synchronized with writeFragment(),
+     *  so we do not release (probably due to an ack) while we are retransmitting.
+     *  Also prevent double-free
+     */
+    public synchronized void releaseResources() { 
+        if (_messageBuf != null && !_released) {
             _cache.release(_messageBuf);
+            _released = true;
+            _releasedBy = new Exception ("Released on " + new Date() + " by:");
+        }
         //_messageBuf = null;
     }
     
@@ -267,16 +280,50 @@ public class OutboundMessageState {
 
     /**
      * Write a part of the the message onto the specified buffer.
+     * See releaseResources() above for synchhronization information.
      *
      * @param out target to write
      * @param outOffset into outOffset to begin writing
      * @param fragmentNum fragment to write (0 indexed)
      * @return bytesWritten
      */
-    public int writeFragment(byte out[], int outOffset, int fragmentNum) {
+    public synchronized int writeFragment(byte out[], int outOffset, int fragmentNum) {
+        if (_messageBuf == null) return -1;
+        if (_released) {
+            /******
+                Solved by synchronization with releaseResources() and simply returning -1.
+                Previous output:
+
+                23:50:57.013 ERROR [acket pusher] sport.udp.OutboundMessageState: SSU OMS Use after free
+                java.lang.Exception: Released on Wed Dec 23 23:50:57 GMT 2009 by:
+                	at net.i2p.router.transport.udp.OutboundMessageState.releaseResources(OutboundMessageState.java:133)
+                	at net.i2p.router.transport.udp.PeerState.acked(PeerState.java:1391)
+                	at net.i2p.router.transport.udp.OutboundMessageFragments.acked(OutboundMessageFragments.java:404)
+                	at net.i2p.router.transport.udp.InboundMessageFragments.receiveACKs(InboundMessageFragments.java:191)
+                	at net.i2p.router.transport.udp.InboundMessageFragments.receiveData(InboundMessageFragments.java:77)
+                	at net.i2p.router.transport.udp.PacketHandler$Handler.handlePacket(PacketHandler.java:485)
+                	at net.i2p.router.transport.udp.PacketHandler$Handler.receivePacket(PacketHandler.java:282)
+                	at net.i2p.router.transport.udp.PacketHandler$Handler.handlePacket(PacketHandler.java:231)
+                	at net.i2p.router.transport.udp.PacketHandler$Handler.run(PacketHandler.java:136)
+                	at java.lang.Thread.run(Thread.java:619)
+                	at net.i2p.util.I2PThread.run(I2PThread.java:71)
+                23:50:57.014 ERROR [acket pusher] ter.transport.udp.PacketPusher: SSU Output Queue Error
+                java.lang.RuntimeException: SSU OMS Use after free: Message 2381821417 with 4 fragments of size 0 volleys: 2 lifetime: 1258 pending fragments: 0 1 2 3 
+                	at net.i2p.router.transport.udp.OutboundMessageState.writeFragment(OutboundMessageState.java:298)
+                	at net.i2p.router.transport.udp.PacketBuilder.buildPacket(PacketBuilder.java:170)
+                	at net.i2p.router.transport.udp.OutboundMessageFragments.preparePackets(OutboundMessageFragments.java:332)
+                	at net.i2p.router.transport.udp.OutboundMessageFragments.getNextVolley(OutboundMessageFragments.java:297)
+                	at net.i2p.router.transport.udp.PacketPusher.run(PacketPusher.java:38)
+                	at java.lang.Thread.run(Thread.java:619)
+                	at net.i2p.util.I2PThread.run(I2PThread.java:71)
+            *******/
+            if (_log.shouldLog(Log.WARN))
+                _log.log(Log.WARN, "SSU OMS Use after free: " + toString(), _releasedBy);
+            return -1;
+            //throw new RuntimeException("SSU OMS Use after free: " + toString());
+        }
         int start = _fragmentSize * fragmentNum;
         int end = start + fragmentSize(fragmentNum);
-        if (_messageBuf == null) return -1;
         int toSend = end - start;
         byte buf[] = _messageBuf.getData();
         if ( (buf != null) && (start + toSend < buf.length) && (out != null) && (outOffset + toSend < out.length) ) {
