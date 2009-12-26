@@ -1,3 +1,18 @@
+2009-12-26 zzz
+    * Console:
+      - Tag the rest of logs.jsp
+    * Tunnels, Transports:
+      - Lots of code to detect improper reuse of cached objects
+        after release
+      - Prevent release of TunnelDataMessage cached ByteArray,
+        as it may be reused if retried in another transport;
+        a nasty bug causing corrupt messages
+      - Prevent race with released resources in UDP OutboundMessageState;
+        a nasty bug causing corrupt messages
+      - More cleanups and comments
+    * UDP: Bid lower than NTCP when we need introducers and don't
+      have enough
+
 2009-12-22 zzz
     * Tunnels:
       - Do RED dropping before the IBGW fragmenter, not after
