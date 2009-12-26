@@ -126,7 +126,7 @@ public class OutNetMessage {
         }
         return ZERO;
     }
-    private static final Long ZERO = new Long(0);
+    private static final Long ZERO = Long.valueOf(0);
     private void locked_initTimestamps() {
         if (_timestamps == null) {
             _timestamps = new HashMap(8);

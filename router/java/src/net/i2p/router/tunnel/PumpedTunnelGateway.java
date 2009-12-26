@@ -79,6 +79,9 @@ public class PumpedTunnelGateway extends TunnelGateway {
      * scheduling a later delayed flush as necessary.  this allows the gw.add call to
      * go quickly, rather than blocking its callers on potentially substantial
      * processing.
+     *
+     * @param queueBuf Empty list for convenience, to use as a temporary buffer.
+     *                 Must be empty when called; will always be emptied before return.
      */
     void pump(List<Pending> queueBuf) {
         synchronized (_prequeue) {
