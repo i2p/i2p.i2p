@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-12-18 06:45+0000\n"
 "PO-Revision-Date: \n"
-"Last-Translator: walking <walking@mail.i2p>\n"
+"Last-Translator: walking <zhazhenzhong@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -994,7 +994,8 @@ msgstr "圣文森特和格林纳丁斯"
 msgid "Venezuela"
 msgstr "委内瑞拉"
 
-#: ../java/build/Countries.java:229 ../java/build/Countries.java:230
+#: ../java/build/Countries.java:229
+#: ../java/build/Countries.java:230
 msgid "Virgin Islands"
 msgstr "维京群岛"
 
@@ -1053,9 +1054,7 @@ msgstr "设置保存成功"
 
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:71
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:253
-msgid ""
-"Error saving the configuration (applied but not saved) - please see the "
-"error logs"
+msgid "Error saving the configuration (applied but not saved) - please see the error logs"
 msgstr "配置保存出错(已应用但未保存) - 参见错误日志"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:32
@@ -1079,8 +1078,7 @@ msgid "Unsupported"
 msgstr "未支持的"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:83
-msgid ""
-"Client configuration saved successfully - restart required to take effect."
+msgid "Client configuration saved successfully - restart required to take effect."
 msgstr "客户程序设置保存成功 - 程序重启后生效"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:89
@@ -1100,8 +1098,7 @@ msgid "started"
 msgstr "已启动"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:111
-msgid ""
-"WebApp configuration saved successfully - restart required to take effect."
+msgid "WebApp configuration saved successfully - restart required to take effect."
 msgstr "WebApp设置保存成功 - 程序重启后生效"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:129
@@ -1320,7 +1317,6 @@ msgid "Disabling UPnP, restart required to take effect"
 msgstr "正在禁用UPnP，程序重启后生效"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:235
-#, fuzzy
 msgid "Requiring SSU introducers"
 msgstr "正在获取SSU中介"
 
@@ -1430,7 +1426,6 @@ msgid "Shutdown"
 msgstr "关　闭"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:59
-#, fuzzy
 msgid "Restart imminent"
 msgstr "立刻重启"
 
@@ -1590,12 +1585,8 @@ msgid "Failed to update the stat filter and location"
 msgstr "统计数据过滤器及地址更新失败"
 
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:121
-msgid ""
-"Graph list updated, may take up to 60s to be reflected here and on the <a "
-"href=\"graphs.jsp\">Graphs Page</a>"
-msgstr ""
-"曲线图列表已更新，更新后的内容可能需要最多 60s 的时间才能在这里及 <a href="
-"\"graphs.jsp\">统计图表</a>页面中反映出来。"
+msgid "Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"
+msgstr "曲线图列表已更新，更新后的内容可能需要最多 60s 的时间才能在这里及 <a href=\"graphs.jsp\">统计图表</a>页面中反映出来。"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHandler.java:137
 msgid "Updated settings for all pools."
@@ -1607,9 +1598,7 @@ msgstr "探索隧道设置保存成功。"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHandler.java:144
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:36
-msgid ""
-"Error saving the configuration (applied but not saved) - please see the "
-"error logs."
+msgid "Error saving the configuration (applied but not saved) - please see the error logs."
 msgstr "配置保存出错(已应用但未保存) - 参见错误日志"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:11
@@ -1663,9 +1652,8 @@ msgid "Outbound"
 msgstr "出站"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:87
-#, fuzzy
 msgid "Length"
-msgstr "莱索托"
+msgstr "长度"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:104
 msgid "Randomization"
@@ -1717,7 +1705,7 @@ msgstr "荷兰语"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:42
 msgid "Russian"
-msgstr ""
+msgstr "俄语"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:42
 msgid "Swedish"
@@ -1991,9 +1979,9 @@ msgstr "已更新"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:267
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:270
-#, fuzzy, java-format
+#, java-format
 msgid "{0} ago"
-msgstr "{0}前过期"
+msgstr "{0}前"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:269
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:273
@@ -2053,9 +2041,9 @@ msgid "Hiding {0} older profiles."
 msgstr "隐藏 {0} 个较旧的信息。"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:77
-#, fuzzy, java-format
+#, java-format
 msgid "Hiding {0} standard profiles."
-msgstr "隐藏 {0} 个较旧的信息。"
+msgstr "隐藏 {0} 个标准描述。"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:82
 msgid "Groups (Caps)"
@@ -2221,9 +2209,7 @@ msgid "caps"
 msgstr "容量"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:260
-msgid ""
-"peak throughput (bytes per second) over a 1 minute period that the peer has "
-"sustained in a single tunnel"
+msgid "peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel"
 msgstr "该节点一分钟由单一隧道通过的数据峰值(byte/s)。"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:260
@@ -2277,15 +2263,11 @@ msgid "Statistics gathered during this router's uptime"
 msgstr "路由运行时收集的统计数据"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:61
-msgid ""
-"The data gathered is quantized over a 1 minute period, so should just be "
-"used as an estimate."
+msgid "The data gathered is quantized over a 1 minute period, so should just be used as an estimate."
 msgstr "所采集数据量化周期为1分钟，仅供参考。"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:44
-msgid ""
-"Configure startup of clients and webapps (services); manually start dormant "
-"services"
+msgid "Configure startup of clients and webapps (services); manually start dormant services"
 msgstr "设置客户程序及Web程序(服务)的启动；手动启动重要服务"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:46
@@ -2415,8 +2397,7 @@ msgid "Uptime"
 msgstr "运行时间"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:171
-msgid ""
-"Help with configuring your firewall and router for optimal I2P performance"
+msgid "Help with configuring your firewall and router for optimal I2P performance"
 msgstr "如何正确配置防火墙和(物理)路由器优化I2P性能"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:198
@@ -2551,11 +2532,8 @@ msgid "Firewalled"
 msgstr "防火墙限制"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:116
-msgid ""
-"ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and "
-"restart"
-msgstr ""
-"错误-UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口并重启程序"
+msgid "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
+msgstr "错误-UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口并重启程序"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:123
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
@@ -2920,9 +2898,7 @@ msgid "Bandwidth limiter"
 msgstr "带宽限制"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:299
-msgid ""
-"I2P will work best if you configure your rates to match the speed of your "
-"internet connection."
+msgid "I2P will work best if you configure your rates to match the speed of your internet connection."
 msgstr "与联网环境相符的速度能使I2P以最佳的状态工作。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:303
@@ -2953,14 +2929,11 @@ msgid "I2P requires at least 12KBps to enable sharing. "
 msgstr "I2P 需要至少 12KBps 才能进行共享。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:346
-msgid ""
-"Please enable sharing (participating in tunnels) by configuring more "
-"bandwidth. "
+msgid "Please enable sharing (participating in tunnels) by configuring more bandwidth. "
 msgstr "请设置更多的带宽以便启用共享功能(加入到其他节点的隧道创建中)。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:347
-msgid ""
-"It improves your anonymity by creating cover traffic, and helps the network."
+msgid "It improves your anonymity by creating cover traffic, and helps the network."
 msgstr "通过制造混淆流量共享能增强您的匿名性，帮助网络成长。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:350
@@ -2969,9 +2942,7 @@ msgid "You have configured I2P to share {0} KBps."
 msgstr "您设置I2P共享 {0} KBps"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:353
-msgid ""
-"The higher the share bandwidth the more you improve your anonymity and help "
-"the network."
+msgid "The higher the share bandwidth the more you improve your anonymity and help the network."
 msgstr "共享的带宽越多，您的匿名性越强同时能帮助网络成长。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:359
@@ -3090,8 +3061,7 @@ msgid "Completely disable"
 msgstr "完全禁用"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:471
-msgid ""
-"(select only if behind a firewall that throttles or blocks outbound TCP)"
+msgid "(select only if behind a firewall that throttles or blocks outbound TCP)"
 msgstr "仅在受到防火墙的流量限制或入站连接限制时使用"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:473
@@ -3122,43 +3092,27 @@ msgstr "设置帮助"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:500
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:549
-msgid ""
-"While I2P will work fine behind most firewalls, your speeds and network "
-"integration will generally improve if the I2P port is forwarded for both UDP "
-"and TCP."
-msgstr ""
-"I2P可以与大多数防火墙共存，如果I2P端口(第一次安装时随机选择)进行了UDP/TCP映"
-"射，您的速度和网络整合度会逐渐提升。"
+msgid "While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP."
+msgstr "I2P可以与大多数防火墙共存，如果I2P端口(第一次安装时随机选择)进行了UDP/TCP映射，您的速度和网络整合度会逐渐提升。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:502
-msgid ""
-"If you can, please poke a hole in your firewall to allow unsolicited UDP and "
-"TCP packets to reach you."
+msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
 msgstr "如果可能，请在防火墙中添加端口并允许入站UDP/TCP数据包通过。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:504
-msgid ""
-"If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole "
-"punching with \"SSU introductions\" to relay traffic."
-msgstr ""
-"如果不能，I2P支持UPnP(Universal Plug and Play)或借助“SSU中介”进行UDP端口穿"
-"透，通过它们也可以中继数据。"
+msgid "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic."
+msgstr "如果不能，I2P支持UPnP(Universal Plug and Play)或借助“SSU中介”进行UDP端口穿透，通过它们也可以中继数据。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:506
-msgid ""
-"Most of the options above are for special situations, for example where UPnP "
-"does not work correctly, or a firewall not under your control is doing harm."
-msgstr ""
-"上述大部分设置仅为特殊情况准备，例如UPnP不能正常工作，或外部防火墙封锁网络。"
+msgid "Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm."
+msgstr "上述大部分设置仅为特殊情况准备，例如UPnP不能正常工作，或外部防火墙封锁网络。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:508
 msgid "Certain firewalls such as symmetric NATs may not work well with I2P."
 msgstr "在某些防火墙下例如Symmetric，I2P可能无法有效利用NAT工作。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:517
-msgid ""
-"UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect "
-"the external IP address and forward ports."
+msgid "UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports."
 msgstr "UPnP与公网网关设备(IGD)通讯可以检测外部IP和映射端口。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:519
@@ -3194,9 +3148,7 @@ msgid "Review the UPnP status here."
 msgstr "在这里检查UPnP状态。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:535
-msgid ""
-"UPnP may be enabled or disabled above, but a change requires a router "
-"restart to take effect."
+msgid "UPnP may be enabled or disabled above, but a change requires a router restart to take effect."
 msgstr "UPnP 的关闭或开启均需要程序重启后生效。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:537
@@ -3208,18 +3160,12 @@ msgid "They are <b>not private</b>."
 msgstr "他们并<b>非私有地址</b>。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:541
-msgid ""
-"Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1."
+msgid "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1."
 msgstr "此外，<b>请勿输入如127.0.0.1或192.168.1.1等私有地址</b>"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:543
-msgid ""
-"If you specify the wrong IP address or hostname, or do not properly "
-"configure your NAT or firewall, your network performance will degrade "
-"substantially."
-msgstr ""
-"如果您设置了错误的IP地址或主机名称，或NAT/防火墙配置不当，您的网络性能将受到"
-"明显影响。"
+msgid "If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially."
+msgstr "如果您设置了错误的IP地址或主机名称，或NAT/防火墙配置不当，您的网络性能将受到明显影响。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:545
 msgid "When in doubt, leave the settings at the defaults."
@@ -3230,18 +3176,11 @@ msgid "Reachability Help"
 msgstr "连通性帮助"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:552
-msgid ""
-"If you think you have opened up your firewall and I2P still thinks you are "
-"firewalled, remember that you may have multiple firewalls, for example both "
-"software packages and external hardware routers."
-msgstr ""
-"如果您认为已经打开了防火墙，但I2P仍然报告您受到防火墙阻隔，请想想您是否可能有"
-"多层防火墙，例如软件防护墙和外部的硬件路由器。"
+msgid "If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers."
+msgstr "如果您认为已经打开了防火墙，但I2P仍然报告您受到防火墙阻隔，请想想您是否可能有多层防火墙，例如软件防护墙和外部的硬件路由器。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:555
-msgid ""
-"If there is an error, the <a href=\"logs.jsp\">logs</a> may also help "
-"diagnose the problem."
+msgid "If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem."
 msgstr "如果存在错误，<a href=\"logs.jsp\">日志</a>可以帮助您诊断问题。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:559
@@ -3253,58 +3192,35 @@ msgid "Your UDP port appears to be firewalled."
 msgstr "您的UDP端口似乎因防火墙而连接受限。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:565
-msgid ""
-"As the firewall detection methods are not 100% reliable, this may "
-"occasionally be displayed in error."
+msgid "As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error."
 msgstr "由于防火墙检测方法并非100%可靠，有时也可能错误地显示此此提示。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:567
-msgid ""
-"However, if it appears consistently, you should check whether both your "
-"external and internal firewalls are open for your port."
+msgid "However, if it appears consistently, you should check whether both your external and internal firewalls are open for your port."
 msgstr "然而，如果总是出现此提示，您应检查外部或内部防火墙是否打开了I2P端口。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:569
-msgid ""
-"I2P will work fine when firewalled, there is no reason for concern. When "
-"firewalled, the router uses \"introducers\" to relay inbound connections."
-msgstr ""
-"即使受到防火墙阻拦，I2P也能够正常工作，无需担心。受到防火墙阻隔时，路由器将通"
-"过“中介(Introducers)”中继入站连接。"
+msgid "I2P will work fine when firewalled, there is no reason for concern. When firewalled, the router uses \"introducers\" to relay inbound connections."
+msgstr "即使受到防火墙阻拦，I2P也能够正常工作，无需担心。受到防火墙阻隔时，路由器将通过“中介(Introducers)”中继入站连接。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:571
-msgid ""
-"However, you will get more participating traffic and help the network more "
-"if you can open your firewall(s)."
-msgstr ""
-"然而，如果您能打开防火墙端口，您才能得到的共享流量，更好的帮助I2P网络。"
+msgid "However, you will get more participating traffic and help the network more if you can open your firewall(s)."
+msgstr "然而，如果您能打开防火墙端口，您才能得到的共享流量，更好的帮助I2P网络。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:573
-msgid ""
-"If you think you have already done so, remember that you may have both a "
-"hardware and a software firewall, or be behind an additional, institutional "
-"firewall you cannot control."
-msgstr ""
-"如果您确信已经打开了防火墙，请想想是不是同时存在硬件和软件防火墙，或存在您无"
-"法控制的额外的机构性的防火墙。"
+msgid "If you think you have already done so, remember that you may have both a hardware and a software firewall, or be behind an additional, institutional firewall you cannot control."
+msgstr "如果您确信已经打开了防火墙，请想想是不是同时存在硬件和软件防火墙，或存在您无法控制的额外的机构性的防火墙。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:575
-msgid ""
-"Also, some routers cannot correctly forward both TCP and UDP on a single "
-"port, or may have other limitations or bugs that prevent them from passing "
-"traffic through to I2P."
-msgstr ""
-"当然，某些路由器可能无法正确映射同时使用TCP和UDP协议的端口，或存在其他限制或"
-"缺陷，障碍了数据进入I2P网络。"
+msgid "Also, some routers cannot correctly forward both TCP and UDP on a single port, or may have other limitations or bugs that prevent them from passing traffic through to I2P."
+msgstr "当然，某些路由器可能无法正确映射同时使用TCP和UDP协议的端口，或存在其他限制或缺陷，障碍了数据进入I2P网络。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:579
 msgid "The router is currently testing whether your UDP port is firewalled."
 msgstr "路由器正在测试您的UDP端口是否被防火墙阻挡。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:583
-msgid ""
-"The router is not configured to publish its address, therefore it does not "
-"expect incoming connections."
+msgid "The router is not configured to publish its address, therefore it does not expect incoming connections."
 msgstr "路由器被设置为禁止发布IP地址，因此并不需要入站连接。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:585
@@ -3312,32 +3228,23 @@ msgid "WARN - Firewalled and Fast"
 msgstr "警告 - 快速节点，因防火墙受限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:587
-msgid ""
-"You have configured I2P to share more than 128KBps of bandwidth, but you are "
-"firewalled."
+msgid "You have configured I2P to share more than 128KBps of bandwidth, but you are firewalled."
 msgstr "您设置I2P共享超过128KBps的带宽，但您的连接因防火墙受阻。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:589
-msgid ""
-"While I2P will work fine in this configuration, if you really have over "
-"128KBps of bandwidth to share, it will be much more helpful to the network "
-"if you open your firewall."
-msgstr ""
-"尽管在此种配置情况下I2P可以正常工作，但如果您的确能够分享超过128kps的带宽，打"
-"开防火墙端口它能工作的更好帮助网络中其他的人。"
+msgid "While I2P will work fine in this configuration, if you really have over 128KBps of bandwidth to share, it will be much more helpful to the network if you open your firewall."
+msgstr "尽管在此种配置情况下I2P可以正常工作，但如果您的确能够分享超过128kps的带宽，打开防火墙端口它能工作的更好帮助网络中其他的人。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:591
 msgid "WARN - Firewalled and Floodfill"
 msgstr "警告 - 种子节点，因防火墙受限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:593
-msgid ""
-"You have configured I2P to be a floodfill router, but you are firewalled."
+msgid "You have configured I2P to be a floodfill router, but you are firewalled."
 msgstr "您已将I2P设置为种子路由，但您的连接已因防火墙受阻。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:595
-msgid ""
-"For best participation as a floodfill router, you should open your firewall."
+msgid "For best participation as a floodfill router, you should open your firewall."
 msgstr "为了种子路由能够更好的参与到I2P网络中，请您的防火墙中打开端口。"
 
 # 暂不翻译方便反馈
@@ -3346,20 +3253,12 @@ msgid "WARN - Firewalled with Inbound TCP Enabled"
 msgstr "警告 - 入站TCP开启，但因防火墙受限"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:599
-msgid ""
-"You have configured inbound TCP, however your UDP port is firewalled, and "
-"therefore it is likely that your TCP port is firewalled as well."
-msgstr ""
-"您设置了使用入站TCP连接，同时您的UDP端口因防火墙受阻，由此看来您的TCP端口也被"
-"防火墙阻挡。"
+msgid "You have configured inbound TCP, however your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well."
+msgstr "您设置了使用入站TCP连接，同时您的UDP端口因防火墙受阻，由此看来您的TCP端口也被防火墙阻挡。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:601
-msgid ""
-"If your TCP port is firewalled with inbound TCP enabled, routers will not be "
-"able to contact you via TCP, which will hurt the network."
-msgstr ""
-"如果您在TCP端口因防火墙受阻的情况下启用入站TCP连接，其他路由器节点将无法与您"
-"建立连接，造成网络受阻。"
+msgid "If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact you via TCP, which will hurt the network."
+msgstr "如果您在TCP端口因防火墙受阻的情况下启用入站TCP连接，其他路由器节点将无法与您建立连接，造成网络受阻。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:603
 msgid "Please open your firewall or disable inbound TCP above."
@@ -3375,9 +3274,7 @@ msgid "You have configured inbound TCP, however you have disabled UDP."
 msgstr "您设置了使用TCP连接，然而禁用了UDP连接。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:609
-msgid ""
-"You appear to be firewalled on TCP, therefore your router cannot accept "
-"inbound connections."
+msgid "You appear to be firewalled on TCP, therefore your router cannot accept inbound connections."
 msgstr "您的TCP连接似乎因防火墙受阻，导致您的路由器无法接收入站连接。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:611
@@ -3390,9 +3287,7 @@ msgid "ERR - Clock Skew"
 msgstr "错误 - 系统时滞"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:615
-msgid ""
-"Your system's clock is skewed, which will make it difficult to participate "
-"in the network."
+msgid "Your system's clock is skewed, which will make it difficult to participate in the network."
 msgstr "如果您的系统时钟太快或太慢，将影响计算机接入网络。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:617
@@ -3405,12 +3300,8 @@ msgid "ERR - Private TCP Address"
 msgstr "错误 - 私有TCP地址"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:621
-msgid ""
-"You must never advertise an unroutable IP address such as 127.0.0.1 or "
-"192.168.1.1 as your external address."
-msgstr ""
-"您不能发布一个公网无法访问的 IP 地址，例如127.0.0.1或192.168.1.1一类的内网地"
-"址。"
+msgid "You must never advertise an unroutable IP address such as 127.0.0.1 or 192.168.1.1 as your external address."
+msgstr "您不能发布一个公网无法访问的 IP 地址，例如127.0.0.1或192.168.1.1一类的内网地址。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:623
 msgid "Correct the address or disable inbound TCP above."
@@ -3426,39 +3317,24 @@ msgid "I2P detected that you are firewalled by a Symmetric NAT."
 msgstr "I2P检测到您受到Symmetic NAT的阻挡。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:629
-msgid ""
-"I2P does not work well behind this type of firewall. You will probably not "
-"be able to accept inbound connections, which will limit your participation "
-"in the network."
-msgstr ""
-"I2P无法与此类防火墙很好的并存。您可能无法接收入站连接，这会障碍您连入I2P网"
-"络。"
+msgid "I2P does not work well behind this type of firewall. You will probably not be able to accept inbound connections, which will limit your participation in the network."
+msgstr "I2P无法与此类防火墙很好的并存。您可能无法接收入站连接，这会障碍您连入I2P网络。"
 
 # 暂不翻译，方便问题反馈
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:631
-msgid ""
-"ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config "
-"and restart"
-msgstr ""
-"错误 - UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口 并重启程"
-"序"
+msgid "ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
+msgstr "错误 - UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口 并重启程序"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:633
 msgid "I2P was unable to bind to port 8887 or other configured port."
 msgstr "I2P无法绑定到端口8887或其他指定的端口上。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:635
-msgid ""
-"Check to see if another program is using the configured port. If so, stop "
-"that program or configure I2P to use a different port."
-msgstr ""
-"检查是否有其他程序正在使用了I2P的端口，如果是，关闭此程序或设置I2P使用不同的"
-"端口。"
+msgid "Check to see if another program is using the configured port. If so, stop that program or configure I2P to use a different port."
+msgstr "检查是否有其他程序正在使用了I2P的端口，如果是，关闭此程序或设置I2P使用不同的端口。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:637
-msgid ""
-"This may be a transient error, if the other program is no longer using the "
-"port."
+msgid "This may be a transient error, if the other program is no longer using the port."
 msgstr "如果其他程序不再使用此端口，这可能是临时性的错误。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:639
@@ -3471,9 +3347,7 @@ msgid "ERR - UDP Disabled and Inbound TCP host/port not set"
 msgstr "错误 - UDP已禁用，且TCP入站主机与端口未设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:643
-msgid ""
-"You have not configured inbound TCP with a hostname and port above, however "
-"you have disabled UDP."
+msgid "You have not configured inbound TCP with a hostname and port above, however you have disabled UDP."
 msgstr "您没有设置入站TCP的主机名称和端口，同时又关闭了UDP。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:645
@@ -3494,9 +3368,7 @@ msgid "This is usually due to a port 7654 conflict. Check the logs to verify."
 msgstr "这通常为7654端口冲突所致，请查看日志确认原因。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:653
-msgid ""
-"Do you have another I2P instance running? Stop the conflicting program and "
-"restart I2P."
+msgid "Do you have another I2P instance running? Stop the conflicting program and restart I2P."
 msgstr "您是否已经运行了另一个I2P实例？请关掉冲突的程序并重启I2P。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:107
@@ -3533,9 +3405,7 @@ msgid "Client Configuration"
 msgstr "客户程序设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:308
-msgid ""
-"The Java clients listed below are started by the router and run in the same "
-"JVM."
+msgid "The Java clients listed below are started by the router and run in the same JVM."
 msgstr "下面列出的Java客户端随路由器启动并运行于同一JVM中。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:312
@@ -3552,28 +3422,12 @@ msgid "WebApp Configuration"
 msgstr "WebApp 设置"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:325
-msgid ""
-"The Java web applications listed below are started by the webConsole client "
-"and run in the same JVM as the router. They are usually web applications "
-"accessible through the router console. They may be complete applications (e."
-"g. i2psnark),front-ends to another client or application which must be "
-"separately enabled (e.g. susidns, i2ptunnel), or have no web interface at "
-"all (e.g. addressbook)."
-msgstr ""
-"下面列出的Java Web 程序随客户端“web控制台”一同启动，并与路由运行于同一JVM中。"
-"这些Web程序通常可以通过路由器界面直接访问。他们可能是完整的程序 (例如  "
-"i2psnark/BT客户端),其他客户端程序的前端或必须单独启动的程序(例如. susidns, "
-"i2ptunnel),甚至根本没有Web界面(例如 addressbook)。"
+msgid "The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook)."
+msgstr "下面列出的Java Web 程序随客户端“web控制台”一同启动，并与路由运行于同一JVM中。这些Web程序通常可以通过路由器界面直接访问。他们可能是完整的程序 (例如  i2psnark/BT客户端),其他客户端程序的前端或必须单独启动的程序(例如. susidns, i2ptunnel),甚至根本没有Web界面(例如 addressbook)。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:327
-msgid ""
-"A web app may also be disabled by removing the .war file from the webapps "
-"directory; however the .war file and web app will reappear when you update "
-"your router to a newer version, so disabling the web app here is the "
-"preferred method."
-msgstr ""
-"从webapps目录中删除相应的.war文件同样可以禁用Web程序;然而这些 .war 文件和Web"
-"程序在更新I2P后还会再次出现,所以推荐在这里通过设置的方法禁用不用的Web程序。"
+msgid "A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method."
+msgstr "从webapps目录中删除相应的.war文件同样可以禁用Web程序;然而这些 .war 文件和Web程序在更新I2P后还会再次出现,所以推荐在这里通过设置的方法禁用不用的Web程序。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:106
 msgid "config keyring"
@@ -3588,8 +3442,7 @@ msgid "The router keyring is used to decrypt encrypted leaseSets."
 msgstr "路由的钥匙环被用来解密和加密赁集."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:297
-msgid ""
-"The keyring may contain keys for local or remote encrypted destinations."
+msgid "The keyring may contain keys for local or remote encrypted destinations."
 msgstr "钥匙环可以包含本地和远程的加密目标(Destination)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:307
@@ -3641,8 +3494,7 @@ msgid "Log record format"
 msgstr "日志记录格式"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:311
-msgid ""
-"(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)"
+msgid "(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)"
 msgstr "( 'd' = 日期, 'c' = 类, 't' = 线程, 'p' = 优先级, 'm' = 消息)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:313
@@ -3650,11 +3502,8 @@ msgid "Log date format"
 msgstr "日志日期格式"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:317
-msgid ""
-"('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' "
-"= millisecond)"
-msgstr ""
-"('MM' = 月, 'dd' = 天, 'HH' = 小时, 'mm' = 分钟, 'ss' = 秒, 'SSS' = 毫秒)"
+msgid "('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)"
+msgstr "('MM' = 月, 'dd' = 天, 'HH' = 小时, 'mm' = 分钟, 'ss' = 秒, 'SSS' = 毫秒)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:319
 msgid "Max log file size"
@@ -3665,9 +3514,7 @@ msgid "Default log level"
 msgstr "默认日志等级"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:327
-msgid ""
-"(DEBUG and INFO are not recommended defaults, as they will drastically slow "
-"down your router)"
+msgid "(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)"
 msgstr "(建议不要使用 DEBUG 或 INFO 作为默认等级,他们会明显降低程序性能)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:329
@@ -3695,19 +3542,12 @@ msgid "Manually Ban / Unban a Peer"
 msgstr "手动封杀/解封某个节点"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:312
-msgid ""
-"Banning will prevent the participation of this peer in tunnels you create."
+msgid "Banning will prevent the participation of this peer in tunnels you create."
 msgstr "封锁将阻止节点参与您的隧道创建"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:324
-msgid ""
-"Bonuses may be positive or negative, and affect the peer's inclusion in Fast "
-"and High Capacity tiers. Fast peers are used for client tunnels, and High "
-"Capacity peers are used for some exploratory tunnels. Current bonuses are "
-"displayed on the"
-msgstr ""
-"评分(Bonuse)可能为正或为负并影响节点是否评为快速和高容量节点。快速节点用于客"
-"户程序通道，高容量节点用于探索隧道。当前评分显示于"
+msgid "Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the"
+msgstr "评分(Bonuse)可能为正或为负并影响节点是否评为快速和高容量节点。快速节点用于客户程序通道，高容量节点用于探索隧道。当前评分显示于"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:326
 msgid "profiles page"
@@ -3739,21 +3579,15 @@ msgid "Shutdown the router"
 msgstr "关闭路由器"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:286
-msgid ""
-"Graceful shutdown lets the router satisfy the agreements it has already made "
-"before shutting down, but may take a few minutes."
-msgstr ""
-"平滑关闭让路由器在关闭前完成已达成的任务，但这可能需要花费几分钟的时间。"
+msgid "Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes."
+msgstr "平滑关闭让路由器在关闭前完成已达成的任务，但这可能需要花费几分钟的时间。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:288
-msgid ""
-"If you need to kill the router immediately, that option is available as well."
+msgid "If you need to kill the router immediately, that option is available as well."
 msgstr "当然你也可以选择立即关闭路由。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:298
-msgid ""
-"If you want the router to restart itself after shutting down, you can choose "
-"one of the following."
+msgid "If you want the router to restart itself after shutting down, you can choose one of the following."
 msgstr "如果你想要路由器关闭后自动重新启动，可以选择下面的选项。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:300
@@ -3761,26 +3595,15 @@ msgid "This is useful in some situations"
 msgstr "重启在某些情况下有用"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:302
-msgid ""
-"for example, if you changed some settings that client applications only read "
-"at startup, such as the routerconsole password or the interface it listens "
-"on."
-msgstr ""
-"例如当修改了客户程序仅在启动时读取的设置，比如路由器控制界面的密码，监听的接"
-"口。"
+msgid "for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on."
+msgstr "例如当修改了客户程序仅在启动时读取的设置，比如路由器控制界面的密码，监听的接口。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:304
-msgid ""
-"A graceful restart will take a few minutes (but your peers will appreciate "
-"your patience), while a hard restart does so immediately."
-msgstr ""
-"平滑重启可能会等待几分钟的时间(但你的节点一定会感激你的耐心)，硬重启可以立即"
-"完成。"
+msgid "A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately."
+msgstr "平滑重启可能会等待几分钟的时间(但你的节点一定会感激你的耐心)，硬重启可以立即完成。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:306
-msgid ""
-"After tearing down the router, it will wait 1 minute before starting back up "
-"again."
+msgid "After tearing down the router, it will wait 1 minute before starting back up again."
 msgstr "路由关闭后将等待1分钟再重新启动。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:316
@@ -3788,15 +3611,11 @@ msgid "Systray integration"
 msgstr "使用系统托盘"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:318
-msgid ""
-"On the windows platform, there is a small application to sit in the system "
-"tray, allowing you to view the router's status"
+msgid "On the windows platform, there is a small application to sit in the system tray, allowing you to view the router's status"
 msgstr "Windows 平台允许小程序进驻系统托盘，让你可以查看路由状态"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:320
-msgid ""
-"(later on, I2P client applications will be able to integrate their own "
-"functionality into the system tray as well)."
+msgid "(later on, I2P client applications will be able to integrate their own functionality into the system tray as well)."
 msgstr "(以后的 I2P 客户端程序也会将它们的功能集成到系统托盘里)。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:322
@@ -3808,9 +3627,7 @@ msgid "Run on startup"
 msgstr "启动时运行"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:330
-msgid ""
-"You can control whether I2P is run on startup or not by selecting one of the "
-"following options"
+msgid "You can control whether I2P is run on startup or not by selecting one of the following options"
 msgstr "这里你可以通过下面的选项来设置开机后 I2P 是否启动"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:332
@@ -3822,17 +3639,12 @@ msgid "If you prefer the command line, you can also run the "
 msgstr "如果你偏好使用命令行，可以运行"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:344
-msgid ""
-"If you are running I2P as service right now, removing it will shut down your "
-"router immediately."
+msgid "If you are running I2P as service right now, removing it will shut down your router immediately."
 msgstr "如果您目前已经以服务形式运行 I2P ，删除 I2P 服务将立刻关闭路由器。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:346
-msgid ""
-"You may want to consider shutting down gracefully, as above, then running "
-"uninstall_i2p_service_winnt.bat."
-msgstr ""
-"您可以考虑先平滑关闭路由，待退出后运行 uninstall_i2p_service_winnt.bat。"
+msgid "You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat."
+msgstr "您可以考虑先平滑关闭路由，待退出后运行 uninstall_i2p_service_winnt.bat。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:354
 msgid "Debugging"
@@ -3843,12 +3655,8 @@ msgid "Launch browser on router startup?"
 msgstr "路由器启动时运行浏览器?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:362
-msgid ""
-"I2P's main configuration interface is this web console, so for your "
-"convenience I2P can launch a web browser on startup pointing at"
-msgstr ""
-"此Web控制台是I2P的主要设置界面，所以如果您您觉得有必要I2P可以在路由启动时调用"
-"浏览器打开"
+msgid "I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at"
+msgstr "此Web控制台是I2P的主要设置界面，所以如果您您觉得有必要I2P可以在路由启动时调用浏览器打开"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:107
 msgid "config stats"
@@ -3912,13 +3720,8 @@ msgid "There is a fundamental tradeoff between anonymity and performance."
 msgstr "匿名性需要以性能为代价。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:312
-msgid ""
-"Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 "
-"hops, 3 hops + 0-2 hops), or a high quantity + backup quantity, may severely "
-"reduce performance or reliability."
-msgstr ""
-"长于3个跳点的隧道(例如 2跳点 + 0-2跳点，3跳点 + 0-1跳点, 3跳点 + 0-2跳点)，或"
-"大量常规+大量备用,可能降低性能和稳定性。"
+msgid "Tunnels longer than 3 hops (for example 2 hops + 0-2 hops, 3 hops + 0-1 hops, 3 hops + 0-2 hops), or a high quantity + backup quantity, may severely reduce performance or reliability."
+msgstr "长于3个跳点的隧道(例如 2跳点 + 0-2跳点，3跳点 + 0-1跳点, 3跳点 + 0-2跳点)，或大量常规+大量备用,可能降低性能和稳定性。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:315
 msgid "High CPU and/or high outbound bandwidth usage may result."
@@ -3929,8 +3732,7 @@ msgid "Change these settings with care, and adjust them if you have problems."
 msgstr "小心更改这些设置。如果遇到问题可以在这里调整。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:332
-msgid ""
-"Exploratory tunnel setting changes are stored in the router.config file."
+msgid "Exploratory tunnel setting changes are stored in the router.config file."
 msgstr "对探测隧道设置的更改将保存入router.config文件中。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:335
@@ -3962,24 +3764,16 @@ msgid "Theme selection disabled for Internet Explorer, sorry."
 msgstr "抱歉，主题功能在InternetExplorer中已禁用。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:311
-msgid ""
-"If you're not using IE, it's likely that your browser is pretending to be "
-"IE; please configure your browser (or proxy) to use a different User Agent "
-"string if you'd like to access the console themes."
-msgstr ""
-"如果您没使用IE，您的浏览器可能正在伪装IE的UserAgent；您需要设置浏览器(或过滤"
-"式代理)使用不同的UserAgent，才能访问路由控制台的主题功能。"
+msgid "If you're not using IE, it's likely that your browser is pretending to be IE; please configure your browser (or proxy) to use a different User Agent string if you'd like to access the console themes."
+msgstr "如果您没使用IE，您的浏览器可能正在伪装IE的UserAgent；您需要设置浏览器(或过滤式代理)使用不同的UserAgent，才能访问路由控制台的主题功能。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:315
 msgid "Router Console Language"
 msgstr "路由控制台语言"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:319
-msgid ""
-"Please contribute to the router console translation project! Contact the "
-"developers on IRC #i2p to help."
-msgstr ""
-"欢迎加入路由控制台翻译项目！提供帮助请通过IRC到#i2p房间与开发人员联系。"
+msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p to help."
+msgstr "欢迎加入路由控制台翻译项目！提供帮助请通过IRC到#i2p房间与开发人员联系。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:106
 msgid "config update"
@@ -4050,9 +3844,7 @@ msgid "Page Not Found"
 msgstr "页面未找到"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:243
-msgid ""
-"Sorry! You appear to be requesting a non-existent Router Console page or "
-"resource."
+msgid "Sorry! You appear to be requesting a non-existent Router Console page or resource."
 msgstr "抱歉!您请求的页面或资源不存在。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:245
@@ -4108,24 +3900,20 @@ msgid "I2P Network Database Summary"
 msgstr "I2P 网络数据库概况"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:109
-#, fuzzy
 msgid "WebApp Not Found"
-msgstr "页面未找到"
+msgstr "Web程序(war)未找到"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:231
-#, fuzzy
 msgid "Web Application Not Running"
-msgstr "程序隧道"
+msgstr "Web程序(.war)未运行"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:233
 msgid "The requested web application is not running."
-msgstr ""
+msgstr "您所访问的Web程序未启动。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:235
-msgid ""
-"Please visit the <a href=\"/configclients.jsp#webapp\">config clients page</"
-"a> to start it."
-msgstr ""
+msgid "Please visit the <a href=\"/configclients.jsp#webapp\">config clients page</a> to start it."
+msgstr "请先在<a href=\"/configclients.jsp#webapp\">配置客户端页面</a>中启动它。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:105
 msgid "peer connections"
@@ -4166,25 +3954,18 @@ msgstr "I2P 隧道概况"
 
 #~ msgid "Depth"
 #~ msgstr "深度"
-
 #~ msgid "Addresses"
 #~ msgstr "地址"
-
 #~ msgid "view without"
 #~ msgstr "查看不含"
-
 #~ msgid "view with"
 #~ msgstr "查看含"
-
 #~ msgid "stats"
 #~ msgstr "统计"
-
 #~ msgid "View"
 #~ msgstr "查看"
-
 #~ msgid "Not Failing"
 #~ msgstr "标准"
-
 #~ msgid ""
 #~ "If you want the router to restart itself after shutting down, you can "
 #~ "choose one of the following.  This is useful in some situations - for "
@@ -4199,7 +3980,6 @@ msgstr "I2P 隧道概况"
 #~ "- 例如当修改了客户程序仅在启动时读取的设置比如路由器控制界面的密码，监听的"
 #~ "接口。平滑重启可能会等待几分钟的时间 (但其他节点一定会感激你的耐心)，硬重"
 #~ "启可以立即完成。 路由关闭后将等待1分钟再重新启动。"
-
 #~ msgid ""
 #~ "On the windows platform, there is a small application to sit in the "
 #~ "system tray, allowing you to view the router's status (later on, I2P "
@@ -4210,3 +3990,4 @@ msgstr "I2P 隧道概况"
 #~ "windows 平台允许小程序进驻系统托盘，让你可以查看路由状态，(以后的 I2P 客户"
 #~ "端程序也会将它们的功能集成到系统托盘里)。如果你使用Windows, 可以在这里开启"
 #~ "或关闭这个托盘图标。"
+
