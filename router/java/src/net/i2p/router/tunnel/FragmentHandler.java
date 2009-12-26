@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -13,6 +12,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
+import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -30,6 +30,8 @@ fragments it across the necessary number of 1KB tunnel messages, and decides how
 each I2NP message should be handled by the tunnel endpoint, encoding that
 data into the raw tunnel payload:</p>
 <ul>
+<li>The 4 byte Tunnel ID</li>
+<li>The 16 byte IV</li>
 <li>the first 4 bytes of the SHA256 of (the remaining preprocessed data concatenated 
     with the IV), using the IV as will be seen on the tunnel endpoint (for
     outbound tunnels), or the IV as was seen on the tunnel gateway (for inbound
@@ -81,13 +83,15 @@ set, this is a follow on fragment.</p>
 </ul>
 
 <p>The I2NP message is encoded in its standard form, and the 
-preprocessed payload must be padded to a multiple of 16 bytes.</p>
+preprocessed payload must be padded to a multiple of 16 bytes.
+The total size, including the tunnel ID and IV, is 1028 bytes.
+</p>
 
  *
  */
 public class FragmentHandler {
-    private I2PAppContext _context;
-    private Log _log;
+    protected RouterContext _context;
+    protected Log _log;
     private final Map<Long, FragmentedMessage> _fragmentedMessages;
     private DefragmentedReceiver _receiver;
     private int _completed;
@@ -98,7 +102,7 @@ public class FragmentHandler {
     static long MAX_DEFRAGMENT_TIME = 60*1000;
     private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
 
-    public FragmentHandler(I2PAppContext context, DefragmentedReceiver receiver) {
+    public FragmentHandler(RouterContext context, DefragmentedReceiver receiver) {
         _context = context;
         _log = context.logManager().getLog(FragmentHandler.class);
         _fragmentedMessages = new HashMap(8);
@@ -185,6 +189,9 @@ public class FragmentHandler {
             // each of the FragmentedMessages populated make a copy out of the
             // payload, which they release separately, so we can release 
             // immediately
+            //
+            // This is certainly interesting, to wrap the 1024-byte array in a new ByteArray
+            // in order to put it in the pool, but it shouldn't cause any harm.
             _cache.release(new ByteArray(preprocessed));
         }
     }
@@ -204,6 +211,13 @@ public class FragmentHandler {
      * this.
      */
     private boolean verifyPreprocessed(byte preprocessed[], int offset, int length) {
+        // ByteCache/ByteArray corruption detection
+        //byte[] orig = new byte[length];
+        //System.arraycopy(preprocessed, 0, orig, 0, length);
+        //try {
+        //    Thread.sleep(75);
+        //} catch (InterruptedException ie) {}
+
         // now we need to verify that the message was received correctly
         int paddingEnd = HopProcessor.IV_LENGTH + 4;
         while (preprocessed[offset+paddingEnd] != (byte)0x00) {
@@ -249,6 +263,13 @@ public class FragmentHandler {
                 _context.statManager().addRateData("tunnel.fullFragments", 1, 0);
         }
         
+        // ByteCache/ByteArray corruption detection
+        //if (!DataHelper.eq(preprocessed, 0, orig, 0, length)) {
+        //    _log.log(Log.CRIT, "Not equal! orig =\n" + Base64.encode(orig, 0, length) +
+        //             "\nprep =\n" + Base64.encode(preprocessed, 0, length),
+        //             new Exception("hosed"));
+        //}
+
         return eq;
     }
     
@@ -514,7 +535,7 @@ public class FragmentHandler {
                     _failed++;
                     noteFailure(_msg.getMessageId(), _msg.toString());
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Dropped failed fragmented message: " + _msg);
+                        _log.warn("Dropped incomplete fragmented message: " + _msg);
                     _context.statManager().addRateData("tunnel.fragmentedDropped", _msg.getFragmentCount(), _msg.getLifetime());
                     _msg.failed();
                 } else {

@@ -71,6 +71,9 @@ public class TunnelParticipant {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Failed to dispatch " + msg + ": processor=" + _processor 
                            + " inboundEndpoint=" + _inboundEndpointProcessor);
+            if (_config != null)
+                _config.incrementProcessedMessages();
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
             return;
         }
         

@@ -25,9 +25,17 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     
     public static final int PREPROCESSED_SIZE = 1024;
     protected static final int IV_SIZE = HopProcessor.IV_LENGTH;
+
+    /**
+     * Here in tunnels, we take from the cache but never add to it.
+     * In other words, we take advantage of other places in the router also using 1024-byte ByteCaches
+     * (since ByteCache only maintains once instance for each size)
+     * Used in BatchedPreprocessor; see add'l comments there
+     */
     protected static final ByteCache _dataCache = ByteCache.getInstance(32, PREPROCESSED_SIZE);
-    protected static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
-    protected static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
+
+    private static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
+    private static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
     
     public TrivialPreprocessor(RouterContext ctx) {
         _context = ctx;
@@ -41,8 +49,10 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * Return true if there were messages remaining, and we should queue up
      * a delayed flush to clear them
      *
+     * NOTE: Unused here, see BatchedPreprocessor override, super is not called.
      */
     public boolean preprocessQueue(List<TunnelGateway.Pending> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+        if (true) throw new IllegalArgumentException("unused, right?");
         long begin = System.currentTimeMillis();
         StringBuilder buf = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -87,6 +97,9 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     
     protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {}
     
+    /*
+     * @deprecated unused except by above
+     */
     private byte[][] preprocess(TunnelGateway.Pending msg) {
         List fragments = new ArrayList(1);
 
@@ -110,6 +123,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * bytes after the IV, followed by the first 4 bytes of that SHA256, lining up
      * exactly to meet the beginning of the instructions. (i hope)
      *
+     * @deprecated unused except by above
      */
     private byte[] preprocessFragment(TunnelGateway.Pending msg) {
         byte target[] = _dataCache.acquire().getData();

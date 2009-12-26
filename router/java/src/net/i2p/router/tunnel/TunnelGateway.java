@@ -224,6 +224,10 @@ public class TunnelGateway {
         public int getFragmentNumber() { return _fragmentNumber; }
         /** ok, fragment sent, increment what the next will be */
         public void incrementFragmentNumber() { _fragmentNumber++; }
+        /**
+         *  Add an ID to the list of the TunnelDataMssages this message was fragmented into.
+         *  Unused except in notePreprocessing() calls for debugging
+         */
         public void addMessageId(long id) { 
             synchronized (Pending.this) {
                 if (_messageIds == null)
@@ -231,6 +235,10 @@ public class TunnelGateway {
                 _messageIds.add(new Long(id));
             }
         }
+        /**
+         *  The IDs of the TunnelDataMssages this message was fragmented into.
+         *  Unused except in notePreprocessing() calls for debugging
+         */
         public List<Long> getMessageIds() { 
             synchronized (Pending.this) { 
                 if (_messageIds != null)

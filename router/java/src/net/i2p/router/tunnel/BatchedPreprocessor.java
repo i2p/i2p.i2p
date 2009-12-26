@@ -363,6 +363,11 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
     protected void send(List<TunnelGateway.Pending> pending, int startAt, int sendThrough, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending " + startAt + ":" + sendThrough + " out of " + pending);
+
+        // Might as well take a buf from the cache;
+        // However it will never be returned to the cache.
+        // (TunnelDataMessage will not wrap the buffer in a new ByteArray and release() it)
+        // See also TDM for more discussion.
         byte preprocessed[] = _dataCache.acquire().getData();
         
         int offset = 0;
@@ -389,7 +394,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                 _log.error("Error preprocessing the messages (offset=" + offset + " start=" + startAt + " through=" + sendThrough + " pending=" + pending.size() + " preproc=" + preprocessed.length);
             return;
         }
-        
+
         long msgId = sender.sendPreprocessed(preprocessed, rec);
         for (int i = 0; i < pending.size(); i++) {
             TunnelGateway.Pending cur = pending.get(i);
