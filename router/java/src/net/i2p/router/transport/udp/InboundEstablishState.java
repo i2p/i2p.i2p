@@ -46,7 +46,7 @@ public class InboundEstablishState {
     // general status 
     private long _establishBegin;
     private long _lastReceive;
-    private long _lastSend;
+    // private long _lastSend;
     private long _nextSend;
     private RemoteHostId _remoteHostId;
     private int _currentState;
@@ -129,6 +129,7 @@ public class InboundEstablishState {
     
     public synchronized byte[] getSentY() {
         if (_sentY == null)
+            // Rare NPE seen here...
             _sentY = _keyBuilder.getMyPublicValueBytes();
         return _sentY;
     }
@@ -198,7 +199,7 @@ public class InboundEstablishState {
     
     /** note that we just sent a SessionCreated packet */
     public synchronized void createdPacketSent() {
-        _lastSend = _context.clock().now();
+        // _lastSend = _context.clock().now();
         if ( (_currentState == STATE_UNKNOWN) || (_currentState == STATE_REQUEST_RECEIVED) )
             _currentState = STATE_CREATED_SENT;
     }
@@ -210,8 +211,7 @@ public class InboundEstablishState {
     public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
     /** RemoteHostId, uniquely identifies an attempt */
-    // FIXME Exporting non-public type through public API FIXME
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
         if (_receivedIdentity == null)

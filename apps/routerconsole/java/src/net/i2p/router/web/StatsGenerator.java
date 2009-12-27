@@ -40,7 +40,7 @@ public class StatsGenerator {
             String group = (String)entry.getKey();
             Set stats = (Set)entry.getValue();
             buf.append("<option value=\"/stats.jsp#").append(group).append("\">");
-            buf.append(group).append("</option>\n");
+            buf.append(_(group)).append("</option>\n");
             for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
                 String stat = (String)statIter.next();
                 buf.append("<option value=\"/stats.jsp#");
@@ -52,7 +52,7 @@ public class StatsGenerator {
             out.write(buf.toString());
             buf.setLength(0);
         }
-        buf.append("</select> <input type=\"submit\" value=\"GO\" />");
+        buf.append("</select> <input type=\"submit\" value=\"").append(_("GO")).append("\" />");
         buf.append("</form>");
         
         buf.append(_("Statistics gathered during this router's uptime")).append(" (");
@@ -69,7 +69,7 @@ public class StatsGenerator {
             buf.append("<h3><a name=\"");
             buf.append(group);
             buf.append("\">");
-            buf.append(group);
+            buf.append(_(group));
             buf.append("</a></h3>");
             buf.append("<ul>");
             out.write(buf.toString());
@@ -88,7 +88,7 @@ public class StatsGenerator {
                 out.write(buf.toString());
                 buf.setLength(0);
             }
-            out.write("</ul><br>");
+            out.write("</ul><br>\n");
         }
         out.flush();
     }
@@ -104,7 +104,7 @@ public class StatsGenerator {
         for (int i = 0; i < periods.length; i++) {
             if (periods[i] > uptime)
                 break;
-            renderPeriod(buf, periods[i], "frequency");
+            renderPeriod(buf, periods[i], _("frequency"));
             Frequency curFreq = freq.getFrequency(periods[i]);
             buf.append(" <i>avg per period:</i> (");
             buf.append(num(curFreq.getAverageEventsPerPeriod()));
@@ -124,9 +124,9 @@ public class StatsGenerator {
             buf.append(" using the lifetime of ");
             buf.append(curFreq.getEventCount());
             buf.append(" events)");
-            buf.append("<br>");
+            buf.append("<br>\n");
         }
-        buf.append("<br>");
+        buf.append("<br>\n");
     }
     
     private void renderRate(String name, StringBuilder buf) {
@@ -138,7 +138,7 @@ public class StatsGenerator {
             buf.append("</i><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
-            buf.append("No lifetime events<br>");
+            buf.append(_("No lifetime events")).append("<br>\n");
             return;
         }
         long now = _context.clock().now();
@@ -150,9 +150,9 @@ public class StatsGenerator {
             if (curRate.getLastCoalesceDate() <= curRate.getCreationDate())
                 break;
             buf.append("<li>");
-            renderPeriod(buf, periods[i], "rate");
+            renderPeriod(buf, periods[i], _("rate"));
             if (curRate.getLastEventCount() > 0) {
-                buf.append( "<i>avg value:</i> (");
+                buf.append( "<i>").append(_("avg value")).append(":</i> (");
                 buf.append(num(curRate.getAverageValue()));
                 buf.append(" peak ");
                 buf.append(num(curRate.getExtremeAverageValue()));
@@ -181,21 +181,21 @@ public class StatsGenerator {
                     buf.append(num(curRate.getExtremeSaturationLimit()));
                     buf.append(")");
                 }
-                buf.append(" <i>events:</i> ");
+                buf.append(" <i>").append(_("events")).append(":</i> ");
                 buf.append(curRate.getLastEventCount());
                 buf.append(" <i>in this period which ended:</i> ");
                 buf.append(DataHelper.formatDuration(now - curRate.getLastCoalesceDate()));
                 buf.append(" ago ");
             } else {
-                buf.append(" <i>No events</i> ");
+                buf.append(" <i>").append(_("No events")).append("</i> ");
             }
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
                 double peakFrequency = curRate.getExtremeEventCount();
-                buf.append(" (lifetime average: ");
+                buf.append(" (").append(_("lifetime average")).append(": ");
                 buf.append(num(avgFrequency));
-                buf.append(", peak average: ");
+                buf.append(", ").append(_("peak average")).append(": ");
                 buf.append(curRate.getExtremeEventCount());
                 buf.append(")");
             }
@@ -210,16 +210,16 @@ public class StatsGenerator {
                 buf.append("&amp;format=xml\" title=\"Dump stat history as XML\">XML</a>");
                 buf.append(" in a format <a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool\">RRDTool</a> understands)");
             }
-            buf.append("</li>");
+            buf.append("</li>\n");
         }
         // Display the strict average
-        buf.append("<li><b>lifetime average value:</b> ");
+        buf.append("<li><b>").append(_("lifetime average value")).append(":</b> ");
         buf.append(num(rate.getLifetimeAverageValue()));
         buf.append(" over ");
         buf.append(rate.getLifetimeEventCount());
         buf.append(" events<br></li>");
         buf.append("</ul>");
-        buf.append("<br>");
+        buf.append("<br>\n");
     }
     
     private static void renderPeriod(StringBuilder buf, long period, String name) {
@@ -239,5 +239,10 @@ public class StatsGenerator {
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /** translate a string */
+    private String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 }

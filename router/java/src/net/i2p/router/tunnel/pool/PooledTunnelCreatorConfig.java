@@ -55,6 +55,9 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
             // remove us from the pool (but not the dispatcher) so that we aren't 
             // selected again.  _expireJob is left to do its thing, in case there
             // are any straggling messages coming down the tunnel
+            //
+            // Todo: Maybe delay or prevent failing if we are near tunnel build capacity,
+            // to prevent collapse (loss of all tunnels)
             _pool.tunnelFailed(this);
             if (_testJob != null) // just in case...
                 _context.jobQueue().removeJob(_testJob);
@@ -79,11 +82,14 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     public TunnelPool getTunnelPool() { return _pool; }
     
 
-    /* FIXME Exporting non-public type through public API FIXME */
-    public void setTestJob(TestJob job) { _testJob = job; }
+    /** @deprecated unused, which makes _testJob unused - why is it here */
+    void setTestJob(TestJob job) { _testJob = job; }
+    /** does nothing, to be deprecated */
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
     
-    // Fix memory leaks caused by references if you need to use pairedTunnel
+    /**
+     * @deprecated Fix memory leaks caused by references if you need to use pairedTunnel
+     */
     public void setPairedTunnel(TunnelInfo tunnel) { /* _pairedTunnel = tunnel; */}
     // public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
 }

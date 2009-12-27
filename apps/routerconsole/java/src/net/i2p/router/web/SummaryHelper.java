@@ -62,6 +62,9 @@ public class SummaryHelper extends HelperBase {
             return DataHelper.formatDuration(router.getUptime());
     }
     
+/**
+    this displayed offset, not skew - now handled in reachability()
+
     private String timeSkew() {
         if (_context == null) return "";
         //if (!_context.clock().getUpdatedSuccessfully())
@@ -72,6 +75,7 @@ public class SummaryHelper extends HelperBase {
             return "";
         return " (" + DataHelper.formatDuration(diff) + " " + _("skew") + ")";
     }
+**/
     
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
@@ -83,15 +87,20 @@ public class SummaryHelper extends HelperBase {
     public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
     
     public String getReachability() {
-        return reachability() + timeSkew();
+        return reachability(); // + timeSkew();
     }
 
     private String reachability() {
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
             return _("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
-        if (!_context.clock().getUpdatedSuccessfully())
-            return _("ERR-ClockSkew");
+        // Warn based on actual skew from peers, not update status, so if we successfully offset
+        // the clock, we don't complain.
+        //if (!_context.clock().getUpdatedSuccessfully())
+        Long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
+        // Display the actual skew, not the offset
+        if (skew != null && Math.abs(skew.longValue()) > 45)
+            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew.longValue()) * 1000));
         if (_context.router().isHidden())
             return _("Hidden");
 
@@ -118,7 +127,9 @@ public class SummaryHelper extends HelperBase {
             default:
                 ra = _context.router().getRouterInfo().getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
-                    if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
+                    if (getActivePeers() <= 0)
+                        return _("ERR-No Active Peers, Check Network Connection and Firewall");
+                    else if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
                         return _("ERR-UDP Disabled and Inbound TCP host/port not set");
                     else

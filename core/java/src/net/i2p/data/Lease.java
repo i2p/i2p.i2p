@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import net.i2p.util.Clock;
-import net.i2p.util.Log;
 
 /**
  * Defines the proof that a particular router / tunnel is allowed to receive
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class Lease extends DataStructureImpl {
-    private final static Log _log = new Log(Lease.class);
     private Hash _gateway;
     private TunnelId _tunnelId;
     private Date _end;

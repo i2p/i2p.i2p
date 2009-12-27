@@ -42,6 +42,7 @@ import net.i2p.util.Log;
 public class ClientManager {
     private Log _log;
     private ClientListenerRunner _listener;
+    private ClientListenerRunner _internalListener;
     private final HashMap<Destination, ClientConnectionRunner>  _runners;        // Destination --> ClientConnectionRunner
     private final Set<ClientConnectionRunner> _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
     private RouterContext _ctx;
@@ -58,9 +59,19 @@ public class ClientManager {
                                               new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _runners = new HashMap();
         _pendingRunners = new HashSet();
+        startListeners(port);
+    }
+
+    /** Todo: Start a 3rd listener for IPV6? */
+    private void startListeners(int port) {
         _listener = new ClientListenerRunner(_ctx, this, port);
         Thread t = new I2PThread(_listener);
         t.setName("ClientListener:" + port);
+        t.setDaemon(true);
+        t.start();
+        _internalListener = new InternalClientListenerRunner(_ctx, this, port);
+        t = new I2PThread(_internalListener);
+        t.setName("ClientListener:" + port + "-i");
         t.setDaemon(true);
         t.start();
     }
@@ -80,16 +91,13 @@ public class ClientManager {
                 _log.error("Error setting the port: " + portStr + " is not valid", nfe);
             }
         } 
-        _listener = new ClientListenerRunner(_ctx, this, port);
-        Thread t = new I2PThread(_listener);
-        t.setName("ClientListener:" + port);
-        t.setDaemon(true);
-        t.start();
+        startListeners(port);
     }
     
     public void shutdown() {
         _log.info("Shutting down the ClientManager");
         _listener.stopListening();
+        _internalListener.stopListening();
         Set<ClientConnectionRunner> runners = new HashSet();
         synchronized (_runners) {
             for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {

@@ -136,17 +136,16 @@ public class ConfigBean implements Serializable {
 		String message = "";
 		if( action != null ) {
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
-				if( action.compareToIgnoreCase( "save") == 0 ) {
+				if(action.equals(_("Save"))) {
 					save();
-					message = "Configuration saved.";
-				}
-				else if( action.compareToIgnoreCase( "reload") == 0 ) {
+					message = _("Configuration saved.");
+				} else if (action.equals(_("Reload"))) {
 					reload();
-					message = "Configuration reloaded.";
+					message = _("Configuration reloaded.");
 				}
 			}			
 			else {
-				message = "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
 			}
 		}
 		if( message.length() > 0 )
@@ -161,5 +160,10 @@ public class ConfigBean implements Serializable {
 	}
 	public void setSerial(String serial ) {
 		this.serial = serial;
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
 	}
 }

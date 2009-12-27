@@ -32,15 +32,18 @@
    <div class="wideload"><p><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" />
           <%=intl._("KBps In")%>
         </td><td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)</td>
+<% /********
 <!-- let's keep this simple...
  bursting up to
     <input name="inboundburstrate" type="text" size="5" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" /> KBps for
     <jsp:getProperty name="nethelper" property="inboundBurstFactorBox" /><br>
 -->
+*********/ %>
     </tr><tr>
         <td><input style="text-align: right; width: 5em;" name="outboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="outboundRate" />" />
          <%=intl._("KBps Out")%>
         </td><td>(<jsp:getProperty name="nethelper" property="outboundRateBits" />)</td>
+<% /********
 <!-- let's keep this simple...
  bursting up to
     <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
@@ -48,6 +51,7 @@
  <i>KBps = kilobytes per second = 1024 bytes per second = 8192 bits per second.<br>
     A negative rate sets the default.</i><br>
 -->
+*********/ %>
     </tr><tr>
         <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> <%=intl._("Share")%></td>
         <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
@@ -121,6 +125,7 @@
  </p><p><b><%=intl._("UDP Configuration:")%></b><br>
  <%=intl._("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br>
+<% /********
 <!-- let's keep this simple...
 <input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
  Require SSU introductions
@@ -128,6 +133,7 @@
  </p><p>
  Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br>
 -->
+*********/ %>
  </p><p>
  <b><%=intl._("TCP Configuration")%>:</b><br>
  <%=intl._("Externally reachable hostname or IP address")%>:<br>
@@ -163,10 +169,12 @@
    <%=intl._("Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm.")%> 
    <%=intl._("Certain firewalls such as symmetric NATs may not work well with I2P.")%>
  </p>
+<% /********
 <!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
 </p>
 -->
+*********/ %>
 <p>
  <%=intl._("UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports.")%>
    <%=intl._("UPnP support is beta, and may not work for any number of reasons")%>:

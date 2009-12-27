@@ -33,7 +33,7 @@ public class MessageHistory {
     private boolean _doPause; // true == briefly stop writing data to the log (used while submitting it)
     private ReinitializeJob _reinitializeJob;
     private WriteJob _writeJob;
-    private SubmitMessageHistoryJob _submitMessageHistoryJob;
+    //private SubmitMessageHistoryJob _submitMessageHistoryJob;
     private volatile boolean _firstPass;
     
     private final static byte[] NL = System.getProperty("line.separator").getBytes();

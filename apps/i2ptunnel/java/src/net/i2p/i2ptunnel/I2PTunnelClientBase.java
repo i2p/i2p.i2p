@@ -27,7 +27,7 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -153,7 +153,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
         } // else delay creating session until createI2PSocket() is called
         
-        Thread t = new I2PThread(this);
+        Thread t = new I2PAppThread(this);
         t.setName("Client " + _clientId);
         listenerReady = false;
         t.start();
@@ -207,7 +207,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
         for (int i = 0; i < _numConnectionBuilders; i++) {
             String name = "ClientBuilder" + _clientId + '.' + i;
-            I2PThread b = new I2PThread(new TunnelConnectionBuilder(), name);
+            I2PAppThread b = new I2PAppThread(new TunnelConnectionBuilder(), name);
             b.setDaemon(true);
             b.start();
         }
@@ -350,7 +350,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * called by derived classes after initialization.
      *
      */
-    public final void startRunning() {
+    public void startRunning() {
         synchronized (startLock) {
             startRunning = true;
             startLock.notify();
@@ -490,7 +490,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected void manageConnection(Socket s) {
         if (s == null) return;
         if (_numConnectionBuilders <= 0) {
-            new I2PThread(new BlockingRunner(s), "Clinet run").start();
+            new I2PAppThread(new BlockingRunner(s), "Clinet run").start();
             return;
         }
         

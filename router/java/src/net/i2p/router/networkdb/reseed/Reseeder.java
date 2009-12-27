@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -52,13 +52,15 @@ public class Reseeder {
                 return;
             } else {
                 System.setProperty(PROP_INPROGRESS, "true");
-                I2PThread reseed = new I2PThread(_reseedRunner, "Reseed");
+                // set to daemon so it doesn't hang a shutdown
+                Thread reseed = new I2PAppThread(_reseedRunner, "Reseed", true);
                 reseed.start();
             }
         }
 
     }
 
+    /** Todo: translate the messages sent via PROP_STATUS */
     public class ReseedRunner implements Runnable, EepGet.StatusListener {
         private boolean _isRunning;
 

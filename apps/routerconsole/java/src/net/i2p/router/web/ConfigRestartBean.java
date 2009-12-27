@@ -54,7 +54,12 @@ public class ConfigRestartBean {
         long timeRemaining = ctx.router().getShutdownTimeRemaining();
         StringBuilder buf = new StringBuilder(128);
         if ((shuttingDown || restarting) && timeRemaining <= 0) {
-            buf.append("<center><b>").append(_("Shutdown imminent", ctx)).append("</b></center>");
+            buf.append("<center><b>");
+            if (restarting)
+                buf.append(_("Restart imminent", ctx));
+            else
+                buf.append(_("Shutdown imminent", ctx));
+            buf.append("</b></center>");
         } else if (shuttingDown) {
             buf.append("<center><b>");
             buf.append(_("Shutdown in {0}", DataHelper.formatDuration(timeRemaining), ctx));

@@ -61,7 +61,9 @@ public abstract class NamingService {
      * if none is known. It is safe for subclasses to always return
      * <code>null</code> if no reverse lookup is possible.
      */
-    public abstract String reverseLookup(Destination dest);
+    public String reverseLookup(Destination dest) { return null; };
+
+    /** @deprecated unused */
     public String reverseLookup(Hash h) { return null; };
 
     /**

@@ -2,6 +2,7 @@ package net.i2p.router.tunnel.pool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.i2p.data.Hash;
@@ -19,23 +20,25 @@ import net.i2p.util.Log;
  * it waits for a short period before looping again (or until it is told that something
  * changed, such as a tunnel failed, new client started up, or tunnel creation was aborted).
  *
+ * Note that 10 minute tunnel expiration is hardcoded in here.
  */
 class BuildExecutor implements Runnable {
-    private final List _recentBuildIds = new ArrayList(100);
+    private final ArrayList<Long> _recentBuildIds = new ArrayList(100);
     private RouterContext _context;
     private Log _log;
     private TunnelPoolManager _manager;
     /** list of TunnelCreatorConfig elements of tunnels currently being built */
-    private final List _currentlyBuilding;
+    private final List<PooledTunnelCreatorConfig> _currentlyBuilding;
     private boolean _isRunning;
     private BuildHandler _handler;
     private boolean _repoll;
+    private static final int MAX_CONCURRENT_BUILDS = 10;
 
     public BuildExecutor(RouterContext ctx, TunnelPoolManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _manager = mgr;
-        _currentlyBuilding = new ArrayList(10);
+        _currentlyBuilding = new ArrayList(MAX_CONCURRENT_BUILDS);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
@@ -51,9 +54,7 @@ class BuildExecutor implements Runnable {
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
-        @SuppressWarnings("static-access")
-        /* FIXME Accessing static field "BW_CAPABILITY_CHARS" FIXME */
-        String bwTiers = _context.router().getRouterInfo().BW_CAPABILITY_CHARS;
+        String bwTiers = RouterInfo.BW_CAPABILITY_CHARS;
         // For each bandwidth tier, create tunnel build agree/reject/expire stats
         for (int i = 0; i < bwTiers.length(); i++) {
             String bwTier = String.valueOf(bwTiers.charAt(i));
@@ -74,16 +75,17 @@ class BuildExecutor implements Runnable {
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
         if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
-        if (allowed > 10) allowed = 10; // Never go beyond 10, that is uncharted territory (old limit was 5)
+        if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
-        List expired = null;
+        List<PooledTunnelCreatorConfig> expired = null;
         int concurrent = 0;
+        // Todo: Make expiration variable
         long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
         synchronized (_currentlyBuilding) {
             // expire any old requests
             for (int i = 0; i < _currentlyBuilding.size(); i++) {
-                TunnelCreatorConfig cfg = (TunnelCreatorConfig)_currentlyBuilding.get(i);
+                PooledTunnelCreatorConfig cfg = _currentlyBuilding.get(i);
                 if (cfg.getExpiration() <= expireBefore) {
                     _currentlyBuilding.remove(i);
                     i--;
@@ -98,7 +100,7 @@ class BuildExecutor implements Runnable {
         
         if (expired != null) {
             for (int i = 0; i < expired.size(); i++) {
-                PooledTunnelCreatorConfig cfg = (PooledTunnelCreatorConfig)expired.get(i);
+                PooledTunnelCreatorConfig cfg = expired.get(i);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Timed out waiting for reply asking for " + cfg);
 
@@ -220,8 +222,8 @@ class BuildExecutor implements Runnable {
 
     public void run() {
         _isRunning = true;
-        List wanted = new ArrayList(8);
-        List pools = new ArrayList(8);
+        List<TunnelPool> wanted = new ArrayList(MAX_CONCURRENT_BUILDS);
+        List<TunnelPool> pools = new ArrayList(8);
         
         int pendingRemaining = 0;
         
@@ -238,7 +240,7 @@ class BuildExecutor implements Runnable {
                 _repoll = pendingRemaining > 0; // resets repoll to false unless there are inbound requeusts pending
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
-                    TunnelPool pool = (TunnelPool)pools.get(i);
+                    TunnelPool pool = pools.get(i);
                     if (!pool.isAlive())
                         continue;
                     int howMany = pool.countHowManyToBuild();
@@ -278,14 +280,15 @@ class BuildExecutor implements Runnable {
                 } else {
                     if ( (allowed > 0) && (wanted.size() > 0) ) {
                         Collections.shuffle(wanted, _context.random());
-                        
+                        Collections.sort(wanted, new TunnelPoolComparator());
+
                         // force the loops to be short, since 3 consecutive tunnel build requests can take
                         // a long, long time
                         if (allowed > 2)
                             allowed = 2;
                         
                         for (int i = 0; (i < allowed) && (wanted.size() > 0); i++) {
-                            TunnelPool pool = (TunnelPool)wanted.remove(0);
+                            TunnelPool pool = wanted.remove(0);
                             //if (pool.countWantedTunnels() <= 0)
                             //    continue;
                             PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
@@ -361,12 +364,37 @@ class BuildExecutor implements Runnable {
     }
     
     /**
+     *  Prioritize the pools for building
+     *  #1: Exploratory
+     *  #2: Pools without tunnels
+     *  #3: Everybody else
+     *
+     *  This prevents a large number of client pools from starving the exploratory pool.
+     *
+     */
+    private static class TunnelPoolComparator implements Comparator {
+        public int compare(Object l, Object r) {
+            TunnelPool tpl = (TunnelPool) l;
+            TunnelPool tpr = (TunnelPool) r;
+            if (tpl.getSettings().isExploratory() && !tpr.getSettings().isExploratory())
+                return -1;
+            if (tpr.getSettings().isExploratory() && !tpl.getSettings().isExploratory())
+                return 1;
+            if (tpl.getTunnelCount() <= 0 && tpr.getTunnelCount() > 0)
+                return -1;
+            if (tpr.getTunnelCount() <= 0 && tpl.getTunnelCount() > 0)
+                return 1;
+            return 0;
+        }
+    }
+
+    /**
      * iterate over the 0hop tunnels, running them all inline regardless of how many are allowed
      * @return number of tunnels allowed after processing these zero hop tunnels (almost always the same as before)
      */
-    private int buildZeroHopTunnels(List wanted, int allowed) {
+    private int buildZeroHopTunnels(List<TunnelPool> wanted, int allowed) {
         for (int i = 0; i < wanted.size(); i++) {
-            TunnelPool pool = (TunnelPool)wanted.get(0);
+            TunnelPool pool = wanted.get(0);
             if (pool.getSettings().getLength() == 0) {
                 PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
                 if (cfg != null) {
@@ -403,8 +431,11 @@ class BuildExecutor implements Runnable {
         long id = cfg.getReplyMessageId();
         if (id > 0) {
             synchronized (_recentBuildIds) { 
-                while (_recentBuildIds.size() > 64)
-                    _recentBuildIds.remove(0);
+                // every so often, shrink the list semi-efficiently
+                if (_recentBuildIds.size() > 98) {
+                    for (int i = 0; i < 32; i++)
+                        _recentBuildIds.remove(0);
+                }
                 _recentBuildIds.add(new Long(id));
             }
         }

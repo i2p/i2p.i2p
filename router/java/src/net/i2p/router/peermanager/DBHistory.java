@@ -105,6 +105,7 @@ public class DBHistory {
      */
     public RateStat getFailedLookupRate() { return _failedLookupRate; }
     
+    /** not sure how much this is used, to be investigated */
     public RateStat getInvalidReplyRate() { return _invalidReplyRate; }
     
     /**
@@ -114,6 +115,8 @@ public class DBHistory {
      */
     public void lookupSuccessful() {
         _successfulLookups++;
+        _failedLookupRate.addData(0, 0);
+        _context.statManager().addRateData("peer.failedLookupRate", 0, 0);
         _lastLookupSuccessful = _context.clock().now();
     }
 
@@ -123,6 +126,7 @@ public class DBHistory {
     public void lookupFailed() {
         _failedLookups++;
         _failedLookupRate.addData(1, 0);
+        _context.statManager().addRateData("peer.failedLookupRate", 1, 0);
         _lastLookupFailed = _context.clock().now();
     }
 
@@ -132,6 +136,10 @@ public class DBHistory {
      *
      */
     public void storeSuccessful() {
+        // Fixme, redefined this to include both lookup and store fails,
+        // need to fix the javadocs
+        _failedLookupRate.addData(0, 0);
+        _context.statManager().addRateData("peer.failedLookupRate", 0, 0);
         _lastStoreSuccessful = _context.clock().now();
     }
 
@@ -271,9 +279,9 @@ public class DBHistory {
     
     private void createRates(String statGroup) {
         if (_failedLookupRate == null)
-            _failedLookupRate = new RateStat("dbHistory.failedLookupRate", "How often does this peer to respond to a lookup?", statGroup, new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+            _failedLookupRate = new RateStat("dbHistory.failedLookupRate", "How often does this peer to respond to a lookup?", statGroup, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         if (_invalidReplyRate == null)
-            _invalidReplyRate = new RateStat("dbHistory.invalidReplyRate", "How often does this peer give us a bad (nonexistant, forged, etc) peer?", statGroup, new long[] { 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+            _invalidReplyRate = new RateStat("dbHistory.invalidReplyRate", "How often does this peer give us a bad (nonexistant, forged, etc) peer?", statGroup, new long[] { 30*60*1000l });
         _failedLookupRate.setStatLog(_context.statManager().getStatLog());
         _invalidReplyRate.setStatLog(_context.statManager().getStatLog());
     }

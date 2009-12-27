@@ -21,6 +21,8 @@ import net.i2p.util.SimpleTimer;
  * Gather fragments of I2NPMessages at a tunnel endpoint, making them available 
  * for reading when complete.
  *
+ * Warning - this is all unsynchronized here - receivers must implement synchronization
+ *
  */
 public class FragmentedMessage {
     private I2PAppContext _context;
@@ -186,6 +188,11 @@ public class FragmentedMessage {
     public int getCompleteSize() {
         if (!_lastReceived) 
             throw new IllegalStateException("wtf, don't get the completed size when we're not complete");
+        if (_releasedAfter > 0) {
+             RuntimeException e = new RuntimeException("use after free in FragmentedMessage");
+             _log.error("FM completeSize()", e);
+             throw e;
+        }
         int size = 0;
         for (int i = 0; i <= _highFragmentNum; i++) {
             ByteArray ba = _fragments[i];
@@ -203,6 +210,11 @@ public class FragmentedMessage {
     
     
     public void writeComplete(OutputStream out) throws IOException {
+        if (_releasedAfter > 0) {
+             RuntimeException e = new RuntimeException("use after free in FragmentedMessage");
+             _log.error("FM writeComplete()", e);
+             throw e;
+        }
         for (int i = 0; i <= _highFragmentNum; i++) {
             ByteArray ba = _fragments[i];
             out.write(ba.getData(), ba.getOffset(), ba.getValid());
@@ -210,6 +222,11 @@ public class FragmentedMessage {
         _completed = true;
     }
     public void writeComplete(byte target[], int offset) {
+        if (_releasedAfter > 0) {
+             RuntimeException e = new RuntimeException("use after free in FragmentedMessage");
+             _log.error("FM writeComplete() 2", e);
+             throw e;
+        }
         for (int i = 0; i <= _highFragmentNum; i++) {
             ByteArray ba = _fragments[i];
             System.arraycopy(ba.getData(), ba.getOffset(), target, offset, ba.getValid());
@@ -239,6 +256,11 @@ public class FragmentedMessage {
      *
      */
     private void releaseFragments() {
+        if (_releasedAfter > 0) {
+             RuntimeException e = new RuntimeException("double free in FragmentedMessage");
+             _log.error("FM releaseFragments()", e);
+             throw e;
+        }
         _releasedAfter = getLifetime();
         for (int i = 0; i <= _highFragmentNum; i++) {
             ByteArray ba = _fragments[i];
@@ -249,6 +271,7 @@ public class FragmentedMessage {
         }
     }
     
+/****
     public InputStream getInputStream() { return new FragmentInputStream(); }
     private class FragmentInputStream extends InputStream {
         private int _fragment;
@@ -272,6 +295,7 @@ public class FragmentedMessage {
             }
         }
     }
+****/
     
     @Override
     public String toString() {
@@ -282,7 +306,7 @@ public class FragmentedMessage {
             if (ba != null)
                 buf.append(i).append(":").append(ba.getValid()).append(" bytes ");
             else
-                buf.append(i).append(": missing ");
+                buf.append(i).append(":missing ");
         }
         buf.append(" highest received: ").append(_highFragmentNum);
         buf.append(" last received? ").append(_lastReceived);
@@ -299,6 +323,7 @@ public class FragmentedMessage {
         return buf.toString();
     }
     
+/*****
     public static void main(String args[]) {
         try {
             I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -325,4 +350,5 @@ public class FragmentedMessage {
             e.printStackTrace();
         }
     }
+******/
 }

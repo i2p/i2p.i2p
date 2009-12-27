@@ -20,6 +20,7 @@ import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.util.I2PThread;
+import net.i2p.util.InternalSocket;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -71,11 +72,14 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         notifier.start();
         
         try {
-            _socket = new Socket(_hostname, _portNum);
+            // If we are in the router JVM, connect using the interal pseudo-socket
+            _socket = InternalSocket.getSocket(_hostname, _portNum);
             _out = _socket.getOutputStream();
             synchronized (_out) {
                 _out.write(I2PClient.PROTOCOL_BYTE);
+                _out.flush();
             }
+            _writer = new ClientWriterRunner(_out, this);
             InputStream in = _socket.getInputStream();
             _reader = new I2CPMessageReader(in, this);
             _reader.startReading();

@@ -20,7 +20,7 @@ import java.util.zip.GZIPInputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -219,7 +219,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         //out.flush();
         PipedInputStream pi = new PipedInputStream();
         PipedOutputStream po = new PipedOutputStream(pi);
-        new I2PThread(new Pusher(pi, out), "HTTP decompresser").start();
+        new I2PAppThread(new Pusher(pi, out), "HTTP decompresser").start();
         out = po;
     }
     

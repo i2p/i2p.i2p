@@ -7,6 +7,7 @@ import net.i2p.router.RouterContext;
 /** 
  * Minor extension to track fragmentation
  *
+ * @deprecated unused
  */
 public class TrivialRouterPreprocessor extends TrivialPreprocessor {
     private RouterContext _routerContext;
@@ -16,7 +17,7 @@ public class TrivialRouterPreprocessor extends TrivialPreprocessor {
         _routerContext = ctx;
     }
 
-    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds) {
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds) {
         _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, null);
     }
 }

@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Defines the structure for why abuse was reported either by the client to
@@ -25,7 +24,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class AbuseReason extends DataStructureImpl {
-    private final static Log _log = new Log(AbuseReason.class);
     private String _reason;
 
     public AbuseReason() {

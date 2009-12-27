@@ -772,8 +772,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         private long acquiredOn;
         
         PrepBuffer() {
-            unencrypted = new byte[16*1024];
-            base = new byte[16*1024];
+            unencrypted = new byte[BUFFER_SIZE];
+            base = new byte[BUFFER_SIZE];
             pad = new byte[16];
             crc = new Adler32();
         }
@@ -1033,7 +1033,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /** _decryptBlockBuf contains another cleartext block of I2NP to parse */
     private boolean recvUnencryptedI2NP() {
         _curReadState.receiveBlock(_decryptBlockBuf);
-        if (_curReadState.getSize() > 16*1024) {
+        if (_curReadState.getSize() > BUFFER_SIZE) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("I2NP message too big - size: " + _curReadState.getSize() + " Dropping " + toString());
             _context.statManager().addRateData("ntcp.corruptTooLargeI2NP", _curReadState.getSize(), getUptime());
@@ -1112,7 +1112,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         return obj == this;
     }
 
-    private final static List _i2npHandlers = new ArrayList(4);
+    private static final int MAX_HANDLERS = 4;
+    private final static List _i2npHandlers = new ArrayList(MAX_HANDLERS);
     private final static I2NPMessageHandler acquireHandler(RouterContext ctx) {
         I2NPMessageHandler rv = null;
         synchronized (_i2npHandlers) {
@@ -1125,7 +1126,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
     private static void releaseHandler(I2NPMessageHandler handler) {
         synchronized (_i2npHandlers) {
-            if (_i2npHandlers.size() < 4)
+            if (_i2npHandlers.size() < MAX_HANDLERS)
                 _i2npHandlers.add(handler);
         }
     }
@@ -1137,13 +1138,13 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         byte data[];
         ByteArrayInputStream bais;
         public DataBuf() {
-            data = new byte[16*1024];
+            data = new byte[BUFFER_SIZE];
             bais = new ByteArrayInputStream(data);
         }
     }
     
-    private static int MAX_DATA_READ_BUFS = 16;
-    private final static List _dataReadBufs = new ArrayList(16);
+    private static final int MAX_DATA_READ_BUFS = 16;
+    private final static List _dataReadBufs = new ArrayList(MAX_DATA_READ_BUFS);
     private static DataBuf acquireReadBuf() {
         synchronized (_dataReadBufs) {
             if (_dataReadBufs.size() > 0)
@@ -1178,7 +1179,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             _crc = new Adler32();
             init();
         }
-        public void init() {
+        private void init() {
             _size = -1;
             _nextWrite = 0;
             _expectedCrc = -1;
@@ -1268,11 +1269,15 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     I2NPMessage read = h.readMessage(_dataBuf.bais);
                     long timeToRecv = System.currentTimeMillis() - _stateBegin;
                     releaseHandler(h);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
-                                   + " received after " + timeToRecv + " with " + _size +"/"+ (_blocks*16) + " bytes on " + toString());
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("I2NP message " + _messagesRead + "/" + (read != null ? read.getUniqueId() : 0) 
+                                   + " received after " + timeToRecv + " with " + _size +"/"+ (_blocks*16) + " bytes on " + NTCPConnection.this.toString());
                     _context.statManager().addRateData("ntcp.receiveTime", timeToRecv, timeToRecv);
                     _context.statManager().addRateData("ntcp.receiveSize", _size, timeToRecv);
+
+                    // FIXME move end of try block here.
+                    // On the input side, move releaseHandler() and init() to a finally block.
+
                     if (read != null) {
                         _transport.messageReceived(read, _remotePeer, null, timeToRecv, _size);
                         if (_messagesRead <= 0)
@@ -1283,23 +1288,27 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     // get it ready for the next I2NP message
                     init();
                 } catch (IOException ioe) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Error parsing I2NP message", ioe);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error parsing I2NP message", ioe);
                     _context.statManager().addRateData("ntcp.corruptI2NPIOE", 1, getUptime());
                     close();
+                    // handler and databuf are lost
                     return;
                 } catch (I2NPMessageException ime) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Error parsing I2NP message", ime);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error parsing I2NP message", ime);
                     _context.statManager().addRateData("ntcp.corruptI2NPIME", 1, getUptime());
                     close();
+                    // handler and databuf are lost
                     return;
                 }
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " blocks " + _blocks);
                     _context.statManager().addRateData("ntcp.corruptI2NPCRC", 1, getUptime());
+                // should we try to read in the message and keep going?
                 close();
+                // databuf is lost
                 return;
             }
         }

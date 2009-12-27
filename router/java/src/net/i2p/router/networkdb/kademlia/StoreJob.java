@@ -255,7 +255,7 @@ class StoreJob extends JobImpl {
     private static final int MAX_DIRECT_EXPIRATION = 15*1000;
 
     /**
-     * Send a store to the given peer through a garlic route, including a reply 
+     * Send a store to the given peer, including a reply 
      * DeliveryStatusMessage so we know it got there
      *
      */
@@ -285,6 +285,11 @@ class StoreJob extends JobImpl {
         sendStore(msg, router, getContext().clock().now() + responseTime);
     }
     
+    /**
+     * Send a store to the given peer, including a reply 
+     * DeliveryStatusMessage so we know it got there
+     *
+     */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
@@ -295,6 +300,11 @@ class StoreJob extends JobImpl {
         }
     }
 
+    /**
+     * Send directly,
+     * with the reply to come back directly.
+     *
+     */
     private void sendDirect(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         msg.setReplyToken(token);
@@ -324,6 +334,12 @@ class StoreJob extends JobImpl {
         getContext().commSystem().processMessage(m);
     }
     
+    /**
+     * This is misnamed, it means sending it out through an exploratory tunnel,
+     * with the reply to come back through an exploratory tunnel.
+     * There is no garlic encryption added.
+     *
+     */
     private void sendStoreThroughGarlic(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         

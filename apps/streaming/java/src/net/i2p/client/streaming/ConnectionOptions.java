@@ -46,6 +46,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_INITIAL_RESEND_DELAY = "i2p.streaming.initialResendDelay";
     public static final String PROP_INITIAL_ACK_DELAY = "i2p.streaming.initialAckDelay";
     public static final String PROP_INITIAL_WINDOW_SIZE = "i2p.streaming.initialWindowSize";
+    /** unused */
     public static final String PROP_INITIAL_RECEIVE_WINDOW = "i2p.streaming.initialReceiveWindow";
     public static final String PROP_INACTIVITY_TIMEOUT = "i2p.streaming.inactivityTimeout";
     public static final String PROP_INACTIVITY_ACTION = "i2p.streaming.inactivityAction";
@@ -58,6 +59,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     static final int INITIAL_WINDOW_SIZE = 6;
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
+    public static final int DEFAULT_INITIAL_ACK_DELAY = 2*1000;    
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
 
@@ -217,7 +219,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setRTT(getInt(opts, PROP_INITIAL_RTT, DEFAULT_INITIAL_RTT));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
-        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 2000));
+        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, DEFAULT_INITIAL_ACK_DELAY));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
@@ -249,7 +251,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
             setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         if (opts.containsKey(PROP_INITIAL_ACK_DELAY))
-            setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 2000));
+            setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, DEFAULT_INITIAL_ACK_DELAY));
         if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
             setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         if (opts.containsKey(PROP_MAX_RESENDS))
@@ -295,6 +297,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return if we want signatures on all packets.
      */
     public boolean getRequireFullySigned() { return _fullySigned; }
+    /** unused, see above */
     public void setRequireFullySigned(boolean sign) { _fullySigned = sign; }
     
     /**
@@ -325,7 +328,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     }
     
     /** after how many consecutive messages should we ack?
-     *  This doesn't appear to be used.
+     * @deprecated This doesn't appear to be used.
      * @return receive window size.
      */
     public int getReceiveWindow() { return _receiveWindow; } 
@@ -405,6 +408,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return ACK delay in ms
      */
     public int getSendAckDelay() { return _sendAckDelay; }
+    /**
+     *  Unused except here, so expect the default initial delay of 2000 ms unless set by the user
+     *  to remain constant.
+     */
     public void setSendAckDelay(int delayMs) { _sendAckDelay = delayMs; }
     
     /** What is the largest message we want to send or receive?

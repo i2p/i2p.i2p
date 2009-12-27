@@ -138,6 +138,7 @@ public class HostsTxtNamingService extends NamingService {
         return null;
     }
 
+    /** @deprecated unused */
     @Override
     public String reverseLookup(Hash h) {
         List filenames = getFilenames();

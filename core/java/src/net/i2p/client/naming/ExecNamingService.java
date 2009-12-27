@@ -126,9 +126,4 @@ public class ExecNamingService extends NamingService {
         }
         return null;
     }
-    
-    @Override
-    public String reverseLookup(Destination dest) {
-        return null;
-    }
 }

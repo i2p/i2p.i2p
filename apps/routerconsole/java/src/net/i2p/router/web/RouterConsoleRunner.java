@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.util.ArrayList;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import org.mortbay.http.SecurityConstraint;
 import org.mortbay.http.handler.SecurityHandler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.jetty.servlet.WebApplicationHandler;
 
 public class RouterConsoleRunner {
     private Server _server;
@@ -87,6 +89,8 @@ public class RouterConsoleRunner {
         if (!_webAppsDir.endsWith("/"))
             _webAppsDir += '/';
 
+        List<String> notStarted = new ArrayList();
+        WebApplicationHandler baseHandler = null;
         try {
             StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
             int boundAddresses = 0;
@@ -111,7 +115,8 @@ public class RouterConsoleRunner {
             File tmpdir = new File(workDir, ROUTERCONSOLE + "-" + _listenPort);
             tmpdir.mkdir();
             wac.setTempDirectory(tmpdir);
-            wac.addHandler(0, new LocaleWebAppHandler(I2PAppContext.getGlobalContext()));
+            baseHandler = new LocaleWebAppHandler(I2PAppContext.getGlobalContext());
+            wac.addHandler(0, baseHandler);
             initialize(wac);
             File dir = new File(_webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());
@@ -132,6 +137,8 @@ public class RouterConsoleRunner {
                                 props.setProperty(PREFIX + appName + ENABLED, "true");
                                 rewrite = true;
                             }
+                        } else {
+                            notStarted.add(appName);
                         }
                     } catch (IOException ioe) {
                         System.err.println("Error resolving '" + fileNames[i] + "' in '" + dir);
@@ -154,6 +161,19 @@ public class RouterConsoleRunner {
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.\n" +
                                "Exception: " + me);
         }
+
+        if (baseHandler != null) {
+            // map each not-started webapp to the error page
+            for (int i = 0; i < notStarted.size(); i++) {
+                try {
+                     baseHandler.mapPathToServlet('/' + notStarted.get(i) + "/*",
+                                                  "net.i2p.router.web.jsp.nowebapp_jsp");
+                } catch (Throwable me) {
+                     System.err.println(me);
+                }
+            }
+        }
+
         try {
             SysTray tray = SysTray.getInstance();
         } catch (Throwable t) {

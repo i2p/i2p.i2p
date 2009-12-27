@@ -42,7 +42,7 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  adjusting bandwidth class boundaries.
      */
     public static final int DEFAULT_OUTBOUND_BANDWIDTH = 40;
-    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 80;
+    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 96;
     public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 40;
 
     public static final int DEFAULT_BURST_SECONDS = 60;

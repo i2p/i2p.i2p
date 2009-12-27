@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -88,9 +89,9 @@ class KBucketSet {
         return removed;
     }
     
-    public Set getAll() { return getAll(new HashSet()); }
-    public Set getAll(Set toIgnore) {
-        HashSet all = new HashSet(1024);
+    public Set<Hash> getAll() { return getAll(Collections.EMPTY_SET); };
+    public Set<Hash> getAll(Set<Hash> toIgnore) {
+        Set<Hash> all = new HashSet(1024);
         for (int i = 0; i < _buckets.length; i++) {
             all.addAll(_buckets[i].getEntries(toIgnore));
         }

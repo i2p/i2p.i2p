@@ -18,7 +18,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -94,7 +94,7 @@ public class TunnelControllerGroup {
             _controllers.add(controller);
             i++;
         }
-        I2PThread startupThread = new I2PThread(new StartControllers(), "Startup tunnels");
+        I2PAppThread startupThread = new I2PAppThread(new StartControllers(), "Startup tunnels");
         startupThread.start();
         
         if (_log.shouldLog(Log.INFO))

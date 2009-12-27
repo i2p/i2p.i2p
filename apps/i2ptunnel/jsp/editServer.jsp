@@ -1,6 +1,7 @@
 <%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"%><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
+<jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
 <% String tun = request.getParameter("tunnel");
    int curTunnel = -1;
    if (tun != null) {
@@ -13,7 +14,7 @@
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>I2P Tunnel Manager - Edit</title>
+    <title><%=intl._("I2P Tunnel Manager - Edit Server Tunnel")%></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 
@@ -172,9 +173,9 @@
             </div>
             <div id="depthField" class="rowItem">
                 <label for="tunnelDepth" accesskey="t">
-                    Dep<span class="accessKey">t</span>h:
+                    Leng<span class="accessKey">t</span>h:
                 </label>
-                <select id="tunnelDepth" name="tunnelDepth" title="Depth of each Tunnel" class="selectbox">
+                <select id="tunnelDepth" name="tunnelDepth" title="Length of each Tunnel" class="selectbox">
                     <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 2);
                   %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>>0 hop tunnel (low anonymity, low latency)</option>
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>>1 hop tunnel (medium anonymity, medium latency)</option>

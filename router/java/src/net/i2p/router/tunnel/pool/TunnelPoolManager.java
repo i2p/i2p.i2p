@@ -29,6 +29,8 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * 
@@ -42,7 +44,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private final Map<Hash, TunnelPool> _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
-    private BuildExecutor _executor;
+    private final BuildExecutor _executor;
     private boolean _isShutdown;
     
     public TunnelPoolManager(RouterContext ctx) {
@@ -175,7 +177,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public int getOutboundClientTunnelCount() { 
         int count = 0;
         List destinations = null;
-        synchronized (_clientInboundPools) {
+        synchronized (_clientOutboundPools) {
             destinations = new ArrayList(_clientOutboundPools.keySet());
         }
         for (int i = 0; i < destinations.size(); i++) {
@@ -250,6 +252,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         startup();
     }
         
+    /**
+     *  Used only at session startup.
+     *  Do not use to change settings.
+     */
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Building tunnels for the client " + client.calculateHash().toBase64() + ": " + settings);
@@ -259,6 +265,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         TunnelPool inbound = null;
         TunnelPool outbound = null;
         // should we share the clientPeerSelector across both inbound and outbound?
+        // or just one for all clients? why separate?
         synchronized (_clientInboundPools) {
             inbound = _clientInboundPools.get(dest);
             if (inbound == null) {
@@ -280,11 +287,22 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             }
         }
         inbound.startup();
-        try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
-        outbound.startup();
+        SimpleScheduler.getInstance().addEvent(new DelayedStartup(outbound), 3*1000);
     }
     
     
+    private static class DelayedStartup implements SimpleTimer.TimedEvent {
+        private TunnelPool pool;
+
+        public DelayedStartup(TunnelPool p) {
+            this.pool = p;
+        }
+
+        public void timeReached() {
+            this.pool.startup();
+        }
+    }
+
     public void removeTunnels(Hash destination) {
         if (destination == null) return;
         if (_context.clientManager().isLocal(destination)) {
@@ -357,12 +375,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector);
         _inboundExploratory.startup();
         
-        try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
         TunnelPoolSettings outboundSettings = new TunnelPoolSettings();
         outboundSettings.setIsExploratory(true);
         outboundSettings.setIsInbound(false);
         _outboundExploratory = new TunnelPool(_context, this, outboundSettings, selector);
-        _outboundExploratory.startup();
+        SimpleScheduler.getInstance().addEvent(new DelayedStartup(_outboundExploratory), 3*1000);
         
         // try to build up longer tunnels
         _context.jobQueue().addJob(new BootstrapPool(_context, _inboundExploratory));

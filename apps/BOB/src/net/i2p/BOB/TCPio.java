@@ -78,16 +78,20 @@ public class TCPio implements Runnable {
 		 * --Sponge
 		 *
 		 * Tested with 128 bytes, and there was no performance gain.
+		 * 8192 bytes did lower load average across many connections.
+		 * Should I raise it higer? The correct thing to do would be to
+		 * override... perhaps use NTCP, but I2P's streaming lib lacks
+		 * anything NTCP compatable.
 		 *
 		 * --Sponge
 		 */
 
 		int b;
-		byte a[] = new byte[1];
+		byte a[] = new byte[8192];
 		try {
 			try {
 				while (lives.get()) {
-					b = Ain.read(a, 0, 1);
+					b = Ain.read(a, 0, 8192);
 					if (b > 0) {
 						Aout.write(a, 0, b);
 					} else if (b == 0) {

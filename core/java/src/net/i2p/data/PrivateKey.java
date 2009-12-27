@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.i2p.crypto.KeyGenerator;
-import net.i2p.util.Log;
 
 /**
  * Defines the PrivateKey as defined by the I2P data structure spec.
@@ -24,7 +23,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class PrivateKey extends DataStructureImpl {
-    private final static Log _log = new Log(PrivateKey.class);
     private byte[] _data;
 
     public final static int KEYSIZE_BYTES = 256;

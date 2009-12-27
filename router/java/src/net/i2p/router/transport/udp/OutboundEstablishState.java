@@ -413,8 +413,7 @@ public class OutboundEstablishState {
     }
 
     /** uniquely identifies an attempt */
-    /* FIXME Exporting non-public type through public API FIXME */
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     /** we have received a real data packet, so we're done establishing */
     public synchronized void dataReceived() {

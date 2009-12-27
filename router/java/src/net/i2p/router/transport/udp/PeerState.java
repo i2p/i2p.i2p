@@ -72,7 +72,7 @@ public class PeerState {
     /** how many consecutive messages have we sent and not received an ACK to */
     private int _consecutiveFailedSends;
     /** when did we last have a failed send (beginning of period) */
-    private long _lastFailedSendPeriod;
+    // private long _lastFailedSendPeriod;
     /** list of messageIds (Long) that we have received but not yet sent */
     private final List _currentACKs;
     /** 
@@ -805,7 +805,7 @@ public class PeerState {
             _concurrentMessagesActive = 0;
         
         _consecutiveFailedSends = 0;
-        _lastFailedSendPeriod = -1;
+        // _lastFailedSendPeriod = -1;
         if (numSends < 2) {
             if (_context.random().nextInt(_concurrentMessagesAllowed) <= 0)
                 _concurrentMessagesAllowed++;
@@ -1003,8 +1003,7 @@ public class PeerState {
             return MAX_RTO;
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
+    RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
     public int add(OutboundMessageState state) {
         if (_dead) { 

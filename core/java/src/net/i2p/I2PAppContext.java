@@ -432,12 +432,14 @@ public class I2PAppContext {
         }
     }
     
+    /** @deprecated unused */
     public PetNameDB petnameDb() {
         if (!_petnameDbInitialized)
             initializePetnameDb();
         return _petnameDb;
     }
 
+    /** @deprecated unused */
     private void initializePetnameDb() {
         synchronized (this) {
             if (_petnameDb == null) {
@@ -720,4 +722,11 @@ public class I2PAppContext {
         return new HashSet(_shutdownTasks);
     }
     
+    /**
+     *  Use this instead of context instanceof RouterContext
+     *  @since 0.7.9
+     */
+    public boolean isRouterContext() {
+        return false;
+    }
 }

@@ -3,7 +3,6 @@ package net.i2p.router.transport.udp;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -462,13 +461,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean updated = false;
         boolean fireTest = false;
 
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Change address? status = " + _reachabilityStatus +
+                      " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
+                      " old = " + _externalListenHost + ':' + _externalListenPort +
+                      " new = " + DataHelper.toString(ourIP) + ':' + ourPort);
+
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Change address? status = " + _reachabilityStatus +
-                                  " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
-                                  " old = " + _externalListenHost + ':' + _externalListenPort);
                     if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
                          (_externalListenHost == null) || (_externalListenPort <= 0) ||
                          (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
@@ -545,8 +546,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
      */
-    /* FIXME Exporting non-public type through public API FIXME */
-    public PeerState getPeerState(RemoteHostId hostInfo) {
+    PeerState getPeerState(RemoteHostId hostInfo) {
         synchronized (_peersByRemoteHost) {
             return (PeerState)_peersByRemoteHost.get(hostInfo);
         }
@@ -783,8 +783,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
+    boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
     
     void dropPeer(Hash peer, boolean shouldShitlist, String why) {
         PeerState state = getPeerState(peer);
@@ -971,6 +970,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return _endpoint.send(packet); 
     }
     
+    /** minimum active peers to maintain IP detection, etc. */
+    private static final int MIN_PEERS = 3;
+    /** minimum peers volunteering to be introducers if we need that */
+    private static final int MIN_INTRODUCER_POOL = 4;
+
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
         if (dataSize > OutboundMessageState.MAX_MSG_SIZE) {
             // NTCP max is lower, so msg will get dropped
@@ -1018,11 +1022,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             // Try to maintain at least 3 peers so we can determine our IP address and
             // we have a selection to run peer tests with.
+            // If we are firewalled, and we don't have enough peers that volunteered to
+            // also introduce us, also bid aggressively so we are preferred over NTCP.
+            // (Otherwise we only talk UDP to those that are firewalled, and we will
+            // never get any introducers)
             int count;
             synchronized (_peersByIdent) {
                 count = _peersByIdent.size();
             }
-            if (alwaysPreferUDP() || count < 3)
+            if (alwaysPreferUDP() || count < MIN_PEERS ||
+                (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
                 return _slowPreferredBid;
             else if (preferUDP())
                 return _slowBid;
@@ -1160,6 +1169,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.info("Picked peers: " + found);
                 _introducersSelectedOn = _context.clock().now();
                 introducersIncluded = true;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Need introducers but we don't know any");
             }
         }
         
@@ -2235,8 +2247,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testEvent.runTest();
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public PeerState pickTestPeer(RemoteHostId dontInclude) {
+    PeerState pickTestPeer(RemoteHostId dontInclude) {
         List peers = null;
         synchronized (_peersByIdent) {
             peers = new ArrayList(_peersByIdent.values());

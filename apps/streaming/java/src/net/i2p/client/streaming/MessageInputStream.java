@@ -99,9 +99,9 @@ public class MessageInputStream extends InputStream {
         }
     }
     private long[] locked_getNacks() {
-        List ids = null;
+        List<Long> ids = null;
         for (long i = _highestReadyBlockId + 1; i < _highestBlockId; i++) {
-            Long l = new Long(i);
+            Long l = Long.valueOf(i);
             if (_notYetReadyBlocks.containsKey(l)) {
                 // ACK
             } else {
@@ -113,7 +113,7 @@ public class MessageInputStream extends InputStream {
         if (ids != null) {
             long rv[] = new long[ids.size()];
             for (int i = 0; i < rv.length; i++)
-                rv[i] = ((Long)ids.get(i)).longValue();
+                rv[i] = ids.get(i).longValue();
             return rv;
         } else {
             return null;

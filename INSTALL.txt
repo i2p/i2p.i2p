@@ -1,9 +1,16 @@
 I2P source installation instructions
 
+Prerequisites to build from source:
+	Java SDK (preferably Sun) 1.5.0 or higher (1.6 recommended)
+	Apache Ant 1.7.0 or higher
+	Optional, For multilanguage support: The xgettext, msgfmt, and msgmerge tools installed
+	from the GNU gettext package http://www.gnu.org/software/gettext/
+
 To build and install I2P from source, you must first build
 and package up the appropriate installer by running:
 
   ant pkg
+
 
 This will produce a few key files:
 * install.jar:    the GUI and console installer
@@ -17,9 +24,6 @@ Or run the GUI installer:
   java -jar i2pinstall.exe
 
 Or move the update file into an existing installation directory and restart.
-
-You will need to have ant installed from http://ant.apache.org/
-(1.7.0 or newer)
 
 Supported JVMs:
   Windows: Latest available from http://java.sun.com/ (1.5+ supported)

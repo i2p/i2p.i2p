@@ -3,5 +3,5 @@
 <meta http-equiv="pragma" content="no-cache" />
 </head>
 <body>
-The I2P Tunnel Manager is not currently running. Please visit the<a href="/configclients.jsp">Client Configuration</a> page to start it.
+The I2P Tunnel Manager is not currently running. Please visit the <a href="/configclients.jsp">Client Configuration</a> page to start it.
 </body></html>

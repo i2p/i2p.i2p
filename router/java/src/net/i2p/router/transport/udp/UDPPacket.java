@@ -38,7 +38,7 @@ public class UDPPacket {
     private long _beforeReceiveFragments;
     private long _afterHandlingTime;
     private int _validateCount;
-    private boolean _isInbound;
+    // private boolean _isInbound;
   
     private static final List _packetCache;
     static {
@@ -83,13 +83,14 @@ public class UDPPacket {
         _ivBuf = new byte[IV_SIZE];
         init(ctx, inbound);
     }
+    // FIXME optimization, remove the inbound parameter, as it is unused. FIXME
     private void init(I2PAppContext ctx, boolean inbound) {
         _context = ctx;
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
         //_packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _packet.setData(_data);
-        _isInbound = inbound;
+        // _isInbound = inbound;
         _initializeTime = _context.clock().now();
         _markedType = -1;
         _validateCount = 0;
@@ -125,8 +126,7 @@ public class UDPPacket {
     int getFragmentCount() { return _fragmentCount; }
     void setFragmentCount(int count) { _fragmentCount = count; }
 
-    // FIXME Exporting non-public type through public API FIXME
-    public RemoteHostId getRemoteHost() {
+    RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
             long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();

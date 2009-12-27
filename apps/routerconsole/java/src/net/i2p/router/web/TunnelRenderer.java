@@ -23,6 +23,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
 import net.i2p.router.tunnel.pool.TunnelPool;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.stat.RateStat;
 import net.i2p.util.ObjectCounter;
 
@@ -229,10 +230,10 @@ public class TunnelRenderer {
         Set<Hash> peers = new HashSet(lc.objects());
         peers.addAll(pc.objects());
         List<Hash> peerList = new ArrayList(peers);
-        Collections.sort(peerList, new HashComparator());
+        Collections.sort(peerList, new CountryComparator(this._context.commSystem()));
 
         out.write("<h2><a name=\"peers\"></a>" + _("Tunnel Counts By Peer") + "</h2>\n");
-        out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Expl. + Client") + "</th><th>" + _("% of total") + "</th><th>" + _("Part. from + to") + "</th><th>" + _("% of total") + "</th></tr>\n");
+        out.write("<table><tr><th>" + _("Peer") + "</th><th>" + _("Our Tunnels") + "</th><th>" + _("% of total") + "</th><th>" + _("Participating Tunnels") + "</th><th>" + _("% of total") + "</th></tr>\n");
         for (Hash h : peerList) {
              out.write("<tr> <td class=\"cells\" align=\"center\">");
              out.write(netDbLink(h));
@@ -250,7 +251,7 @@ public class TunnelRenderer {
                  out.write('0');
              out.write('\n');
         }
-        out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>" + _("Tunnels") + "</b> <td align=\"center\"><b>" + tunnelCount);
+        out.write("<tr class=\"tablefooter\"> <td align=\"center\"><b>" + _("Totals") + "</b> <td align=\"center\"><b>" + tunnelCount);
         out.write("</b> <td>&nbsp;</td> <td align=\"center\"><b>" + partCount);
         out.write("</b> <td>&nbsp;</td></tr></table></div>\n");
     }
@@ -294,6 +295,26 @@ public class TunnelRenderer {
          public int compare(Object l, Object r) {
              return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
         }
+    }
+    
+    private static class CountryComparator implements Comparator<Hash> {
+        public CountryComparator(CommSystemFacade comm) {
+            this.comm = comm;
+        }
+        public int compare(Hash l, Hash r) {
+            // get both countries
+            String lc = this.comm.getCountry(l);
+            String rc = this.comm.getCountry(r);
+            
+            // make them non-null
+            lc = (lc == null) ? "zzzz" : lc;
+            rc = (rc == null) ? "zzzz" : rc;
+            
+            // let String handle the rest
+            return lc.compareTo(rc);
+        }
+        
+        private CommSystemFacade comm;
     }
 
     private String getCapacity(Hash peer) {

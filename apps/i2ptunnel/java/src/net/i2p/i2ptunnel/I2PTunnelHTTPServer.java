@@ -17,7 +17,7 @@ import java.util.zip.GZIPOutputStream;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataHelper;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.data.Base32;
 
@@ -118,7 +118,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 useGZIP = true;
             
             if (allowGZIP && useGZIP) {
-                I2PThread req = new I2PThread(new CompressedRequestor(s, socket, modifiedHeader), Thread.currentThread().getName()+".hc");
+                I2PAppThread req = new I2PAppThread(new CompressedRequestor(s, socket, modifiedHeader), Thread.currentThread().getName()+".hc");
                 req.start();
             } else {
                 new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
@@ -174,7 +174,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.info("request headers: " + _headers);
                 serverout.write(_headers.getBytes());
                 browserin = _browser.getInputStream();
-                I2PThread sender = new I2PThread(new Sender(serverout, browserin, "server: browser to server"), Thread.currentThread().getName() + "hcs");
+                I2PAppThread sender = new I2PAppThread(new Sender(serverout, browserin, "server: browser to server"), Thread.currentThread().getName() + "hcs");
                 sender.start();
                 
                 browserout = _browser.getOutputStream();

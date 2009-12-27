@@ -141,6 +141,9 @@
     </target>
     <target name="poupdate">
         <ant dir="apps/routerconsole/java/" target="poupdate" />
+        <ant dir="apps/i2psnark/java/" target="poupdate" />
+        <ant dir="apps/i2ptunnel/java/" target="poupdate" />
+        <ant dir="apps/susidns/src/" target="poupdate" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
@@ -205,6 +208,7 @@
         <ant dir="apps/susidns/src/" target="distclean" />
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
+        <ant dir="apps/jetty/" target="distclean" />
         <delete>
             <fileset dir="." includes="**/*.class" />
             <fileset dir="." includes="**/*.java~" />
@@ -285,9 +289,10 @@
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
-        <copy file="hosts.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
-        <copy file="history.txt" todir="pkg-temp/" />
+        <!-- overwrite the truncated history put in by the updater -->
+        <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
         <!-- test classes aren't in the jars anymore
@@ -343,19 +348,19 @@
         </copy>
         <!-- make a "classic" theme -->
         <copy todir="pkg-temp/docs/themes/console/classic/" >
-            <fileset  dir="installer/resources/themes/console/classic/" />
+            <fileset  dir="installer/resources/themes/console/classic/" excludes="**/i2plogo.png" />
         </copy>
         <!-- Add dark theme -->
         <copy todir="pkg-temp/docs/themes/console/dark/" >
-            <fileset  dir="installer/resources/themes/console/dark/" />
+            <fileset  dir="installer/resources/themes/console/dark/" excludes="**/i2plogo.png" />
         </copy>
         <!-- Add light theme -->
         <copy todir="pkg-temp/docs/themes/console/light/" >
-            <fileset  dir="installer/resources/themes/console/light/" />
+            <fileset  dir="installer/resources/themes/console/light/" excludes="**/i2plogo.png" />
         </copy>
          <!-- Add midnight theme -->
         <copy todir="pkg-temp/docs/themes/console/midnight/" >
-            <fileset  dir="installer/resources/themes/console/midnight/" />
+            <fileset  dir="installer/resources/themes/console/midnight/" excludes="**/i2plogo.png" />
         </copy>        
         <!-- Add shared images.. these are subject to flux and change! -->
         <copy todir="pkg-temp/docs/themes/console/images/" >
@@ -409,6 +414,15 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
+        <!-- the following overwrites history.txt on unix to shrink the update file -->
+        <exec executable="head" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt">
+            <arg value="-n" />
+            <arg value="1500" />
+            <arg value="history.txt" />
+        </exec>
+        <exec executable="echo" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt" append="true">
+            <arg value="EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
+        </exec>
         <!-- may be pointless now, people with split directories will never see this -->
         <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
     </target>

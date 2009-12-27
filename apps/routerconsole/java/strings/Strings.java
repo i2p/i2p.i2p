@@ -52,5 +52,24 @@ class Dummy {
         _("dark");
         _("light");
         _("midnight");        
+
+        // stat groups for stats.jsp
+        _("Bandwidth");
+        _("BandwidthLimiter");
+        _("ClientMessages");
+        _("Encryption");
+        _("i2cp");
+        _("I2PTunnel");
+        _("InNetPool");
+        _("JobQueue");
+        _("NetworkDatabase");
+        _("ntcp");
+        _("Peers");
+        _("Router");
+        _("Stream");
+        _("Throttle");
+        _("Transport");
+        _("Tunnels");
+        _("udp");
     }
 }

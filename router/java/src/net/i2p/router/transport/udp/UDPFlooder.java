@@ -9,14 +9,14 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
-import net.i2p.util.Log;
+// import net.i2p.util.Log;
 
 /**
  *
  */
 class UDPFlooder implements Runnable {
     private RouterContext _context;
-    private Log _log;
+    // private Log _log;
     private UDPTransport _transport;
     private final List _peers;
     private boolean _alive;
@@ -24,7 +24,7 @@ class UDPFlooder implements Runnable {
     
     public UDPFlooder(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
-        _log = ctx.logManager().getLog(UDPFlooder.class);
+        // _log = ctx.logManager().getLog(UDPFlooder.class);
         _transport = transport;
         _peers = new ArrayList(4);
         ctx.random().nextBytes(_floodData);

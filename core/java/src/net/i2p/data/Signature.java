@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Defines the signature as defined by the I2P data structure spec.
  * A signature is a 40byte Integer verifying the authenticity of some data 
@@ -23,7 +21,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class Signature extends DataStructureImpl {
-    private final static Log _log = new Log(Signature.class);
     private byte[] _data;
 
     public final static int SIGNATURE_BYTES = 40;

@@ -233,11 +233,35 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         return opts;
     }
 
+    private InternalSocketRunner isr;
+
+    /**
+     * Actually start working on incoming connections.
+     * Overridden to start an internal socket too.
+     *
+     */
+    @Override
+    public void startRunning() {
+        super.startRunning();
+        this.isr = new InternalSocketRunner(this);
+    }
+
+    /**
+     * Overridden to close internal socket too.
+     */
+    public boolean close(boolean forced) {
+        boolean rv = super.close(forced);
+        if (this.isr != null)
+            this.isr.stopRunning();
+        return rv;
+    }
+
     private static final boolean DEFAULT_GZIP = true;
     // all default to false
     public static final String PROP_REFERER = "i2ptunnel.httpclient.sendReferer";
     public static final String PROP_USER_AGENT = "i2ptunnel.httpclient.sendUserAgent";
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
+    public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
     
     private static long __requestId = 0;
     protected void clientConnectionRun(Socket s) {
@@ -245,6 +269,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         OutputStream out = null;
         String targetRequest = null;
         boolean usingWWWProxy = false;
+        boolean usingInternalServer = false;
         String currentProxy = null;
         long requestId = ++__requestId;
         try {
@@ -271,6 +296,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
                     method = line.substring(0, pos);
+                    // TODO use Java URL class to make all this simpler and more robust
                     String request = line.substring(pos + 1);
                     if (request.startsWith("/") && getTunnel().getClientOptions().getProperty("i2ptunnel.noproxy") != null) {
                         request = "http://i2p" + request;
@@ -316,8 +342,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                     }
                     
-                    // Quick hack for foo.bar.i2p
-                    if (host.toLowerCase().endsWith(".i2p")) {
+                    if (host.toLowerCase().equals("proxy.i2p")) {
+                        // so we don't do any naming service lookups
+                        destination = "proxy.i2p";
+                        usingInternalServer = true;
+                    } else if (host.toLowerCase().endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
                         // Host becomes the destination key
@@ -454,15 +483,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                         destination = request.substring(0, pos);
                         line = method + " " + request.substring(pos);
-                    }
+                    }   // end host name processing
 
-                    boolean isValid = usingWWWProxy || isSupportedAddress(host, protocol);
+                    boolean isValid = usingWWWProxy || usingInternalServer || isSupportedAddress(host, protocol);
                     if (!isValid) {
                         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix(requestId) + "notValid(" + host + ")");
                         method = null;
                         destination = null;
                         break;
-                    } else if (!usingWWWProxy) {
+                    } else if ((!usingWWWProxy) && (!usingInternalServer)) {
                         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix(requestId) + "host=getHostName(" + destination + ")");
                         host = getHostName(destination); // hide original host
                     }
@@ -473,7 +502,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         _log.debug(getPrefix(requestId) + "HOST  :" + host + ":");
                         _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
                     }
-                    
+
+                    // end first line processing
+
                 } else {
                     if (lowercaseLine.startsWith("host: ") && !usingWWWProxy) {
                         line = "Host: " + host;
@@ -505,14 +536,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         continue; // completely strip the line
                     }
                 }
-                
+
                 if (line.length() == 0) {
                     
                     String ok = getTunnel().getClientOptions().getProperty("i2ptunnel.gzip");
                     boolean gzip = DEFAULT_GZIP;
                     if (ok != null)
                         gzip = Boolean.valueOf(ok).booleanValue();
-                    if (gzip) {
+                    if (gzip && !usingInternalServer) {
                         // according to rfc2616 s14.3, this *should* force identity, even if
                         // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
                         // seems to work.
@@ -526,7 +557,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 } else {
                     newRequest.append(line).append("\r\n"); // HTTP spec
                 }
-            }
+            } // end header processing
+
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
 
@@ -548,7 +580,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             
             // Serve local proxy files (images, css linked from error pages)
             // Ignore all the headers
-            if (destination.equals("proxy.i2p")) {
+            if (usingInternalServer) {
                 serveLocalFile(out, method, targetRequest);
                 s.close();
                 return;
@@ -560,7 +592,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
                 byte[] header;
-                boolean showAddrHelper = false;
+                String jumpServers = null;
                 if (usingWWWProxy)
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 else if(ahelper != 0)
@@ -569,9 +601,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     header = getErrorPage("dnf", ERR_DESTINATION_UNKNOWN);
                 else {
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
-                    showAddrHelper = true;
+                    jumpServers = getTunnel().getClientOptions().getProperty(PROP_JUMP_SERVERS);
+                    if (jumpServers == null)
+                        jumpServers = DEFAULT_JUMP_SERVERS;
                 }
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination, showAddrHelper);
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination, jumpServers);
                 s.close();
                 return;
             }
@@ -726,15 +760,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
     
-    private static String jumpServers[] = {
-                                           "http://i2host.i2p/cgi-bin/i2hostjump?",
-                                           // "http://orion.i2p/jump/",
-                                           "http://stats.i2p/cgi-bin/jump.cgi?a=",
-                                           // "http://trevorreznik.i2p/cgi-bin/jump.php?hostname=",
-                                           "http://i2jump.i2p/"
-                                          };
+    private static String DEFAULT_JUMP_SERVERS =
+                                           "http://i2host.i2p/cgi-bin/i2hostjump?," +
+                                           "http://stats.i2p/cgi-bin/jump.cgi?a=," +
+                                           "http://i2jump.i2p/";
+
+    /**
+     *  @param jumpServers comma- or space-separated list, or null
+     */
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
-                                          boolean usingWWWProxy, String wwwProxy, boolean showAddrHelper) throws IOException {
+                                          boolean usingWWWProxy, String wwwProxy, String jumpServers) throws IOException {
         if (out != null) {
             out.write(errMessage);
             if (targetRequest != null) {
@@ -750,12 +785,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 out.write(uri.getBytes());
                 out.write("</a>".getBytes());
                 if (usingWWWProxy) out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
-                if (showAddrHelper) {
+                if (jumpServers != null && jumpServers.length() > 0) {
                     // Fixme untranslated
                     out.write("<br><br>Click a link below to look for an address helper by using a \"jump\" service:<br>".getBytes());
-                    for (int i = 0; i < jumpServers.length; i++) {
+
+                    StringTokenizer tok = new StringTokenizer(jumpServers, ", ");
+                    while (tok.hasMoreTokens()) {
+                        String jurl = tok.nextToken();
+                        if (!jurl.startsWith("http://"))
+                            continue;
                         // Skip jump servers we don't know
-                        String jumphost = jumpServers[i].substring(7);  // "http://"
+                        String jumphost = jurl.substring(7);  // "http://"
                         jumphost = jumphost.substring(0, jumphost.indexOf('/'));
                         try {
                             Destination dest = I2PTunnel.destFromName(jumphost);
@@ -765,10 +805,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
 
                         out.write("<br><a href=\"".getBytes());
-                        out.write(jumpServers[i].getBytes());
+                        out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("\">".getBytes());
-                        out.write(jumpServers[i].getBytes());
+                        out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("</a>".getBytes());
                     }
@@ -792,7 +832,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     header = getErrorPage(I2PAppContext.getGlobalContext(), "dnfp", ERR_DESTINATION_UNKNOWN);
                 else
                     header = getErrorPage(I2PAppContext.getGlobalContext(), "dnf", ERR_DESTINATION_UNKNOWN);
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, false);
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, null);
             } catch (IOException ioe) {
                 // static
                 //_log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);

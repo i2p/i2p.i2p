@@ -169,8 +169,14 @@ public class PacketBuilder {
         
         int sizeWritten = state.writeFragment(data, off, fragment);
         if (sizeWritten != size) {
-            _log.error("Size written: " + sizeWritten + " but size: " + size 
-                       + " for fragment " + fragment + " of " + state.getMessageId());
+            if (sizeWritten < 0) {
+                // probably already freed from OutboundMessageState
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Write failed for fragment " + fragment + " of " + state.getMessageId());
+            } else {
+                _log.error("Size written: " + sizeWritten + " but size: " + size 
+                           + " for fragment " + fragment + " of " + state.getMessageId());
+            }
             packet.release();
             return null;
         } else if (_log.shouldLog(Log.DEBUG))
@@ -879,8 +885,7 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
+    UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
@@ -930,8 +935,7 @@ public class PacketBuilder {
      */
     private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
+    UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
         InetAddress aliceAddr = null;
         try {
             aliceAddr = InetAddress.getByAddress(alice.getIP());

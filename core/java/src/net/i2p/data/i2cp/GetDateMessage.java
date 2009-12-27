@@ -12,14 +12,11 @@ package net.i2p.data.i2cp;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Request the other side to send us what they think the current time is
  *
  */
 public class GetDateMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(GetDateMessage.class);
     public final static int MESSAGE_TYPE = 32;
 
     public GetDateMessage() {

@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.util.Log;
 
 /**
  * Defines the message ID of a message delivered between a router and a client
@@ -25,7 +24,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class MessageId extends DataStructureImpl {
-    private final static Log _log = new Log(MessageId.class);
     private long _messageId;
 
     public MessageId() {

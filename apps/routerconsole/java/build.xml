@@ -89,7 +89,7 @@
         <!-- jar again to get the latest messages_*.class files -->
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
-    <target name="poupdate" depends="compile">
+    <target name="poupdate" depends="build">
         <ant target="war" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->

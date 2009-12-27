@@ -19,7 +19,7 @@ import java.util.Set;
 
 
 /**
- *
+ *  deprecated unused but can be instantiated through I2PAppContext
  */
 public class PetNameDB {
     /** name (String) to PetName mapping */

@@ -5,6 +5,9 @@ import java.io.IOException;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 
+/**
+ *  @deprecated unused
+ */
 public class PetNameNamingService extends NamingService {
 
     private PetNameDB _petnameDb;

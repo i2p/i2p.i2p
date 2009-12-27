@@ -16,6 +16,7 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.InternalSocket;
 
 /**
  * EepGet [-p 127.0.0.1:4444] 
@@ -869,7 +870,7 @@ public class EepGet {
         if (_proxy != null) try { _proxy.close(); } catch (IOException ioe) {}
 
         if (_shouldProxy) {
-            _proxy = new Socket(_proxyHost, _proxyPort);
+            _proxy = InternalSocket.getSocket(_proxyHost, _proxyPort);
         } else {
             try {
                 URL url = new URL(_actualURL);

@@ -136,9 +136,4 @@ public class EepGetNamingService extends NamingService {
         _log.error("Caught from: " + url + hostname);
         return null;
     }
-    
-    @Override
-    public String reverseLookup(Destination dest) {
-        return null;
-    }
 }
