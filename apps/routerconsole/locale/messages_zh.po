@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-18 06:45+0000\n"
+"POT-Creation-Date: 2009-12-27 02:41+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: walking <zhazhenzhong@gmail.com>\n"
 "Language-Team: \n"
@@ -1088,7 +1088,7 @@ msgstr "客户程序索引无效"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:94
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:17
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:363
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:371
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:382
 msgid "Client"
 msgstr "客户"
 
@@ -1206,7 +1206,7 @@ msgstr "服务"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:86
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:254
+#: ../java/strings/Strings.java:72
 msgid "Tunnels"
 msgstr "隧道"
 
@@ -1236,6 +1236,7 @@ msgstr "日志"
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:92
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:227
+#: ../java/strings/Strings.java:67
 msgid "Peers"
 msgstr "节点"
 
@@ -1847,11 +1848,16 @@ msgstr "分钟"
 msgid "Redraw"
 msgstr "重绘"
 
+#: ../java/src/net/i2p/router/web/LogsHelper.java:37
+msgid "File location"
+msgstr "文件位置"
+
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:59
 msgid "Network Database RouterInfo Lookup"
 msgstr "网络数据库 RouterInfo 检索"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:74
+#: ../java/strings/Strings.java:68
 msgid "Router"
 msgstr "路由器"
 
@@ -1968,7 +1974,7 @@ msgid "Full entry"
 msgstr "完整项"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:266
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:96
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:105
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:581
 msgid "Hidden"
 msgstr "隐身"
@@ -2258,6 +2264,10 @@ msgstr "封锁直到重启或{0}后"
 msgid "unban now"
 msgstr "立即解封"
 
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:55
+msgid "GO"
+msgstr ""
+
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:58
 msgid "Statistics gathered during this router's uptime"
 msgstr "路由运行时收集的统计数据"
@@ -2265,6 +2275,42 @@ msgstr "路由运行时收集的统计数据"
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:61
 msgid "The data gathered is quantized over a 1 minute period, so should just be used as an estimate."
 msgstr "所采集数据量化周期为1分钟，仅供参考。"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:107
+msgid "frequency"
+msgstr "更新频率"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:141
+msgid "No lifetime events"
+msgstr "自运行起无事件"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:153
+msgid "rate"
+msgstr "速度"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:155
+msgid "avg value"
+msgstr "均值"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:184
+msgid "events"
+msgstr "事件"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:190
+msgid "No events"
+msgstr "无事件"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:196
+msgid "lifetime average"
+msgstr "总平均值"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:198
+msgid "peak average"
+msgstr "峰值平均值"
+
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:216
+msgid "lifetime average value"
+msgstr "总平均值"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:44
 msgid "Configure startup of clients and webapps (services); manually start dormant services"
@@ -2488,114 +2534,116 @@ msgstr "隧道延迟"
 msgid "Backlog"
 msgstr "积压"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:73
-msgid "skew"
-msgstr "时滞"
-
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:92
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:96
 msgid "ERR-Client Manager I2CP Error - check logs"
 msgstr "错误-客户程序管理器I2CP错误 - 请看日志"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:94
-msgid "ERR-ClockSkew"
-msgstr "错误-系统时滞"
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:103
+#, java-format
+msgid "ERR-Clock Skew of {0}"
+msgstr "错误-系统时滞 {0}"
 
 # 暂不翻译，确定/良好 可能影响按钮的翻译
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:103
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:112
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:557
 msgid "OK"
 msgstr "正常"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:104
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:113
 msgid "ERR-Private TCP Address"
 msgstr "错误-TCP私有地址"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:106
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:115
 msgid "ERR-SymmetricNAT"
 msgstr "错误-SymmeticNAT"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:109
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:118
 msgid "WARN-Firewalled with Inbound TCP Enabled"
 msgstr "警告-入站TCP开启但因防火墙受限"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:111
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:120
 msgid "WARN-Firewalled and Floodfill"
 msgstr "警告-种子节点因防火墙受限"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:113
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:122
 msgid "WARN-Firewalled and Fast"
 msgstr "警告-快速节点因防火墙受限"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:114
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:123
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:561
 msgid "Firewalled"
 msgstr "防火墙限制"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:116
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:125
 msgid "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
 msgstr "错误-UDP端口已占用 - 在高级设置中设置 i2np.udp.internalPort=新端口并重启程序"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:123
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:131
+msgid "ERR-No Active Peers, Check Network Connection and Firewall"
+msgstr "错误-无活动节点，请检查网络连接及防火墙"
+
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:134
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
 msgstr "错误-UDP已禁用且TCP入站主机与端口未设置"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:125
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:136
 msgid "WARN-Firewalled with UDP Disabled"
 msgstr "警告-因防火墙受限且UDP被禁用"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:127
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:138
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:577
 msgid "Testing"
 msgstr "测试中"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:360
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:371
 msgid "Add/remove/edit &amp; control your client and server tunnels"
 msgstr "添加、删除、编辑或控制客户程序隧道和服务隧道"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:360
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:371
 msgid "Local Destinations"
 msgstr "本地目标"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:369
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:380
 msgid "Server"
 msgstr "服务"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:373
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:384
 msgid "Show tunnels"
 msgstr "显示隧道"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:384
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:395
 msgid "Leases expired"
 msgstr "Lease已过期"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:384
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:385
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:395
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:396
 msgid "Rebuilding"
 msgstr "正在重建"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:385
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:396
 msgid "ago"
 msgstr "前"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:388
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:399
 msgid "Ready"
 msgstr "就绪"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:392
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:403
 msgid "Building"
 msgstr "创建中"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:392
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:403
 msgid "Building tunnels"
 msgstr "正在隧道创建"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:404
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:415
 #: ../java/strings/Strings.java:36
 msgid "shared clients"
 msgstr "共享客户端"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:41
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:63
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:273
 msgid "configure"
 msgstr "设置"
 
@@ -2716,12 +2764,16 @@ msgid "% of total"
 msgstr "占总数%"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:236
-msgid "Expl. + Client"
-msgstr "探测+客户"
+msgid "Our Tunnels"
+msgstr "我方隧道"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:236
-msgid "Part. from + to"
-msgstr "相邻共享节点"
+msgid "Participating Tunnels"
+msgstr "共享隧道"
+
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:254
+msgid "Totals"
+msgstr "总计"
 
 #: ../java/strings/Strings.java:12
 msgid "addressbook"
@@ -2826,6 +2878,62 @@ msgstr "亮色调"
 #: ../java/strings/Strings.java:54
 msgid "midnight"
 msgstr "午夜"
+
+#: ../java/strings/Strings.java:57
+msgid "Bandwidth"
+msgstr "带宽"
+
+#: ../java/strings/Strings.java:58
+msgid "BandwidthLimiter"
+msgstr "带宽限制"
+
+#: ../java/strings/Strings.java:59
+msgid "ClientMessages"
+msgstr "客户消息"
+
+#: ../java/strings/Strings.java:60
+msgid "Encryption"
+msgstr "加密"
+
+#: ../java/strings/Strings.java:61
+msgid "i2cp"
+msgstr ""
+
+#: ../java/strings/Strings.java:62
+msgid "I2PTunnel"
+msgstr "I2P隧道"
+
+#: ../java/strings/Strings.java:63
+msgid "InNetPool"
+msgstr ""
+
+#: ../java/strings/Strings.java:64
+msgid "JobQueue"
+msgstr "作业队列"
+
+#: ../java/strings/Strings.java:65
+msgid "NetworkDatabase"
+msgstr "网络数据库"
+
+#: ../java/strings/Strings.java:66
+msgid "ntcp"
+msgstr "NTCP"
+
+#: ../java/strings/Strings.java:69
+msgid "Stream"
+msgstr "流"
+
+#: ../java/strings/Strings.java:70
+msgid "Throttle"
+msgstr "门槛"
+
+#: ../java/strings/Strings.java:71
+msgid "Transport"
+msgstr "传输"
+
+#: ../java/strings/Strings.java:73
+msgid "udp"
+msgstr "UDP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:106
 msgid "config networking"
@@ -3891,6 +3999,18 @@ msgstr "I2P 版本及运行环境"
 msgid "Please include this information in bug reports"
 msgstr "报告问题时请包括以下信息"
 
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:267
+msgid "Critical Logs"
+msgstr "关键日志"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:271
+msgid "Router Logs"
+msgstr "路由器日志"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:277
+msgid "Service (Wrapper) Logs"
+msgstr "服务(封装)日志"
+
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:105
 msgid "network database summary"
 msgstr "I2P 网络数据库概况"
@@ -3952,6 +4072,12 @@ msgstr "隧道概况"
 msgid "I2P Tunnel Summary"
 msgstr "I2P 隧道概况"
 
+#~ msgid "skew"
+#~ msgstr "时滞"
+#~ msgid "Expl. + Client"
+#~ msgstr "探测+客户"
+#~ msgid "Part. from + to"
+#~ msgstr "相邻共享节点"
 #~ msgid "Depth"
 #~ msgstr "深度"
 #~ msgid "Addresses"
