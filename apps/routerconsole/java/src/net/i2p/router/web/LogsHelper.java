@@ -10,7 +10,7 @@ public class LogsHelper extends HelperBase {
     
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
-        return "Location: <b><code>" + _context.logManager().currentFile() + "</code></b><br><br>" + str;
+        return _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b><br><br>" + str;
     }
     
     public String getCriticalLogs() {
@@ -34,7 +34,7 @@ public class LogsHelper extends HelperBase {
             return "";
         else {
             str = str.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-            return _("File location") + ":<b><code> " + f.getAbsolutePath() + "</code></b> <pre>" + str + "</pre>";
+            return _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b> <pre>" + str + "</pre>";
         }
     }
     
