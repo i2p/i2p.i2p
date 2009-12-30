@@ -113,10 +113,10 @@ class BuildHandler {
                 if (toHandle > MAX_HANDLE_AT_ONCE)
                     toHandle = MAX_HANDLE_AT_ONCE;
                 handled = new ArrayList(toHandle);
-                if (false) {
-                    for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
-                        handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
-                } else {
+                //if (false) {
+                //    for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
+                //        handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
+                //} else {
                     // drop any expired messages
                     long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
                     do {
@@ -140,7 +140,7 @@ class BuildHandler {
                     // when adding)
                     for (int i = 0; i < toHandle && _inboundBuildMessages.size() > 0; i++)
                         handled.add(_inboundBuildMessages.remove(0));
-                }
+                //}
             }
             remaining = _inboundBuildMessages.size();
         }
@@ -482,6 +482,14 @@ class BuildHandler {
         return 0;
     }
     
+    /**
+     *  Actually process the request and send the reply.
+     *
+     *  Todo: Replies are not subject to RED for bandwidth reasons,
+     *  and the bandwidth is not credited to any tunnel.
+     *  If we did credit the reply to the tunnel, it would
+     *  prevent the classification of the tunnel as 'inactive' on tunnels.jsp.
+     */
     @SuppressWarnings("static-access")
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
@@ -604,8 +612,7 @@ class BuildHandler {
             return;
         }
 
-        BuildResponseRecord resp = new BuildResponseRecord();
-        byte reply[] = resp.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
+        byte reply[] = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
         for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
