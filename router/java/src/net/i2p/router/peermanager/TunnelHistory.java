@@ -28,13 +28,13 @@ public class TunnelHistory {
     private RateStat _failRate;
     private String _statGroup;
     
-    /** probabalistic tunnel rejection due to a flood of requests */
+    /** probabalistic tunnel rejection due to a flood of requests - essentially unused */
     public static final int TUNNEL_REJECT_PROBABALISTIC_REJECT = 10;
-    /** tunnel rejection due to temporary cpu/job/tunnel overload */
+    /** tunnel rejection due to temporary cpu/job/tunnel overload - essentially unused */
     public static final int TUNNEL_REJECT_TRANSIENT_OVERLOAD = 20;
     /** tunnel rejection due to excess bandwidth usage */
     public static final int TUNNEL_REJECT_BANDWIDTH = 30;
-    /** tunnel rejection due to system failure */
+    /** tunnel rejection due to system failure - essentially unused */
     public static final int TUNNEL_REJECT_CRIT = 50;
     
     public TunnelHistory(RouterContext context, String statGroup) {
@@ -100,8 +100,10 @@ public class TunnelHistory {
         }
     }
 
-    // Define this rate as the probability it really failed
-    // @param pct = probability * 100
+    /**
+     * Define this rate as the probability it really failed
+     * @param pct = probability * 100
+     */
     public void incrementFailed(int pct) {
         _lifetimeFailed++;
         _failRate.addData(pct, 1);
@@ -150,7 +152,7 @@ public class TunnelHistory {
         _failRate.store(out, "tunnelHistory.failRate");
     }
     
-    private void add(StringBuilder buf, String name, long val, String description) {
+    private static void add(StringBuilder buf, String name, long val, String description) {
         buf.append("# ").append(name.toUpperCase()).append(NL).append("# ").append(description).append(NL);
         buf.append("tunnels.").append(name).append('=').append(val).append(NL).append(NL);
     }

@@ -532,7 +532,7 @@ class SearchJob extends JobImpl {
     void replyFound(DatabaseSearchReplyMessage message, Hash peer) {
         long duration = _state.replyFound(peer);
         // this processing can take a while, so split 'er up
-        getContext().jobQueue().addJob(new SearchReplyJob(getContext(), this, (DatabaseSearchReplyMessage)message, peer, duration));
+        getContext().jobQueue().addJob(new SearchReplyJob(getContext(), this, message, peer, duration));
     }
     
     /**

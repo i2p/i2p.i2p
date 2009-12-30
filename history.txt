@@ -1,3 +1,12 @@
+2009-12-31 zzz
+    * BuildResponseRecord: Make static
+    * i2np: Remove unused logs
+    * i2psnark: Fix message box, was a little too small
+    * InternalSocket: Fallback to external socket on fail
+    * NetDb: Fix exploration by adding a null hash to mean
+      "don't give me floodfills"
+    * PeerSelector: Downgrade floodfills with high fail rate
+
 2009-12-26 zzz
     * Console:
       - Tag the rest of logs.jsp

@@ -1170,6 +1170,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _introducersSelectedOn = _context.clock().now();
                 introducersIncluded = true;
             } else {
+                // maybe we should fail to publish an address at all in this case?
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Need introducers but we don't know any");
             }
