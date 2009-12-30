@@ -36,10 +36,12 @@ public class InternalSocket extends Socket {
     public static Socket getSocket(String host, int port) throws IOException {
         if (System.getProperty("router.version") != null &&
             (host.equals("127.0.0.1") || host.equals("localhost"))) {
-            return new InternalSocket(port);
-        } else {
-            return new Socket(host, port);
+            try {
+                return new InternalSocket(port);
+            } catch (IOException ioe) {}
+            // guess it wasn't really internal...
         }
+        return new Socket(host, port);
     }
 
     @Override
