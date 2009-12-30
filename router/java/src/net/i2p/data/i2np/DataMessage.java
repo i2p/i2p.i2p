@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-// import net.i2p.util.Log;
 
 /**
  * Defines a message containing arbitrary bytes of data
@@ -20,7 +19,6 @@ import net.i2p.data.DataHelper;
  * @author jrandom
  */
 public class DataMessage extends I2NPMessageImpl {
-    // private final static Log _log = new Log(DataMessage.class);
     public final static int MESSAGE_TYPE = 20;
     private byte _data[];
     
