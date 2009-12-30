@@ -85,12 +85,14 @@ class ExploreJob extends SearchJob {
         msg.setReplyTunnel(replyTunnelId);
         
         int available = MAX_CLOSEST - msg.getDontIncludePeers().size();
-        // TODO: add this once ../HTLMJ handles it
-        //if (available > 0) {
-        //    // add a flag to say this is an exploration and we don't want floodfills in the responses
-        //    if (msg.getDontIncludePeers().add(Hash.FAKE_HASH))
-        //        available--;
-        //}
+        if (available > 0) {
+            // Add a flag to say this is an exploration and we don't want floodfills in the responses.
+            // Doing it this way is of course backwards-compatible.
+            // Supported as of 0.7.9
+            if (msg.getDontIncludePeers().add(Hash.FAKE_HASH))
+                available--;
+        }
+
         KBucketSet ks = _facade.getKBuckets();
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());
         // in a few releases, we can (and should) remove this,

@@ -100,7 +100,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
                 sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
             } else {
-                Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
+                Set<RouterInfo> routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
                                                                             CLOSENESS_THRESHOLD,
                                                                             _message.getDontIncludePeers());
                 if (getContext().clientManager().isLocal(ls.getDestination())) {
@@ -142,13 +142,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 }
             } else {
                 // not found locally - return closest peer routerInfo structs
-                Set dontInclude = _message.getDontIncludePeers();
-                // TODO: Honor flag to exclude all floodfills
+                Set<Hash> dontInclude = _message.getDontIncludePeers();
+                // Honor flag to exclude all floodfills
                 //if (dontInclude.contains(Hash.FAKE_HASH)) {
-                //    dontInclude = new HashSet(dontInclude);
-                //    dontInclude.addAll( pfffft );
-                //}
-                Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
+                // This is handled in FloodfillPeerSelector
+                Set<RouterInfo> routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
                                                                         MAX_ROUTERS_RETURNED, 
                                                                         dontInclude);
 
@@ -199,7 +197,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     
     private void sendData(Hash key, DataStructure data, Hash toPeer, TunnelId replyTunnel) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending data matching key key " + key.toBase64() + " to peer " + toPeer.toBase64() 
+            _log.debug("Sending data matching key " + key.toBase64() + " to peer " + toPeer.toBase64() 
                        + " tunnel " + replyTunnel);
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         msg.setKey(key);
@@ -216,7 +214,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         sendMessage(msg, toPeer, replyTunnel);
     }
     
-    protected void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
+    protected void sendClosest(Hash key, Set<RouterInfo> routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending closest routers to key " + key.toBase64() + ": # peers = " 
                        + routerInfoSet.size() + " tunnel " + replyTunnel);

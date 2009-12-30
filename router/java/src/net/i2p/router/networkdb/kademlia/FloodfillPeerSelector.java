@@ -98,7 +98,8 @@ class FloodfillPeerSelector extends PeerSelector {
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
      *  The list is in 3 groups - sorted by routing key within each group.
-     *  Group 1: No store or lookup failure in a long time
+     *  Group 1: No store or lookup failure in a long time, and
+    *            lookup fail rate no more than 1.5 * average
      *  Group 2: No store or lookup failure in a little while or
      *           success newer than failure
      *  Group 3: All others
@@ -126,6 +127,14 @@ class FloodfillPeerSelector extends PeerSelector {
         int found = 0;
         long now = _context.clock().now();
 
+        double maxFailRate;
+        if (_context.router().getUptime() > 60*60*1000) {
+            double currentFailRate = _context.statManager().getRate("peer.failedLookupRate").getRate(60*60*1000).getAverageValue();
+            maxFailRate = Math.max(0.20d, 1.5d * currentFailRate);
+        } else {
+            maxFailRate = 100d; // disable
+        }
+
         // split sorted list into 3 sorted lists
         for (int i = 0; found < howMany && i < ffs.size(); i++) {
             Hash entry = sorted.first();
@@ -146,7 +155,8 @@ class FloodfillPeerSelector extends PeerSelector {
                 if (prof != null && prof.getDBHistory() != null
                     && prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
                     && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
-                    && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD) {
+                    && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD
+                    && prof.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getAverageValue() < maxFailRate) {
                     // good
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Good: " + entry);
@@ -246,11 +256,14 @@ class FloodfillPeerSelector extends PeerSelector {
 
         /**
          *  @return list of all with the 'f' mark in their netdb except for shitlisted ones.
+         *  Will return non-floodfills only if there aren't enough floodfills.
+         *
          *  The list is in 3 groups - unsorted (shuffled) within each group.
          *  Group 1: If preferConnected = true, the peers we are directly
          *           connected to, that meet the group 2 criteria
          *  Group 2: Netdb published less than 3h ago, no bad send in last 30m.
          *  Group 3: All others
+         *  Group 4: Non-floodfills, sorted by closest-to-the-key
          */
         public List<Hash> get(int howMany, boolean preferConnected) {
             Collections.shuffle(_floodfillMatches, _context.random());
@@ -310,6 +323,8 @@ class FloodfillPeerSelector extends PeerSelector {
     
     /**
      * Floodfill peers only. Used only by HandleDatabaseLookupMessageJob to populate the DSRM.
+     * UNLESS peersToIgnore contains Hash.FAKE_HASH (all zeros), in which case this is an exploratory
+     * lookup, and the response should not include floodfills.
      *
      * @param key the original key (NOT the routing key)
      * @return List of Hash for the peers selected, ordered
@@ -317,6 +332,15 @@ class FloodfillPeerSelector extends PeerSelector {
     @Override
     public List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
-        return selectFloodfillParticipants(rkey, maxNumRouters, peersToIgnore, kbuckets);
+        if (peersToIgnore != null && peersToIgnore.contains(Hash.FAKE_HASH)) {
+            // return non-ff
+            peersToIgnore.addAll(selectFloodfillParticipants(peersToIgnore, kbuckets));
+            FloodfillSelectionCollector matches = new FloodfillSelectionCollector(rkey, peersToIgnore, maxNumRouters);
+            kbuckets.getAll(matches);
+            return matches.get(maxNumRouters);
+        } else {
+            // return ff
+            return selectFloodfillParticipants(rkey, maxNumRouters, peersToIgnore, kbuckets);
+        }
     }
 }
