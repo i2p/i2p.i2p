@@ -25,6 +25,7 @@
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
+        <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
@@ -193,6 +194,7 @@
         <delete file="i2p.exe" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
+        <delete file="BOB-one.jar" failonerror="false" quiet="true" />	
     </target>
     <target name="distclean" depends="clean">
         <ant dir="core/java/" target="distclean" />
@@ -531,6 +533,10 @@
         <echo message="Building Slackware package." />
         <ant dir="Slackware/i2p/" target="slackpkg" />
         <ant dir="Slackware/i2p-base/" target="slackpkg" />
+    </target>
+    <target name="justBOB" depends="builddepSmall">
+        <ant dir="apps/BOB/" target="onejar" />
+        <copy file="apps/BOB/dist/BOB-one.jar" todir="." />
     </target>
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />

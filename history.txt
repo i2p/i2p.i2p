@@ -1,3 +1,7 @@
+2010-01-01 sponge
+    * Happy New year everyone!
+    * Added a target to generate a stand-alone BOB jar file.
+
 2009-12-31 zzz
     * BuildResponseRecord: Make static
     * i2np: Remove unused logs

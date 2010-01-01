@@ -71,4 +71,19 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-do-jar-with-libraries-without-mainclass,-do-jar-with-libraries-without-manifest,-post-jar" description="Build BOB into a SINGLE JAR." name="onejar">
+        <jar jarfile="dist/BOB-one.jar">
+            <zipfileset src="${dist.jar}" excludes="META-INF/*" />
+            <zipfileset src="dist/lib/i2p.jar" excludes="META-INF/*"/>
+            <zipfileset src="dist/lib/i2ptunnel.jar" excludes="META-INF/*"/>
+            <zipfileset src="dist/lib/mstreaming.jar" excludes="META-INF/*"/>
+            <zipfileset src="dist/lib/router.jar" excludes="META-INF/*"/>
+            <zipfileset src="dist/lib/streaming.jar" excludes="META-INF/*"/>
+            <zipfileset src="dist/lib/wrapper.jar" excludes="META-INF/*"/>
+            <zipfileset src="../../installer/lib/jbigi/jbigi.jar" excludes="META-INF/*"/>
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.BOB.Main"/>
+            </manifest>
+        </jar>
+    </target>
 </project>
