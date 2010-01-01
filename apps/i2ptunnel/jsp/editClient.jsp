@@ -86,10 +86,11 @@
                 <label for="port" accesskey="P">
                     <span class="accessKey">P</span>ort:
                     <% String value = editBean.getClientPort(curTunnel);
-                       if (value == null || "".equals(value.trim()))
+                       if (value == null || "".equals(value.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
+                       }
                      %>
                 </label>
                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />               
@@ -121,10 +122,11 @@
          <% if ("streamrclient".equals(tunnelType)) { %>
                     Host:
                     <% String vvv = otherInterface;
-                       if (vvv == null || "".equals(vvv.trim()))
+                       if (vvv == null || "".equals(vvv.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
+                       }   
                      %>
          <% } else { %>
                     <%=intl._("Other")%>(<span class="accessKey">O</span>):
@@ -149,10 +151,11 @@
                 <label for="targetDestination" accesskey="T">
                     <%=intl._("Tunnel Destination")%>(<span class="accessKey">T</span>):
                     <% String value2 = editBean.getClientDestination(curTunnel);
-                       if (value2 == null || "".equals(value2.trim()))
+                       if (value2 == null || "".equals(value2.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
+                       }   
                      %>
                 </label>
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                

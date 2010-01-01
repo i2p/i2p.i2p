@@ -103,10 +103,11 @@
                 <label for="targetPort" accesskey="P">
                     <%=intl._("Port")%>(<span class="accessKey">P</span>):
                     <% String value = editBean.getTargetPort(curTunnel);
-                       if (value == null || "".equals(value.trim()))
+                       if (value == null || "".equals(value.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
+                       }   
                      %>
                 </label>
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext" />               
@@ -129,10 +130,11 @@
                 <label for="privKeyFile" accesskey="k">
                     <%=intl._("Private key file")%>(<span class="accessKey">k</span>):
                     <% String value2 = editBean.getPrivateKeyFile(curTunnel);
-                       if (value2 == null || "".equals(value2.trim()))
+                       if (value2 == null || "".equals(value2.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
+                       }
                      %>
                 </label>
                 <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
