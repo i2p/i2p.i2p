@@ -19,6 +19,10 @@ public class Messages {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
+    public static String _(String key, I2PAppContext ctx) {
+        return Translate.getString(key, ctx, BUNDLE_NAME);
+    }
+
     /**
      *  translate a string with a parameter
      *  This is a lot more expensive than getString(s, ctx), so use sparingly.

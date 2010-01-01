@@ -359,7 +359,7 @@ public class IndexBean {
         if (tun != null && tun.getName() != null)
             return tun.getName();
         else
-            return "New Tunnel";
+            return _("New Tunnel");
     }
     
     public String getClientPort(int tunnel) {
@@ -379,16 +379,16 @@ public class IndexBean {
     }
     
     public String getTypeName(String internalType) {
-        if ("client".equals(internalType)) return "Standard client";
-        else if ("httpclient".equals(internalType)) return "HTTP client";
-        else if ("ircclient".equals(internalType)) return "IRC client";
-        else if ("server".equals(internalType)) return "Standard server";
-        else if ("httpserver".equals(internalType)) return "HTTP server";
-        else if ("sockstunnel".equals(internalType)) return "SOCKS 4/4a/5 proxy";
-        else if ("connectclient".equals(internalType)) return "CONNECT/SSL/HTTPS proxy";
-        else if ("ircserver".equals(internalType)) return "IRC server";
-        else if ("streamrclient".equals(internalType)) return "Streamr client";
-        else if ("streamrserver".equals(internalType)) return "Streamr server";
+        if ("client".equals(internalType)) return _("Standard client");
+        else if ("httpclient".equals(internalType)) return _("HTTP client");
+        else if ("ircclient".equals(internalType)) return _("IRC client");
+        else if ("server".equals(internalType)) return _("Standard server");
+        else if ("httpserver".equals(internalType)) return _("HTTP server");
+        else if ("sockstunnel".equals(internalType)) return _("SOCKS 4/4a/5 proxy");
+        else if ("connectclient".equals(internalType)) return _("CONNECT/SSL/HTTPS proxy");
+        else if ("ircserver".equals(internalType)) return _("IRC server");
+        else if ("streamrclient".equals(internalType)) return _("Streamr client");
+        else if ("streamrserver".equals(internalType)) return _("Streamr server");
         else return internalType;
     }
     
@@ -934,5 +934,9 @@ public class IndexBean {
         for (int i = 0; i < msgs.size(); i++) {
             buf.append((String)msgs.get(i)).append("\n");
         }
+    }
+
+    private String _(String key) {
+        return Messages._(key, _context);
     }
 }

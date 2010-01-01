@@ -140,7 +140,7 @@
             <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
-                    <%=intl._("Outproies")%>(<span class="accessKey">x</span>):
+                    <%=intl._("Outproxies")%>(<span class="accessKey">x</span>):
                 </label>
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext" />                
             </div>

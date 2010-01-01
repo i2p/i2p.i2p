@@ -167,7 +167,7 @@
                         <option value="ircserver">IRC</option>
                         <option value="streamrserver">Streamr</option>
                     </select>
-                    <input class="control" type="submit" value="Create" />
+                    <input class="control" type="submit" value="<%=intl._("Create")%>" />
                 </div>
             </form>
         </div>
