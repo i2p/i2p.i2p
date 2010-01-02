@@ -85,41 +85,40 @@ public class TunnelRenderer {
             }
             out.write("<tr>");
             if (cfg.getReceiveTunnel() != null)
-                out.write(" <td class=\"cells\" align=\"center\">" + cfg.getReceiveTunnel().getTunnelId() +"</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + cfg.getReceiveTunnel().getTunnelId() +"</td>");
             else
-                out.write(" <td class=\"cells\" align=\"center\">n/a</td>");
+                out.write("<td class=\"cells\" align=\"center\">n/a</td>");
             if (cfg.getReceiveFrom() != null)
-                out.write(" <td class=\"cells\" align=\"right\">" + netDbLink(cfg.getReceiveFrom()) +"</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + netDbLink(cfg.getReceiveFrom()) +"</td>");
             else
-                out.write(" <td class=\"cells\" align=\"center\">&nbsp;</td>");
+                out.write("<td class=\"cells\">&nbsp;</td>");
             if (cfg.getSendTunnel() != null)
-                out.write(" <td class=\"cells\" align=\"center\">" + cfg.getSendTunnel().getTunnelId() +"</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + cfg.getSendTunnel().getTunnelId() +"</td>");
             else
-                out.write(" <td class=\"cells\" align=\"center\">&nbsp;</td>");
+                out.write("<td class=\"cells\">&nbsp;</td>");
             if (cfg.getSendTo() != null)
-                out.write(" <td class=\"cells\" align=\"center\">" + netDbLink(cfg.getSendTo()) +"</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + netDbLink(cfg.getSendTo()) +"</td>");
             else
-//                out.write(" <td class=\"cells\" align=\"center\">&nbsp;</td>");
-                out.write(" <td class=\"cells\" align=\"center\">&nbsp;</td>");
+                out.write("<td class=\"cells\">&nbsp;</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
             if (timeLeft > 0)
-                out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration(timeLeft) + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration(timeLeft) + "</td>");
             else
-                out.write(" <td class=\"cells\" align=\"center\">(" + _("grace period") + ")</td>");
-            out.write(" <td class=\"cells\" align=\"center\">" + cfg.getProcessedMessagesCount() + "KB</td>");
+                out.write("<td class=\"cells\" align=\"center\">(" + _("grace period") + ")</td>");
+            out.write("<td class=\"cells\" align=\"center\">" + cfg.getProcessedMessagesCount() + "KB</td>");
             int lifetime = (int) ((_context.clock().now() - cfg.getCreation()) / 1000);
             if (lifetime <= 0)
                 lifetime = 1;
             if (lifetime > 10*60)
                 lifetime = 10*60;
             int bps = 1024 * (int) cfg.getProcessedMessagesCount() / lifetime;
-            out.write(" <td class=\"cells\" align=\"center\">" + bps + "Bps</td>");
+            out.write("<td class=\"cells\" align=\"center\">" + bps + "Bps</td>");
             if (cfg.getSendTo() == null)
-                out.write(" <td class=\"cells\" align=\"center\">" + _("Outbound Endpoint") + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + _("Outbound Endpoint") + "</td>");
             else if (cfg.getReceiveFrom() == null)
-                out.write(" <td class=\"cells\" align=\"center\">" + _("Inbound Gateway") + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + _("Inbound Gateway") + "</td>");
             else
-                out.write(" <td class=\"cells\" align=\"center\">" + _("Participant") + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + _("Participant") + "</td>");
             out.write("</tr>\n");
             processed += cfg.getProcessedMessagesCount();
         }
