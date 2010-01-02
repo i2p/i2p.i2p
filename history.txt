@@ -1,3 +1,11 @@
+2010-01-02 zzz
+    * Console: Save refresh setting
+    * i2psnark:
+      - Don't URL-encode chars we don't have to
+      - CSS tweaks
+    * Transport: Implement 'laptop mode' to change ident and port
+      when the IP changes
+
 2010-01-01 sponge
     * Happy New year everyone!
     * Added a target to generate a stand-alone BOB jar file.

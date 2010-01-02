@@ -37,6 +37,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
@@ -314,10 +315,10 @@ public class Router {
         readConfig();
         
         setupHandlers();
-        if (ALLOW_DYNAMIC_KEYS) {
-            if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
-                killKeys();
-        }
+        //if (ALLOW_DYNAMIC_KEYS) {
+        //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+        //        killKeys();
+        //}
 
         _context.messageValidator().startup();
         _context.tunnelDispatcher().startup();
@@ -526,7 +527,7 @@ public class Router {
 
     static final String IDENTLOG = "identlog.txt";
     public void killKeys() {
-        new Exception("Clearing identity files").printStackTrace();
+        //new Exception("Clearing identity files").printStackTrace();
         int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
             File f = new File(_context.getRouterDir(),_rebuildFiles[i]);
@@ -540,6 +541,12 @@ public class Router {
                 }
             }
         }
+
+        // now that we have random ports, keeping the same port would be bad
+        removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
+        removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+        saveConfig();
+
         if (remCount > 0) {
             FileOutputStream log = null;
             try {
@@ -909,11 +916,11 @@ public class Router {
      */
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
-    public void finalShutdown(int exitCode) {
+    private void finalShutdown(int exitCode) {
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
-            if ("true".equalsIgnoreCase(_context.getProperty(PROP_DYNAMIC_KEYS, "false")))
+            if (Boolean.valueOf(_context.getProperty(PROP_DYNAMIC_KEYS)).booleanValue())
                 killKeys();
         }
 

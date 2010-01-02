@@ -132,6 +132,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** remember IP changes */
     public static final String PROP_IP= "i2np.lastIP";
     public static final String PROP_IP_CHANGE = "i2np.lastIPChange";
+    public static final String PROP_LAPTOP_MODE = "i2np.laptopMode";
 
     /** do we require introducers, regardless of our status? */
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
@@ -516,9 +517,35 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // store these for laptop-mode (change ident on restart... or every time... when IP changes)
             String oldIP = _context.getProperty(PROP_IP);
             if (!_externalListenHost.getHostAddress().equals(oldIP)) {
+                long lastChanged = 0;
+                long now = _context.clock().now();
+                String lcs = _context.getProperty(PROP_IP_CHANGE);
+                if (lcs != null) {
+                    try {
+                        lastChanged = Long.parseLong(lcs);
+                    } catch (NumberFormatException nfe) {}
+                }
+
                 _context.router().setConfigSetting(PROP_IP, _externalListenHost.getHostAddress());
-                _context.router().setConfigSetting(PROP_IP_CHANGE, "" + _context.clock().now());
+                _context.router().setConfigSetting(PROP_IP_CHANGE, "" + now);
                 _context.router().saveConfig();
+
+                // laptop mode
+                // For now, only do this at startup
+                if (oldIP != null &&
+                    System.getProperty("wrapper.version") != null &&
+                    Boolean.valueOf(_context.getProperty(PROP_LAPTOP_MODE)).booleanValue() &&
+                    now - lastChanged > 10*60*1000 &&
+                    _context.router().getUptime() < 10*60*1000) {
+                    _log.log(Log.CRIT, "IP changed, restarting with a new identity and port");
+                    // this removes the UDP port config
+                    _context.router().killKeys();
+                    // do we need WrapperManager.signalStopped() like in ConfigServiceHandler ???
+                    // without it, the wrapper complains "shutdown unexpectedly"
+                    // but we can't have that dependency in the router
+                    _context.router().shutdown(Router.EXIT_HARD_RESTART);
+                    // doesn't return
+                }
             }
             _context.router().rebuildRouterInfo();
         }

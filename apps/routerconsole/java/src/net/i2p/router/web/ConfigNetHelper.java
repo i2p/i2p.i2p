@@ -84,6 +84,10 @@ public class ConfigNetHelper extends HelperBase {
         return getChecked(Router.PROP_DYNAMIC_KEYS);
     }
 
+    public String getLaptopChecked() {
+        return getChecked(UDPTransport.PROP_LAPTOP_MODE);
+    }
+
     public String getTcpAutoPortChecked(int mode) {
         String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
         boolean specified = port != null && port.length() > 0;
