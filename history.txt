@@ -1,4 +1,7 @@
 2010-01-02 sponge
+    * Fix one last stupid mistake in build.xml, my fault.
+
+2010-01-02 sponge
     * Fix NB 6.8 goofyness... 'till ant 1.7.1 or > is needed, stay with NB
 	6.5, as the newer ones place a check for 1.7.1. We require 1.7.0
 

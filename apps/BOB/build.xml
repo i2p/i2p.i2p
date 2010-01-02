@@ -71,7 +71,7 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-do-jar-with-libraries-without-mainclass,-do-jar-with-libraries-without-manifest,-post-jar" description="Build BOB into a SINGLE JAR." name="onejar">
+    <target depends="jar" description="Build BOB into a SINGLE JAR." name="onejar">
 	<!-- Make needed working dirs -->
 	<mkdir dir="${dist.dir}/lib" />
 	<mkdir dir="${dist.dir}/classes" />
