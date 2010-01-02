@@ -370,8 +370,13 @@ public class TrackerClient extends I2PAppThread
   }
 
   /**
-   * Very lazy byte[] to URL encoder.  Just encodes everything, even
-   * "normal" chars.
+   * Very lazy byte[] to URL encoder.  Just encodes almost everything, even
+   * some "normal" chars.
+   * By not encoding about 1/4 of the chars, we make random data like hashes about 16% smaller.
+   *
+   * RFC1738: 0-9a-zA-Z$-_.+!*'(),
+   * Us:      0-9a-zA-Z
+   *
    */
   public static String urlencode(byte[] bs)
   {
@@ -379,10 +384,16 @@ public class TrackerClient extends I2PAppThread
     for (int i = 0; i < bs.length; i++)
       {
         int c = bs[i] & 0xFF;
-        sb.append('%');
-        if (c < 16)
-          sb.append('0');
-        sb.append(Integer.toHexString(c));
+        if ((c >= '0' && c <= '9') ||
+            (c >= 'A' && c <= 'Z') ||
+            (c >= 'a' && c <= 'z')) {
+            sb.append((char)c);
+        } else {
+            sb.append('%');
+            if (c < 16)
+              sb.append('0');
+            sb.append(Integer.toHexString(c));
+        }
       }
          
     return sb.toString();
