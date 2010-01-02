@@ -368,7 +368,7 @@ public class SummaryHelper extends HelperBase {
         Collections.sort(clients, new AlphaComparator());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\"><table>");
+        buf.append("<h3><a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\"><table>");
         
         for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
             Destination client = (Destination)iter.next();
