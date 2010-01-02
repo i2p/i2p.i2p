@@ -1,3 +1,8 @@
+2010-01-02 sponge
+    * Fix build.xml target for justBOB
+    * Fix Main build.xml so that it actually deletes backup files and add a
+      few extra types that should be commonly needed... atleast by me.
+
 2010-01-02 zzz
     * Console: Save refresh setting
     * i2psnark:

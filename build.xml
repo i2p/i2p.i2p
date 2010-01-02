@@ -211,10 +211,51 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
+	<!-- 
+		NOTE! We need to turn off the default excludes for these
+		patterns to work. 
+		These are the defaultexcludes in Ant as seen on
+		http://ant.apache.org/manual/CoreTasks/defaultexcludes.html
+		     **/*~
+                     **/#*#
+                     **/.#*
+                     **/%*%
+                     **/._*
+                     **/CVS
+                     **/CVS/**
+                     **/.cvsignore
+                     **/SCCS
+                     **/SCCS/**
+                     **/vssver.scc
+                     **/.svn
+                     **/.svn/**
+                     **/.DS_Store
+		The only recourse is to remove the offending ones.
+		We do this here, as we only need one change, and then put it
+		back after we are done with it.
+	-->
+	<defaultexcludes remove="**/*~"/>
+
         <delete>
             <fileset dir="." includes="**/*.class" />
             <fileset dir="." includes="**/*.java~" />
+	    <!-- 
+	    	Less common, but they pollute my workspace here, so we
+            	might as well nuke these as well. Are there any others?
+            	
+            	!!??? Why don't we just nuke "**/*~" ???!!
+
+            	++Sponge
+            -->
+            <fileset dir="." includes="**/*.txt~" />
+            <fileset dir="." includes="**/*.xml~"  />
+            <fileset dir="." includes="**/*.sh~"  />
+            <fileset dir="." includes="**/*.SlackBuild~" />
         </delete>
+	<!--
+		Now we put the defaults back
+	-->
+	<defaultexcludes default="true"/>
     </target>
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
     <target name="pkgclean" depends="deletepkg-temp">

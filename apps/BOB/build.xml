@@ -72,18 +72,43 @@
 
     -->
     <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-do-jar-with-libraries-without-mainclass,-do-jar-with-libraries-without-manifest,-post-jar" description="Build BOB into a SINGLE JAR." name="onejar">
-        <jar jarfile="dist/BOB-one.jar">
+	<!-- Make needed working dirs -->
+	<mkdir dir="${dist.dir}/lib" />
+	<mkdir dir="${dist.dir}/classes" />
+
+	<!-- Copy jars -->
+	<copy todir="${dist.dir}/lib" flatten="true" >
+	    <path>
+	        <pathelement path="${javac.classpath}" />
+	    </path>
+	</copy>
+	<copy todir="${dist.dir}/lib" file="../../installer/lib/jbigi/jbigi.jar" />
+
+	<!-- Extract the classes inside the jar files -->
+	<unjar dest="${dist.dir}/classes" >
+            <fileset dir="${dist.dir}/lib" >
+                <include name="**/*.jar" />
+            </fileset>
+        </unjar>
+
+        <!-- Recombine the classes into a new jar file -->
+	<jar jarfile="${dist.dir}/lib/all-in-one.jar" >
+	    <fileset dir="${dist.dir}/classes" />
+        </jar>
+
+        <!-- Clean up work area -->        
+        <delete dir="${dist.dir}/classes" followsymlinks="false" includeemptydirs="true"/>
+
+        <!-- Make the single jar file -->
+        <jar jarfile="dist/BOB-one.jar" >
             <zipfileset src="${dist.jar}" excludes="META-INF/*" />
-            <zipfileset src="dist/lib/i2p.jar" excludes="META-INF/*"/>
-            <zipfileset src="dist/lib/i2ptunnel.jar" excludes="META-INF/*"/>
-            <zipfileset src="dist/lib/mstreaming.jar" excludes="META-INF/*"/>
-            <zipfileset src="dist/lib/router.jar" excludes="META-INF/*"/>
-            <zipfileset src="dist/lib/streaming.jar" excludes="META-INF/*"/>
-            <zipfileset src="dist/lib/wrapper.jar" excludes="META-INF/*"/>
-            <zipfileset src="../../installer/lib/jbigi/jbigi.jar" excludes="META-INF/*"/>
+            <zipfileset src="${dist.dir}/lib/all-in-one.jar" excludes="**/META-INF/*" />
             <manifest>
-                <attribute name="Main-Class" value="net.i2p.BOB.Main"/>
+                <attribute name="Main-Class" value="net.i2p.BOB.Main" />
             </manifest>
         </jar>
+
+        <!-- Clean up the fake jar file -->
+        <delete file="${dist.dir}/lib/all-in-one.jar" />
     </target>
 </project>
