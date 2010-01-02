@@ -20,7 +20,6 @@ body {
      font-weight: bold;
      font-size: 11pt;
      color: #005;
-     text-shadow: 0px 0px 1px rgba(0,0,148,0.9);
 }
 
 .snarkRefresh:hover {
@@ -33,7 +32,6 @@ body {
      color: #f60;
      border-bottom: 3px solid #f60;
      border-top: 3px solid #f60;
-     text-shadow: 0px 0px 1px rgba(255,128,0,0.9);
 }
 
 .snarkRefresh:active {
@@ -46,7 +44,6 @@ body {
      color: #f30;
      border-bottom: 3px solid #f30;
      border-top: 3px solid #f30;
-     text-shadow: 0px 0px 1px rgba(255,32,0,0.5);
 }
 
 .snarkMessages {
@@ -63,7 +60,7 @@ body {
      color: #531;
      height: 79px;
      width: auto;
-     background: #f83 url('../console/images/orangetile.png');
+     background: #f0dea0;
 }
 
 pre {
@@ -84,10 +81,10 @@ table {
 
 th {
      padding: 4px;
-     font-size: 8pt;
+     font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #001;
-     background: #f60 url('/themes/console/images/tabletitleorange.png') repeat-x;
+     background: #fda;
      whitespace: nowrap;
 }
 
@@ -102,13 +99,13 @@ td {
 }
 
 .snarkTorrentEven {
-     background: #fb1;
-     font-size: 7pt;
+     background: #fea;
+     font-size: 8pt;
 }
 
 .snarkTorrentOdd {
-     background: #fa1;
-     font-size: 7pt;
+     background: #f0dea0;
+     font-size: 8pt;
 }
 
 .snarkNewTorrent {
@@ -123,9 +120,7 @@ td {
 .snarkConfigTitle {
      font-size: 11pt;
      font-weight: bold;
-     text-decoration: underline;
      text-transform: uppercase;
-     text-shadow: 0px 0px 2px rgba(172,172,192,0.9);
 }
 
 .snarkConfig {
@@ -296,5 +291,4 @@ div.configsection a: hover {
      font-weight: bold;
      font-size: 11pt;
      color: #001;
-     text-shadow: 0px 0px 1px rgba(0,0,148,0.9);
  }
