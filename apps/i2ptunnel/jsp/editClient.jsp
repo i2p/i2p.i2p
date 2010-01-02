@@ -39,11 +39,11 @@
                 if (curTunnel >= 0) {
                     tunnelTypeName = editBean.getTunnelType(curTunnel);
                     tunnelType = editBean.getInternalType(curTunnel);
-                  %><h4>Edit proxy settings</h4><% 
+                  %><h4><%=intl._("Edit proxy settings")%></h4><% 
                 } else {
                     tunnelTypeName = editBean.getTypeName(request.getParameter("type"));
                     tunnelType = request.getParameter("type");
-                  %><h4>New proxy settings</h4><% 
+                  %><h4><%=intl._("New proxy settings")%></h4><% 
                 } %>
                 <input type="hidden" name="tunnel" value="<%=request.getParameter("tunnel")%>" />
                 <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
