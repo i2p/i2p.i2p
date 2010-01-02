@@ -6,10 +6,12 @@
     String d = request.getParameter("refresh");
     String newDelay = "";
     if (d == null || "".equals(d))
-        d = System.getProperty("routerconsole.summaryRefresh");
-    else
+        d = intl.getRefresh();
+    else {
+        d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
         // pass the new delay parameter to the iframe
         newDelay = "?refresh=" + d;
+    }
     if (!"0".equals(d))
         out.print("<iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\">\n");
 %>
@@ -25,13 +27,11 @@
         out.print("<div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
         out.print("<b>");
         // We have intl defined when this is included, but not when compiled standalone.
-        // Not that we really need it standalone, but I can't figure out how to keep
-        // this from being compiled by JspC in the build file.
-        out.print(net.i2p.router.web.Messages.getString("Refresh (s)", net.i2p.I2PAppContext.getGlobalContext()));
-        out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
+        out.print(intl._("Refresh (s)"));
+        out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" >\n");
         out.print("<button type=\"submit\" value=\"Enable\" >");
         // ditto
-        out.print(net.i2p.router.web.Messages.getString("Enable", net.i2p.I2PAppContext.getGlobalContext()));
+        out.print(intl._("Enable"));
         out.print("</button>\n");
         out.print("</form></div></div>\n");
     }
