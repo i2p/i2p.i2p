@@ -122,3 +122,31 @@ p.footer {
   line-height: 160% !important;
   -moz-box-shadow: inset 0px 0px 1px 0px #002;
 }
+
+input[type=submit] {
+     border: 1px outset #999;
+     background: #ddf;
+     color: #001;
+     margin: 5px;
+     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     padding: 1px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #006;
+     opacity: 0.9;
+}
+
+
+input[type=submit]:hover {
+     background: #22a;
+     color: #fff;
+     border: 1px solid #f60;
+     opacity: 1.0;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+
+}
+

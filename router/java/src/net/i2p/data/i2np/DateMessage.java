@@ -12,14 +12,12 @@ import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Contains the sending router's current time, to sync (and verify sync)
  *
  */
 public class DateMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DateMessage.class);
     public final static int MESSAGE_TYPE = 16;
     private long _now;
     

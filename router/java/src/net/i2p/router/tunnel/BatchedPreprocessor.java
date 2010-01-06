@@ -2,7 +2,7 @@ package net.i2p.router.tunnel;
 
 import java.util.List;
 
-import net.i2p.I2PAppContext;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
@@ -45,11 +45,10 @@ import net.i2p.util.Log;
  *   }
  */
 public class BatchedPreprocessor extends TrivialPreprocessor {
-    private Log _log;
     private long _pendingSince;
     private String _name;
     
-    public BatchedPreprocessor(I2PAppContext ctx, String name) {
+    public BatchedPreprocessor(RouterContext ctx, String name) {
         super(ctx);
         _log = ctx.logManager().getLog(BatchedPreprocessor.class);
         _name = name;
@@ -68,6 +67,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         ctx.statManager().createRateStat("tunnel.batchFragmentation", "Avg. number of fragments per msg", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
     }
     
+    /** 1003 */
     private static final int FULL_SIZE = PREPROCESSED_SIZE 
                                          - IV_SIZE 
                                          - 1  // 0x00 ending the padding
@@ -77,11 +77,28 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
     
     /* not final or private so the test code can adjust */
     static long DEFAULT_DELAY = 100;
-    /** Wait up to this long before sending (flushing) a small tunnel message */
+    /**
+     *  Wait up to this long before sending (flushing) a small tunnel message
+     *  Warning - overridden in BatchedRouterPreprocessor
+     */
     protected long getSendDelay() { return DEFAULT_DELAY; }
     
-    /** if we have 50 messages queued that are too small, flush them anyway */
-    private static final int FORCE_BATCH_FLUSH = 50;
+    /**
+     *  if we have this many messages queued that are too small, flush them anyway
+     *  Even small messages take up about 200 bytes or so.
+     */
+    private static final int FORCE_BATCH_FLUSH = 5;
+    
+    /** If we have this much allocated, flush anyway.
+     *  Tune this to trade off padding vs. fragmentation.
+     *  The lower the value, the more we are willing to send off
+     *  a tunnel msg that isn't full so the next message can start
+     *  in a new tunnel msg to minimize fragmentation.
+     *
+     *  This should be at most FULL_SIZE - (39 + a few), since
+     *  you want to at least fit in the instructions and a few bytes.
+     */
+    private static final int FULL_ENOUGH_SIZE = (FULL_SIZE * 80) / 100;
     
     /** how long do we want to wait before flushing */
     @Override
@@ -98,8 +115,11 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         return rv;
     }
     
+    /* See TunnelGateway.QueuePreprocessor for Javadoc */ 
     @Override
-    public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+    public boolean preprocessQueue(List<TunnelGateway.Pending> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+        if (_log.shouldLog(Log.INFO))
+            display(0, pending, "Starting");
         StringBuilder timingBuf = null;
         if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("Preprocess queue with " + pending.size() + " to send");
@@ -116,12 +136,15 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         int batchCount = 0;
         int beforeLooping = pending.size();
         
+        // loop until the queue is empty
         while (pending.size() > 0) {
             int allocated = 0;
             long beforePendingLoop = System.currentTimeMillis();
+
+            // loop until we fill up a single message
             for (int i = 0; i < pending.size(); i++) {
                 long pendingStart = System.currentTimeMillis();
-                TunnelGateway.Pending msg = (TunnelGateway.Pending)pending.get(i);
+                TunnelGateway.Pending msg = pending.get(i);
                 int instructionsSize = getInstructionsSize(msg);
                 instructionsSize += getInstructionAugmentationSize(msg, allocated, instructionsSize);
                 int curWanted = msg.getData().length - msg.getOffset() + instructionsSize;
@@ -135,7 +158,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                         // the instructions alone exceed the size, so we won't get any
                         // of the message into it.  don't include it
                         i--;
-                        msg = (TunnelGateway.Pending)pending.get(i);
+                        msg = pending.get(i);
                         allocated -= curWanted;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Pushback of " + curWanted + " (message " + (i+1) + " in " + pending + ")");
@@ -144,18 +167,22 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                         long waited = _context.clock().now() - _pendingSince;
                         _context.statManager().addRateData("tunnel.batchDelaySent", pending.size(), waited);
                     }
+
+                    // Send the message
                     long beforeSend = System.currentTimeMillis();
                     _pendingSince = 0;
                     send(pending, 0, i, sender, rec);
                     _context.statManager().addRateData("tunnel.batchFullFragments", 1, 0);
                     long afterSend = System.currentTimeMillis();
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Allocated=" + allocated + " so we sent " + (i+1) 
-                                  + " (last complete? " + (msg.getOffset() >= msg.getData().length) 
-                                  + ", off=" + msg.getOffset() + ", count=" + pending.size() + ")");
+                        display(allocated, pending, "Sent the message with " + (i+1));
+                        //_log.info(_name + ": Allocated=" + allocated + "B, Sent " + (i+1) 
+                        //          + " msgs (last complete? " + (msg.getOffset() >= msg.getData().length) 
+                        //          + ", off=" + msg.getOffset() + ", pending=" + pending.size() + ")");
 
+                    // Remove what we sent from the pending queue
                     for (int j = 0; j < i; j++) {
-                        TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.remove(0);
+                        TunnelGateway.Pending cur = pending.remove(0);
                         if (cur.getOffset() < cur.getData().length)
                             throw new IllegalArgumentException("i=" + i + " j=" + j + " off=" + cur.getOffset() 
                                                                + " len=" + cur.getData().length + " alloc=" + allocated);
@@ -167,7 +194,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                     }
                     if (msg.getOffset() >= msg.getData().length) {
                         // ok, this last message fit perfectly, remove it too
-                        TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.remove(0);
+                        TunnelGateway.Pending cur = pending.remove(0);
                         if (timingBuf != null)
                             timingBuf.append(" sent perfect fit " + cur).append(".");
                         notePreprocessing(cur.getMessageId(), cur.getFragmentNumber(), msg.getData().length, msg.getMessageIds(), "flushed tail, remaining: " + pending);
@@ -186,20 +213,24 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                                          + "/" + (beforeSend-start)
                                          + " pending current " + (pendingEnd-pendingStart)).append(".");
                     break;
-                }
+                }  // if >= full size
                 if (timingBuf != null)
                     timingBuf.append(" After pending loop " + (System.currentTimeMillis()-beforePendingLoop)).append(".");
-            }
+            }  // for
             
-            long afterCleared = System.currentTimeMillis();
             if (_log.shouldLog(Log.INFO))
                 display(allocated, pending, "after looping to clear " + (beforeLooping - pending.size()));
             long afterDisplayed = System.currentTimeMillis();
             if (allocated > 0) {
-                // after going through the entire pending list, we still don't
-                // have enough data to send a full message
+                // After going through the entire pending list, we have only a partial message.
+                // We might flush it or might not, but we are returning either way.
 
-                if ( (pending.size() > FORCE_BATCH_FLUSH) || ( (_pendingSince > 0) && (getDelayAmount() <= 0) ) ) {
+                if ( (pending.size() > FORCE_BATCH_FLUSH) ||                    // enough msgs - or
+                     ( (_pendingSince > 0) && (getDelayAmount() <= 0) ) ||      // time to flush - or
+                     (allocated >= FULL_ENOUGH_SIZE)) {                         // full enough
+                     //(pending.get(0).getFragmentNumber() > 0)) {                // don't delay anybody's last fragment,
+                     //                                                           // which would be the first fragment in the message
+
                     // not even a full message, but we want to flush it anyway
                     
                     if (pending.size() > 1)
@@ -209,21 +240,24 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                     send(pending, 0, pending.size()-1, sender, rec);
                     _context.statManager().addRateData("tunnel.batchSmallFragments", FULL_SIZE - allocated, 0);
                     
+                    // Remove everything in the outgoing message from the pending queue
                     int beforeSize = pending.size();
-                    for (int i = 0; i < pending.size(); i++) {
-                        TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.get(i);
-                        if (cur.getOffset() >= cur.getData().length) {
-                            pending.remove(i);
-                            notePreprocessing(cur.getMessageId(), cur.getFragmentNumber(), cur.getData().length, cur.getMessageIds(), "flushed remaining");
-                            _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1, 0);
-                            _context.statManager().addRateData("tunnel.writeDelay", cur.getLifetime(), cur.getData().length);
-                            i--;
-                        }
+                    for (int i = 0; i < beforeSize; i++) {
+                        TunnelGateway.Pending cur = pending.get(0);
+                        if (cur.getOffset() < cur.getData().length)
+                            break;
+                        pending.remove(0);
+                        notePreprocessing(cur.getMessageId(), cur.getFragmentNumber(), cur.getData().length, cur.getMessageIds(), "flushed remaining");
+                        _context.statManager().addRateData("tunnel.batchFragmentation", cur.getFragmentNumber() + 1, 0);
+                        _context.statManager().addRateData("tunnel.writeDelay", cur.getLifetime(), cur.getData().length);
                     }
+
                     if (pending.size() > 0) {
+                        // rare
                         _pendingSince = _context.clock().now();
                         _context.statManager().addRateData("tunnel.batchFlushRemaining", pending.size(), beforeSize);
-                        display(allocated, pending, "flushed, some remain");
+                        if (_log.shouldLog(Log.INFO))
+                            display(allocated, pending, "flushed, some remain");
                         
                         if (timingBuf != null) {
                             timingBuf.append(" flushed, some remain (displayed to now: " + (System.currentTimeMillis()-afterDisplayed) + ")");
@@ -232,12 +266,15 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                         }
                         return true;
                     } else {
-                        long delayAmount = _context.clock().now() - _pendingSince;
-                        _pendingSince = 0;
+                        long delayAmount = 0;
+                        if (_pendingSince > 0) {
+                            delayAmount = _context.clock().now() - _pendingSince;
+                            _pendingSince = 0;
+                        }
                         if (batchCount > 1)
                             _context.statManager().addRateData("tunnel.batchCount", batchCount, 0);
                         if (_log.shouldLog(Log.INFO))
-                            display(allocated, pending, "flushed " + (beforeSize) + ", no remaining after " + delayAmount);
+                            display(allocated, pending, "flushed " + (beforeSize) + ", no remaining after " + delayAmount + "ms");
                         
                         if (timingBuf != null) {
                             timingBuf.append(" flushed, none remain (displayed to now: " + (System.currentTimeMillis()-afterDisplayed) + ")");
@@ -246,14 +283,17 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                         }
                         return false;
                     }
+                    // won't get here, we returned
                 } else {
+                     // We didn't flush. Note that the messages remain on the pending list.
                     _context.statManager().addRateData("tunnel.batchDelay", pending.size(), 0);
                     if (_pendingSince <= 0)
                         _pendingSince = _context.clock().now();
                     if (batchCount > 1)
                         _context.statManager().addRateData("tunnel.batchCount", batchCount, 0);
                     // not yet time to send the delayed flush
-                    display(allocated, pending, "dont flush");
+                    if (_log.shouldLog(Log.INFO))
+                        display(allocated, pending, "dont flush");
                     
                     if (timingBuf != null) {
                         timingBuf.append(" dont flush (displayed to now: " + (System.currentTimeMillis()-afterDisplayed) + ")");
@@ -262,14 +302,15 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                     }
                     return true;
                 }
+                // won't get here, we returned
             } else {
                 // ok, we sent some, but haven't gone back for another 
                 // pass yet.  keep looping
                 
                 if (timingBuf != null)
                     timingBuf.append(" Keep looping");
-            }
-        }
+            }  // if allocated
+        }  // while
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sent everything on the list (pending=" + pending.size() + ")");
@@ -283,20 +324,25 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         return false;
     }
     
-    private void display(long allocated, List pending, String title) {
+    /*
+     * Only if Log.INFO
+     *
+     * title: allocated: X pending: X (delay: X) [0]:offset/length/lifetime [1]:etc.
+     */
+    private void display(long allocated, List<TunnelGateway.Pending> pending, String title) {
         if (_log.shouldLog(Log.INFO)) {
             long highestDelay = 0;
-            StringBuilder buf = new StringBuilder();
+            StringBuilder buf = new StringBuilder(128);
             buf.append(_name).append(": ");
             buf.append(title);
-            buf.append(" allocated: ").append(allocated);
+            buf.append(" - allocated: ").append(allocated);
             buf.append(" pending: ").append(pending.size());
             if (_pendingSince > 0)
                 buf.append(" delay: ").append(getDelayAmount(false));
             for (int i = 0; i < pending.size(); i++) {
-                TunnelGateway.Pending curPending = (TunnelGateway.Pending)pending.get(i);
-                buf.append(" pending[").append(i).append("]: ");
-                buf.append(curPending.getOffset()).append("/").append(curPending.getData().length).append('/');
+                TunnelGateway.Pending curPending = pending.get(i);
+                buf.append(" [").append(i).append("]:");
+                buf.append(curPending.getOffset()).append('/').append(curPending.getData().length).append('/');
                 buf.append(curPending.getLifetime());
                 if (curPending.getLifetime() > highestDelay)
                     highestDelay = curPending.getLifetime();
@@ -314,9 +360,14 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
      * @param startAt first index in pending to send (inclusive)
      * @param sendThrough last index in pending to send (inclusive)
      */
-    protected void send(List pending, int startAt, int sendThrough, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+    protected void send(List<TunnelGateway.Pending> pending, int startAt, int sendThrough, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending " + startAt + ":" + sendThrough + " out of " + pending);
+
+        // Might as well take a buf from the cache;
+        // However it will never be returned to the cache.
+        // (TunnelDataMessage will not wrap the buffer in a new ByteArray and release() it)
+        // See also TDM for more discussion.
         byte preprocessed[] = _dataCache.acquire().getData();
         
         int offset = 0;
@@ -343,10 +394,10 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                 _log.error("Error preprocessing the messages (offset=" + offset + " start=" + startAt + " through=" + sendThrough + " pending=" + pending.size() + " preproc=" + preprocessed.length);
             return;
         }
-        
+
         long msgId = sender.sendPreprocessed(preprocessed, rec);
         for (int i = 0; i < pending.size(); i++) {
-            TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.get(i);
+            TunnelGateway.Pending cur = pending.get(i);
             cur.addMessageId(msgId);
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -359,9 +410,9 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
      *
      * @return new offset into the target for further bytes to be written
      */
-    private int writeFragments(List pending, int startAt, int sendThrough, byte target[], int offset) {
+    private int writeFragments(List<TunnelGateway.Pending> pending, int startAt, int sendThrough, byte target[], int offset) {
         for (int i = startAt; i <= sendThrough; i++) {
-            TunnelGateway.Pending msg = (TunnelGateway.Pending)pending.get(i);
+            TunnelGateway.Pending msg = pending.get(i);
             int prevOffset = offset;
             if (msg.getOffset() == 0) {
                 offset = writeFirstFragment(msg, target, offset);

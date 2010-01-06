@@ -17,7 +17,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Payload;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router to ask it to deliver
@@ -26,7 +25,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class SendMessageMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(SendMessageMessage.class);
     public final static int MESSAGE_TYPE = 5;
     private SessionId _sessionId;
     private Destination _destination;

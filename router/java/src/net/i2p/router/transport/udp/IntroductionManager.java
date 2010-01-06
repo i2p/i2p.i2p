@@ -23,9 +23,9 @@ public class IntroductionManager {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** map of relay tag to PeerState that should receive the introduction */
-    private Map _outbound;
+    private Map<Long, PeerState> _outbound;
     /** list of peers (PeerState) who have given us introduction tags */
-    private final List _inbound;
+    private final List<PeerState> _inbound;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -74,7 +74,7 @@ public class IntroductionManager {
     }
     
     public PeerState get(long id) {
-        return (PeerState)_outbound.get(new Long(id));
+        return _outbound.get(new Long(id));
     }
     
     /**
@@ -90,7 +90,7 @@ public class IntroductionManager {
      * and we want to keep our introducers valid.
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
-        List peers = null;
+        List<PeerState> peers = null;
         int start = _context.random().nextInt(Integer.MAX_VALUE);
         synchronized (_inbound) {
             if (_log.shouldLog(Log.DEBUG))
@@ -103,7 +103,7 @@ public class IntroductionManager {
         int found = 0;
         long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);
         for (int i = 0; i < sz && found < howMany; i++) {
-            PeerState cur = (PeerState)peers.get((start + i) % sz);
+            PeerState cur = peers.get((start + i) % sz);
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
             if (ri == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -144,7 +144,7 @@ public class IntroductionManager {
         long pingCutoff = _context.clock().now() - (2 * 60 * 60 * 1000);
         inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 4);
         for (int i = 0; i < sz; i++) {
-            PeerState cur = (PeerState)peers.get(i);
+            PeerState cur = peers.get(i);
             if (cur.getIntroducerTime() > pingCutoff &&
                 cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
@@ -157,6 +157,18 @@ public class IntroductionManager {
         return found;
     }
     
+    /**
+     * Not as elaborate as pickInbound() above.
+     * Just a quick check to see how many volunteers we know,
+     * which the Transport uses to see if we need more.
+     * @return number of peers that have volunteerd to introduce us
+     */
+    int introducerCount() {
+        synchronized(_inbound) {
+            return _inbound.size();
+        }
+    }
+
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
         if (_context.router().isHidden())
             return;

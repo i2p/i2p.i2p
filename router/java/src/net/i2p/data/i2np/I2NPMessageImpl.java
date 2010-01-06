@@ -66,6 +66,22 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             throw new DataFormatException("Bad bytes", ime);
         }
     }
+
+    /**
+     *  Read the header, then read the rest into buffer, then call
+     *  readMessage in the implemented message type
+     *
+     *  Specifically:
+     *    1 byte type (if caller didn't read already, as specified by the type param
+     *    4 byte ID
+     *    8 byte expiration
+     *    2 byte size
+     *    1 byte checksum
+     *    size bytes of payload (read by readMessage() in implementation)
+     *
+     *  @param type the message type or -1 if we should read it here
+     *  @param buffer temp buffer to use
+     */
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         try {
             if (type < 0)
@@ -268,6 +284,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      */
 
     
+    /** used by SSU only */
     public int toRawByteArray(byte buffer[]) {
         verifyUnwritten();
         if (RAW_FULL_SIZE)
@@ -298,9 +315,13 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 
     
+/*****
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len) throws I2NPMessageException {
         return fromRawByteArray(ctx, buffer, offset, len, new I2NPMessageHandler(ctx));
     }
+*****/
+
+    /** used by SSU only */
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len, I2NPMessageHandler handler) throws I2NPMessageException {
         int type = (int)DataHelper.fromLong(buffer, offset, 1);
         offset++;

@@ -189,7 +189,10 @@ public class Timestamper implements Runnable {
         long expectedDelta = 0;
         _wellSynced = false;
         for (int i = 0; i < _concurringServers; i++) {
-            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            if (i > 0) {
+                // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
+                try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
+            }
             now = NtpClient.currentTime(serverList);
             long delta = now - _context.clock().now();
             found[i] = delta;

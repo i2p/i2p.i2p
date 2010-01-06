@@ -131,17 +131,20 @@ public class TunnelDispatcher implements Service {
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
     }
 
+    /** for IBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(HopConfig cfg) {
-        if (true)
+        //if (true)
             return new BatchedRouterPreprocessor(_context, cfg); 
-        else
-            return new TrivialRouterPreprocessor(_context); 
+        //else
+        //    return new TrivialRouterPreprocessor(_context); 
     }
+
+    /** for OBGW */
     private TunnelGateway.QueuePreprocessor createPreprocessor(TunnelCreatorConfig cfg) {
-        if (true)
+        //if (true)
             return new BatchedRouterPreprocessor(_context, cfg); 
-        else
-            return new TrivialRouterPreprocessor(_context); 
+        //else
+        //    return new TrivialRouterPreprocessor(_context); 
     }
     
     /**
@@ -237,7 +240,7 @@ public class TunnelDispatcher implements Service {
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
         //TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
-        TunnelGateway gw = new PumpedTunnelGateway(_context, preproc, sender, receiver, _pumper);
+        TunnelGateway gw = new ThrottledPumpedTunnelGateway(_context, preproc, sender, receiver, _pumper, cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         _inboundGateways.put(recvId, gw);
         _participatingConfig.put(recvId, cfg);
@@ -605,12 +608,17 @@ public class TunnelDispatcher implements Service {
         if (pctDrop <= 0)
             return false;
         // increase the drop probability for OBEP,
+        // (except lower it for tunnel build messages (type 21)),
         // and lower it for IBGW, for network efficiency
         double len = length;
-        if (type.startsWith("OBEP"))
-            len *= 1.5;
-        else if (type.startsWith("IBGW"))
+        if (type.startsWith("OBEP")) {
+            if (type.equals("OBEP 21"))
+                len /= 1.5;
+            else
+                len *= 1.5;
+        } else if (type.startsWith("IBGW")) {
             len /= 1.5;
+        }
         // drop in proportion to size w.r.t. a standard 1024-byte message
         // this is a little expensive but we want to adjust the curve between 0 and 1
         // Most messages are 1024, only at the OBEP do we see other sizes

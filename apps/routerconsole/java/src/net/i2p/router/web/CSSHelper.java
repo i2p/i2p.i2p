@@ -11,6 +11,8 @@ public class CSSHelper extends HelperBase {
     public static final String DEFAULT_THEME = "light";
     private static final String BASE = "/themes/console/";
     private static final String FORCE = "classic";
+    public static final String PROP_REFRESH = "routerconsole.summaryRefresh";
+    public static final String DEFAULT_REFRESH = "60";
 
     public String getTheme(String userAgent) {
         String url = BASE;
@@ -32,6 +34,17 @@ public class CSSHelper extends HelperBase {
     /** needed for conditional css loads for zh */
     public String getLang() {
         return Messages.getLanguage(_context);
+    }
+
+    /** change refresh and save it */
+    public void setRefresh(String r) {
+        _context.router().setConfigSetting(PROP_REFRESH, r);
+        _context.router().saveConfig();
+    }
+
+    /** @return refresh time in seconds, as a string */
+    public String getRefresh() {
+        return _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
     }
 
     /** translate the title and display consistently */

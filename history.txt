@@ -1,3 +1,172 @@
+2010-01-06 zzz
+    * Summary bar tweaks
+
+2010-01-02 sponge
+    * Fix one last stupid mistake in build.xml, my fault.
+
+2010-01-02 sponge
+    * Fix NB 6.8 goofyness... 'till ant 1.7.1 or > is needed, stay with NB
+	6.5, as the newer ones place a check for 1.7.1. We require 1.7.0
+
+2010-01-02 sponge
+    * Fix build.xml target for justBOB
+    * Fix Main build.xml so that it actually deletes backup files and add a
+      few extra types that should be commonly needed... atleast by me.
+
+2010-01-02 zzz
+    * Console: Save refresh setting
+    * i2psnark:
+      - Don't URL-encode chars we don't have to
+      - CSS tweaks
+    * Transport: Implement 'laptop mode' to change ident and port
+      when the IP changes
+
+2010-01-01 sponge
+    * Happy New year everyone!
+    * Added a target to generate a stand-alone BOB jar file.
+
+2009-12-31 zzz
+    * BuildResponseRecord: Make static
+    * i2np: Remove unused logs
+    * i2psnark: Fix message box, was a little too small
+    * InternalSocket: Fallback to external socket on fail
+    * NetDb: Fix exploration by adding a null hash to mean
+      "don't give me floodfills"
+    * PeerSelector: Downgrade floodfills with high fail rate
+
+2009-12-26 zzz
+    * Console:
+      - Tag the rest of logs.jsp
+    * Tunnels, Transports:
+      - Lots of code to detect improper reuse of cached objects
+        after release
+      - Prevent release of TunnelDataMessage cached ByteArray,
+        as it may be reused if retried in another transport;
+        a nasty bug causing corrupt messages
+      - Prevent race with released resources in UDP OutboundMessageState;
+        a nasty bug causing corrupt messages
+      - More cleanups and comments
+    * UDP: Bid lower than NTCP when we need introducers and don't
+      have enough
+
+2009-12-22 zzz
+    * Tunnels:
+      - Do RED dropping before the IBGW fragmenter, not after
+      - Change batch time to 250ms for IBGWs (was 100ms)
+      - Change batch time to 150ms for exploratory OBGWs (was 100ms)
+      - Start a new message in the fragmenter if almost full
+      - Fix a major, longstanding synchronization bug in the FragmentHandler
+        which led to corrupt messages at the endpoints
+      - More cleanups and comments
+
+2009-12-20 zzz
+    * Console:
+      - Fix status to show a disconnected network error rather than
+        clock skew or UDP error when disconnected
+      - Use peer clock skew rather than clock offset for determining
+        whether to display clock skew error
+      - tunnels.jsp: Clarify tunnel table headings
+    * Contexts: Add isRouterContext() method
+    * Profile, DBHistory:
+      - Tweak the rate periods
+      - Add a global fail rate stat
+      - Increase the HashMap sizes
+    * Router: Move some more threads to I2PAppThread so an OOM won't
+      crash the router
+    * Timestamper: Reduce delays (cuts 10s out of router startup)
+    * Transport: Rework peer clock skew method to always return a value
+    * Tunnels:
+      - Reduce the drop probability for TunnelBuildMessages at the OBEP
+      - Schedule outbound startup instead of hanging the thread for 3s
+      - Cleanup preprocessor code, add comments
+
+2009-12-18 zzz
+    * Console: Fix spacing in update section
+    * I2CP:
+      - Move client-side writes to their own thread
+      - Reenable InternalSockets
+    * i2ptunnel: Fix bundle script
+    * InNetMessagePool: Cleanup
+    * Log:
+      - Close old file on rotate
+      - Buffer writes
+      - Write in UTF-8
+    * SusiDNS:
+      - Remove untranslatable button images (-15KB)
+      - Tag buttons and messages
+      - Add some button CSS
+    * Tunnel building:
+      - Increase timeout to 13s (was 10s)
+      - Fix tunnel.buildReplyTooSlow stat
+      - Tweak logging
+      - Prioritize expl. builds over client builds
+      - Code cleanups
+    * TunnelSettings: Drop, unused
+
+2009-12-15 zzz
+    * HTTP Proxy: Make jump server list configurable
+    * I2CP: Remove unused logs
+    * i2psnark: Fix stop/start, cleanups
+    * i2ptunnel: Fix bundle location
+    * SusiDNS:
+      - Rewrite and correct a lot of the text, tag jsps
+      - UTF-8 fixes
+    * TunnelManager: Fix a locking bug
+    * Update: Improve error message
+
+2009-12-13 zzz
+    * Find ResourceBundles in wars
+    * Fix restart from config.jsp if no wrapper
+    * i2psnark: Elaborate popups
+
+2009-12-12 welterde
+    * Sort peers on tunnels.jsp by country
+    * fix NPE in ^^
+
+2009-12-12 zzz
+    * Disable InternalSockets until it's fixed
+
+2009-12-11 zzz
+    * Addressbook, susidns: Rework addressbook into a
+      HttpServlet, so susidns can kick it when the subscription
+      list changes
+    * Build: Truncate the history in the updater (-80KB)
+    * Console:
+      - Add a nicer handler for missing webapps
+      - Restore the restart message
+      - Change "depth" to "length"
+    * Data: Cache the Hash hashcode
+    * EepGet: Use InternalSocket if available
+    * Fragmenter: Pull the new comments, new stats, and
+      debug log fix from i2p.i2p.zzz.batch in - but not the
+      batching mods, which need a fresh look.
+    * I2CP: Implement an internal "socket" class that
+      allows clients in the same JVM to connect to the
+      router without going through the kernel
+    * I2NP: Drop unused classes
+    * i2psnark:
+      - Translation support
+      - Tweak torrent name popup
+    * I2PTunnel:
+      - Translation support
+      - Switch all I2PThreads to I2PAppThreads
+      - Run an InternalSocket as well for the HTTP Proxy
+    * Naming Services:
+      - New EepGetAndAddNamingService that appends new
+        hosts to hosts.txt
+      - Move default reverseLookup to base class
+      - Deprecate unused services
+    * NetDb:
+      - Switch from ArrayList to ConcurrentHashSet in
+        KBucketImpl to reduce chance of deadlock;
+        remove periodic shuffling of the bucket,
+        needs to be addressed elsewhere
+    * SusiDNS:
+      - Translation support
+      - Remove jsp's from the war
+    * Translation: Move code from routerconsole to core,
+      to support translation of other webapps
+
 * 2009-12-08  0.7.8 released
 
 2009-12-08 zzz

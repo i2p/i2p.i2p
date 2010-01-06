@@ -5,9 +5,10 @@ import net.i2p.util.Translate;
 
 /**
  * Translate strings for this package.
+ * @since 0.7.9
  */
 public class Messages {
-    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.messages";
+    private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.web.messages";
     private final I2PAppContext _context;
 
     public Messages() {
@@ -17,6 +18,10 @@ public class Messages {
     /** lang in routerconsole.lang property, else current locale */
     public String _(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
+    }
+
+    public static String _(String key, I2PAppContext ctx) {
+        return Translate.getString(key, ctx, BUNDLE_NAME);
     }
 
     /**

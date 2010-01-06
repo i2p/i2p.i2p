@@ -22,7 +22,7 @@ import net.i2p.util.Log;
 
 /**
  * Defines the hash as defined by the I2P data structure spec.
- * AA hash is the SHA-256 of some data, taking up 32 bytes.
+ * A hash is the SHA-256 of some data, taking up 32 bytes.
  *
  * @author jrandom
  */

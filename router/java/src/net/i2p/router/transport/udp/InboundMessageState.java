@@ -27,6 +27,7 @@ public class InboundMessageState {
     private int _lastFragment;
     private long _receiveBegin;
     private int _completeSize;
+    private boolean _released;
     
     /** expire after 10s */
     private static final long MAX_RECEIVE_TIME = 10*1000;
@@ -156,9 +157,15 @@ public class InboundMessageState {
             for (int i = 0; i < _fragments.length; i++)
                 _fragmentCache.release(_fragments[i]);
         //_fragments = null;
+        _released = true;
     }
     
     public ByteArray[] getFragments() {
+        if (_released) {
+            RuntimeException e = new RuntimeException("Use after free: " + toString());
+            _log.error("SSU IMS", e);
+            throw e;
+        }
         return _fragments;
     }
     public int getFragmentCount() { return _lastFragment+1; }

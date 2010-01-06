@@ -122,6 +122,11 @@
     <br>
     <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> />
     <%=intl._("Hidden mode - do not publish IP")%> <i><%=intl._("(prevents participating traffic)")%></i><br>
+ </p><p>
+ <%=intl._("Action when IP changes")%>:<br>
+    <input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> />
+    <%=intl._("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
+    (<i><%=intl._("Experimental")%></i>)
  </p><p><b><%=intl._("UDP Configuration:")%></b><br>
  <%=intl._("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" /><br>

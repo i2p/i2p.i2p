@@ -19,6 +19,7 @@ import net.i2p.util.InternalServerSocket;
  * Listen for in-JVM connections on the internal "socket"
  *
  * @author zzz
+ * @since 0.7.9
  */
 public class InternalClientListenerRunner extends ClientListenerRunner {
 

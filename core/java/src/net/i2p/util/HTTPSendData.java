@@ -12,6 +12,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Simple helper class to submit data via HTTP Post
  *
+ * @deprecated unused
  */
 public class HTTPSendData {
     private final static Log _log = new Log(HTTPSendData.class);

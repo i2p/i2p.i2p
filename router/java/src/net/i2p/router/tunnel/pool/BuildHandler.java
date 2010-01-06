@@ -31,6 +31,8 @@ import net.i2p.util.Log;
 
 /**
  *
+ * Note that 10 minute tunnel expiration is hardcoded in here.
+ *
  */
 class BuildHandler {
     private RouterContext _context;
@@ -39,20 +41,27 @@ class BuildHandler {
     private Job _buildMessageHandlerJob;
     private Job _buildReplyMessageHandlerJob;
     /** list of BuildMessageState, oldest first */
-    private final List _inboundBuildMessages;
-    /** list of BuildReplyMessageState, oldest first */
-    private final List _inboundBuildReplyMessages;
-    /** list of BuildEndMessageState, oldest first */
-    private final List _inboundBuildEndMessages;
+    private final List<BuildMessageState> _inboundBuildMessages;
+    /** list of BuildReplyMessageState, oldest first - unused unless HANDLE_REPLIES_INLINE == false */
+    private final List<BuildReplyMessageState> _inboundBuildReplyMessages;
+    /** list of BuildEndMessageState, oldest first - unused unless HANDLE_REPLIES_INLINE == false */
+    private final List<BuildEndMessageState> _inboundBuildEndMessages;
     private BuildMessageProcessor _processor;
+
+    private static final boolean HANDLE_REPLIES_INLINE = true;
     
     public BuildHandler(RouterContext ctx, BuildExecutor exec) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _exec = exec;
         _inboundBuildMessages = new ArrayList(16);
-        _inboundBuildReplyMessages = new ArrayList(16);
-        _inboundBuildEndMessages = new ArrayList(16);
+        if (HANDLE_REPLIES_INLINE) {
+            _inboundBuildEndMessages = null;
+            _inboundBuildReplyMessages = null;
+        } else {
+            _inboundBuildEndMessages = new ArrayList(16);
+            _inboundBuildReplyMessages = new ArrayList(16);
+        }
     
         _context.statManager().createRateStat("tunnel.reject.10", "How often we reject a tunnel probabalistically", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.reject.20", "How often we reject a tunnel because of transient overload", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -104,10 +113,10 @@ class BuildHandler {
                 if (toHandle > MAX_HANDLE_AT_ONCE)
                     toHandle = MAX_HANDLE_AT_ONCE;
                 handled = new ArrayList(toHandle);
-                if (false) {
-                    for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
-                        handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
-                } else {
+                //if (false) {
+                //    for (int i = 0; i < toHandle; i++) // LIFO for lower response time (should we RED it for DoS?)
+                //        handled.add(_inboundBuildMessages.remove(_inboundBuildMessages.size()-1));
+                //} else {
                     // drop any expired messages
                     long dropBefore = System.currentTimeMillis() - (BuildRequestor.REQUEST_TIMEOUT/4);
                     do {
@@ -131,7 +140,7 @@ class BuildHandler {
                     // when adding)
                     for (int i = 0; i < toHandle && _inboundBuildMessages.size() > 0; i++)
                         handled.add(_inboundBuildMessages.remove(0));
-                }
+                //}
             }
             remaining = _inboundBuildMessages.size();
         }
@@ -148,14 +157,16 @@ class BuildHandler {
             }
             handled.clear();
         }
-        synchronized (_inboundBuildEndMessages) {
-            int toHandle = _inboundBuildEndMessages.size();
-            if (toHandle > 0) {
-                if (handled == null)
-                    handled = new ArrayList(_inboundBuildEndMessages);
-                else
-                    handled.addAll(_inboundBuildEndMessages);
-                _inboundBuildEndMessages.clear();
+        if (!HANDLE_REPLIES_INLINE) {
+            synchronized (_inboundBuildEndMessages) {
+                int toHandle = _inboundBuildEndMessages.size();
+                if (toHandle > 0) {
+                    if (handled == null)
+                        handled = new ArrayList(_inboundBuildEndMessages);
+                    else
+                        handled.addAll(_inboundBuildEndMessages);
+                    _inboundBuildEndMessages.clear();
+                }
             }
         }
         if (handled != null) {
@@ -181,7 +192,10 @@ class BuildHandler {
         return remaining;
     }
     
+    /** Warning - noop if HANDLE_REPLIES_INLINE == true */
     void handleInboundReplies() {
+        if (HANDLE_REPLIES_INLINE)
+            return;
         List handled = null;
         synchronized (_inboundBuildReplyMessages) {
             int toHandle = _inboundBuildReplyMessages.size();
@@ -236,8 +250,8 @@ class BuildHandler {
     private void handleReply(TunnelBuildReplyMessage msg, PooledTunnelCreatorConfig cfg, long delay) {
         long requestedOn = cfg.getExpiration() - 10*60*1000;
         long rtt = _context.clock().now() - requestedOn;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(msg.getUniqueId() + ": Handling the reply after " + rtt + ", delayed " + delay + " waiting for " + cfg);
+        if (_log.shouldLog(Log.INFO))
+            _log.info(msg.getUniqueId() + ": Handling the reply after " + rtt + ", delayed " + delay + " waiting for " + cfg);
         
         BuildReplyHandler handler = new BuildReplyHandler();
         List order = cfg.getReplyOrder();
@@ -468,6 +482,14 @@ class BuildHandler {
         return 0;
     }
     
+    /**
+     *  Actually process the request and send the reply.
+     *
+     *  Todo: Replies are not subject to RED for bandwidth reasons,
+     *  and the bandwidth is not credited to any tunnel.
+     *  If we did credit the reply to the tunnel, it would
+     *  prevent the classification of the tunnel as 'inactive' on tunnels.jsp.
+     */
     @SuppressWarnings("static-access")
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
@@ -590,8 +612,7 @@ class BuildHandler {
             return;
         }
 
-        BuildResponseRecord resp = new BuildResponseRecord();
-        byte reply[] = resp.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
+        byte reply[] = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
         for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
@@ -663,10 +684,10 @@ class BuildHandler {
         }
     }
     
-    /** um, this is bad.  don't set this. */
-    private static final boolean DROP_ALL_REQUESTS = false;
-    private static final boolean HANDLE_REPLIES_INLINE = true;
-
+    /**
+     *  Handle incoming Tunnel Build Messages, which are generally requests to us,
+     *  but could also be the reply where we are the IBEP.
+     */
     private class TunnelBuildMessageHandlerJobBuilder implements HandlerJobBuilder {
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             // need to figure out if this is a reply to an inbound tunnel request (where we are the
@@ -704,9 +725,11 @@ class BuildHandler {
                     _exec.repoll();
                 }
             } else {
-                if (DROP_ALL_REQUESTS || _exec.wasRecentlyBuilding(reqId)) {
+                if (_exec.wasRecentlyBuilding(reqId)) {
+                    // we are the IBEP but we already gave up?
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping the reply " + reqId + ", as we used to be building that");
+                    _context.statManager().addRateData("tunnel.buildReplyTooSlow", 1, 0);
                 } else {
                     synchronized (_inboundBuildMessages) {
                         boolean removed = false;

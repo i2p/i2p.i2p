@@ -32,9 +32,11 @@ public class HopProcessor {
     static final int IV_LENGTH = 16;
     private static final ByteCache _cache = ByteCache.getInstance(128, IV_LENGTH);
     
+    /** @deprecated unused */
     public HopProcessor(I2PAppContext ctx, HopConfig config) {
         this(ctx, config, createValidator());
     }
+
     public HopProcessor(I2PAppContext ctx, HopConfig config, IVValidator validator) {
         _context = ctx;
         _log = ctx.logManager().getLog(HopProcessor.class);
@@ -42,6 +44,7 @@ public class HopProcessor {
         _validator = validator;
     }
     
+    /** @deprecated unused */
     protected static IVValidator createValidator() { 
         // yeah, we'll use an O(1) validator later (e.g. bloom filter)
         return new HashSetIVValidator();
@@ -88,10 +91,10 @@ public class HopProcessor {
             encrypt(orig, offset, length);
             updateIV(orig, offset);
         }
-        if (_log.shouldLog(Log.DEBUG)) {
+        //if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
             //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));
-        }
+        //}
         return true;
     }
     

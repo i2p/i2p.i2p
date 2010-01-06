@@ -62,6 +62,9 @@ public class SummaryHelper extends HelperBase {
             return DataHelper.formatDuration(router.getUptime());
     }
     
+/**
+    this displayed offset, not skew - now handled in reachability()
+
     private String timeSkew() {
         if (_context == null) return "";
         //if (!_context.clock().getUpdatedSuccessfully())
@@ -72,6 +75,7 @@ public class SummaryHelper extends HelperBase {
             return "";
         return " (" + DataHelper.formatDuration(diff) + " " + _("skew") + ")";
     }
+**/
     
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
@@ -83,15 +87,20 @@ public class SummaryHelper extends HelperBase {
     public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
     
     public String getReachability() {
-        return reachability() + timeSkew();
+        return reachability(); // + timeSkew();
     }
 
     private String reachability() {
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
             return _("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
-        if (!_context.clock().getUpdatedSuccessfully())
-            return _("ERR-ClockSkew");
+        // Warn based on actual skew from peers, not update status, so if we successfully offset
+        // the clock, we don't complain.
+        //if (!_context.clock().getUpdatedSuccessfully())
+        Long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
+        // Display the actual skew, not the offset
+        if (skew != null && Math.abs(skew.longValue()) > 45)
+            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew.longValue()) * 1000));
         if (_context.router().isHidden())
             return _("Hidden");
 
@@ -118,7 +127,9 @@ public class SummaryHelper extends HelperBase {
             default:
                 ra = _context.router().getRouterInfo().getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
-                    if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
+                    if (getActivePeers() <= 0)
+                        return _("ERR-No Active Peers, Check Network Connection and Firewall");
+                    else if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
                         return _("ERR-UDP Disabled and Inbound TCP host/port not set");
                     else
@@ -347,52 +358,58 @@ public class SummaryHelper extends HelperBase {
     }
     
     /**
-     * How many client destinations are connected locally.
+     * Client destinations connected locally.
      *
      * @return html section summary
      */
     public String getDestinations() {
-        // covert the set to a list so we can sort by name and not lose duplicates
-        List clients = new ArrayList(_context.clientManager().listClients());
-        Collections.sort(clients, new AlphaComparator());
+        // convert the set to a list so we can sort by name and not lose duplicates
+        List<Destination> clients = new ArrayList(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\"><table>");
-        
-        for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
-            Destination client = (Destination)iter.next();
-            String name = getName(client);
-            Hash h = client.calculateHash();
+        buf.append("<h3><a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\">");
+        if (clients.size() > 0) {
+            Collections.sort(clients, new AlphaComparator());
+            buf.append("<table>");
             
-            buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
-            if (_context.clientManager().shouldPublishLeaseSet(h))
-                buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
-            else
-                buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
-            buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
-            buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
-            if (name.length() < 16)
-                buf.append(name);
-            else
-                buf.append(name.substring(0,15)).append("&hellip;");
-            buf.append("</a></b></td>\n");
-            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
-            if (ls != null) {
-                long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
-                if (timeToExpire < 0) {
-                    // red or yellow light                 
-                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration(0-timeToExpire));
-                    buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+            for (Iterator<Destination> iter = clients.iterator(); iter.hasNext(); ) {
+                Destination client = iter.next();
+                String name = getName(client);
+                Hash h = client.calculateHash();
+                
+                buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
+                if (_context.clientManager().shouldPublishLeaseSet(h))
+                    buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
+                else
+                    buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
+                buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
+                buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
+                if (name.length() < 16)
+                    buf.append(name);
+                else
+                    buf.append(name.substring(0,15)).append("&hellip;");
+                buf.append("</a></b></td>\n");
+                LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
+                if (ls != null) {
+                    long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
+                    if (timeToExpire < 0) {
+                        // red or yellow light                 
+                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration(0-timeToExpire));
+                        buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+                    } else {
+                        // green light 
+                        buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_("Ready")).append("\"></td></tr>\n");
+                    }
                 } else {
-                    // green light 
-                    buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_("Ready")).append("\"></td></tr>\n");
+                    // yellow light
+                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Building")).append("&hellip;\" title=\"").append(_("Building tunnels")).append("&hellip;\"></td></tr>\n");
                 }
-            } else {
-                // yellow light
-                buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Building")).append("&hellip;\" title=\"").append(_("Building tunnels")).append("&hellip;\"></td></tr>\n");
             }
+            buf.append("</table>");
+        } else {
+            buf.append("<center><i>").append(_("none")).append("</i></center>");
         }
-        buf.append("</table></div><hr>\n");
+        buf.append("</div><hr>\n");
         return buf.toString();
     }
     

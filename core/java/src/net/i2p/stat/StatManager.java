@@ -51,7 +51,7 @@ public class StatManager {
      */
     public static final String DEFAULT_STAT_REQUIRED =
         "bw.recvRate,bw.sendBps,bw.sendRate,client.sendAckTime,clock.skew,crypto.elGamal.encrypt," +
-        "jobQueue.jobLag,netDb.successTime,router.fastPeers," +
+        "jobQueue.jobLag,netDb.successTime,peer.failedLookupRate,router.fastPeers," +
         "prng.bufferFillTime,prng.bufferWaitTime,router.memoryUsed," +
         "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
         "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout" +

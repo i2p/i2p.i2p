@@ -30,7 +30,16 @@ public class OutboundTunnelEndpoint {
     }
     public void dispatch(TunnelDataMessage msg, Hash recvFrom) {
         _config.incrementProcessedMessages();
-        _processor.process(msg.getData(), 0, msg.getData().length, recvFrom);
+        boolean ok = _processor.process(msg.getData(), 0, msg.getData().length, recvFrom);
+        if (!ok) {
+            // invalid IV
+            // If we pass it on to the handler, it will fail
+            // If we don't, the data buf won't get released from the cache... that's ok
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid IV, dropping at OBEP " + _config);
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
+            return;
+        }
         _handler.receiveTunnelMessage(msg.getData(), 0, msg.getData().length);
     }
     

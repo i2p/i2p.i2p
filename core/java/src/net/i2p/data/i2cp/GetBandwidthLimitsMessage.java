@@ -8,15 +8,12 @@ package net.i2p.data.i2cp;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.i2p.util.Log;
-
 /**
  * Request the router tells us the current bw limits
  *
  * @author zzz
  */
 public class GetBandwidthLimitsMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(GetBandwidthLimitsMessage.class);
     public final static int MESSAGE_TYPE = 8;
 
     public GetBandwidthLimitsMessage() {

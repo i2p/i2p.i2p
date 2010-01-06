@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
  *  A simple in-JVM Socket using Piped Streams.
  *  We use port numbers just like regular sockets.
  *  Can only connect to InternalServerSocket.
+ * @since 0.7.9
  */
 public class InternalSocket extends Socket {
     private InputStream _is;
@@ -36,10 +37,12 @@ public class InternalSocket extends Socket {
     public static Socket getSocket(String host, int port) throws IOException {
         if (System.getProperty("router.version") != null &&
             (host.equals("127.0.0.1") || host.equals("localhost"))) {
-            return new InternalSocket(port);
-        } else {
-            return new Socket(host, port);
+            try {
+                return new InternalSocket(port);
+            } catch (IOException ioe) {}
+            // guess it wasn't really internal...
         }
+        return new Socket(host, port);
     }
 
     @Override

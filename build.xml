@@ -25,6 +25,7 @@
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
+        <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
@@ -193,6 +194,7 @@
         <delete file="i2p.exe" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
+        <delete file="BOB-one.jar" failonerror="false" quiet="true" />	
     </target>
     <target name="distclean" depends="clean">
         <ant dir="core/java/" target="distclean" />
@@ -209,10 +211,51 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
+	<!-- 
+		NOTE! We need to turn off the default excludes for these
+		patterns to work. 
+		These are the defaultexcludes in Ant as seen on
+		http://ant.apache.org/manual/CoreTasks/defaultexcludes.html
+		     **/*~
+                     **/#*#
+                     **/.#*
+                     **/%*%
+                     **/._*
+                     **/CVS
+                     **/CVS/**
+                     **/.cvsignore
+                     **/SCCS
+                     **/SCCS/**
+                     **/vssver.scc
+                     **/.svn
+                     **/.svn/**
+                     **/.DS_Store
+		The only recourse is to remove the offending ones.
+		We do this here, as we only need one change, and then put it
+		back after we are done with it.
+	-->
+	<defaultexcludes remove="**/*~"/>
+
         <delete>
             <fileset dir="." includes="**/*.class" />
             <fileset dir="." includes="**/*.java~" />
+	    <!-- 
+	    	Less common, but they pollute my workspace here, so we
+            	might as well nuke these as well. Are there any others?
+            	
+            	!!??? Why don't we just nuke "**/*~" ???!!
+
+            	++Sponge
+            -->
+            <fileset dir="." includes="**/*.txt~" />
+            <fileset dir="." includes="**/*.xml~"  />
+            <fileset dir="." includes="**/*.sh~"  />
+            <fileset dir="." includes="**/*.SlackBuild~" />
         </delete>
+	<!--
+		Now we put the defaults back
+	-->
+	<defaultexcludes default="true"/>
     </target>
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
     <target name="pkgclean" depends="deletepkg-temp">
@@ -531,6 +574,10 @@
         <echo message="Building Slackware package." />
         <ant dir="Slackware/i2p/" target="slackpkg" />
         <ant dir="Slackware/i2p-base/" target="slackpkg" />
+    </target>
+    <target name="justBOB" depends="builddepSmall">
+        <ant dir="apps/BOB/" target="onejar" />
+        <copy file="apps/BOB/dist/BOB-one.jar" todir="." />
     </target>
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />

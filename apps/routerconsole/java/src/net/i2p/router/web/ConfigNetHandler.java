@@ -4,7 +4,7 @@ import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
+import net.i2p.router.web.ConfigServiceHandler;
 
 /**
  * Handler to deal with form submissions from the main config form and act
@@ -30,6 +30,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _ntcpAutoIP;
     private boolean _ntcpAutoPort;
     private boolean _upnp;
+    private boolean _laptop;
     private String _inboundRate;
     private String _inboundBurstRate;
     private String _inboundBurst;
@@ -70,6 +71,7 @@ public class ConfigNetHandler extends FormHandler {
         _ntcpAutoPort = mode.equals("2");
     }
     public void setUpnp(String moo) { _upnp = true; }
+    public void setLaptop(String moo) { _laptop = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -230,6 +232,16 @@ public class ConfigNetHandler extends FormHandler {
             }
             _context.router().setConfigSetting(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
 
+            if (Boolean.valueOf(_context.getProperty(UDPTransport.PROP_LAPTOP_MODE)).booleanValue() !=
+                _laptop) {
+                // This is minor, don't set restartRequired
+                if (_laptop)
+                    addFormNotice(_("Enabling laptop mode"));
+                else
+                    addFormNotice(_("Disabling laptop mode"));
+            }
+            _context.router().setConfigSetting(UDPTransport.PROP_LAPTOP_MODE, "" + _laptop);
+
             if (_requireIntroductions) {
                 _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
                 addFormNotice(_("Requiring SSU introducers"));
@@ -256,30 +268,33 @@ public class ConfigNetHandler extends FormHandler {
         if (switchRequired) {
             hiddenSwitch();
         } else if (restartRequired) {
-            // Wow this dumps all conns immediately and really isn't nice
-            //addFormNotice("Performing a soft restart");
-            //_context.router().restart();
-            //addFormNotice("Soft restart complete");
+            if (System.getProperty("wrapper.version") == null) {
+                // Wow this dumps all conns immediately and really isn't nice
+                addFormNotice("Performing a soft restart");
+                _context.router().restart();
+                addFormNotice("Soft restart complete");
 
-            // Most of the time we aren't changing addresses, just enabling or disabling
-            // things, so let's try just a new routerInfo and see how that works.
-            // Maybe we should restart if we change addresses though?
-            // No, this doesn't work well, really need to call SSU Transport externalAddressReceived(),
-            // but that's hard to get to, and doesn't handle port changes, etc.
-            // So don't do this...
-            //_context.router().rebuildRouterInfo();
-            //addFormNotice("Router Info rebuilt");
-
-            // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
-            // But it would be hard to get right, so just do a restart.
-            addFormError(_("Gracefully restarting I2P to change published router address"));
-            _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+                // Most of the time we aren't changing addresses, just enabling or disabling
+                // things, so let's try just a new routerInfo and see how that works.
+                // Maybe we should restart if we change addresses though?
+                // No, this doesn't work well, really need to call SSU Transport externalAddressReceived(),
+                // but that's hard to get to, and doesn't handle port changes, etc.
+                // So don't do this...
+                //_context.router().rebuildRouterInfo();
+                //addFormNotice("Router Info rebuilt");
+            } else {
+                // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
+                // But it would be hard to get right, so just do a restart.
+                addFormError(_("Gracefully restarting I2P to change published router address"));
+                _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+                _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+            }
         }
     }
 
     private void hiddenSwitch() {
         // Full restart required to generate new keys
-        _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+        _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
     

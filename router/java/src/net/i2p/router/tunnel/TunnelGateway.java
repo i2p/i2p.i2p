@@ -3,12 +3,12 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -34,9 +34,9 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class TunnelGateway {
-    protected I2PAppContext _context;
+    protected RouterContext _context;
     protected Log _log;
-    protected final List _queue;
+    protected final List<Pending> _queue;
     protected QueuePreprocessor _preprocessor;
     protected Sender _sender;
     protected Receiver _receiver;
@@ -53,7 +53,7 @@ public class TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
-    public TunnelGateway(I2PAppContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
+    public TunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver) {
         _context = context;
         _log = context.logManager().getLog(getClass());
         _queue = new ArrayList(4);
@@ -110,7 +110,7 @@ public class TunnelGateway {
             
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
-                Pending m = (Pending)_queue.get(i);
+                Pending m = _queue.get(i);
                 if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Expire on the queue (size=" + _queue.size() + "): " + m);
@@ -154,12 +154,18 @@ public class TunnelGateway {
         
     public interface QueuePreprocessor {
         /** 
+         * Caller must synchronize on the list!
+         *
          * @param pending list of Pending objects for messages either unsent
          *                or partly sent.  This list should be update with any
          *                values removed (the preprocessor owns the lock)
+         *                Messages are not removed from the list until actually sent.
+         *                The status of unsent and partially-sent messages is stored in
+         *                the Pending structure.
+         *
          * @return true if we should delay before preprocessing again 
          */
-        public boolean preprocessQueue(List pending, Sender sender, Receiver receiver);
+        public boolean preprocessQueue(List<Pending> pending, Sender sender, Receiver receiver);
         
         /** how long do we want to wait before flushing */
         public long getDelayAmount();
@@ -173,6 +179,9 @@ public class TunnelGateway {
         public long receiveEncrypted(byte encrypted[]);
     }
     
+    /**
+     *  Stores all the state for an unsent or partially-sent message
+     */
     public static class Pending {
         protected Hash _toRouter;
         protected TunnelId _toTunnel;
@@ -182,7 +191,7 @@ public class TunnelGateway {
         protected int _offset;
         protected int _fragmentNumber;
         protected long _created;
-        private List _messageIds;
+        private List<Long> _messageIds;
         
         public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) { 
             this(message, toRouter, toTunnel, System.currentTimeMillis()); 
@@ -215,6 +224,10 @@ public class TunnelGateway {
         public int getFragmentNumber() { return _fragmentNumber; }
         /** ok, fragment sent, increment what the next will be */
         public void incrementFragmentNumber() { _fragmentNumber++; }
+        /**
+         *  Add an ID to the list of the TunnelDataMssages this message was fragmented into.
+         *  Unused except in notePreprocessing() calls for debugging
+         */
         public void addMessageId(long id) { 
             synchronized (Pending.this) {
                 if (_messageIds == null)
@@ -222,7 +235,11 @@ public class TunnelGateway {
                 _messageIds.add(new Long(id));
             }
         }
-        public List getMessageIds() { 
+        /**
+         *  The IDs of the TunnelDataMssages this message was fragmented into.
+         *  Unused except in notePreprocessing() calls for debugging
+         */
+        public List<Long> getMessageIds() { 
             synchronized (Pending.this) { 
                 if (_messageIds != null)
                     return new ArrayList(_messageIds); 
@@ -231,6 +248,8 @@ public class TunnelGateway {
             } 
         }
     }
+
+    /** Extend for debugging */
     class PendingImpl extends Pending {
         public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
             super(message, toRouter, toTunnel, _context.clock().now());
@@ -269,11 +288,11 @@ public class TunnelGateway {
             long beforeLock = _context.clock().now();
             long afterChecked = -1;
             long delayAmount = -1;
-            if (_queue.size() > 10000) // stay out of the synchronized block
-                System.out.println("foo!");
+            //if (_queue.size() > 10000) // stay out of the synchronized block
+            //    System.out.println("foo!");
             synchronized (_queue) {
-                if (_queue.size() > 10000) // stay in the synchronized block
-                    System.out.println("foo!");
+                //if (_queue.size() > 10000) // stay in the synchronized block
+                //    System.out.println("foo!");
                 afterChecked = _context.clock().now();
                 if (_queue.size() > 0) {
                     if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )

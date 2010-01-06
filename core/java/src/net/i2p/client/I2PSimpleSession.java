@@ -79,6 +79,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                 _out.write(I2PClient.PROTOCOL_BYTE);
                 _out.flush();
             }
+            _writer = new ClientWriterRunner(_out, this);
             InputStream in = _socket.getInputStream();
             _reader = new I2CPMessageReader(in, this);
             _reader.startReading();

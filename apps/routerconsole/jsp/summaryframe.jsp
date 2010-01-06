@@ -19,11 +19,10 @@
                            "Shutdown immediately".equals(action) || "Restart immediately".equals(action);
     if (!shutdownSoon) {
         if (d == null || "".equals(d)) {
-            d = System.getProperty("routerconsole.summaryRefresh");
-            if (d == null || "".equals(d))
-                d = "60";
+            d = intl.getRefresh();
         } else {
-            System.setProperty("routerconsole.summaryRefresh", d);
+            d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
+            intl.setRefresh(d);
         }
         // we probably don't get here if d == "0" since caught in summary.jsi, but just
         // to be sure...
@@ -42,7 +41,7 @@
             long delay = 60;
             try { delay = Long.parseLong(d); } catch (NumberFormatException nfe) {}
             if (delay*1000 < timeleft + 5000)
-                out.print("<meta http-equiv=\"refresh\" content=\"" + d + "\" />\n");
+                out.print("<meta http-equiv=\"refresh\" content=\"" + d + "\" >\n");
             else
                 shutdownSoon = true;
         }
@@ -57,13 +56,13 @@
         if ("0".equals(d)) {
             out.print("<b>");
             out.print(intl._("Refresh (s)"));
-            out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" />\n");
+            out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" >\n");
             out.print("<button type=\"submit\" value=\"Enable\" >");
             out.print(intl._("Enable"));
             out.print("</button></div>\n");
         } else {
             // this will load in the iframe but subsequent pages will not have the iframe
-            out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" />\n");
+            out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" >\n");
             out.print("<button type=\"submit\" value=\"Disable\" >");
             out.print(intl._("Disable {0}s Refresh", d));
             out.print("</button></div>\n");

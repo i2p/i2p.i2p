@@ -18,7 +18,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a router sends to another router to test the network
@@ -27,7 +26,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DatabaseStoreMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DatabaseStoreMessage.class);
     public final static int MESSAGE_TYPE = 1;
     private Hash _key;
     private int _type;

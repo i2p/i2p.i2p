@@ -10,7 +10,6 @@ package net.i2p.data.i2cp;
  */
 
 import net.i2p.I2PException;
-import net.i2p.util.Log;
 
 /**
  * Represent an error serializing or deserializing an APIMessage
@@ -18,7 +17,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class I2CPMessageException extends I2PException {
-    private final static Log _log = new Log(I2CPMessageException.class);
 
     public I2CPMessageException(String message, Throwable parent) {
         super(message, parent);

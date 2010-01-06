@@ -18,7 +18,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a client sends to a router when authorizing
@@ -27,7 +26,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class CreateLeaseSetMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(CreateLeaseSetMessage.class);
     public final static int MESSAGE_TYPE = 4;
     private SessionId _sessionId;
     private LeaseSet _leaseSet;

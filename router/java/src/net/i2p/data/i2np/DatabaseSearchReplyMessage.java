@@ -15,7 +15,6 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.util.Log;
 
 /**
  * Defines the message a router sends to another router in response to a
@@ -25,7 +24,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DatabaseSearchReplyMessage.class);
     public final static int MESSAGE_TYPE = 3;
     private Hash _key;
     private List _peerHashes;

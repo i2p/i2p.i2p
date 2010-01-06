@@ -8,6 +8,8 @@ import net.i2p.util.ConcurrentHashSet;
 
 /** 
  * waste lots of RAM 
+ *
+ * @deprecated unused
  */
 class HashSetIVValidator implements IVValidator {
     private final Set<ByteArray> _received;

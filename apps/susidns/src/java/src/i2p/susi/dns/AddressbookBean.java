@@ -194,20 +194,27 @@ public class AddressbookBean
 			// addressbook.jsp catches the case where the whole book is empty.
 			String filterArg = "";
 			if( search != null && search.length() > 0 ) {
-				message = "Search ";
+				message = _("Search") + ' ';
 			}
 			if( filter != null && filter.length() > 0 ) {
 				if( search != null && search.length() > 0 )
-					message += "within ";
-				message += "Filtered list ";
+					message = _("Search within filtered list") + ' ';
+				else
+					message = _("Filtered list") + ' ';
 				filterArg = "&filter=" + filter;
 			}
 			if (entries.length == 0) {
-				message += "- no matches";
+				message += "- " + _("no matches") + '.';
 			} else if (getBeginInt() == 0 && getEndInt() == entries.length - 1) {
 				if (message.length() == 0)
-					message = "Addressbook ";
-				message += "contains " + entries.length + " entries";
+					message = _("Addressbook") + ' ';
+				if (entries.length <= 0)
+					message += _("contains no entries");
+				else if (entries.length == 1)
+					message += _("contains 1 entry");
+				else
+					message += _("contains {0} entries", entries.length);
+				message += '.';
 			} else {
 				if (getBeginInt() > 0) {
 					int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
@@ -216,7 +223,7 @@ public class AddressbookBean
 					           "&begin=" + newBegin + "&end=" + newEnd + "\">" + newBegin +
 					           '-' + newEnd + "</a> | ";
 		       		}
-				message += "Showing " + getBegin() + '-' + getEnd() + " of " + entries.length;
+				message += _("Showing {0} of {1}", "" + getBegin() + '-' + getEnd(), entries.length);
 				if (getEndInt() < entries.length - 1) {
 					int newBegin = Math.min(entries.length - 1, getEndInt() + 1);
 					int newEnd = Math.min(entries.length, getEndInt() + DISPLAY_SIZE);
@@ -245,38 +252,43 @@ public class AddressbookBean
 		if( action != null ) {
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
 				boolean changed = false;
-				if( action.compareToIgnoreCase( "add") == 0 ) {
+				int deleted = 0;
+				String name = null;
+				if (action.equals(_("Add"))) {
 					if( addressbook != null && hostname != null && destination != null ) {
 						addressbook.put( hostname, destination );
 						changed = true;
-						message += "Destination added.<br/>";
+						message = _("Destination added.");
+						// clear search when adding
+						search = null;
 					}
-				}
-				if( action.compareToIgnoreCase( "delete" ) == 0 ) {
+				} else if (action.equals(_("Delete"))) {
 					Iterator it = deletionMarks.iterator();
-					int deleted = 0;
 					while( it.hasNext() ) {
-						String name = (String)it.next();
+						name = (String)it.next();
 						addressbook.remove( name );
 						changed = true;
 						deleted++;
 					}
 					if( changed ) {
-						message += "" + deleted + " destination(s) deleted.<br/>";
+						if (deleted == 1)
+							message = _("Destination {0} deleted.", name);
+						else
+							message = _("{0} destinations deleted.", deleted);
 					}
 				}
 				if( changed ) {
 					try {
 						save();
-						message += "Addressbook saved.<br/>";
+						message += "<br>" + _("Addressbook saved.");
 					} catch (Exception e) {
 						Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
-						message += "ERROR: Could not write addressbook file.<br/>";
+						message += "<br>" + _("ERROR: Could not write addressbook file.");
 					}
 				}
 			}			
 			else {
-				message = "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
+				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.");
 			}
 		}
 		
@@ -363,5 +375,20 @@ public class AddressbookBean
 		try {
 			endIndex = Integer.parseInt(s);
 		} catch (NumberFormatException nfe) {}
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
+	}
+
+	/** translate */
+	private static String _(String s, Object o) {
+		return Messages.getString(s, o);
+	}
+
+	/** translate */
+	private static String _(String s, Object o, Object o2) {
+		return Messages.getString(s, o, o2);
 	}
 }

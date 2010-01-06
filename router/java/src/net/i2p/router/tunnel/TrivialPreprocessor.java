@@ -3,11 +3,11 @@ package net.i2p.router.tunnel;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -17,18 +17,27 @@ import net.i2p.util.Log;
  * each of those out.  This does not coallesce message fragments or delay for more
  * optimal throughput.
  *
+ * See FragmentHandler Javadoc for tunnel message fragment format
  */
 public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
-    protected I2PAppContext _context;
-    private Log _log;
+    protected RouterContext _context;
+    protected Log _log;
     
     public static final int PREPROCESSED_SIZE = 1024;
     protected static final int IV_SIZE = HopProcessor.IV_LENGTH;
+
+    /**
+     * Here in tunnels, we take from the cache but never add to it.
+     * In other words, we take advantage of other places in the router also using 1024-byte ByteCaches
+     * (since ByteCache only maintains once instance for each size)
+     * Used in BatchedPreprocessor; see add'l comments there
+     */
     protected static final ByteCache _dataCache = ByteCache.getInstance(32, PREPROCESSED_SIZE);
-    protected static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
-    protected static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
+
+    private static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
+    private static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
     
-    public TrivialPreprocessor(I2PAppContext ctx) {
+    public TrivialPreprocessor(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(TrivialPreprocessor.class);
     }
@@ -40,8 +49,10 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * Return true if there were messages remaining, and we should queue up
      * a delayed flush to clear them
      *
+     * NOTE: Unused here, see BatchedPreprocessor override, super is not called.
      */
-    public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+    public boolean preprocessQueue(List<TunnelGateway.Pending> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
+        if (true) throw new IllegalArgumentException("unused, right?");
         long begin = System.currentTimeMillis();
         StringBuilder buf = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -49,7 +60,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
             buf.append("Trivial preprocessing of ").append(pending.size()).append(" ");
         }
         while (pending.size() > 0) {
-            TunnelGateway.Pending msg = (TunnelGateway.Pending)pending.remove(0);
+            TunnelGateway.Pending msg = pending.remove(0);
             long beforePreproc = System.currentTimeMillis();
             byte preprocessed[][] = preprocess(msg);
             long afterPreproc = System.currentTimeMillis();
@@ -84,8 +95,11 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         return false;
     }
     
-    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List messageIds, String msg) {}
+    protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {}
     
+    /*
+     * @deprecated unused except by above
+     */
     private byte[][] preprocess(TunnelGateway.Pending msg) {
         List fragments = new ArrayList(1);
 
@@ -109,6 +123,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * bytes after the IV, followed by the first 4 bytes of that SHA256, lining up
      * exactly to meet the beginning of the instructions. (i hope)
      *
+     * @deprecated unused except by above
      */
     private byte[] preprocessFragment(TunnelGateway.Pending msg) {
         byte target[] = _dataCache.acquire().getData();
@@ -175,6 +190,8 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         //_log.debug("# pad bytes:  " + numPadBytes + " payloadLength: " + payloadLength + " instructions: " + instructionsLength);
 
         int paddingRemaining = numPadBytes;
+        // FIXME inefficient, waste of 3/4 of the entropy
+        // Should get a byte array of random, change all the zeros to something else, and ArrayCopy
         while (paddingRemaining > 0) {
             byte b = (byte)(_context.random().nextInt() & 0xFF);
             if (b != 0x00) {
@@ -196,7 +213,11 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     private static final byte MASK_TYPE = FragmentHandler.MASK_TYPE;
     /** is this the first of a fragmented message? */
     private static final byte MASK_FRAGMENTED = FragmentHandler.MASK_FRAGMENTED;
-    /** are there follow up headers? */
+
+    /**
+     *  are there follow up headers?
+     *  @deprecated unimplemented
+     */
     private static final byte MASK_EXTENDED = FragmentHandler.MASK_EXTENDED;
     private static final byte MASK_TUNNEL = (byte)(FragmentHandler.TYPE_TUNNEL << 5);
     private static final byte MASK_ROUTER = (byte)(FragmentHandler.TYPE_ROUTER << 5);
@@ -311,19 +332,30 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         return offset;
     }
 
+    /**
+     *  @return generally 3 or 35 or 39 for first fragment, 7 for subsequent fragments.
+     *
+     *  Does NOT include 4 for the message ID if the message will be fragmented;
+     *  call getInstructionAugmentationSize() for that.
+     */
     protected int getInstructionsSize(TunnelGateway.Pending msg) {
         if (msg.getFragmentNumber() > 0) 
             return 7;
+        // control byte
         int header = 1;
+        // tunnel ID
         if (msg.getToTunnel() != null)
             header += 4;
+        // router hash
         if (msg.getToRouter() != null)
             header += 32;
+        // size
         header += 2;
         
         return header;
     }
     
+    /** @return 0 or 4 */
     protected int getInstructionAugmentationSize(TunnelGateway.Pending msg, int offset, int instructionsSize) {
         int payloadLength = msg.getData().length - msg.getOffset();
         if (offset + payloadLength + instructionsSize + IV_SIZE + 1 + 4 > PREPROCESSED_SIZE) {

@@ -37,10 +37,12 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.FileUtil;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -201,6 +203,8 @@ public class Router {
         installUpdates();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
+        // But context.isRouterContext() is even easier...
+        // Both of these as of 0.7.9
         System.setProperty("router.version", RouterVersion.VERSION);
 
         // NOW we start all the activity
@@ -228,14 +232,10 @@ public class Router {
             }
         };
         _shutdownHook = new ShutdownHook(_context);
-        _gracefulShutdownDetector = new I2PThread(new GracefulShutdown());
-        _gracefulShutdownDetector.setDaemon(true);
-        _gracefulShutdownDetector.setName("Graceful shutdown hook");
+        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(), "Graceful shutdown hook", true);
         _gracefulShutdownDetector.start();
         
-        I2PThread watchdog = new I2PThread(new RouterWatchdog(_context));
-        watchdog.setName("RouterWatchdog");
-        watchdog.setDaemon(true);
+        Thread watchdog = new I2PAppThread(new RouterWatchdog(_context), "RouterWatchdog", true);
         watchdog.start();
         
     }
@@ -315,10 +315,10 @@ public class Router {
         readConfig();
         
         setupHandlers();
-        if (ALLOW_DYNAMIC_KEYS) {
-            if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
-                killKeys();
-        }
+        //if (ALLOW_DYNAMIC_KEYS) {
+        //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
+        //        killKeys();
+        //}
 
         _context.messageValidator().startup();
         _context.tunnelDispatcher().startup();
@@ -339,7 +339,7 @@ public class Router {
         long waited = System.currentTimeMillis() - before;
         if (_log.shouldLog(Log.INFO))
             _log.info("Waited " + waited + "ms to initialize");
-        
+
         _context.jobQueue().addJob(new StartupJob(_context));
     }
     
@@ -527,7 +527,7 @@ public class Router {
 
     static final String IDENTLOG = "identlog.txt";
     public void killKeys() {
-        new Exception("Clearing identity files").printStackTrace();
+        //new Exception("Clearing identity files").printStackTrace();
         int remCount = 0;
         for (int i = 0; i < _rebuildFiles.length; i++) {
             File f = new File(_context.getRouterDir(),_rebuildFiles[i]);
@@ -541,6 +541,12 @@ public class Router {
                 }
             }
         }
+
+        // now that we have random ports, keeping the same port would be bad
+        removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
+        removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+        saveConfig();
+
         if (remCount > 0) {
             FileOutputStream log = null;
             try {
@@ -910,11 +916,11 @@ public class Router {
      */
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
-    public void finalShutdown(int exitCode) {
+    private void finalShutdown(int exitCode) {
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
-            if ("true".equalsIgnoreCase(_context.getProperty(PROP_DYNAMIC_KEYS, "false")))
+            if (Boolean.valueOf(_context.getProperty(PROP_DYNAMIC_KEYS)).booleanValue())
                 killKeys();
         }
 

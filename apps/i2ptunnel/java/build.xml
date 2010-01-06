@@ -41,10 +41,8 @@
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
             </manifest>
         </jar>
-        <ant target="war" />
         <ant target="bundle" />
-        <!-- jar again to get the latest messages_*.class files -->
-        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" update="true" />
+        <ant target="war" />
     </target>
 
     <target name="bundle" depends="compile, precompilejsp">

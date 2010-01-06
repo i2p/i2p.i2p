@@ -169,8 +169,14 @@ public class PacketBuilder {
         
         int sizeWritten = state.writeFragment(data, off, fragment);
         if (sizeWritten != size) {
-            _log.error("Size written: " + sizeWritten + " but size: " + size 
-                       + " for fragment " + fragment + " of " + state.getMessageId());
+            if (sizeWritten < 0) {
+                // probably already freed from OutboundMessageState
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Write failed for fragment " + fragment + " of " + state.getMessageId());
+            } else {
+                _log.error("Size written: " + sizeWritten + " but size: " + size 
+                           + " for fragment " + fragment + " of " + state.getMessageId());
+            }
             packet.release();
             return null;
         } else if (_log.shouldLog(Log.DEBUG))

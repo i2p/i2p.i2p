@@ -29,7 +29,7 @@
 
     <div id="statusMessagePanel" class="panel">
         <div class="header">
-            <h4>Status Messages</h4>
+            <h4><%=intl._("Status Messages")%></h4>
         </div>
 
         <div class="separator">
@@ -44,7 +44,7 @@
 
         <div class="footer">
             <div class="toolbox">
-                <a class="control" href="index.jsp">Refresh</a>
+                <a class="control" href="index.jsp"><%=intl._("Refresh")%></a>
             </div>
         </div>    
     </div>
@@ -53,7 +53,7 @@
         <div class="header"></div>
         <div class="footer">
             <div class="toolbox">
-                <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all">Stop All</a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all">Start All</a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all">Restart All</a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration">Reload Config</a>
+                <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all"><%=intl._("Stop All")%></a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all"><%=intl._("Start All")%></a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all"><%=intl._("Restart All")%></a> <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration"><%=intl._("Reload Config")%></a>
             </div>
         </div> 
     </div>
@@ -63,23 +63,23 @@
     <div id="localServerTunnelList" class="panel">
         <div class="header">
             
-    <h4>I2P Server Tunnels</h4>
+    <h4><%=intl._("I2P Server Tunnels")%></h4>
         </div>
 
         
   <div class="separator"> </div>
 
         <div class="nameHeaderField rowItem">
-            <label>Name:</label>
+            <label><%=intl._("Name")%>:</label>
         </div>
         <div class="previewHeaderField rowItem">
-            <label>Points at:</label>
+            <label><%=intl._("Points at")%>:</label>
         </div>
         <div class="targetHeaderField rowItem">
-            <label>Preview:</label>
+            <label><%=intl._("Preview")%>:</label>
         </div>
         <div class="statusHeaderField rowItem">
-            <label>Status:</label>
+            <label><%=intl._("Status")%>:</label>
 <hr />        </div>
         
         <%
@@ -88,11 +88,11 @@
             
       %>
         <div class="nameField rowItem">
-            <label>Name:</label>
+            <label><%=intl._("Name")%>:</label>
             <span class="text"><a href="edit.jsp?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
         </div>
         <div class="previewField rowItem">
-            <label>Points at:</label>
+            <label><%=intl._("Points at")%>:</label>
             <span class="text">
         <%
             if ("httpserver".equals(indexBean.getInternalType(curServer))) {
@@ -108,41 +108,41 @@
         <div class="targetField rowItem">
             <%
             if ("httpserver".equals(indexBean.getInternalType(curServer)) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-          %><label>Preview:</label>    
-            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p">Preview</a>     
+          %><label><%=intl._("Preview")%>:</label>    
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p"><%=intl._("Preview")%></a>     
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
-          %><span class="text">Base32 Address:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
+          %><span class="text"><%=intl._("Base32 Address")%>:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
         <%
             } else {
-          %><span class="comment">No Preview</span>
+          %><span class="comment"><%=intl._("No Preview")%></span>
         <%
             }
       %></div>
         <div class="statusField rowItem">
-            <label>Status:</label>
+            <label><%=intl._("Status")%>:</label>
             <%
             switch (indexBean.getTunnelStatus(curServer)) {
                 case IndexBean.STARTING:
-          %><div class="statusStarting text">Starting...</div>    
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
+          %><div class="statusStarting text"><%=intl._("Starting...")%></div>    
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._("Stop")%></a>
         <%
                 break;
                 case IndexBean.RUNNING:
-          %><div class="statusRunning text">Running</div>    
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
+          %><div class="statusRunning text"><%=intl._("Running")%></div>    
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>"><%=intl._("Stop")%></a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
-          %><div class="statusNotRunning text">Stopped</div>    
-            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curServer%>">Start</a>
+          %><div class="statusNotRunning text"><%=intl._("Stopped")%></div>    
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curServer%>"><%=intl._("Start")%></a>
         <%
                 break;
             }
       %></div>
 
         <div class="descriptionField rowItem">
-            <label>Description:</label>
+            <label><%=intl._("Description")%>:</label>
             <div class="text"><%=indexBean.getTunnelDescription(curServer)%></div>
         </div>
 
@@ -160,14 +160,14 @@
             <form id="addNewServerTunnelForm" action="edit.jsp"> 
             <div class="toolbox">
                     
-        <label>New server tunnel:</label>
+        <label><%=intl._("New server tunnel")%>:</label>
                     <select name="type">
-                        <option value="server">Standard</option>
+                        <option value="server"><%=intl._("Standard")%></option>
                         <option value="httpserver">HTTP</option>
                         <option value="ircserver">IRC</option>
                         <option value="streamrserver">Streamr</option>
                     </select>
-                    <input class="control" type="submit" value="Create" />
+                    <input class="control" type="submit" value="<%=intl._("Create")%>" />
                 </div>
             </form>
         </div>
@@ -177,26 +177,26 @@
     <div id="localClientTunnelList" class="panel">
         <div class="header">
             
-    <h4>I2P Client Tunnels</h4>
+    <h4><%=intl._("I2P Client Tunnels")%></h4>
         </div>
 
         
   <div class="separator"> </div>
         
         <div class="nameHeaderField rowItem">
-            <label>Name:</label>
+            <label><%=intl._("Name")%>:</label>
         </div>
         <div class="portHeaderField rowItem">
-            <label>Port:</label>
+            <label><%=intl._("Port")%>:</label>
         </div>
         <div class="typeHeaderField rowItem">
-            <label>Type:</label>
+            <label><%=intl._("Type")%>:</label>
         </div>
         <div class="interfaceHeaderField rowItem">
-            <label>Interface:</label>
+            <label><%=intl._("Interface")%>:</label>
         </div>
         <div class="statusHeaderField rowItem">
-            <label>Status:</label>
+            <label><%=intl._("Status")%>:</label>
         </div>
 
         <div class="separator">
@@ -207,43 +207,43 @@
             if (!indexBean.isClient(curClient)) continue;
       %>
         <div class="nameField rowItem">
-            <label>Name:</label>
+            <label><%=intl._("Name")%>:</label>
             <span class="text"><a href="edit.jsp?tunnel=<%=curClient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
         </div>
         <div class="portField rowItem">
-            <label>Port:</label>
+            <label><%=intl._("Port")%>:</label>
             <span class="text"><%=indexBean.getClientPort(curClient)%></span>
         </div>
         <div class="typeField rowItem">
-            <label>Type:</label>
+            <label><%=intl._("Type")%>:</label>
             <span class="text"><%=indexBean.getTunnelType(curClient)%></span>
         </div>
         <div class="interfaceField rowItem">
-            <label>Interface:</label>
+            <label><%=intl._("Interface")%>:</label>
             <span class="text"><%=indexBean.getClientInterface(curClient)%></span>
         </div>
         <div class="statusField rowItem">
-            <label>Status:</label>
+            <label><%=intl._("Status")%>:</label>
             <%
             switch (indexBean.getTunnelStatus(curClient)) {
                 case IndexBean.STARTING:
-          %><div class="statusStarting text">Starting...</div>
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
+          %><div class="statusStarting text"><%=intl._("Starting...")%></div>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._("Stop")%></a>
         <%
                 break;
                 case IndexBean.STANDBY:
-          %><div class="statusStarting text">Standby</div>
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
+          %><div class="statusStarting text"><%=intl._("Standby")%></div>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._("Stop")%></a>
         <%
                 break;
                 case IndexBean.RUNNING:
-          %><div class="statusRunning text">Running</div>
-            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
+          %><div class="statusRunning text"><%=intl._("Running")%></div>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>"><%=intl._("Stop")%></a>
         <%
                 break;
                 case IndexBean.NOT_RUNNING:
-          %><div class="statusNotRunning text">Stopped</div>
-            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curClient%>">Start</a>
+          %><div class="statusNotRunning text"><%=intl._("Stopped")%></div>
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curClient%>"><%=intl._("Start")%></a>
         <%
                 break;
             }
@@ -253,9 +253,9 @@
         <div class="destinationField rowItem">
             <label>
             <% if ("httpclient".equals(indexBean.getInternalType(curClient)) || "connectclient".equals(indexBean.getInternalType(curClient))) { %>
-                Outproxy:
+                <%=intl._("Outproxy")%>:
             <% } else { %>
-                Destination:
+                <%=intl._("Destination")%>:
             <% } %>
             </label>
             <input class="freetext" size="40" readonly="readonly" value="<%=indexBean.getClientDestination(curClient)%>" />
@@ -263,7 +263,7 @@
       <% } %>
 
         <div class="descriptionField rowItem">
-            <label>Description:</label>
+            <label><%=intl._("Description")%>:</label>
             <div class="text"><%=indexBean.getTunnelDescription(curClient)%></div>
         </div>
 
@@ -281,16 +281,16 @@
             <form id="addNewClientTunnelForm" action="edit.jsp">
                 <div class="toolbox">
                     
-        <label>New client tunnel:</label>
+        <label><%=intl._("New client tunnel")%>:</label>
                     <select name="type">
-                        <option value="client">Standard</option>
+                        <option value="client"><%=intl._("Standard")%></option>
                         <option value="httpclient">HTTP</option>
                         <option value="ircclient">IRC</option>
                         <option value="sockstunnel">SOCKS 4/4a/5</option>
                         <option value="connectclient">CONNECT</option>
                         <option value="streamrclient">Streamr</option>
                     </select>
-                    <input class="control" type="submit" value="Create" />
+                    <input class="control" type="submit" value="<%=intl._("Create")%>" />
                 </div>
             </form>
         </div>

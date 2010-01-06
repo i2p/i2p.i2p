@@ -71,6 +71,9 @@ public class TunnelParticipant {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Failed to dispatch " + msg + ": processor=" + _processor 
                            + " inboundEndpoint=" + _inboundEndpointProcessor);
+            if (_config != null)
+                _config.incrementProcessedMessages();
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
             return;
         }
         
@@ -101,8 +104,11 @@ public class TunnelParticipant {
         }
     }
     
+/****
     private int _periodMessagesTransferred;
     private long _lastCoallesced = System.currentTimeMillis();
+****/
+
     /** 
      * take note that the peers specified were able to push us data.  hmm, is this safe?
      * this could be easily gamed to get us to rank some peer of their choosing as quite

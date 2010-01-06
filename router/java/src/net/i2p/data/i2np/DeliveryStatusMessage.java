@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the message sent back in reply to a message when requested, containing
@@ -21,7 +20,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DeliveryStatusMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DeliveryStatusMessage.class);
     public final static int MESSAGE_TYPE = 10;
     private long _id;
     private long _arrival;

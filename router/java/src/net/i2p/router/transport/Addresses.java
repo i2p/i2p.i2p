@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class Addresses {
     
-    /** return the first non-local address it finds, or null */
+    /** @return the first non-local address it finds, or null */
     public static String getAnyAddress() {
         String[] a = getAddresses();
         if (a.length > 0)
@@ -31,7 +31,7 @@ public class Addresses {
     }
 
     /**
-     *  Return an array of all addresses, excluding
+     *  @return an array of all addresses, excluding
      *  IPv6, local, broadcast, multicast, etc.
      */
     public static String[] getAddresses() {

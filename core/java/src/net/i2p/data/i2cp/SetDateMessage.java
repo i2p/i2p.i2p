@@ -17,14 +17,12 @@ import java.util.Date;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Clock;
-import net.i2p.util.Log;
 
 /**
  * Tell the other side what time it is
  *
  */
 public class SetDateMessage extends I2CPMessageImpl {
-    private final static Log _log = new Log(SetDateMessage.class);
     public final static int MESSAGE_TYPE = 33;
     private Date _date;
 
