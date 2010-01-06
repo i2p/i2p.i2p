@@ -126,6 +126,13 @@ public class SummaryBarRenderer {
                .append(_("Textual router performance statistics"))
                .append("\">")
                .append(_("Stats"))
+               .append("</a>\n" +
+
+                        "<a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"")
+               .append(_("Local Destinations"))
+               .append("\">")
+               .append(_("I2PTunnel"))
+
                .append("</a></td></tr></table>\n");
 
             out.write(buf.toString());

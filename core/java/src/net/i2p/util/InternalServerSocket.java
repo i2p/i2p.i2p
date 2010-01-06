@@ -26,6 +26,7 @@ import net.i2p.I2PAppContext;
  *  that may vanish. If you do use multipe writers,
  *  you may get intermittent 'write end dead' or 'pipe broken' IOExceptions on the reader side.
  *  See http://techtavern.wordpress.com/2008/07/16/whats-this-ioexception-write-end-dead/
+ * @since 0.7.9
  */
 public class InternalServerSocket extends ServerSocket {
     private static final ConcurrentHashMap<Integer, InternalServerSocket> _sockets = new ConcurrentHashMap(4);

@@ -12,6 +12,7 @@ import net.i2p.router.RouterContext;
  * Same as PTG, but check to see if a message should be dropped before queueing it.
  * Used for IBGWs.
  *
+ * @since 0.7.9
  */
 public class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
     /** saved so we can note messages that get dropped */

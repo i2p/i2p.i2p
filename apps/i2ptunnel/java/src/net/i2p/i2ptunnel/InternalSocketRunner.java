@@ -12,6 +12,7 @@ import net.i2p.util.Log;
  * Listen for in-JVM connections on the internal "socket"
  *
  * @author zzz
+ * @since 0.7.9
  */
 class InternalSocketRunner implements Runnable {
     private I2PTunnelClientBase client;

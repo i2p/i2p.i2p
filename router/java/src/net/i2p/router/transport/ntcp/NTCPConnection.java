@@ -602,8 +602,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         OutNetMessage msg = null;
         synchronized (_outbound) {
             if (_currentOutbound != null) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("attempt for multiple outbound messages with " + System.identityHashCode(_currentOutbound) + " already waiting and " + _outbound.size() + " queued");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("attempt for multiple outbound messages with " + System.identityHashCode(_currentOutbound) + " already waiting and " + _outbound.size() + " queued");
                 return;
             }
                 //throw new RuntimeException("We should not be preparing a write while we still have one pending");

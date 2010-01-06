@@ -1,3 +1,6 @@
+2010-01-06 zzz
+    * Summary bar tweaks
+
 2010-01-02 sponge
     * Fix one last stupid mistake in build.xml, my fault.
 

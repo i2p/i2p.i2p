@@ -20,8 +20,8 @@ public class BuildResponseRecord {
      * Create a new encrypted response
      *
      * @param status the response
-     * @param responseMessageID unused except for debugging
-     * @param a 528-byte response record
+     * @param responseMessageId unused except for debugging
+     * @return a 528-byte response record
      */
     public static byte[] create(I2PAppContext ctx, int status, SessionKey replyKey, byte replyIV[], long responseMessageId) {
         //Log log = ctx.logManager().getLog(BuildResponseRecord.class);

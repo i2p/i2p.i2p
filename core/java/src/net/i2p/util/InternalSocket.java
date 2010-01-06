@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
  *  A simple in-JVM Socket using Piped Streams.
  *  We use port numbers just like regular sockets.
  *  Can only connect to InternalServerSocket.
+ * @since 0.7.9
  */
 public class InternalSocket extends Socket {
     private InputStream _is;

@@ -358,52 +358,58 @@ public class SummaryHelper extends HelperBase {
     }
     
     /**
-     * How many client destinations are connected locally.
+     * Client destinations connected locally.
      *
      * @return html section summary
      */
     public String getDestinations() {
-        // covert the set to a list so we can sort by name and not lose duplicates
-        List clients = new ArrayList(_context.clientManager().listClients());
-        Collections.sort(clients, new AlphaComparator());
+        // convert the set to a list so we can sort by name and not lose duplicates
+        List<Destination> clients = new ArrayList(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\"><table>");
-        
-        for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
-            Destination client = (Destination)iter.next();
-            String name = getName(client);
-            Hash h = client.calculateHash();
+        buf.append("<h3><a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\">");
+        if (clients.size() > 0) {
+            Collections.sort(clients, new AlphaComparator());
+            buf.append("<table>");
             
-            buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
-            if (_context.clientManager().shouldPublishLeaseSet(h))
-                buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
-            else
-                buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
-            buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
-            buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
-            if (name.length() < 16)
-                buf.append(name);
-            else
-                buf.append(name.substring(0,15)).append("&hellip;");
-            buf.append("</a></b></td>\n");
-            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
-            if (ls != null) {
-                long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
-                if (timeToExpire < 0) {
-                    // red or yellow light                 
-                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration(0-timeToExpire));
-                    buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+            for (Iterator<Destination> iter = clients.iterator(); iter.hasNext(); ) {
+                Destination client = iter.next();
+                String name = getName(client);
+                Hash h = client.calculateHash();
+                
+                buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
+                if (_context.clientManager().shouldPublishLeaseSet(h))
+                    buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
+                else
+                    buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
+                buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
+                buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
+                if (name.length() < 16)
+                    buf.append(name);
+                else
+                    buf.append(name.substring(0,15)).append("&hellip;");
+                buf.append("</a></b></td>\n");
+                LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
+                if (ls != null) {
+                    long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
+                    if (timeToExpire < 0) {
+                        // red or yellow light                 
+                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration(0-timeToExpire));
+                        buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+                    } else {
+                        // green light 
+                        buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_("Ready")).append("\"></td></tr>\n");
+                    }
                 } else {
-                    // green light 
-                    buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_("Ready")).append("\"></td></tr>\n");
+                    // yellow light
+                    buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Building")).append("&hellip;\" title=\"").append(_("Building tunnels")).append("&hellip;\"></td></tr>\n");
                 }
-            } else {
-                // yellow light
-                buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Building")).append("&hellip;\" title=\"").append(_("Building tunnels")).append("&hellip;\"></td></tr>\n");
             }
+            buf.append("</table>");
+        } else {
+            buf.append("<center><i>").append(_("none")).append("</i></center>");
         }
-        buf.append("</table></div><hr>\n");
+        buf.append("</div><hr>\n");
         return buf.toString();
     }
     
