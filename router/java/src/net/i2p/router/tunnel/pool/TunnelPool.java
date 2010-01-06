@@ -163,7 +163,7 @@ public class TunnelPool {
                 TunnelInfo backloggedTunnel = null;
                 if (avoidZeroHop) {
                     for (int i = 0; i < _tunnels.size(); i++) {
-                        TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                        TunnelInfo info = _tunnels.get(i);
                         if ( (info.getLength() > 1) && (info.getExpiration() > _context.clock().now()) ) {
                             // avoid outbound tunnels where the 1st hop is backlogged
                             if (_settings.isInbound() || !_context.commSystem().isBacklogged(info.getPeer(1))) {
@@ -184,7 +184,7 @@ public class TunnelPool {
                 // ok, either we are ok using zero hop tunnels, or only fallback tunnels remain.  pick 'em
                 // randomly
                 for (int i = 0; i < _tunnels.size(); i++) {
-                    TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                    TunnelInfo info = _tunnels.get(i);
                     if (info.getExpiration() > _context.clock().now()) {
                         // avoid outbound tunnels where the 1st hop is backlogged
                         if (_settings.isInbound() || info.getLength() <= 1 ||
@@ -216,7 +216,7 @@ public class TunnelPool {
     public TunnelInfo getTunnel(TunnelId gatewayId) {
         synchronized (_tunnels) {
             for (int i = 0; i < _tunnels.size(); i++) {
-                TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                TunnelInfo info = _tunnels.get(i);
                 if (_settings.isInbound()) {
                     if (info.getReceiveTunnelId(0).equals(gatewayId))
                         return info;
@@ -249,7 +249,7 @@ public class TunnelPool {
         int fallbacks = 0;
         synchronized (_tunnels) {
             for (int i = 0; i < _tunnels.size(); i++) {
-                TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                TunnelInfo info = _tunnels.get(i);
                 if (info.getLength() <= 1 && ++fallbacks >= needed)
                     return false;
             }
@@ -487,12 +487,27 @@ public class TunnelPool {
 
         long expireAfter = _context.clock().now(); // + _settings.getRebuildPeriod();
         
-        TreeSet leases = new TreeSet(new LeaseComparator());
+        TunnelInfo zeroHopTunnel = null;
+        Lease zeroHopLease = null;
+        TreeSet<Lease> leases = new TreeSet(new LeaseComparator());
         for (int i = 0; i < _tunnels.size(); i++) {
-            TunnelInfo tunnel = (TunnelInfo)_tunnels.get(i);
+            TunnelInfo tunnel = _tunnels.get(i);
             if (tunnel.getExpiration() <= expireAfter)
                 continue; // expires too soon, skip it
-            
+
+            if (tunnel.getLength() <= 1) {
+                // More than one zero-hop tunnel in a lease is pointless
+                // and increases the leaseset size needlessly.
+                // Keep only the one that expires the latest.
+                if (zeroHopTunnel != null) {
+                    if (zeroHopTunnel.getExpiration() > tunnel.getExpiration())
+                        continue;
+                    if (zeroHopLease != null)
+                        leases.remove(zeroHopLease);
+                }
+                zeroHopTunnel = tunnel;
+            }
+
             TunnelId inId = tunnel.getReceiveTunnelId(0);
             Hash gw = tunnel.getPeer(0);
             if ( (inId == null) || (gw == null) ) {
@@ -504,6 +519,9 @@ public class TunnelPool {
             lease.setTunnelId(inId);
             lease.setGateway(gw);
             leases.add(lease);
+            // remember in case we want to remove it for a later-expiring zero-hopper
+            if (tunnel.getLength() <= 1)
+                zeroHopLease = lease;
         }
         
         // Go ahead and use less leases for now, hopefully a new tunnel will be built soon
@@ -523,10 +541,10 @@ public class TunnelPool {
         }
 
         LeaseSet ls = new LeaseSet();
-        Iterator iter = leases.iterator();
+        Iterator<Lease> iter = leases.iterator();
         int count = Math.min(leases.size(), wanted);
         for (int i = 0; i < count; i++)
-             ls.addLease((Lease) iter.next());
+             ls.addLease(iter.next());
         if (_log.shouldLog(Log.INFO))
             _log.info(toString() + ": built new leaseSet: " + ls);
         return ls;
@@ -608,7 +626,7 @@ public class TunnelPool {
             synchronized (_tunnels) {
                 expireTime = new int[_tunnels.size()];
                 for (int i = 0; i < _tunnels.size(); i++) {
-                    TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                    TunnelInfo info = _tunnels.get(i);
                     if (allowZeroHop || (info.getLength() > 1)) {
                         int timeToExpire = (int) (info.getExpiration() - now);
                         if (timeToExpire > 0 && timeToExpire < avg) {
@@ -681,7 +699,7 @@ public class TunnelPool {
         synchronized (_tunnels) {
             boolean enough = _tunnels.size() > wanted;
             for (int i = 0; i < _tunnels.size(); i++) {
-                TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                TunnelInfo info = _tunnels.get(i);
                 if (allowZeroHop || (info.getLength() > 1)) {
                     long timeToExpire = info.getExpiration() - expireAfter;
                     if (timeToExpire <= 0) {
