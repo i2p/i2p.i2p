@@ -40,7 +40,9 @@ button span.hide{
  <%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
+<% if (request.getParameter("edit") == null) { %>
  <input type="submit" name="edit" value="<%=intl._("Add Client")%>" />
+<% } %>
  <input type="submit" name="action" value="<%=intl._("Save Client Configuration")%>" />
 </div></div><h3><a name="webapp"></a><%=intl._("WebApp Configuration")%></h3><p>
  <%=intl._("The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook).")%>
