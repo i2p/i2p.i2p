@@ -109,7 +109,8 @@ public class ClientAppConfig {
                 ClientAppConfig app = (ClientAppConfig) apps.get(i);
                 buf.append(PREFIX).append(i).append(".main=").append(app.className).append("\n");
                 buf.append(PREFIX).append(i).append(".name=").append(app.clientName).append("\n");
-                buf.append(PREFIX).append(i).append(".args=").append(app.args).append("\n");
+                if (app.args != null)
+                    buf.append(PREFIX).append(i).append(".args=").append(app.args).append("\n");
                 buf.append(PREFIX).append(i).append(".delay=").append(app.delay / 1000).append("\n");
                 buf.append(PREFIX).append(i).append(".startOnLoad=").append(!app.disabled).append("\n");
             }

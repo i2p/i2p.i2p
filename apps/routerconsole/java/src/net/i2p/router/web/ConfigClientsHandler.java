@@ -50,6 +50,18 @@ public class ConfigClientsHandler extends FormHandler {
                 startWebApp(app);
             return;
         }
+
+        // value
+        if (_action.startsWith("Delete ")) {
+            String app = _action.substring(7);
+            int appnum = -1;
+            try {
+                appnum = Integer.parseInt(app);
+            } catch (NumberFormatException nfe) {}
+            if (appnum >= 0)
+                deleteClient(appnum);
+            return;
+        }
         // label (IE)
         String xStart = _("Start");
         if (_action.toLowerCase().startsWith(xStart + "<span class=hide> ") &&
@@ -72,26 +84,79 @@ public class ConfigClientsHandler extends FormHandler {
     public void setSettings(Map settings) { _settings = new HashMap(settings); }
     
     private void saveClientChanges() {
-        List clients = ClientAppConfig.getClientApps(_context);
+        List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
-            ClientAppConfig ca = (ClientAppConfig) clients.get(cur);
+            ClientAppConfig ca = clients.get(cur);
             Object val = _settings.get(cur + ".enabled");
             if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
                 ca.disabled = val == null;
+            // edit of an existing entry
+            String desc = getString("desc" + cur);
+            if (desc != null) {
+                int spc = desc.indexOf(" ");
+                String clss = desc;
+                String args = null;
+                if (spc >= 0) {
+                    clss = desc.substring(0, spc);
+                    args = desc.substring(spc + 1);
+                }
+                ca.className = clss;
+                ca.args = args;
+                ca.clientName = getString("name" + cur);
+            }
         }
+
+        int newClient = clients.size();
+        String newDesc = getString("desc" + newClient);
+        if (newDesc != null) {
+            // new entry
+            int spc = newDesc.indexOf(" ");
+            String clss = newDesc;
+            String args = null;
+            if (spc >= 0) {
+                clss = newDesc.substring(0, spc);
+                args = newDesc.substring(spc + 1);
+            }
+            String name = getString("name" + newClient);
+            if (name == null) name = "new client";
+            ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
+                                                     _settings.get(newClient + ".enabled") != null);
+            clients.add(ca);
+            addFormNotice(_("New client added") + ": " + name + " (" + clss + ").");
+        }
+
         ClientAppConfig.writeClientAppConfig(_context, clients);
         addFormNotice(_("Client configuration saved successfully - restart required to take effect."));
     }
 
+    /** curses Jetty for returning arrays */
+    private String getString(String key) {
+        String[] arr = (String[]) _settings.get(key);
+        if (arr == null)
+            return null;
+        return arr[0];
+    }
+
     private void startClient(int i) {
-        List clients = ClientAppConfig.getClientApps(_context);
+        List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         if (i >= clients.size()) {
             addFormError(_("Bad client index."));
             return;
         }
-        ClientAppConfig ca = (ClientAppConfig) clients.get(i);
+        ClientAppConfig ca = clients.get(i);
         LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), configClient_log);
         addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("started") + '.');
+    }
+
+    private void deleteClient(int i) {
+        List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
+        if (i < 0 || i >= clients.size()) {
+            addFormError(_("Bad client index."));
+            return;
+        }
+        ClientAppConfig ca = clients.remove(i);
+        ClientAppConfig.writeClientAppConfig(_context, clients);
+        addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("deleted") + '.');
     }
 
     private void saveWebAppChanges() {
