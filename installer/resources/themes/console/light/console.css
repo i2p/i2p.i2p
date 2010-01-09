@@ -196,12 +196,7 @@ div.refresh {
      padding: 2px 0 0px 0 !important;
 }
 
-div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.5);
-}
-
 div.routersummary a:hover {
-     text-shadow: 0px 0px 0.5px rgba(255, 255, 255, 0.7);
      color: #f60;
 }
 
@@ -470,7 +465,7 @@ table {
      cell-padding: 1px;
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
-     font: 7pt/130% "Lucida Sans Unicode", Verdana, Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font: 7pt/130% "Lucida Sans Unicode", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
 }
 
 table hr {

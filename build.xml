@@ -362,6 +362,8 @@
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/eepsite_index_de.html" tofile="pkg-temp/eepsite/docroot/index_de.html" />
+        <copy file="installer/resources/eepsite_index_fr.html" tofile="pkg-temp/eepsite/docroot/index_fr.html" />
+        <copy file="installer/resources/eepsite_index_ru.html" tofile="pkg-temp/eepsite/docroot/index_ru.html" />
         <copy file="installer/resources/eepsite.css" todir="pkg-temp/eepsite/docroot/" />
         <copy file="installer/resources/robots.txt" todir="pkg-temp/eepsite/docroot/" />
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />

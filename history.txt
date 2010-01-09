@@ -1,3 +1,6 @@
+2010-01-09 zzz
+    * Include new eepsite indexes in pkg
+
 2010-01-06 zzz
     * Summary bar tweaks
 

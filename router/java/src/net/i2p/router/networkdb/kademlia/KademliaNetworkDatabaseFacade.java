@@ -910,6 +910,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return TIMEOUT_MULTIPLIER * (int)responseTime;  // give it up to 3x the average response time
     }
 
+    /** unused (overridden in FNDF) */
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
         if ( (ds == null) || (key == null) ) {
             if (onFailure != null) 
