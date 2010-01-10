@@ -28,6 +28,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.VersionComparator;
 
 public class NetDbRenderer {
     private RouterContext _context;
@@ -185,7 +186,7 @@ public class NetDbRenderer {
         // versions table
         List<String> versionList = new ArrayList(versions.objects());
         if (versionList.size() > 0) {
-            Collections.sort(versionList, Collections.reverseOrder(new TrustedUpdate.VersionComparator()));
+            Collections.sort(versionList, Collections.reverseOrder(new VersionComparator()));
             buf.append("<table>\n");
             buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {
