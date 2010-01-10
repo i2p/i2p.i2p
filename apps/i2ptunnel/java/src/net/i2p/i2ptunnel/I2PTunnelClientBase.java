@@ -89,12 +89,52 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     
     private static final int DEFAULT_NUM_CONNECTION_BUILDERS = 5;
     private static final int DEFAULT_MAX_WAIT_TIME = 30*1000;
-    
-    //public I2PTunnelClientBase(int localPort, boolean ownDest,
-    //		       Logging l) {
-    //    I2PTunnelClientBase(localPort, ownDest, l, (EventDispatcher)null);
-    //}
 
+    // true if we are chained from a server.
+    private boolean chained = false;
+
+    public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager MGR,
+            I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
+            throws IllegalArgumentException {
+        super(localPort + " (uninitialized)", notifyThis, tunnel);
+        chained = true;
+        sockMgr = MGR;
+        _clientId = clientId;
+        this.localPort = localPort;
+        this.l = l;
+        this.handlerName = handlerName + _clientId;
+        _ownDest = true; // == ! shared client
+        _context = tunnel.getContext();
+        _context.statManager().createRateStat("i2ptunnel.client.closeBacklog", "How many pending sockets remain when we close one due to backlog?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+
+        Thread t = new I2PAppThread(this);
+        t.setName("Client " + _clientId);
+        listenerReady = false;
+        t.start();
+        open = true;
+        synchronized (this) {
+            while (!listenerReady && open) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+            }
+        }
+
+        configurePool(tunnel);
+
+        if (open && listenerReady) {
+            l.log("Ready! Port " + getLocalPort());
+            notifyEvent("openBaseClientResult", "ok");
+        } else {
+            l.log("Error listening - please see the logs!");
+            notifyEvent("openBaseClientResult", "error");
+        }
+    }
     public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, 
                                EventDispatcher notifyThis, String handlerName, 
                                I2PTunnel tunnel) throws IllegalArgumentException {
@@ -559,10 +599,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     }
                     return false;
                 }
-                I2PSession session = sockMgr.getSession();
-                if (session != null) {
-                    getTunnel().removeSession(session);
-                }
+                if (!chained) {
+                    I2PSession session = sockMgr.getSession();
+                    if (session != null) {
+                        getTunnel().removeSession(session);
+                    }
+                } // else the app chaining to this one closes it!
             }
             l.log("Closing client " + toString());
             open = false;

@@ -1,3 +1,7 @@
+2010-01-10 sponge
+    * Insert reverse connection ability into the http server code so that
+      seedless can start to get worked on. It's disabled by default.
+
 2010-01-09 zzz
     * Include new eepsite indexes in pkg
 

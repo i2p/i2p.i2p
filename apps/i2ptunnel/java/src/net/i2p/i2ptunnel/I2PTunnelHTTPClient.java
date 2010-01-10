@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -150,7 +151,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
 
+    public I2PTunnelHTTPClient(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
+        super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
+        proxyList = new ArrayList();
 
+        setName(getLocalPort() + " -> HTTPClient [NO PROXIES]");
+        startRunning();
+
+        notifyEvent("openHTTPClientResult", "ok");
+    }
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -160,7 +169,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
-        proxyList = new ArrayList();
+        proxyList = new ArrayList(); // We won't use outside of i2p
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
             return;
@@ -251,6 +260,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     /**
      * Overridden to close internal socket too.
      */
+    @Override
     public boolean close(boolean forced) {
         boolean rv = super.close(forced);
         if (this.isr != null)
