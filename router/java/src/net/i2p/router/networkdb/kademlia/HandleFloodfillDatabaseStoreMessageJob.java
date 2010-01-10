@@ -64,6 +64,11 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         RouterInfo prevNetDb = null;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
+            Hash key = _message.getKey();
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Handling dbStore of leaseset " + _message);
+                //_log.info("Handling dbStore of leasset " + key + " with expiration of " 
+                //          + new Date(_message.getLeaseSet().getEarliestLeaseDate()));
    
             try {
                 // Never store a leaseSet for a local dest received from somebody else.
@@ -72,18 +77,18 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 // somebody has our keys... 
                 // This could happen with multihoming - where it's really important to prevent
                 // storing the other guy's leaseset, it will confuse us badly.
-                if (getContext().clientManager().isLocal(_message.getKey())) {
+                if (getContext().clientManager().isLocal(key)) {
                     //getContext().statManager().addRateData("netDb.storeLocalLeaseSetAttempt", 1, 0);
                     // throw rather than return, so that we send the ack below (prevent easy attack)
                     throw new IllegalArgumentException("Peer attempted to store local leaseSet: " +
-                                                       _message.getKey().toBase64().substring(0, 4));
+                                                       key.toBase64().substring(0, 4));
                 }
                 LeaseSet ls = _message.getLeaseSet();
                 // mark it as something we received, so we'll answer queries 
                 // for it.  this flag does NOT get set on entries that we 
                 // receive in response to our own lookups.
                 ls.setReceivedAsPublished(true);
-                LeaseSet match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
+                LeaseSet match = getContext().netDb().store(key, _message.getLeaseSet());
                 if ( (match == null) || (match.getEarliestLeaseDate() < _message.getLeaseSet().getEarliestLeaseDate()) ) {
                     wasNew = true;
                 } else {

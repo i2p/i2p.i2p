@@ -49,7 +49,7 @@ public class OutboundTunnelEndpoint {
                 _log.debug("outbound tunnel " + _config + " received a full message: " + msg
                            + " to be forwarded on to "
                            + (toRouter != null ? toRouter.toBase64().substring(0,4) : "")
-                           + (toTunnel != null ? toTunnel.getTunnelId() + "" : ""));
+                           + (toTunnel != null ? ":" + toTunnel.getTunnelId() : ""));
             // don't drop it if we are the target
             if ((!_context.routerHash().equals(toRouter)) &&
                 _context.tunnelDispatcher().shouldDropParticipatingMessage("OBEP " + msg.getType(), msg.getMessageSize()))

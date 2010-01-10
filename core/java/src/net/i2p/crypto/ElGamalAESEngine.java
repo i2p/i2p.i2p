@@ -359,8 +359,8 @@ public class ElGamalAESEngine {
      * @param target public key to which the data should be encrypted. 
      * @param key session key to use during encryption
      * @param tagsForDelivery session tags to be associated with the key (or newKey if specified), or null
-     * @param currentTag sessionTag to use, or null if it should use ElG
-     * @param newKey key to be delivered to the target, with which the tagsForDelivery should be associated
+     * @param currentTag sessionTag to use, or null if it should use ElG (i.e. new session)
+     * @param newKey key to be delivered to the target, with which the tagsForDelivery should be associated, or null
      * @param paddedSize minimum size in bytes of the body after padding it (if less than the
      *          body's real size, no bytes are appended but the body is not truncated)
      */
@@ -368,12 +368,12 @@ public class ElGamalAESEngine {
                                  SessionTag currentTag, SessionKey newKey, long paddedSize) {
         if (currentTag == null) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Current tag is null, encrypting as new session", new Exception("encrypt new"));
+                _log.info("Current tag is null, encrypting as new session");
             _context.statManager().updateFrequency("crypto.elGamalAES.encryptNewSession");
             return encryptNewSession(data, target, key, tagsForDelivery, newKey, paddedSize);
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Current tag is NOT null, encrypting as existing session", new Exception("encrypt existing"));
+            _log.info("Current tag is NOT null, encrypting as existing session");
         _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
         byte rv[] = encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
         if (_log.shouldLog(Log.DEBUG))
@@ -383,6 +383,7 @@ public class ElGamalAESEngine {
 
     /**
      * Encrypt the data to the target using the given key and deliver the specified tags
+     * No new session key
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                  SessionTag currentTag, long paddedSize) {
@@ -391,6 +392,8 @@ public class ElGamalAESEngine {
 
     /**
      * Encrypt the data to the target using the given key and deliver the specified tags
+     * No new session key
+     * No current tag (encrypt as new session)
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery, long paddedSize) {
         return encrypt(data, target, key, tagsForDelivery, null, null, paddedSize);
@@ -398,6 +401,8 @@ public class ElGamalAESEngine {
 
     /**
      * Encrypt the data to the target using the given key delivering no tags
+     * No new session key
+     * No current tag (encrypt as new session)
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, long paddedSize) {
         return encrypt(data, target, key, null, null, null, paddedSize);

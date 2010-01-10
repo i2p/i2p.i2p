@@ -19,7 +19,7 @@ import net.i2p.util.Log;
 
 /**
  * Build a HandleDatabaseLookupMessageJob whenever a DatabaseLookupMessage arrives
- *
+ * Unused - see kademlia/ for replacement
  */
 public class DatabaseLookupMessageHandler implements HandlerJobBuilder {
     private RouterContext _context;

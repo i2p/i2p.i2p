@@ -22,7 +22,7 @@ import net.i2p.util.Log;
 
 /**
  * Receive DatabaseStoreMessage data and store it in the local net db
- *
+ * Unused - see kademlia/ for replacement
  */
 public class HandleDatabaseStoreMessageJob extends JobImpl {
     private Log _log;

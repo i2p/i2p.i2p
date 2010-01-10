@@ -18,7 +18,7 @@ import net.i2p.router.RouterContext;
 
 /**
  * Create a HandleDatabaseStoreMessageJob whenever a DatabaseStoreMessage arrives
- *
+ * Unused - see kademlia/ for replacement
  */
 public class DatabaseStoreMessageHandler implements HandlerJobBuilder {
     private RouterContext _context;

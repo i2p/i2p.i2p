@@ -33,7 +33,7 @@ import net.i2p.util.Log;
 /**
  * Handle a lookup for a key received from a remote peer.  Needs to be implemented
  * to send back replies, etc
- *
+ * Unused directly - see kademlia/ for extension
  */
 public class HandleDatabaseLookupMessageJob extends JobImpl {
     private Log _log;
