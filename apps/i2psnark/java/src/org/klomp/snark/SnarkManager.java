@@ -561,7 +561,7 @@ public class SnarkManager implements Snark.CompleteListener {
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
             return _("Too many files in \"{0}\" ({1}), deleting it!", info.getName(), files.size());
         } else if ( (files == null) && (info.getName().endsWith(".torrent")) ) {
-            return _("Torrent file \"{0}\" cannot end in '.torrent', deleting it!", info.getName());
+            return _("Torrent file \"{0}\" cannot end in \".torrent\", deleting it!", info.getName());
         } else if (info.getPieces() <= 0) {
             return _("No pieces in \"{0}\",  deleting it!", info.getName());
         } else if (info.getPieces() > Storage.MAX_PIECES) {

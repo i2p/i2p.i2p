@@ -1,3 +1,12 @@
+* 2010-01-12  0.7.9 released
+
+2010-01-12 zzz
+    * I2CP: Clean up resources on 5-minute leaseset timeout at startup
+    * Increase max floodfills to 9 (was 6)
+    * Temporarily disable routerInfo floodfill verifies
+    * Fix .fr eepsite index css
+    * Javdoc tweaks
+
 2010-01-09 zzz
     * Include new eepsite indexes in pkg
 

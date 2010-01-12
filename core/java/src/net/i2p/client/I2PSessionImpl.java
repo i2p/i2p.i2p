@@ -289,8 +289,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After getDate / begin waiting for a response");
             int waitcount = 0;
             while (!_dateReceived) {
-                if (waitcount++ > 30)
+                if (waitcount++ > 30) {
+                    closeSocket();
                     throw new IOException("no date handshake");
+                }
                 try {
                     synchronized (_dateReceivedLock) {
                         _dateReceivedLock.wait(1000);
@@ -307,8 +309,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             // wait until we have created a lease set
             waitcount = 0;
             while (_leaseSet == null) {
-                if (waitcount++ > 5*60)
+                if (waitcount++ > 5*60) {
+                    try {
+                        _producer.disconnect(this);
+                    } catch (I2PSessionException ipe) {}
+                    closeSocket();
                     throw new IOException("no leaseset");
+                }
                 synchronized (_leaseSetWait) {
                     try {
                         _leaseSetWait.wait(1000);

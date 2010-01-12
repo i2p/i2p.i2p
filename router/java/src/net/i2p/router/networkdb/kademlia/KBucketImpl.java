@@ -231,7 +231,7 @@ class KBucketImpl implements KBucket {
     
     /**
      *  Todo: shuffling here is a hack and doesn't work since
-     *  wwe witched back to a HashSet implementation
+     *  we switched back to a HashSet implementation
      */
     public int add(Hash peer) {
             _entries.add(peer);
