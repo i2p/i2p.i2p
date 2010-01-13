@@ -77,7 +77,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
     
     /**
-     * Framed average clock skew of connected peers in seconds, or the clock offset if we cannot answer.
+     * @return Framed average clock skew of connected peers in seconds, or the clock offset if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
      */
     @Override

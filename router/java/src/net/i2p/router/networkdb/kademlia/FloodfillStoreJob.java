@@ -53,6 +53,7 @@ class FloodfillStoreJob extends StoreJob {
     @Override
     protected void succeed() {
         super.succeed();
+
         if (_state != null) {
             // Get the time stamp from the data we sent, so the Verify job can meke sure that
             // it finds something stamped with that time or newer.
@@ -61,6 +62,8 @@ class FloodfillStoreJob extends StoreJob {
             boolean isRouterInfo = data instanceof RouterInfo;
             if (isRouterInfo) {
                 published = ((RouterInfo) data).getPublished();
+                // Temporarily disable
+                return;
             } else if (data instanceof LeaseSet) {
                 published = ((LeaseSet) data).getEarliestLeaseDate();
             }
