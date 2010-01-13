@@ -44,21 +44,21 @@ public class EepGet {
     protected String _actualURL;
     private String _postData;
     private boolean _allowCaching;
-    protected final List _listeners;
+    protected final List<StatusListener> _listeners;
     
-    private boolean _keepFetching;
-    private Socket _proxy;
+    protected boolean _keepFetching;
+    protected Socket _proxy;
     protected OutputStream _proxyOut;
     protected InputStream _proxyIn;
     protected OutputStream _out;
     protected long _alreadyTransferred;
-    private long _bytesTransferred;
+    protected long _bytesTransferred;
     protected long _bytesRemaining;
     protected int _currentAttempt;
     private String _etag;
     private String _lastModified;
-    private boolean _encodingChunked;
-    private boolean _notModified;
+    protected boolean _encodingChunked;
+    protected boolean _notModified;
     private String _contentType;
     protected boolean _transferFailed;
     protected boolean _headersRead;
@@ -441,7 +441,7 @@ public class EepGet {
             timeout.setTotalTimeoutPeriod(_fetchEndTime);
             try {
                 for (int i = 0; i < _listeners.size(); i++) 
-                    ((StatusListener)_listeners.get(i)).attempting(_url);
+                    _listeners.get(i).attempting(_url);
                 sendRequest(timeout);
                 timeout.resetTimer();
                 doFetch(timeout);
@@ -452,7 +452,7 @@ public class EepGet {
             } catch (IOException ioe) {
                 timeout.cancel();
                 for (int i = 0; i < _listeners.size(); i++) 
-                    ((StatusListener)_listeners.get(i)).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, ioe);
+                    _listeners.get(i).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, ioe);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("ERR: doFetch failed " +  ioe);
             } finally {
@@ -480,13 +480,13 @@ public class EepGet {
         }
 
         for (int i = 0; i < _listeners.size(); i++) 
-            ((StatusListener)_listeners.get(i)).transferFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt);
+            _listeners.get(i).transferFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt);
         if (_log.shouldLog(Log.WARN))
             _log.warn("All attempts failed for " + _url);
         return false;
     }
 
-    /** return true if the URL was completely retrieved */
+    /** single fetch */
     protected void doFetch(SocketTimeout timeout) throws IOException {
         _headersRead = false;
         _aborted = false;
@@ -586,7 +586,7 @@ public class EepGet {
                 _bytesRemaining -= read;
             if (read > 0) {
                 for (int i = 0; i < _listeners.size(); i++) 
-                    ((StatusListener)_listeners.get(i)).bytesTransferred(
+                    _listeners.get(i).bytesTransferred(
                             _alreadyTransferred, 
                             read, 
                             _bytesTransferred, 
@@ -615,12 +615,12 @@ public class EepGet {
         if (_transferFailed) {
             // 404, etc - transferFailed is called after all attempts fail, by fetch() above
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, new Exception("Attempt failed"));
+                _listeners.get(i).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, new Exception("Attempt failed"));
         } else if ((_minSize > 0) && (_alreadyTransferred < _minSize)) {
             throw new IOException("Bytes transferred " + _alreadyTransferred + " violates minimum of " + _minSize + " bytes");
         } else if ( (_bytesRemaining == -1) || (remaining == 0) ) {
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).transferComplete(
+                _listeners.get(i).transferComplete(
                         _alreadyTransferred, 
                         _bytesTransferred, 
                         _encodingChunked?-1:_bytesRemaining, 
@@ -744,7 +744,7 @@ public class EepGet {
         }
     }
     
-    private long readChunkLength() throws IOException {
+    protected long readChunkLength() throws IOException {
         StringBuilder buf = new StringBuilder(8);
         int nl = 0;
         while (true) {
@@ -808,7 +808,7 @@ public class EepGet {
 
     private void handle(String key, String val) {
         for (int i = 0; i < _listeners.size(); i++) 
-            ((StatusListener)_listeners.get(i)).headerReceived(_url, _currentAttempt, key.trim(), val.trim());
+            _listeners.get(i).headerReceived(_url, _currentAttempt, key.trim(), val.trim());
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Header line: [" + key + "] = [" + val + "]");
