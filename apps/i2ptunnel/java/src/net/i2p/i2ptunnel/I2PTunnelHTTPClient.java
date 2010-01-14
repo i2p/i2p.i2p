@@ -57,7 +57,7 @@ import net.i2p.util.Translate;
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
-    private final List proxyList;
+    protected List proxyList;
 
     private HashMap addressHelpers = new HashMap();
 

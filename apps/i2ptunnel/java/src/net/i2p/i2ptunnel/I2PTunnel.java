@@ -236,6 +236,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             runServer(args, l);
         } else if ("httpserver".equals(cmdname)) {
             runHttpServer(args, l);
+        } else if ("httpbidirserver".equals(cmdname)) {
+            runHttpBidirServer(args, l);
         } else if ("ircserver".equals(cmdname)) {
             runIrcServer(args, l);
         } else if ("textserver".equals(cmdname)) {
@@ -300,6 +302,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("ping <args>");
         l.log("server <host> <port> <privkeyfile>");
         l.log("httpserver <host> <port> <spoofedhost> <privkeyfile>");
+        l.log("httpbidirserver <host> <port> <proxyport> <spoofedhost> <privkeyfile>");
         l.log("textserver <host> <port> <privkey>");
         l.log("genkeys <privkeyfile> [<pubkeyfile>]");
         l.log("gentextkeys");
@@ -499,6 +502,80 @@ public class I2PTunnel implements Logging, EventDispatcher {
             l.log("  creates an HTTP server that sends all incoming data\n" 
                   + "  of its destination to host:port., filtering the HTTP\n" 
                   + "  headers so it looks like the request is to the spoofed host.");
+            notifyEvent("serverTaskId", Integer.valueOf(-1));
+        }
+    }
+
+    /**
+     * Run the HTTP server pointing at the host and port specified using the private i2p
+     * destination loaded from the specified file, replacing the HTTP headers
+     * so that the Host: specified is the one spoofed. Also runs an HTTP proxy for
+     * bidirectional communications on the same tunnel destination.<p />
+     *
+     * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
+     * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
+     * 'ok').  So, success = serverTaskId != -1 and openServerResult = ok.
+     *
+     * @param args {hostname, portNumber, proxyPortNumber, spoofedHost, privKeyFilename}
+     * @param l logger to receive events and output
+     */
+    public void runHttpBidirServer(String args[], Logging l) {
+        if (args.length == 5) {
+            InetAddress serverHost = null;
+            int portNum = -1;
+            int port2Num = -1;
+            File privKeyFile = null;
+            try {
+                serverHost = InetAddress.getByName(args[0]);
+            } catch (UnknownHostException uhe) {
+                l.log("unknown host");
+                _log.error(getPrefix() + "Error resolving " + args[0], uhe);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            try {
+                portNum = Integer.parseInt(args[1]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            try {
+                port2Num = Integer.parseInt(args[2]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[2], nfe);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            String spoofedHost = args[3];
+
+            privKeyFile = new File(args[4]);
+            if (!privKeyFile.isAbsolute())
+                privKeyFile = new File(_context.getConfigDir(), args[4]);
+            if (!privKeyFile.canRead()) {
+                l.log("private key file does not exist");
+                _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[4]);
+                notifyEvent("serverTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            I2PTunnelHTTPBidirServer serv = new I2PTunnelHTTPBidirServer(serverHost, portNum, port2Num, privKeyFile, args[3], spoofedHost, l, (EventDispatcher) this, this);
+            serv.setReadTimeout(readTimeout);
+            serv.startRunning();
+            addtask(serv);
+            notifyEvent("serverTaskId", Integer.valueOf(serv.getId()));
+            return;
+        } else {
+            l.log("httpserver <host> <port> <proxyport> <spoofedhost> <privkeyfile>");
+            l.log("  creates a bidirectional HTTP server that sends all incoming data\n"
+                  + "  of its destination to host:port., filtering the HTTP\n"
+                  + "  headers so it looks like the request is to the spoofed host,"
+                  + "  and listens to host:proxyport to proxy HTTP requests.");
             notifyEvent("serverTaskId", Integer.valueOf(-1));
         }
     }

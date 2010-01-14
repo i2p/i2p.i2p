@@ -389,6 +389,7 @@ public class IndexBean {
         else if ("ircserver".equals(internalType)) return _("IRC server");
         else if ("streamrclient".equals(internalType)) return _("Streamr client");
         else if ("streamrserver".equals(internalType)) return _("Streamr server");
+        else if ("httpbidirserver".equals(internalType)) return _("HTTP bidir");
         else return internalType;
     }
     
@@ -779,8 +780,11 @@ public class IndexBean {
                 config.setProperty("listenPort", _port);
             if (_reachableByOther != null)
                 config.setProperty("interface", _reachableByOther);
-            else
+            else if (_reachableBy != null)
                 config.setProperty("interface", _reachableBy);
+            else
+                config.setProperty("interface", "");
+
             config.setProperty("sharedClient", _sharedClient + "");
             for (String p : _booleanClientOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
@@ -806,11 +810,22 @@ public class IndexBean {
         } else if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
-        } else if ("httpserver".equals(_type)) {
+        } else if ("httpserver".equals(_type) || "httpbidirserver".equals(_type)) {
             if (_spoofedHost != null)
                 config.setProperty("spoofedHost", _spoofedHost);
         }
-
+        if ("httpbidirserver".equals(_type)) {
+            if (_port != null)
+                config.setProperty("listenPort", _port);
+            if (_reachableByOther != null)
+                config.setProperty("interface", _reachableByOther);
+            else if (_reachableBy != null)
+                config.setProperty("interface", _reachableBy);
+            else if (_targetHost != null)
+                config.setProperty("interface", _targetHost);
+            else
+                config.setProperty("interface", "");
+        }
         return config;
     }
     

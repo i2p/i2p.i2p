@@ -48,47 +48,29 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     private static final boolean DEFAULT_USE_POOL = false;
+    protected static volatile long __serverId = 0;
+    private static final String PROP_HANDLER_COUNT = "i2ptunnel.blockingHandlerCount";
+    private static final int DEFAULT_HANDLER_COUNT = 10;
 
-    private I2PTunnelTask task = null;
-    private boolean bidir = false;
-    private int localPort = 4445;
 
-    private int DEFAULT_LOCALPORT = 4445;
+
+    protected I2PTunnelTask task = null;
+    protected boolean bidir = false;
+
+    private int DEFAULT_LOCALPORT = 4488;
+    protected int localPort = DEFAULT_LOCALPORT;
 
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host + ":" + port + " <- " + privData, notifyThis, tunnel);
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(privData));
-        String usePool = tunnel.getClientOptions().getProperty("i2ptunnel.usePool");
-        if (usePool != null)
-            _usePool = "true".equalsIgnoreCase(usePool);
-        else
-            _usePool = DEFAULT_USE_POOL;
-        String biDir = tunnel.getClientOptions().getProperty("i2ptunnel.bidir");
-        if (biDir != null) {
-            bidir = "true".equalsIgnoreCase(biDir);
-            String lp = tunnel.getClientOptions().getProperty("i2ptunnel.bidir.port");
-            if (lp != null)
-               localPort = Integer.parseInt(lp);
-            else
-               localPort = DEFAULT_LOCALPORT;
-        } else
-            bidir = false;
+        SetUsePool(tunnel);
         init(host, port, bais, privData, l);
     }
 
     public I2PTunnelServer(InetAddress host, int port, File privkey, String privkeyname, Logging l,
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host + ":" + port + " <- " + privkeyname, notifyThis, tunnel);
-        String usePool = tunnel.getClientOptions().getProperty("i2ptunnel.usePool");
-        if (usePool != null)
-            _usePool = "true".equalsIgnoreCase(usePool);
-        else
-            _usePool = DEFAULT_USE_POOL;
-        String biDir = tunnel.getClientOptions().getProperty("i2ptunnel.bidir");
-        if (biDir != null)
-            bidir = "true".equalsIgnoreCase(biDir);
-        else
-            bidir = false;
+        SetUsePool(tunnel);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(privkey);
@@ -104,20 +86,18 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host + ":" + port + " <- " + privkeyname, notifyThis, tunnel);
-        String usePool = tunnel.getClientOptions().getProperty("i2ptunnel.usePool");
-        if (usePool != null)
-            _usePool = "true".equalsIgnoreCase(usePool);
-        else
-            _usePool = DEFAULT_USE_POOL;
-        String biDir = tunnel.getClientOptions().getProperty("i2ptunnel.bidir");
-        if (biDir != null)
-            bidir = "true".equalsIgnoreCase(biDir);
-        else
-            bidir = false;
+        SetUsePool(tunnel);
         init(host, port, privData, privkeyname, l);
     }
 
 
+    private void SetUsePool(I2PTunnel Tunnel) {
+        String usePool = Tunnel.getClientOptions().getProperty("i2ptunnel.usePool");
+        if (usePool != null)
+            _usePool = "true".equalsIgnoreCase(usePool);
+        else
+            _usePool = DEFAULT_USE_POOL;
+    }
     private void init(InetAddress host, int port, InputStream privData, String privkeyname, Logging l) {
         this.l = l;
         this.remoteHost = host;
@@ -144,10 +124,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
             }
         }
-        if(bidir == true) {
-            /* start the httpclient */
-            task = new I2PTunnelHTTPClient(localPort, l, sockMgr, getTunnel(), getEventDispatcher(), __serverId);
-        }
+
         sockMgr.setName("Server");
         getTunnel().addSession(sockMgr.getSession());
         l.log("Ready!");
@@ -155,8 +132,6 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         open = true;
     }
 
-    
-    private static volatile long __serverId = 0;
     
     /**
      * Start running the I2PTunnelServer.
@@ -215,9 +190,6 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
-    private static final String PROP_HANDLER_COUNT = "i2ptunnel.blockingHandlerCount";
-    private static final int DEFAULT_HANDLER_COUNT = 10;
-    
     protected int getHandlerCount() { 
         int rv = DEFAULT_HANDLER_COUNT;
         String cnt = getTunnel().getClientOptions().getProperty(PROP_HANDLER_COUNT);

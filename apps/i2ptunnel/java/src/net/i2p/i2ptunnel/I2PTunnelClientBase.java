@@ -93,12 +93,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     // true if we are chained from a server.
     private boolean chained = false;
 
-    public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager MGR,
+    public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager SktMgr,
             I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
             throws IllegalArgumentException {
         super(localPort + " (uninitialized)", notifyThis, tunnel);
         chained = true;
-        sockMgr = MGR;
+        sockMgr = SktMgr;
         _clientId = clientId;
         this.localPort = localPort;
         this.l = l;

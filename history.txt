@@ -1,3 +1,7 @@
+2010-01-14 sponge
+    * Clean up reverse connection ability, remove some annoyingly redundent
+      code. Place all settings in the console. It works!
+
 2010-01-10 sponge
     * Insert reverse connection ability into the http server code so that
       seedless can start to get worked on. It's disabled by default.
