@@ -67,7 +67,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     // private Object conLock = new Object();
     
     /** List of Socket for those accept()ed but not yet started up */
-    private List _waitingSockets = new ArrayList(); // FIXME should be final and use a factory. FIXME
+    protected final List _waitingSockets = new ArrayList(4); // FIXME should be final and use a factory. FIXME
     /** How many connections will we allow to be in the process of being built at once? */
     private int _numConnectionBuilders;
     /** How long will we allow sockets to sit in the _waitingSockets map before killing them? */
@@ -93,12 +93,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     // true if we are chained from a server.
     private boolean chained = false;
 
-    public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager SktMgr,
+    public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager sktMgr,
             I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
             throws IllegalArgumentException {
         super(localPort + " (uninitialized)", notifyThis, tunnel);
         chained = true;
-        sockMgr = SktMgr;
+        sockMgr = sktMgr;
         _clientId = clientId;
         this.localPort = localPort;
         this.l = l;
@@ -228,7 +228,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *
      */
     private void configurePool(I2PTunnel tunnel) {
-        _waitingSockets = new ArrayList(4);
+        //_waitingSockets = new ArrayList(4);
         
         Properties opts = tunnel.getClientOptions();
         String maxWait = opts.getProperty(PROP_MAX_WAIT_TIME, DEFAULT_MAX_WAIT_TIME+"");

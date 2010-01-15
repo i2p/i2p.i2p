@@ -57,7 +57,7 @@ import net.i2p.util.Translate;
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
-    protected List proxyList;
+    protected final List proxyList = new ArrayList();
 
     private HashMap addressHelpers = new HashMap();
 
@@ -153,7 +153,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     public I2PTunnelHTTPClient(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
         super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
-        proxyList = new ArrayList();
+       // proxyList = new ArrayList();
 
         setName(getLocalPort() + " -> HTTPClient [NO PROXIES]");
         startRunning();
@@ -169,7 +169,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
-        proxyList = new ArrayList(); // We won't use outside of i2p
+        //proxyList = new ArrayList(); // We won't use outside of i2p
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
             return;

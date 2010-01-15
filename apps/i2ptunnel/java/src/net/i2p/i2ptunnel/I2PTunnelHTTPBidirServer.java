@@ -15,20 +15,20 @@ public class I2PTunnelHTTPBidirServer extends I2PTunnelHTTPServer {
 
     public I2PTunnelHTTPBidirServer(InetAddress host, int port, int proxyport, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, spoofHost, l, notifyThis, tunnel);
-        I2PTunnelHTTPBidirServerSet(tunnel, l, proxyport);
+        finishSetupI2PTunnelHTTPBidirServer(l, proxyport);
     }
 
     public I2PTunnelHTTPBidirServer(InetAddress host, int port, int proxyport, File privkey, String privkeyname, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privkey, privkeyname, spoofHost, l, notifyThis, tunnel);
-        I2PTunnelHTTPBidirServerSet(tunnel, l, proxyport);
+        finishSetupI2PTunnelHTTPBidirServer(l, proxyport);
     }
 
     public I2PTunnelHTTPBidirServer(InetAddress host, int port, int proxyport, InputStream privData, String privkeyname, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, privkeyname, spoofHost, l, notifyThis, tunnel);
-        I2PTunnelHTTPBidirServerSet(tunnel, l, proxyport);
+        finishSetupI2PTunnelHTTPBidirServer(l, proxyport);
     }
 
-    private void I2PTunnelHTTPBidirServerSet(I2PTunnel tunnel, Logging l, int proxyport) {
+    private void finishSetupI2PTunnelHTTPBidirServer(Logging l, int proxyport) {
         
         localPort = proxyport;
         bidir = true;

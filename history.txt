@@ -1,4 +1,10 @@
 2010-01-14 sponge
+    * Fully clean up I2PTunnel. No more lint issues, should compile 100%
+      clean.
+    * Dropped unused class BufferLogger from I2PTunnel as it is not used
+      anylonger.
+
+2010-01-14 sponge
     * Clean up reverse connection ability, remove some annoyingly redundent
       code. Place all settings in the console. It works!
 

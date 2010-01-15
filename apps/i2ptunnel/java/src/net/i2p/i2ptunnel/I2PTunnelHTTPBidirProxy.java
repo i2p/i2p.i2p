@@ -24,7 +24,7 @@
 
 package net.i2p.i2ptunnel;
 
-import java.util.ArrayList;
+// import java.util.ArrayList;
 
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.util.EventDispatcher;
@@ -44,7 +44,7 @@ public class I2PTunnelHTTPBidirProxy extends I2PTunnelHTTPClient implements Runn
      */
     public I2PTunnelHTTPBidirProxy(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
         super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
-        proxyList = new ArrayList();
+        // proxyList = new ArrayList();
 
         setName(getLocalPort() + " -> HTTPClient [NO PROXIES]");
         startRunning();
