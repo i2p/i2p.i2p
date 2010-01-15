@@ -32,7 +32,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 class StoreJob extends JobImpl {
-    private Log _log;
+    protected Log _log;
     private KademliaNetworkDatabaseFacade _facade;
     protected StoreState _state;
     private Job _onSuccess;
@@ -293,7 +293,11 @@ class StoreJob extends JobImpl {
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
-            sendStoreThroughGarlic(msg, peer, expiration);
+            // if it is an encrypted leaseset...
+            if (getContext().keyRing().get(msg.getKey()) != null)
+                sendStoreThroughGarlic(msg, peer, expiration);
+            else
+                sendStoreThroughClient(msg, peer, expiration);
         } else {
             getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
             sendDirect(msg, peer, expiration);
@@ -390,6 +394,93 @@ class StoreJob extends JobImpl {
     }
  
     /**
+     * Send a leaseset store message out the client tunnel,
+     * with the reply to come back through a client tunnel.
+     * Stores are garlic encrypted to hide the identity from the OBEP.
+     *
+     * This makes it harder for an exploratory OBEP or IBGW to correlate it
+     * with one or more destinations. Since we are publishing the leaseset,
+     * it's easy to find out that an IB tunnel belongs to this dest, and
+     * it isn't much harder to do the same for an OB tunnel.
+     *
+     * As a side benefit, client tunnels should be faster and more reliable than
+     * exploratory tunnels.
+     *
+     * @param msg must contain a leaseset
+     * @since 0.7.10
+     */
+    private void sendStoreThroughClient(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
+        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        Hash client = msg.getKey();
+
+        TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel(client);
+        if (replyTunnel == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No reply inbound tunnels available!");
+            fail();
+            return;
+        }
+        TunnelId replyTunnelId = replyTunnel.getReceiveTunnelId(0);
+        msg.setReplyToken(token);
+        msg.setReplyTunnel(replyTunnelId);
+        msg.setReplyGateway(replyTunnel.getPeer(0));
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
+
+        Hash to = peer.getIdentity().getHash();
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client);
+        if (outTunnel != null) {
+            // garlic encrypt
+            MessageWrapper.WrappedMessage wm = MessageWrapper.wrap(getContext(), msg, client, peer);
+            if (wm == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Fail garlic encrypting from: " + client);
+                fail();
+                return;
+            }
+            I2NPMessage sent = wm.getMessage();
+
+            SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, sent.getMessageSize());
+            FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
+            StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
+    
+            if (_log.shouldLog(Log.DEBUG)) {
+                _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
+                //_log.debug("Expiration is " + new Date(sent.getMessageExpiration()));
+            }
+            getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
+            _state.addPending(to, wm);
+            getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), null, to);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No outbound tunnels to send a dbStore out - delaying...");
+            // continueSending() above did an addPending() so remove it here.
+            // This means we will skip the peer next time, can't be helped for now
+            // without modding StoreState
+            _state.replyTimeout(to);
+            Job waiter = new WaitJob(getContext());
+            waiter.getTiming().setStartAfter(getContext().clock().now() + 3*1000);
+            getContext().jobQueue().addJob(waiter);
+            //fail();
+        }
+    }
+    
+    /**
+     * Called to wait a little while
+     * @since 0.7.10
+     */
+    private class WaitJob extends JobImpl {
+        public WaitJob(RouterContext enclosingContext) {
+            super(enclosingContext);
+        }
+        public void runJob() {
+            sendNext();
+        }
+        public String getName() { return "Kademlia Store Send Delay"; }
+    }
+
+    /**
      * Called after sending a dbStore to a peer successfully, 
      * marking the store as successful
      *
@@ -414,11 +505,16 @@ class StoreJob extends JobImpl {
 
         public String getName() { return "Kademlia Store Send Success"; }
         public void runJob() {
-            long howLong = _state.confirmed(_peer.getIdentity().getHash());
+            Hash hash = _peer.getIdentity().getHash();
+            MessageWrapper.WrappedMessage wm = _state.getPendingMessage(hash);
+            if (wm != null)
+                wm.acked();
+            long howLong = _state.confirmed(hash);
+
             if (_log.shouldLog(Log.INFO))
                 _log.info(StoreJob.this.getJobId() + ": Marking store of " + _state.getTarget() 
-                          + " to " + _peer.getIdentity().getHash().toBase64() + " successful after " + howLong);
-            getContext().profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
+                          + " to " + hash.toBase64() + " successful after " + howLong);
+            getContext().profileManager().dbStoreSent(hash, howLong);
             getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
             if ( (_sendThrough != null) && (_msgSize > 0) ) {
@@ -456,11 +552,17 @@ class StoreJob extends JobImpl {
             _sendOn = sendOn;
         }
         public void runJob() {
+            Hash hash = _peer.getIdentity().getHash();
             if (_log.shouldLog(Log.INFO))
-                _log.info(StoreJob.this.getJobId() + ": Peer " + _peer.getIdentity().getHash().toBase64() 
+                _log.info(StoreJob.this.getJobId() + ": Peer " + hash.toBase64() 
                           + " timed out sending " + _state.getTarget());
-            _state.replyTimeout(_peer.getIdentity().getHash());
-            getContext().profileManager().dbStoreFailed(_peer.getIdentity().getHash());
+
+            MessageWrapper.WrappedMessage wm = _state.getPendingMessage(hash);
+            if (wm != null)
+                wm.fail();
+            _state.replyTimeout(hash);
+
+            getContext().profileManager().dbStoreFailed(hash);
             getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn, 0);
             
             sendNext();

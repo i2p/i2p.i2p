@@ -118,6 +118,8 @@ public class GarlicMessageBuilder {
     ***/
 
     /**
+     * called by above
+     *
      * @param ctx scope
      * @param config how/what to wrap
      * @param wrappedKey output parameter that will be filled with the sessionKey used
@@ -127,6 +129,22 @@ public class GarlicMessageBuilder {
      */
     private static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
                                              int numTagsToDeliver, boolean forceElGamal, SessionKeyManager skm) {
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, numTagsToDeliver, LOW_THRESHOLD, false, skm);
+    }
+
+    /**
+     * called by netdb
+     *
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
+     * @param numTagsToDeliver only if the estimated available tags are below the threshold
+     * @param lowTagsThreshold the threshold
+     * @param skm non-null
+     */
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set<SessionTag> wrappedTags,
+                                             int numTagsToDeliver, int lowTagsThreshold, boolean forceElGamal, SessionKeyManager skm) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
@@ -154,7 +172,7 @@ public class GarlicMessageBuilder {
             if (log.shouldLog(Log.DEBUG))
                 log.debug("Available tags for encryption to " + key + ": " + availTags);
 
-            if (availTags < LOW_THRESHOLD) { // arbitrary threshold
+            if (availTags < lowTagsThreshold) { // arbitrary threshold
                 for (int i = 0; i < numTagsToDeliver; i++)
                     wrappedTags.add(new SessionTag(true));
                 if (log.shouldLog(Log.INFO))

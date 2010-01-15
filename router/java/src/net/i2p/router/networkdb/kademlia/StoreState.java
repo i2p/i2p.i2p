@@ -5,23 +5,26 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
 /**
- *  Todo: remove exploratory
+ *
  */
 class StoreState {
     private RouterContext _context;
     private Hash _key;
     private DataStructure _data;
     private final HashSet<Hash> _pendingPeers;
-    private HashMap<Hash, Long> _pendingPeerTimes;
+    private Map<Hash, Long> _pendingPeerTimes;
+    private Map<Hash, MessageWrapper.WrappedMessage> _pendingMessages;
     private final HashSet<Hash> _successfulPeers;
-    private final HashSet<Hash> _successfulExploratoryPeers;
+    //private final HashSet<Hash> _successfulExploratoryPeers;
     private final HashSet<Hash> _failedPeers;
     private final HashSet<Hash> _attemptedPeers;
     private int _completeCount;
@@ -35,16 +38,17 @@ class StoreState {
         _context = ctx;
         _key = key;
         _data = data;
-        _pendingPeers = new HashSet(16);
-        _pendingPeerTimes = new HashMap(16);
-        _attemptedPeers = new HashSet(16);
+        _pendingPeers = new HashSet(4);
+        _pendingPeerTimes = new HashMap(4);
+        _pendingMessages = new ConcurrentHashMap(4);
+        _attemptedPeers = new HashSet(8);
         if (toSkip != null) {
             _attemptedPeers.addAll(toSkip);
             _completeCount = toSkip.size();
         }
-        _failedPeers = new HashSet(16);
-        _successfulPeers = new HashSet(16);
-        _successfulExploratoryPeers = new HashSet(16);
+        _failedPeers = new HashSet(8);
+        _successfulPeers = new HashSet(4);
+        //_successfulExploratoryPeers = new HashSet(16);
         _completed = -1;
         _started = _context.clock().now();
     }
@@ -66,12 +70,15 @@ class StoreState {
             return (Set<Hash>)_successfulPeers.clone(); 
         }
     }
-    /** @deprecated unused */
+    /** unused */
+/****
     public Set<Hash> getSuccessfulExploratory() { 
         synchronized (_successfulExploratoryPeers) {
             return (Set<Hash>)_successfulExploratoryPeers.clone(); 
         }
     }
+****/
+
     public Set<Hash> getFailed() { 
         synchronized (_failedPeers) {
             return (Set<Hash>)_failedPeers.clone(); 
@@ -86,6 +93,23 @@ class StoreState {
 
     public long getWhenStarted() { return _started; }
     public long getWhenCompleted() { return _completed; }
+
+    /*
+     * @since 0.7.10
+     */
+    public void addPending(Hash peer, MessageWrapper.WrappedMessage msg) {
+        addPending(peer);
+        _pendingMessages.put(peer, msg);
+    }
+
+    /*
+     * @return the message or null; will only return the message once, so
+     * tags are only acked or failed once.
+     * @since 0.7.10
+     */
+    public MessageWrapper.WrappedMessage getPendingMessage(Hash peer) {
+        return _pendingMessages.remove(peer);
+    }
 
     public void addPending(Hash peer) {
         synchronized (_pendingPeers) {
@@ -128,7 +152,8 @@ class StoreState {
         return rv;
     }
 
-    /** @deprecated unused */
+    /** unused */
+/****
     public long confirmedExploratory(Hash peer) {
         long rv = -1;
         synchronized (_pendingPeers) {
@@ -142,6 +167,7 @@ class StoreState {
         }
         return rv;
     }
+****/
 
     public void replyTimeout(Hash peer) {
         synchronized (_pendingPeers) {
@@ -193,6 +219,7 @@ class StoreState {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
+/****
         buf.append(" Successful Exploratory: ");
         synchronized (_successfulExploratoryPeers) {
             buf.append(_successfulExploratoryPeers.size()).append(' ');
@@ -201,6 +228,7 @@ class StoreState {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
+****/
         return buf.toString();
     }
 }

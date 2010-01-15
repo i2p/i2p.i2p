@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -33,22 +34,32 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     private long _sendTime;
     private long _published;
     private boolean _isRouterInfo;
+    private MessageWrapper.WrappedMessage _wrappedMessage;
+    private final Set<Hash> _ignore;
     
-    private static final int VERIFY_TIMEOUT = 10*1000;
+    private static final int START_DELAY = 20*1000;
+    private static final int VERIFY_TIMEOUT = 15*1000;
+    private static final int MAX_PEERS_TO_TRY = 5;
     
     /**
+     *  Delay a few seconds, then start the verify
      *  @param sentTo who to give the credit or blame to, can be null
      */
     public FloodfillVerifyStoreJob(RouterContext ctx, Hash key, long published, boolean isRouterInfo, Hash sentTo, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
+        facade.verifyStarted(key);
         _key = key;
         _published = published;
         _isRouterInfo = isRouterInfo;
         _log = ctx.logManager().getLog(getClass());
         _sentTo = sentTo;
         _facade = facade;
-        // wait 10 seconds before trying to verify the store
-        getTiming().setStartAfter(ctx.clock().now() + VERIFY_TIMEOUT);
+        _ignore = new HashSet(MAX_PEERS_TO_TRY);
+        if (sentTo != null) {
+            _ignore.add(_sentTo);
+        }
+        // wait some time before trying to verify the store
+        getTiming().setStartAfter(ctx.clock().now() + START_DELAY);
         getContext().statManager().createRateStat("netDb.floodfillVerifyOK", "How long a floodfill verify takes when it succeeds", "NetworkDatabase", new long[] { 60*60*1000 });
         getContext().statManager().createRateStat("netDb.floodfillVerifyFail", "How long a floodfill verify takes when it fails", "NetworkDatabase", new long[] { 60*60*1000 });
         getContext().statManager().createRateStat("netDb.floodfillVerifyTimeout", "How long a floodfill verify takes when it times out", "NetworkDatabase", new long[] { 60*60*1000 });
@@ -56,46 +67,77 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     public String getName() { return "Verify netdb store"; }
 
     /**
-     *  Wait 10 seconds, then query a random floodfill for the leaseset or routerinfo
+     *  Query a random floodfill for the leaseset or routerinfo
      *  that we just stored to a (hopefully different) floodfill peer.
      *
-     *  If it fails (after waiting up to another 10 seconds), resend the data.
+     *  If it fails (after a timeout period), resend the data.
      *  If the queried data is older than what we stored, that counts as a fail.
      **/
     public void runJob() { 
         _target = pickTarget();
-        if (_target == null) return;
-        
+        if (_target == null) {
+            _facade.verifyFinished(_key);
+            return;
+        }        
+
         DatabaseLookupMessage lookup = buildLookup();
-        if (lookup == null) return;
+        if (lookup == null) {
+            _facade.verifyFinished(_key);
+            return;
+        }        
  
-        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+        // If we are verifying a leaseset, use the destination's own tunnels,
+        // to avoid association by the exploratory tunnel OBEP.
+        // Unless it is an encrypted leaseset.
+        TunnelInfo outTunnel;
+        if (_isRouterInfo || getContext().keyRing().get(_key) != null)
+            outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+        else
+            outTunnel = getContext().tunnelManager().selectOutboundTunnel(_key);
         if (outTunnel == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnels to verify a store");
+            _facade.verifyFinished(_key);
             return;
         }
         
+        // garlic encrypt to hide contents from the OBEP
+        RouterInfo peer = _facade.lookupRouterInfoLocally(_target);
+        if (peer == null) {
+             if (_log.shouldLog(Log.WARN))
+                 _log.warn("Fail finding target RI");
+            _facade.verifyFinished(_key);
+            return;
+        }
+        Hash fromKey;
+        if (_isRouterInfo)
+            fromKey = null;
+        else
+            fromKey = _key;
+        _wrappedMessage = MessageWrapper.wrap(getContext(), lookup, fromKey, peer);
+        if (_wrappedMessage == null) {
+             if (_log.shouldLog(Log.WARN))
+                _log.warn("Fail Garlic encrypting");
+            _facade.verifyFinished(_key);
+            return;
+        }
+        I2NPMessage sent = _wrappedMessage.getMessage();
+
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting verify (stored " + _key + " to " + _sentTo + "), asking " + _target);
         _sendTime = getContext().clock().now();
         _expiration = _sendTime + VERIFY_TIMEOUT;
         getContext().messageRegistry().registerPending(new VerifyReplySelector(), new VerifyReplyJob(getContext()), new VerifyTimeoutJob(getContext()), VERIFY_TIMEOUT);
-        getContext().tunnelDispatcher().dispatchOutbound(lookup, outTunnel.getSendTunnelId(0), _target);
+        getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), _target);
     }
     
     /**
      *  Pick a responsive floodfill close to the key, but not the one we sent to
      */
     private Hash pickTarget() {
-        Set<Hash> ignore = null;
-        if (_sentTo != null) {
-            ignore = new HashSet(1);
-            ignore.add(_sentTo);
-        }
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
-        List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, ignore, _facade.getKBuckets());
+        List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
         if (peers.size() > 0)
             return peers.get(0);
         
@@ -105,7 +147,14 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     }
     
     private DatabaseLookupMessage buildLookup() {
-        TunnelInfo replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel();
+        // If we are verifying a leaseset, use the destination's own tunnels,
+        // to avoid association by the exploratory tunnel OBEP.
+        // Unless it is an encrypted leaseset.
+        TunnelInfo replyTunnelInfo;
+        if (_isRouterInfo || getContext().keyRing().get(_key) != null)
+            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel();
+        else
+            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_key);
         if (replyTunnelInfo == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No inbound tunnels to get a reply from!");
@@ -145,6 +194,9 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         public String getName() { return "Handle floodfill verification reply"; }
         public void runJob() {
             long delay = getContext().clock().now() - _sendTime;
+            if (_wrappedMessage != null)
+                _wrappedMessage.acked();
+            _facade.verifyFinished(_key);
             if (_message instanceof DatabaseStoreMessage) {
                 // Verify it's as recent as the one we sent
                 boolean success = false;
@@ -160,19 +212,20 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                         getContext().profileManager().dbStoreSuccessful(_sentTo);
                     getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Verify success");
+                        _log.info("Verify success for " + _key);
                     return;
                 }
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Verify failed - older");
+                    _log.warn("Verify failed (older) for " + _key);
             } else if (_message instanceof DatabaseSearchReplyMessage) {
                 // assume 0 old, all new, 0 invalid, 0 dup
                 getContext().profileManager().dbLookupReply(_target,  0,
                                 ((DatabaseSearchReplyMessage)_message).getNumReplies(), 0, 0, delay);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Verify failed - DSRM");
+                    _log.warn("Verify failed (DSRM) for " + _key);
             }
             // store failed, boo, hiss!
+            // For now, blame the sent-to peer, but not the verify peer
             if (_sentTo != null)
                 getContext().profileManager().dbStoreFailed(_sentTo);
             getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
@@ -183,8 +236,9 @@ public class FloodfillVerifyStoreJob extends JobImpl {
     
     /**
      *  the netDb store failed to verify, so resend it to a random floodfill peer
-     *  Fixme - this can loop for a long time - do we need a token or counter
-     *  so we don't have multiple verify jobs?
+     *  Fixme - since we now store closest-to-the-key, this is likely to store to the
+     *  very same ff as last time, until the stats get bad enough to switch.
+     *  Pass the failed ff through as a don't-store-to?
      */
     private void resend() {
         DataStructure ds;
@@ -202,14 +256,24 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         }
         public String getName() { return "Floodfill verification timeout"; }
         public void runJob() { 
-            // don't know who to blame (we could have gotten a DSRM) so blame both
+            if (_wrappedMessage != null)
+                _wrappedMessage.fail();
+            // Only blame the verify peer
             getContext().profileManager().dbLookupFailed(_target);
-            if (_sentTo != null)
-                getContext().profileManager().dbStoreFailed(_sentTo);
+            //if (_sentTo != null)
+            //    getContext().profileManager().dbStoreFailed(_sentTo);
             getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime, 0);
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Verify timed out");
-            resend(); 
+                _log.warn("Verify timed out for: " + _key);
+            if (_ignore.size() < MAX_PEERS_TO_TRY) {
+                // Don't resend, simply rerun FVSJ.this inline and
+                // chose somebody besides _target for verification
+                _ignore.add(_target);
+                FloodfillVerifyStoreJob.this.runJob();
+            } else {
+                _facade.verifyFinished(_key);
+                resend(); 
+            }
         }
     }
 }

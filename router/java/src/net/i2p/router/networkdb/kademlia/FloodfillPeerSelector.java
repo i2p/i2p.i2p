@@ -108,11 +108,11 @@ class FloodfillPeerSelector extends PeerSelector {
          return selectFloodfillParticipants(key, maxNumRouters, null, kbuckets);
     }
 
-    /** .75 * PublishLocalRouterInfoJob.PUBLISH_DELAY */
-    private static final int NO_FAIL_STORE_OK = 15*60*1000;
+    /** .5 * PublishLocalRouterInfoJob.PUBLISH_DELAY */
+    private static final int NO_FAIL_STORE_OK = 10*60*1000;
     private static final int NO_FAIL_STORE_GOOD = NO_FAIL_STORE_OK * 2;
     /** this must be longer than the max streaming timeout (60s) */
-    private static final int NO_FAIL_LOOKUP_OK = 5*60*1000;
+    private static final int NO_FAIL_LOOKUP_OK = 2*60*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
     private static final int MAX_GOOD_RESP_TIME = 5*1000;
 

@@ -4,6 +4,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.Payload;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
@@ -52,9 +53,26 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         }
         */
         
+        // FVSJ could also result in a DSRM.
+        // Since there's some code that replies directly to this to gather new ff RouterInfos,
+        // sanitize it
         if ( (_client != null) && 
+             (msg.getType() == DatabaseSearchReplyMessage.MESSAGE_TYPE) &&
+             (_client.equals(((DatabaseSearchReplyMessage)msg).getSearchKey()))) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Removing replies from a DSRM down a tunnel for " + _client.toBase64() + ": " + msg);
+            DatabaseSearchReplyMessage orig = (DatabaseSearchReplyMessage) msg;
+            DatabaseSearchReplyMessage newMsg = new DatabaseSearchReplyMessage(_context);
+            newMsg.setFromHash(orig.getFromHash());
+            newMsg.setSearchKey(orig.getSearchKey());
+            msg = newMsg;
+        } else if ( (_client != null) && 
              (msg.getType() != DeliveryStatusMessage.MESSAGE_TYPE) &&
              (msg.getType() != GarlicMessage.MESSAGE_TYPE) &&
+             // allow DSM of our own key (used by FloodfillVerifyStoreJob)
+             // as long as there's no reply token (FVSJ will never set a reply token but an attacker might)
+             ((msg.getType() != DatabaseStoreMessage.MESSAGE_TYPE)  || (!_client.equals(((DatabaseStoreMessage)msg).getKey())) ||
+              (((DatabaseStoreMessage)msg).getReplyToken() != 0)) &&
              (msg.getType() != TunnelBuildReplyMessage.MESSAGE_TYPE)) {
             // drop it, since we should only get tunnel test messages and garlic messages down
             // client tunnels
@@ -62,7 +80,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + msg, new Exception("cause"));
             return;
         }
-        
+
         if ( (target == null) || ( (tunnel == null) && (_context.routerHash().equals(target) ) ) ) {
             // targetting us either implicitly (no target) or explicitly (no tunnel)
             // make sure we don't honor any remote requests directly (garlic instructions, etc)

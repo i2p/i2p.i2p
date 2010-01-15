@@ -145,23 +145,20 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     }
 
 
-    /** TagSet */
-    /* FIXME Exporting non-public type through public API */
-    protected Set<TagSet> getInboundTagSets() {
+    /** TagSet - used only by HTML */
+    private Set<TagSet> getInboundTagSets() {
         synchronized (_inboundTagSets) {
             return new HashSet(_inboundTagSets.values());
         }
     }
 
-    /** OutboundSession */
-    /* FIXME Exporting non-public type through public API */
-    protected Set<OutboundSession> getOutboundSessions() {
+    /** OutboundSession - used only by HTML */
+    private Set<OutboundSession> getOutboundSessions() {
         synchronized (_outboundSessions) {
             return new HashSet(_outboundSessions.values());
         }
     }
 
-    /* FIXME Exporting non-public type through public API */
 /****** leftover from when we had the persistent SKM
     protected void setData(Set<TagSet> inboundTagSets, Set<OutboundSession> outboundSessions) {
         if (_log.shouldLog(Log.INFO))
@@ -531,7 +528,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *
      * @return number of tag sets expired
      */
-    public int aggressiveExpire() {
+    private int aggressiveExpire() {
         int removed = 0;
         int remaining = 0;
         long now = _context.clock().now();
@@ -569,9 +566,8 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         //_log.warn("Expiring tags: [" + tagsToDrop + "]");
 
         synchronized (_outboundSessions) {
-            for (Iterator<PublicKey> iter = _outboundSessions.keySet().iterator(); iter.hasNext();) {
-                PublicKey key = iter.next();
-                OutboundSession sess = _outboundSessions.get(key);
+            for (Iterator<OutboundSession> iter = _outboundSessions.values().iterator(); iter.hasNext();) {
+                OutboundSession sess = iter.next();
                 removed += sess.expireTags();
                 // don't kill a new session or one that's temporarily out of tags
                 if (sess.getLastUsedDate() < now - (SESSION_LIFETIME_MAX_MS / 2) &&
@@ -663,6 +659,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         }
     }
 
+    /** fixme pass in context and change to static */
     private class OutboundSession {
         private PublicKey _target;
         private SessionKey _currentKey;

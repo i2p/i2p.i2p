@@ -18,6 +18,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  *  This extends StoreJob to fire off a FloodfillVerifyStoreJob after success.
@@ -54,6 +55,11 @@ class FloodfillStoreJob extends StoreJob {
     protected void succeed() {
         super.succeed();
         if (_state != null) {
+            if (_facade.isVerifyInProgress(_state.getTarget())) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Skipping verify, one already in progress for: " + _state.getTarget());
+                return;
+            }
             // Get the time stamp from the data we sent, so the Verify job can meke sure that
             // it finds something stamped with that time or newer.
             long published = 0;

@@ -24,6 +24,7 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -35,11 +36,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private boolean _floodfillEnabled;
     /** for testing, see isFloodfill() below */
     private static String _alwaysQuery;
+    private final Set<Hash> _verifiesInProgress;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
          _floodfillEnabled = false;
+         _verifiesInProgress = new ConcurrentHashSet(8);
         _alwaysQuery = _context.getProperty("netDb.alwaysQuery");
 
         _context.statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -318,6 +321,21 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return sel.selectFloodfillParticipants(getKBuckets());
     }
     
+    /** @since 0.7.10 */
+    boolean isVerifyInProgress(Hash h) {
+        return _verifiesInProgress.contains(h);
+    }
+
+    /** @since 0.7.10 */
+    void verifyStarted(Hash h) {
+        _verifiesInProgress.add(h);
+    }
+
+    /** @since 0.7.10 */
+    void verifyFinished(Hash h) {
+        _verifiesInProgress.remove(h);
+    }
+
     /** NTCP cons drop quickly but SSU takes a while, so it's prudent to keep this
      *  a little higher than 1 or 2. */
     protected final static int MIN_ACTIVE_PEERS = 5;

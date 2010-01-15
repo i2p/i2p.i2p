@@ -54,13 +54,8 @@ class RequestLeaseSetJob extends JobImpl {
         if (_runner.isDead()) return;
         
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
-        Date end = null;
-        // get the earliest end date
-        for (int i = 0; i < _requestState.getRequested().getLeaseCount(); i++) {
-            if ( (end == null) || (end.getTime() > _requestState.getRequested().getLease(i).getEndDate().getTime()) )
-                end = _requestState.getRequested().getLease(i).getEndDate();
-        }
-        
+        Date end = new Date(_requestState.getRequested().getEarliestLeaseDate());
+
         msg.setEndDate(end);
         msg.setSessionId(_runner.getSessionId());
         
