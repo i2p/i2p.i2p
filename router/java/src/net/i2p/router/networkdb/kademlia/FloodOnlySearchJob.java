@@ -80,6 +80,8 @@ class FloodOnlySearchJob extends FloodSearchJob {
         KBucketSet ks = _facade.getKBuckets();
         if (ks != null) {
             Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
+            // Ideally we would add the key to an exclude list, so we don't try to query a ff peer for itself,
+            // but we're passing the rkey not the key, so we do it below instead in certain cases.
             floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(rkey, MIN_FOR_NO_DSRM, ks);
         } else {
             floodfillPeers = Collections.EMPTY_LIST;
@@ -147,7 +149,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
 
         int count = 0; // keep a separate count since _lookupsRemaining could be decremented elsewhere
         for (int i = 0; _lookupsRemaining < CONCURRENT_SEARCHES && i < floodfillPeers.size(); i++) {
-            Hash peer = (Hash)floodfillPeers.get(i);
+            Hash peer = floodfillPeers.get(i);
             if (peer.equals(getContext().routerHash()))
                 continue;
             
@@ -158,6 +160,16 @@ class FloodOnlySearchJob extends FloodSearchJob {
                 failed();
                 return;
             }
+
+            // As explained above, it's hard to keep the key itself out of the ff list,
+            // so let's just skip it for now if the outbound tunnel is zero-hop.
+            // Yes, that means we aren't doing double-lookup for a floodfill
+            // if it happens to be closest to itself and we are using zero-hop exploratory tunnels.
+            // If we don't, the OutboundMessageDistributor ends up logging erors for
+            // not being able to send to the floodfill, if we don't have an older netdb entry.
+            if (outTunnel.getLength() <= 1 && peer.equals(_key) && floodfillPeers.size() > 1)
+                continue;
+            
             synchronized(_unheardFrom) {
                 _unheardFrom.add(peer);
             }
