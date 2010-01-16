@@ -54,7 +54,14 @@ class RequestLeaseSetJob extends JobImpl {
         if (_runner.isDead()) return;
         
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
-        Date end = new Date(_requestState.getRequested().getEarliestLeaseDate());
+        long endTime = _requestState.getRequested().getEarliestLeaseDate();
+        // Add a small number of ms (0-300) that increases as we approach the expire time.
+        // Since the earliest date functions as a version number,
+        // this will force the floodfill to flood each new version;
+        // otherwise it won't if the earliest time hasn't changed.
+        long fudge = 300 - ((endTime - getContext().clock().now()) / 2000);
+        endTime += fudge;
+        Date end = new Date(endTime);
 
         msg.setEndDate(end);
         msg.setSessionId(_runner.getSessionId());
