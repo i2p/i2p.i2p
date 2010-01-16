@@ -84,7 +84,7 @@ public class RouterClock extends Clock {
 
         if (_alreadyChanged) {
             if (delta > 15*1000)
-                getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
+                getLog().error("Warning - Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
             else if (getLog().shouldLog(Log.INFO))
                 getLog().info("Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
             

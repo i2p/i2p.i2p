@@ -50,8 +50,8 @@ public class Clock implements Timestamper.UpdateListener {
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
     /** after we've started up and shifted the clock, don't allow shifts of more than 10 minutes */
     public final static long MAX_LIVE_OFFSET = 10 * 60 * 1000;
-    /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
-    public final static long MIN_OFFSET_CHANGE = 10 * 1000;
+    /** if the clock skewed changes by less than this, ignore the update (so we don't slide all over the place) */
+    public final static long MIN_OFFSET_CHANGE = 5 * 1000;
 
     public void setOffset(long offsetMs) {
         setOffset(offsetMs, false);        
@@ -60,7 +60,7 @@ public class Clock implements Timestamper.UpdateListener {
     /**
      * Specify how far away from the "correct" time the computer is - a positive
      * value means that we are slow, while a negative value means we are fast.
-     *
+     * Warning - overridden in RouterClock
      */
     public void setOffset(long offsetMs, boolean force) {
         if (false) return;
