@@ -76,6 +76,7 @@ public class ProfileOrganizer {
      */
     public static final String PROP_MINIMUM_FAST_PEERS = "profileOrganizer.minFastPeers";
     public static final int DEFAULT_MINIMUM_FAST_PEERS = 8;
+    /** this is misnamed, it is really the max minimum number. */
     private static final int DEFAULT_MAXIMUM_FAST_PEERS = 16;
     /**
      * Defines the minimum number of 'high capacity' peers that the organizer should 
@@ -674,6 +675,7 @@ public class ProfileOrganizer {
 
             locked_unfailAsNecessary();
             locked_promoteFastAsNecessary();
+            locked_demoteFastAsNecessary();
 
             Collections.shuffle(_notFailingPeersList, _context.random());
 
@@ -745,6 +747,28 @@ public class ProfileOrganizer {
             }
         }
         return;
+    }
+    
+    /**
+     * We want to put a cap on the fast pool, to use only a small set of routers
+     * for client tunnels for anonymity reasons. Also, unless we use only a small
+     * number, we don't really find out who the fast ones are.
+     * @since 0.7.10
+     */
+    private void locked_demoteFastAsNecessary() {
+        int maxFastPeers = getMaximumFastPeers();
+        int numToDemote = _fastPeers.size() - maxFastPeers;
+        if (numToDemote > 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Need to explicitly demote " + numToDemote + " peers from the fast group");
+            // sort by speed, slowest-first
+            Set<PeerProfile> sorted = new TreeSet(new SpeedComparator());
+            sorted.addAll(_fastPeers.values());
+            Iterator<PeerProfile> iter = sorted.iterator();
+            for (int i = 0; i < numToDemote; i++) {
+                _fastPeers.remove(iter.next().getPeer());
+            }
+        }
     }
     
     /** how many not failing/active peers must we have? */
@@ -916,6 +940,7 @@ public class ProfileOrganizer {
             locked_calculateSpeedThresholdMean(reordered);
             return;
         }
+/*****
         Set speeds = new TreeSet();
         for (Iterator iter = reordered.iterator(); iter.hasNext(); ) {
             PeerProfile profile = (PeerProfile)iter.next();
@@ -939,6 +964,7 @@ public class ProfileOrganizer {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Threshold value for speed: " + _thresholdSpeedValue + " out of speeds: " + speeds);
+*****/
     }
     
     private void locked_calculateSpeedThresholdMean(Set reordered) {
@@ -1196,6 +1222,10 @@ public class ProfileOrganizer {
         return _context.getProperty(PROP_MINIMUM_FAST_PEERS, def);
     }
     
+    /** fixme add config  @since 0.7.10 */
+    protected int getMaximumFastPeers() {
+        return 30;
+    }
     
     /**
      * Defines the minimum number of 'fast' peers that the organizer should select.  If
