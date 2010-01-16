@@ -217,6 +217,8 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 }
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Verify failed (older) for " + _key);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Rcvd older lease: " + dsm.getLeaseSet());
             } else if (_message instanceof DatabaseSearchReplyMessage) {
                 // assume 0 old, all new, 0 invalid, 0 dup
                 getContext().profileManager().dbLookupReply(_target,  0,
@@ -238,7 +240,9 @@ public class FloodfillVerifyStoreJob extends JobImpl {
      *  the netDb store failed to verify, so resend it to a random floodfill peer
      *  Fixme - since we now store closest-to-the-key, this is likely to store to the
      *  very same ff as last time, until the stats get bad enough to switch.
-     *  Pass the failed ff through as a don't-store-to?
+     *  Therefore, pass the failed ff through as a don't-store-to.
+     *  Let's also add the one we just tried to verify with, as they could be a pair of no-flooders.
+     *  So at least we'll try THREE ffs round-robin if things continue to fail...
      */
     private void resend() {
         DataStructure ds;
@@ -246,8 +250,14 @@ public class FloodfillVerifyStoreJob extends JobImpl {
             ds = _facade.lookupRouterInfoLocally(_key);
         else
             ds = _facade.lookupLeaseSetLocally(_key);
-        if (ds != null)
-            _facade.sendStore(_key, ds, null, null, FloodfillNetworkDatabaseFacade.PUBLISH_TIMEOUT, null);
+        if (ds != null) {
+            Set<Hash> toSkip = new HashSet(2);
+            if (_sentTo != null)
+                toSkip.add(_sentTo);
+            if (_target != null)
+                toSkip.add(_target);
+            _facade.sendStore(_key, ds, null, null, FloodfillNetworkDatabaseFacade.PUBLISH_TIMEOUT, toSkip);
+        }
     }
     
     private class VerifyTimeoutJob extends JobImpl {
