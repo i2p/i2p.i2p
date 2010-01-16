@@ -67,6 +67,16 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             newMsg.setSearchKey(orig.getSearchKey());
             msg = newMsg;
         } else if ( (_client != null) && 
+             (msg.getType() == DatabaseStoreMessage.MESSAGE_TYPE) &&
+             (((DatabaseStoreMessage)msg).getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO)) {
+            // FVSJ may result in an unsolicited RI store if the peer went non-ff.
+            // Maybe we can figure out a way to handle this safely, so we don't ask him again.
+            // For now, just hope we eventually find out through other means.
+            // Todo: if peer was ff and RI is not ff, queue for exploration in netdb (but that isn't part of the facade now)
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping DSM down a tunnel for " + _client.toBase64() + ": " + msg);
+            return;
+        } else if ( (_client != null) && 
              (msg.getType() != DeliveryStatusMessage.MESSAGE_TYPE) &&
              (msg.getType() != GarlicMessage.MESSAGE_TYPE) &&
              // allow DSM of our own key (used by FloodfillVerifyStoreJob)
