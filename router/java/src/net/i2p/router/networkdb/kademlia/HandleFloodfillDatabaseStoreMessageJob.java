@@ -156,23 +156,6 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             if (invalidMessage == null) {
                 getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
                 getContext().statManager().addRateData("netDb.storeHandled", ackEnd-recvEnd, 0);
-                if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()) && (_message.getReplyToken() > 0) ) {
-                    if (wasNew) {
-                        long floodBegin = System.currentTimeMillis();
-                        if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
-                            _facade.flood(_message.getLeaseSet());
-                        // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
-                        //else if (!_message.getRouterInfo().isHidden())
-                        else
-                            _facade.flood(_message.getRouterInfo());
-                        long floodEnd = System.currentTimeMillis();
-                        getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin, 0);
-                    } else {
-                        // don't flood it *again*
-                        getContext().statManager().addRateData("netDb.storeFloodOld", 1, 0);
-                    }
-                }
-
             } else {
                 // Should we record in the profile?
                 if (_log.shouldLog(Log.WARN))
@@ -181,6 +164,26 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         } else if (invalidMessage != null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unknown peer sent bad data: " + invalidMessage);
+        }
+
+        // flood it
+        if (invalidMessage == null &&
+            FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()) &&
+            _message.getReplyToken() > 0) {
+            if (wasNew) {
+                long floodBegin = System.currentTimeMillis();
+                if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+                    _facade.flood(_message.getLeaseSet());
+                // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
+                //else if (!_message.getRouterInfo().isHidden())
+                else
+                    _facade.flood(_message.getRouterInfo());
+                long floodEnd = System.currentTimeMillis();
+                getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin, 0);
+            } else {
+                // don't flood it *again*
+                getContext().statManager().addRateData("netDb.storeFloodOld", 1, 0);
+            }
         }
     }
     

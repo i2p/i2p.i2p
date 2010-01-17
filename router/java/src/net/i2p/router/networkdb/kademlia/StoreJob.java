@@ -30,6 +30,7 @@ import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 class StoreJob extends JobImpl {
     protected Log _log;
@@ -431,26 +432,36 @@ class StoreJob extends JobImpl {
         Hash to = peer.getIdentity().getHash();
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client);
         if (outTunnel != null) {
-            // garlic encrypt
-            MessageWrapper.WrappedMessage wm = MessageWrapper.wrap(getContext(), msg, client, peer);
-            if (wm == null) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Fail garlic encrypting from: " + client);
-                fail();
-                return;
+            I2NPMessage sent;
+            boolean shouldEncrypt = supportsEncryption(peer);
+            if (shouldEncrypt) {
+                // garlic encrypt
+                MessageWrapper.WrappedMessage wm = MessageWrapper.wrap(getContext(), msg, client, peer);
+                if (wm == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Fail garlic encrypting from: " + client);
+                    fail();
+                    return;
+                }
+                sent = wm.getMessage();
+                _state.addPending(to, wm);
+            } else {
+                sent = msg;
+                _state.addPending(to);
             }
-            I2NPMessage sent = wm.getMessage();
 
             SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, sent.getMessageSize());
             FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
             StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
     
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
+                if (shouldEncrypt)
+                    _log.debug("sending encrypted store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
+                else
+                    _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + sent);
                 //_log.debug("Expiration is " + new Date(sent.getMessageExpiration()));
             }
             getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
-            _state.addPending(to, wm);
             getContext().tunnelDispatcher().dispatchOutbound(sent, outTunnel.getSendTunnelId(0), null, to);
         } else {
             if (_log.shouldLog(Log.WARN))
@@ -478,6 +489,21 @@ class StoreJob extends JobImpl {
             sendNext();
         }
         public String getName() { return "Kademlia Store Send Delay"; }
+    }
+
+    private static final String MIN_ENCRYPTION_VERSION = "0.7.10";
+
+    /**
+     * *sigh*
+     * sadly due to a bug in HandleFloodfillDatabaseStoreMessageJob, where
+     * a floodfill would not flood anything that arrived garlic-wrapped
+     * @since 0.7.10
+     */
+    private static boolean supportsEncryption(RouterInfo ri) {
+        String v = ri.getOption("router.version");
+        if (v == null)
+            return false;
+        return (new VersionComparator()).compare(v, MIN_ENCRYPTION_VERSION) >= 0;
     }
 
     /**
