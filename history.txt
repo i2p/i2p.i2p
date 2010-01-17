@@ -1,3 +1,30 @@
+2010-01-14 sponge
+    * Fully clean up I2PTunnel. No more lint issues, should compile 100%
+      clean.
+    * Dropped unused class BufferLogger from I2PTunnel as it is not used
+      anylonger.
+
+2010-01-14 sponge
+    * Clean up reverse connection ability, remove some annoyingly redundent
+      code. Place all settings in the console. It works!
+
+2010-01-10 sponge
+    * Insert reverse connection ability into the http server code so that
+      seedless can start to get worked on. It's disabled by default.
+
+* 2010-01-12  0.7.9 released
+
+2010-01-12 zzz
+    * I2CP: Clean up resources on 5-minute leaseset timeout at startup
+    * Increase max floodfills to 9 (was 6)
+    * Temporarily disable routerInfo floodfill verifies
+    * Fix .fr eepsite index css
+    * Javdoc tweaks
+
+
+2010-01-09 zzz
+    * Include new eepsite indexes in pkg
+
 2010-01-06 zzz
     * Summary bar tweaks
 

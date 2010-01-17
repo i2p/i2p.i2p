@@ -107,9 +107,9 @@
         </div>
         <div class="targetField rowItem">
             <%
-            if ("httpserver".equals(indexBean.getInternalType(curServer)) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
+            if (("httpserver".equals(indexBean.getInternalType(curServer)) || ("httpbidirserver".equals(indexBean.getInternalType(curServer)))) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><label><%=intl._("Preview")%>:</label>    
-            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p"><%=intl._("Preview")%></a>     
+            <a class="control" title="Test HTTP server through I2P" href="http://<%=indexBean.getDestHashBase32(curServer)%>.b32.i2p"><%=intl._("Preview")%></a>
             <%
             } else if (indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
           %><span class="text"><%=intl._("Base32 Address")%>:<br /><%=indexBean.getDestHashBase32(curServer)%>.b32.i2p</span>
@@ -164,6 +164,7 @@
                     <select name="type">
                         <option value="server"><%=intl._("Standard")%></option>
                         <option value="httpserver">HTTP</option>
+                        <option value="httpbidirserver">HTTP bidir</option>
                         <option value="ircserver">IRC</option>
                         <option value="streamrserver">Streamr</option>
                     </select>

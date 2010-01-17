@@ -29,7 +29,7 @@ public class I2PSink implements Sink {
         
         // create maker
         if (!raw)
-            this.maker = new I2PDatagramMaker(this.sess);
+            this.maker.setI2PDatagramMaker(this.sess);
     }
     
     /** @param src ignored */
@@ -54,20 +54,8 @@ public class I2PSink implements Sink {
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     protected boolean raw;
     protected I2PSession sess;
     protected Destination dest;
-    protected I2PDatagramMaker maker; // FIXME should be final and use a factory. FIXME
+    protected final I2PDatagramMaker maker= new I2PDatagramMaker(); // FIXME should be final and use a factory. FIXME
 }

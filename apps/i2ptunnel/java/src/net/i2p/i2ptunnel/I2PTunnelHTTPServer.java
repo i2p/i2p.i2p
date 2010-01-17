@@ -39,21 +39,21 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
-        _spoofHost = spoofHost;
-        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
-        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel", new long[] { 60*1000, 10*60*1000 });
+        setupI2PTunnelHTTPServer(spoofHost);
     }
 
     public I2PTunnelHTTPServer(InetAddress host, int port, File privkey, String privkeyname, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privkey, privkeyname, l, notifyThis, tunnel);
-        _spoofHost = spoofHost;
-        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
-        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000 });
+        setupI2PTunnelHTTPServer(spoofHost);
     }
 
     public I2PTunnelHTTPServer(InetAddress host, int port, InputStream privData, String privkeyname, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, privkeyname, l, notifyThis, tunnel);
-        _spoofHost = spoofHost;        
+        setupI2PTunnelHTTPServer(spoofHost);
+    }
+
+    private void setupI2PTunnelHTTPServer(String spoofHost) {
+        _spoofHost = spoofHost;
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000 });
     }
