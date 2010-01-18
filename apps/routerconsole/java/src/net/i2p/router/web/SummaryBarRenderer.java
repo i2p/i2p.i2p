@@ -380,6 +380,12 @@ public class SummaryBarRenderer {
            .append(_helper.getParticipatingTunnels())
            .append("</td></tr>\n" +
 
+                   "<tr><td align=\"left\"><b>")
+           .append(_("Share ratio"))
+           .append(":</b></td><td align=\"right\">")
+           .append(_helper.getShareRatio())
+           .append("</td></tr>\n" +
+
                    "</table><hr><h3><a href=\"/jobs.jsp\" target=\"_top\" title=\"")
            .append(_("What's in the router's job queue?"))
            .append("\">")

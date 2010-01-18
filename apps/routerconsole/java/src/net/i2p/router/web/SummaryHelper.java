@@ -499,6 +499,15 @@ public class SummaryHelper extends HelperBase {
             return _context.tunnelManager().getParticipatingCount();
     }
  
+    /** @since 0.7.10 */
+    public String getShareRatio() { 
+        if (_context == null) 
+            return "0";
+        double sr = _context.tunnelManager().getShareRatio();
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+        return fmt.format(sr);
+    }
+
     /**
      * How lagged our job queue is over the last minute (pretty printed with
      * the units attached)
