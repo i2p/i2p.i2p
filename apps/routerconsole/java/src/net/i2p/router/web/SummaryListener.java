@@ -173,7 +173,7 @@ class SummaryRenderer {
             throw ioe;
         }
     }
-    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1, true); }
+    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1, false); }
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         long end = _listener.now() - 60*1000;
         if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
@@ -184,6 +184,7 @@ class SummaryRenderer {
         try {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimePeriod(start/1000, 0);
+            def.setLowerLimit(0d);
             String name = _listener.getRate().getRateStat().getName();
             // heuristic to set K=1024
             if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0 || name.indexOf("memory") >= 0)
