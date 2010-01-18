@@ -15,13 +15,29 @@ public class GraphHelper extends HelperBase {
     private int _width;
     private int _height;
     private int _refreshDelaySeconds;
+
+    private static final String PROP_X = "routerconsole.graphX";
+    private static final String PROP_Y = "routerconsole.graphY";
+    private static final String PROP_REFRESH = "routerconsole.graphRefresh";
+    private static final String PROP_PERIODS = "routerconsole.graphPeriods";
+    private static final String PROP_EVENTS = "routerconsole.graphEvents";
+    private static final int DEFAULT_X = 250;
+    private static final int DEFAULT_Y = 100;
+    private static final int DEFAULT_REFRESH = 60;
+    private static final int DEFAULT_PERIODS = 60;
     
     public GraphHelper() {
-        _periodCount = 60; // SummaryListener.PERIODS;
-        _showEvents = false;
-        _width = 250;
-        _height = 100;
-        _refreshDelaySeconds = 60;
+    }
+
+    /** set the defaults after we have a context */
+    @Override
+    public void setContextId(String contextId) {
+        super.setContextId(contextId);
+        _width = _context.getProperty(PROP_X, DEFAULT_X);
+        _height = _context.getProperty(PROP_Y, DEFAULT_Y);
+        _periodCount = _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS);
+        _refreshDelaySeconds = _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
+        _showEvents = Boolean.valueOf(_context.getProperty(PROP_EVENTS)).booleanValue();
     }
     
     public void setPeriodCount(String str) { 
@@ -102,7 +118,9 @@ public class GraphHelper extends HelperBase {
         }
         return ""; 
     }
+
     public String getForm() { 
+        saveSettings();
         try {
             _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats.jsp\">" + _("Select Stats") + "</a>]</h3>");
             _out.write("<form action=\"graphs.jsp\" method=\"GET\">");
@@ -118,6 +136,25 @@ public class GraphHelper extends HelperBase {
             ioe.printStackTrace();
         }
         return ""; 
+    }
+
+    /**
+     *  Silently save settings if changed, no indication of success or failure
+     *  @since 0.7.10
+     */
+    private void saveSettings() {
+        if (_width != _context.getProperty(PROP_X, DEFAULT_X) ||
+            _height != _context.getProperty(PROP_Y, DEFAULT_Y) ||
+            _periodCount != _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS) ||
+            _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
+            _showEvents != Boolean.valueOf(_context.getProperty(PROP_EVENTS)).booleanValue()) {
+            _context.router().setConfigSetting(PROP_X, "" + _width);
+            _context.router().setConfigSetting(PROP_Y, "" + _height);
+            _context.router().setConfigSetting(PROP_PERIODS, "" + _periodCount);
+            _context.router().setConfigSetting(PROP_REFRESH, "" + _refreshDelaySeconds);
+            _context.router().setConfigSetting(PROP_EVENTS, "" + _showEvents);
+            _context.router().saveConfig();
+        }
     }
 
 /** inner class, don't bother reindenting */

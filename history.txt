@@ -1,3 +1,13 @@
+2010-01-18 zzz
+    * configclients.jsp: Fix add-new-client feature
+    * Console: Add a tunnel share ratio estimate
+    * graphs.jsp:
+      - Remove jrobin sig
+      - Set lower limit to 0
+      - Save settings when changed
+    * Reseed: Support SSL and proxies
+    * Translate: Catch empty string
+
 2010-01-17 zzz
     * Clock: Change a CRIT to an ERROR, lower threshold for changing from 10s to 5s
     * configclients.jsp: Support add, delete, edit
