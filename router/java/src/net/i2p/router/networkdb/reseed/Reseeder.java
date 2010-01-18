@@ -17,6 +17,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SSLEepGet;
 
 /**
  * Moved from ReseedHandler in routerconsole. See ReseedChecker for additional comments.
@@ -38,6 +39,8 @@ public class Reseeder {
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
     private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
+    public static final String PROP_PROXY_HOST = "router.reseedProxyHost";
+    public static final String PROP_PROXY_PORT = "router.reseedProxyPort";
 
     public Reseeder(RouterContext ctx) {
         _context = ctx;
@@ -63,6 +66,8 @@ public class Reseeder {
     /** Todo: translate the messages sent via PROP_STATUS */
     public class ReseedRunner implements Runnable, EepGet.StatusListener {
         private boolean _isRunning;
+        private String _proxyHost;
+        private int _proxyPort;
 
         public ReseedRunner() {
             _isRunning = false; 
@@ -71,6 +76,8 @@ public class Reseeder {
         public boolean isRunning() { return _isRunning; }
         public void run() {
             _isRunning = true;
+            _proxyHost = _context.getProperty(PROP_PROXY_HOST);
+            _proxyPort = _context.getProperty(PROP_PROXY_PORT, -1);
             System.out.println("Reseed start");
             reseed(false);
             System.out.println("Reseed complete");
@@ -237,9 +244,15 @@ public class Reseeder {
         private byte[] readURL(URL url) throws Exception {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
 
-            // Do a non-proxied eepget into our ByteArrayOutputStream with 0 retries
-            EepGet get = new EepGet( I2PAppContext.getGlobalContext(), false, null, -1, 0, 0, MAX_RESEED_RESPONSE_SIZE,
-                null, baos, url.toString(), false, null, null);
+            EepGet get;
+            if (url.toString().startsWith("https")) {
+                get = new SSLEepGet(I2PAppContext.getGlobalContext(), baos, url.toString());
+            } else {
+                // Do a (probably) non-proxied eepget into our ByteArrayOutputStream with 0 retries
+                boolean shouldProxy = _proxyHost != null && _proxyHost.length() > 0 && _proxyPort > 0;
+                get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, _proxyHost, _proxyPort, 0, 0, MAX_RESEED_RESPONSE_SIZE,
+                                 null, baos, url.toString(), false, null, null);
+            }
             get.addStatusListener(ReseedRunner.this);
             if (get.fetch()) return baos.toByteArray(); else return null;
         }
