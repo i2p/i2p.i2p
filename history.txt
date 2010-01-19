@@ -1,3 +1,10 @@
+2010-01-19 sponge
+    * Firewall fix for NTCP, where firewalls will forget a NAT relationship
+      on a stream... AKA setting keepalive. This should fix the stuck NTCP
+      issue that has been bothing zzz for years.
+    * Set keepalive on BOB connections too, since this will assist closing
+      the connections in the event of a crash on a client.
+
 2010-01-18 zzz
     * configclients.jsp: Fix add-new-client feature
     * Console: Add a tunnel share ratio estimate

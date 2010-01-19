@@ -418,6 +418,8 @@ public class EventPumper implements Runnable {
                 try { chan.close(); } catch (IOException ioe) { }
                 return;
             }
+            // BUGFIX for firewalls. --Sponge
+            chan.socket().setKeepAlive(true);
 
             SelectionKey ckey = chan.register(_selector, SelectionKey.OP_READ);
             NTCPConnection con = new NTCPConnection(_context, _transport, chan, ckey);
@@ -436,6 +438,8 @@ public class EventPumper implements Runnable {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("processing connect for " + key + " / " + con + ": connected? " + connected);
             if (connected) {
+                // BUGFIX for firewalls. --Sponge
+                chan.socket().setKeepAlive(true);
                 con.setKey(key);
                 con.outboundConnected();
                 _context.statManager().addRateData("ntcp.connectSuccessful", 1, 0);

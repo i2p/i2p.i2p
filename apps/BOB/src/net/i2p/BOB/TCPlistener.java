@@ -78,6 +78,7 @@ public class TCPlistener implements Runnable {
 				while (lives.get()) {
 					try {
 						server = listener.accept();
+						server.setKeepAlive(true);
 						g = true;
 					} catch (SocketTimeoutException ste) {
 						g = false;
