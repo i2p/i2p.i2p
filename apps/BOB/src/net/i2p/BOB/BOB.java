@@ -256,11 +256,13 @@ public class BOB {
 				listener = new ServerSocket(Integer.parseInt(props.getProperty(PROP_BOB_PORT)), 10, InetAddress.getByName(props.getProperty(PROP_BOB_HOST)));
 				Socket server = null;
 				listener.setSoTimeout(500); // .5 sec
+				
 				while (spin.get()) {
 					//DoCMDS connection;
 
 					try {
 						server = listener.accept();
+						server.setKeepAlive(true);
 						g = true;
 					} catch (ConnectException ce) {
 						g = false;
