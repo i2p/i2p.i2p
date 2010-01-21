@@ -126,7 +126,11 @@ class LogWriter implements Runnable {
 
     private void writeRecord(String val) {
         if (val == null) return;
-        if (_currentOut == null) rotateFile();
+        if (_currentOut == null) {
+            rotateFile();
+            if (_currentOut == null)
+                return; // hosed
+        }
 
         try {
             _currentOut.write(val);
@@ -168,8 +172,7 @@ class LogWriter implements Runnable {
         try {
             _currentOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
         } catch (IOException ioe) {
-            System.err.println("Error rotating into [" + f.getAbsolutePath() + "]");
-            ioe.printStackTrace();
+            System.err.println("Error rotating into [" + f.getAbsolutePath() + "]" + ioe);
         }
     }
 
