@@ -1,3 +1,6 @@
+2010-01-21 dr|z3d
+    * New eepsite structure and enhanced pages. Now with graphics and stuff!
+
 2010-01-19 sponge
     * Firewall fix for NTCP, where firewalls will forget a NAT relationship
       on a stream... AKA setting keepalive. This should fix the stuck NTCP
