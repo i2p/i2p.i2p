@@ -1,3 +1,14 @@
+2010-01-21 zzz
+    * eepget.bat: Add to pkg
+    * Floodfills: Increase max to 15 (was 9) and min to 10 (was 4)
+    * I2PTunnelServer: Fix bug preventing connection retries
+      at startup from working
+    * Logs: Don't be quite so noisy in the wrapper log if we
+      can't open the router log
+    * Properties: Don't play games with \r and \n on load/save,
+      it was causing fatal issues on DOS if your username started
+      with r or n
+
 2010-01-19 sponge
     * Firewall fix for NTCP, where firewalls will forget a NAT relationship
       on a stream... AKA setting keepalive. This should fix the stuck NTCP
