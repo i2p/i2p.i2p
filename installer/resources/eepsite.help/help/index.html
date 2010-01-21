@@ -12,17 +12,17 @@
 <div class="langbar">
 <!-- Most of these languages listed here are yet to be translated -->
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a> 
-<a href="index_na.html"><img src="lib/cn.png" title="Chinese" alt="Chinese"></a> 
+<a href="index_na.html"><img src="lib/cn.png" title="中文" alt="中文"></a> 
 <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a> 
-<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
-<a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a> 
+<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a> 
 <a href="index_na.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a> 
+<a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a> 
 <a href="index_na.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> 
 
 </div>
 <h2>Quick Guide to Anonymous Webserving on I2P</h2>
 
- <p>This is your eepsite, your own anonymous I2P webserver - simply edit the files under ./eepsite/docroot/ 
+ <p>This is your eepsite, your own anonymous I2P webserver - simply edit the files under ~/.i2p/eepsite/docroot/ (Linux) or %APPDATA%\I2P\eepsite\docroot\ (Windows)  
  and they'll be reachable by others once you follow the instructions below.
  In I2P, eepsites are addressed using a 'key', which is represented as a really long Base64 string.
  (The 'key' is somewhat analogous to an IP address, and
@@ -64,7 +64,7 @@
  <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
      be right back here. Hopefully it worked.
  <li>Before you tell the world about your new eepsite, you should add some content.
-     Go to i2p/eepsite/docroot and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!
+     Go to ~/.i2p/eepsite/docroot/ (Linux) or %APPDATA%\I2P\eepsite\docroot\ (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!
 </ul>
 <h2>Register your own .I2P Domain</h2><ul>
  <li>Now it's time to add your eepsite to an I2P address book hosted by a site
