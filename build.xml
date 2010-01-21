@@ -359,26 +359,13 @@
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/logs" />
-        <mkdir dir="pkg-temp/eepsite/docroot" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
+        <mkdir dir="pkg-temp/eepsite/docroot" />
         <mkdir dir="pkg-temp/eepsite/docroot/help" />
         <mkdir dir="pkg-temp/eepsite/docroot/help/lib" />
-        <copy todir="pkg-temp/eepsite/docroot/help/" >
-            <fileset dir="installer/resources/eepsite.help/" />
+        <copy todir="pkg-temp/eepsite/docroot/" >
+            <fileset dir="installer/resources/eepsite.help/"  includes="robots.txt index.html help/pagetemplate.html help/index*.html **/*.png **/*.css" />
         </copy>
-        <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
-            <fileset dir="installer/resources/eepsite.help/help/lib/" />
-        </copy>  
-        <copy file="installer/resources/eepsite.help/index.html" tofile="pkg-temp/eepsite/docroot/" />
-<!-- Let's see if we can lose this chunk -->
-<!--    <copy file="installer/resources/eepsite.help/help/index.html" tofile="pkg-temp/eepsite/docroot/help/" /> -->
-<!--    <copy file="installer/resources/eepsite.help/help/index_de.html" tofile="pkg-temp/eepsite/docroot/help/" /> -->
-<!--    <copy file="installer/resources/eepsite.help/help/index_fr.html" tofile="pkg-temp/eepsite/docroot/help/" /> -->
-<!--    <copy file="installer/resources/eepsite.help/help/index_de.html" tofile="pkg-temp/eepsite/docroot/help/" /> -->
-<!--    <copy file="installer/resources/eepsite.help/help/index_ru.html" tofile="pkg-temp/eepsite/docroot/help/" /> -->
-<!--    <copy file="installer/resources/eepsite.help/help/lib/eepsite.css" todir="pkg-temp/eepsite/docroot/help/lib/" /> -->
-
-        <copy file="installer/resources/eepsite.help/robots.txt" todir="pkg-temp/eepsite/docroot/" />
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
