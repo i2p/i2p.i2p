@@ -5,22 +5,32 @@
     <title>Willkommen zu Ihrer Eepsite!</title>
     <meta name="generator" content="muse.el">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="eepsite.css">
+    <link rel="stylesheet" type="text/css" href="lib/eepsite.css">
   </head><body>
+<div class="fairylights">
+<div class="main">
     <h1>Willkommen zu Ihrer Eepsite!</h1>
-<p>Diese ist Ihre <strong>Eepsite</strong>, Ihre Web-Präsens über I2P. Editieren Sie einfach die Dateien unter
-<em>~/.i2p/eepsite/docroot/</em> (Linux) oder <em>%APPDATA%\I2P\eepsite\docroot\</em> (Windows)
+<div class="langbar">
+<!-- Most of these languages listed here are yet to be translated -->
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a> 
+<!--    <a href="index_zh.html"><img src="/flags.jsp?c=cn" title="Chinese" alt="Chinese"></a>  -->
+    <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a> 
+<!--    <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a> -->
+<!--   <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a> -->
+<!--    <a href="index_se.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> -->
+</div>
+<p>Diese ist Ihre <strong>Eepsite</strong>, Ihre Web-Präsens über I2P. Editieren Sie einfach die Dateien unter <em>i2p/eepsite/docroot/</em>
 und nachdem Sie den Anweisungen weiter unten gefolgt sind, werden Sie –
 vertreten durch Ihre Eepsite – von anderen im I2P-Netz und, soweit
 verfügbar, über private „Out-Proxys“ weltweit erreichbar sein.</p>
 
 <p>In I2P werden Eepsites unter Verwendung eines Schlüssels (key) adressiert, dieser wird durch eine sehr lange Base64-Zeichenkette<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup> dargestellt.
-(Dieser Schlüssel ist analog zur Standard IP-Adresse zu verstehen; man kann ihn sich in der Konfiguration für Eepsites unter <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> anzeigen lassen.)</p>
+(Dieser Schlüssel ist analog zur Standard IP-Adresse zu verstehen; man kann ihn sich in der Konfiguration für Eepsites unter <a href="http://localhost:7657/i2ptunnel/index.jsp">I2PTunnel</a> anzeigen lassen.)</p>
 
 <p>Folgende Anweisungen sollen zeigen, wie man einer Eepsite einen
 Namen wie beispielsweise „meineseite.i2p“ zuweist und an dem Schlüssel
 bindet.
-Sie können Ihre Eepsite, nachdem sie gestartet wurde, lokal unter <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> erreichen.</p>
+Sie können Ihre Eepsite, nachdem sie gestartet wurde, lokal unter <a href="http://localhost:7658/">http://localhost:7658/</a> erreichen.</p>
 
 <p>Es folgt eine schrittweise Anleitung für das Starten Ihrer neuen Eepsite und dessen Ankündigung in der I2P-Gemeinde.</p>
 
@@ -40,10 +50,10 @@ und hat verschiedene Wege um Ihre Eepsite bekannt zu machen.</p>
 <ol>
 <li>Wählen Sie einen eigenen Namen für Ihre Eepsite – nur in diesem
 Beispiel heißt sie „meineseite.i2p“ – benutzen Sie nur Kleinschrift.
-Sie können in Ihrem <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">Adressbuch</a> überprüfen, ob der gewünschte Name bereits vergeben ist (Anmerkung: die Daten aus den Adressbuch werden im Klartext in der <em>i2p/hosts.txt</em> gespeichert).
+Sie können in Ihrem <a href="http://localhost:7657/susidns/addressbook.jsp?book=router">Adressbuch</a> überprüfen, ob der gewünschte Name bereits vergeben ist (Anmerkung: die Daten aus den Adressbuch werden im Klartext in der <em>i2p/hosts.txt</em> gespeichert).
 <br>
 <br></li>
-<li>Rufen Sie nun, möglichst in einem neuen Browser-Fenster, die Konfiguration für Eepsites <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> auf. Unter „Local Server Tunnels“ wählen Sie den Eintrag „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite</a>“.
+<li>Rufen Sie nun, möglichst in einem neuen Browser-Fenster, die Konfiguration für Eepsites <a href="http://localhost:7657/i2ptunnel/index.jsp">I2PTunnel</a> auf. Unter „Local Server Tunnels“ wählen Sie den Eintrag „<a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite</a>“.
 Sie befinden sich nun auf der Seite mit Überschrift „Edit server
 settings“. In das Feld für „Website name:“ überschreiben Sie die
 Vorgabe „mysite.i2p“ mit Ihrem Wunschnamen. Optional geben Sie im Feld
@@ -61,9 +71,9 @@ Ihr <em>privates</em> Adressbuch geschrieben (<em>i2p/privatehosts.txt</em>).
 <li>Jetzt sichern Sie Ihre Einstellungen indem Sie auf „Save“ klicken.
 <br>
 <br></li>
-<li>Wir gehen wieder zurück auf die Konfigurationsseite <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a>
+<li>Wir gehen wieder zurück auf die Konfigurationsseite <a href="http://localhost:7657/i2ptunnel/index.jsp">I2PTunnel</a>
 und drücken den „Start“-Knopf für die „eepsite“. Nach dem erfolgreichen
-Start wird Ihre Eepsite auf der linken Seite in der I2P <a href="http://127.0.0.1:7657/index.jsp">Router Console</a> unter „Local
+Start wird Ihre Eepsite auf der linken Seite in der I2P <a href="http://localhost:7657/index.jsp">Router Console</a> unter „Local
 Destinations“ angezeigt.</li>
 </ol>
 
@@ -72,14 +82,14 @@ Destinations“ angezeigt.</li>
 <h4>Das Veröffentlichen vorbereiten</h4>
 
 <ol>
-<li>Heben Sie in der „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Konfiguration</a>“
+<li>Heben Sie in der „<a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">Konfiguration</a>“
 den gesamten Schlüssel für Ihre Eepsite hervor und kopieren ihn in die
 Zwischenablage. Stellen Sie sicher auch tatsächlich die gesamte, über
 500 Zeichen lange Zeichenkette die auf „AAAA“ endet, „erwischt“ zu
 haben.
 <br>
 <br></li>
-<li>Öffnen Sie Ihr <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">Master-Adressbuch</a>,
+<li>Öffnen Sie Ihr <a href="http://localhost:7657/susidns/addressbook.jsp?book=master">Master-Adressbuch</a>,
 tragen Ihren zuvor gewählten Wunschnamen ihrer Eepsite unter „Hostname“
 ein und kopieren den Schlüssel in das Feld „Destination“. Ein Klick auf
 „Add“ und diese „Destination“ ist in Ihrem Adressbuch.<sup><a class="footref" name="fnr.2" href="#fn.2">2</a></sup>
@@ -94,8 +104,7 @@ Adresse hat sich geändert.
 <br></li>
 <li>Bevor Sie der Welt von Ihrer neuen Eepsite berichten sollte sie
 auch über ein wenig Inhalt verfügen. Begeben Sie sich in das
-Verzeichnis <em>„~/.i2p/eepsite/docroot/“</em> (Linux) oder <em>„%APPDATA%\I2P\eepsite\docroot\“</em> (Windows)
-und benennen Sie dieses Dokument von <em>„index.html“</em> nach <em>„hilfe.html“</em> um, so können Sie später darauf zurück greifen. Erstellen Sie Ihre eigene <em>„index.html“</em> und füllen diese mit Inhalten, Bildern oder was auch immer Sie anderen hierüber mitteilen wollen.</li>
+Verzeichnis <em>„i2p/Eepsite/docroot“</em> und benennen Sie dieses Dokument von <em>„index.html“</em> nach <em>„hilfe.html“</em> um, so können Sie später darauf zurück greifen. Erstellen Sie Ihre eigene <em>„index.html“</em> und füllen diese mit Inhalten, Bildern oder was auch immer Sie anderen hierüber mitteilen wollen.</li>
 </ol>
 
 <h4><a name="AnkerDEOeA" id="AnkerDEOeA"></a>Die Eepsite öffentlich ankündigen</h4>
@@ -104,7 +113,7 @@ und benennen Sie dieses Dokument von <em>„index.html“</em> nach <em>„hilfe
 <li>Nun ist es an der Zeit, Ihre Eepsite in einem globalen I2P-Adressbuch, wie beispielsweise bei <a href="http://stats.i2p/i2p/addkey.html">stats.i2p</a>,
 einzutragen. Das heißt, Sie müssen Namen und Schlüssel Ihrer Eepsite
 und eine optionale Beschreibung in ein Formular auf einen oder mehreren
-dieser Seiten eingeben. Wie schon oben gesagt, Ihr Schlüssel ist der <em>vollständige</em> Schlüssel wie er in der <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> Konfiguration für die „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Eepsite</a>“
+dieser Seiten eingeben. Wie schon oben gesagt, Ihr Schlüssel ist der <em>vollständige</em> Schlüssel wie er in der <a href="http://localhost:7657/i2ptunnel/index.jsp">I2PTunnel</a> Konfiguration für die „<a href="http://localhost:7657/i2ptunnel/edit.jsp?tunnel=3">Eepsite</a>“
 im Feld „Local destination“ angegeben ist (... über 500 Zeichen, endet
 auf „AAAA“). Bestätigen Sie Ihre Angaben mit einem klick auf „Submit“.
 Überprüfen Sie ob Ihr Schlüssel tatsächlich hinzugefügt wurde.
@@ -116,7 +125,7 @@ Ihre Eesite durch
 den Eintrag des Namens im Browser aufzurufen.
 <br>
 <br></li>
-<li>Weil wir gerade von Adressbuchupdates sprechen – es ist eine gute Zeit um weitere Adressbücher dem bestehenden <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">Abonnement</a>
+<li>Weil wir gerade von Adressbuchupdates sprechen – es ist eine gute Zeit um weitere Adressbücher dem bestehenden <a href="http://localhost:7657/susidns/subscriptions.jsp">Abonnement</a>
 hinzuzufügen. Öffnen Sie Ihre Konfiguration und fügen Sie einige der
 folgenden Dienste Ihrem Abonnement hinzu (nur die jeweilige URL) und
 speichern Sie die Angaben.<sup><a class="footref" name="fnr.3" href="#fn.3">3</a></sup> Ab jetzt erhalten Sie ebenso alle Updates automatisch!
@@ -162,11 +171,11 @@ Wartezeit dieses Vorgehen nicht nötig sein.
 </ul>
 
 
-<p>______________
-</p><p class="footnote"><a class="footnum" name="fn.1" href="#fnr.1">1.</a> <strong>Base64</strong>
+<hr><p class="footnote"><a class="footnum" name="fn.1" href="#fnr.1">1.</a> <strong>Base64</strong>
 beschreibt ein Verfahren zur Kodierung von 8-Bit-Binärdaten in eine
 Zeichenfolge, die nur aus wenigen, Codepage-unabhängigen ASCII-Zeichen
 besteht.
 </p><p class="footnote"><a class="footnum" name="fn.2" href="#fnr.2">2.</a> Anmerkung: Wenn dieses Vorgehen mit der Fehlermeldung „Invalid nonce. Are you being spoofed?“ quittiert wird, müssen <em>Cookies</em> im Browser erlaubt werden. Ist dies nicht möglich, können Sie mit einem Editor die Datei <em>„i2p/userhosts.txt“</em> bearbeiten und so die Adressen einfügen. <a href="http://sperrbezirk.i2p/Konqueror_Susi.html">Konqueror</a> ist etwas eigenwillig.
 </p><p class="footnote"><a class="footnum" name="fn.3" href="#fnr.3">3.</a> Gleiches wie unter <sup><a class="footref" name="fnr.2" href="#fn.2">2</a></sup> gilt für <em>„i2p/addressbook/subscriptions.txt“</em>.</p>
-  </body></html>
+</div></div> 
+</body></html>
