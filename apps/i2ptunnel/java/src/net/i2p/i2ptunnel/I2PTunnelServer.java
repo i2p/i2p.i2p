@@ -4,6 +4,7 @@
 package net.i2p.i2ptunnel;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -98,6 +99,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         else
             _usePool = DEFAULT_USE_POOL;
     }
+
     private void init(InetAddress host, int port, InputStream privData, String privkeyname, Logging l) {
         this.l = l;
         this.remoteHost = host;
@@ -113,15 +115,26 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             }
         }
 
+        // copy the privData to a new BAIS, so we can always reset() it if we have to retry
+        ByteArrayInputStream privDataCopy;
+        try {
+            privDataCopy = copyOfInputStream(privData);
+        } catch (IOException ioe) {
+            _log.log(Log.CRIT, "Cannot read private key data for " + privkeyname, ioe);
+            return;
+        }
+
+        // Todo: Can't stop a tunnel from the UI while it's in this loop (no session yet)
         while (sockMgr == null) {
             synchronized (slock) {
-                sockMgr = I2PSocketManagerFactory.createManager(privData, getTunnel().host, portNum,
+                sockMgr = I2PSocketManagerFactory.createManager(privDataCopy, getTunnel().host, portNum,
                                                                 props);
 
             }
             if (sockMgr == null) {
                 _log.log(Log.CRIT, "Unable to create socket manager");
                 try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                privDataCopy.reset();
             }
         }
 
@@ -132,6 +145,24 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         open = true;
     }
 
+    /**
+     *  Copy input stream to a byte array, so we can retry
+     *  @since 0.7.10
+     */
+    private static ByteArrayInputStream copyOfInputStream(InputStream is) throws IOException {
+        byte[] buf = new byte[128];
+        ByteArrayOutputStream os = new ByteArrayOutputStream(768);
+        try {
+            int read;
+            while ((read = is.read(buf)) >= 0) {
+                os.write(buf, 0, read);
+            }
+        } finally {
+             try { is.close(); } catch (IOException ioe) {}
+             // don't need to close BAOS
+        }
+        return new ByteArrayInputStream(os.toByteArray());
+    }
     
     /**
      * Start running the I2PTunnelServer.
