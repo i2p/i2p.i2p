@@ -1053,8 +1053,9 @@ public class Router {
                     String val = _config.getProperty(key);
                     // Escape line breaks before saving.
                     // Remember: "\" needs escaping both for regex and string.
-                    val = val.replaceAll("\\r","\\\\r");
-                    val = val.replaceAll("\\n","\\\\n");
+                    // NOOO - see comments in DataHelper
+                    //val = val.replaceAll("\\r","\\\\r");
+                    //val = val.replaceAll("\\n","\\\\n");
                     buf.append(key).append('=').append(val).append('\n');
                 }
             }

@@ -280,8 +280,13 @@ public class DataHelper {
                 String val = line.substring(split+1);   //.trim() ??????????????
                 // Unescape line breaks after loading.
                 // Remember: "\" needs escaping both for regex and string.
-                val = val.replaceAll("\\\\r","\r");
-                val = val.replaceAll("\\\\n","\n");
+
+                // For some reason this was turning \r (one backslash) into CR,
+                // I think it needed one more \\ in the pattern?,
+                // which sucks if your username is randy on DOS,
+                // it was a horrible idea anyway
+                //val = val.replaceAll("\\\\r","\r");
+                //val = val.replaceAll("\\\\n","\n");
                 if ( (key.length() > 0) && (val.length() > 0) )
                     if (forceLowerCase)
                         props.setProperty(key.toLowerCase(), val);
