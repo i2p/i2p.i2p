@@ -164,7 +164,7 @@ class LogWriter implements Runnable {
                 }
             }
             if (!parent.isDirectory()) {
-                System.err.println("wtf, we cannot put the logs in a subdirectory of a plain file!  we want to stre the log as " + f.getAbsolutePath());
+                System.err.println("Cannot put the logs in a subdirectory of a plain file: " + f.getAbsolutePath());
                 //System.exit(0);
             }
         }
