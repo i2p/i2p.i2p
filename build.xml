@@ -356,17 +356,17 @@
         <copy todir="pkg-temp/docs/themes/" >
           <fileset dir="installer/resources/themes/" />
         </copy>
+        <!-- Eepsite stuff here -->
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/logs" />
-        <mkdir dir="pkg-temp/eepsite/docroot" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
-        <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
-        <copy file="installer/resources/eepsite_index_de.html" tofile="pkg-temp/eepsite/docroot/index_de.html" />
-        <copy file="installer/resources/eepsite_index_fr.html" tofile="pkg-temp/eepsite/docroot/index_fr.html" />
-        <copy file="installer/resources/eepsite_index_ru.html" tofile="pkg-temp/eepsite/docroot/index_ru.html" />
-        <copy file="installer/resources/eepsite.css" todir="pkg-temp/eepsite/docroot/" />
-        <copy file="installer/resources/robots.txt" todir="pkg-temp/eepsite/docroot/" />
+        <mkdir dir="pkg-temp/eepsite/docroot" />
+        <mkdir dir="pkg-temp/eepsite/docroot/help" />
+        <mkdir dir="pkg-temp/eepsite/docroot/help/lib" />
+        <copy todir="pkg-temp/eepsite/docroot/" >
+            <fileset dir="installer/resources/eepsite.help/"  includes="robots.txt index.html help/pagetemplate.html help/index*.html **/*.png **/*.css" />
+        </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
