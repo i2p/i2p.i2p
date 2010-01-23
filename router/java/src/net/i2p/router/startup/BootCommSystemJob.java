@@ -13,6 +13,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
+/** This actually boots almost everything */
 public class BootCommSystemJob extends JobImpl {
     private Log _log;
     
@@ -26,18 +27,29 @@ public class BootCommSystemJob extends JobImpl {
     public String getName() { return "Boot Communication System"; }
     
     public void runJob() {
+        // The netDb and the peer manager both take a long time to start up,
+        // as they may have to read in ~1000 files or more each
+        // So turn on the multiple job queues and start these two first.
+        // These two (plus the current job) will consume 3 of the 4 runners,
+        // leaving one for everything else, which allows us to start without
+        // a huge job lag displayed on the console.
+        getContext().jobQueue().allowParallelOperation();
+        startupDb();
+        getContext().jobQueue().addJob(new BootPeerManagerJob(getContext()));
+
         // start up the network comm system
-        
         getContext().commSystem().startup();
         getContext().tunnelManager().startup();
-        getContext().peerManager().startup();
+
+        // start I2CP
+        getContext().jobQueue().addJob(new StartAcceptingClientsJob(getContext()));
+
+        getContext().jobQueue().addJob(new ReadConfigJob(getContext()));
+    }
         
+    private void startupDb() {
         Job bootDb = new BootNetworkDbJob(getContext());
-        boolean useTrusted = false;
-        String useTrustedStr = getContext().router().getConfigSetting(PROP_USE_TRUSTED_LINKS);
-        if (useTrustedStr != null) {
-            useTrusted = Boolean.TRUE.toString().equalsIgnoreCase(useTrustedStr);
-        }
+        boolean useTrusted = Boolean.valueOf(getContext().getProperty(PROP_USE_TRUSTED_LINKS)).booleanValue();
         if (useTrusted) {
             _log.debug("Using trusted links...");
             getContext().jobQueue().addJob(new BuildTrustedLinksJob(getContext(), bootDb));
