@@ -11,16 +11,16 @@ package net.i2p.router.startup;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 
-/** start up the network database */
-public class BootNetworkDbJob extends JobImpl {
+/** start up the peer manager */
+public class BootPeerManagerJob extends JobImpl {
     
-    public BootNetworkDbJob(RouterContext ctx) {
+    public BootPeerManagerJob(RouterContext ctx) {
         super(ctx);
     }
     
-    public String getName() { return "Boot Network Database"; }
+    public String getName() { return "Boot Peer Manager"; }
     
     public void runJob() {
-        getContext().netDb().startup();
+        getContext().peerManager().startup();
     }
 }

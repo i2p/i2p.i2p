@@ -346,8 +346,12 @@ class PersistentDataStore extends TransientDataStore {
                         _alreadyWarned = false;
                     for (int i = 0; i < routerInfoFiles.length; i++) {
                         Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
-                        if ( (key != null) && (!isKnown(key)) )
-                            PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i], key));
+                        if ( (key != null) && (!isKnown(key)) ) {
+                            // Run it inline so we don't clog up the job queue, esp. at startup
+                            // Also this allows us to wait until it is really done to call checkReseed() and set _initialized
+                            //PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i], key));
+                            (new ReadRouterJob(routerInfoFiles[i], key)).runJob();
+                        }
                     }
                 }
             } catch (IOException ioe) {
