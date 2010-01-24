@@ -25,6 +25,9 @@ public class GraphHelper extends HelperBase {
     private static final int DEFAULT_Y = 100;
     private static final int DEFAULT_REFRESH = 60;
     private static final int DEFAULT_PERIODS = 60;
+    static final int MAX_X = 2048;
+    static final int MAX_Y = 1024;
+    private static final int MIN_REFRESH = 15;
     
     public GraphHelper() {
     }
@@ -45,13 +48,13 @@ public class GraphHelper extends HelperBase {
     }
     public void setShowEvents(boolean b) { _showEvents = b; }
     public void setHeight(String str) {
-        try { _height = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
+        try { _height = Math.min(Integer.parseInt(str), MAX_Y); } catch (NumberFormatException nfe) {}
     }
     public void setWidth(String str) {
-        try { _width = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
+        try { _width = Math.min(Integer.parseInt(str), MAX_X); } catch (NumberFormatException nfe) {}
     }
     public void setRefreshDelay(String str) {
-        try { _refreshDelaySeconds = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
+        try { _refreshDelaySeconds = Math.max(Integer.parseInt(str), MIN_REFRESH); } catch (NumberFormatException nfe) {}
     }
     
     public String getImages() { 
