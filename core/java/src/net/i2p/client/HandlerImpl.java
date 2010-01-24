@@ -25,7 +25,7 @@ abstract class HandlerImpl implements I2CPMessageHandler {
     public HandlerImpl(I2PAppContext context, int type) {
         _context = context;
         _type = type;
-        _log = new Log(getClass());
+        _log = context.logManager().getLog(getClass());
     }
     
     public int getType() {

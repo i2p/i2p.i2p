@@ -714,7 +714,7 @@
             <arg value="i2pupdate.sud" />
         </java>
         <!-- will this use the monotonerc file in the current workspace? -->
-        <echo message="Checking out fresh copy into ../i2p-${release-number} for tarballing:" />
+        <echo message="Checking out fresh copy into ../i2p-${release.number} for tarballing:" />
         <delete dir="../i2p-${release.number}" />
         <exec executable="mtn" failonerror="true">
             <arg value="co" />
@@ -768,7 +768,7 @@
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.sud" />
         </exec>
-        <echo message="Don't forget to mtn tag h: i2p-${release.number}" />
+        <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 </project>
