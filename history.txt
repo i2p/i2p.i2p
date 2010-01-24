@@ -1,3 +1,20 @@
+2010-01-24 zzz
+    * Clock:
+      - Don't let a client update the router clock
+      - Restore and enhance vanished clock error log message
+    * Graphs: Enforce max size to lessen chance of OOM from malicious link
+    * NetDb:
+      - Move stat initialization, reduce number of rates
+      - Add basic DOS prevention by not flooding if stores are too-frequent
+    * ProfileOrganizer:
+      - Limit High Cap to 75 max
+      - Reduce max lock wait time, change no lock error to warning
+      - More cleanup
+    * Startup:
+      - Enable multiple parallel job runners much sooner to speed startup
+      - Rearrange the startup order to get the long jobs started sooner
+      - Don't allow the netDb readin job to clog the job queue
+
 2010-01-21 dr|z3d
     * New eepsite structure and enhanced pages. Now with graphics and stuff!
 
