@@ -39,14 +39,6 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     public HandleFloodfillDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
-        ctx.statManager().createRateStat("netDb.storeHandled", "How many netDb store messages have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("netDb.storeLeaseSetHandled", "How many leaseSet store messages have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        //ctx.statManager().createRateStat("netDb.storeLocalLeaseSetAttempt", "Peer tries to store our leaseset (multihome?)", "NetworkDatabase", new long[] { 60*60*1000l });
-        //ctx.statManager().createRateStat("netDb.storeLocalRouterInfoAttempt", "Peer tries to store our router info", "NetworkDatabase", new long[] { 60*60*1000l });
-        ctx.statManager().createRateStat("netDb.storeRouterInfoHandled", "How many routerInfo store messages have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("netDb.storeRecvTime", "How long it takes to handle the local store part of a dbStore?", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
-        ctx.statManager().createRateStat("netDb.storeFloodNew", "How long it takes to flood out a newly received entry?", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
-        ctx.statManager().createRateStat("netDb.storeFloodOld", "How often we receive an old entry?", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;

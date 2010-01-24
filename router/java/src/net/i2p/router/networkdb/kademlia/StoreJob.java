@@ -73,12 +73,6 @@ class StoreJob extends JobImpl {
                     DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
-        getContext().statManager().createRateStat("netDb.storeRouterInfoSent", "How many routerInfo store messages have we sent?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storeLeaseSetSent", "How many leaseSet store messages have we sent?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storeFailedPeers", "How many peers each netDb must be sent to before failing completely?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*1000, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
         _state = new StoreState(getContext(), key, data, toSkip);
         _onSuccess = onSuccess;

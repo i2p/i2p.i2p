@@ -36,7 +36,6 @@ public class RepublishLeaseSetJob extends JobImpl {
         _dest = destHash;
         _lastPublished = 0;
         //getTiming().setStartAfter(ctx.clock().now()+REPUBLISH_LEASESET_DELAY);
-        getContext().statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     public String getName() { return "Republish a local leaseSet"; }
     public void runJob() {

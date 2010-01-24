@@ -37,6 +37,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     /** for testing, see isFloodfill() below */
     private static String _alwaysQuery;
     private final Set<Hash> _verifiesInProgress;
+    private FloodThrottler _floodThrottler;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
@@ -115,6 +116,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             key = ((LeaseSet)ds).getDestination().calculateHash();
         else
             key = ((RouterInfo)ds).getIdentity().calculateHash();
+        // DOS prevention
+        if (_floodThrottler != null && _floodThrottler.shouldThrottle(key)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Too many recent stores, not flooding key: " + key);
+            _context.statManager().addRateData("netDb.floodThrottled", 1, 0);
+            return;
+        }
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         List peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
@@ -124,6 +132,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             RouterInfo target = lookupRouterInfoLocally(peer);
             if ( (target == null) || (_context.shitlist().isShitlisted(peer)) )
                 continue;
+            // Don't flood a RI back to itself
+            // Not necessary, a ff will do its own flooding (reply token == 0)
+            //if (peer.equals(target.getIdentity().getHash()))
+            //    continue;
             if (peer.equals(_context.routerHash()))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
@@ -176,7 +188,17 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     
-    public void setFloodfillEnabled(boolean yes) { _floodfillEnabled = yes; }
+    synchronized void setFloodfillEnabled(boolean yes) {
+        _floodfillEnabled = yes;
+        if (yes && _floodThrottler == null) {
+            _floodThrottler = new FloodThrottler();
+            _context.statManager().createRateStat("netDb.floodThrottled", "How often do we decline to flood?", "NetworkDatabase", new long[] { 60*60*1000l });
+            // following are for HFDSMJ
+            _context.statManager().createRateStat("netDb.storeFloodNew", "How long it takes to flood out a newly received entry?", "NetworkDatabase", new long[] { 60*60*1000l });
+            _context.statManager().createRateStat("netDb.storeFloodOld", "How often we receive an old entry?", "NetworkDatabase", new long[] { 60*60*1000l });
+        }
+    }
+
     public boolean floodfillEnabled() { return _floodfillEnabled; }
     public static boolean floodfillEnabled(RouterContext ctx) {
         return ((FloodfillNetworkDatabaseFacade)ctx.netDb()).floodfillEnabled();
