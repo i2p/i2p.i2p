@@ -155,8 +155,13 @@ public class Timestamper implements Runnable {
                         try {
                             lastFailed = !queryTime(_servers.toArray(new String[_servers.size()]));
                         } catch (IllegalArgumentException iae) {
-                            if ( (!lastFailed) && (_log.shouldLog(Log.ERROR)) )
-                                _log.error("Unable to reach any of the NTP servers - network disconnected?");
+                            if ( (!_initialized) && (_log.shouldLog(Log.ERROR)) ) {
+                                List<String> all = new ArrayList();
+                                if (_priorityServers != null)
+                                    all.addAll(_priorityServers);
+                                all.addAll(_servers);
+                                _log.error("Unable to reach any of the NTP servers " + all + " - network disconnected? Or set time.sntpServerList=myserver1.com,myserver2.com in advanced configuration.");
+                            }
                             lastFailed = true;
                         }
                     }

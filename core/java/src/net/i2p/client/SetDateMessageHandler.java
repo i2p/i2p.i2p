@@ -27,7 +27,11 @@ class SetDateMessageHandler extends HandlerImpl {
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         _log.debug("Handle message " + message);
         SetDateMessage msg = (SetDateMessage) message;
-        Clock.getInstance().setNow(msg.getDate().getTime());
+        // Only do this if we are NOT in the router context;
+        // otherwise, it sets getUpdatedSuccessfully() in Clock when all
+        // we did was get the time from ourselves.
+        if (!_context.isRouterContext())
+            Clock.getInstance().setNow(msg.getDate().getTime());
         session.dateUpdated();
     }
 }
