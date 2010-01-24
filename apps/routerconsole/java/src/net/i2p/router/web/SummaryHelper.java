@@ -414,10 +414,10 @@ public class SummaryHelper extends HelperBase {
     }
     
     /** compare translated nicknames - put "shared clients" first in the sort */
-    private class AlphaComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            String lname = getName((Destination)lhs);
-            String rname = getName((Destination)rhs);
+    private class AlphaComparator implements Comparator<Destination> {
+        public int compare(Destination lhs, Destination rhs) {
+            String lname = getName(lhs);
+            String rname = getName(rhs);
             String xsc = _("shared clients");
             if (lname.equals(xsc))
                 return -1;
