@@ -92,9 +92,10 @@ public class Clock implements Timestamper.UpdateListener {
             else if (getLog().shouldLog(Log.INFO))
                 getLog().info("Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
             
-            if (!_statCreated)
+            if (!_statCreated) {
                 _context.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
+            }
             _context.statManager().addRateData("clock.skew", delta, 0);
         } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");

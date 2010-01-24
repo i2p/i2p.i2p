@@ -59,8 +59,8 @@ public class PeerState {
     private boolean _rekeyBeganLocally;
     /** when were the current cipher and MAC keys established/rekeyed? */
     private long _keyEstablishedTime;
-    /** how far off is the remote peer from our clock, in seconds? */
-    private short _clockSkew;
+    /** how far off is the remote peer from our clock, in milliseconds? */
+    private long _clockSkew;
     /** what is the current receive second, for congestion control? */
     private long _currentReceiveSecond;
     /** when did we last send them a packet? */
@@ -327,8 +327,8 @@ public class PeerState {
     public boolean getRekeyBeganLocally() { return _rekeyBeganLocally; }
     /** when were the current cipher and MAC keys established/rekeyed? */
     public long getKeyEstablishedTime() { return _keyEstablishedTime; }
-    /** how far off is the remote peer from our clock, in seconds? */
-    public short getClockSkew() { return ( (short) (_clockSkew / 1000)); }
+    /** how far off is the remote peer from our clock, in milliseconds? */
+    public long getClockSkew() { return _clockSkew ; }
     /** what is the current receive second, for congestion control? */
     public long getCurrentReceiveSecond() { return _currentReceiveSecond; }
     /** when did we last send them a packet? */
@@ -425,9 +425,9 @@ public class PeerState {
     public void setRekeyBeganLocally(boolean local) { _rekeyBeganLocally = local; }
     /** when were the current cipher and MAC keys established/rekeyed? */
     public void setKeyEstablishedTime(long when) { _keyEstablishedTime = when; }
-    /** how far off is the remote peer from our clock, in seconds? */
-    public void adjustClockSkew(short skew) { 
-        _clockSkew = (short)(0.9*(float)_clockSkew + 0.1*(float)skew); 
+    /** how far off is the remote peer from our clock, in milliseconds? */
+    public void adjustClockSkew(long skew) { 
+        _clockSkew = (long) (0.9*(float)_clockSkew + 0.1*(float)skew); 
     }
     /** what is the current receive second, for congestion control? */
     public void setCurrentReceiveSecond(long sec) { _currentReceiveSecond = sec; }

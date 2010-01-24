@@ -99,7 +99,7 @@ public class SummaryHelper extends HelperBase {
         //if (!_context.clock().getUpdatedSuccessfully())
         Long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
-        if (skew != null && Math.abs(skew.longValue()) > 45)
+        if (skew != null && Math.abs(skew.longValue()) > 30)
             return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew.longValue()) * 1000));
         if (_context.router().isHidden())
             return _("Hidden");

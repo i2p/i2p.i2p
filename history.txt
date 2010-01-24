@@ -1,3 +1,19 @@
+2010-01-28 zzz
+    * ProfileOrganizerRenderer: Cleanups
+    * Reseed: Update welt's reseed hostname
+    * Transport clock skews:
+      - Store and report UDP clock skews even for large values, so
+        a badly skewed local clock will be reported to the console
+      - Don't shitlist for NTCP clock skew if we don't know what time it is
+      - If NTP hasn't worked yet, have NTCP or SSU update the clock one time
+      - Include failed clock skew in NTCP skew vector if there aren't many connections
+      - Don't include NTCP clock skews for non-established connections
+      - Fix framed clock skew frame size
+      - Report framed clock skew even if for only one peer, if NTP hasn't worked yet
+      - Don't log RRD errors after clock adjustment
+      - Reduce min skew for console warning to 30s (was 45s)
+      - More Java 5 cleanups
+
 2010-01-24 zzz
     * Clock:
       - Don't let a client update the router clock

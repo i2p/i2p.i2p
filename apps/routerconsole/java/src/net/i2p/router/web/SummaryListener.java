@@ -68,7 +68,10 @@ class SummaryListener implements RateSummaryListener {
             } catch (IOException ioe) {
                 _log.error("Error adding", ioe);
             } catch (RrdException re) {
-                _log.error("Error adding", re);
+                // this can happen after the time slews backwards, so don't make it an error
+                // org.jrobin.core.RrdException: Bad sample timestamp 1264343107. Last update time was 1264343172, at least one second step is required
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error adding", re);
             }
         }
     }
