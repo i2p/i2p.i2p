@@ -254,72 +254,29 @@
 	-->
 	<defaultexcludes default="true"/>
     </target>
+
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
+
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
         </delete>
     </target>
-    <target name="preppkg" depends="build, buildexe, preplicenses, prepconsoleDocs">
-        <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
-        <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
-        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+
+    <target name="preppkg" depends="preppkg-linux, buildexe">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
-        <copy file="build/router.jar" todir="pkg-temp/lib/" />
-        <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <copy file="build/sam.jar" todir="pkg-temp/lib/" />
-        <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
-        <copy file="build/systray.jar" todir="pkg-temp/lib" />
-        <!-- <copy file="build/sucker.jar" todir="pkg-temp/lib" /> -->
-        <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
-        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
-        <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
         <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
-        <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
-        <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
-        <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
-        <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
-        <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
-        <!-- <copy file="build/syndie.war" todir="pkg-temp/webapps/" /> -->
-        <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
-        <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
-        <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
-        <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
-        <copy file="installer/resources/clients.config" todir="pkg-temp/" />
-        <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/eepget.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
         <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
-        <!-- <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/osid" todir="pkg-temp/" />
         <copy file="installer/resources/postinstall.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
-        <copy file="installer/resources/systray.config" todir="pkg-temp/" />
-        <!-- <copy file="installer/resources/uninstall_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
             <fileset dir="installer/lib/wrapper/freebsd/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux/">
-            <fileset dir="installer/lib/wrapper/linux/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux64/">
-            <fileset dir="installer/lib/wrapper/linux64/" />
         </copy>
         <copy todir="pkg-temp/lib/wrapper/macosx/">
             <fileset dir="installer/lib/wrapper/macosx/" />
@@ -330,19 +287,68 @@
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
+    </target>
+
+    <!-- only what is needed for debian, etc. -->
+    <target name="preppkg-linux-only" depends="preppkg-linux">
+        <!-- rip the non-linux stuff out of jbigi.jar -->
+        <mkdir dir="tmpextract" />
+        <unjar src="build/jbigi.jar" dest="tmpextract/" />
+        <jar destfile="pkg-temp/lib/jbigi.jar" >
+            <fileset dir="tmpextract/" includes="*linux*" />
+        </jar>
+        <delete dir="tmpextract/" />
+    </target>
+
+    <target name="preppkg-linux" depends="build, preplicenses, prepconsoleDocs">
+        <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
+        <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
+        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
+        <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
+        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy file="build/router.jar" todir="pkg-temp/lib/" />
+        <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <copy file="build/sam.jar" todir="pkg-temp/lib/" />
+        <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
+        <copy file="build/systray.jar" todir="pkg-temp/lib" />
+        <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
+        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
+        <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
+        <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
+        <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
+        <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+        <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
+        <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
+        <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
+        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
+        <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/clients.config" todir="pkg-temp/" />
+        <copy file="installer/resources/eepget" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
+        <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
+        <copy file="installer/resources/osid" todir="pkg-temp/" />
+        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
+        <copy file="installer/resources/systray.config" todir="pkg-temp/" />
+        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
+        <copy todir="pkg-temp/lib/wrapper/linux/">
+            <fileset dir="installer/lib/wrapper/linux/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux64/">
+            <fileset dir="installer/lib/wrapper/linux64/" />
+        </copy>
         <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
         <!-- overwrite the truncated history put in by the updater -->
         <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
-        <!-- test classes aren't in the jars anymore
-        <copy file="core/perl/i2pbench.sh" todir="pkg-temp/scripts/" />
-        <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
-        -->
-        <!-- polecat: please put your modified toolbar.html in installer/resources/toolbar.html 
-             and uncomment the following -->
-        <!-- <copy file="installer/resources/toolbar.html" todir="pkg-temp/docs/" /> -->
         <!-- overwrite the news put in by the updater -->
         <copy file="installer/resources/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
         <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
@@ -367,6 +373,7 @@
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
+
     <target name="preplicenses">
         <copy file="LICENSE.txt" todir="pkg-temp/" />
         <copy todir="pkg-temp/licenses/" >

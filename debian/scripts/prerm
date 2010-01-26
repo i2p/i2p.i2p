@@ -10,6 +10,8 @@ update-rc.d -f i2p remove
 # dpkg doesn't know about these files, created by postinstall.sh
 I2P=/usr/lib/i2p
 rm -f $I2P/i2psvc $I2P/lib/libwrapper.so $I2P/lib/wrapper.jar
+# copied out of jbigi.jar by the router
+rm -f $I2P/libjbigi.so $I2P/libjcpuid.so
 
 # the home directory for the i2p daemon
 SVCHOME=/var/lib/i2p

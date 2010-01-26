@@ -14,7 +14,7 @@ This sets up a binary package with the following:
 
 Todo:
 
-- Remove 1MB lib/jbigi.jar, just build and include dynamic libjbigi
+- Remove lib/jbigi.jar, just build and include dynamic libjbigi
   and the linux libjcpuid (and add dependency on libgmp)
 - Initial router.config for i2psvc (without confusing i2p that
   the router directory already exists):

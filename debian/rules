@@ -1,19 +1,11 @@
 #!/usr/bin/make -f
 
 build:
-	ant preppkg
+	ant preppkg-linux-only
 	mkdir -p debian/tmp/usr/lib
 	mkdir -p debian/tmp/etc/init.d
 	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p
 	cp -a pkg-temp debian/tmp/usr/lib/i2p
-	rm -f debian/tmp/usr/lib/i2p/*.bat
-	rm -f debian/tmp/usr/lib/i2p/i2p.exe
-	rm -rf debian/tmp/usr/lib/i2p/icons
-	rm -f debian/tmp/usr/lib/i2p/lib/systray4j.dll
-	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/freebsd
-	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/macosx
-	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/solaris
-	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/win32
 	chmod +x debian/tmp/usr/lib/i2p/postinstall.sh
 	sed 's|$$INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/wrapper.config > debian/tmp/usr/lib/i2p/a
 	sed 's|$$SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/wrapper.config
