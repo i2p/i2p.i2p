@@ -137,8 +137,10 @@ class LogWriter implements Runnable {
             // may be a little off if a lot of multi-byte chars, but unlikely
             _numBytesInCurrentFile += val.length();
         } catch (Throwable t) {
-            System.err.println("Error writing record, disk full?");
-            t.printStackTrace();
+            if (!_write)
+                return;
+            System.err.println("Error writing log, disk full? " + t);
+            //t.printStackTrace();
         }
         if (_numBytesInCurrentFile >= _manager.getFileSize()) {
             rotateFile();
