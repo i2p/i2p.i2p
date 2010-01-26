@@ -29,8 +29,6 @@ public class RouterClock extends Clock {
      */
     @Override
     public void setOffset(long offsetMs, boolean force) {
-
-        if (false) return;
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
@@ -54,7 +52,8 @@ public class RouterClock extends Clock {
             }
 
             // If so configured, check sanity of proposed clock offset
-            if (Boolean.valueOf(_contextRC.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() == true) {
+            if (Boolean.valueOf(_contextRC.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() &&
+                _alreadyChanged) {
 
                 // Try calculating peer clock skew
                 Long peerClockSkew = _contextRC.commSystem().getFramedAveragePeerClockSkew(50);
