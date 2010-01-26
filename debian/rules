@@ -1,20 +1,44 @@
 #!/usr/bin/make -f
 
 build:
-	ant preppkg && \
-	(cd pkg-temp; chmod +x postinstall.sh) && \
-	mkdir -p debian/tmp/var/lib && \
-	mkdir -p debian/tmp/etc/init.d && \
-	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p && \
-	cp -a pkg-temp debian/tmp/var/lib/i2p && \
+	ant preppkg
+	mkdir -p debian/tmp/usr/lib
+	mkdir -p debian/tmp/etc/init.d
+	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p
+	cp -a pkg-temp debian/tmp/usr/lib/i2p
+	rm -f debian/tmp/usr/lib/i2p/*.bat
+	rm -f debian/tmp/usr/lib/i2p/i2p.exe
+	rm -rf debian/tmp/usr/lib/i2p/icons
+	rm -f debian/tmp/usr/lib/i2p/lib/systray4j.dll
+	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/freebsd
+	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/macosx
+	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/solaris
+	rm -rf debian/tmp/usr/lib/i2p/lib/wrapper/win32
+	chmod +x debian/tmp/usr/lib/i2p/postinstall.sh
+	sed 's|$$INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/wrapper.config > debian/tmp/usr/lib/i2p/a
+	sed 's|$$SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/wrapper.config
+	mkdir -p debian/tmp/usr/bin
+	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/eepget > debian/tmp/usr/lib/i2p/a
+	mv debian/tmp/usr/lib/i2p/a debian/tmp/usr/lib/i2p/eepget
+	cp debian/tmp/usr/lib/i2p/eepget  debian/tmp/usr/bin/eepget
+	chmod +x debian/tmp/usr/bin/eepget
+	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/runplain.sh > debian/tmp/usr/lib/i2p/a
+	sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/runplain.sh
+	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/i2prouter > debian/tmp/usr/lib/i2p/a
+	sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/i2prouter
+	cp debian/tmp/usr/lib/i2p/i2prouter debian/tmp/usr/bin/i2prouter
+	chmod +x debian/tmp/usr/bin/i2prouter
+	rm debian/tmp/usr/lib/i2p/a
 	touch debian/build
+
 binary: build
-	mkdir -p debian/tmp/DEBIAN && \
-	dpkg-gencontrol && \
-	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/tmp/DEBIAN && \
+	mkdir -p debian/tmp/DEBIAN
+	dpkg-gencontrol
+	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/tmp/DEBIAN
 	dpkg-deb -b debian/tmp ..
+
 clean:
 	rm -f debian/build
-	ant clean
-	rm -Rf pkg-temp
+	rm -rf debian/tmp/
+	ant distclean
 	@exit 0

@@ -1,2 +1,19 @@
 #!/bin/sh
-exec /etc/init.d/i2p stop
+/etc/init.d/i2p stop
+
+# stuff in /tmp
+rm -f /tmp/wrapper.log /tmp/wrapper.log.1 /tmp/wrapper.log.2 /tmp/i2p.pid /tmp/routerjvm.pid /tmp/router.ping
+
+# /etc/rc*.d/*i2p files	
+update-rc.d -f i2p remove
+
+# dpkg doesn't know about these files, created by postinstall.sh
+I2P=/usr/lib/i2p
+rm -f $I2P/i2psvc $I2P/lib/libwrapper.so $I2P/lib/wrapper.jar
+
+# the home directory for the i2p daemon
+SVCHOME=/var/lib/i2p
+rm -rf $SVCHOME
+
+# if any user other than i2psvc has run i2p, the files in ~user/.i2p are not removed
+exit 0

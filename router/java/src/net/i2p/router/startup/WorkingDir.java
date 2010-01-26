@@ -47,6 +47,8 @@ public class WorkingDir {
     private final static String PROP_WORKING_DIR = "i2p.dir.config";
     private final static String WORKING_DIR_DEFAULT_WINDOWS = "I2P";
     private final static String WORKING_DIR_DEFAULT = ".i2p";
+    private final static String WORKING_DIR_DEFAULT_DAEMON = "i2p-config";
+    private final static String DAEMON_USER = "i2psvc";
 
     /**
      * Only call this once on router invocation.
@@ -70,7 +72,10 @@ public class WorkingDir {
                     home = appdata;
                 dirf = new File(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else {
-                dirf = new File(home, WORKING_DIR_DEFAULT);
+                if (DAEMON_USER.equals(System.getProperty("user.name")))
+                    dirf = new File(home, WORKING_DIR_DEFAULT_DAEMON);
+                else
+                    dirf = new File(home, WORKING_DIR_DEFAULT);
             }
         }
 

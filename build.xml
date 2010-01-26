@@ -197,6 +197,8 @@
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />	
     </target>
     <target name="distclean" depends="clean">
+        <delete dir="debian/tmp" />
+        <delete file="debian/files" />
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
@@ -237,8 +239,7 @@
 	<defaultexcludes remove="**/*~"/>
 
         <delete>
-            <fileset dir="." includes="**/*.class" />
-            <fileset dir="." includes="**/*.java~" />
+            <fileset dir="." includes="**/*.class **/*.java~ **/*.txt~ **/*.xml~ **/*.sh~ **/*.SlackBuild~" />
 	    <!-- 
 	    	Less common, but they pollute my workspace here, so we
             	might as well nuke these as well. Are there any others?
@@ -247,10 +248,6 @@
 
             	++Sponge
             -->
-            <fileset dir="." includes="**/*.txt~" />
-            <fileset dir="." includes="**/*.xml~"  />
-            <fileset dir="." includes="**/*.sh~"  />
-            <fileset dir="." includes="**/*.SlackBuild~" />
         </delete>
 	<!--
 		Now we put the defaults back
@@ -770,5 +767,16 @@
         </exec>
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
+    </target>
+    <target name="debian">
+        <echo message="Did you update the version in these files?" />
+        <exec executable="ls" failonerror="true">
+            <arg value="-l" />
+            <arg value="debian/changelog" />
+        </exec>
+        <echo message="====================" />
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true" >
+            <arg value="-b" />
+        </exec>
     </target>
 </project>
