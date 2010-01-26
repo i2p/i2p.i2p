@@ -1,3 +1,17 @@
+> Date: Fri, 13 Aug 2004 15:58:30 +1200 (NZST)
+> Message-ID: <1776.202.37.75.101.1092369510.squirrel@202.37.75.101>
+> From: adam@adambuckley.net
+> To: jrandom@i2p.net
+>
+> [...]
+>
+> I hereby authorize my NtpClient.java and NtpMessage.java code to be
+> redistributed under the BSD license for the purpose of integration with
+> the I2P project, providing that I am credited as the original author of
+> the code.
+>
+> [...]
+
 /*
  * Copyright (c) 2004, Adam Buckley
  * All rights reserved.
