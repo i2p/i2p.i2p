@@ -411,6 +411,10 @@ class PersistentDataStore extends TransientDataStore {
                         try {
                             // persist = false so we don't write what we just read
                             _facade.store(ri.getIdentity().getHash(), ri, false);
+                            // when heardAbout() was removed from TransientDataStore, it broke
+                            // profile bootstrapping for new routers,
+                            // so add it here.
+                            getContext().profileManager().heardAbout(ri.getIdentity().getHash(), ri.getPublished());
                         } catch (IllegalArgumentException iae) {
                             _log.info("Refused locally loaded routerInfo - deleting");
                             corrupt = true;

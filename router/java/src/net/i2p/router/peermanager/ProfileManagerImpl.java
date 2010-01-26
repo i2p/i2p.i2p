@@ -311,6 +311,17 @@ public class ProfileManagerImpl implements ProfileManager {
         if (data == null) return;
         data.setLastHeardAbout(_context.clock().now());
     }
+
+    /**
+     * Note that the local router received a reference to the given peer
+     * at a certain time. Only update the time if newer.
+     */
+    public void heardAbout(Hash peer, long when) {
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        if (when > data.getLastHeardAbout())
+            data.setLastHeardAbout(when);
+    }
     
     /**
      * Note that the router received a message from the given peer on the specified
