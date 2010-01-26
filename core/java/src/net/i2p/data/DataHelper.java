@@ -48,8 +48,8 @@ import net.i2p.util.ReusableGZIPOutputStream;
  * @author jrandom
  */
 public class DataHelper {
-    private final static byte _equalBytes[] = "=".getBytes(); // in UTF-8
-    private final static byte _semicolonBytes[] = ";".getBytes(); // in UTF-8
+    private final static byte EQUAL_BYTES[] = "=".getBytes(); // in UTF-8
+    private final static byte SEMICOLON_BYTES[] = ";".getBytes(); // in UTF-8
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -76,17 +76,17 @@ public class DataHelper {
         int read = read(rawStream, data);
         if (read != size) throw new DataFormatException("Not enough data to read the properties");
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-        byte eqBuf[] = new byte[_equalBytes.length];
-        byte semiBuf[] = new byte[_semicolonBytes.length];
+        byte eqBuf[] = new byte[EQUAL_BYTES.length];
+        byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key = readString(in);
             read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(eqBuf, _equalBytes))) {
+            if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
                 break;
             }
             String val = readString(in);
             read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(semiBuf, _semicolonBytes))) {
+            if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
                 break;
             }
             props.put(key, val);
@@ -123,7 +123,7 @@ public class DataHelper {
         if (props != null) {
             OrderedProperties p = new OrderedProperties();
             p.putAll(props);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
             for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
                 String key = (String) iter.next();
                 String val = p.getProperty(key);
@@ -131,15 +131,17 @@ public class DataHelper {
                     writeStringUTF8(baos, key);
                 else
                     writeString(baos, key);
-                baos.write(_equalBytes);
+                baos.write(EQUAL_BYTES);
                 if (utf8)
                     writeStringUTF8(baos, val);
                 else
                     writeString(baos, val);
-                baos.write(_semicolonBytes);
+                baos.write(SEMICOLON_BYTES);
             }
             baos.close();
             byte propBytes[] = baos.toByteArray();
+            if (propBytes.length > 65535)
+                throw new DataFormatException("Properties too big (65535 max): " + propBytes.length);
             writeLong(rawStream, 2, propBytes.length);
             rawStream.write(propBytes);
         } else {
@@ -164,9 +166,9 @@ public class DataHelper {
                 //key = new String(key.getBytes(), "UTF-8");
                 //val = new String(val.getBytes(), "UTF-8");
                 writeString(baos, key);
-                baos.write(_equalBytes);
+                baos.write(EQUAL_BYTES);
                 writeString(baos, val);
-                baos.write(_semicolonBytes);
+                baos.write(SEMICOLON_BYTES);
             }
             baos.close();
             byte propBytes[] = baos.toByteArray();
@@ -190,17 +192,17 @@ public class DataHelper {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
         ByteArrayInputStream in = new ByteArrayInputStream(source, offset, size);
-        byte eqBuf[] = new byte[_equalBytes.length];
-        byte semiBuf[] = new byte[_semicolonBytes.length];
+        byte eqBuf[] = new byte[EQUAL_BYTES.length];
+        byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key = readString(in);
             int read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(eqBuf, _equalBytes))) {
+            if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
                 break;
             }
             String val = readString(in);
             read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(semiBuf, _semicolonBytes))) {
+            if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
                 break;
             }
             target.put(key, val);

@@ -22,8 +22,6 @@ public class DataMessage extends I2NPMessageImpl {
     public final static int MESSAGE_TYPE = 20;
     private byte _data[];
     
-    // private static final int MAX_SIZE = 64*1024;  // LINT -- field hides another field, and not used
-    
     public DataMessage(I2PAppContext context) {
         super(context);
         _data = null;
@@ -48,7 +46,7 @@ public class DataMessage extends I2NPMessageImpl {
         int curIndex = offset;
         long size = DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
-        if (size > 64*1024)
+        if (size > MAX_SIZE)
             throw new I2NPMessageException("wtf, size=" + size);
         _data = new byte[(int)size];
         System.arraycopy(data, curIndex, _data, 0, (int)size);

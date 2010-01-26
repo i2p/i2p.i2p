@@ -1,3 +1,14 @@
+2010-01-28 zzz
+    * Clock: Don't refuse to update because of peer skew the first time
+    * I2NP: Various cleanup and bulletproofing
+    * Log: Try to avoid complaints at shutdown
+    * Profiles: Fix lack of profiles at router startup, especially for new routers
+    * stats.jsp: Shrink the dropdown box
+
+2010-01-26 zzz
+    * build.xml: Speed up distclean additions
+    * Debian: Fixup, update, enhance scripts
+
 2010-01-24 zzz
     * ProfileOrganizerRenderer: Cleanups
     * Reseed: Update welt's reseed hostname
