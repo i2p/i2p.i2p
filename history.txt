@@ -1,3 +1,6 @@
+2010-01-28 welterde
+    * enhance support for multiple RouterAddresses' of the same style in RouterInfo
+
 2010-01-26 zzz
     * build.xml: Speed up distclean additions
     * Clock: Don't refuse to update because of peer skew the first time
