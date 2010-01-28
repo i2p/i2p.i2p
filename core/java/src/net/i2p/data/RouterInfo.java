@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
 
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA256Generator;
@@ -449,6 +450,18 @@ public class RouterInfo extends DataStructureImpl {
             }
         }
         return null;
+    }
+    
+    public List<RouterAddress> getTargetAddresses(String transportStyle) {
+        List<RouterAddress> ret = new Vector<RouterAddress>();
+        synchronized(this._addresses) {
+            for(Object o : this._addresses) {
+                RouterAddress addr = (RouterAddress)o;
+                if(addr.getTransportStyle().equals(transportStyle))
+                    ret.add(addr);
+            }
+        }
+        return ret;
     }
 
     /**
