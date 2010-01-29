@@ -642,6 +642,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // Iterate through the old failure / success count, copying over the old
         // values (if any tunnels overlap between leaseSets).  no need to be
         // ueberthreadsafe fascists here, since these values are just heuristics
+      /****** unused
         if (rv != null) {
             for (int i = 0; i < rv.getLeaseCount(); i++) {
                 Lease old = rv.getLease(i);
@@ -655,6 +656,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 }
             }
         }
+       *******/
         
         return rv;
     }
