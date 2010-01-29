@@ -442,6 +442,11 @@ class StoreJob extends JobImpl {
             } else {
                 sent = msg;
                 _state.addPending(to);
+                // now that almost all floodfills are at 0.7.10,
+                // just refuse to store unencrypted to older ones.
+                _state.replyTimeout(to);
+                getContext().jobQueue().addJob(new WaitJob(getContext()));
+                return;
             }
 
             SendSuccessJob onReply = new SendSuccessJob(getContext(), peer, outTunnel, sent.getMessageSize());
