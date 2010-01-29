@@ -776,6 +776,7 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
     <target name="debian">
+        <!-- binary only -->
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
@@ -784,6 +785,20 @@
         <echo message="====================" />
         <exec executable="dpkg-buildpackage" failifexecutionfails="true" >
             <arg value="-b" />
+        </exec>
+    </target>
+    <target name="debian-source">
+        <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
+        <ant dir="apps/jetty" target="verifyJettylib" />
+        <echo message="Did you update the version in these files?" />
+        <exec executable="ls" failonerror="true">
+            <arg value="-l" />
+            <arg value="debian/changelog" />
+        </exec>
+        <echo message="====================" />
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true" >
+            <arg value="-S" />
+            <arg value="-I_MTN" />
         </exec>
     </target>
 </project>
