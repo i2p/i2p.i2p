@@ -37,8 +37,8 @@ public class RouterInfo extends DataStructureImpl {
     private final static Log _log = new Log(RouterInfo.class);
     private RouterIdentity _identity;
     private volatile long _published;
-    private final Set _addresses;
-    private final Set _peers;
+    private final Set<RouterAddress> _addresses;
+    private final Set<Hash> _peers;
     private /* FIXME final FIXME */ Properties _options;
     private volatile Signature _signature;
     private volatile Hash _currentRoutingKey;
@@ -61,8 +61,8 @@ public class RouterInfo extends DataStructureImpl {
     public RouterInfo() {
         setIdentity(null);
         setPublished(0);
-        _addresses = new HashSet();
-        _peers = new HashSet();
+        _addresses = new HashSet(2);
+        _peers = new HashSet(0);
         _options = new OrderedProperties();
         setSignature(null);
         _validated = false;
@@ -132,7 +132,7 @@ public class RouterInfo extends DataStructureImpl {
      * router can be contacted.
      *
      */
-    public Set getAddresses() {
+    public Set<RouterAddress> getAddresses() {
         synchronized (_addresses) {
             return new HashSet(_addresses);
         }
@@ -143,7 +143,7 @@ public class RouterInfo extends DataStructureImpl {
      * can be contacted.
      *
      */
-    public void setAddresses(Set addresses) {
+    public void setAddresses(Set<RouterAddress> addresses) {
         synchronized (_addresses) {
             _addresses.clear();
             if (addresses != null) _addresses.addAll(addresses);
@@ -152,20 +152,22 @@ public class RouterInfo extends DataStructureImpl {
     }
 
     /**
-     * Retrieve a set of SHA-256 hashes of RouterIdentities from rotuers
+     * Retrieve a set of SHA-256 hashes of RouterIdentities from routers
      * this router can be reached through.
      *
+     * @deprecated Implemented here but unused elsewhere
      */
-    public Set getPeers() {
+    public Set<Hash> getPeers() {
         return _peers;
     }
 
     /**
-     * Specify a set of SHA-256 hashes of RouterIdentities from rotuers
+     * Specify a set of SHA-256 hashes of RouterIdentities from routers
      * this router can be reached through.
      *
+     * @deprecated Implemented here but unused elsewhere
      */
-    public void setPeers(Set peers) {
+    public void setPeers(Set<Hash> peers) {
         synchronized (_peers) {
             _peers.clear();
             if (peers != null) _peers.addAll(peers);
@@ -277,6 +279,7 @@ public class RouterInfo extends DataStructureImpl {
             // answer: they're always empty... they're a placeholder for one particular
             //         method of trusted links, which isn't implemented in the router
             //         at the moment, and may not be later.
+            // fixme to reduce objects - if (_peers == null) write 0
             DataHelper.writeLong(out, 1, _peers.size());
             List peers = DataHelper.sortStructures(_peers);
             for (Iterator iter = peers.iterator(); iter.hasNext();) {
@@ -401,7 +404,7 @@ public class RouterInfo extends DataStructureImpl {
         RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
         if ((gen.getModData() == null) || (_routingKeyGenMod == null)
             || (!DataHelper.eq(gen.getModData(), _routingKeyGenMod))) {
-            setRoutingKey(gen.getRoutingKey(getIdentity().getHash()));
+            setRoutingKey(gen.getRoutingKey(_identity.getHash()));
             _routingKeyGenMod = gen.getModData();
         }
         return _currentRoutingKey;
@@ -412,7 +415,7 @@ public class RouterInfo extends DataStructureImpl {
     }
 
     public boolean validateRoutingKey() {
-        Hash identKey = getIdentity().getHash();
+        Hash identKey = _identity.getHash();
         Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(identKey);
         if (rk.equals(getRoutingKey()))
             return true;
@@ -430,7 +433,7 @@ public class RouterInfo extends DataStructureImpl {
      */
     public boolean isCurrent(long maxAgeMs) {
         long earliestExpire = Clock.getInstance().now() - maxAgeMs;
-        if (getPublished() < earliestExpire)
+        if (_published < earliestExpire)
             return false;
 
         return true;
@@ -550,7 +553,7 @@ public class RouterInfo extends DataStructureImpl {
         RouterInfo info = (RouterInfo) object;
         return DataHelper.eq(_identity, info.getIdentity())
                && DataHelper.eq(_signature, info.getSignature())
-               && DataHelper.eq(getPublished(), info.getPublished())
+               && DataHelper.eq(_published, info.getPublished())
                && DataHelper.eq(_addresses, info.getAddresses())
                && DataHelper.eq(_options, info.getOptions()) 
                && DataHelper.eq(_peers, info.getPeers());
@@ -559,7 +562,7 @@ public class RouterInfo extends DataStructureImpl {
     @Override
     public int hashCode() {
         if (!_hashCodeInitialized) {
-            _hashCode = DataHelper.hashCode(_identity) + (int) getPublished();
+            _hashCode = DataHelper.hashCode(_identity) + (int) _published;
             _hashCodeInitialized = true;
         }
         return _hashCode;
@@ -570,9 +573,9 @@ public class RouterInfo extends DataStructureImpl {
         if (_stringified != null) return _stringified;
         StringBuilder buf = new StringBuilder(5*1024);
         buf.append("[RouterInfo: ");
-        buf.append("\n\tIdentity: ").append(getIdentity());
-        buf.append("\n\tSignature: ").append(getSignature());
-        buf.append("\n\tPublished on: ").append(new Date(getPublished()));
+        buf.append("\n\tIdentity: ").append(_identity);
+        buf.append("\n\tSignature: ").append(_signature);
+        buf.append("\n\tPublished on: ").append(new Date(_published));
         Set addresses = _addresses; // getAddresses()
         buf.append("\n\tAddresses: #: ").append(addresses.size());
         for (Iterator iter = addresses.iterator(); iter.hasNext();) {

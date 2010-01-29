@@ -96,9 +96,9 @@ public class RouterIdentity extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterIdentity)) return false;
         RouterIdentity ident = (RouterIdentity) object;
-        return DataHelper.eq(getCertificate(), ident.getCertificate())
-               && DataHelper.eq(getSigningPublicKey(), ident.getSigningPublicKey())
-               && DataHelper.eq(getPublicKey(), ident.getPublicKey());
+        return DataHelper.eq(_certificate, ident.getCertificate())
+               && DataHelper.eq(_signingKey, ident.getSigningPublicKey())
+               && DataHelper.eq(_publicKey, ident.getPublicKey());
     }
     
     /** the public key has enough randomness in it to use it by itself for speed */

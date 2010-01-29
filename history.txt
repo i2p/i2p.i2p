@@ -1,3 +1,16 @@
+2010-01-29 zzz
+    * build.xml: Add a debian-source target
+    * Data structures:
+      - Speed up some hashcode() and equals()
+      - Cleanup and javadoc
+    * Jetty: Turn on checkAliases
+    * NetDb:
+      - Add basic DOS prevention for lookups
+      - Move flood throttle check so we don't throttle ourselves
+      - Don't store over client tunnels to pre-0.7.10 floodfills
+      - Don't update unused lease fail stats
+    * Startup: Disable browser launch for debian daemon
+
 2010-01-28 welterde
     * enhance support for multiple RouterAddresses' of the same style in RouterInfo
 

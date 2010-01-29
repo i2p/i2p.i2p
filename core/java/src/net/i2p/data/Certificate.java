@@ -140,11 +140,11 @@ public class Certificate extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Certificate)) return false;
         Certificate cert = (Certificate) object;
-        return getCertificateType() == cert.getCertificateType() && DataHelper.eq(getPayload(), cert.getPayload());
+        return _type == cert.getCertificateType() && DataHelper.eq(_payload, cert.getPayload());
     }
     @Override
     public int hashCode() {
-        return getCertificateType() + DataHelper.hashCode(getPayload());
+        return _type + DataHelper.hashCode(_payload);
     }
     @Override
     public String toString() {

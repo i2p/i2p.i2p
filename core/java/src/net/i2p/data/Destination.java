@@ -129,9 +129,9 @@ public class Destination extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Destination)) return false;
         Destination dst = (Destination) object;
-        return DataHelper.eq(getCertificate(), dst.getCertificate())
-               && DataHelper.eq(getSigningPublicKey(), dst.getSigningPublicKey())
-               && DataHelper.eq(getPublicKey(), dst.getPublicKey());
+        return DataHelper.eq(_certificate, dst.getCertificate())
+               && DataHelper.eq(_signingKey, dst.getSigningPublicKey())
+               && DataHelper.eq(_publicKey, dst.getPublicKey());
     }
     
     /** the public key has enough randomness in it to use it by itself for speed */
