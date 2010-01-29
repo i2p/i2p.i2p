@@ -11,8 +11,8 @@ package net.i2p.data.i2np;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -39,10 +39,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     
     private static final boolean RAW_FULL_SIZE = false;
     
-    /** unsynchronized as its pretty much read only (except at startup) */
-    private static final Map _builders = new HashMap(8);
+    /** unused */
+    private static final Map<Integer, Builder> _builders = new ConcurrentHashMap(1);
+    /** @deprecated unused */
     public static final void registerBuilder(Builder builder, int type) { _builders.put(Integer.valueOf(type), builder); }
-    /** interface for extending the types of messages handled */
+    /** interface for extending the types of messages handled - unused */
     public interface Builder {
         /** instantiate a new I2NPMessage to be populated shortly */
         public I2NPMessage build(I2PAppContext ctx);
@@ -383,16 +384,19 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 return new TunnelGatewayMessage(context);
             case DataMessage.MESSAGE_TYPE:
                 return new DataMessage(context);
-            //case TunnelCreateMessage.MESSAGE_TYPE:
-            //    return new TunnelCreateMessage(context);
-            //case TunnelCreateStatusMessage.MESSAGE_TYPE:
-            //    return new TunnelCreateStatusMessage(context);
             case TunnelBuildMessage.MESSAGE_TYPE:
                 return new TunnelBuildMessage(context);
             case TunnelBuildReplyMessage.MESSAGE_TYPE:
                 return new TunnelBuildReplyMessage(context);
+            // since 0.7.10
+            case VariableTunnelBuildMessage.MESSAGE_TYPE:
+                return new VariableTunnelBuildMessage(context);
+            // since 0.7.10
+            case VariableTunnelBuildReplyMessage.MESSAGE_TYPE:
+                return new VariableTunnelBuildReplyMessage(context);
             default:
-                Builder builder = (Builder)_builders.get(Integer.valueOf(type));
+                // unused
+                Builder builder = _builders.get(Integer.valueOf(type));
                 if (builder == null)
                     return null;
                 else

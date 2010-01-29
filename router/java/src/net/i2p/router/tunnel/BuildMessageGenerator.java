@@ -22,18 +22,24 @@ import net.i2p.util.Log;
  */
 public class BuildMessageGenerator {
     // cached, rather than creating lots of temporary Integer objects whenever we build a tunnel
-    public static final Integer ORDER[] = new Integer[TunnelBuildMessage.RECORD_COUNT];
+    public static final Integer ORDER[] = new Integer[TunnelBuildMessage.MAX_RECORD_COUNT];
     static { for (int i = 0; i < ORDER.length; i++) ORDER[i] = Integer.valueOf(i); }
     
     /** return null if it is unable to find a router's public key (etc) */
+/****
     public TunnelBuildMessage createInbound(RouterContext ctx, TunnelCreatorConfig cfg) {
         return create(ctx, cfg, null, -1);
     }
+****/
+
     /** return null if it is unable to find a router's public key (etc) */
+/****
     public TunnelBuildMessage createOutbound(RouterContext ctx, TunnelCreatorConfig cfg, Hash replyRouter, long replyTunnel) {
         return create(ctx, cfg, replyRouter, replyTunnel);
     }
+****/
     
+/****
     private TunnelBuildMessage create(RouterContext ctx, TunnelCreatorConfig cfg, Hash replyRouter, long replyTunnel) {
         TunnelBuildMessage msg = new TunnelBuildMessage(ctx);
         List order = new ArrayList(ORDER.length);
@@ -50,14 +56,15 @@ public class BuildMessageGenerator {
         layeredEncrypt(ctx, msg, cfg, order);
         return msg;
     }
+****/
     
     /**
      * Place the asymmetrically encrypted record in the specified record slot, 
      * containing the hop's configuration (as well as the reply info, if it is an outbound endpoint)
      */
-    public void createRecord(int recordNum, int hop, TunnelBuildMessage msg, TunnelCreatorConfig cfg, Hash replyRouter, long replyTunnel, I2PAppContext ctx, PublicKey peerKey) {
+    public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg, TunnelCreatorConfig cfg, Hash replyRouter, long replyTunnel, I2PAppContext ctx, PublicKey peerKey) {
         byte encrypted[] = new byte[TunnelBuildMessage.RECORD_SIZE];
-        Log log = ctx.logManager().getLog(getClass());
+        Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         if (peerKey != null) {
             BuildRequestRecord req = null;
             if ( (!cfg.isInbound()) && (hop + 1 == cfg.getLength()) ) //outbound endpoint
@@ -79,7 +86,7 @@ public class BuildMessageGenerator {
         msg.setRecord(recordNum, new ByteArray(encrypted));
     }
     
-    private BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop, Hash replyRouter, long replyTunnel) {
+    private static BuildRequestRecord createUnencryptedRecord(I2PAppContext ctx, TunnelCreatorConfig cfg, int hop, Hash replyRouter, long replyTunnel) {
         Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         if (hop < cfg.getLength()) {
             // ok, now lets fill in some data
@@ -143,10 +150,10 @@ public class BuildMessageGenerator {
      * Encrypt the records so their hop ident is visible at the appropriate times
      * @param order list of hop #s as Integers.  For instance, if (order.get(1) is 4), it is peer cfg.getPeer(4)
      */
-    public void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg, TunnelCreatorConfig cfg, List order) {
+    public static void layeredEncrypt(I2PAppContext ctx, TunnelBuildMessage msg, TunnelCreatorConfig cfg, List order) {
         Log log = ctx.logManager().getLog(BuildMessageGenerator.class);
         // encrypt the records so that the right elements will be visible at the right time
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++) {
+        for (int i = 0; i < msg.getRecordCount(); i++) {
             ByteArray rec = msg.getRecord(i);
             Integer hopNum = (Integer)order.get(i);
             int hop = hopNum.intValue();

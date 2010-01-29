@@ -3,9 +3,12 @@ package net.i2p.router.tunnel.pool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
@@ -28,7 +31,9 @@ class BuildExecutor implements Runnable {
     private Log _log;
     private TunnelPoolManager _manager;
     /** list of TunnelCreatorConfig elements of tunnels currently being built */
-    private final List<PooledTunnelCreatorConfig> _currentlyBuilding;
+    private final Object _currentlyBuilding;
+    /** indexed by ptcc.getReplyMessageId() */
+    private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _currentlyBuildingMap;
     private boolean _isRunning;
     private BuildHandler _handler;
     private boolean _repoll;
@@ -38,7 +43,8 @@ class BuildExecutor implements Runnable {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _manager = mgr;
-        _currentlyBuilding = new ArrayList(MAX_CONCURRENT_BUILDS);
+        _currentlyBuilding = new Object();
+        _currentlyBuildingMap = new ConcurrentHashMap(MAX_CONCURRENT_BUILDS);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
@@ -82,21 +88,18 @@ class BuildExecutor implements Runnable {
         int concurrent = 0;
         // Todo: Make expiration variable
         long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
-        synchronized (_currentlyBuilding) {
             // expire any old requests
-            for (int i = 0; i < _currentlyBuilding.size(); i++) {
-                PooledTunnelCreatorConfig cfg = _currentlyBuilding.get(i);
+            for (Iterator<PooledTunnelCreatorConfig> iter = _currentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
+                PooledTunnelCreatorConfig cfg = iter.next();
                 if (cfg.getExpiration() <= expireBefore) {
-                    _currentlyBuilding.remove(i);
-                    i--;
+                    iter.remove();
                     if (expired == null)
                         expired = new ArrayList();
                     expired.add(cfg);
                 }
             }
-            concurrent = _currentlyBuilding.size();
+            concurrent = _currentlyBuildingMap.size();
             allowed -= concurrent;
-        }
         
         if (expired != null) {
             for (int i = 0; i < expired.size(); i++) {
@@ -303,9 +306,6 @@ class BuildExecutor implements Runnable {
                                 }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
-                                synchronized (_currentlyBuilding) {
-                                    _currentlyBuilding.add(cfg);
-                                }
                                 buildTunnel(pool, cfg);
                                 realBuilt++;
                                 
@@ -400,9 +400,6 @@ class BuildExecutor implements Runnable {
                 if (cfg != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Configuring short tunnel " + i + " for " + pool + ": " + cfg);
-                    synchronized (_currentlyBuilding) {
-                        _currentlyBuilding.add(cfg);
-                    }
                     buildTunnel(pool, cfg);
                     if (cfg.getLength() > 1) {
                         allowed--; // oops... shouldn't have done that, but hey, its not that bad...
@@ -422,6 +419,15 @@ class BuildExecutor implements Runnable {
     
     void buildTunnel(TunnelPool pool, PooledTunnelCreatorConfig cfg) {
         long beforeBuild = System.currentTimeMillis();
+        if (cfg.getLength() > 1) {
+            // should we allow an ID of 0?
+            cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+            if (addToBuilding(cfg)) {
+                _log.error("Dup reply ID: " + cfg.getReplyMessageId());
+                // fail
+                return;
+            }
+        }
         BuildRequestor.request(_context, pool, cfg, this);
         long buildTime = System.currentTimeMillis() - beforeBuild;
         if (cfg.getLength() <= 1)
@@ -445,8 +451,9 @@ class BuildExecutor implements Runnable {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Build complete for " + cfg);
         pool.buildComplete(cfg);
+        if (cfg.getLength() > 1)
+            removeFromBuilding(cfg.getReplyMessageId());
         synchronized (_currentlyBuilding) { 
-            _currentlyBuilding.remove(cfg);
             _currentlyBuilding.notifyAll();
         }
         
@@ -479,6 +486,22 @@ class BuildExecutor implements Runnable {
             _log.info(tunnel + ": Peer " + peer.toBase64() + " did not reply to the tunnel join request");
     }
     
-    List locked_getCurrentlyBuilding() { return _currentlyBuilding; }
+    /**
+     *  Only do this for non-fallback tunnels.
+     *  @return true if refused because of a duplicate key
+     */
+    private boolean addToBuilding(PooledTunnelCreatorConfig cfg) {
+        //_log.error("Adding ID: " + cfg.getReplyMessageId() + "; size was: " + _currentlyBuildingMap.size());
+        return _currentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg) != null;
+    }
+
+    /**
+     *  @return ptcc or null
+     */
+    PooledTunnelCreatorConfig removeFromBuilding(long id) {
+        //_log.error("Removing ID: " + id + "; size was: " + _currentlyBuildingMap.size());
+        return _currentlyBuildingMap.remove(Long.valueOf(id));
+    }
+
     public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
 }

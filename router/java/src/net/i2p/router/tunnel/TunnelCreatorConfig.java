@@ -26,7 +26,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
     /** gateway first */
     private Hash _peers[];
     private long _expiration;
-    private List _order;
+    private List<Integer> _order;
     private long _replyMessageId;
     private boolean _isInbound;
     private long _messagesProcessed;
@@ -54,7 +54,11 @@ public class TunnelCreatorConfig implements TunnelInfo {
         _failures = 0;
     }
     
-    /** how many hops are there in the tunnel? */
+    /**
+     *  How many hops are there in the tunnel?
+     *  INCLUDING US.
+     *  i.e. one more than the TunnelCreatorConfig length.
+     */
     public int getLength() { return _config.length; }
     
     public Properties getOptions() { return null; }
@@ -91,8 +95,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
     public void setExpiration(long when) { _expiration = when; }
     
     /** component ordering in the new style request */
-    public List getReplyOrder() { return _order; }
-    public void setReplyOrder(List order) { _order = order; }
+    public List<Integer> getReplyOrder() { return _order; }
+    public void setReplyOrder(List<Integer> order) { _order = order; }
     /** new style reply message id */
     public long getReplyMessageId() { return _replyMessageId; }
     public void setReplyMessageId(long id) { _replyMessageId = id; }

@@ -12,18 +12,20 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
+import net.i2p.data.i2np.VariableTunnelBuildMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.tunnel.BuildMessageGenerator;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  *
  */
 class BuildRequestor {
-    private static final List ORDER = new ArrayList(BuildMessageGenerator.ORDER.length);
+    private static final List<Integer> ORDER = new ArrayList(BuildMessageGenerator.ORDER.length);
     static {
         for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++)
             ORDER.add(Integer.valueOf(i));
@@ -50,7 +52,7 @@ class BuildRequestor {
     }
     
     /** new style requests need to fill in the tunnel IDs before hand */
-    public static void prepare(RouterContext ctx, PooledTunnelCreatorConfig cfg) {
+    private static void prepare(RouterContext ctx, PooledTunnelCreatorConfig cfg) {
         for (int i = 0; i < cfg.getLength(); i++) {
             if ( (!cfg.isInbound()) && (i == 0) ) {
                 // outbound gateway (us) doesn't receive on a tunnel id
@@ -67,8 +69,14 @@ class BuildRequestor {
             cfg.getConfig(i).setReplyIV(new ByteArray(iv));
             cfg.getConfig(i).setReplyKey(ctx.keyGenerator().generateSessionKey());
         }
-        cfg.setReplyMessageId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        // This is in BuildExecutor.buildTunnel() now
+        // And it was overwritten by the one in createTunnelBuildMessage() anyway!
+        //cfg.setReplyMessageId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
     }
+
+    /**
+     *  @param cfg ReplyMessageId must be set
+     */
     public static void request(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
         // new style crypto fills in all the blanks, while the old style waits for replies to fill in the next hop, etc
         prepare(ctx, cfg);
@@ -156,33 +164,94 @@ class BuildRequestor {
                       + "ms and dispatched in " + (System.currentTimeMillis()-beforeDispatch));
     }
     
+    private static final String MIN_VARIABLE_VERSION = "0.7.11";
+    /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
+    private static final int SHORT_RECORDS = 5;
+    private static final int LONG_RECORDS = TunnelBuildMessage.MAX_RECORD_COUNT;
+    private static final VersionComparator _versionComparator = new VersionComparator();
+    private static final List<Integer> SHORT_ORDER = new ArrayList(SHORT_RECORDS);
+    static {
+        for (int i = 0; i < SHORT_RECORDS; i++)
+            SHORT_ORDER.add(Integer.valueOf(i));
+    }
+
+    private static boolean supportsVariable(RouterContext ctx, Hash h) {
+        RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
+        if (ri == null)
+            return false;
+        String v = ri.getOption("router.version");
+        if (v == null)
+            return false;
+        return _versionComparator.compare(v, MIN_VARIABLE_VERSION) >= 0;
+    }
+
+    /**
+     *  If the tunnel is short enough, and everybody in the tunnel, and the
+     *  OBEP or IBGW for the paired tunnel, all support the new variable-sized tunnel build message,
+     *  then use that, otherwise the old 8-entry version.
+     */
     private static TunnelBuildMessage createTunnelBuildMessage(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, TunnelInfo pairedTunnel, BuildExecutor exec) {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
         long replyTunnel = 0;
         Hash replyRouter = null;
+        boolean useVariable = cfg.getLength() <= SHORT_RECORDS;
         if (cfg.isInbound()) {
-            replyTunnel = 0;
+            //replyTunnel = 0; // as above
             replyRouter = ctx.routerHash();
+            if (useVariable) {
+                // check the reply OBEP and all the tunnel peers except ourselves
+                if (!supportsVariable(ctx, pairedTunnel.getPeer(pairedTunnel.getLength() - 1))) {
+                    useVariable = false;
+                } else {
+                    for (int i = 0; i < cfg.getLength() - 1; i++) {
+                        if (!supportsVariable(ctx, cfg.getPeer(i))) {
+                            useVariable = false;
+                            break;
+                        }
+                    }
+                }
+            }
         } else {
             replyTunnel = pairedTunnel.getReceiveTunnelId(0).getTunnelId();
             replyRouter = pairedTunnel.getPeer(0);
+            if (useVariable) {
+                // check the reply IBGW and all the tunnel peers except ourselves
+                if (!supportsVariable(ctx, replyRouter)) {
+                    useVariable = false;
+                } else {
+                    for (int i = 1; i < cfg.getLength() - 1; i++) {
+                        if (!supportsVariable(ctx, cfg.getPeer(i))) {
+                            useVariable = false;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         // populate and encrypt the message
-        BuildMessageGenerator gen = new BuildMessageGenerator();
-        TunnelBuildMessage msg = new TunnelBuildMessage(ctx);
+        TunnelBuildMessage msg;
+        List<Integer> order;
+        if (useVariable) {
+            msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
+            order = new ArrayList(SHORT_ORDER);
+            log.log(Log.CRIT, "Using new VTBM");
+        } else {
+            msg = new TunnelBuildMessage(ctx);
+            order = new ArrayList(ORDER);
+        }
 
-        long replyMessageId = ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE);
-        cfg.setReplyMessageId(replyMessageId);
+        // This is in BuildExecutor.buildTunnel() now
+        //long replyMessageId = ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        //cfg.setReplyMessageId(replyMessageId);
         
-        List order = new ArrayList(ORDER);
         Collections.shuffle(order, ctx.random()); // randomized placement within the message
         cfg.setReplyOrder(order);
         
         if (log.shouldLog(Log.DEBUG))
             log.debug("Build order: " + order + " for " + cfg);
         
-        for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++) {
+        for (int i = 0; i < msg.getRecordCount(); i++) {
             int hop = ((Integer)order.get(i)).intValue();
             PublicKey key = null;
     
@@ -202,9 +271,9 @@ class BuildRequestor {
             }
             if (log.shouldLog(Log.DEBUG))
                 log.debug(cfg.getReplyMessageId() + ": record " + i + "/" + hop + " has key " + key);
-            gen.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel, ctx, key);
+            BuildMessageGenerator.createRecord(i, hop, msg, cfg, replyRouter, replyTunnel, ctx, key);
         }
-        gen.layeredEncrypt(ctx, msg, cfg, order);
+        BuildMessageGenerator.layeredEncrypt(ctx, msg, cfg, order);
         
         return msg;
     }
