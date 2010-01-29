@@ -12,6 +12,7 @@ import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -38,6 +39,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     private static String _alwaysQuery;
     private final Set<Hash> _verifiesInProgress;
     private FloodThrottler _floodThrottler;
+    private LookupThrottler _lookupThrottler;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
@@ -63,11 +65,12 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public void startup() {
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
+        _lookupThrottler = new LookupThrottler();
     }
 
     @Override
     protected void createHandlers() {
-        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context));
+        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new FloodfillDatabaseStoreMessageHandler(_context, this));
     }
     
@@ -103,6 +106,22 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
+    /**
+     *  Increments and tests.
+     *  @since 0.7.11
+     */
+    boolean shouldThrottleFlood(Hash key) {
+        return _floodThrottler != null && _floodThrottler.shouldThrottle(key);
+    }
+
+    /**
+     *  Increments and tests.
+     *  @since 0.7.11
+     */
+    boolean shouldThrottleLookup(Hash from, TunnelId id) {
+        return _lookupThrottler.shouldThrottle(from, id);
+    }
+
     private static final int MAX_TO_FLOOD = 7;
 
     /**
@@ -116,13 +135,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             key = ((LeaseSet)ds).getDestination().calculateHash();
         else
             key = ((RouterInfo)ds).getIdentity().calculateHash();
-        // DOS prevention
-        if (_floodThrottler != null && _floodThrottler.shouldThrottle(key)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Too many recent stores, not flooding key: " + key);
-            _context.statManager().addRateData("netDb.floodThrottled", 1, 0);
-            return;
-        }
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         List peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());

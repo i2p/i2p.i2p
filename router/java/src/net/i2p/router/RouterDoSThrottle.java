@@ -6,6 +6,7 @@ import net.i2p.data.Hash;
  * Minor extention of the router throttle to handle some DoS events and 
  * throttle accordingly.
  *
+ * @deprecated unused
  */
 class RouterDoSThrottle extends RouterThrottleImpl {
     public RouterDoSThrottle(RouterContext context) {

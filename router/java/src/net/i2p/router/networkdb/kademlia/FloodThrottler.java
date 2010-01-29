@@ -7,6 +7,9 @@ import net.i2p.util.SimpleTimer;
 
 /**
  * Count how often we have recently flooded a key
+ * This offers basic DOS protection but is not a complete solution.
+ *
+ * @since 0.7.11
  */
 class FloodThrottler {
     private ObjectCounter<Hash> counter;

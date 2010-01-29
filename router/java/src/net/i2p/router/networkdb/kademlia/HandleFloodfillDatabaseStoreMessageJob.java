@@ -54,9 +54,9 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         String invalidMessage = null;
         boolean wasNew = false;
         RouterInfo prevNetDb = null;
+        Hash key = _message.getKey();
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
-            Hash key = _message.getKey();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of leaseset " + _message);
                 //_log.info("Handling dbStore of leasset " + key + " with expiration of " 
@@ -92,7 +92,6 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1, 0);
-            Hash key = _message.getKey();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + key + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));
@@ -163,6 +162,14 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()) &&
             _message.getReplyToken() > 0) {
             if (wasNew) {
+                // DOS prevention
+                // Note this does not throttle the ack above
+                if (_facade.shouldThrottleFlood(key)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Too many recent stores, not flooding key: " + key);
+                    getContext().statManager().addRateData("netDb.floodThrottled", 1, 0);
+                    return;
+                }
                 long floodBegin = System.currentTimeMillis();
                 if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
                     _facade.flood(_message.getLeaseSet());
