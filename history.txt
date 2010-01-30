@@ -1,3 +1,8 @@
+2010-01-30 sponge
+    * Fix NPE in TCPtoI2P when a lookup fails, report the error to the stream.
+    * Fix setkeys bug in DoCMDS, forgot to create the object before calling
+      it's methods, which threw an NPE.
+
 2010-01-29 zzz
     * build.xml: Add a debian-source target
     * Data structures:

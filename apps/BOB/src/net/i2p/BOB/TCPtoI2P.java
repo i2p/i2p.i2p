@@ -146,8 +146,14 @@ public class TCPtoI2P implements Runnable {
 				input = line.toLowerCase();
 				Destination dest = null;
 				if (input.endsWith(".i2p")) {
-					dest = I2PTunnel.destFromName(input);
-					line = dest.toBase64();
+					try {
+						dest = I2PTunnel.destFromName(input);
+						line = dest.toBase64();
+					} catch (NullPointerException npe) {
+						// Could not find the destination!?
+						Emsg("Can't find destination: " + input, out);
+						return;
+					}
 				}
 				dest = new Destination();
 				dest.fromBase64(line);
