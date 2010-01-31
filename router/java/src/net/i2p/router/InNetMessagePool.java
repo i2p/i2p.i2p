@@ -42,6 +42,9 @@ public class InNetMessagePool implements Service {
     private boolean _alive;
     private boolean _dispatchThreaded;
     
+    /** Make this >= the max I2NP message type number (currently 24) */
+    private static final int MAX_I2NP_MESSAGE_TYPE = 31;
+
     /**
      * If set to true, we will have two additional threads - one for dispatching
      * tunnel data messages, and another for dispatching tunnel gateway messages.
@@ -62,8 +65,7 @@ public class InNetMessagePool implements Service {
     
     public InNetMessagePool(RouterContext context) {
         _context = context;
-        // 32 is greater than the max I2NP message type number (currently 22) + 1
-        _handlerJobBuilders = new HandlerJobBuilder[32];
+        _handlerJobBuilders = new HandlerJobBuilder[MAX_I2NP_MESSAGE_TYPE + 1];
         if (DISPATCH_DIRECT) {
             // keep the compiler happy since they are final
             _pendingDataMessages = null;
@@ -160,6 +162,7 @@ public class InNetMessagePool implements Service {
             shortCircuitTunnelData(messageBody, fromRouterHash);
             allowMatches = false;
         } else {
+            // why don't we allow type 0? There used to be a message of type 0 long ago...
             if ( (type > 0) && (type < _handlerJobBuilders.length) ) {
                 HandlerJobBuilder builder = _handlerJobBuilders[type];
 

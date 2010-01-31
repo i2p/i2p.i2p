@@ -397,10 +397,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             default:
                 // unused
                 Builder builder = _builders.get(Integer.valueOf(type));
-                if (builder == null)
-                    return null;
-                else
+                if (builder != null)
                     return builder.build(context);
+                return new UnknownI2NPMessage(context, type);
         }
     }
 }

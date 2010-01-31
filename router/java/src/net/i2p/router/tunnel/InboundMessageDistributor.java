@@ -204,6 +204,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                     return;
                 }
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
+                // Can we route UnknownI2NPMessages to a destination too?
                 if (!(data instanceof DataMessage)) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("cant send a " + data.getClass().getName() + " to a destination");
