@@ -42,7 +42,12 @@
         <get src="${jetty.url}" verbose="true" dest="${jetty.filename}" />
     </target>
 
-    <uptodate property="verified.already" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+    <condition property="verified.already" >
+        <and>
+            <available file="${jetty.filename}" />
+            <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+        </and>
+    </condition>
 
     <target name="verifyJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
