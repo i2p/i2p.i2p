@@ -255,7 +255,8 @@
 	<defaultexcludes default="true"/>
     </target>
 
-    <target name="pkg" depends="distclean, updater, preppkg, installer" />
+    <!-- A few reeleases only, then back to updater. First release was 0.7.11 -->
+    <target name="pkg" depends="distclean, updaterWithJettyFixes, preppkg, installer" />
 
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>

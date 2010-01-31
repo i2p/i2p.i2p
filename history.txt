@@ -1,3 +1,7 @@
+2010-01-31 zzz
+    * i2psnark standalone: Fix CSS
+    * Jetty: Update to 5.1.15 to get ResourceHandler fix
+
 2010-01-30 sponge
     * Fix NPE in TCPtoI2P when a lookup fails, report the error to the stream.
     * Fix setkeys bug in DoCMDS, forgot to create the object before calling
