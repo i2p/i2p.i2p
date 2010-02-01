@@ -253,6 +253,12 @@ class BuildHandler {
             // For each peer in the tunnel
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
+                // If this tunnel member is us, skip this record, don't update profile or stats
+                // for ourselves, we always agree
+                // Why must we save a slot for ourselves anyway?
+                if (peer.equals(_context.routerHash()))
+                    continue;
+
                 int record = order.indexOf(Integer.valueOf(i));
                 if (record < 0) {
                     _log.error("Bad status index " + i);
@@ -260,9 +266,9 @@ class BuildHandler {
                     _exec.buildComplete(cfg, cfg.getTunnelPool());
                     return;
                 }
+
                 int howBad = statuses[record];
-                // If this tunnel member isn't ourselves
-                if (!peer.toBase64().equals(_context.routerHash().toBase64())) {
+
                     // Look up routerInfo
                     RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
                     // Default and detect bandwidth tier
@@ -277,7 +283,6 @@ class BuildHandler {
                     }
                     if (_log.shouldLog(Log.INFO))
                         _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
-                }
 
                 if (howBad == 0) {
                     // w3wt
