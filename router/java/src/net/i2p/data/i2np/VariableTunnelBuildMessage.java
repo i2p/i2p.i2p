@@ -7,7 +7,7 @@ import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 
 /**
- * @since 0.7.11
+ * @since 0.7.12
  */
 public class VariableTunnelBuildMessage extends TunnelBuildMessage {
     public static final int MESSAGE_TYPE = 23;

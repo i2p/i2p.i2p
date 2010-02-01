@@ -10,7 +10,7 @@ import net.i2p.data.DataHelper;
  * Transmitted from the new outbound endpoint to the creator through a
  * reply tunnel
  *
- * @since 0.7.11
+ * @since 0.7.12
  */
 public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     public static final int MESSAGE_TYPE = 24;

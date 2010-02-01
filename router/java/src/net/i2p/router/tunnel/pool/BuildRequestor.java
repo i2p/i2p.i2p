@@ -174,7 +174,9 @@ class BuildRequestor {
                       + "ms and dispatched in " + (System.currentTimeMillis()-beforeDispatch));
     }
     
-    private static final String MIN_VARIABLE_VERSION = "0.7.11";
+    private static final String MIN_VARIABLE_VERSION = "0.7.12";
+    /** change this to true in 0.7.13 if testing goes well */
+    private static final boolean SEND_VARIABLE = false;
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
     private static final int SHORT_RECORDS = 5;
     private static final int LONG_RECORDS = TunnelBuildMessage.MAX_RECORD_COUNT;
@@ -204,7 +206,7 @@ class BuildRequestor {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
         long replyTunnel = 0;
         Hash replyRouter = null;
-        boolean useVariable = cfg.getLength() <= SHORT_RECORDS;
+        boolean useVariable = SEND_VARIABLE && cfg.getLength() <= SHORT_RECORDS;
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above
             replyRouter = ctx.routerHash();
