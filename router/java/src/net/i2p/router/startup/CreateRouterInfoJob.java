@@ -56,7 +56,8 @@ public class CreateRouterInfoJob extends JobImpl {
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
             getContext().router().addCapabilities(info);
             info.setOptions(stats);
-            info.setPeers(new HashSet());
+            // not necessary, in constructor
+            //info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
             RouterIdentity ident = new RouterIdentity();
             Certificate cert = getContext().router().createCertificate();

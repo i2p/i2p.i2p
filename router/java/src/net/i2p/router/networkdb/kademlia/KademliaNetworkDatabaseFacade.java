@@ -44,7 +44,6 @@ import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
-import net.i2p.util.ObjectCounter;
 
 /**
  * Kademlia based version of the network database
@@ -140,8 +139,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _lastExploreNew = 0;
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
-        context.statManager().createRateStat("netDb.lookupLeaseSetDeferred", "how many lookups are deferred for a single leaseSet lookup?", "NetworkDatabase", new long[] { 60*1000, 5*60*1000 });
-        context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 10*60*1000 });
+        context.statManager().createRateStat("netDb.lookupLeaseSetDeferred", "how many lookups are deferred for a single leaseSet lookup?", "NetworkDatabase", new long[] { 60*60*1000 });
+        context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 60*60*1000 });
+        // following are for StoreJob
+        context.statManager().createRateStat("netDb.storeRouterInfoSent", "How many routerInfo store messages have we sent?", "NetworkDatabase", new long[] { 60*60*1000l });
+        context.statManager().createRateStat("netDb.storeLeaseSetSent", "How many leaseSet store messages have we sent?", "NetworkDatabase", new long[] { 60*60*1000l });
+        context.statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "NetworkDatabase", new long[] { 60*60*1000l });
+        context.statManager().createRateStat("netDb.storeFailedPeers", "How many peers each netDb must be sent to before failing completely?", "NetworkDatabase", new long[] { 60*60*1000l });
+        context.statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "NetworkDatabase", new long[] { 60*60*1000l });
+        context.statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for RepublishLeaseSetJob
+        context.statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 60*60*1000l });
     }
     
     @Override
@@ -634,6 +642,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // Iterate through the old failure / success count, copying over the old
         // values (if any tunnels overlap between leaseSets).  no need to be
         // ueberthreadsafe fascists here, since these values are just heuristics
+      /****** unused
         if (rv != null) {
             for (int i = 0; i < rv.getLeaseCount(); i++) {
                 Lease old = rv.getLease(i);
@@ -647,6 +656,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 }
             }
         }
+       *******/
         
         return rv;
     }
@@ -910,6 +920,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return TIMEOUT_MULTIPLIER * (int)responseTime;  // give it up to 3x the average response time
     }
 
+    /** unused (overridden in FNDF) */
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
         if ( (ds == null) || (key == null) ) {
             if (onFailure != null) 

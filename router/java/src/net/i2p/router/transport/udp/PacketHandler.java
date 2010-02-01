@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -417,25 +418,35 @@ public class PacketHandler {
             long recvOn = packet.getBegin();
             long sendOn = reader.readTimestamp() * 1000;
             long skew = recvOn - sendOn;
+
+            // update skew whether or not we will be dropping the packet for excessive skew
+            if (state != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
+                state.adjustClockSkew(skew);
+            }
+            _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
+
+            if (!_context.clock().getUpdatedSuccessfully()) {
+                // adjust the clock one time in desperation
+                // this doesn't seem to work for big skews, we never get anything back,
+                // so we have to wait for NTCP to do it
+                _context.clock().setOffset(0 - skew, true);
+                if (skew != 0)
+                    _log.error("NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
+            }
+
             if (skew > GRACE_PERIOD) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Packet too far in the past: " + new Date(sendOn/1000) + ": " + packet);
+                    _log.warn("Packet too far in the past: " + new Date(sendOn) + ": " + packet);
                 _context.statManager().addRateData("udp.droppedInvalidSkew", skew, packet.getExpiration());
                 return;
             } else if (skew < 0 - GRACE_PERIOD) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Packet too far in the future: " + new Date(sendOn/1000) + ": " + packet);
+                    _log.warn("Packet too far in the future: " + new Date(sendOn) + ": " + packet);
                 _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew, packet.getExpiration());
                 return;
             }
-
-            if (state != null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
-                state.adjustClockSkew((short)skew);
-            }
-
-            _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
 
             //InetAddress fromHost = packet.getPacket().getAddress();
             //int fromPort = packet.getPacket().getPort();

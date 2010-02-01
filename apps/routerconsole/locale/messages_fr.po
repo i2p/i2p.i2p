@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-01 02:59+0000\n"
-"PO-Revision-Date: 2009-12-04 22:22+0100\n"
+"PO-Revision-Date: 2010-01-17 22:09+0100\n"
 "Last-Translator: \n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -90,7 +90,7 @@ msgstr "Limiteur de bande passante"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:299
 msgid "I2P will work best if you configure your rates to match the speed of your internet connection."
-msgstr ""
+msgstr "I2P fonctionnera mieux si vous configurez le débit de transmission et réception pour qu'ils soient égales à ceux de votre connexion internet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:303
 msgid "KBps In"
@@ -117,15 +117,15 @@ msgstr "Vous avez configuré I2P à partager que {0} KOps."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:335
 msgid "I2P requires at least 12KBps to enable sharing. "
-msgstr ""
+msgstr "I2P a besoin de plus de 12KOps afin d'activer le partage de bande passante"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:336
 msgid "Please enable sharing (participating in tunnels) by configuring more bandwidth. "
-msgstr ""
+msgstr "Veuillez activer le partage de bande passante (tunnels participants) en augmentant votre bande passante."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:337
 msgid "It improves your anonymity by creating cover traffic, and helps the network."
-msgstr ""
+msgstr "Cela aidera votre anonymat en cachant vos données parmi les données des autres, et cela améliorera le réseau."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:340
 #, java-format
@@ -134,7 +134,7 @@ msgstr "Vous avez configuré I2P à partager {0} KOps."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:343
 msgid "The higher the share bandwidth the more you improve your anonymity and help the network."
-msgstr ""
+msgstr "En partageant plus de votre bande passante, vous améliorerez votre anonymat et le réseau."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:347
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:478
@@ -165,7 +165,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:355
 msgid "The default settings will work for most people."
-msgstr ""
+msgstr "La configuration par défaut marchera pour la plupart des gens."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:357
 msgid "There is help below."
@@ -202,7 +202,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:381
 msgid "Ignore local interface IP address"
-msgstr ""
+msgstr "Ignorer l'adresse IP de l'interface locale"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:385
 msgid "Use SSU IP address detection only"
@@ -211,7 +211,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:389
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:443
 msgid "Specify hostname or IP"
-msgstr "Stipuler l'adresse IP ou le nom de l'hôte"
+msgstr "Saisir l'adresse IP ou le nom de l'hôte"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:395
 msgid "Select Interface"
@@ -266,7 +266,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:453
 msgid "Completely disable"
-msgstr ""
+msgstr "Desactiver complètement"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:455
 msgid "(select only if behind a firewall that throttles or blocks outbound TCP)"
@@ -282,7 +282,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:469
 msgid "Specify Port"
-msgstr "Stipuler le port"
+msgstr "Saisir le port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:473
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:342
@@ -454,7 +454,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:562
 msgid "WARN - Firewalled and Fast"
-msgstr ""
+msgstr "WARN - Pare-feu et Rapide"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:564
 msgid "You have configured I2P to share more than 128KBps of bandwidth, but you are firewalled."
@@ -466,7 +466,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:568
 msgid "WARN - Firewalled and Floodfill"
-msgstr ""
+msgstr "WARN - Pare-feu et Floodfill"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:570
 msgid "You have configured I2P to be a floodfill router, but you are firewalled."
@@ -478,7 +478,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:574
 msgid "WARN - Firewalled with Inbound TCP Enabled"
-msgstr ""
+msgstr "WARN - Pare-feu avec TCP entrant activé"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:576
 msgid "You have configured inbound TCP, however your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well."
@@ -494,7 +494,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:582
 msgid "WARN - Firewalled with UDP Disabled"
-msgstr ""
+msgstr "WARN - Pare-feu avec UDP desactivé"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:584
 msgid "You have configured inbound TCP, however you have disabled UDP."
@@ -522,7 +522,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:596
 msgid "ERR - Private TCP Address"
-msgstr ""
+msgstr "ERR - Adresse TCP privée"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:598
 msgid "You must never advertise an unroutable IP address such as 127.0.0.1 or 192.168.1.1 as your external address."
@@ -534,7 +534,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:602
 msgid "ERR - SymmetricNAT"
-msgstr ""
+msgstr "ERR - NAT symétrique"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:604
 msgid "I2P detected that you are firewalled by a Symmetric NAT."
@@ -881,7 +881,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:300
 msgid "This is useful in some situations"
-msgstr ""
+msgstr "C'est utile dans certains cas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:302
 msgid "for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on."
@@ -1107,7 +1107,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:319
 msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p to help."
-msgstr ""
+msgstr "Veuillez contribuer à la traduction du 'router console' ! Contactez les développeurs sur IRC #i2p afin de donner un coup de main."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:106
 msgid "config update"
@@ -1235,7 +1235,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:231
 msgid "Please include this information in bug reports"
-msgstr ""
+msgstr "Veuillez inclure cette information dans les rapports des bugs"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:105
 msgid "network database summary"
@@ -1308,7 +1308,7 @@ msgstr "Non supportée"
 
 #: src/net/i2p/router/web/ConfigClientsHandler.java:83
 msgid "Client configuration saved successfully - restart required to take effect."
-msgstr ""
+msgstr "La configuration du client a été sauvegardé avec succès - redémarrer pour prendre effet. "
 
 #: src/net/i2p/router/web/ConfigClientsHandler.java:89
 msgid "Bad client index."
@@ -1341,7 +1341,7 @@ msgstr "Echec de démarrage"
 
 #: src/net/i2p/router/web/ConfigClientsHandler.java:137
 msgid "Failed to find server."
-msgstr ""
+msgstr "Pas pu trouver un serveur."
 
 #: src/net/i2p/router/web/ConfigClientsHelper.java:17
 msgid "Class and arguments"
@@ -1529,7 +1529,7 @@ msgstr ""
 
 #: src/net/i2p/router/web/ConfigNetHandler.java:293
 msgid "Updating bandwidth share percentage"
-msgstr ""
+msgstr "Mise à jour du pourcentage de bande passante partagée"
 
 #: src/net/i2p/router/web/ConfigNetHandler.java:363
 msgid "Updated bandwidth limits"
@@ -1557,7 +1557,7 @@ msgstr "Pair"
 
 #: src/net/i2p/router/web/ConfigPeerHandler.java:24
 msgid "banned until restart"
-msgstr ""
+msgstr "interdit jusqu'au rédémarrage"
 
 #: src/net/i2p/router/web/ConfigPeerHandler.java:27
 #: src/net/i2p/router/web/ConfigPeerHandler.java:38
@@ -1567,11 +1567,11 @@ msgstr "Pair pas valable"
 
 #: src/net/i2p/router/web/ConfigPeerHandler.java:33
 msgid "unbanned"
-msgstr ""
+msgstr "plus interdit"
 
 #: src/net/i2p/router/web/ConfigPeerHandler.java:35
 msgid "is not currently banned"
-msgstr ""
+msgstr "n'est pas actuellement interdit"
 
 #: src/net/i2p/router/web/ConfigPeerHandler.java:47
 msgid "Bad speed value"
@@ -1613,11 +1613,11 @@ msgstr "Redémarrage en {0}"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:56
 msgid "Graceful shutdown initiated"
-msgstr ""
+msgstr "Fermature gracieuse initiée"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:60
 msgid "Shutdown immediately!  boom bye bye bad bwoy"
-msgstr ""
+msgstr "Fermer immédiatement !"
 
 #: src/net/i2p/router/web/ConfigServiceHandler.java:63
 msgid "Graceful shutdown cancelled"
@@ -1703,7 +1703,7 @@ msgstr ""
 
 #: src/net/i2p/router/web/ConfigTunnelsHandler.java:142
 msgid "Exploratory tunnel configuration saved successfully."
-msgstr ""
+msgstr "Configuration du tunnel exploratoire a été sauvegardé avec succès."
 
 #: src/net/i2p/router/web/ConfigTunnelsHandler.java:144
 #: src/net/i2p/router/web/ConfigUIHandler.java:36
@@ -1818,11 +1818,11 @@ msgstr "Suédois"
 
 #: src/net/i2p/router/web/ConfigUpdateHandler.java:63
 msgid "Update available, attempting to download now"
-msgstr ""
+msgstr "Mise à jour disponible, en tentant de la télécharger actuellement"
 
 #: src/net/i2p/router/web/ConfigUpdateHandler.java:65
 msgid "Update available, click button on left to download"
-msgstr ""
+msgstr "Mise à jour disponible, cliquez sur le bouton sur la gauche pour la télécharger"
 
 #: src/net/i2p/router/web/ConfigUpdateHandler.java:67
 msgid "No update available"
@@ -2439,23 +2439,23 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryHelper.java:104
 msgid "ERR-Private TCP Address"
-msgstr ""
+msgstr "ERR - Adresse TCP privée"
 
 #: src/net/i2p/router/web/SummaryHelper.java:106
 msgid "ERR-SymmetricNAT"
-msgstr ""
+msgstr "ERR - NAT symétrique"
 
 #: src/net/i2p/router/web/SummaryHelper.java:109
 msgid "WARN-Firewalled with Inbound TCP Enabled"
-msgstr ""
+msgstr "WARN - pare-feu avec TCP entrant activé"
 
 #: src/net/i2p/router/web/SummaryHelper.java:111
 msgid "WARN-Firewalled and Floodfill"
-msgstr ""
+msgstr "WARN - Pare-feu et Floodfill"
 
 #: src/net/i2p/router/web/SummaryHelper.java:113
 msgid "WARN-Firewalled and Fast"
-msgstr ""
+msgstr "WARN - Pare-feu et Rapide"
 
 #: src/net/i2p/router/web/SummaryHelper.java:116
 msgid "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
@@ -2467,7 +2467,7 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryHelper.java:125
 msgid "WARN-Firewalled with UDP Disabled"
-msgstr ""
+msgstr "WARN - Pare-feu avec UDP desactivé"
 
 #: src/net/i2p/router/web/SummaryHelper.java:360
 msgid "Add/remove/edit &amp; control your client and server tunnels"

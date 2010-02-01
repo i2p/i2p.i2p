@@ -64,16 +64,16 @@ public class Address extends DataStructureImpl {
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getHostname()) 
-        + DataHelper.hashCode(getDestination());
+        return DataHelper.hashCode(_hostname) 
+        + DataHelper.hashCode(_destination);
     }
     
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
         buf.append("[Address: ");
-        buf.append("\n\tHostname: ").append(getHostname());
-        buf.append("\n\tDestination: ").append(getDestination());
+        buf.append("\n\tHostname: ").append(_hostname);
+        buf.append("\n\tDestination: ").append(_destination);
         buf.append("]");
         return buf.toString();
     }

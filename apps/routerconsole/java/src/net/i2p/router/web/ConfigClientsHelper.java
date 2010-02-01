@@ -79,10 +79,12 @@ public class ConfigClientsHelper extends HelperBase {
             buf.append("<a href=\"").append(link).append("\">").append(_(name)).append("</a>");
         } else if (edit && !ro) {
             buf.append("<input type=\"text\" name=\"name").append(index).append("\" value=\"");
-            buf.append(_(name));
+            if (name.length() > 0)
+                buf.append(_(name));
             buf.append("\" >");
         } else {
-            buf.append(_(name));
+            if (name.length() > 0)
+                buf.append(_(name));
         }
         buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {

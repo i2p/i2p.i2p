@@ -113,11 +113,58 @@
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext" />               
             </div>
             
+            <% if ("httpbidirserver".equals(tunnelType)) {
+            %>
+            <div class="subdivider">
+                <hr />
+            </div>
+            <div id="accessField" class="rowItem">
+                <label><%=intl._("Access Point")%>:</label>
+            </div> 
+            <div id="portField" class="rowItem">
+           	<label for="port" accesskey="P">
+           	     <span class="accessKey">P</span>ort:
+           	     <% String value4 = editBean.getClientPort(curTunnel);
+           	        if (value4 == null || "".equals(value4.trim())) {
+           	            out.write(" <font color=\"red\">(");
+           	            out.write(intl._("required"));
+           	            out.write(")</font>");
+           	        }
+               	      %>
+              	 </label>
+                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />
+            </div>
+            <% String otherInterface = "";
+            String clientInterface = editBean.getClientInterface(curTunnel);
+            %>
+            <div id="reachField" class="rowItem">
+                <label for="reachableBy" accesskey="r">
+                    <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
+                </label>
+                <select id="reachableBy" name="reachableBy" title="Valid IP for Client Access" class="selectbox">
+                  <%   if (!("127.0.0.1".equals(clientInterface)) &&
+                           !("0.0.0.0".equals(clientInterface)) &&
+                            (clientInterface != null) &&
+                            (clientInterface.trim().length() > 0)) {
+                            otherInterface = clientInterface;
+                       }
+                  %><option value="127.0.0.1"<%=("127.0.0.1".equals(clientInterface) ? " selected=\"selected\"" : "")%>><%=intl._("Locally (127.0.0.1)")%></option>
+                    <option value="0.0.0.0"<%=("0.0.0.0".equals(clientInterface) ? " selected=\"selected\"" : "")%>><%=intl._("Everyone (0.0.0.0)")%></option>
+                    <option value="other"<%=(!("".equals(otherInterface))    ? " selected=\"selected\"" : "")%>><%=intl._("LAN Hosts (Please specify your LAN address)")%></option>
+                </select>                
+            </div> 
+            <div id="otherField" class="rowItem">
+                <label for="reachableByOther" accesskey="O">
+                    <%=intl._("Other")%>(<span class="accessKey">O</span>):
+                </label>
+                <input type="text" size="20" id="reachableByOther" name="reachableByOther" title="Alternative IP for Client Access" value="<%=otherInterface%>" class="freetext" />                
+            </div>
+            <% } %>
             <div class="subdivider">
                 <hr />
             </div>
             
-            <% if ("httpserver".equals(tunnelType)) {
+            <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
           %><div id="websiteField" class="rowItem">
                 <label for="spoofedHost" accesskey="W">
                     <%=intl._("Website name")%>(<span class="accessKey">W</span>):
@@ -129,8 +176,8 @@
           %><div id="privKeyField" class="rowItem">
                 <label for="privKeyFile" accesskey="k">
                     <%=intl._("Private key file")%>(<span class="accessKey">k</span>):
-                    <% String value2 = editBean.getPrivateKeyFile(curTunnel);
-                       if (value2 == null || "".equals(value2.trim())) {
+                    <% String value3 = editBean.getPrivateKeyFile(curTunnel);
+                       if (value3 == null || "".equals(value3.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
@@ -139,6 +186,7 @@
                 </label>
                 <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
             </div>
+
          <% if (!"streamrserver".equals(tunnelType)) { %>
             <div id="profileField" class="rowItem">
                 <label for="profile" accesskey="f">

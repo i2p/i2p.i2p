@@ -29,8 +29,6 @@ public class RouterClock extends Clock {
      */
     @Override
     public void setOffset(long offsetMs, boolean force) {
-
-        if (false) return;
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
@@ -54,7 +52,8 @@ public class RouterClock extends Clock {
             }
 
             // If so configured, check sanity of proposed clock offset
-            if (Boolean.valueOf(_contextRC.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() == true) {
+            if (Boolean.valueOf(_contextRC.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() &&
+                _alreadyChanged) {
 
                 // Try calculating peer clock skew
                 Long peerClockSkew = _contextRC.commSystem().getFramedAveragePeerClockSkew(50);
@@ -88,9 +87,10 @@ public class RouterClock extends Clock {
             else if (getLog().shouldLog(Log.INFO))
                 getLog().info("Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
             
-            if (!_statCreated)
+            if (!_statCreated) {
                 _contextRC.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
+            }
             _contextRC.statManager().addRateData("clock.skew", delta, 0);
         } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");

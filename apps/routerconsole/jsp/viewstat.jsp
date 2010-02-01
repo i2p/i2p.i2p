@@ -51,7 +51,7 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
         boolean hideGrid = Boolean.valueOf(""+request.getParameter("hideGrid")).booleanValue();
         boolean hideTitle = Boolean.valueOf(""+request.getParameter("hideTitle")).booleanValue();
         boolean showEvents = Boolean.valueOf(""+request.getParameter("showEvents")).booleanValue();
-        boolean showCredit = true;
+        boolean showCredit = false;
         if (request.getParameter("showCredit") != null)
           showCredit = Boolean.valueOf(""+request.getParameter("showCredit")).booleanValue();
         if (fakeBw)

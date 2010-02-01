@@ -122,15 +122,15 @@ public class RouterAddress extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
-        return DataHelper.eq(getCost(), addr.getCost()) && DataHelper.eq(getExpiration(), addr.getExpiration())
-               && DataHelper.eq(getOptions(), addr.getOptions())
-               && DataHelper.eq(getTransportStyle(), addr.getTransportStyle());
+        return DataHelper.eq(_cost, addr.getCost()) && DataHelper.eq(_expiration, addr.getExpiration())
+               && DataHelper.eq(_options, addr.getOptions())
+               && DataHelper.eq(_transportStyle, addr.getTransportStyle());
     }
     
     /** the style should be sufficient, for speed */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getTransportStyle());
+        return DataHelper.hashCode(_transportStyle);
     }
     
     @Override

@@ -92,7 +92,12 @@ shared bandwidth, and amount of locally-generated traffic.
 The recommended method for limiting participating tunnels is
 to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
 You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
-the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.</ul>
+the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.
+<li class="tidylist"><b>Share ratio:</b>
+The number of participating tunnels you route for others, divided by the total number of hops in
+all your exploratory and client tunnels.
+A number greater than 1.00 means you are contributing more tunnels to the network than you are using.
+</ul>
 
 <h3>Congestion</h3><div align="justify">
 Some basic indications of router overload:</div><ul>

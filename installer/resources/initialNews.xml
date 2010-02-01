@@ -1,5 +1,5 @@
-<i2p.news date="$Date: 2009-12-08 00:00:00 $">
-<i2p.release version="0.7.8" date="2009/12/08" minVersion="0.6"/>
+<i2p.news date="$Date: 2010-01-22 00:00:00 $">
+<i2p.release version="0.7.10" date="2010/01/22" minVersion="0.6"/>
 <h4><ul><li>Congratulations on getting I2P installed!</li></ul></h4>
 <p>
 <b>Welcome to I2P!</b>
@@ -17,6 +17,7 @@ please <b>check out</b> our
 <p>
 Point your IRC client to <b>localhost:6668</b> and say hi to us on #i2p.
 </p>
+
 <h4><ul><li>Gratulation zur erfolgreichen Installation von I2P!</li></ul></h4>
 <p>
 <b>Willkommen bei I2P!</b>
@@ -31,6 +32,20 @@ Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>
 </p>
 <p>
 Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal #i2p.
+</p>
+
+<h4><ul><li>Поздравляем с успешным завершением установки I2P!</li></ul></h4>
+<p>
+<b>Добро пожаловать в I2P!</b> Немного терпения! I2P-маршрутизатору потребуется пара минут для запуска модулей и первого подключения к сети I2P. 
+</p>
+<p>
+Пока Вы ждете, самое время зайти в <a href="config.jsp">сетевые настройки</a> и <b>выставить ограничение скорости</b> в соответствии со скоростью Вашего подключения к интернету. 
+</p>
+<p>
+Как только в панели слева в разделе «Локальные туннели» появится запись «коллективные клиенты» — I2P готов к работе. Подключайте Ваш IRC-клиент к серверу <b>localhost:6668</b> и заходите сказать нам привет на канал <b>#i2p</b>.
+</p>
+<p>
+<b>Не забудьте заглянуть</b> в наш <a href="http://www.i2p2.i2p/faq_ru.html">FAQ</a>.
 </p>
 </i2p.news>
 

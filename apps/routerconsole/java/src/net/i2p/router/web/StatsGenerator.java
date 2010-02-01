@@ -38,19 +38,20 @@ public class StatsGenerator {
         for (Iterator iter = groups.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
             String group = (String)entry.getKey();
-            Set stats = (Set)entry.getValue();
             buf.append("<option value=\"/stats.jsp#").append(group).append("\">");
             buf.append(_(group)).append("</option>\n");
-            for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
-                String stat = (String)statIter.next();
-                buf.append("<option value=\"/stats.jsp#");
-                buf.append(stat);
-                buf.append("\">...");
-                buf.append(stat);
-                buf.append("</option>\n");
-            }
-            out.write(buf.toString());
-            buf.setLength(0);
+            // let's just do the groups
+            //Set stats = (Set)entry.getValue();
+            //for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
+            //    String stat = (String)statIter.next();
+            //    buf.append("<option value=\"/stats.jsp#");
+            //    buf.append(stat);
+            //    buf.append("\">...");
+            //    buf.append(stat);
+            //    buf.append("</option>\n");
+            //}
+            //out.write(buf.toString());
+            //buf.setLength(0);
         }
         buf.append("</select> <input type=\"submit\" value=\"").append(_("GO")).append("\" />");
         buf.append("</form>");

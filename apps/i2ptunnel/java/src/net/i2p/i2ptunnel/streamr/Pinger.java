@@ -16,7 +16,7 @@ public class Pinger implements Source, Runnable {
     
     public void start() {
         this.running = true;
-        this.waitlock = new Object();
+        //this.waitlock = new Object();
         this.thread.start();
     }
     
@@ -54,6 +54,6 @@ public class Pinger implements Source, Runnable {
 
     protected Sink sink;
     protected Thread thread;
-    protected Object waitlock; // FIXME should be final and use a factory. FIXME
+    private final Object waitlock = new Object();
     protected boolean running;
 }

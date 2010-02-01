@@ -83,14 +83,14 @@ public class TunnelId extends DataStructureImpl {
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelId))
             return false;
-        return getTunnelId() == ((TunnelId)obj).getTunnelId();
+        return _tunnelId == ((TunnelId)obj).getTunnelId();
     }
     
     @Override
     public int hashCode() {
-        return (int)getTunnelId(); 
+        return (int)_tunnelId; 
     }
     
     @Override
-    public String toString() { return String.valueOf(getTunnelId()); }
+    public String toString() { return String.valueOf(_tunnelId); }
 }

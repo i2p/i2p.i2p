@@ -72,6 +72,7 @@ class RouterThrottleImpl implements RouterThrottle {
         }
     }
     
+    /** @deprecated unused, function moved to netdb */
     public boolean acceptNetDbLookupRequest(Hash key) { 
         long lag = _context.jobQueue().getMaxLag();
         if (lag > JOB_LAG_LIMIT) {

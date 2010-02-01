@@ -126,15 +126,21 @@ class LogWriter implements Runnable {
 
     private void writeRecord(String val) {
         if (val == null) return;
-        if (_currentOut == null) rotateFile();
+        if (_currentOut == null) {
+            rotateFile();
+            if (_currentOut == null)
+                return; // hosed
+        }
 
         try {
             _currentOut.write(val);
             // may be a little off if a lot of multi-byte chars, but unlikely
             _numBytesInCurrentFile += val.length();
         } catch (Throwable t) {
-            System.err.println("Error writing record, disk full?");
-            t.printStackTrace();
+            if (!_write)
+                return;
+            System.err.println("Error writing log, disk full? " + t);
+            //t.printStackTrace();
         }
         if (_numBytesInCurrentFile >= _manager.getFileSize()) {
             rotateFile();
@@ -160,7 +166,7 @@ class LogWriter implements Runnable {
                 }
             }
             if (!parent.isDirectory()) {
-                System.err.println("wtf, we cannot put the logs in a subdirectory of a plain file!  we want to stre the log as " + f.getAbsolutePath());
+                System.err.println("Cannot put the logs in a subdirectory of a plain file: " + f.getAbsolutePath());
                 //System.exit(0);
             }
         }
@@ -168,8 +174,7 @@ class LogWriter implements Runnable {
         try {
             _currentOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
         } catch (IOException ioe) {
-            System.err.println("Error rotating into [" + f.getAbsolutePath() + "]");
-            ioe.printStackTrace();
+            System.err.println("Error rotating into [" + f.getAbsolutePath() + "]" + ioe);
         }
     }
 

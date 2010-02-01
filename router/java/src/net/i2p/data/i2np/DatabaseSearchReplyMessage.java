@@ -26,13 +26,14 @@ import net.i2p.data.Hash;
 public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public final static int MESSAGE_TYPE = 3;
     private Hash _key;
-    private List _peerHashes;
+    private List<Hash> _peerHashes;
     private Hash _from;
     
     public DatabaseSearchReplyMessage(I2PAppContext context) {
         super(context);
-        _context.statManager().createRateStat("netDb.searchReplyMessageSend", "How many search reply messages we send", "NetworkDatabase", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("netDb.searchReplyMessageReceive", "How many search reply messages we receive", "NetworkDatabase", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
+        // do this in netdb if we need it
+        //_context.statManager().createRateStat("netDb.searchReplyMessageSend", "How many search reply messages we send", "NetworkDatabase", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("netDb.searchReplyMessageReceive", "How many search reply messages we receive", "NetworkDatabase", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         setSearchKey(null);
         _peerHashes = new ArrayList(3);
         setFromHash(null);
@@ -45,7 +46,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public void setSearchKey(Hash key) { _key = key; }
     
     public int getNumReplies() { return _peerHashes.size(); }
-    public Hash getReply(int index) { return (Hash)_peerHashes.get(index); }
+    public Hash getReply(int index) { return _peerHashes.get(index); }
     public void addReply(Hash peer) { _peerHashes.add(peer); }
     //public void addReplies(Collection replies) { _peerHashes.addAll(replies); }
     
@@ -77,7 +78,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         curIndex += Hash.HASH_LENGTH;
         _from = new Hash(from);
 
-        _context.statManager().addRateData("netDb.searchReplyMessageReceive", num*32 + 64, 1);
+        //_context.statManager().addRateData("netDb.searchReplyMessageReceive", num*32 + 64, 1);
     }
     
     /** calculate the message body's length (not including the header and footer */

@@ -43,9 +43,9 @@ public class ConfigLoggingHelper extends HelperBase {
             buf.append(prefix).append('=').append(level).append('\n');
         }
         buf.append("</textarea><br>\n");
-        buf.append("<i>Add additional logging statements above. Example: net.i2p.router.tunnel=WARN</i><br>");
-        buf.append("<i>Or put entries in the logger.config file. Example: logger.record.net.i2p.router.tunnel=WARN</i><br>");
-        buf.append("<i>Valid levels are DEBUG, INFO, WARN, ERROR, CRIT</i>\n");
+        buf.append("<i>" + _("Add additional logging statements above. Example: net.i2p.router.tunnel=WARN") + "</i><br>");
+        buf.append("<i>" + _("Or put entries in the logger.config file. Example: logger.record.net.i2p.router.tunnel=WARN") + "</i><br>");
+        buf.append("<i>" + _("Valid levels are DEBUG, INFO, WARN, ERROR, CRIT") + "</i>\n");
         return buf.toString();
     }
 

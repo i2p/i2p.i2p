@@ -48,7 +48,18 @@ public final class I2PDatagramMaker {
         sxPrivKey = session.getPrivateKey();
         sxDestBytes = session.getMyDestination().toByteArray();
     }
+    /**
+     * Construct a new I2PDatagramMaker that is null.
+     * Use setI2PDatagramMaker to set the parameters.
+     */
+    public I2PDatagramMaker() {
+        // nop
+    }
 
+    public void setI2PDatagramMaker(I2PSession session) {
+        sxPrivKey = session.getPrivateKey();
+        sxDestBytes = session.getMyDestination().toByteArray();
+    }
     /**
      * Make a repliable I2P datagram containing the specified payload.
      *

@@ -155,6 +155,7 @@ public interface ProfileManager {
      * through an explicit dbStore or in a dbLookupReply
      */
     void heardAbout(Hash peer);
+    void heardAbout(Hash peer, long when);
     
     /**
      * Note that the router received a message from the given peer on the specified

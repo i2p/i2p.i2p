@@ -33,17 +33,17 @@ class ProfileOrganizerRenderer {
         _comparator = new ProfileComparator();
     }
     public void renderStatusHTML(Writer out, boolean full) throws IOException {
-        Set peers = _organizer.selectAllPeers();
+        Set<Hash> peers = _organizer.selectAllPeers();
         
         long now = _context.clock().now();
         long hideBefore = now - 90*60*1000;
         
-        TreeSet order = new TreeSet(_comparator);
-        TreeSet integratedPeers = new TreeSet(_comparator);
+        TreeSet<PeerProfile> order = new TreeSet(_comparator);
+        TreeSet<PeerProfile> integratedPeers = new TreeSet(_comparator);
         int older = 0;
         int standard = 0;
-        for (Iterator iter = peers.iterator(); iter.hasNext();) {
-            Hash peer = (Hash)iter.next();
+        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext();) {
+            Hash peer = iter.next();
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
             //if (_organizer.isWellIntegrated(peer)) {
@@ -87,8 +87,8 @@ class ProfileOrganizerRenderer {
                    buf.append("<th>&nbsp;</th>");
                    buf.append("</tr>");
         int prevTier = 1;
-        for (Iterator iter = order.iterator(); iter.hasNext();) {
-            PeerProfile prof = (PeerProfile)iter.next();
+        for (Iterator<PeerProfile> iter = order.iterator(); iter.hasNext();) {
+            PeerProfile prof = iter.next();
             Hash peer = prof.getPeer();
             
             int tier = 0;
@@ -201,8 +201,8 @@ class ProfileOrganizerRenderer {
         buf.append("<th class=\"smallhead\">").append(_("1h Fail Rate")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_("1d Fail Rate")).append("</th>");
         buf.append("</tr>");
-        for (Iterator iter = integratedPeers.iterator(); iter.hasNext();) {
-            PeerProfile prof = (PeerProfile)iter.next();
+        for (Iterator<PeerProfile> iter = integratedPeers.iterator(); iter.hasNext();) {
+            PeerProfile prof = iter.next();
             Hash peer = prof.getPeer();
 
             buf.append("<tr><td align=\"center\" nowrap>");
@@ -266,16 +266,8 @@ class ProfileOrganizerRenderer {
         out.flush();
     }
     
-    private class ProfileComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            if ( (lhs == null) || (rhs == null) ) 
-                throw new NullPointerException("lhs=" + lhs + " rhs=" + rhs);
-            if ( !(lhs instanceof PeerProfile) || !(rhs instanceof PeerProfile) ) 
-                throw new ClassCastException("lhs=" + lhs.getClass().getName() + " rhs=" + rhs.getClass().getName());
-            
-            PeerProfile left = (PeerProfile)lhs;
-            PeerProfile right = (PeerProfile)rhs;
-            
+    private class ProfileComparator implements Comparator<PeerProfile> {
+        public int compare(PeerProfile left, PeerProfile right) {
             if (_context.profileOrganizer().isFast(left.getPeer())) {
                 if (_context.profileOrganizer().isFast(right.getPeer())) {
                     return compareHashes(left, right);

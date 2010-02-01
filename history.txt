@@ -1,3 +1,155 @@
+2010-01-31 zzz
+    * i2psnark standalone: Fix CSS
+    * Jetty: Update to 5.1.15 to get ResourceHandler fix
+
+2010-01-30 sponge
+    * Fix NPE in TCPtoI2P when a lookup fails, report the error to the stream.
+    * Fix setkeys bug in DoCMDS, forgot to create the object before calling
+      it's methods, which threw an NPE.
+
+2010-01-29 zzz
+    * build.xml: Add a debian-source target
+    * Data structures:
+      - Speed up some hashcode() and equals()
+      - Cleanup and javadoc
+    * Jetty: Turn on checkAliases
+    * NetDb:
+      - Add basic DOS prevention for lookups
+      - Move flood throttle check so we don't throttle ourselves
+      - Don't store over client tunnels to pre-0.7.10 floodfills
+      - Don't update unused lease fail stats
+    * Startup: Disable browser launch for debian daemon
+
+2010-01-28 welterde
+    * enhance support for multiple RouterAddresses' of the same style in RouterInfo
+
+2010-01-26 zzz
+    * build.xml: Speed up distclean additions
+    * Clock: Don't refuse to update because of peer skew the first time
+    * Debian: Fixup, update, enhance scripts
+    * I2NP: Various cleanup and bulletproofing
+    * Log: Try to avoid complaints at shutdown
+    * Profiles: Fix lack of profiles at router startup, especially for new routers
+    * stats.jsp: Shrink the dropdown box
+
+2010-01-24 zzz
+    * ProfileOrganizerRenderer: Cleanups
+    * Reseed: Update welt's reseed hostname
+    * Transport clock skews:
+      - Store and report UDP clock skews even for large values, so
+        a badly skewed local clock will be reported to the console
+      - Don't shitlist for NTCP clock skew if we don't know what time it is
+      - If NTP hasn't worked yet, have NTCP or SSU update the clock one time
+      - Include failed clock skew in NTCP skew vector if there aren't many connections
+      - Don't include NTCP clock skews for non-established connections
+      - Fix framed clock skew frame size
+      - Report framed clock skew even if for only one peer, if NTP hasn't worked yet
+      - Don't log RRD errors after clock adjustment
+      - Reduce min skew for console warning to 30s (was 45s)
+      - More Java 5 cleanups
+
+2010-01-24 zzz
+    * Clock:
+      - Don't let a client update the router clock
+      - Restore and enhance vanished clock error log message
+    * Graphs: Enforce max size to lessen chance of OOM from malicious link
+    * NetDb:
+      - Move stat initialization, reduce number of rates
+      - Add basic DOS prevention by not flooding if stores are too-frequent
+    * ProfileOrganizer:
+      - Limit High Cap to 75 max
+      - Reduce max lock wait time, change no lock error to warning
+      - More cleanup
+    * Startup:
+      - Enable multiple parallel job runners much sooner to speed startup
+      - Rearrange the startup order to get the long jobs started sooner
+      - Don't allow the netDb readin job to clog the job queue
+
+2010-01-21 dr|z3d
+    * New eepsite structure and enhanced pages. Now with graphics and stuff!
+
+* 2010-01-22  0.7.10 released
+
+2010-01-21 zzz
+    * eepget.bat: Add to pkg
+    * Floodfills: Increase max to 15 (was 9) and min to 10 (was 4)
+    * I2PTunnelServer: Fix bug preventing connection retries
+      at startup from working
+    * Logs: Don't be quite so noisy in the wrapper log if we
+      can't open the router log
+    * Properties: Don't play games with \r and \n on load/save,
+      it was causing fatal issues on DOS if your username started
+      with r or n
+
+2010-01-19 sponge
+    * Firewall fix for NTCP, where firewalls will forget a NAT relationship
+      on a stream... AKA setting keepalive. This should fix the stuck NTCP
+      issue that has been bothing zzz for years.
+    * Set keepalive on BOB connections too, since this will assist closing
+      the connections in the event of a crash on a client.
+
+2010-01-18 zzz
+    * configclients.jsp: Fix add-new-client feature
+    * Console: Add a tunnel share ratio estimate
+    * graphs.jsp:
+      - Remove jrobin sig
+      - Set lower limit to 0
+      - Save settings when changed
+    * Reseed: Support SSL and proxies
+    * Translate: Catch empty string
+
+2010-01-17 zzz
+    * Clock: Change a CRIT to an ERROR, lower threshold for changing from 10s to 5s
+    * configclients.jsp: Support add, delete, edit
+    * I2CP: Clean up resources on 5-minute leaseset timeout at startup
+    * LeaseSet generation: Increment the lease date slightly, to force
+      the floodfill to flood it when it changes
+    * NetDb Lookups: Don't try to send a RI lookup to itself through a zero-hop tunnel
+    * NetDb Stores and Verifies:
+      - Do LS stores and verifies through client tunnels
+        to prevent correlation by the OBEP or FF
+      - Encrypt LS stores to prevent snooping by the OBEP,
+        if the floodfill supports it
+      - Encrypt LS and RI verifies to prevent snooping by the OBEP
+      - Extend verify delay and timeout
+      - Reenable RI verifies
+      - Disallow simultaneous verifies for the same key
+      - Don't resend on verify timeout; try a different peer instead
+      - Don't resend to same peer on verify fail, try a different one
+      - Adjust ff selection criteria
+      - Flood even if received garlic-encrypted
+    * Profiles: Limit fast peers to 30 max
+    * SSLEepGet: New
+    * Tunnels: Prevent more than one zero-hop tunnel in a lease
+    * VersionComparator: Move from TrustedUpdate.java to util
+
+2010-01-14 sponge
+    * Fully clean up I2PTunnel. No more lint issues, should compile 100%
+      clean.
+    * Dropped unused class BufferLogger from I2PTunnel as it is not used
+      anylonger.
+
+2010-01-14 sponge
+    * Clean up reverse connection ability, remove some annoyingly redundent
+      code. Place all settings in the console. It works!
+
+2010-01-10 sponge
+    * Insert reverse connection ability into the http server code so that
+      seedless can start to get worked on. It's disabled by default.
+
+* 2010-01-12  0.7.9 released
+
+2010-01-12 zzz
+    * I2CP: Clean up resources on 5-minute leaseset timeout at startup
+    * Increase max floodfills to 9 (was 6)
+    * Temporarily disable routerInfo floodfill verifies
+    * Fix .fr eepsite index css
+    * Javdoc tweaks
+
+
+2010-01-09 zzz
+    * Include new eepsite indexes in pkg
+
 2010-01-06 zzz
     * Summary bar tweaks
 

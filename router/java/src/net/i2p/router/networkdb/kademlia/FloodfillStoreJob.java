@@ -54,6 +54,7 @@ class FloodfillStoreJob extends StoreJob {
     @Override
     protected void succeed() {
         super.succeed();
+
         if (_state != null) {
             if (_facade.isVerifyInProgress(_state.getTarget())) {
                 if (_log.shouldLog(Log.INFO))
@@ -67,6 +68,8 @@ class FloodfillStoreJob extends StoreJob {
             boolean isRouterInfo = data instanceof RouterInfo;
             if (isRouterInfo) {
                 published = ((RouterInfo) data).getPublished();
+                // Temporarily disable
+                return;
             } else if (data instanceof LeaseSet) {
                 published = ((LeaseSet) data).getEarliestLeaseDate();
             }

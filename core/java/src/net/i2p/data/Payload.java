@@ -96,13 +96,13 @@ public class Payload extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Payload)) return false;
         Payload p = (Payload) object;
-        return DataHelper.eq(getUnencryptedData(), p.getUnencryptedData())
-               && DataHelper.eq(getEncryptedData(), p.getEncryptedData());
+        return DataHelper.eq(_unencryptedData, p.getUnencryptedData())
+               && DataHelper.eq(_encryptedData, p.getEncryptedData());
     }
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getUnencryptedData());
+        return DataHelper.hashCode(_unencryptedData);
     }
     
     @Override
@@ -110,10 +110,10 @@ public class Payload extends DataStructureImpl {
         if (true) return "[Payload]";
         StringBuilder buf = new StringBuilder(128);
         buf.append("[Payload: ");
-        if (getUnencryptedData() != null)
-            buf.append("\n\tData: ").append(DataHelper.toString(getUnencryptedData(), 16));
+        if (_unencryptedData != null)
+            buf.append("\n\tData: ").append(DataHelper.toString(_unencryptedData, 16));
         else
-            buf.append("\n\tData: *encrypted* = [").append(DataHelper.toString(getEncryptedData(), 16)).append("]");
+            buf.append("\n\tData: *encrypted* = [").append(DataHelper.toString(_encryptedData, 16)).append("]");
         buf.append("]");
         return buf.toString();
     }

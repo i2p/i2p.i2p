@@ -1,2 +1,9 @@
 #!/bin/sh
-exec userdel i2p
+I2PUSER=i2psvc
+exec userdel $I2PUSER
+
+# if somebody did updates in-network, there may be new files that dpkg
+# doesn't know about, so just to be sure
+I2P=/usr/lib/i2p
+rm -rf $I2P
+

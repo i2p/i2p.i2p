@@ -207,6 +207,9 @@ The following applications and libraries are not used or bundled in
 binary packages, therefore the licenses are not included in binary
 distributions. See the source package for the additional license information.
 
+   Admin Manager:
+   Public domain
+
    Atalk:
    Public domain
 
