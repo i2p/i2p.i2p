@@ -39,6 +39,7 @@ public class RouterAddress extends DataStructureImpl {
      * contacting this router.  The value 0 means free and 255 means really expensive.
      * No value above 255 is allowed.
      *
+     * @deprecated unused for now
      */
     public int getCost() {
         return _cost;
@@ -48,6 +49,7 @@ public class RouterAddress extends DataStructureImpl {
      * Configure the weighted cost of using the address.
      * No value above 255 is allowed.
      *
+     * NTCP is set to 10 and SSU to 5, but it's unused.
      */
     public void setCost(int cost) {
         _cost = cost;
@@ -57,6 +59,7 @@ public class RouterAddress extends DataStructureImpl {
      * Retrieve the date after which the address should not be used.  If this
      * is null, then the address never expires.
      *
+     * @deprecated unused for now
      */
     public Date getExpiration() {
         return _expiration;
@@ -65,6 +68,7 @@ public class RouterAddress extends DataStructureImpl {
     /**
      * Configure the expiration date of the address (null for no expiration)
      *
+     * Unused for now, always null
      */
     public void setExpiration(Date expiration) {
         _expiration = expiration;
