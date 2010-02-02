@@ -51,6 +51,8 @@ public interface TunnelManagerFacade extends Service {
     public int getInboundClientTunnelCount();
     /** how many outbound client tunnels do we have available? */
     public int getOutboundClientTunnelCount();
+    /** how many outbound client tunnels in this pool? */
+    public int getOutboundClientTunnelCount(Hash destination);
     public double getShareRatio();
     
     /** When does the last tunnel we are participating in expire? */

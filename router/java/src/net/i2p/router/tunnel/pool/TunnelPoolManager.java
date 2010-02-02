@@ -190,6 +190,21 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         return count;
     }
+
+    /**
+     *  Use to verify a tunnel pool is alive
+     *  @since 0.7.11
+     */
+    public int getOutboundClientTunnelCount(Hash destination)  {
+        TunnelPool pool = null;
+        synchronized (_clientOutboundPools) {
+            pool = _clientOutboundPools.get(destination);
+        }
+        if (pool != null)
+            return pool.getTunnelCount();
+        return 0;
+    }
+    
     public int getParticipatingCount() { return _context.tunnelDispatcher().getParticipatingCount(); }
     public long getLastParticipatingExpiration() { return _context.tunnelDispatcher().getLastParticipatingExpiration(); }
     

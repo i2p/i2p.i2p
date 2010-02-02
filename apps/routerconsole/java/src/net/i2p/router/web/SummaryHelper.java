@@ -390,7 +390,7 @@ public class SummaryHelper extends HelperBase {
                     buf.append(name.substring(0,15)).append("&hellip;");
                 buf.append("</a></b></td>\n");
                 LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
-                if (ls != null) {
+                if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
                     long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                     if (timeToExpire < 0) {
                         // red or yellow light                 
