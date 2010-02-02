@@ -36,6 +36,8 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String DEFAULT_PROXY_PORT = "" + DEFAULT_PROXY_PORT_INT;
     /** default false */
     public static final String PROP_UPDATE_UNSIGNED = "router.updateUnsigned";
+    /** default false - use for distros */
+    public static final String PROP_UPDATE_DISABLED = "router.updateDisabled";
     /** no default */
     public static final String PROP_ZIP_URL = "router.updateUnsignedURL";
     

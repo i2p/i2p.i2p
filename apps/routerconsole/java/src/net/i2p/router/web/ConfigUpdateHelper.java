@@ -5,7 +5,20 @@ import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 
 public class ConfigUpdateHelper extends HelperBase {
+    private boolean _dontInstall;
+
     public ConfigUpdateHelper() {}
+    
+    /** hook this so we can call dontInstall() once after getting a context */
+    @Override
+    public void setContextId(String contextId) {
+        super.setContextId(contextId);
+        _dontInstall = NewsFetcher.getInstance(_context).dontInstall();
+    }
+
+    public boolean canInstall() {
+        return !_dontInstall;
+    }
     
     public boolean updateAvailable() {
         return true;
@@ -80,27 +93,34 @@ public class ConfigUpdateHelper extends HelperBase {
         return buf.toString();
     }
     
+    /**
+     *  Right now the jsp hides the whole select box if _dontInstall is true but this could change
+     */
     public String getUpdatePolicySelectBox() {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY, ConfigUpdateHandler.DEFAULT_UPDATE_POLICY);
         
         StringBuilder buf = new StringBuilder(256);
         buf.append("<select name=\"updatePolicy\">");
         
-        if ("notify".equals(policy))
-            buf.append("<option value=\"notify\" selected=\"true\">").append(_("Notify only")).append("</option>");
-        else
-            buf.append("<option value=\"notify\">" + _("Notify only") + "</option>");
+        buf.append("<option value=\"notify\"");
+        if ("notify".equals(policy) || _dontInstall)
+            buf.append(" selected=\"true\"");
+        buf.append('>').append(_("Notify only")).append("</option>");
 
-        if ("download".equals(policy))
-            buf.append("<option value=\"download\" selected=\"true\">" + _("Download and verify only") + "</option>");
-        else
-            buf.append("<option value=\"download\">" + _("Download and verify only") + "</option>");
+        buf.append("<option value=\"download\"");
+        if (_dontInstall)
+            buf.append(" disabled=\"true\"");
+        else if ("download".equals(policy))
+            buf.append(" selected=\"true\"");
+        buf.append('>').append(_("Download and verify only")).append("</option>");
         
         if (System.getProperty("wrapper.version") != null) {
-            if ("install".equals(policy))
-                buf.append("<option value=\"install\" selected=\"true\">" + _("Download, verify, and restart") + "</option>");
-            else
-                buf.append("<option value=\"install\">" + _("Download, verify, and restart") + "</option>");
+            buf.append("<option value=\"install\"");
+            if (_dontInstall)
+                buf.append(" disabled=\"true\"");
+            else if ("install".equals(policy))
+                buf.append(" selected=\"true\"");
+            buf.append('>').append(_("Download, verify, and restart")).append("</option>");
         }
         
         buf.append("</select>\n");

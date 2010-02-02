@@ -103,9 +103,16 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         }
     }
     
+    boolean dontInstall() {
+        File test = new File(_context.getBaseDir(), "history.txt");
+        boolean readonly = ((test.exists() && !test.canWrite()) || (!_context.getBaseDir().canWrite()));
+        boolean disabled = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_UPDATE_DISABLED)).booleanValue();
+        return readonly || disabled;
+    }
+
     private boolean shouldInstall() {
         String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
-        if ("notify".equals(policy))
+        if ("notify".equals(policy) || dontInstall())
             return false;
         File zip = new File(_context.getRouterDir(), Router.UPDATE_FILE);
         return !zip.exists();
@@ -158,7 +165,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public boolean shouldFetchUnsigned() {
         String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
         return url != null && url.length() > 0 &&
-               Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED)).booleanValue();
+               Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED)).booleanValue() &&
+               !dontInstall();
     }
 
     /**
@@ -304,7 +312,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Our version was NOT found (" + RouterVersion.VERSION + "), update needed");
-        _updateAvailable = true;
+        _updateAvailable = !dontInstall();
         
         if (shouldInstall()) {
             if (_log.shouldLog(Log.DEBUG))
