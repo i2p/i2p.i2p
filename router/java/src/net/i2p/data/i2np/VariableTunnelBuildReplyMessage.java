@@ -33,15 +33,14 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) 
             throw new I2NPMessageException("Message type is incorrect for this message");
-        if (dataSize != calculateWrittenLength()) 
-            throw new I2NPMessageException("Wrong length (expects " + calculateWrittenLength() + ", recv " + dataSize + ")");
-        
         int r = (int)DataHelper.fromLong(data, offset, 1);
         if (r <= 0 || r > MAX_RECORD_COUNT)
             throw new I2NPMessageException("Bad record count " + r);
         RECORD_COUNT = r;
+        if (dataSize != calculateWrittenLength()) 
+            throw new I2NPMessageException("Wrong length (expects " + calculateWrittenLength() + ", recv " + dataSize + ")");
         _records = new ByteArray[RECORD_COUNT];
-        super.readMessage(data, offset + 1, dataSize, TunnelBuildMessage.MESSAGE_TYPE);
+        super.readMessage(data, offset + 1, dataSize, TunnelBuildReplyMessage.MESSAGE_TYPE);
     }
     
     protected int writeMessageBody(byte[] out, int curIndex) throws I2NPMessageException {
@@ -50,7 +49,7 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
             throw new I2NPMessageException("Not large enough (too short by " + remaining + ")");
         if (RECORD_COUNT <= 0 || RECORD_COUNT > MAX_RECORD_COUNT)
             throw new I2NPMessageException("Bad record count " + RECORD_COUNT);
-        DataHelper.toLong(out, curIndex, 1, RECORD_COUNT);
+        DataHelper.toLong(out, curIndex++, 1, RECORD_COUNT);
         // can't call super, written length check will fail
         //return super.writeMessageBody(out, curIndex + 1);
         for (int i = 0; i < RECORD_COUNT; i++) {
