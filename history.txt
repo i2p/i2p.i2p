@@ -1,3 +1,10 @@
+2010-02-03 zzz
+    * Console:
+      - Hide update buttons and update config if install dir is readonly or if configured
+      - Show yellow star if no outbound tunnels
+    * i2psnark: Don't prefer to opportunistically unchoke unchoking peers when not interested
+    * NetDb: Lower min RouterInfo expiration to 2.5h (was 3h)
+
 2010-01-31 zzz
     * i2psnark standalone: Fix CSS
     * Jetty: Update to 5.1.15 to get ResourceHandler fix

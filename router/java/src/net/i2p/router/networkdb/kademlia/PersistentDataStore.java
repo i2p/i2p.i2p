@@ -152,7 +152,8 @@ class PersistentDataStore extends TransientDataStore {
         }
         public String getName() { return "Remove Key"; }
         public void runJob() {
-            _log.info("Removing key " + _key /* , getAddedBy() */);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Removing key " + _key /* , getAddedBy() */);
             try {
                 File dbDir = getDbDir();
                 removeFile(_key, dbDir);

@@ -105,8 +105,8 @@ class PeerCheckerTask extends TimerTask
             peer.resetCounters();
 
             _util.debug(peer + ":", Snark.DEBUG);
-            _util.debug(" ul: " + upload/KILOPERSECOND
-                        + " dl: " + download/KILOPERSECOND
+            _util.debug(" ul: " + upload*1024/KILOPERSECOND
+                        + " dl: " + download*1024/KILOPERSECOND
                         + " i: " + peer.isInterested()
                         + " I: " + peer.isInteresting()
                         + " c: " + peer.isChoking()
