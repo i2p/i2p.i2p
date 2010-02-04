@@ -1,3 +1,6 @@
+2010-02-04 zzz
+    * i2psnark: Fix sending stopped events to the tracker
+
 2010-02-03 zzz
     * Console:
       - Hide update buttons and update config if install dir is readonly or if configured
