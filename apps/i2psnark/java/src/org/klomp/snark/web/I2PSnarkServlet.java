@@ -662,10 +662,10 @@ public class I2PSnarkServlet extends HttpServlet {
                     client = "Azureus";
                 else if ("CwsL".equals(ch))
                     client = "I2PSnarkXL";
-                else if ("ZV".equals(ch.substring(2,4)))
+                else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
                     client = "Robert";
-                else if ("VUZP".equals(ch))
-                    client = "Robert";
+                else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4
+                    client = "Transmission";
                 else
                     client = _("Unknown") + " (" + ch + ')';
                 out.write(client + "&nbsp;&nbsp;" + peer.toString().substring(5, 9));
