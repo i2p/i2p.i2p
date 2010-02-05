@@ -63,7 +63,7 @@ public class UnsignedUpdateHandler extends UpdateHandler {
         /** Get the file */
         @Override
         protected void update() {
-            _status = "<b>Updating</b>";
+            updateStatus("<b>" + _("Updating") + "</b>");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Starting unsigned update URL: " + _zipURL);
             // always proxy for now
@@ -85,10 +85,10 @@ public class UnsignedUpdateHandler extends UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             File updFile = new File(_updateFile);
             if (FileUtil.verifyZip(updFile)) {
-                _status = "<b>Update downloaded</b>";
+                updateStatus("<b>" + _("Update downloaded") + "</b>");
             } else {
                 updFile.delete();
-                _status = "<b>Unsigned update file is corrupt</b> from " + url;
+                updateStatus("<b>" + _("Unsigned update file from {0} is corrupt", url) + "</b>");
                 _log.log(Log.CRIT, "Corrupt zip file from " + url);
                 return;
             }
@@ -108,20 +108,22 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                 _context.router().saveConfig();
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was downloaded, restarting to install it");
-                    _status = "<b>Update downloaded</b><br>Restarting";
+                    updateStatus("<b>" + _("Update downloaded") + "</b><br>" + _("Restarting"));
                     restart();
                 } else {
                     _log.log(Log.CRIT, "Update was downloaded, will be installed at next restart");
-                    _status = "<b>Update downloaded</b><br>";
+                    StringBuilder buf = new StringBuilder(64);
+                    buf.append("<b>").append(_("Update downloaded")).append("</b><br>");
                     if (System.getProperty("wrapper.version") != null)
-                        _status += "Click Restart to install";
+                        buf.append(_("Click Restart to install"));
                     else
-                        _status += "Click Shutdown and restart to install";
-                    _status += " Version " + _zipVersion;
+                        buf.append(_("Click Shutdown and restart to install"));
+                        buf.append(' ').append(_("Version {0}", _zipVersion));
+                    updateStatus(buf.toString());
                 }
             } else {
                 _log.log(Log.CRIT, "Failed copy to " + to);
-                _status = "<b>Failed copy to " + to + "</b>";
+                updateStatus("<b>" + _("Failed copy to {0}", to) + "</b>");
             }
         }
     }

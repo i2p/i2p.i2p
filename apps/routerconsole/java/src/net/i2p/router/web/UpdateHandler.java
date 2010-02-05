@@ -32,7 +32,7 @@ public class UpdateHandler {
     protected RouterContext _context;
     protected Log _log;
     protected String _updateFile;
-    protected static String _status = "";
+    private static String _status = "";
     private String _action;
     private String _nonce;
     
@@ -129,7 +129,7 @@ public class UpdateHandler {
         public UpdateRunner() { 
             _isRunning = false;
             this.done = false;
-            _status = "<b>Updating</b>";
+            updateStatus("<b>" + _("Updating") + "</b>");
         }
         public boolean isRunning() { return _isRunning; }
         public boolean isDone() {
@@ -142,7 +142,7 @@ public class UpdateHandler {
             _isRunning = false;
         }
         protected void update() {
-            _status = "<b>Updating</b>";
+            updateStatus("<b>" + _("Updating") + "</b>");
             String updateURL = selectUpdateURL();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Selected update URL: " + updateURL);
@@ -169,19 +169,18 @@ public class UpdateHandler {
         }
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
             StringBuilder buf = new StringBuilder(64);
-            buf.append("<b>Updating</b> ");
+            buf.append("<b>").append(_("Updating")).append("</b> ");
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
                          ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);
             synchronized (_pct) {
                 buf.append(_pct.format(pct));
             }
             buf.append(":<br>\n");
-            buf.append(DataHelper.formatSize(currentWrite + alreadyTransferred));
-            buf.append("B transferred");
-            _status = buf.toString();
+            buf.append(_("{0}B transferred", DataHelper.formatSize(currentWrite + alreadyTransferred)));
+            updateStatus(buf.toString());
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
-            _status = "<b>Update downloaded</b>";
+            updateStatus("<b>" + _("Update downloaded") + "</b>");
             TrustedUpdate up = new TrustedUpdate(_context);
             File f = new File(_updateFile);
             File to = new File(_context.getRouterDir(), Router.UPDATE_FILE);
@@ -201,22 +200,23 @@ public class UpdateHandler {
                 _context.router().saveConfig();
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
-                    _status = "<b>Update verified</b><br>Restarting";
+                    updateStatus("<b>" + _("Update verified") + "</b><br>" + _("Restarting"));
                     restart();
                 } else {
                     _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
-                    _status = "<b>Update downloaded</b><br>";
+                    StringBuilder buf = new StringBuilder(64);
+                    buf.append("<b>").append(_("Update downloaded")).append("</b><br>");
                     if (System.getProperty("wrapper.version") != null)
-                        _status += "Click Restart to install";
+                        buf.append(_("Click Restart to install"));
                     else
-                        _status += "Click Shutdown and restart to install";
+                        buf.append(_("Click Shutdown and restart to install"));
                     if (up.newVersion() != null)
-                        _status += " Version " + up.newVersion();
+                        buf.append(' ').append(_("Version {0}", up.newVersion()));
+                    updateStatus(buf.toString());
                 }
             } else {
-                err = err + " from " + url;
-                _log.log(Log.CRIT, err);
-                _status = "<b>" + err + "</b>";
+                _log.log(Log.CRIT, err + " from " + url);
+                updateStatus("<b>" + err + ' ' + _("from {0}", url) + " </b>");
             }
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
@@ -224,7 +224,7 @@ public class UpdateHandler {
             _log.log(Log.CRIT, "Update from " + url + " did not download completely (" +
                                bytesRemaining + " remaining after " + currentAttempt + " tries)");
 
-            _status = "<b>Transfer failed</b>";
+            updateStatus("<b>" + _("Transfer failed") + "</b>");
         }
         public void headerReceived(String url, int attemptNum, String key, String val) {}
         public void attempting(String url) {}
@@ -251,4 +251,30 @@ public class UpdateHandler {
         _log.log(Log.DEBUG, "Picked update source " + index + ".");
         return (String) URLList.get(index);
     }
+    
+    protected void updateStatus(String s) {
+        _status = s;
+    }
+
+    /** translate a string */
+    protected String _(String s) {
+        return Messages.getString(s, _context);
+    }
+
+    /**
+     *  translate a string with a parameter
+     *  This is a lot more expensive than _(s), so use sparingly.
+     *
+     *  @param s string to be translated containing {0}
+     *    The {0} will be replaced by the parameter.
+     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *  @param o parameter, not translated.
+     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    Do not double the single quotes in the parameter.
+     *    Use autoboxing to call with ints, longs, floats, etc.
+     */
+    protected String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
+    }
+
 }
