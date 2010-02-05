@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.i2p.CoreVersion;
@@ -108,8 +110,10 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     private static I2PAppContext _context;
 
     private Log       _log;
-    private ArrayList _trustedKeys;
+    private Map<SigningPublicKey, String> _trustedKeys;
     private String _newVersion;
+    /** 172 */
+    private static final int KEYSIZE_B64_BYTES = 2 + (SigningPublicKey.KEYSIZE_BYTES * 4 / 3);
 
     /**
      * Constructs a new <code>TrustedUpdate</code> with the default global
@@ -128,7 +132,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     public TrustedUpdate(I2PAppContext context) {
         _context = context;
         _log = _context.logManager().getLog(TrustedUpdate.class);
-        _trustedKeys = new ArrayList();
+        _trustedKeys = new HashMap(4);
         _newVersion = null;
 
         String propertyTrustedKeys = context.getProperty(PROP_TRUSTED_KEYS);
@@ -137,14 +141,41 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             StringTokenizer propertyTrustedKeysTokens = new StringTokenizer(propertyTrustedKeys, " ,\r\n");
 
             while (propertyTrustedKeysTokens.hasMoreTokens())
-                _trustedKeys.add(propertyTrustedKeysTokens.nextToken().trim());
+                addKey(propertyTrustedKeysTokens.nextToken().trim(), "");
 
         } else {
-            _trustedKeys.add(DEFAULT_TRUSTED_KEY);
-            _trustedKeys.add(DEFAULT_TRUSTED_KEY2);
+            addKey(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
+            addKey(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
+            //addKey(DEFAULT_TRUSTED_KEY3, "complication@mail.i2p");
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
+    }
+
+    /**
+     *  Duplicate keys or names rejected,
+     *  except that duplicate empty names are allowed
+     *  @since 0.7.12
+     *  @return true if successful
+     */
+    public boolean addKey(String key, String name) {
+        SigningPublicKey signingPublicKey = new SigningPublicKey();
+        try {
+            // fromBase64() won't reject a string that is too long
+            if (key.length() != KEYSIZE_B64_BYTES)
+                throw new DataFormatException("x");
+            signingPublicKey.fromBase64(key);
+        } catch (DataFormatException dfe) {
+            _log.error("Bad signing key for " + name + " : " + key);
+            return false;
+        }
+        if (_trustedKeys.containsKey(signingPublicKey) ||
+            ((!name.equals("")) && _trustedKeys.containsValue(name))) {
+            _log.error("Duplicate signing key for " + name + " : " + key);
+            return false;
+        }
+        _trustedKeys.put(signingPublicKey, name);
+        return true;
     }
 
     /**
@@ -267,23 +298,25 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * 
      * @return An <code>ArrayList</code> containting the trusted keys.
      */
+/***
     public ArrayList getTrustedKeys() {
         return _trustedKeys;
     }
-    
+***/    
     
     /**
      * Fetches the trusted keys for the current instance.
+     * We could sort it but don't bother.
      * 
      * @return A <code>String</code> containing the trusted keys,
      * delimited by CR LF line breaks.
      */
     public String getTrustedKeysString() {
         StringBuilder buf = new StringBuilder(1024);
-        for (int i = 0; i < _trustedKeys.size(); i++) {
+        for (SigningPublicKey spk : _trustedKeys.keySet()) {
             // If something already buffered, first add line break.
             if (buf.length() > 0) buf.append("\r\n");
-            buf.append((String) _trustedKeys.get(i));
+            buf.append(spk.toBase64());
         }
             
         return buf.toString();
@@ -565,18 +598,10 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      *         <code>false</code>.
      */
     public boolean verify(File signedFile) {
-        for (int i = 0; i < _trustedKeys.size(); i++) {
-            SigningPublicKey signingPublicKey = new SigningPublicKey();
-
-            try {
-                signingPublicKey.fromBase64((String)_trustedKeys.get(i));
-                boolean isValidSignature = verify(signedFile, signingPublicKey);
-
-                if (isValidSignature)
-                    return true;
-            } catch (DataFormatException dfe) {
-                _log.log(Log.CRIT, "Trusted key " + i + " is not valid");
-            }
+        for (SigningPublicKey signingPublicKey : _trustedKeys.keySet()) {
+            boolean isValidSignature = verify(signedFile, signingPublicKey);
+            if (isValidSignature)
+                return true;
         }
 
         if (_log.shouldLog(Log.WARN))
