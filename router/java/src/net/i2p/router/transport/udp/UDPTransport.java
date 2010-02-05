@@ -154,6 +154,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
+    public static final int DEFAULT_COST = 5;
     private static final int TEST_FREQUENCY = 13*60*1000;
     public static final long[] RATES = { 10*60*1000 };
     
@@ -1213,7 +1214,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
 
             RouterAddress addr = new RouterAddress();
-            addr.setCost(5);
+            addr.setCost(DEFAULT_COST);
             addr.setExpiration(null);
             addr.setTransportStyle(STYLE);
             addr.setOptions(options);

@@ -28,6 +28,7 @@ public class NTCPAddress {
     public final static String PROP_PORT = "port";
     /** Host name used in RouterAddress definitions */
     public final static String PROP_HOST = "host";
+    public static final int DEFAULT_COST = 10;
     
     public NTCPAddress(String host, int port) {
         if (host != null)
@@ -82,7 +83,7 @@ public class NTCPAddress {
         
         RouterAddress addr = new RouterAddress();
         
-        addr.setCost(10);
+        addr.setCost(DEFAULT_COST);
         addr.setExpiration(null);
         
         Properties props = new Properties();

@@ -234,7 +234,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         props.setProperty(NTCPAddress.PROP_HOST, name);
         props.setProperty(NTCPAddress.PROP_PORT, port);
         RouterAddress addr = new RouterAddress();
-        addr.setCost(10);
+        addr.setCost(NTCPAddress.DEFAULT_COST);
         addr.setExpiration(null);
         addr.setOptions(props);
         addr.setTransportStyle(NTCPTransport.STYLE);
@@ -268,7 +268,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         RouterAddress newAddr = oldAddr;
         if (newAddr == null) {
             newAddr = new RouterAddress();
-            newAddr.setCost(10);
+            newAddr.setCost(NTCPAddress.DEFAULT_COST);
             newAddr.setExpiration(null);
             newAddr.setTransportStyle(NTCPTransport.STYLE);
             newProps = new Properties();
