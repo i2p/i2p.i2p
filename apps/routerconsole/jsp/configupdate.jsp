@@ -36,8 +36,9 @@
         <tr><td class= "mediumtags" align="right"><b><%=intl._("News URL")%>:</b></td>
           <td><input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Refresh frequency")%>:</b>
-          <td><jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /></td><tr>
-          <td class= "mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
+          <td><jsp:getProperty name="updatehelper" property="refreshFrequencySelectBox" /></td></tr>
+    <% if (updatehelper.canInstall()) { %>
+        <tr><td class= "mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("Update through the eepProxy?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td>
@@ -52,8 +53,11 @@
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>
-          <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td>
-        </tr><tr class="tablefooter"><td colspan="2">
+          <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>
+    <% } else { %>
+        <tr><td class= "mediumtags" align="center" colspan="2"><b><%=intl._("I2P updates are disabled because you do not have write permission for the install directory.")%></b></td></tr>
+    <% }   // if canInstall %>
+        <tr class="tablefooter"><td colspan="2">
         <div class="formaction">
             <input type="submit" name="action" value="<%=intl._("Save")%>" />
             <input type="reset" value="<%=intl._("Cancel")%>" />

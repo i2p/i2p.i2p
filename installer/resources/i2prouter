@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 #
 # Skeleton sh script suitable for starting and stopping

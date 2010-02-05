@@ -977,7 +977,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             long dataMsgId = _cloveId;
             getContext().messageHistory().sendPayloadMessage(dataMsgId, true, sendTime);
             getContext().clientManager().messageDeliveryStatusUpdate(_from, _clientMessageId, true);
-            _lease.setNumSuccess(_lease.getNumSuccess()+1);
+            // unused
+            //_lease.setNumSuccess(_lease.getNumSuccess()+1);
         
             int size = _clientMessageSize;
             
@@ -1022,7 +1023,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 _log.debug(OutboundClientMessageOneShotJob.this.getJobId()
                            + ": Soft timeout through the lease " + _lease);
             
-            _lease.setNumFailure(_lease.getNumFailure()+1);
+            // unused
+            //_lease.setNumFailure(_lease.getNumFailure()+1);
             if (_key != null && _tags != null && _leaseSet != null) {
                 SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
                 if (skm != null)

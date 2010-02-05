@@ -58,6 +58,23 @@
     <Arg>webapps/i2psnark.war</Arg>
   </Call>
 
+  <!-- this is so we can find the css -->
+  <Call name="addContext">
+    <Arg>
+      <New class="org.mortbay.http.HttpContext">
+        <Set name="contextPath">/themes</Set>
+        <Set name="resourceBase">./docs/themes</Set>
+        <Call name="addHandler">
+          <Arg>
+            <New class="org.mortbay.http.handler.ResourceHandler">
+              <Set name="redirectWelcome">FALSE</Set>
+	    </New>
+          </Arg>
+        </Call>
+      </New>
+    </Arg>
+  </Call>
+  
   <!-- =============================================================== -->
   <!-- Configure the Other Server Options                              -->
   <!-- =============================================================== -->

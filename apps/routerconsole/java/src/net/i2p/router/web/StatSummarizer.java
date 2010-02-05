@@ -119,6 +119,10 @@ public class StatSummarizer implements Runnable {
         return renderPng(rate, out, -1, -1, false, false, false, false, -1, true); 
     }
     public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+        if (width > GraphHelper.MAX_X)
+            width = GraphHelper.MAX_X;
+        if (height > GraphHelper.MAX_Y)
+            height = GraphHelper.MAX_Y;
         for (int i = 0; i < _listeners.size(); i++) {
             SummaryListener lsnr = (SummaryListener)_listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
@@ -147,6 +151,10 @@ public class StatSummarizer implements Runnable {
     
     public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         long end = _context.clock().now() - 60*1000;
+        if (width > GraphHelper.MAX_X)
+            width = GraphHelper.MAX_X;
+        if (height > GraphHelper.MAX_Y)
+            height = GraphHelper.MAX_Y;
         if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
         if (periodCount > SummaryListener.PERIODS)
             periodCount = SummaryListener.PERIODS;
@@ -156,6 +164,7 @@ public class StatSummarizer implements Runnable {
         try {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimePeriod(start/1000, 0);
+            def.setLowerLimit(0d);
             def.setBaseValue(1024);
             String title = "Bandwidth usage";
             if (!hideTitle)

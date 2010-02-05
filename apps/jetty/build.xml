@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.sha1" value="021164f84da7304bd1ff07c268b45aa3e0b13322" />
-    <property name="jetty.md5" value="a61adc832be6baf2678935506743cfc3" />
-    <property name="jetty.url" value="http://dist.codehaus.org/jetty/jetty-5.1.x/jetty-5.1.12.zip" />
-    <property name="jetty.filename" value="jetty-5.1.12.zip" />
+    <property name="jetty.base" value="jetty-5.1.15" />
+    <property name="jetty.sha1" value="3a7a3de50f86f0cdb23c33aec632ea7f44132c5e" />
+    <property name="jetty.filename" value="${jetty.base}.tgz" />
+    <property name="jetty.url" value="http://dist.codehaus.org/jetty/jetty-5.1.x/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
 
@@ -32,7 +32,6 @@
         <echo message="Even if you deploy the Jetty archive manually, the build script will" />
         <echo message="still attempt to verify its checksums, which must be:" />
         <echo message="SHA1 ${jetty.sha1}" />
-        <echo message="MD5 ${jetty.md5}" />
         <echo message="" />
         <input message="Download Jetty archive automatically?" validargs="y,n" addproperty="jetty.download" />
         <fail message="Aborting as requested. Please deploy the Jetty archive manually." >
@@ -43,16 +42,18 @@
         <get src="${jetty.url}" verbose="true" dest="${jetty.filename}" />
     </target>
 
-    <uptodate property="verified.already" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+    <condition property="verified.already" >
+        <and>
+            <available file="${jetty.filename}" />
+            <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+        </and>
+    </condition>
 
     <target name="verifyJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
-            <and>
                 <checksum file="${jetty.filename}" algorithm="SHA" property="${jetty.sha1}" />
-                <checksum file="${jetty.filename}" algorithm="MD5" property="${jetty.md5}" />
-            </and>
         </condition>
-        <fail message="Jetty archive does not match its checksums!" >
+        <fail message="Jetty archive does not match its checksum!" >
             <condition>
                 <not>
                     <istrue value="${jetty.zip.verified}" />
@@ -63,15 +64,16 @@
     </target>
 
     <target name="extractJettylib" unless="jetty.zip.extracted" >
-        <unzip src="${jetty.filename}" dest="." />
+        <gunzip src="${jetty.filename}" dest="jetty.tar" />
+        <untar src="jetty.tar" dest="." />
         <mkdir dir="jettylib" />
         <copy todir="jettylib">
-            <fileset dir="jetty-5.1.12/lib">
+            <fileset dir="${jetty.base}/lib">
                 <include name="*.jar" />
             </fileset>
         </copy>
         <copy todir="jettylib">
-            <fileset dir="jetty-5.1.12/ext">
+            <fileset dir="${jetty.base}/ext">
                 <include name="ant.jar" />
                 <include name="commons-el.jar" />
                 <include name="commons-logging.jar" />
@@ -81,7 +83,8 @@
                 <include name="org.mortbay.jetty.jar" />
             </fileset>
         </copy>
-        <delete dir="jetty-5.1.12" />
+        <delete file="jetty.tar" />
+        <delete dir="${jetty.base}" />
     </target>
 
     <target name="build" depends="jar" />
@@ -128,9 +131,9 @@
         <mkdir dir="./build/javadoc" />
         <unzip src="${jetty.filename}" dest="./build/javadoc" >
             <patternset>
-                <include name="jetty-5.1.12/javadoc/" />
+                <include name="${jetty.base}/javadoc/" />
             </patternset>
-            <mapper type="glob" from="jetty-5.1.12/javadoc/*" to="javadoc/*" />
+            <mapper type="glob" from="${jetty.base}/javadoc/*" to="javadoc/*" />
         </unzip>
     </target>
 

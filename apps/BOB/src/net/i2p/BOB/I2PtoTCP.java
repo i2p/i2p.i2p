@@ -102,6 +102,7 @@ public class I2PtoTCP implements Runnable {
 						break die;
 					}
 					sock = new Socket(host, port);
+					sock.setKeepAlive(true);
 					// make readers/writers
 					in = sock.getInputStream();
 					out = sock.getOutputStream();

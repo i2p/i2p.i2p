@@ -12,6 +12,7 @@ import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -37,6 +38,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     /** for testing, see isFloodfill() below */
     private static String _alwaysQuery;
     private final Set<Hash> _verifiesInProgress;
+    private FloodThrottler _floodThrottler;
+    private LookupThrottler _lookupThrottler;
     
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
@@ -62,11 +65,12 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public void startup() {
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
+        _lookupThrottler = new LookupThrottler();
     }
 
     @Override
     protected void createHandlers() {
-        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context));
+        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new FloodfillDatabaseLookupMessageHandler(_context, this));
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new FloodfillDatabaseStoreMessageHandler(_context, this));
     }
     
@@ -102,6 +106,22 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         }
     }
 
+    /**
+     *  Increments and tests.
+     *  @since 0.7.11
+     */
+    boolean shouldThrottleFlood(Hash key) {
+        return _floodThrottler != null && _floodThrottler.shouldThrottle(key);
+    }
+
+    /**
+     *  Increments and tests.
+     *  @since 0.7.11
+     */
+    boolean shouldThrottleLookup(Hash from, TunnelId id) {
+        return _lookupThrottler.shouldThrottle(from, id);
+    }
+
     private static final int MAX_TO_FLOOD = 7;
 
     /**
@@ -124,6 +144,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             RouterInfo target = lookupRouterInfoLocally(peer);
             if ( (target == null) || (_context.shitlist().isShitlisted(peer)) )
                 continue;
+            // Don't flood a RI back to itself
+            // Not necessary, a ff will do its own flooding (reply token == 0)
+            //if (peer.equals(target.getIdentity().getHash()))
+            //    continue;
             if (peer.equals(_context.routerHash()))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
@@ -176,7 +200,17 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     @Override
     protected PeerSelector createPeerSelector() { return new FloodfillPeerSelector(_context); }
     
-    public void setFloodfillEnabled(boolean yes) { _floodfillEnabled = yes; }
+    synchronized void setFloodfillEnabled(boolean yes) {
+        _floodfillEnabled = yes;
+        if (yes && _floodThrottler == null) {
+            _floodThrottler = new FloodThrottler();
+            _context.statManager().createRateStat("netDb.floodThrottled", "How often do we decline to flood?", "NetworkDatabase", new long[] { 60*60*1000l });
+            // following are for HFDSMJ
+            _context.statManager().createRateStat("netDb.storeFloodNew", "How long it takes to flood out a newly received entry?", "NetworkDatabase", new long[] { 60*60*1000l });
+            _context.statManager().createRateStat("netDb.storeFloodOld", "How often we receive an old entry?", "NetworkDatabase", new long[] { 60*60*1000l });
+        }
+    }
+
     public boolean floodfillEnabled() { return _floodfillEnabled; }
     public static boolean floodfillEnabled(RouterContext ctx) {
         return ((FloodfillNetworkDatabaseFacade)ctx.netDb()).floodfillEnabled();

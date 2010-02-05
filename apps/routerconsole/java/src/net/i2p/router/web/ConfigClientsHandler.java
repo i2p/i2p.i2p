@@ -108,7 +108,7 @@ public class ConfigClientsHandler extends FormHandler {
 
         int newClient = clients.size();
         String newDesc = getString("desc" + newClient);
-        if (newDesc != null) {
+        if (newDesc != null && newDesc.trim().length() > 0) {
             // new entry
             int spc = newDesc.indexOf(" ");
             String clss = newDesc;
@@ -118,7 +118,7 @@ public class ConfigClientsHandler extends FormHandler {
                 args = newDesc.substring(spc + 1);
             }
             String name = getString("name" + newClient);
-            if (name == null) name = "new client";
+            if (name == null || name.trim().length() <= 0) name = "new client";
             ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
                                                      _settings.get(newClient + ".enabled") != null);
             clients.add(ca);

@@ -17,7 +17,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.util.Log;
+//import net.i2p.util.Log;
 
 /**
  * Defines the message a router sends to another router to search for a
@@ -26,18 +26,22 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class DatabaseLookupMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(DatabaseLookupMessage.class);
+    //private final static Log _log = new Log(DatabaseLookupMessage.class);
     public final static int MESSAGE_TYPE = 2;
     private Hash _key;
     private Hash _fromHash;
     private TunnelId _replyTunnel;
-    private Set _dontIncludePeers;
+    private Set<Hash> _dontIncludePeers;
     
-    private static volatile long _currentLookupPeriod = 0;
-    private static volatile int _currentLookupCount = 0;
+    //private static volatile long _currentLookupPeriod = 0;
+    //private static volatile int _currentLookupCount = 0;
     // if we try to send over 20 netDb lookups in 10 seconds, we're acting up
-    private static final long LOOKUP_THROTTLE_PERIOD = 10*1000;
-    private static final long LOOKUP_THROTTLE_MAX = 50;
+    //private static final long LOOKUP_THROTTLE_PERIOD = 10*1000;
+    //private static final long LOOKUP_THROTTLE_MAX = 50;
+
+    /** Insanely big. Not much more than 1500 will fit in a message.
+        Have to prevent a huge alloc on rcv of a malicious msg though */
+    private static final int MAX_NUM_PEERS = 512;
     
     public DatabaseLookupMessage(I2PAppContext context) {
         this(context, false);
@@ -48,24 +52,27 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         //setFrom(null);
         //setDontIncludePeers(null);
         
-        context.statManager().createRateStat("router.throttleNetDbDoSSend", "How many netDb lookup messages we are sending during a period with a DoS detected", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-    
+        // This is the wrong place for this, any throttling should be in netdb
+        // And it doesnt throttle anyway (that would have to be in netdb), it just increments a stat
+        //context.statManager().createRateStat("router.throttleNetDbDoSSend", "How many netDb lookup messages we are sending during a period with a DoS detected", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        //
         // only check DoS generation if we are creating the message...
-        if (locallyCreated) {
-            // we do this in the writeMessage so we know that we have all the data
-            int dosCount = detectDoS(context);
-            if (dosCount > 0) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Are we flooding the network with NetDb messages?  (" + dosCount 
-                              + " messages so far)", new Exception("Flood cause"));
-            }
-        }
+        //if (locallyCreated) {
+        //    // we do this in the writeMessage so we know that we have all the data
+        //    int dosCount = detectDoS(context);
+        //    if (dosCount > 0) {
+        //        if (_log.shouldLog(Log.WARN))
+        //            _log.warn("Are we flooding the network with NetDb messages?  (" + dosCount 
+        //                      + " messages so far)", new Exception("Flood cause"));
+        //    }
+        //}
     }
     
     /**
      * Return number of netDb messages in this period, if flood, else 0
      *
      */
+/*****
     private static int detectDoS(I2PAppContext context) {
         int count = _currentLookupCount++;
         // now lets check for DoS
@@ -87,6 +94,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
             return 0;
         }
     }
+*****/
     
     /**
      * Defines the key being searched for
@@ -113,7 +121,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
      *
      * @return Set of Hash objects, each of which is the H(routerIdentity) to skip
      */
-    public Set getDontIncludePeers() { return _dontIncludePeers; }
+    public Set<Hash> getDontIncludePeers() { return _dontIncludePeers; }
     public void setDontIncludePeers(Set peers) {
         if (peers != null)
             _dontIncludePeers = new HashSet(peers);
@@ -156,9 +164,9 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         int numPeers = (int)DataHelper.fromLong(data, curIndex, 2);
         curIndex += 2;
         
-        if ( (numPeers < 0) || (numPeers >= (1<<16) ) )
+        if ( (numPeers < 0) || (numPeers > MAX_NUM_PEERS) )
             throw new I2NPMessageException("Invalid number of peers - " + numPeers);
-        Set peers = new HashSet(numPeers);
+        Set<Hash> peers = new HashSet(numPeers);
         for (int i = 0; i < numPeers; i++) {
             byte peer[] = new byte[Hash.HASH_LENGTH];
             System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
@@ -201,11 +209,14 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
         } else {
-            byte len[] = DataHelper.toLong(2, _dontIncludePeers.size());
+            int size = _dontIncludePeers.size();
+            if (size > MAX_NUM_PEERS)
+                throw new I2NPMessageException("Too many peers: " + size);
+            byte len[] = DataHelper.toLong(2, size);
             out[curIndex++] = len[0];
             out[curIndex++] = len[1];
-            for (Iterator iter = _dontIncludePeers.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Iterator<Hash> iter = _dontIncludePeers.iterator(); iter.hasNext(); ) {
+                Hash peer = iter.next();
                 System.arraycopy(peer.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
                 curIndex += Hash.HASH_LENGTH;
             }

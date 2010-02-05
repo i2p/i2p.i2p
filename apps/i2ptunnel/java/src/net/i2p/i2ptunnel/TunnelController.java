@@ -154,6 +154,8 @@ public class TunnelController implements Logging {
             startServer();
         } else if ("httpserver".equals(type)) {
             startHttpServer();
+        } else if ("httpbidirserver".equals(type)) {
+            startHttpBidirServer();
         } else if ("ircserver".equals(type)) {
             startIrcServer();
         } else if ("streamrserver".equals(type)) {
@@ -294,6 +296,16 @@ public class TunnelController implements Logging {
         _tunnel.runHttpServer(new String[] { targetHost, targetPort, spoofedHost, privKeyFile }, this);
     }
     
+    private void startHttpBidirServer() {
+        setListenOn();
+        String targetHost = getTargetHost();
+        String targetPort = getTargetPort();
+        String listenPort = getListenPort();
+        String spoofedHost = getSpoofedHost();
+        String privKeyFile = getPrivKeyFile();
+        _tunnel.runHttpBidirServer(new String[] { targetHost, targetPort, listenPort, spoofedHost, privKeyFile }, this);
+    }
+
     private void startIrcServer() {
         String targetHost = getTargetHost(); 
         String targetPort = getTargetPort(); 

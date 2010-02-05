@@ -105,6 +105,12 @@ public class Router {
         System.setProperty("user.timezone", "GMT");
         // just in case, lets make it explicit...
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+        // https://www.kb.cert.org/vuls/id/402580
+        // http://docs.codehaus.org/display/JETTY/SystemProperties
+        // Fixed in Jetty 5.1.15 but we are running 5.1.12
+        // The default is true, unfortunately it was previously
+        // set to false in wrapper.config thru 0.7.10 so we must set it back here.
+        System.setProperty("Dorg.mortbay.util.FileResource.checkAliases", "true");
     }
     
     public Router() { this(null, null); }
@@ -1053,8 +1059,9 @@ public class Router {
                     String val = _config.getProperty(key);
                     // Escape line breaks before saving.
                     // Remember: "\" needs escaping both for regex and string.
-                    val = val.replaceAll("\\r","\\\\r");
-                    val = val.replaceAll("\\n","\\\\n");
+                    // NOOO - see comments in DataHelper
+                    //val = val.replaceAll("\\r","\\\\r");
+                    //val = val.replaceAll("\\n","\\\\n");
                     buf.append(key).append('=').append(val).append('\n');
                 }
             }

@@ -134,8 +134,8 @@ public class RouterContext extends I2PAppContext {
         _shitlist = new Shitlist(this);
         _blocklist = new Blocklist(this);
         _messageValidator = new MessageValidator(this);
-        //_throttle = new RouterThrottleImpl(this);
-        _throttle = new RouterDoSThrottle(this);
+        _throttle = new RouterThrottleImpl(this);
+        //_throttle = new RouterDoSThrottle(this);
         _integrationCalc = new IntegrationCalculator(this);
         _speedCalc = new SpeedCalculator(this);
         _capacityCalc = new CapacityCalculator(this);

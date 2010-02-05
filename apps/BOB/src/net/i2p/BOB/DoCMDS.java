@@ -691,6 +691,7 @@ public class DoCMDS implements Runnable {
 												try {
 													prikey = new ByteArrayOutputStream();
 													prikey.write(net.i2p.data.Base64.decode(Arg));
+													d = new Destination();
 													d.fromBase64(Arg);
 												} catch (Exception ex) {
 													Arg = "";

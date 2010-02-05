@@ -1,24 +1,18 @@
 Source: i2p
-Maintainer: jrandom
+Maintainer: i2p
 Section: net
 Priority: optional
-Homepage: http://dev.i2p2.de
-Build-Depends: java-sdk, ant
-Recommends: libgmp3c2
-Version: 0.7-0
-Tags: implemented-in::java, interface::daemon, network::client, network::server, role::program, security::cryptography
+Homepage: http://www.i2p2.de/
+Build-Depends: java-sdk, ant, gettext
 
 Package: i2p
 Architecture: all
 Section: net
 Priority: optional
 Depends: java-runtime
-Recommends: libgmp3c2
 Description: load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
-Homepage: http://www.i2p2.de
-Version: 0.7-0
-Tags: implemented-in::java, interface::daemon, network::client, network::server, role::program, security::cryptography
+Homepage: http://www.i2p2.de/

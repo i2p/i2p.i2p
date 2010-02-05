@@ -1,9 +1,14 @@
 #!/bin/sh
-TOP=/var/lib/i2p
-useradd -b $TOP -r i2p 2>/dev/null
-chown i2p $TOP -R
+SVCHOME=/var/lib/i2p
+I2P=/usr/lib/i2p
+I2PUSER=i2psvc
 
-update-rc.d
+useradd -d $SVCHOME -r $I2PUSER
+chown $I2PUSER:$I2PUSER $I2P -R
+mkdir -p $SVCHOME
+chown $I2PUSER:$I2PUSER $SVCHOME
 
-cd $TOP
-exec su i2p -c ./postinstall.sh
+update-rc.d i2p defaults
+
+cd $I2P
+exec su $I2PUSER ./postinstall.sh

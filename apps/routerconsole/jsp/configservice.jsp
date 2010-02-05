@@ -32,8 +32,7 @@
  </div>
  <% if (System.getProperty("wrapper.version") != null) { %>
  <p><%=intl._("If you want the router to restart itself after shutting down, you can choose one of the following.")%> 
-    <%=intl._("This is useful in some situations")%> - 
-    <%=intl._("for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on.")%> 
+    <%=intl._("This is useful in some situations - for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on.")%> 
     <%=intl._("A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately.")%> 
     <%=intl._("After tearing down the router, it will wait 1 minute before starting back up again.")%></p>
  <hr><div class="formaction">
@@ -50,8 +49,7 @@
  <input type="submit" name="action" value="<%=intl._("Show systray icon")%>" >
  <input type="submit" name="action" value="<%=intl._("Hide systray icon")%>" >
 </div><h3><%=intl._("Run on startup")%></h3>
- <p><%=intl._("You can control whether I2P is run on startup or not by selecting one of the following options")%> - 
-    <%=intl._("I2P will install (or remove) a service accordingly.")%> 
+ <p><%=intl._("You can control whether I2P is run on startup or not by selecting one of the following options - I2P will install (or remove) a service accordingly.")%> 
     <%=intl._("If you prefer the command line, you can also run the ")%> <code>install_i2p_service_winnt.bat</code> (<%=intl._("or")%>
  <code>uninstall_i2p_service_winnt.bat</code>).</p>
  <hr><div class="formaction">
@@ -63,9 +61,7 @@
 
  <% if (System.getProperty("wrapper.version") != null) { %>
  <h3><%=intl._("Debugging")%></h3>
- <p> At times, it may be helpful to debug I2P by getting a thread dump. 
-     To do so, please select the following option and review the thread dumped to
- <a href="logs.jsp#servicelogs">wrapper.log</a>.</p>
+ <p><%=intl._("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%></p>
   <hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Dump threads")%>" >
 <% } %></div>

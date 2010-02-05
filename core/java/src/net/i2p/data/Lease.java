@@ -77,11 +77,13 @@ public class Lease extends DataStructureImpl {
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease were successful.
      *
+     * @deprecated unused
      */
     public int getNumSuccess() {
         return _numSuccess;
     }
 
+    /** @deprecated unused */
     public void setNumSuccess(int num) {
         _numSuccess = num;
     }
@@ -90,11 +92,13 @@ public class Lease extends DataStructureImpl {
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease failed.
      *
+     * @deprecated unused
      */
     public int getNumFailure() {
         return _numFailure;
     }
 
+    /** @deprecated unused */
     public void setNumFailure(int num) {
         _numFailure = num;
     }
@@ -131,25 +135,25 @@ public class Lease extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Lease)) return false;
         Lease lse = (Lease) object;
-        return DataHelper.eq(getEndDate(), lse.getEndDate())
-               && DataHelper.eq(getTunnelId(), lse.getTunnelId())
-               && DataHelper.eq(getGateway(), lse.getGateway());
+        return DataHelper.eq(_end, lse.getEndDate())
+               && DataHelper.eq(_tunnelId, lse.getTunnelId())
+               && DataHelper.eq(_gateway, lse.getGateway());
 
     }
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getEndDate()) + DataHelper.hashCode(getGateway())
-               + DataHelper.hashCode(getTunnelId());
+        return DataHelper.hashCode(_end) + DataHelper.hashCode(_gateway)
+               + DataHelper.hashCode(_tunnelId);
     }
     
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[Lease: ");
-        buf.append("\n\tEnd Date: ").append(getEndDate());
-        buf.append("\n\tGateway: ").append(getGateway());
-        buf.append("\n\tTunnelId: ").append(getTunnelId());
+        buf.append("\n\tEnd Date: ").append(_end);
+        buf.append("\n\tGateway: ").append(_gateway);
+        buf.append("\n\tTunnelId: ").append(_tunnelId);
         buf.append("]");
         return buf.toString();
     }

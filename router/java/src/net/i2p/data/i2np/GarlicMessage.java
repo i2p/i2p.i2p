@@ -44,7 +44,7 @@ public class GarlicMessage extends I2NPMessageImpl {
         
         long len = DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
-        if ( (len <= 0) || (len > 64*1024) ) throw new I2NPMessageException("size="+len);
+        if ( (len <= 0) || (len > MAX_SIZE) ) throw new I2NPMessageException("size="+len);
         _data = new byte[(int)len];
         System.arraycopy(data, curIndex, _data, 0, (int)len);
     }

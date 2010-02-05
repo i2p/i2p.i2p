@@ -53,6 +53,7 @@ public class NTCPTransport extends TransportImpl {
 
     private List _sent;
     private NTCPSendFinisher _finisher;
+    private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
 
     public NTCPTransport(RouterContext ctx) {
@@ -382,24 +383,36 @@ public class NTCPTransport extends TransportImpl {
         return active;
     }
 
+    /** @param skew in seconds */
+    void setLastBadSkew(long skew) {
+        _lastBadSkew = skew;
+    }
+
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
      */
     @Override
-    public Vector getClockSkews() {
+    public Vector<Long> getClockSkews() {
 
-        Vector peers = new Vector();
-        Vector skews = new Vector();
+        Vector<NTCPConnection> peers = new Vector();
+        Vector<Long> skews = new Vector();
 
         synchronized (_conLock) {
             peers.addAll(_conByIdent.values());
         }
 
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            NTCPConnection con = (NTCPConnection)iter.next();
-            skews.addElement(new Long (con.getClockSkew()));
+        for (Iterator<NTCPConnection> iter = peers.iterator(); iter.hasNext(); ) {
+            NTCPConnection con = iter.next();
+            if (con.isEstablished())
+                skews.addElement(Long.valueOf(con.getClockSkew()));
         }
+
+        // If we don't have many peers, maybe it is because of a bad clock, so
+        // return the last bad skew we got
+        if (skews.size() < 5 && _lastBadSkew != 0)
+            skews.addElement(Long.valueOf(_lastBadSkew));
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");
         return skews;

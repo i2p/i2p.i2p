@@ -260,6 +260,7 @@ public class TunnelPool {
     /** list of tunnelInfo instances of tunnels currently being built */
     public List listPending() { synchronized (_inProgress) { return new ArrayList(_inProgress); } }
     
+    /** duplicate of size(), let's pick one */
     int getTunnelCount() { synchronized (_tunnels) { return _tunnels.size(); } }
     
     public TunnelPoolSettings getSettings() { return _settings; }
@@ -273,6 +274,7 @@ public class TunnelPool {
     }
     public TunnelPeerSelector getSelector() { return _peerSelector; }
     public boolean isAlive() { return _alive; }
+    /** duplicate of getTunnelCount(), let's pick one */
     public int size() { 
         synchronized (_tunnels) {
             return _tunnels.size();

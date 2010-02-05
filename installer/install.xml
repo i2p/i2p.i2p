@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.7.8</appversion>
+        <appversion>0.7.10</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -138,6 +138,8 @@
                 <args><arg value="$INSTALL_PATH\uninstall_i2p_service_unix" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper" /></args></executable>
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH\eepget" /></args></executable>
 
             <!-- workaround for vista permission problems - see comments above -->
             <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"

@@ -70,9 +70,9 @@ public class ClientAppConfig {
     /*
      * Go through the properties, and return a List of ClientAppConfig structures
      */
-    public static List getClientApps(RouterContext ctx) {
+    public static List<ClientAppConfig> getClientApps(RouterContext ctx) {
         Properties clientApps = getClientAppProps(ctx);
-        List rv = new ArrayList(5);
+        List<ClientAppConfig> rv = new ArrayList(8);
         int i = 0;
         while (true) {
             String className = clientApps.getProperty(PREFIX + i + ".main");

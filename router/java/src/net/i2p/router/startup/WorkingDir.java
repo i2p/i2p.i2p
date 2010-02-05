@@ -47,6 +47,9 @@ public class WorkingDir {
     private final static String PROP_WORKING_DIR = "i2p.dir.config";
     private final static String WORKING_DIR_DEFAULT_WINDOWS = "I2P";
     private final static String WORKING_DIR_DEFAULT = ".i2p";
+    private final static String WORKING_DIR_DEFAULT_DAEMON = "i2p-config";
+    /** we do a couple of things differently if this is the username */
+    private final static String DAEMON_USER = "i2psvc";
 
     /**
      * Only call this once on router invocation.
@@ -70,7 +73,10 @@ public class WorkingDir {
                     home = appdata;
                 dirf = new File(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else {
-                dirf = new File(home, WORKING_DIR_DEFAULT);
+                if (DAEMON_USER.equals(System.getProperty("user.name")))
+                    dirf = new File(home, WORKING_DIR_DEFAULT_DAEMON);
+                else
+                    dirf = new File(home, WORKING_DIR_DEFAULT);
             }
         }
 
@@ -194,11 +200,15 @@ public class WorkingDir {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile), "UTF-8")));
             out.println("# Modified by I2P User dir migration script");
             String s = null;
+            boolean isDaemon = DAEMON_USER.equals(System.getProperty("user.name"));
             while ((s = DataHelper.readLine(in)) != null) {
                 if (s.endsWith("=\"eepsite/jetty.xml\"")) {
                     s = s.replace("=\"eepsite/jetty.xml\"", "=\"" + todir.getAbsolutePath() +
                                                             File.separatorChar + "eepsite" +
                                                             File.separatorChar + "jetty.xml\"");
+                } else if (isDaemon && s.equals("clientApp.4.startOnLoad=true")) {
+                    // disable browser launch for daemon
+                    s = "clientApp.4.startOnLoad=false";
                 }
                 out.println(s);
             }

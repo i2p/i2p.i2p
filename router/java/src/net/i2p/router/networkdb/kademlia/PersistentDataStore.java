@@ -152,7 +152,8 @@ class PersistentDataStore extends TransientDataStore {
         }
         public String getName() { return "Remove Key"; }
         public void runJob() {
-            _log.info("Removing key " + _key /* , getAddedBy() */);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Removing key " + _key /* , getAddedBy() */);
             try {
                 File dbDir = getDbDir();
                 removeFile(_key, dbDir);
@@ -411,6 +412,10 @@ class PersistentDataStore extends TransientDataStore {
                         try {
                             // persist = false so we don't write what we just read
                             _facade.store(ri.getIdentity().getHash(), ri, false);
+                            // when heardAbout() was removed from TransientDataStore, it broke
+                            // profile bootstrapping for new routers,
+                            // so add it here.
+                            getContext().profileManager().heardAbout(ri.getIdentity().getHash(), ri.getPublished());
                         } catch (IllegalArgumentException iae) {
                             _log.info("Refused locally loaded routerInfo - deleting");
                             corrupt = true;

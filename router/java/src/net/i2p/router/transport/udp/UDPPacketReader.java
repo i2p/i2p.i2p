@@ -74,6 +74,7 @@ public class UDPPacketReader {
         return (_message[_payloadBeginOffset] & (1 << 2)) != 0;
     }
     
+    /** @return seconds */
     public long readTimestamp() {
         return DataHelper.fromLong(_message, _payloadBeginOffset + 1, 4);
     }

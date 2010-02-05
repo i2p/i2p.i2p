@@ -39,6 +39,7 @@ public class RouterAddress extends DataStructureImpl {
      * contacting this router.  The value 0 means free and 255 means really expensive.
      * No value above 255 is allowed.
      *
+     * @deprecated unused for now
      */
     public int getCost() {
         return _cost;
@@ -48,6 +49,7 @@ public class RouterAddress extends DataStructureImpl {
      * Configure the weighted cost of using the address.
      * No value above 255 is allowed.
      *
+     * NTCP is set to 10 and SSU to 5, but it's unused.
      */
     public void setCost(int cost) {
         _cost = cost;
@@ -57,6 +59,7 @@ public class RouterAddress extends DataStructureImpl {
      * Retrieve the date after which the address should not be used.  If this
      * is null, then the address never expires.
      *
+     * @deprecated unused for now
      */
     public Date getExpiration() {
         return _expiration;
@@ -65,6 +68,7 @@ public class RouterAddress extends DataStructureImpl {
     /**
      * Configure the expiration date of the address (null for no expiration)
      *
+     * Unused for now, always null
      */
     public void setExpiration(Date expiration) {
         _expiration = expiration;
@@ -122,15 +126,15 @@ public class RouterAddress extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
-        return DataHelper.eq(getCost(), addr.getCost()) && DataHelper.eq(getExpiration(), addr.getExpiration())
-               && DataHelper.eq(getOptions(), addr.getOptions())
-               && DataHelper.eq(getTransportStyle(), addr.getTransportStyle());
+        return DataHelper.eq(_cost, addr.getCost()) && DataHelper.eq(_expiration, addr.getExpiration())
+               && DataHelper.eq(_options, addr.getOptions())
+               && DataHelper.eq(_transportStyle, addr.getTransportStyle());
     }
     
     /** the style should be sufficient, for speed */
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getTransportStyle());
+        return DataHelper.hashCode(_transportStyle);
     }
     
     @Override

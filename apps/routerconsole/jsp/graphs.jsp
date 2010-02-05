@@ -13,8 +13,8 @@
  <div class="graphspanel">
  <div class="widepanel">
  <jsp:useBean class="net.i2p.router.web.GraphHelper" id="graphHelper" scope="request" />
- <jsp:setProperty name="graphHelper" property="*" />
  <jsp:setProperty name="graphHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="graphHelper" property="*" />
  <jsp:setProperty name="graphHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="graphHelper" property="images" />
  <jsp:getProperty name="graphHelper" property="form" />

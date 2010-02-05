@@ -46,6 +46,13 @@ import net.i2p.util.RandomSource;
  * writeBytes() will output the original encrypted
  * leases and the original leaseset signature.
  *
+ * Revocation (zero leases) isn't used anywhere. In addition:
+ *  - A revoked leaseset has an EarliestLeaseDate of -1, so it will
+ *    never be stored successfully.
+ *  - Revocation of an encrypted leaseset will explode.
+ *  - So having an included signature at all is pointless?
+ *
+ *
  * @author jrandom
  */
 public class LeaseSet extends DataStructureImpl {
@@ -54,7 +61,7 @@ public class LeaseSet extends DataStructureImpl {
     private PublicKey _encryptionKey;
     private SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
-    private List _leases;
+    private List<Lease> _leases;
     private Signature _signature;
     private volatile Hash _currentRoutingKey;
     private volatile byte[] _routingKeyGenMod;
@@ -62,7 +69,7 @@ public class LeaseSet extends DataStructureImpl {
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     private long _lastExpiration;
-    private List _decryptedLeases;
+    private List<Lease> _decryptedLeases;
     private boolean _decrypted;
     private boolean _checked;
 
@@ -75,7 +82,7 @@ public class LeaseSet extends DataStructureImpl {
         setSigningKey(null);
         setSignature(null);
         setRoutingKey(null);
-        _leases = new ArrayList();
+        _leases = new ArrayList(MAX_LEASES);
         _routingKeyGenMod = null;
         _receivedAsPublished = false;
         _firstExpiration = Long.MAX_VALUE;
@@ -100,6 +107,7 @@ public class LeaseSet extends DataStructureImpl {
         _encryptionKey = encryptionKey;
     }
 
+    /** @deprecated unused */
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
@@ -130,6 +138,10 @@ public class LeaseSet extends DataStructureImpl {
             _lastExpiration = expire;
     }
 
+    /**
+     *  @return 0-6
+     *  A LeaseSet with no leases is revoked.
+     */
     public int getLeaseCount() {
         if (isEncrypted())
             return _leases.size() - 1;
@@ -208,6 +220,7 @@ public class LeaseSet extends DataStructureImpl {
 
     /**
      * Verify that the signature matches the lease set's destination's signing public key.
+     * OR the included revocation key.
      *
      * @return true only if the signature matches
      */
@@ -216,17 +229,18 @@ public class LeaseSet extends DataStructureImpl {
         if (getDestination() == null) return false;
         byte data[] = getBytes();
         if (data == null) return false;
-        boolean signedByDest = DSAEngine.getInstance().verifySignature(getSignature(), data,
-                                                                       getDestination().getSigningPublicKey());
+        boolean signedByDest = DSAEngine.getInstance().verifySignature(_signature, data,
+                                                                       _destination.getSigningPublicKey());
         boolean signedByRevoker = false;
         if (!signedByDest) {
-            signedByRevoker = DSAEngine.getInstance().verifySignature(getSignature(), data, _signingKey);
+            signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, data, _signingKey);
         }
         return signedByDest || signedByRevoker;
     }
 
     /**
      * Verify that the signature matches the lease set's destination's signing public key.
+     * OR the specified revocation key.
      *
      * @return true only if the signature matches
      */
@@ -235,11 +249,11 @@ public class LeaseSet extends DataStructureImpl {
         if (getDestination() == null) return false;
         byte data[] = getBytes();
         if (data == null) return false;
-        boolean signedByDest = DSAEngine.getInstance().verifySignature(getSignature(), data,
-                                                                       getDestination().getSigningPublicKey());
+        boolean signedByDest = DSAEngine.getInstance().verifySignature(_signature, data,
+                                                                       _destination.getSigningPublicKey());
         boolean signedByRevoker = false;
         if (!signedByDest) {
-            signedByRevoker = DSAEngine.getInstance().verifySignature(getSignature(), data, signingKey);
+            signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, data, signingKey);
         }
         return signedByDest || signedByRevoker;
     }
@@ -339,9 +353,9 @@ public class LeaseSet extends DataStructureImpl {
         LeaseSet ls = (LeaseSet) object;
         return DataHelper.eq(getEncryptionKey(), ls.getEncryptionKey()) &&
         //DataHelper.eq(getVersion(), ls.getVersion()) &&
-               DataHelper.eq(_leases, ls._leases) && DataHelper.eq(getSignature(), ls.getSignature())
-               && DataHelper.eq(getSigningKey(), ls.getSigningKey())
-               && DataHelper.eq(getDestination(), ls.getDestination());
+               DataHelper.eq(_leases, ls._leases) && DataHelper.eq(_signature, ls.getSignature())
+               && DataHelper.eq(_signingKey, ls.getSigningKey())
+               && DataHelper.eq(_destination, ls.getDestination());
 
     }
     
@@ -357,11 +371,11 @@ public class LeaseSet extends DataStructureImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
         buf.append("[LeaseSet: ");
-        buf.append("\n\tDestination: ").append(getDestination());
-        buf.append("\n\tEncryptionKey: ").append(getEncryptionKey());
-        buf.append("\n\tSigningKey: ").append(getSigningKey());
+        buf.append("\n\tDestination: ").append(_destination);
+        buf.append("\n\tEncryptionKey: ").append(_encryptionKey);
+        buf.append("\n\tSigningKey: ").append(_signingKey);
         //buf.append("\n\tVersion: ").append(getVersion());
-        buf.append("\n\tSignature: ").append(getSignature());
+        buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tLeases: #").append(getLeaseCount());
         for (int i = 0; i < getLeaseCount(); i++)
             buf.append("\n\t\tLease (").append(i).append("): ").append(getLease(i));

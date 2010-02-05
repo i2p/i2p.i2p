@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 ### BEGIN INIT INFO
 # Provides:		i2p
@@ -13,8 +13,8 @@ set -e
 
 . /lib/lsb/init-functions
 
-function I2P {
-	su i2p -c "/var/lib/i2p/i2prouter $1"
+I2P () {
+	su i2psvc -c "/usr/lib/i2p/i2prouter $1"
 }
 
 case "$1" in

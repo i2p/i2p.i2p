@@ -99,7 +99,7 @@ public class SummaryHelper extends HelperBase {
         //if (!_context.clock().getUpdatedSuccessfully())
         Long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
-        if (skew != null && Math.abs(skew.longValue()) > 45)
+        if (skew != null && Math.abs(skew.longValue()) > 30)
             return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew.longValue()) * 1000));
         if (_context.router().isHidden())
             return _("Hidden");
@@ -390,7 +390,7 @@ public class SummaryHelper extends HelperBase {
                     buf.append(name.substring(0,15)).append("&hellip;");
                 buf.append("</a></b></td>\n");
                 LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
-                if (ls != null) {
+                if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
                     long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                     if (timeToExpire < 0) {
                         // red or yellow light                 
@@ -414,10 +414,10 @@ public class SummaryHelper extends HelperBase {
     }
     
     /** compare translated nicknames - put "shared clients" first in the sort */
-    private class AlphaComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            String lname = getName((Destination)lhs);
-            String rname = getName((Destination)rhs);
+    private class AlphaComparator implements Comparator<Destination> {
+        public int compare(Destination lhs, Destination rhs) {
+            String lname = getName(lhs);
+            String rname = getName(rhs);
             String xsc = _("shared clients");
             if (lname.equals(xsc))
                 return -1;
@@ -499,6 +499,15 @@ public class SummaryHelper extends HelperBase {
             return _context.tunnelManager().getParticipatingCount();
     }
  
+    /** @since 0.7.10 */
+    public String getShareRatio() { 
+        if (_context == null) 
+            return "0";
+        double sr = _context.tunnelManager().getShareRatio();
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+        return fmt.format(sr);
+    }
+
     /**
      * How lagged our job queue is over the last minute (pretty printed with
      * the units attached)

@@ -416,7 +416,7 @@ public class PeerCoordinator implements PeerListener
                 count++;
                 if (uploaders < maxUploaders)
                   {
-                    if (!peer.isChoked())
+                    if (peer.isInteresting() && !peer.isChoked())
                       interested.add(unchokedCount++, peer);
                     else
                       interested.add(peer);

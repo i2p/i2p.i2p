@@ -365,12 +365,20 @@ public class EstablishState {
                 // the skew is not authenticated yet, but it is certainly fatal to
                 // the establishment, so fail hard if appropriate
                 long diff = 1000*Math.abs(_tsA-_tsB);
-                if (diff >= Router.CLOCK_FUDGE_FACTOR) {
+                if (!_context.clock().getUpdatedSuccessfully()) {
+                    // Adjust the clock one time in desperation
+                    _context.clock().setOffset(1000 * (_tsB - _tsA), true);
+                    _tsA = _tsB;
+                    if (diff != 0)
+                        _log.error("NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
+                } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
                     _transport.markReachable(_con.getRemotePeer().calculateHash(), false);
+                    // Only shitlist if we know what time it is
                     _context.shitlist().shitlistRouter(DataHelper.formatDuration(diff),
                                                        _con.getRemotePeer().calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
+                    _transport.setLastBadSkew(_tsA- _tsB);
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
@@ -570,12 +578,21 @@ public class EstablishState {
                     _log.debug(prefix() + "verification successful for " + _con);
 
                 long diff = 1000*Math.abs(tsA-_tsB);
-                if (diff >= Router.CLOCK_FUDGE_FACTOR) {
+                if (!_context.clock().getUpdatedSuccessfully()) {
+                    // Adjust the clock one time in desperation
+                    // This isn't very likely, outbound will do it first
+                    _context.clock().setOffset(1000 * (_tsB - tsA), true);
+                    tsA = _tsB;
+                    if (diff != 0)
+                        _log.error("NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
+                } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
                     _transport.markReachable(alice.calculateHash(), true);
+                    // Only shitlist if we know what time it is
                     _context.shitlist().shitlistRouter(DataHelper.formatDuration(diff),
                                                        alice.calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
+                    _transport.setLastBadSkew(tsA- _tsB);
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {

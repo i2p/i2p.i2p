@@ -17,7 +17,7 @@
 <!--   * Uncomment the addWebApplications section to use to enable             -->
 <!--           war files placed in the webapps/ dir.                           -->
 <!--                                                                           -->
-<!-- I2P uses Jetty 5.1.12. We have no plans to upgrade to Jetty 6, due to     -->
+<!-- I2P uses Jetty 5.1.15. We have no plans to upgrade to Jetty 6, due to     -->
 <!-- the significant changes in the API. If you need web server features not   -->
 <!-- found in Jetty 5, you may install and run Jetty 6 in a different JVM,     -->
 <!-- or run any other web server such as Apache. If you do run another         -->

@@ -77,7 +77,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public boolean haveHighOutboundCapacity() { return (_manager == null ? false : _manager.haveHighOutboundCapacity()); } 
     
     /**
-     * Framed average clock skew of connected peers in seconds, or the clock offset if we cannot answer.
+     * @param percentToInclude 1-100
+     * @return Framed average clock skew of connected peers in seconds, or the clock offset if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
      */
     @Override
@@ -87,21 +88,23 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             return Long.valueOf(_context.clock().getOffset() / 1000);
         }
         Vector skews = _manager.getClockSkews();
-        if (skews == null) {
+        if (skews == null ||
+            skews.size() <= 0 ||
+            (skews.size() < 5 && _context.clock().getUpdatedSuccessfully())) {
             return Long.valueOf(_context.clock().getOffset() / 1000);
         }
-        if (skews.size() < 5) {
-            return Long.valueOf(_context.clock().getOffset() / 1000);
-        }
+
         // Going to calculate, sort them
         Collections.sort(skews);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Clock skews: " + skews);
         // Calculate frame size
-        int frameSize = Math.min((skews.size() * percentToInclude / 100), 2);
+        int frameSize = Math.max((skews.size() * percentToInclude / 100), 1);
         int first = (skews.size() / 2) - (frameSize / 2);
-        int last = (skews.size() / 2) + (frameSize / 2);
+        int last = Math.min((skews.size() / 2) + (frameSize / 2), skews.size() - 1);
         // Sum skew values
         long sum = 0;
-        for (int i = first; i < last; i++) {
+        for (int i = first; i <= last; i++) {
             long value = ((Long) (skews.get(i))).longValue();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding clock skew " + i + " valued " + value + " s.");

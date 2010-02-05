@@ -373,8 +373,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 return new DatabaseSearchReplyMessage(context);
             case DeliveryStatusMessage.MESSAGE_TYPE:
                 return new DeliveryStatusMessage(context);
-            case DateMessage.MESSAGE_TYPE:
-                return new DateMessage(context);
+            // unused since forever (0.5?)
+            //case DateMessage.MESSAGE_TYPE:
+            //    return new DateMessage(context);
             case GarlicMessage.MESSAGE_TYPE:
                 return new GarlicMessage(context);
             case TunnelDataMessage.MESSAGE_TYPE:
@@ -383,6 +384,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 return new TunnelGatewayMessage(context);
             case DataMessage.MESSAGE_TYPE:
                 return new DataMessage(context);
+            // unused since 0.6.1.10
             //case TunnelCreateMessage.MESSAGE_TYPE:
             //    return new TunnelCreateMessage(context);
             //case TunnelCreateStatusMessage.MESSAGE_TYPE:
