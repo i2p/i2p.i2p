@@ -124,6 +124,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_trustedKeys != null) && (_trustedKeys.length() > 0) ) {
+            _trustedKeys = _trustedKeys.replaceAll("\r\n", ",").replaceAll("\n", ",");
             String oldKeys = new TrustedUpdate(_context).getTrustedKeysString();
             if ( (oldKeys == null) || (!_trustedKeys.equals(oldKeys)) ) {
                 _context.router().setConfigSetting(PROP_TRUSTED_KEYS, _trustedKeys);
