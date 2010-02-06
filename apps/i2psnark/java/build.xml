@@ -53,7 +53,8 @@
      -->
     <target name="war" depends="jar, bundle"> 
         <war destfile="../i2psnark.war" webxml="../web.xml">
-          <classes dir="./build/obj" includes="**/*.class" excludes="**/RunStandalone.class" />
+          <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
+          <classes dir="./build/obj" includes="**/web/*.class" />
         </war>
     </target>
     
