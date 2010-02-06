@@ -65,6 +65,10 @@ public class ConfigUpdateHandler extends FormHandler {
                     addFormNotice(_("Update available, attempting to download now"));
                 else
                     addFormNotice(_("Update available, click button on left to download"));
+                // So that update() will post a status to the summary bar before we reload
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {}
             } else
                 addFormNotice(_("No update available"));
             return;

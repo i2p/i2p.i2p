@@ -37,6 +37,10 @@ public class ConfigClientsHandler extends FormHandler {
             saveWebAppChanges();
             return;
         }
+        if (_action.equals(_("Install Plugin"))) {
+            installPlugin();
+            return;
+        }
         // value
         if (_action.startsWith("Start ")) {
             String app = _action.substring(6);
@@ -189,8 +193,7 @@ public class ConfigClientsHandler extends FormHandler {
                     try {
                         File path = new File(_context.getBaseDir(), "webapps");
                         path = new File(path, app + ".war");
-                        s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
-                        // no passwords... initialize(wac);
+                        WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
                         addFormNotice(_("WebApp") + " <a href=\"/" + app + "/\">" + _(app) + "</a> " + _("started") + '.');
                     } catch (Exception ioe) {
                         addFormError(_("Failed to start") + ' ' + _(app) + " " + ioe + '.');
@@ -200,5 +203,28 @@ public class ConfigClientsHandler extends FormHandler {
             }
         }
         addFormError(_("Failed to find server."));
+    }
+
+    private void installPlugin() {
+        String url = getString("pluginURL");
+        if (url == null || url.length() <= 0) {
+            addFormError(_("No plugin URL specified."));
+            return;
+        }
+        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        PluginUpdateHandler puh = PluginUpdateHandler.getInstance(_context);
+        if (puh.isRunning()) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        puh.update(url);
+        addFormNotice(_("Downloading plugin from {0}", url));
+        // So that update() will post a status to the summary bar before we reload
+        try {
+           Thread.sleep(1000);
+        } catch (InterruptedException ie) {}
     }
 }
