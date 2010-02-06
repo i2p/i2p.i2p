@@ -179,6 +179,22 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     /**
+     *  Do we know about the following key?
+     *  @since 0.7.12
+     */
+    public boolean haveKey(String key) {
+        if (key.length() != KEYSIZE_B64_BYTES)
+            return false;
+        SigningPublicKey signingPublicKey = new SigningPublicKey();
+        try {
+            signingPublicKey.fromBase64(key);
+        } catch (DataFormatException dfe) {
+            return false;
+        }
+        return _trustedKeys.containsKey(signingPublicKey);
+    }
+
+    /**
      * Parses command line arguments when this class is used from the command
      * line.
      * 
@@ -409,6 +425,22 @@ D8usM7Dxp5yrDrCYZ5AIijc=
 
         if (!verify(signedFile))
             return "Unknown signing key or corrupt file";
+
+        return migrateFile(signedFile, outputFile);
+    }
+
+    /**
+     * Extract the file. Skips and ignores the signature and version. No verification.
+     * 
+     * @param signedFile     A signed update file.
+     * @param outputFile     The file to write the verified data to.
+     * 
+     * @return <code>null</code> if the
+     *         data was moved, and an error <code>String</code> otherwise.
+     */
+    public String migrateFile(File signedFile, File outputFile) {
+        if (!signedFile.exists())
+            return "File not found: " + signedFile.getAbsolutePath();
 
         FileInputStream fileInputStream = null;
         FileOutputStream fileOutputStream = null;
