@@ -314,6 +314,8 @@
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- pulled out of routerconsole.jar in 0.7.12 -->
+        <copy file="apps/jrobin/jrobin-1.4.0.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
@@ -487,6 +489,8 @@
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater -->
+        <copy file="apps/jrobin/jrobin-1.4.0.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />

@@ -64,13 +64,15 @@
     <target name="jar" depends="compile">
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
-                <attribute name="Class-Path" value="i2p.jar router.jar" />
+                <attribute name="Class-Path" value="i2p.jar router.jar jrobin-1.4.0.jar" />
             </manifest>
         </jar>
         <delete dir="./tmpextract" />
+       <!-- jrobin taken out of routerconsole.jar in 0.7.12
         <unjar src="../../jrobin/jrobin-1.4.0.jar" dest="./tmpextract" />
         <jar destfile="./build/routerconsole.jar" basedir="./tmpextract" update="true" />
         <delete dir="./tmpextract" />
+       -->
         
         <ant target="war" />
 
