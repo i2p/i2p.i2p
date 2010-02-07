@@ -70,7 +70,11 @@ public class SummaryBarRenderer {
                .append(_("Anonymous resident webserver"))
                .append("\">")
                .append(_("Webserver"))
-               .append("</a></td></tr></table>\n" +
+               .append("</a>")
+
+               .append(NavHelper.getClientAppLinks(_context))
+
+               .append("</td></tr></table>\n" +
 
                        "<hr><h3><a href=\"/config.jsp\" target=\"_top\" title=\"")
                .append(_("Configure I2P Router"))

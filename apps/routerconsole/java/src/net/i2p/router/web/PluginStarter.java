@@ -131,6 +131,15 @@ public class PluginStarter implements Runnable {
         // add themes in console/themes
 
         // add summary bar link
+        File pluginConfig = new File(pluginDir, "plugin.config");
+        if (pluginConfig.exists()) {
+            Properties props = new Properties();
+            DataHelper.loadProps(props, pluginConfig);
+            String name = props.getProperty("consoleLinkName");
+            String url = props.getProperty("consoleLinkURL");
+            if (name != null && url != null && name.length() > 0 && url.length() > 0)
+                NavHelper.registerApp(name, url);
+        }
 
         return true;
     }

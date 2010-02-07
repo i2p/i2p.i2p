@@ -1,14 +1,13 @@
 package net.i2p.router.web;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.I2PAppContext;
 
-public class NavHelper extends HelperBase {
-    private static Map _apps = new HashMap();
-    
-    public NavHelper() {}
+public class NavHelper {
+    private static Map<String, String> _apps = new ConcurrentHashMap();
     
     /**
      * To register a new client application so that it shows up on the router
@@ -25,13 +24,17 @@ public class NavHelper extends HelperBase {
         _apps.remove(name);
     }
     
-    public String getClientAppLinks() {
+    /**
+     *  Fixme, this translates with the router console bundle, not
+     *  the plugin bundle
+     */
+    public static String getClientAppLinks(I2PAppContext ctx) {
         StringBuilder buf = new StringBuilder(1024); 
-        for (Iterator iter = _apps.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String path = (String)_apps.get(name);
-            buf.append("<a href=\"").append(path).append("\">");
-            buf.append(name).append("</a> |");
+        for (Iterator<String> iter = _apps.keySet().iterator(); iter.hasNext(); ) {
+            String name = iter.next();
+            String path = _apps.get(name);
+            buf.append(" <a target=\"_top\" href=\"").append(path).append("\">");
+            buf.append(Messages.getString(name, ctx)).append("</a>");
         }
         return buf.toString();
     }
