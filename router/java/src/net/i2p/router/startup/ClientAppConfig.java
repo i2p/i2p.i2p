@@ -33,12 +33,21 @@ public class ClientAppConfig {
     public String args;
     public long delay;
     public boolean disabled;
+    /** @since 0.7.12 */
+    public String classpath;
+
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
         className = cl;
         clientName = client;
         args = a;
         delay = d;
         disabled = dis;
+    }
+
+    /** @since 0.7.12 */
+    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp) {
+        this(cl, client, a, d, dis);
+        classpath = cp;
     }
 
     public static File configFile(I2PAppContext ctx) {
@@ -104,6 +113,7 @@ public class ClientAppConfig {
             String delayStr = clientApps.getProperty(PREFIX + i + ".delay");
             String onBoot = clientApps.getProperty(PREFIX + i + ".onBoot");
             String disabled = clientApps.getProperty(PREFIX + i + ".startOnLoad");
+            String classpath = clientApps.getProperty(PREFIX + i + ".classpath");
             i++;
             boolean dis = disabled != null && "false".equals(disabled);
 
@@ -115,11 +125,12 @@ public class ClientAppConfig {
             if (delayStr != null && !onStartup)
                 try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
 
-            rv.add(new ClientAppConfig(className, clientName, args, delay, dis));
+            rv.add(new ClientAppConfig(className, clientName, args, delay, dis, classpath));
         }
         return rv;
     }
 
+    /** classpath not supported */
     public static void writeClientAppConfig(RouterContext ctx, List apps) {
         File cfgFile = configFile(ctx);
         FileOutputStream fos = null;

@@ -2,6 +2,9 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +42,7 @@ public class PluginStarter implements Runnable {
     }
 
     static void startPlugins(RouterContext ctx) {
+        Log log = ctx.logManager().getLog(PluginStarter.class);
         Properties props = pluginProperties();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -47,9 +51,9 @@ public class PluginStarter implements Runnable {
                     String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
                     try {
                         if (!startPlugin(ctx, app))
-                            System.err.println("Failed to start plugin: " + app);
+                            log.error("Failed to start plugin: " + app);
                     } catch (Exception e) {
-                        System.err.println("Failed to start plugin: " + app + ' ' + e);
+                        log.error("Failed to start plugin: " + app, e);
                     }
                 }
             }
@@ -58,9 +62,10 @@ public class PluginStarter implements Runnable {
 
     /** @return true on success */
     static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
+        Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
-            System.err.println("Cannot start nonexistent plugin: " + appName);
+            log.error("Cannot start nonexistent plugin: " + appName);
             return false;
         }
 
@@ -91,7 +96,7 @@ public class PluginStarter implements Runnable {
                             WebAppStarter.startWebApp(ctx, server, warName, path);
                         }
                     } catch (IOException ioe) {
-                        System.err.println("Error resolving '" + fileNames[i] + "' in '" + webappDir);
+                        log.error("Error resolving '" + fileNames[i] + "' in '" + webappDir, ioe);
                     }
                 }
             }
@@ -157,6 +162,15 @@ public class PluginStarter implements Runnable {
                     argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
                 }
             }
+            if (app.classpath != null) {
+                String cp = new String(app.classpath);
+                if (cp.indexOf("$") >= 0) {
+                    cp = cp.replace("$I2P", ctx.getBaseDir().getAbsolutePath());
+                    cp = cp.replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
+                    cp = cp.replace("$PLUGIN", pluginDir.getAbsolutePath());
+                }
+                addToClasspath(cp, app.clientName, log);
+            }
             if (app.delay == 0) {
                 // run this guy now
                 LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log);
@@ -165,5 +179,39 @@ public class PluginStarter implements Runnable {
                 ctx.jobQueue().addJob(new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay));
             }
         }
+    }
+
+    /**
+     *  Perhaps there's an easy way to use Thread.setContextClassLoader()
+     *  but I don't see how to make it magically get used for everything.
+     *  So add this to the whole JVM's classpath.
+     */
+    private static void addToClasspath(String classpath, String clientName, Log log) {
+        StringTokenizer tok = new StringTokenizer(classpath, ",");
+        while (tok.hasMoreTokens()) {
+            String elem = tok.nextToken().trim();
+            File f = new File(elem);
+            if (!f.isAbsolute()) {
+                log.error("Plugin client " + clientName + " classpath element is not absolute: " + f);
+                continue;
+            }
+            try {
+                log.error("INFO: Adding plugin classpath: " + f);
+                addPath(f.toURI().toURL());
+            } catch (Exception e) {
+                log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
+            }
+        }
+    }
+
+    /**
+     *  http://jimlife.wordpress.com/2007/12/19/java-adding-new-classpath-at-runtime/
+     */
+    public static void addPath(URL u) throws Exception {
+        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class urlClass = URLClassLoader.class;
+        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        method.setAccessible(true);
+        method.invoke(urlClassLoader, new Object[]{u});
     }
 }
