@@ -17,6 +17,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 import org.mortbay.http.HttpListener;
 import org.mortbay.jetty.Server;
@@ -103,6 +104,29 @@ public class PluginStarter implements Runnable {
         }
 
         // add translation jars in console/locale
+        // These will not override existing resource bundles since we are adding them
+        // later in the classpath.
+        File localeDir = new File(pluginDir, "console/locale");
+        if (localeDir.exists() && localeDir.isDirectory()) {
+            File[] files = localeDir.listFiles();
+            if (files != null) {
+                boolean added = false;
+                for (int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    if (f.getName().endsWith(".jar")) {
+                        try {
+                            addPath(f.toURI().toURL());
+                            log.error("INFO: Adding translation plugin to classpath: " + f);
+                            added = true;
+                        } catch (Exception e) {
+                            log.error("Plugin " + appName + " bad classpath element: " + f, e);
+                        }
+                    }
+                }
+                if (added)
+                    Translate.clearCache();
+            }
+        }
 
         // add themes in console/themes
 
@@ -196,8 +220,8 @@ public class PluginStarter implements Runnable {
                 continue;
             }
             try {
-                log.error("INFO: Adding plugin classpath: " + f);
                 addPath(f.toURI().toURL());
+                log.error("INFO: Adding plugin to classpath: " + f);
             } catch (Exception e) {
                 log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
             }
