@@ -68,6 +68,25 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
+    public String getForm3() {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<table>\n");
+        buf.append("<tr><th align=\"right\">" + _("Plugin") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Start Now") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
+        Properties props = PluginStarter.pluginProperties();
+        Set<String> keys = new TreeSet(props.keySet());
+        for (Iterator<String> iter = keys.iterator(); iter.hasNext(); ) {
+            String name = iter.next();
+            if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
+                String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
+                String val = props.getProperty(name);
+                renderForm(buf, app, app, !"addressbook".equals(app),
+                           "true".equals(val), false, app, false, false);
+            }
+        }
+        buf.append("</table>\n");
+        return buf.toString();
+    }
+
     /** ro trumps edit and showEditButton */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
                             boolean enabled, boolean ro, String desc, boolean edit, boolean showEditButton) {

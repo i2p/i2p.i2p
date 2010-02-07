@@ -181,13 +181,17 @@ public class RouterConsoleRunner {
         }
 
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
-        Thread t = new I2PAppThread(fetcher, "NewsFetcher");
-        t.setDaemon(true);
+        Thread t = new I2PAppThread(fetcher, "NewsFetcher", true);
         t.start();
         
-        Thread st = new I2PAppThread(new StatSummarizer(), "StatSummarizer");
-        st.setDaemon(true);
-        st.start();
+        t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
+        t.start();
+        
+        List<RouterContext> contexts = RouterContext.listContexts();
+        if (contexts != null) {
+            t = new I2PAppThread(new PluginStarter(contexts.get(0)), "PluginStarter", true);
+            t.start();
+        }
     }
     
     static void initialize(WebApplicationContext context) {
@@ -206,10 +210,10 @@ public class RouterConsoleRunner {
     }
     
     static String getPassword() {
-        List contexts = RouterContext.listContexts();
+        List<RouterContext> contexts = RouterContext.listContexts();
         if (contexts != null) {
             for (int i = 0; i < contexts.size(); i++) {
-                RouterContext ctx = (RouterContext)contexts.get(i);
+                RouterContext ctx = contexts.get(i);
                 String password = ctx.getProperty("consolePassword");
                 if (password != null) {
                     password = password.trim();
@@ -267,11 +271,12 @@ public class RouterConsoleRunner {
         }
     }
 
-    private static class WarFilenameFilter implements FilenameFilter {
+    static class WarFilenameFilter implements FilenameFilter {
         private static final WarFilenameFilter _filter = new WarFilenameFilter();
         public static WarFilenameFilter instance() { return _filter; }
         public boolean accept(File dir, String name) {
             return (name != null) && (name.endsWith(".war") && !name.equals(ROUTERCONSOLE + ".war"));
         }
     }
+
 }

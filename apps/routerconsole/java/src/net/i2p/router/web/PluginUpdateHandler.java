@@ -20,13 +20,13 @@ import net.i2p.util.VersionComparator;
 /**
  * Download and install a plugin.
  * A plugin is a standard .sud file with a 40-byte signature,
- * a 16-byte version (which is ignored), and a .zip file.
+ * a 16-byte version, and a .zip file.
  * Unlike for router updates, we need not have the public key
  * for the signature in advance.
  *
  * The zip file must have a standard directory layout, with
- * a install.properties file at the top level.
- * The properties file contains properties for the package name, version,
+ * a plugin.config file at the top level.
+ * The config file contains properties for the package name, version,
  * signing public key, and other settings.
  * The zip file will typically contain a webapps/ or lib/ dir,
  * and a webapps.config and/or clients.config file.
@@ -159,7 +159,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 updateStatus("<b>" + _("Plugin from {0} is corrupt", url) + "</b>");
                 return;
             }
-            File installProps = new File(tempDir, "install.properties");
+            File installProps = new File(tempDir, "plugin.config");
             Properties props = new OrderedProperties();
             try {
                 DataHelper.loadProps(props, installProps);
@@ -220,6 +220,8 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
+            // todo compare sud version with property version
+
             String minVersion = props.getProperty("min-i2p-version");
             if (minVersion != null &&
                 (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
@@ -236,17 +238,16 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
-            boolean isUpdate = Boolean.valueOf(props.getProperty("update")).booleanValue();
             File destDir = new File(appDir, appName);
             if (destDir.exists()) {
-                if (!isUpdate) {
+                if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
                     to.delete();
                     updateStatus("<b>" + _("Downloaded plugin is not for upgrading but the plugin is already installed", url) + "</b>");
                     return;
                 }
 
                 // compare previous version
-                File oldPropFile = new File(destDir, "install.properties");
+                File oldPropFile = new File(destDir, "plugin.config");
                 Properties oldProps = new OrderedProperties();
                 try {
                     DataHelper.loadProps(oldProps, oldPropFile);
@@ -289,7 +290,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 // check if it is running now and stop it?
 
             } else {
-                if (isUpdate) {
+                if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
                     to.delete();
                     updateStatus("<b>" + _("Plugin is for upgrades only, but the plugin is not installed", url) + "</b>");
                     return;
@@ -309,9 +310,22 @@ public class PluginUpdateHandler extends UpdateHandler {
             }
 
             to.delete();
-            updateStatus("<b>" + _("Plugin successfully installed in {0}", destDir.getAbsolutePath()) + "</b>");
-
-            // start everything
+            if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
+                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())
+                    updateStatus("<b>" + _("Plugin {0} successfully installed, router restart required", appName) + "</b>");
+                else
+                    updateStatus("<b>" + _("Plugin {0} successfully installed", appName) + "</b>");
+            } else {
+                // start everything
+                try {
+                    if (PluginStarter.startPlugin(_context, appName))
+                        updateStatus("<b>" + _("Plugin {0} started", appName) + "</b>");
+                    else
+                        updateStatus("<b>" + _("Failed to start plugin {0}, check logs", appName) + "</b>");
+                } catch (Exception e) {
+                    updateStatus("<b>" + _("Failed to start plugin {0}:", appName) + ' ' + e + "</b>");
+                }
+            }
         }
 
         @Override

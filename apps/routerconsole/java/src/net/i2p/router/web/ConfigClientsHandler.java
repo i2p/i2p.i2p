@@ -1,7 +1,6 @@
 package net.i2p.router.web;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +12,6 @@ import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.util.Log;
 
-import org.mortbay.http.HttpListener;
 import org.mortbay.jetty.Server;
 
 /**
@@ -180,16 +178,14 @@ public class ConfigClientsHandler extends FormHandler {
         addFormNotice(_("WebApp configuration saved successfully - restart required to take effect."));
     }
 
-    // Big hack for the moment, not using properties for directory and port
-    // Go through all the Jetty servers, find the one serving port 7657,
-    // requested and add the .war to that one
+    /**
+     * Big hack for the moment, not using properties for directory and port
+     * Go through all the Jetty servers, find the one serving port 7657,
+     * requested and add the .war to that one
+     */
     private void startWebApp(String app) {
-        Collection c = Server.getHttpServers();
-        for (int i = 0; i < c.size(); i++) {
-            Server s = (Server) c.toArray()[i];
-            HttpListener[] hl = s.getListeners();
-            for (int j = 0; j < hl.length; j++) {
-                if (hl[j].getPort() == 7657) {
+        Server s = PluginStarter.getConsoleServer();
+        if (s != null) {
                     try {
                         File path = new File(_context.getBaseDir(), "webapps");
                         path = new File(path, app + ".war");
@@ -199,8 +195,6 @@ public class ConfigClientsHandler extends FormHandler {
                         addFormError(_("Failed to start") + ' ' + _(app) + " " + ioe + '.');
                     }
                     return;
-                }
-            }
         }
         addFormError(_("Failed to find server."));
     }

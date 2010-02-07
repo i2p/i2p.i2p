@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -72,6 +73,26 @@ public class ClientAppConfig {
      */
     public static List<ClientAppConfig> getClientApps(RouterContext ctx) {
         Properties clientApps = getClientAppProps(ctx);
+        return getClientApps(clientApps);
+    }
+
+    /*
+     * Go through the properties, and return a List of ClientAppConfig structures
+     */
+    public static List<ClientAppConfig> getClientApps(File cfgFile) {
+        Properties clientApps = new Properties();
+        try {
+            DataHelper.loadProps(clientApps, cfgFile);
+        } catch (IOException ioe) {
+            return Collections.EMPTY_LIST;
+        }
+        return getClientApps(clientApps);
+    }
+
+    /*
+     * Go through the properties, and return a List of ClientAppConfig structures
+     */
+    private static List<ClientAppConfig> getClientApps(Properties clientApps) {
         List<ClientAppConfig> rv = new ArrayList(8);
         int i = 0;
         while (true) {
