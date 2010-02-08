@@ -35,6 +35,8 @@ public class ClientAppConfig {
     public boolean disabled;
     /** @since 0.7.12 */
     public String classpath;
+    /** @since 0.7.12 */
+    public String stopargs;
 
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
         className = cl;
@@ -45,9 +47,10 @@ public class ClientAppConfig {
     }
 
     /** @since 0.7.12 */
-    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp) {
+    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp, String sa) {
         this(cl, client, a, d, dis);
         classpath = cp;
+        stopargs = sa;
     }
 
     public static File configFile(I2PAppContext ctx) {
@@ -114,6 +117,7 @@ public class ClientAppConfig {
             String onBoot = clientApps.getProperty(PREFIX + i + ".onBoot");
             String disabled = clientApps.getProperty(PREFIX + i + ".startOnLoad");
             String classpath = clientApps.getProperty(PREFIX + i + ".classpath");
+            String stopargs = clientApps.getProperty(PREFIX + i + ".stopargs");
             i++;
             boolean dis = disabled != null && "false".equals(disabled);
 
@@ -125,12 +129,12 @@ public class ClientAppConfig {
             if (delayStr != null && !onStartup)
                 try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
 
-            rv.add(new ClientAppConfig(className, clientName, args, delay, dis, classpath));
+            rv.add(new ClientAppConfig(className, clientName, args, delay, dis, classpath, stopargs));
         }
         return rv;
     }
 
-    /** classpath not supported */
+    /** classpath and stopargs not supported */
     public static void writeClientAppConfig(RouterContext ctx, List apps) {
         File cfgFile = configFile(ctx);
         FileOutputStream fos = null;

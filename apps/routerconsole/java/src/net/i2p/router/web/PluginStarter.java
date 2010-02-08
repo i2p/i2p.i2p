@@ -76,7 +76,7 @@ public class PluginStarter implements Runnable {
             Properties props = new Properties();
             DataHelper.loadProps(props, clientConfig);
             List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
-            runClientApps(ctx, pluginDir, clients);
+            runClientApps(ctx, pluginDir, clients, true);
         }
 
         // start console webapps in console/webapps
@@ -142,6 +142,37 @@ public class PluginStarter implements Runnable {
         return true;
     }
 
+    /** @return true on success */
+    static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
+        Log log = ctx.logManager().getLog(PluginStarter.class);
+        File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
+            log.error("Cannot stop nonexistent plugin: " + appName);
+            return false;
+        }
+
+        // stop things in clients.config
+        File clientConfig = new File(pluginDir, "clients.config");
+        if (clientConfig.exists()) {
+            Properties props = new Properties();
+            DataHelper.loadProps(props, clientConfig);
+            List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
+            runClientApps(ctx, pluginDir, clients, false);
+        }
+
+        // stop console webapps in console/webapps
+
+        // remove summary bar link
+        Properties props = pluginProperties(ctx, appName);
+        String name = props.getProperty("consoleLinkName_" + Messages.getLanguage(ctx));
+        if (name == null)
+            name = props.getProperty("consoleLinkName");
+        if (name != null && name.length() > 0)
+            NavHelper.unregisterApp(name);
+
+        return true;
+    }
+
     /** plugin.config */
     public static Properties pluginProperties(I2PAppContext ctx, String appName) {
         File cfgFile = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + '/' + "plugin.config");
@@ -202,12 +233,21 @@ public class PluginStarter implements Runnable {
         return null;
     }
 
-    private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps) {
+    /** @param start true=start, false=stop */
+    private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, boolean start) {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         for(ClientAppConfig app : apps) {
-            if (app.disabled)
+            if (start && app.disabled)
                 continue;
-            String argVal[] = LoadClientAppsJob.parseArgs(app.args);
+            String argVal[];
+            if (start) {
+                argVal = LoadClientAppsJob.parseArgs(app.args);
+            } else {
+                // stopargs must be present
+                if (app.stopargs == null || app.stopargs.length() <= 0)
+                    continue;
+                argVal = LoadClientAppsJob.parseArgs(app.stopargs);
+            }
             // do this after parsing so we don't need to worry about quoting
             for (int i = 0; i < argVal.length; i++) {
                 if (argVal[i].indexOf("$") >= 0) {
@@ -225,7 +265,7 @@ public class PluginStarter implements Runnable {
                 }
                 addToClasspath(cp, app.clientName, log);
             }
-            if (app.delay == 0) {
+            if (app.delay == 0 || !start) {
                 // run this guy now
                 LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log);
             } else {

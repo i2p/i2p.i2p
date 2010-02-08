@@ -287,7 +287,12 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
 
-                // check if it is running now and stop it?
+                // check if it is running first?
+                try {
+                    if (!PluginStarter.stopPlugin(_context, appName)) {
+                        // failed, ignore
+                    }
+                } catch (Exception e) {} // ignore
 
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
