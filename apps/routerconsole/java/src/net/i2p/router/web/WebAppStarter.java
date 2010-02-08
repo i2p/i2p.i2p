@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
+import org.mortbay.http.HttpContext;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
@@ -57,4 +58,17 @@ public class WebAppStarter {
         wac.setConfigurationClassNames(newClassNames);
         return wac;
     }
+
+    /**
+     *  stop it
+     */
+    static void stopWebApp(Server server, String appName) {
+        // this will return a new context if one does not exist
+        HttpContext wac = server.getContext('/' + appName);
+        try {
+            // false -> not graceful
+            wac.stop(false);
+        } catch (InterruptedException ie) {}
+    }
+
 }

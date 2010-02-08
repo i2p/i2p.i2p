@@ -84,13 +84,19 @@ public class PluginStarter implements Runnable {
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
-            File webappDir = new File(pluginDir, "webapps");
+            File webappDir = new File(consoleDir, "webapps");
             String fileNames[] = webappDir.list(RouterConsoleRunner.WarFilenameFilter.instance());
             if (fileNames != null) {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
                         String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
-                        // check for duplicates in $I2P ?
+                        // check for duplicates in $I2P
+                        // easy way for now...
+                        if (warName.equals("i2psnark") || warName.equals("susidns") || warName.equals("i2ptunnel") ||
+                            warName.equals("susimail") || warName.equals("addressbook")) {
+                            log.error("Skipping duplicate webapp " + warName + " in plugin " + appName);
+                            continue;
+                        }
                         String enabled = props.getProperty(PREFIX + warName + ENABLED);
                         if (! "false".equals(enabled)) {
                             String path = new File(webappDir, fileNames[i]).getCanonicalPath();
@@ -161,6 +167,24 @@ public class PluginStarter implements Runnable {
         }
 
         // stop console webapps in console/webapps
+        Server server = getConsoleServer();
+        if (server != null) {
+            File consoleDir = new File(pluginDir, "console");
+            Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
+            File webappDir = new File(consoleDir, "webapps");
+            String fileNames[] = webappDir.list(RouterConsoleRunner.WarFilenameFilter.instance());
+            if (fileNames != null) {
+                for (int i = 0; i < fileNames.length; i++) {
+                    String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
+                    if (warName.equals("i2psnark") || warName.equals("susidns") || warName.equals("i2ptunnel") ||
+                        warName.equals("susimail") || warName.equals("addressbook")) {
+                        continue;
+                    }
+                    WebAppStarter.stopWebApp(server, warName);
+                }
+            }
+        }
+
 
         // remove summary bar link
         Properties props = pluginProperties(ctx, appName);
