@@ -25,8 +25,7 @@ public class NavHelper {
     }
     
     /**
-     *  Fixme, this translates with the router console bundle, not
-     *  the plugin bundle
+     *  Translated string is loaded by PluginStarter
      */
     public static String getClientAppLinks(I2PAppContext ctx) {
         StringBuilder buf = new StringBuilder(1024); 
@@ -34,7 +33,7 @@ public class NavHelper {
             String name = iter.next();
             String path = _apps.get(name);
             buf.append(" <a target=\"_top\" href=\"").append(path).append("\">");
-            buf.append(Messages.getString(name, ctx)).append("</a>");
+            buf.append(name).append("</a>");
         }
         return buf.toString();
     }

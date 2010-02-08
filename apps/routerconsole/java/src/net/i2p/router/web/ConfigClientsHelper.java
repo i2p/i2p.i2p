@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -79,8 +81,56 @@ public class ConfigClientsHelper extends HelperBase {
             if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
                 String val = props.getProperty(name);
-                renderForm(buf, app, app, !"addressbook".equals(app),
-                           "true".equals(val), false, app, false, false);
+                Properties appProps = PluginStarter.pluginProperties(_context, app);
+                StringBuilder desc = new StringBuilder(256);
+                desc.append("<table border=\"0\">")
+                    .append("<tr><td><b>").append(_("Version")).append("<td>").append(appProps.getProperty("version"))
+                    .append("<tr><td><b>")
+                    .append(_("Signed by")).append("<td>").append(appProps.getProperty("keyName"));
+                String s = appProps.getProperty("date");
+                if (s != null) {
+                    long ms = 0;
+                    try {
+                        ms = Long.parseLong(s);
+                    } catch (NumberFormatException nfe) {}
+                    if (ms > 0) {
+                        String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(ms));
+                        desc.append("<tr><td><b>")
+                            .append(_("Date")).append("<td>").append(date);
+                    }
+                }
+                s = appProps.getProperty("author");
+                if (s != null) {
+                    // fixme translate info using bundle specified in appProps
+                    desc.append("<tr><td><b>")
+                        .append(_("Author")).append("<td>").append(s);
+                }
+                s = appProps.getProperty("description_" + Messages.getLanguage(_context));
+                if (s == null)
+                    s = appProps.getProperty("description");
+                if (s != null) {
+                    // fixme translate info using bundle specified in appProps
+                    desc.append("<tr><td><b>")
+                        .append(_("Description")).append("<td>").append(s);
+                }
+                s = appProps.getProperty("license");
+                if (s != null) {
+                    desc.append("<tr><td><b>")
+                        .append(_("License")).append("<td>").append(s);
+                }
+                s = appProps.getProperty("websiteURL");
+                if (s != null) {
+                    desc.append("<tr><td>")
+                        .append("<a href=\"").append(s).append("\">").append(_("Website")).append("</a><td>&nbsp;");
+                }
+                s = appProps.getProperty("updateURL");
+                if (s != null) {
+                    desc.append("<tr><td>")
+                        .append("<a href=\"").append(s).append("\">").append(_("Update link")).append("</a><td>&nbsp;");
+                }
+                desc.append("</table>");
+                renderForm(buf, app, app, false,
+                           "true".equals(val), false, desc.toString(), false, false);
             }
         }
         buf.append("</table>\n");

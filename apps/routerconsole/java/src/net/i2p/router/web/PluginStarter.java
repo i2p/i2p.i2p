@@ -131,20 +131,31 @@ public class PluginStarter implements Runnable {
         // add themes in console/themes
 
         // add summary bar link
-        File pluginConfig = new File(pluginDir, "plugin.config");
-        if (pluginConfig.exists()) {
-            Properties props = new Properties();
-            DataHelper.loadProps(props, pluginConfig);
-            String name = props.getProperty("consoleLinkName");
-            String url = props.getProperty("consoleLinkURL");
-            if (name != null && url != null && name.length() > 0 && url.length() > 0)
-                NavHelper.registerApp(name, url);
-        }
+        Properties props = pluginProperties(ctx, appName);
+        String name = props.getProperty("consoleLinkName_" + Messages.getLanguage(ctx));
+        if (name == null)
+            name = props.getProperty("consoleLinkName");
+        String url = props.getProperty("consoleLinkURL");
+        if (name != null && url != null && name.length() > 0 && url.length() > 0)
+            NavHelper.registerApp(name, url);
 
         return true;
     }
 
-    /** this auto-adds a propery for every dir in the plugin directory */
+    /** plugin.config */
+    public static Properties pluginProperties(I2PAppContext ctx, String appName) {
+        File cfgFile = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + '/' + "plugin.config");
+        Properties rv = new Properties();
+        try {
+            DataHelper.loadProps(rv, cfgFile);
+        } catch (IOException ioe) {}
+        return rv;
+    }
+
+    /**
+     *  plugins.config
+     *  this auto-adds a propery for every dir in the plugin directory
+     */
     public static Properties pluginProperties() {
         File dir = I2PAppContext.getGlobalContext().getConfigDir();
         Properties rv = new Properties();
@@ -165,6 +176,16 @@ public class PluginStarter implements Runnable {
                 rv.setProperty(prop, "true");
         }
         return rv;
+    }
+
+    /**
+     *  plugins.config
+     */
+    public static void storePluginProperties(Properties props) {
+        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), "plugins.config");
+        try {
+            DataHelper.storeProps(props, cfgFile);
+        } catch (IOException ioe) {}
     }
 
     /** see comments in ConfigClientsHandler */

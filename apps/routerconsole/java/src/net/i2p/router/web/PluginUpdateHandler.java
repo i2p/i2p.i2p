@@ -313,8 +313,12 @@ public class PluginUpdateHandler extends UpdateHandler {
             if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
                 if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())
                     updateStatus("<b>" + _("Plugin {0} successfully installed, router restart required", appName) + "</b>");
-                else
+                else {
                     updateStatus("<b>" + _("Plugin {0} successfully installed", appName) + "</b>");
+                    Properties pluginProps = PluginStarter.pluginProperties();
+                    pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
+                    PluginStarter.storePluginProperties(pluginProps);
+                }
             } else {
                 // start everything
                 try {
