@@ -216,7 +216,9 @@ public class PluginUpdateHandler extends UpdateHandler {
             String appName = props.getProperty("name");
             String version = props.getProperty("version");
             if (appName == null || version == null || appName.length() <= 0 || version.length() <= 0 ||
-                appName.startsWith(".") || appName.indexOf("/") > 0 || appName.indexOf("\\") > 0) {
+                appName.indexOf("<") >= 0 || appName.indexOf(">") >= 0 ||
+                version.indexOf("<") >= 0 || version.indexOf(">") >= 0 ||
+                appName.startsWith(".") || appName.indexOf("/") >= 0 || appName.indexOf("\\") >= 0) {
                 to.delete();
                 updateStatus("<b>" + _("Plugin from {0} has invalid name or version", url) + "</b>");
                 return;
@@ -229,7 +231,7 @@ public class PluginUpdateHandler extends UpdateHandler {
 
             // todo compare sud version with property version
 
-            String minVersion = props.getProperty("min-i2p-version");
+            String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
             if (minVersion != null &&
                 (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
                 to.delete();
@@ -237,7 +239,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
-            minVersion = props.getProperty("min-java-version");
+            minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
             if (minVersion != null &&
                 (new VersionComparator()).compare(System.getProperty("java.version"), minVersion) < 0) {
                 to.delete();
@@ -279,14 +281,14 @@ public class PluginUpdateHandler extends UpdateHandler {
                     updateStatus("<b>" + _("New plugin version {0} is not newer than installed plugin", version) + "</b>");
                     return;
                 }
-                minVersion = props.getProperty("min-installed-version");
+                minVersion = ConfigClientsHelper.stripHTML(props, "min-installed-version");
                 if (minVersion != null &&
                     (new VersionComparator()).compare(minVersion, oldVersion) > 0) {
                     to.delete();
                     updateStatus("<b>" + _("Plugin update requires installed version {0} or higher", minVersion) + "</b>");
                     return;
                 }
-                String maxVersion = props.getProperty("max-installed-version");
+                String maxVersion = ConfigClientsHelper.stripHTML(props, "max-installed-version");
                 if (maxVersion != null &&
                     (new VersionComparator()).compare(maxVersion, oldVersion) < 0) {
                     to.delete();
