@@ -138,10 +138,10 @@ public class PluginStarter implements Runnable {
 
         // add summary bar link
         Properties props = pluginProperties(ctx, appName);
-        String name = props.getProperty("consoleLinkName_" + Messages.getLanguage(ctx));
+        String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
-            name = props.getProperty("consoleLinkName");
-        String url = props.getProperty("consoleLinkURL");
+            name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
+        String url = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
         if (name != null && url != null && name.length() > 0 && url.length() > 0)
             NavHelper.registerApp(name, url);
 
@@ -188,9 +188,9 @@ public class PluginStarter implements Runnable {
 
         // remove summary bar link
         Properties props = pluginProperties(ctx, appName);
-        String name = props.getProperty("consoleLinkName_" + Messages.getLanguage(ctx));
+        String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
-            name = props.getProperty("consoleLinkName");
+            name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
         if (name != null && name.length() > 0)
             NavHelper.unregisterApp(name);
 

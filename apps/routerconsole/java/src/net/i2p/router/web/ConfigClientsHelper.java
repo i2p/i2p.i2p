@@ -84,10 +84,15 @@ public class ConfigClientsHelper extends HelperBase {
                 Properties appProps = PluginStarter.pluginProperties(_context, app);
                 StringBuilder desc = new StringBuilder(256);
                 desc.append("<table border=\"0\">")
-                    .append("<tr><td><b>").append(_("Version")).append("<td>").append(appProps.getProperty("version"))
+                    .append("<tr><td><b>").append(_("Version")).append("<td>").append(stripHTML(appProps, "version"))
                     .append("<tr><td><b>")
-                    .append(_("Signed by")).append("<td>").append(appProps.getProperty("keyName"));
-                String s = appProps.getProperty("date");
+                    .append(_("Signed by")).append("<td>");
+                String s = stripHTML(appProps, "keyName");
+                if (s.indexOf("@") > 0)
+                    desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
+                else
+                    desc.append(s);
+                s = stripHTML(appProps, "date");
                 if (s != null) {
                     long ms = 0;
                     try {
@@ -99,29 +104,33 @@ public class ConfigClientsHelper extends HelperBase {
                             .append(_("Date")).append("<td>").append(date);
                     }
                 }
-                s = appProps.getProperty("author");
+                s = stripHTML(appProps, "author");
                 if (s != null) {
                     desc.append("<tr><td><b>")
-                        .append(_("Author")).append("<td>").append(s);
+                        .append(_("Author")).append("<td>");
+                    if (s.indexOf("@") > 0)
+                        desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
+                    else
+                        desc.append(s);
                 }
-                s = appProps.getProperty("description_" + Messages.getLanguage(_context));
+                s = stripHTML(appProps, "description_" + Messages.getLanguage(_context));
                 if (s == null)
-                    s = appProps.getProperty("description");
+                    s = stripHTML(appProps, "description");
                 if (s != null) {
                     desc.append("<tr><td><b>")
                         .append(_("Description")).append("<td>").append(s);
                 }
-                s = appProps.getProperty("license");
+                s = stripHTML(appProps, "license");
                 if (s != null) {
                     desc.append("<tr><td><b>")
                         .append(_("License")).append("<td>").append(s);
                 }
-                s = appProps.getProperty("websiteURL");
+                s = stripHTML(appProps, "websiteURL");
                 if (s != null) {
                     desc.append("<tr><td>")
                         .append("<a href=\"").append(s).append("\">").append(_("Website")).append("</a><td>&nbsp;");
                 }
-                String updateURL = appProps.getProperty("updateURL");
+                String updateURL = stripHTML(appProps, "updateURL");
                 if (updateURL != null) {
                     desc.append("<tr><td>")
                         .append("<a href=\"").append(updateURL).append("\">").append(_("Update link")).append("</a><td>&nbsp;");
@@ -184,5 +193,17 @@ public class ConfigClientsHelper extends HelperBase {
             buf.append(desc);
         }
         buf.append("</td></tr>\n");
+    }
+
+    /**
+     *  Like in DataHelper but doesn't convert null to ""
+     *  There's a lot worse things a plugin could do but...
+     */
+    static String stripHTML(Properties props, String key) {
+        String orig = props.getProperty(key);
+        if (orig == null) return null;
+        String t1 = orig.replace('<', ' ');
+        String rv = t1.replace('>', ' ');
+        return rv;
     }
 }
