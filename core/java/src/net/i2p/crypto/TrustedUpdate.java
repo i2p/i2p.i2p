@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
@@ -104,7 +105,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
 */
 
     private static final int    VERSION_BYTES       = 16;
-    private static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
+    public static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
     private static final String PROP_TRUSTED_KEYS   = "router.trustedUpdateKeys";
 
     private static I2PAppContext _context;
@@ -274,7 +275,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     private static final void showVersionCLI(String signedFile) {
-        String versionString = new TrustedUpdate().getVersionString(new File(signedFile));
+        String versionString = getVersionString(new File(signedFile));
 
         if (versionString.equals(""))
             System.out.println("No version string found in file '" + signedFile + "'");
@@ -347,7 +348,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return The version string read, or an empty string if no version string
      *         is present.
      */
-    public String getVersionString(File signedFile) {
+    public static String getVersionString(File signedFile) {
         FileInputStream fileInputStream = null;
 
         try {
@@ -376,6 +377,45 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             if (fileInputStream != null)
                 try {
                     fileInputStream.close();
+                } catch (IOException ioe) {
+                }
+        }
+    }
+    
+    /**
+     * Reads the version string from an input stream
+     * 
+     * @param inputStream containing at least 56 bytes
+     * 
+     * @return The version string read, or an empty string if no version string
+     *         is present.
+     */
+    public static String getVersionString(InputStream inputStream) {
+        try {
+            long skipped = inputStream.skip(Signature.SIGNATURE_BYTES);
+            if (skipped != Signature.SIGNATURE_BYTES)
+                return "";
+            byte[] data = new byte[VERSION_BYTES];
+            int bytesRead = DataHelper.read(inputStream, data);
+
+            if (bytesRead != VERSION_BYTES) {
+                return "";
+            }
+
+            for (int i = 0; i < VERSION_BYTES; i++) 
+                if (data[i] == 0x00) {
+                    return new String(data, 0, i, "UTF-8");
+                }
+
+            return new String(data, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + uee.getMessage());
+        } catch (IOException ioe) {
+            return "";
+        } finally {
+            if (inputStream != null)
+                try {
+                    inputStream.close();
                 } catch (IOException ioe) {
                 }
         }
