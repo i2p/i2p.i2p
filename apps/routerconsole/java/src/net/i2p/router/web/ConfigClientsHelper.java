@@ -42,11 +42,11 @@ public class ConfigClientsHelper extends HelperBase {
             ClientAppConfig ca = clients.get(cur);
             renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
                        "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit), true);
+                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit), true, false);
         }
         
         if ("new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false);
+            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -63,7 +63,7 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
                 renderForm(buf, app, app, !"addressbook".equals(app),
-                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war", false, false);
+                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war", false, false, false);
             }
         }
         buf.append("</table>\n");
@@ -101,7 +101,6 @@ public class ConfigClientsHelper extends HelperBase {
                 }
                 s = appProps.getProperty("author");
                 if (s != null) {
-                    // fixme translate info using bundle specified in appProps
                     desc.append("<tr><td><b>")
                         .append(_("Author")).append("<td>").append(s);
                 }
@@ -109,7 +108,6 @@ public class ConfigClientsHelper extends HelperBase {
                 if (s == null)
                     s = appProps.getProperty("description");
                 if (s != null) {
-                    // fixme translate info using bundle specified in appProps
                     desc.append("<tr><td><b>")
                         .append(_("Description")).append("<td>").append(s);
                 }
@@ -123,14 +121,14 @@ public class ConfigClientsHelper extends HelperBase {
                     desc.append("<tr><td>")
                         .append("<a href=\"").append(s).append("\">").append(_("Website")).append("</a><td>&nbsp;");
                 }
-                s = appProps.getProperty("updateURL");
-                if (s != null) {
+                String updateURL = appProps.getProperty("updateURL");
+                if (updateURL != null) {
                     desc.append("<tr><td>")
-                        .append("<a href=\"").append(s).append("\">").append(_("Update link")).append("</a><td>&nbsp;");
+                        .append("<a href=\"").append(updateURL).append("\">").append(_("Update link")).append("</a><td>&nbsp;");
                 }
                 desc.append("</table>");
                 renderForm(buf, app, app, false,
-                           "true".equals(val), false, desc.toString(), false, false);
+                           "true".equals(val), false, desc.toString(), false, false, updateURL != null);
             }
         }
         buf.append("</table>\n");
@@ -139,7 +137,8 @@ public class ConfigClientsHelper extends HelperBase {
 
     /** ro trumps edit and showEditButton */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
-                            boolean enabled, boolean ro, String desc, boolean edit, boolean showEditButton) {
+                            boolean enabled, boolean ro, String desc, boolean edit,
+                            boolean showEditButton, boolean showUpdateButton) {
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
@@ -165,10 +164,14 @@ public class ConfigClientsHelper extends HelperBase {
         if ((!enabled) && !edit) {
             buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
         }
-        if (showEditButton && (!edit) && !ro) {
+        if (showEditButton && (!edit) && !ro)
             buf.append("<button type=\"submit\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Delete ").append(index).append("\" >" + _("Delete") + "<span class=hide> ").append(index).append("</span></button>");
+        if (showUpdateButton && (!edit) && !ro) {
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");
         }
+        if ((!edit) && !ro)
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Delete ").append(index).append("\" >" + _("Delete") + "<span class=hide> ").append(index).append("</span></button>");
         buf.append("</td><td align=\"left\" width=\"50%\">");
         if (edit && !ro) {
             buf.append("<input type=\"text\" size=\"80\" name=\"desc").append(index).append("\" value=\"");
