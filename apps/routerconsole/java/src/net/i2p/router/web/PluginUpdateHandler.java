@@ -209,6 +209,8 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
             }
+
+            String sudVersion = TrustedUpdate.getVersionString(f);
             f.delete();
 
             String appName = props.getProperty("name");
@@ -217,6 +219,11 @@ public class PluginUpdateHandler extends UpdateHandler {
                 appName.startsWith(".") || appName.indexOf("/") > 0 || appName.indexOf("\\") > 0) {
                 to.delete();
                 updateStatus("<b>" + _("Plugin from {0} has invalid name or version", url) + "</b>");
+                return;
+            }
+            if (!version.equals(sudVersion)) {
+                to.delete();
+                updateStatus("<b>" + _("Plugin {0} has mismatched versions", appName) + "</b>");
                 return;
             }
 
@@ -242,7 +249,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             if (destDir.exists()) {
                 if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
                     to.delete();
-                    updateStatus("<b>" + _("Downloaded plugin is not for upgrading but the plugin is already installed", url) + "</b>");
+                    updateStatus("<b>" + _("Downloaded plugin is for new installs only, but the plugin is already installed", url) + "</b>");
                     return;
                 }
 

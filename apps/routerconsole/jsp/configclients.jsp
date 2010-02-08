@@ -55,7 +55,7 @@ button span.hide{
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Save WebApp Configuration")%>" />
 </div></div><h3><a name="webapp"></a><%=intl._("Plugin Configuration")%></h3><p>
- <%=intl._("The plugins listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console.")%>
+ <%=intl._("The plugins listed below are started by the webConsole client.")%>
  </p><div class="wideload"><p>
  <jsp:getProperty name="clientshelper" property="form3" />
  </p><hr><div class="formaction">
