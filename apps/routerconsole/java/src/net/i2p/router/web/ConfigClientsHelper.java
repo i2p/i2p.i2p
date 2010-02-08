@@ -35,18 +35,18 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm1() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">" + _("Client") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Start Now") + "</th><th align=\"left\">" + _("Class and arguments") + "</th></tr>\n");
+        buf.append("<tr><th align=\"right\">" + _("Client") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Class and arguments") + "</th></tr>\n");
         
         List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
             renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
                        "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit), true, false);
+                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit), true, false, false);
         }
         
         if ("new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false);
+            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -54,7 +54,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">" + _("WebApp") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Start Now") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
+        buf.append("<tr><th align=\"right\">" + _("WebApp") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
         Properties props = RouterConsoleRunner.webAppProperties();
         Set<String> keys = new TreeSet(props.keySet());
         for (Iterator<String> iter = keys.iterator(); iter.hasNext(); ) {
@@ -63,7 +63,7 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
                 renderForm(buf, app, app, !"addressbook".equals(app),
-                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war", false, false, false);
+                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war", false, false, false, false);
             }
         }
         buf.append("</table>\n");
@@ -73,7 +73,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getForm3() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
-        buf.append("<tr><th align=\"right\">" + _("Plugin") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Start Now") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
+        buf.append("<tr><th align=\"right\">" + _("Plugin") + "</th><th>" + _("Run at Startup?") + "</th><th>" + _("Control") + "</th><th align=\"left\">" + _("Description") + "</th></tr>\n");
         Properties props = PluginStarter.pluginProperties();
         Set<String> keys = new TreeSet(props.keySet());
         for (Iterator<String> iter = keys.iterator(); iter.hasNext(); ) {
@@ -128,7 +128,8 @@ public class ConfigClientsHelper extends HelperBase {
                 }
                 desc.append("</table>");
                 renderForm(buf, app, app, false,
-                           "true".equals(val), false, desc.toString(), false, false, updateURL != null);
+                           "true".equals(val), false, desc.toString(), false, false,
+                           updateURL != null, true);
             }
         }
         buf.append("</table>\n");
@@ -138,7 +139,7 @@ public class ConfigClientsHelper extends HelperBase {
     /** ro trumps edit and showEditButton */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
                             boolean enabled, boolean ro, String desc, boolean edit,
-                            boolean showEditButton, boolean showUpdateButton) {
+                            boolean showEditButton, boolean showUpdateButton, boolean showStopButton) {
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
@@ -166,6 +167,8 @@ public class ConfigClientsHelper extends HelperBase {
         }
         if (showEditButton && (!edit) && !ro)
             buf.append("<button type=\"submit\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
+        if (showStopButton && (!edit))
+            buf.append("<button type=\"submit\" name=\"edit\" value=\"Stop ").append(index).append("\" >" + _("Stop") + "<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
             buf.append("<button type=\"submit\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");
