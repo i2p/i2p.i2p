@@ -1,24 +1,30 @@
 /*
+	Launch4j (http://launch4j.sourceforge.net/)
+	Cross-platform Java application wrapper for creating Windows native executables.
 
- 	launch4j :: Cross-platform Java application wrapper for creating Windows native executables
-	Copyright (C) 2004-2005 Grzegorz Kowal
+	Copyright (c) 2004, 2007 Grzegorz Kowal
 
-	Compiled with Mingw port of GCC, Bloodshed Dev-C++ IDE (http://www.bloodshed.net/devcpp.html)
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
 
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 2.1 of the License, or (at your option) any later version.
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
 
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
+	Except as contained in this notice, the name(s) of the above copyright holders
+	shall not be used in advertising or otherwise to promote the sale, use or other
+	dealings in this Software without prior written authorization.
 
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
 */
 
 #include "../resource.h"
@@ -27,29 +33,32 @@
 int main(int argc, char* argv[])
 {
     setConsoleFlag();
-	HMODULE hLibrary = NULL;
-	char cmdLine[BIG_STR] = "";
-    int i; // causes error: 'for' loop initial declaration used outside C99 mode.
-	for (i = 1; i < argc; i++) {
-		strcat(cmdLine, argv[i]);
-		if (i < argc - 1) {
-			strcat(cmdLine, " ");
+	LPTSTR cmdLine = GetCommandLine();
+	if (*cmdLine == '"') {
+		if (*(cmdLine = strchr(cmdLine + 1, '"') + 1)) {
+			cmdLine++;
 		}
+	} else if ((cmdLine = strchr(cmdLine, ' ')) != NULL) {
+		cmdLine++;
+	} else {
+		cmdLine = "";
 	}
-	if (!prepare(hLibrary, cmdLine)) {
-		if (hLibrary != NULL) {
-			FreeLibrary(hLibrary);
-		}
-		return 1;
-	}
-	FreeLibrary(hLibrary);
-
-	int result = (int) execute(TRUE);
-	if (result == -1) {
-		char errMsg[BIG_STR] = "could not start the application: ";
-		strcat(errMsg, strerror(errno));
+	int result = prepare(cmdLine);
+	if (result == ERROR_ALREADY_EXISTS) {
+		char errMsg[BIG_STR] = {0};
+		loadString(INSTANCE_ALREADY_EXISTS_MSG, errMsg);
 		msgBox(errMsg);
+		closeLogFile();
+		return 2;
+	}
+	if (result != TRUE) {
+		signalError();
 		return 1;
+	}
+
+	result = (int) execute(TRUE);
+	if (result == -1) {
+		signalError();
 	} else {
 		return result;
 	}

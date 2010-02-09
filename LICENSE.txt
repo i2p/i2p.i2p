@@ -80,9 +80,10 @@ Public domain except as listed below:
 
 
 Installer:
-   Launch4j 2.0.RC3:
-   Copyright (C) 2005 Grzegorz Kowal
-   See licenses/LICENSE-GPLv2.txt
+   Launch4j 3.0.1:
+   Copyright (c) 2004, 2008 Grzegorz Kowal
+   See licenses/LICENSE-Launch4j.txt (in binary packages)
+   See installer/lib/launch4j/LICENSE.txt (in source packages)
    The following projects are used by Launch4j...
 	MinGW binutils (http://www.mingw.org/)
 
