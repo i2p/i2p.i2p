@@ -440,7 +440,7 @@
     </target>
     <target name="prepconsoleDocs" depends="prepgeoupdate">
         <copy todir="pkg-temp/docs/" >
-          <fileset dir="." includes="readme*.html" />
+          <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy" />
         </copy>
     </target>
