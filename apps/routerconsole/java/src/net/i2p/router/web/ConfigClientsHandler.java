@@ -35,6 +35,10 @@ public class ConfigClientsHandler extends FormHandler {
             saveWebAppChanges();
             return;
         }
+        if (_action.equals(_("Save Plugin Configuration"))) {
+            savePluginChanges();
+            return;
+        }
         if (_action.equals(_("Install Plugin"))) {
             installPlugin();
             return;
@@ -60,10 +64,42 @@ public class ConfigClientsHandler extends FormHandler {
             try {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
-            if (appnum >= 0)
+            if (appnum >= 0) {
                 deleteClient(appnum);
+            } else {
+                try {
+                    PluginStarter.stopPlugin(_context, app);
+                } catch (Exception e) {}
+                PluginStarter.deletePlugin(_context, app);
+                addFormNotice(_("Deleted plugin {0}", app));
+            }
             return;
         }
+
+        // value
+        if (_action.startsWith("Stop ")) {
+            String app = _action.substring(5);
+            try {
+                PluginStarter.stopPlugin(_context, app);
+            } catch (Exception e) {}
+            addFormNotice(_("Stopped plugin {0}", app));
+            return;
+        }
+
+        // value
+        if (_action.startsWith("Update ")) {
+            String app = _action.substring(7);
+            updatePlugin(app);
+            return;
+        }
+
+        // value
+        if (_action.startsWith("Check ")) {
+            String app = _action.substring(6);
+            checkPlugin(app);
+            return;
+        }
+
         // label (IE)
         String xStart = _("Start");
         if (_action.toLowerCase().startsWith(xStart + "<span class=hide> ") &&
@@ -81,6 +117,7 @@ public class ConfigClientsHandler extends FormHandler {
         } else {
             addFormError(_("Unsupported") + ' ' + _action + '.');
         }
+
     }
     
     public void setSettings(Map settings) { _settings = new HashMap(settings); }
@@ -175,7 +212,23 @@ public class ConfigClientsHandler extends FormHandler {
                 props.setProperty(name, "" + (val != null));
         }
         RouterConsoleRunner.storeWebAppProperties(props);
-        addFormNotice(_("WebApp configuration saved successfully - restart required to take effect."));
+        addFormNotice(_("WebApp configuration saved."));
+    }
+
+    private void savePluginChanges() {
+        Properties props = PluginStarter.pluginProperties();
+        Set keys = props.keySet();
+        int cur = 0;
+        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            if (! (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)))
+                continue;
+            String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
+            Object val = _settings.get(app + ".enabled");
+            props.setProperty(name, "" + (val != null));
+        }
+        PluginStarter.storePluginProperties(props);
+        addFormNotice(_("Plugin configuration saved."));
     }
 
     /**
@@ -205,6 +258,20 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("No plugin URL specified."));
             return;
         }
+        installPlugin(url);
+    }
+
+    private void updatePlugin(String app) {
+        Properties props = PluginStarter.pluginProperties(_context, app);
+        String url = props.getProperty("updateURL");
+        if (url == null) {
+            addFormError(_("No update URL specified for {0}",app));
+            return;
+        }
+        installPlugin(url);
+    }
+
+    private void installPlugin(String url) {
         if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
             addFormError(_("Plugin or update download already in progress."));
             return;
@@ -221,4 +288,23 @@ public class ConfigClientsHandler extends FormHandler {
            Thread.sleep(1000);
         } catch (InterruptedException ie) {}
     }
+
+    private void checkPlugin(String app) {
+        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        PluginUpdateChecker puc = PluginUpdateChecker.getInstance(_context);
+        if (puc.isRunning()) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        puc.update(app);
+        addFormNotice(_("Checking plugin {0} for updates", app));
+        // So that update() will post a status to the summary bar before we reload
+        try {
+           Thread.sleep(1000);
+        } catch (InterruptedException ie) {}
+    }
+
 }

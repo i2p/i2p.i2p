@@ -19,6 +19,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
@@ -41,6 +42,10 @@ public class PluginStarter implements Runnable {
         _context = ctx;
     }
 
+    static boolean pluginsEnabled(I2PAppContext ctx) {
+         return Boolean.valueOf(ctx.getProperty("router.enablePlugins")).booleanValue();
+    }
+
     public void run() {
         startPlugins(_context);
     }
@@ -50,9 +55,9 @@ public class PluginStarter implements Runnable {
         Properties props = pluginProperties();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
-            if (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)) {
+            if (name.startsWith(PREFIX) && name.endsWith(ENABLED)) {
                 if (Boolean.valueOf(props.getProperty(name)).booleanValue()) {
-                    String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
+                    String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
                     try {
                         if (!startPlugin(ctx, app))
                             log.error("Failed to start plugin: " + app);
@@ -188,7 +193,6 @@ public class PluginStarter implements Runnable {
             }
         }
 
-
         // remove summary bar link
         Properties props = pluginProperties(ctx, appName);
         String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
@@ -197,6 +201,25 @@ public class PluginStarter implements Runnable {
         if (name != null && name.length() > 0)
             NavHelper.unregisterApp(name);
 
+        return true;
+    }
+
+    /** @return true on success - call stopPlugin() first */
+    static boolean deletePlugin(RouterContext ctx, String appName) {
+        Log log = ctx.logManager().getLog(PluginStarter.class);
+        File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
+            log.error("Cannot stop nonexistent plugin: " + appName);
+            return false;
+        }
+        FileUtil.rmdir(pluginDir, false);
+        Properties props = pluginProperties();
+        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            if (name.startsWith(PREFIX + appName))
+                iter.remove();
+        }
+        storePluginProperties(props);
         return true;
     }
 

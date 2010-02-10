@@ -62,14 +62,15 @@ public class PluginUpdateChecker extends UpdateHandler {
             String oldVersion = props.getProperty("version");
             String xpi2pURL = props.getProperty("updateURL");
             if (oldVersion == null || xpi2pURL == null) {
-                updateStatus("<b>" + _("Cannot update, plugin {0} is not installed", appName) + "</b>");
+                updateStatus("<b>" + _("Cannot check, plugin {0} is not installed", appName) + "</b>");
                 return;
             }
 
             if (_pluginUpdateCheckerRunner == null)
-                _pluginUpdateCheckerRunner = new PluginUpdateCheckerRunner(xpi2pURL);
+                _pluginUpdateCheckerRunner = new PluginUpdateCheckerRunner();
             if (_pluginUpdateCheckerRunner.isRunning())
                 return;
+            _xpi2pURL = xpi2pURL;
             _appName = appName;
             _oldVersion = oldVersion;
             System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
@@ -89,18 +90,16 @@ public class PluginUpdateChecker extends UpdateHandler {
     }
     
     public class PluginUpdateCheckerRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
-        String _updateURL;
         ByteArrayOutputStream _baos;
 
-        public PluginUpdateCheckerRunner(String url) { 
+        public PluginUpdateCheckerRunner() { 
             super();
-            _updateURL = url;
             _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
         }
 
         @Override
         protected void update() {
-            updateStatus("<b>" + _("Checking plugin {0} for updates", _appName) + "</b>");
+            updateStatus("<b>" + _("Checking for update of plugin {0}", _appName) + "</b>");
             // use the same settings as for updater
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);

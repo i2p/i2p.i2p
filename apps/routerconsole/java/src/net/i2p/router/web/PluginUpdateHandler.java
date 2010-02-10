@@ -90,11 +90,9 @@ public class PluginUpdateHandler extends UpdateHandler {
     }
     
     public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
-        String _updateURL;
 
         public PluginUpdateRunner(String url) { 
             super();
-            _updateURL = url;
         }
 
         @Override
@@ -287,7 +285,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 if (oldVersion == null ||
                     (new VersionComparator()).compare(oldVersion, version) >= 0) {
                     to.delete();
-                    updateStatus("<b>" + _("New plugin version {0} is not newer than installed plugin", version) + "</b>");
+                    updateStatus("<b>" + _("Downloaded plugin version {0} is not newer than installed plugin", version) + "</b>");
                     return;
                 }
                 minVersion = ConfigClientsHelper.stripHTML(props, "min-installed-version");

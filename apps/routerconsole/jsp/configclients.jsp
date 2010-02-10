@@ -54,16 +54,20 @@ button span.hide{
  <i><%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Save WebApp Configuration")%>" />
-</div></div><h3><a name="webapp"></a><%=intl._("Plugin Configuration")%></h3><p>
+</div></div>
+<% if (clientshelper.showPlugins()) { %>
+<h3><a name="webapp"></a><%=intl._("Plugin Configuration")%></h3><p>
  <%=intl._("The plugins listed below are started by the webConsole client.")%>
  </p><div class="wideload"><p>
  <jsp:getProperty name="clientshelper" property="form3" />
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></div><h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
- <%=intl._("To install a plugin, enter the URL to download the plugin from:")%>
+ <%=intl._("To install a plugin, enter the download URL:")%>
  </p><div class="wideload"><p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Install Plugin")%>" />
- </div></div></form></div></div></body></html>
+ </div></div>
+<% } %>
+</form></div></div></body></html>

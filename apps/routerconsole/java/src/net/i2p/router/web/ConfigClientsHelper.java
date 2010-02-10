@@ -70,6 +70,10 @@ public class ConfigClientsHelper extends HelperBase {
         return buf.toString();
     }
 
+    public boolean showPlugins() {
+        return PluginStarter.pluginsEnabled(_context);
+    }
+
     public String getForm3() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table>\n");
@@ -170,7 +174,7 @@ public class ConfigClientsHelper extends HelperBase {
             if (ro)
                 buf.append("disabled=\"true\" ");
         }
-        buf.append("/></td><td align=\"center\" width=\"15%\">");
+        buf.append("></td><td align=\"center\" width=\"15%\">");
         if ((!enabled) && !edit) {
             buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
         }
