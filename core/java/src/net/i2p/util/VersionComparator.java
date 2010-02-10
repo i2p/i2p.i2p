@@ -5,7 +5,8 @@ import java.util.StringTokenizer;
 
 /**
  * Compares versions.
- * Characters other than [0-9.] are ignored.
+ * Characters other than [0-9.-_] are ignored.
+ * I2P only uses '.' but Sun Java uses '_' and plugins may use any of '.-_'
  * Moved from TrustedUpdate.java
  * @since 0.7.10
  */
@@ -15,8 +16,8 @@ public class VersionComparator implements Comparator<String> {
         // try it the easy way first
         if (l.equals(r))
             return 0;
-        StringTokenizer lTokens = new StringTokenizer(sanitize(l), ".");
-        StringTokenizer rTokens = new StringTokenizer(sanitize(r), ".");
+        StringTokenizer lTokens = new StringTokenizer(sanitize(l), VALID_SEPARATOR_CHARS);
+        StringTokenizer rTokens = new StringTokenizer(sanitize(r), VALID_SEPARATOR_CHARS);
 
         while (lTokens.hasMoreTokens() && rTokens.hasMoreTokens()) {
             String lNumber = lTokens.nextToken();
@@ -48,7 +49,8 @@ public class VersionComparator implements Comparator<String> {
         return left - right;
     }
 
-    private static final String VALID_VERSION_CHARS = "0123456789.";
+    private static final String VALID_SEPARATOR_CHARS = ".-_";
+    private static final String VALID_VERSION_CHARS = "0123456789" + VALID_SEPARATOR_CHARS;
 
     private static final String sanitize(String versionString) {
         StringBuilder versionStringBuilder = new StringBuilder(versionString);

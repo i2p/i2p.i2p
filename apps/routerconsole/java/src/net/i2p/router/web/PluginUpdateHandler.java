@@ -2,6 +2,7 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
@@ -184,6 +185,14 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
+            // add all existing plugin keys, so any conflicts with existing keys
+            // will be discovered and rejected
+            Map<String, String> existingKeys = PluginStarter.getPluginKeys(_context);
+            for (Map.Entry<String, String> e : existingKeys.entrySet()) {
+                // ignore dups/bad keys
+                up.addKey(e.getKey(), e.getValue());
+            }
+
             if (up.haveKey(pubkey)) {
                 // the key is already in the TrustedUpdate keyring
                 if (!up.verify(f)) {
@@ -285,14 +294,14 @@ public class PluginUpdateHandler extends UpdateHandler {
                 if (minVersion != null &&
                     (new VersionComparator()).compare(minVersion, oldVersion) > 0) {
                     to.delete();
-                    updateStatus("<b>" + _("Plugin update requires installed version {0} or higher", minVersion) + "</b>");
+                    updateStatus("<b>" + _("Plugin update requires installed plugin version {0} or higher", minVersion) + "</b>");
                     return;
                 }
                 String maxVersion = ConfigClientsHelper.stripHTML(props, "max-installed-version");
                 if (maxVersion != null &&
                     (new VersionComparator()).compare(maxVersion, oldVersion) < 0) {
                     to.delete();
-                    updateStatus("<b>" + _("Plugin update requires installed version {0} or lower", maxVersion) + "</b>");
+                    updateStatus("<b>" + _("Plugin update requires installed plugin version {0} or lower", maxVersion) + "</b>");
                     return;
                 }
 
@@ -306,7 +315,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
                     to.delete();
-                    updateStatus("<b>" + _("Plugin is for upgrades only, but the plugin is not installed", url) + "</b>");
+                    updateStatus("<b>" + _("Plugin is for upgrades only, but the plugin is not installed") + "</b>");
                     return;
                 }
                 if (!destDir.mkdir()) {
@@ -319,16 +328,16 @@ public class PluginUpdateHandler extends UpdateHandler {
             // Finally, extract the zip to the plugin directory
             if (!FileUtil.extractZip(to, destDir)) {
                 to.delete();
-                updateStatus("<b>" + _("Unzip of plugin in plugin directory {0} failed", destDir.getAbsolutePath()) + "</b>");
+                updateStatus("<b>" + _("Failed to install plugin in {0}", destDir.getAbsolutePath()) + "</b>");
                 return;
             }
 
             to.delete();
             if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
                 if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())
-                    updateStatus("<b>" + _("Plugin {0} successfully installed, router restart required", appName) + "</b>");
+                    updateStatus("<b>" + _("Plugin {0} installed, router restart required", appName) + "</b>");
                 else {
-                    updateStatus("<b>" + _("Plugin {0} successfully installed", appName) + "</b>");
+                    updateStatus("<b>" + _("Plugin {0} installed", appName) + "</b>");
                     Properties pluginProps = PluginStarter.pluginProperties();
                     pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
                     PluginStarter.storePluginProperties(pluginProps);
@@ -337,11 +346,11 @@ public class PluginUpdateHandler extends UpdateHandler {
                 // start everything
                 try {
                     if (PluginStarter.startPlugin(_context, appName))
-                        updateStatus("<b>" + _("Plugin {0} started", appName) + "</b>");
+                        updateStatus("<b>" + _("Plugin {0} installed and started", appName) + "</b>");
                     else
-                        updateStatus("<b>" + _("Failed to start plugin {0}, check logs", appName) + "</b>");
+                        updateStatus("<b>" + _("Plugin {0} installed but failed to start, check logs", appName) + "</b>");
                 } catch (Exception e) {
-                    updateStatus("<b>" + _("Failed to start plugin {0}:", appName) + ' ' + e + "</b>");
+                    updateStatus("<b>" + _("Plugin {0} installed but failed to start", appName) + ": " + e + "</b>");
                 }
             }
         }
@@ -350,7 +359,7 @@ public class PluginUpdateHandler extends UpdateHandler {
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
             File f = new File(_updateFile);
             f.delete();
-            updateStatus("<b>" + _("Plugin download from {0} failed", url) + "</b>");
+            updateStatus("<b>" + _("Failed to download plugin from {0}", url) + "</b>");
         }
     }
     

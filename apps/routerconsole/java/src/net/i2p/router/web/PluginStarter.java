@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -220,15 +223,45 @@ public class PluginStarter implements Runnable {
             DataHelper.loadProps(rv, cfgFile);
         } catch (IOException ioe) {}
 
+        List<String> names = getPlugins();
+        for (String name : names) {
+            String prop = PREFIX + name + ENABLED;
+            if (rv.getProperty(prop) == null)
+                rv.setProperty(prop, "true");
+        }
+        return rv;
+    }
+
+    /**
+     *  all installed plugins whether enabled or not
+     */
+    public static List<String> getPlugins() {
+        List<String> rv = new ArrayList();
         File pluginDir = new File(I2PAppContext.getGlobalContext().getAppDir(), PluginUpdateHandler.PLUGIN_DIR);
         File[] files = pluginDir.listFiles();
         if (files == null)
             return rv;
         for (int i = 0; i < files.length; i++) {
-            String name = files[i].getName();
-            String prop = PREFIX + name + ENABLED;
-            if (files[i].isDirectory() && rv.getProperty(prop) == null)
-                rv.setProperty(prop, "true");
+            if (files[i].isDirectory())
+                rv.add(files[i].getName());
+        }
+        return rv;
+    }
+
+    /**
+     *  The signing keys from all the plugins
+     *  @return Map of key to keyname
+     *  Last one wins if a dup (installer should prevent dups)
+     */
+    public static Map<String, String> getPluginKeys(I2PAppContext ctx) {
+        Map<String, String> rv = new HashMap();
+        List<String> names = getPlugins();
+        for (String name : names) {
+            Properties props = pluginProperties(ctx, name);
+            String pubkey = props.getProperty("key");
+            String keyName = props.getProperty("keyName");
+            if (pubkey != null && keyName != null && pubkey.length() == 172 && keyName.length() > 0)
+                rv.put(pubkey, keyName);
         }
         return rv;
     }
