@@ -1,4 +1,8 @@
 2010-02-10 zzz
+    * I2PTunnelRunner: Flush initial data, for some reason it wasn't
+      getting flushed ever in some cases.
+
+2010-02-10 zzz
     64-bit windows installer fixes. Still no 64-bit wrapper.
     Thanks eche|on for testing!
     * Izpack:
