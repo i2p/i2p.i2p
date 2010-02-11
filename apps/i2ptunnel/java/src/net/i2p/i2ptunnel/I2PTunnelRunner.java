@@ -125,7 +125,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             if (initialI2PData != null) {
                 synchronized (slock) {
                     i2pout.write(initialI2PData);
-                    //i2pout.flush();
+                    i2pout.flush();
                 }
             }
             if (initialSocketData != null) {
