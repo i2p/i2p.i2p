@@ -50,6 +50,7 @@ public class PluginStarter implements Runnable {
         startPlugins(_context);
     }
 
+    /** this shouldn't throw anything */
     static void startPlugins(RouterContext ctx) {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         Properties props = pluginProperties();
@@ -61,7 +62,7 @@ public class PluginStarter implements Runnable {
                     try {
                         if (!startPlugin(ctx, app))
                             log.error("Failed to start plugin: " + app);
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         log.error("Failed to start plugin: " + app, e);
                     }
                 }
@@ -69,7 +70,10 @@ public class PluginStarter implements Runnable {
         }
     }
 
-    /** @return true on success */
+    /**
+     *  @return true on success
+     *  @throws just about anything, caller would be wise to catch Throwable
+     */
     static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
@@ -159,7 +163,10 @@ public class PluginStarter implements Runnable {
         return true;
     }
 
-    /** @return true on success */
+    /**
+     *  @return true on success
+     *  @throws just about anything, caller would be wise to catch Throwable
+     */
     static boolean stopPlugin(RouterContext ctx, String appName) throws IOException {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);

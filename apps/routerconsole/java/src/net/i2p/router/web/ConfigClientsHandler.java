@@ -72,8 +72,9 @@ public class ConfigClientsHandler extends FormHandler {
                     PluginStarter.stopPlugin(_context, app);
                     PluginStarter.deletePlugin(_context, app);
                     addFormNotice(_("Deleted plugin {0}", app));
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     addFormError(_("Error deleting plugin {0}", app) + ": " + e);
+                    _log.error("Error deleting plugin " + app,  e);
                 }
             }
             return;
@@ -84,8 +85,11 @@ public class ConfigClientsHandler extends FormHandler {
             String app = _action.substring(5);
             try {
                 PluginStarter.stopPlugin(_context, app);
-            } catch (IOException e) {}
-            addFormNotice(_("Stopped plugin {0}", app));
+                addFormNotice(_("Stopped plugin {0}", app));
+            } catch (Throwable e) {
+                addFormError(_("Error stopping plugin {0}", app) + ": " + e);
+                    _log.error("Error stopping plugin " + app,  e);
+            }
             return;
         }
 
@@ -247,8 +251,9 @@ public class ConfigClientsHandler extends FormHandler {
                         path = new File(path, app + ".war");
                         WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
                         addFormNotice(_("WebApp") + " <a href=\"/" + app + "/\">" + _(app) + "</a> " + _("started") + '.');
-                    } catch (Exception ioe) {
-                        addFormError(_("Failed to start") + ' ' + _(app) + " " + ioe + '.');
+                    } catch (Throwable e) {
+                        addFormError(_("Failed to start") + ' ' + _(app) + " " + e + '.');
+                        _log.error("Failed to start webapp " + app, e);
                     }
                     return;
         }

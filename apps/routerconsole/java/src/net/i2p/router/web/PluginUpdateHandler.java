@@ -308,7 +308,10 @@ public class PluginUpdateHandler extends UpdateHandler {
                     if (!PluginStarter.stopPlugin(_context, appName)) {
                         // failed, ignore
                     }
-                } catch (IOException e) {} // ignore
+                } catch (Throwable e) {
+                    // no updateStatus() for this one
+                    _log.error("Error stopping plugin " + appName, e);
+                }
 
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
@@ -347,8 +350,9 @@ public class PluginUpdateHandler extends UpdateHandler {
                         updateStatus("<b>" + _("Plugin {0} installed and started", appName) + "</b>");
                     else
                         updateStatus("<b>" + _("Plugin {0} installed but failed to start, check logs", appName) + "</b>");
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     updateStatus("<b>" + _("Plugin {0} installed but failed to start", appName) + ": " + e + "</b>");
+                    _log.error("Error starting plugin " + appName, e);
                 }
             }
         }

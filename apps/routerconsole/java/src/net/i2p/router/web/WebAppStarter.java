@@ -30,6 +30,7 @@ public class WebAppStarter {
 
     /**
      *  adds and starts
+     *  @throws just about anything, caller would be wise to catch Throwable
      */
     static void startWebApp(I2PAppContext ctx, Server server, String appName, String warPath) throws Exception {
          File tmpdir = new File(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
@@ -61,6 +62,7 @@ public class WebAppStarter {
 
     /**
      *  stop it
+     *  @throws just about anything, caller would be wise to catch Throwable
      */
     static void stopWebApp(Server server, String appName) {
         // this will return a new context if one does not exist
