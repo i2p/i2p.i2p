@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -69,9 +70,11 @@ public class ConfigClientsHandler extends FormHandler {
             } else {
                 try {
                     PluginStarter.stopPlugin(_context, app);
-                } catch (Exception e) {}
-                PluginStarter.deletePlugin(_context, app);
-                addFormNotice(_("Deleted plugin {0}", app));
+                    PluginStarter.deletePlugin(_context, app);
+                    addFormNotice(_("Deleted plugin {0}", app));
+                } catch (IOException e) {
+                    addFormError(_("Error deleting plugin {0}", app) + ": " + e);
+                }
             }
             return;
         }
@@ -81,7 +84,7 @@ public class ConfigClientsHandler extends FormHandler {
             String app = _action.substring(5);
             try {
                 PluginStarter.stopPlugin(_context, app);
-            } catch (Exception e) {}
+            } catch (IOException e) {}
             addFormNotice(_("Stopped plugin {0}", app));
             return;
         }

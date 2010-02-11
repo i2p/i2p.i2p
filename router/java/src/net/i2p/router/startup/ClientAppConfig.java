@@ -37,6 +37,8 @@ public class ClientAppConfig {
     public String classpath;
     /** @since 0.7.12 */
     public String stopargs;
+    /** @since 0.7.12 */
+    public String uninstallargs;
 
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
         className = cl;
@@ -47,10 +49,11 @@ public class ClientAppConfig {
     }
 
     /** @since 0.7.12 */
-    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp, String sa) {
+    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp, String sa, String ua) {
         this(cl, client, a, d, dis);
         classpath = cp;
         stopargs = sa;
+        uninstallargs = ua;
     }
 
     public static File configFile(I2PAppContext ctx) {
@@ -118,6 +121,7 @@ public class ClientAppConfig {
             String disabled = clientApps.getProperty(PREFIX + i + ".startOnLoad");
             String classpath = clientApps.getProperty(PREFIX + i + ".classpath");
             String stopargs = clientApps.getProperty(PREFIX + i + ".stopargs");
+            String uninstallargs = clientApps.getProperty(PREFIX + i + ".uninstallargs");
             i++;
             boolean dis = disabled != null && "false".equals(disabled);
 
@@ -129,7 +133,8 @@ public class ClientAppConfig {
             if (delayStr != null && !onStartup)
                 try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
 
-            rv.add(new ClientAppConfig(className, clientName, args, delay, dis, classpath, stopargs));
+            rv.add(new ClientAppConfig(className, clientName, args, delay, dis,
+                   classpath, stopargs, uninstallargs));
         }
         return rv;
     }

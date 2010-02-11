@@ -77,6 +77,7 @@ public class PluginStarter implements Runnable {
             log.error("Cannot start nonexistent plugin: " + appName);
             return false;
         }
+        //log.error("Starting plugin: " + appName);
 
         // load and start things in clients.config
         File clientConfig = new File(pluginDir, "clients.config");
@@ -84,7 +85,7 @@ public class PluginStarter implements Runnable {
             Properties props = new Properties();
             DataHelper.loadProps(props, clientConfig);
             List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
-            runClientApps(ctx, pluginDir, clients, true);
+            runClientApps(ctx, pluginDir, clients, "start");
         }
 
         // start console webapps in console/webapps
@@ -98,6 +99,7 @@ public class PluginStarter implements Runnable {
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
                         String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
+                        //log.error("Found webapp: " + warName);
                         // check for duplicates in $I2P
                         // easy way for now...
                         if (warName.equals("i2psnark") || warName.equals("susidns") || warName.equals("i2ptunnel") ||
@@ -107,6 +109,7 @@ public class PluginStarter implements Runnable {
                         }
                         String enabled = props.getProperty(PREFIX + warName + ENABLED);
                         if (! "false".equals(enabled)) {
+                            //log.error("Starting webapp: " + warName);
                             String path = new File(webappDir, fileNames[i]).getCanonicalPath();
                             WebAppStarter.startWebApp(ctx, server, warName, path);
                         }
@@ -157,7 +160,7 @@ public class PluginStarter implements Runnable {
     }
 
     /** @return true on success */
-    static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
+    static boolean stopPlugin(RouterContext ctx, String appName) throws IOException {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
@@ -171,7 +174,7 @@ public class PluginStarter implements Runnable {
             Properties props = new Properties();
             DataHelper.loadProps(props, clientConfig);
             List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
-            runClientApps(ctx, pluginDir, clients, false);
+            runClientApps(ctx, pluginDir, clients, "stop");
         }
 
         // stop console webapps in console/webapps
@@ -201,16 +204,25 @@ public class PluginStarter implements Runnable {
         if (name != null && name.length() > 0)
             NavHelper.unregisterApp(name);
 
+        log.error("Stopping plugin: " + appName);
         return true;
     }
 
     /** @return true on success - call stopPlugin() first */
-    static boolean deletePlugin(RouterContext ctx, String appName) {
+    static boolean deletePlugin(RouterContext ctx, String appName) throws IOException {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot stop nonexistent plugin: " + appName);
             return false;
+        }
+        // uninstall things in clients.config
+        File clientConfig = new File(pluginDir, "clients.config");
+        if (clientConfig.exists()) {
+            Properties props = new Properties();
+            DataHelper.loadProps(props, clientConfig);
+            List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
+            runClientApps(ctx, pluginDir, clients, "uninstall");
         }
         FileUtil.rmdir(pluginDir, false);
         Properties props = pluginProperties();
@@ -313,20 +325,28 @@ public class PluginStarter implements Runnable {
         return null;
     }
 
-    /** @param start true=start, false=stop */
-    private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, boolean start) {
+    /** @param action "start" or "stop" or "uninstall" */
+    private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         for(ClientAppConfig app : apps) {
-            if (start && app.disabled)
+            if (action.equals("start") && app.disabled)
                 continue;
             String argVal[];
-            if (start) {
+            if (action.equals("start")) {
+                // start
                 argVal = LoadClientAppsJob.parseArgs(app.args);
             } else {
-                // stopargs must be present
-                if (app.stopargs == null || app.stopargs.length() <= 0)
+                String args;
+                if (action.equals("stop"))
+                    args = app.stopargs;
+                else if (action.equals("uninstall"))
+                    args = app.uninstallargs;
+                else
+                    throw new IllegalArgumentException("bad action");
+                // args must be present
+                if (args == null || args.length() <= 0)
                     continue;
-                argVal = LoadClientAppsJob.parseArgs(app.stopargs);
+                argVal = LoadClientAppsJob.parseArgs(args);
             }
             // do this after parsing so we don't need to worry about quoting
             for (int i = 0; i < argVal.length; i++) {
@@ -345,7 +365,7 @@ public class PluginStarter implements Runnable {
                 }
                 addToClasspath(cp, app.clientName, log);
             }
-            if (app.delay == 0 || !start) {
+            if (app.delay == 0 || !action.equals("start")) {
                 // run this guy now
                 LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log);
             } else {

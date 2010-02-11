@@ -53,8 +53,10 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
 
         I2PAppContext i2pContext = I2PAppContext.getGlobalContext();
         File libDir = new File(i2pContext.getBaseDir(), "lib");
-        File pluginLibDir = new File(i2pContext.getAppDir(),
-                                        PluginUpdateHandler.PLUGIN_DIR + ctxPath + '/' + "lib");
+        // FIXME this only works if war is the same name as the plugin
+        File pluginDir = new File(i2pContext.getAppDir(),
+                                        PluginUpdateHandler.PLUGIN_DIR + ctxPath);
+
         File dir = libDir;
         String cp;
         if (ctxPath.equals("/susidns")) {
@@ -63,10 +65,11 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
         } else if (ctxPath.equals("/i2psnark")) {
             // duplicate classes removed from the .war in 0.7.12
             cp = "i2psnark.jar";
-        } else if (pluginLibDir.exists()) {
-            Properties props = RouterConsoleRunner.webAppProperties(pluginLibDir.getAbsolutePath());
+        } else if (pluginDir.exists()) {
+            File consoleDir = new File(pluginDir, "console");
+            Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
-            dir = pluginLibDir;
+            dir = pluginDir;
         } else {
             Properties props = RouterConsoleRunner.webAppProperties();
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
@@ -79,6 +82,8 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
             String path;
             if (elem.startsWith("$I2P"))
                 path = i2pContext.getBaseDir().getAbsolutePath() + '/' + elem.substring(4);
+            else if (elem.startsWith("$PLUGIN"))
+                path = dir.getAbsolutePath() + '/' + elem.substring(7);
             else
                 path = dir.getAbsolutePath() + '/' + elem;
             System.err.println("Adding " + path + " to classpath for " + appName);

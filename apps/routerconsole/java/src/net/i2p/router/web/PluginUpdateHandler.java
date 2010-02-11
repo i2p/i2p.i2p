@@ -308,7 +308,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                     if (!PluginStarter.stopPlugin(_context, appName)) {
                         // failed, ignore
                     }
-                } catch (Exception e) {} // ignore
+                } catch (IOException e) {} // ignore
 
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
