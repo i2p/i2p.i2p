@@ -1,3 +1,7 @@
+2010-02-12 sponge
+    * org.mortbay.jetty.Server modified method to accept attributes for
+      batch webapp launches via addWebApplications.
+
 2010-02-10 zzz
     * I2PTunnelRunner: Flush initial data, for some reason it wasn't
       getting flushed ever in some cases.
