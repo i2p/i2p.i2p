@@ -1,3 +1,7 @@
+2010-02-13 sponge
+    * Fix addWebApplications API goofup
+    * Bump BOB version, which I forgot to do.
+
 2010-02-13 zzz
     * Floodfills: Increase max to 28 (was 15) and min to 20 (was 10)
 
