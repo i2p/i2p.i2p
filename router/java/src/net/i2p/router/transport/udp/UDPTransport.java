@@ -39,7 +39,7 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class UDPTransport extends TransportImpl implements TimedWeightedPriorityMessageQueue.FailedListener {
-    private Log _log;
+    private final Log _log;
     private UDPEndpoint _endpoint;
     /** Peer (Hash) to PeerState */
     private final Map<Hash, PeerState> _peersByIdent;
@@ -47,15 +47,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final Map<RemoteHostId, PeerState> _peersByRemoteHost;
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
-    private MessageQueue _outboundMessages;
+    private final MessageQueue _outboundMessages;
     private OutboundMessageFragments _fragments;
-    private OutboundMessageFragments.ActiveThrottle _activeThrottle;
+    private final OutboundMessageFragments.ActiveThrottle _activeThrottle;
     private OutboundRefiller _refiller;
     private PacketPusher _pusher;
     private InboundMessageFragments _inboundFragments;
     private UDPFlooder _flooder;
     private PeerTestManager _testManager;
-    private IntroductionManager _introManager;
+    private final IntroductionManager _introManager;
     private ExpirePeerEvent _expireEvent;
     private PeerTestEvent _testEvent;
     private short _reachabilityStatus;
@@ -75,22 +75,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** introduction key */
     private SessionKey _introKey;
     
-    /** shared fast bid for connected peers */
-    private TransportBid _fastBid;
-    /** shared slow bid for unconnected peers when we want to prefer UDP */
-    private TransportBid _slowBid;
-    /** save some conns for inbound */
-    private TransportBid _nearCapacityBid;
-    /** shared slow bid for unconnected peers */
-    private TransportBid _slowestBid;
-    /** shared fast bid for unconnected peers when we want to prefer UDP */
-    private TransportBid _fastPreferredBid;
-    /** shared slow bid for unconnected peers when we want to always prefer UDP */
-    private TransportBid _slowPreferredBid;
-    private TransportBid _transientFail;
-    
     /** list of RemoteHostId for peers whose packets we want to drop outright */
-    private final List _dropList;
+    private final List<RemoteHostId> _dropList;
     
     private int _expireTimeout;
 
@@ -158,6 +144,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int TEST_FREQUENCY = 13*60*1000;
     public static final long[] RATES = { 10*60*1000 };
     
+    private static final int[] BID_VALUES = { 15, 20, 50, 65, 80, 95, 100, 115, TransportBid.TRANSIENT_FAIL };
+    private static final int FAST_PREFERRED_BID = 0;
+    private static final int SLOW_PREFERRED_BID = 1;
+    private static final int FAST_BID = 2;
+    private static final int SLOW_BID = 3;
+    private static final int SLOWEST_BID = 4;
+    private static final int SLOWEST_COST_BID = 5;
+    private static final int NEAR_CAPACITY_BID = 6;
+    private static final int NEAR_CAPACITY_COST_BID = 7;
+    private static final int TRANSIENT_FAIL_BID = 8;
+    private final TransportBid[] _cachedBid;
+
     public UDPTransport(RouterContext ctx) {
         super(ctx);
         _context = ctx;
@@ -171,14 +169,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _outboundMessages = mq;
         _activeThrottle = mq;
 
-        _fastBid = new SharedBid(50);
-        _slowBid = new SharedBid(65);
-        _fastPreferredBid = new SharedBid(15);
-        _slowPreferredBid = new SharedBid(20);
-        _slowestBid = new SharedBid(80);
-        _nearCapacityBid = new SharedBid(100);
-        _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
-        
+        _cachedBid = new SharedBid[BID_VALUES.length];
+        for (int i = 0; i < BID_VALUES.length; i++) {
+            _cachedBid[i] = new SharedBid(BID_VALUES[i]);
+        }
+
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         _flooder = new UDPFlooder(_context, this);
@@ -1014,9 +1009,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an established peer: " + peer);
             if (preferUDP())
-                return _fastPreferredBid;
+                return _cachedBid[FAST_PREFERRED_BID];
             else
-                return _fastBid;
+                return _cachedBid[FAST_BID];
         } else {
             // If we don't have a port, all is lost
             if ( _reachabilityStatus == CommSystemFacade.STATUS_HOSED) {
@@ -1043,7 +1038,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
             if (!allowConnection())
-                return _transientFail;
+                return _cachedBid[TRANSIENT_FAIL_BID];
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
@@ -1060,13 +1055,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (alwaysPreferUDP() || count < MIN_PEERS ||
                 (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
-                return _slowPreferredBid;
+                return _cachedBid[SLOW_PREFERRED_BID];
             else if (preferUDP())
-                return _slowBid;
-            else if (haveCapacity())
-                return _slowestBid;
-            else
-                return _nearCapacityBid;
+                return _cachedBid[SLOW_BID];
+            else if (haveCapacity()) {
+                if (addr.getCost() > DEFAULT_COST)
+                    return _cachedBid[SLOWEST_COST_BID];
+                else
+                    return _cachedBid[SLOWEST_BID];
+            } else {
+                if (addr.getCost() > DEFAULT_COST)
+                    return _cachedBid[NEAR_CAPACITY_COST_BID];
+                else
+                    return _cachedBid[NEAR_CAPACITY_BID];
+            }
         }
     }
 

@@ -33,26 +33,27 @@ import net.i2p.util.Log;
  *
  */
 public class NTCPTransport extends TransportImpl {
-    private Log _log;
-    private SharedBid _fastBid;
-    private SharedBid _slowBid;
+    private final Log _log;
+    private final SharedBid _fastBid;
+    private final SharedBid _slowBid;
+    private final SharedBid _slowCostBid;
     /** save some conns for inbound */
-    private SharedBid _nearCapacityBid;
-    private SharedBid _transientFail;
+    private final SharedBid _nearCapacityBid;
+    private final SharedBid _nearCapacityCostBid;
+    private final SharedBid _transientFail;
     private final Object _conLock;
-    private Map<Hash, NTCPConnection> _conByIdent;
+    private final Map<Hash, NTCPConnection> _conByIdent;
     private NTCPAddress _myAddress;
-    private EventPumper _pumper;
-    private Reader _reader;
+    private final EventPumper _pumper;
+    private final Reader _reader;
     private net.i2p.router.transport.ntcp.Writer _writer;
     /**
      * list of NTCPConnection of connections not yet established that we
      * want to remove on establishment or close on timeout
      */
-    private final List _establishing;
+    private final List<NTCPConnection> _establishing;
 
-    private List _sent;
-    private NTCPSendFinisher _finisher;
+    private final NTCPSendFinisher _finisher;
     private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
 
@@ -128,7 +129,6 @@ public class NTCPTransport extends TransportImpl {
         _conLock = new Object();
         _conByIdent = new HashMap(64);
 
-        _sent = new ArrayList(4);
         _finisher = new NTCPSendFinisher(ctx, this);
 
         _pumper = new EventPumper(ctx, this);
@@ -137,7 +137,9 @@ public class NTCPTransport extends TransportImpl {
 
         _fastBid = new SharedBid(25); // best
         _slowBid = new SharedBid(70); // better than ssu unestablished, but not better than ssu established
+        _slowCostBid = new SharedBid(85);
         _nearCapacityBid = new SharedBid(90); // not better than ssu - save our conns for inbound
+        _nearCapacityCostBid = new SharedBid(105);
         _transientFail = new SharedBid(TransportBid.TRANSIENT_FAIL);
     }
 
@@ -313,10 +315,17 @@ public class NTCPTransport extends TransportImpl {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("slow bid when trying to send to " + peer.toBase64());
-        if (haveCapacity())
-            return _slowBid;
-        else
-            return _nearCapacityBid;
+        if (haveCapacity()) {
+            if (addr.getCost() > NTCPAddress.DEFAULT_COST)
+                return _slowCostBid;
+            else
+                return _slowBid;
+        } else {
+            if (addr.getCost() > NTCPAddress.DEFAULT_COST)
+                return _nearCapacityCostBid;
+            else
+                return _nearCapacityBid;
+        }
     }
 
     public boolean allowConnection() {

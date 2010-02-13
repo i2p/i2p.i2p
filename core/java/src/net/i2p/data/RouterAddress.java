@@ -39,7 +39,7 @@ public class RouterAddress extends DataStructureImpl {
      * contacting this router.  The value 0 means free and 255 means really expensive.
      * No value above 255 is allowed.
      *
-     * @deprecated unused for now
+     * Unused before 0.7.12
      */
     public int getCost() {
         return _cost;
@@ -49,7 +49,7 @@ public class RouterAddress extends DataStructureImpl {
      * Configure the weighted cost of using the address.
      * No value above 255 is allowed.
      *
-     * NTCP is set to 10 and SSU to 5, but it's unused.
+     * NTCP is set to 10 and SSU to 5 by default, unused before 0.7.12
      */
     public void setCost(int cost) {
         _cost = cost;
