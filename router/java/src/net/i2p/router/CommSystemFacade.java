@@ -49,7 +49,7 @@ public abstract class CommSystemFacade implements Service {
      * Return framed average clock skew of connected peers in seconds, or null if we cannot answer.
      * CommSystemFacadeImpl overrides this.
      */
-    public Long getFramedAveragePeerClockSkew(int percentToInclude) { return null; }
+    public long getFramedAveragePeerClockSkew(int percentToInclude) { return 0; }
     
     /**
      * Determine under what conditions we are remotely reachable.

@@ -77,11 +77,45 @@ public class NtpClient {
     }
     
     /**
+     * Query the ntp servers, returning the current time from first one we find
+     * Hack to return time and stratum
+     * @return time in rv[0] and stratum in rv[1]
+     * @throws IllegalArgumentException if none of the servers are reachable
+     * @since 0.7.12
+     */
+    public static long[] currentTimeAndStratum(String serverNames[]) {
+        if (serverNames == null) 
+            throw new IllegalArgumentException("No NTP servers specified");
+        ArrayList names = new ArrayList(serverNames.length);
+        for (int i = 0; i < serverNames.length; i++)
+            names.add(serverNames[i]);
+        Collections.shuffle(names);
+        for (int i = 0; i < names.size(); i++) {
+            long[] rv = currentTimeAndStratum((String)names.get(i));
+            if (rv != null && rv[0] > 0)
+                return rv;
+        }
+        throw new IllegalArgumentException("No reachable NTP servers specified");
+    }
+    
+    /**
      * Query the given NTP server, returning the current internet time
      *
      * @return milliseconds since january 1, 1970 (UTC), or -1 on error
      */
     public static long currentTime(String serverName) {
+         long[] la = currentTimeAndStratum(serverName);
+         if (la != null)
+             return la[0];
+         return -1;
+    }
+
+    /**
+     * Hack to return time and stratum
+     * @return time in rv[0] and stratum in rv[1], or null for error
+     * @since 0.7.12
+     */
+    private static long[] currentTimeAndStratum(String serverName) {
         try {
             // Send request
             DatagramSocket socket = new DatagramSocket();
@@ -104,7 +138,7 @@ public class NtpClient {
                 socket.receive(packet);
             } catch (InterruptedIOException iie) {
                 socket.close();
-                return -1;
+                return null;
             }
 
             // Immediately record the incoming timestamp
@@ -123,15 +157,17 @@ public class NtpClient {
             // Anything else is right out, treat such responses like errors
             if ((msg.stratum < 1) || (msg.stratum > 15)) {
                 //System.out.println("Response from NTP server of unacceptable stratum " + msg.stratum + ", failing.");
-                return(-1);
+                return null;
             }
             
-            long rv = (long)(System.currentTimeMillis() + localClockOffset*1000);
+            long[] rv = new long[2];
+            rv[0] = (long)(System.currentTimeMillis() + localClockOffset*1000);
+            rv[1] = msg.stratum;
             //System.out.println("host: " + address.getHostAddress() + " rtt: " + roundTripDelay + " offset: " + localClockOffset + " seconds");
             return rv;
         } catch (IOException ioe) {
             //ioe.printStackTrace();
-            return -1;
+            return null;
         }
     }
     

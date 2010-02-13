@@ -51,6 +51,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _log.info("Starting up the comm system");
         _manager = new TransportManager(_context);
         _manager.startListening();
+        startTimestamper();
     }
     
     public void shutdown() {
@@ -78,20 +79,20 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     /**
      * @param percentToInclude 1-100
-     * @return Framed average clock skew of connected peers in seconds, or the clock offset if we cannot answer.
+     * @return Framed average clock skew of connected peers in milliseconds, or the clock offset if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
+     * Todo: change Vectors to milliseconds
      */
     @Override
-    public Long getFramedAveragePeerClockSkew(int percentToInclude) {
+    public long getFramedAveragePeerClockSkew(int percentToInclude) {
         if (_manager == null) {
-            // round toward zero
-            return Long.valueOf(_context.clock().getOffset() / 1000);
+            return _context.clock().getOffset();
         }
         Vector skews = _manager.getClockSkews();
         if (skews == null ||
             skews.size() <= 0 ||
             (skews.size() < 5 && _context.clock().getUpdatedSuccessfully())) {
-            return Long.valueOf(_context.clock().getOffset() / 1000);
+            return _context.clock().getOffset();
         }
 
         // Going to calculate, sort them
@@ -106,12 +107,12 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         long sum = 0;
         for (int i = first; i <= last; i++) {
             long value = ((Long) (skews.get(i))).longValue();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Adding clock skew " + i + " valued " + value + " s.");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Adding clock skew " + i + " valued " + value + " s.");
             sum = sum + value;
         }
-        // Calculate average (round toward zero)
-        return Long.valueOf(sum / frameSize);
+        // Calculate average
+        return sum * 1000 / frameSize;
     }
     
     public List getBids(OutNetMessage msg) {
@@ -480,5 +481,39 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             buf.append("</a>");
         buf.append("</tt>");
         return buf.toString();
+    }
+
+    /*
+     * Timestamper stuff
+     *
+     * This is used as a backup to NTP over UDP.
+     * @since 0.7.12
+     */
+
+    private static final int TIME_START_DELAY = 5*60*1000;
+    private static final int TIME_REPEAT_DELAY = 10*60*1000;
+    /** @since 0.7.12 */
+    private void startTimestamper() {
+        SimpleScheduler.getInstance().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
+    }
+
+    /**
+     * Update the clock offset based on the average of the peers.
+     * This uses the default stratum which is lower than any reasonable
+     * NTP source, so it will be ignored unless NTP is broken.
+     * @since 0.7.12
+     */
+    private class Timestamper implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+             // use the same % as in RouterClock so that check will never fail
+             // This is their our offset w.r.t. them...
+             long peerOffset = getFramedAveragePeerClockSkew(50);
+             if (peerOffset == 0)
+                 return;
+             long currentOffset = _context.clock().getOffset();
+             // ... so we subtract it to get in sync with them
+             long newOffset = currentOffset - peerOffset;
+             _context.clock().setOffset(newOffset);
+        }
     }
 }

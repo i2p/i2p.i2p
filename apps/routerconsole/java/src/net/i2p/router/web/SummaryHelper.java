@@ -16,6 +16,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
+import net.i2p.router.RouterClock;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -88,6 +89,10 @@ public class SummaryHelper extends HelperBase {
     
     public String getReachability() {
         return reachability(); // + timeSkew();
+        // testing
+        //return reachability() +
+        //       " Offset: " + DataHelper.formatDuration(_context.clock().getOffset()) +
+        //       " Slew: " + DataHelper.formatDuration(((RouterClock)_context.clock()).getDeltaOffset());
     }
 
     private String reachability() {
@@ -97,10 +102,10 @@ public class SummaryHelper extends HelperBase {
         // Warn based on actual skew from peers, not update status, so if we successfully offset
         // the clock, we don't complain.
         //if (!_context.clock().getUpdatedSuccessfully())
-        Long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
+        long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
-        if (skew != null && Math.abs(skew.longValue()) > 30)
-            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew.longValue()) * 1000));
+        if (Math.abs(skew) > 30*1000)
+            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew)));
         if (_context.router().isHidden())
             return _("Hidden");
 

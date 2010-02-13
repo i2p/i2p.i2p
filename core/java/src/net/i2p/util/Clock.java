@@ -118,6 +118,15 @@ public class Clock implements Timestamper.UpdateListener {
     }
 
     /**
+     *  @param stratum ignored
+     *  @since 0.7.12
+     */
+    public void setNow(long realTime, int stratum) {
+        long diff = realTime - System.currentTimeMillis();
+        setOffset(diff);
+    }
+
+    /**
      * Retrieve the current time synchronized with whatever reference clock is in
      * use.
      *

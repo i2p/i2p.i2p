@@ -23,6 +23,7 @@ public class Timestamper implements Runnable {
     private final List<UpdateListener> _listeners;
     private int _queryFrequency;
     private int _concurringServers;
+    private int _consecutiveFails;
     private volatile boolean _disabled;
     private boolean _daemon;
     private boolean _initialized;
@@ -34,6 +35,7 @@ public class Timestamper implements Runnable {
     private static final String DEFAULT_DISABLED = "true";
     /** how many times do we have to query if we are changing the clock? */
     private static final int DEFAULT_CONCURRING_SERVERS = 3;
+    private static final int MAX_CONSECUTIVE_FAILS = 10;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";
@@ -106,7 +108,7 @@ public class Timestamper implements Runnable {
     }
     public UpdateListener getListener(int index) {
         synchronized (_listeners) {
-            return (UpdateListener)_listeners.get(index);
+            return _listeners.get(index);
         }
     }
     
@@ -171,8 +173,12 @@ public class Timestamper implements Runnable {
                 synchronized (this) { notifyAll(); }
                 long sleepTime;
                 if (lastFailed) {
-                    sleepTime = 30*1000;
+                    if (++_consecutiveFails >= MAX_CONSECUTIVE_FAILS)
+                        sleepTime = 30*60*1000;
+                    else
+                        sleepTime = 30*1000;
                 } else {
+                    _consecutiveFails = 0;
                     sleepTime = _context.random().nextInt(_queryFrequency) + _queryFrequency;
                     if (_wellSynced)
                         sleepTime *= 3;
@@ -191,6 +197,7 @@ public class Timestamper implements Runnable {
     private boolean queryTime(String serverList[]) throws IllegalArgumentException {
         long found[] = new long[_concurringServers];
         long now = -1;
+        int stratum = -1;
         long expectedDelta = 0;
         _wellSynced = false;
         for (int i = 0; i < _concurringServers; i++) {
@@ -198,7 +205,9 @@ public class Timestamper implements Runnable {
                 // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
                 try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
             }
-            now = NtpClient.currentTime(serverList);
+            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList);
+            now = timeAndStratum[0];
+            stratum = (int) timeAndStratum[1];
             long delta = now - _context.clock().now();
             found[i] = delta;
             if (i == 0) {
@@ -230,7 +239,7 @@ public class Timestamper implements Runnable {
                 }
             }
         }
-        stampTime(now);
+        stampTime(now, stratum);
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuilder buf = new StringBuilder(64);
             buf.append("Deltas: ");
@@ -242,14 +251,14 @@ public class Timestamper implements Runnable {
     }
     
     /**
-     * Send an HTTP request to a given URL specifying the current time 
+     * Notify the listeners
      */
-    private void stampTime(long now) {
+    private void stampTime(long now, int stratum) {
         long before = _context.clock().now();
         synchronized (_listeners) {
             for (int i = 0; i < _listeners.size(); i++) {
-                UpdateListener lsnr = (UpdateListener)_listeners.get(i);
-                lsnr.setNow(now);
+                UpdateListener lsnr = _listeners.get(i);
+                lsnr.setNow(now, stratum);
             }
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -311,13 +320,16 @@ public class Timestamper implements Runnable {
     
     /**
      * Interface to receive update notifications for when we query the time
-     *
+     * Only used by Clock.
+     * stratum parameter added in 0.7.12.
+     * If there were any users outside of the tree, this broke compatibility, sorry.
      */
     public interface UpdateListener {
         /**
          * The time has been queried and we have a current value for 'now'
          *
          */
-        public void setNow(long now);
+        /** @param stratum 1-15, 1 being the best (added in 0.7.12) */
+        public void setNow(long now, int stratum);
     }
 }
