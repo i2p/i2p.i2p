@@ -1,3 +1,6 @@
+2010-02-13 zzz
+    * Floodfills: Increase max to 28 (was 15) and min to 20 (was 10)
+
 2010-02-12 sponge
     * org.mortbay.jetty.Server modified method to accept attributes for
       batch webapp launches via addWebApplications.
