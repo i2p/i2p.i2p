@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-01 02:59+0000\n"
-"PO-Revision-Date: 2010-01-17 22:09+0100\n"
+"PO-Revision-Date: 2010-02-13 11:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -1223,11 +1223,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:105
 msgid "logs"
-msgstr "enregistrements"
+msgstr "fichier traces"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:227
 msgid "I2P Router Logs"
-msgstr "Enregistrements du routeur I2P"
+msgstr "Fichier traces du routeur I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:229
 msgid "I2P Version & Running Environment"
@@ -2213,7 +2213,7 @@ msgstr "Services I2P"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:48
 msgid "Manage your I2P hosts file here (I2P domain name resolution)"
-msgstr ""
+msgstr "Gérer votre fichier 'I2P hosts' ici (I2P DNS)"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:50
 msgid "Addressbook"
@@ -2254,7 +2254,7 @@ msgstr "I2P Configuration Interne"
 #: src/net/i2p/router/web/SummaryBarRenderer.java:80
 #: src/net/i2p/router/web/SummaryBarRenderer.java:344
 msgid "View existing tunnels and tunnel build status"
-msgstr ""
+msgstr "Montrer les tunnels existants et le statut de création des tunnels"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:86
 #: src/net/i2p/router/web/SummaryBarRenderer.java:221
@@ -2263,7 +2263,7 @@ msgstr "Montrer toutes les connexions actuelles aux pairs"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:92
 msgid "Show recent peer performance profiles"
-msgstr ""
+msgstr "Montrer les profils de la performance récente des pairs"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:94
 msgid "Profiles"
@@ -2279,15 +2279,15 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:104
 msgid "Health Report"
-msgstr ""
+msgstr "Fichier traces du routeur"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:106
 msgid "Logs"
-msgstr "Enregistrements"
+msgstr "Fichier traces"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:110
 msgid "Show the router's workload, and how it's performing"
-msgstr ""
+msgstr "Montrer les tâches en cours"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:112
 msgid "Jobs"
@@ -2295,7 +2295,7 @@ msgstr "Tâches"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:116
 msgid "Graph router performance"
-msgstr ""
+msgstr "Montrer la performance du routeur avec des graphes"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:118
 msgid "Graphs"
@@ -2303,7 +2303,7 @@ msgstr "Graphes"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:122
 msgid "Textual router performance statistics"
-msgstr ""
+msgstr "La performance statistique du routeur en texte"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:134
 msgid "I2P Router Help"
@@ -2375,7 +2375,7 @@ msgstr ""
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:309
 msgid "Configure router bandwidth allocation"
-msgstr ""
+msgstr "Configurer la bande passante du routeur"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:311
 msgid "Bandwidth in/out"
@@ -2403,7 +2403,7 @@ msgstr "Participant"
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:373
 msgid "What's in the router's job queue?"
-msgstr ""
+msgstr "Montrer les tâches du routeur qui sont à traiter "
 
 #: src/net/i2p/router/web/SummaryBarRenderer.java:375
 msgid "Congestion"
@@ -2471,7 +2471,7 @@ msgstr "WARN - Pare-feu avec UDP desactivé"
 
 #: src/net/i2p/router/web/SummaryHelper.java:360
 msgid "Add/remove/edit &amp; control your client and server tunnels"
-msgstr ""
+msgstr "Ajouter/enlever/éditer &amp; contrôler vos tunnels client et serveur"
 
 #: src/net/i2p/router/web/SummaryHelper.java:360
 msgid "Local Destinations"
