@@ -43,6 +43,7 @@ public class GeoIP {
     private final Set<Long> _pendingSearch;
     private final Set<Long> _notFound;
     private final AtomicBoolean _lock;
+    private int _lookupRunCount;
     
     public GeoIP(RouterContext context) {
         _context = context;
@@ -92,9 +93,14 @@ public class GeoIP {
     }
 
     private class LookupJob implements Runnable {
+        private static final int CLEAR = 8;
+
         public void run() {
             if (_lock.getAndSet(true))
                 return;
+            // clear the negative cache every few runs, to prevent it from getting too big
+            if (((++_lookupRunCount) % CLEAR) == 0)
+                _notFound.clear();
             Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
             if (search.length <= 0)
                 return;
