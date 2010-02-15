@@ -1,21 +1,35 @@
 /*
- launch4j :: Cross-platform Java application wrapper for creating Windows native executables
- Copyright (C) 2005 Grzegorz Kowal
+	Launch4j (http://launch4j.sourceforge.net/)
+	Cross-platform Java application wrapper for creating Windows native executables.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+	Copyright (c) 2004, 2007 Grzegorz Kowal
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+	All rights reserved.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+	Redistribution and use in source and binary forms, with or without modification,
+	are permitted provided that the following conditions are met:
+
+	    * Redistributions of source code must retain the above copyright notice,
+	      this list of conditions and the following disclaimer.
+	    * Redistributions in binary form must reproduce the above copyright notice,
+	      this list of conditions and the following disclaimer in the documentation
+	      and/or other materials provided with the distribution.
+	    * Neither the name of the Launch4j nor the names of its contributors
+	      may be used to endorse or promote products derived from this software without
+	      specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+	PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+	NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 /*
  * Created on 2005-04-24
@@ -30,6 +44,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Copyright (C) 2005 Grzegorz Kowal
@@ -40,13 +56,25 @@ public class Util {
 
 	private Util() {}
 
+	public static File createTempFile(String suffix) throws IOException {
+		String tmpdir = System.getProperty("launch4j.tmpdir");
+		if (tmpdir != null) {
+			if (tmpdir.indexOf(' ') != -1) {
+				throw new IOException(Messages.getString("Util.tmpdir"));
+			}
+			return File.createTempFile("launch4j", suffix, new File(tmpdir));
+		} else {
+			return File.createTempFile("launch4j", suffix);
+		}
+	}
+
 	/**
 	 * Returns the base directory of a jar file or null if the class is a standalone file. 
 	 * @return System specific path
 	 * 
 	 * Based on a patch submitted by Josh Elsasser
 	 */
-	public static String getJarBasedir() {
+	public static File getJarBasedir() {
 		String url = Util.class.getClassLoader()
 				.getResource(Util.class.getName().replace('.', '/') + ".class")
 				.getFile()
@@ -58,9 +86,9 @@ public class Util {
 				x = jar.lastIndexOf('\\');	
 			}
 			String basedir = jar.substring(0, x + 1);
-			return new File(basedir).getPath();
+			return new File(basedir);
 		} else {
-			return null;
+			return new File(".");
 		}
 	}
 
@@ -78,24 +106,41 @@ public class Util {
 		}
 	}
 
-	public static void exec(String cmd, Log log) throws ExecException {
+	public static void exec(String[] cmd, Log log) throws ExecException {
 		BufferedReader is = null;
 		try {
 			if (WINDOWS_OS) {
-				cmd = cmd.replaceAll("/", "\\\\");
+				for (int i = 0; i < cmd.length; i++) {
+					cmd[i] = cmd[i].replaceAll("/", "\\\\");
+				}
 			}
 			Process p = Runtime.getRuntime().exec(cmd);
 			is = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
+			int errLine = -1;
+			Pattern pattern = Pattern.compile(":\\d+:");
 			while ((line = is.readLine()) != null) {
 				log.append(line);
+				Matcher matcher = pattern.matcher(line);
+				if (matcher.find()) {
+					errLine = Integer.valueOf(
+							line.substring(matcher.start() + 1, matcher.end() - 1))
+							.intValue();
+					if (line.matches("(?i).*unrecognized escape sequence")) {
+						log.append(Messages.getString("Util.use.double.backslash"));
+					}
+					break;
+				}
 			}
 			is.close();
 			p.waitFor();
+			if (errLine != -1) {
+				throw new ExecException(Messages.getString("Util.exec.failed")
+						+ ": " + cmd, errLine);
+			}
 			if (p.exitValue() != 0) {
-				String msg = "Exec failed (" + p.exitValue() + "): " + cmd;
-				log.append(msg);
-				throw new ExecException(msg);
+				throw new ExecException(Messages.getString("Util.exec.failed")
+						+ "(" + p.exitValue() + "): " + cmd);
 			}
 		} catch (IOException e) {
 			close(is);

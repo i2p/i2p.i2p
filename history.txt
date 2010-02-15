@@ -1,3 +1,43 @@
+* 2010-02-15  0.7.11 released
+
+2010-02-13 sponge
+    * Fix addWebApplications API goofup
+    * Bump BOB version, which I forgot to do.
+
+2010-02-13 zzz
+    * Floodfills: Increase max to 28 (was 15) and min to 20 (was 10)
+
+2010-02-12 sponge
+    * org.mortbay.jetty.Server modified method to accept attributes for
+      batch webapp launches via addWebApplications.
+
+2010-02-10 zzz
+    * I2PTunnelRunner: Flush initial data, for some reason it wasn't
+      getting flushed ever in some cases.
+
+2010-02-10 zzz
+    64-bit windows installer fixes. Still no 64-bit wrapper.
+    Thanks eche|on for testing!
+    * Izpack:
+      Add 64-bit windows dll so installer doesn't die trying to add shortcuts
+    * Launch4j:
+      Upgrade to launch4j 3.0.1 2008-07-20.
+      The license is BSD for launch4j and MIT for the wrapper code in head/
+      Changelog is in installer/lib/launch4j/web/changelog.html
+      Hopefully this will fix installs for 64-bit JRE on 64-bit windows.
+      The previous version was 2.0-RC3 2005-08-13.
+      The previous license was GPLv2 for launch4j and LGPLv2.1 for the wrapper code in head/
+      The bin/ld.exe and bin/windres.exe files were contributed by
+      i2p users in 2005 so the i2p installer could be built on windows.
+      They have not been updated for 3.0.1, so pkg builds on windows
+      will presumably still get 2.0-RC3.
+
+2010-02-06 zzz
+    * Console: Fix saving update keys, was broken in 0.7.10
+    * i2psnark: Add transmission ID
+    * news.xml: Wrap i2p version tags in XML comment
+    * Transport: Try yet again to prevent two NTCP pumpers
+
 2010-02-04 zzz
     * i2psnark: Fix sending stopped events to the tracker
 

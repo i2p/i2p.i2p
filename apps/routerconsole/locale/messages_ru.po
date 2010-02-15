@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-18 18:36+0000\n"
-"PO-Revision-Date: 2010-01-18 18:37+0000\n"
+"POT-Creation-Date: 2010-02-10 13:36+0000\n"
+"PO-Revision-Date: 2010-02-10 20:19+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -36,39 +36,39 @@ msgstr "IP заблокирован"
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP заблокирован по записи в blocklist.txt: {0}"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:91
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:92
 msgid "Rejecting tunnels: Shutting down"
 msgstr "Не принимаем туннели: Маршрутизатор в процессе остановки"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:140
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:141
 msgid "Rejecting tunnels: High message delay"
 msgstr "Не принимаем туннели: Слишком большая задержка сообщений"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:176
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:177
 msgid "Rejecting most tunnels: High number of requests"
 msgstr "Не принимаем большую часть туннелей: Слишком много запросов"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:232
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:233
 msgid "Rejecting tunnels: Limit reached"
 msgstr "Не принимаем туннели: Достигнут предел количества туннелей"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:300
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:301
 msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Не принимаем туннели: Достигнут предел пропускной способности"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:370
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:371
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "Не принимаем большую часть туннелей: Достигнут предел пропускной способности"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:374
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:375
 msgid "Accepting most tunnels"
 msgstr "Принимаем большую часть туннелей"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:376
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:377
 msgid "Accepting tunnels"
 msgstr "Принимаем туннели"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:486
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:487
 msgid "Rejecting tunnels"
 msgstr "Не принимаем туннели"
 
@@ -80,8 +80,8 @@ msgstr "Нет транспортных протоколов (в скрытом 
 msgid "Unreachable on any transport"
 msgstr "Недоступен по всем транспортным протоколам"
 
-#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:373
-#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:578
+#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:380
+#: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:594
 #, java-format
 msgid "Excessive clock skew: {0}"
 msgstr "Чрезмерное расхождение времени: {0}"
@@ -1144,7 +1144,7 @@ msgstr "Редактировать"
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:328
 msgid "Add Client"
-msgstr "Добавить клиента"
+msgstr "Добавить клиент"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:36
 msgid "Class and arguments"
@@ -1773,139 +1773,136 @@ msgstr "Русский"
 msgid "Swedish"
 msgstr "Svenska"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:56
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:58
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:310
 msgid "Check for updates"
 msgstr "Проверить обновления"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:63
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:65
 msgid "Update available, attempting to download now"
 msgstr "Доступно обновление, пытаемся загрузить"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:65
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:67
 msgid "Update available, click button on left to download"
 msgstr "Доступно обновление, нажмите кнопку слева для загрузки"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:67
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:69
 msgid "No update available"
 msgstr "Нет доступных обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:75
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:77
 msgid "Updating news URL to"
 msgstr "Новый URL новостей"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:83
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:85
 msgid "Updating proxy host to"
 msgstr "Новый адрес I2P-прокси"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:91
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:93
 msgid "Updating proxy port to"
 msgstr "Новый порт I2P-прокси"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:104
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:106
 msgid "Updating refresh frequency to"
 msgstr "Новый интервал проверки обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:111
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:113
 msgid "Updating update policy to"
 msgstr "Новый режим обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:120
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:122
 msgid "Updating update URLs."
 msgstr "Новые URL обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:128
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:131
 msgid "Updating trusted keys."
 msgstr "Обновление списка доверенных ключей."
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:136
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:139
 msgid "Updating unsigned update URL to"
 msgstr "Новый URL неподписанной тестовой сборки"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:75
-#: ../java/src/net/i2p/router/web/GraphHelper.java:133
+#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:88
+#: ../java/src/net/i2p/router/web/GraphHelper.java:136
 msgid "Never"
 msgstr "Никогда"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:77
+#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:90
 msgid "Every"
 msgstr "Каждые"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:90
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:92
+#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:108
 msgid "Notify only"
 msgstr "Только уведомлять"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:95
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:97
+#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:115
 msgid "Download and verify only"
 msgstr "Только скачать и проверить целостность"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:101
-#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:103
+#: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:123
 msgid "Download, verify, and restart"
 msgstr "Скачать, проверить и обновить I2P"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:125
+#: ../java/src/net/i2p/router/web/GraphHelper.java:128
 msgid "Configure Graph Display"
 msgstr "Настройка показа графиков"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:125
+#: ../java/src/net/i2p/router/web/GraphHelper.java:128
 msgid "Select Stats"
 msgstr "Выбрать параметры"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:127
+#: ../java/src/net/i2p/router/web/GraphHelper.java:130
 msgid "Periods"
 msgstr "Количество интервалов"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:128
+#: ../java/src/net/i2p/router/web/GraphHelper.java:131
 msgid "Plot averages"
 msgstr "Строить график средних значений"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:129
+#: ../java/src/net/i2p/router/web/GraphHelper.java:132
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:405
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:332
 msgid "or"
 msgstr "или"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:129
+#: ../java/src/net/i2p/router/web/GraphHelper.java:132
 msgid "plot events"
 msgstr "строить график количества событий"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:130
+#: ../java/src/net/i2p/router/web/GraphHelper.java:133
 msgid "Image sizes"
 msgstr "Размеры графиков"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:130
+#: ../java/src/net/i2p/router/web/GraphHelper.java:133
 msgid "width"
 msgstr "ширина"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:131
+#: ../java/src/net/i2p/router/web/GraphHelper.java:134
 msgid "height"
 msgstr "высота"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:131
-#: ../java/src/net/i2p/router/web/GraphHelper.java:132
+#: ../java/src/net/i2p/router/web/GraphHelper.java:134
+#: ../java/src/net/i2p/router/web/GraphHelper.java:135
 msgid "pixels"
 msgstr "пикселей"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:133
+#: ../java/src/net/i2p/router/web/GraphHelper.java:136
 msgid "Refresh delay"
 msgstr "Интервал обновления"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:133
+#: ../java/src/net/i2p/router/web/GraphHelper.java:136
 msgid "hour"
 msgstr "час"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:133
+#: ../java/src/net/i2p/router/web/GraphHelper.java:136
 msgid "minute"
 msgstr "минута"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:133
+#: ../java/src/net/i2p/router/web/GraphHelper.java:136
 msgid "minutes"
 msgstr "минут(ы)"
 
-#: ../java/src/net/i2p/router/web/GraphHelper.java:134
+#: ../java/src/net/i2p/router/web/GraphHelper.java:137
 msgid "Redraw"
 msgstr "Перерисовать"
 
@@ -2312,7 +2309,7 @@ msgstr "забанен ли этот пир, недоступен, дает ош
 msgid "status"
 msgstr "статус"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:321
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:313
 msgid "n/a"
 msgstr "нет данных"
 
@@ -2330,51 +2327,51 @@ msgstr "Забанен до перезагрузки или истечения {
 msgid "unban now"
 msgstr "разбанить"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:55
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:56
 msgid "GO"
 msgstr "Перейти"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:58
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:59
 msgid "Statistics gathered during this router's uptime"
 msgstr "Статистика собрана за время с последнего запуска маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:61
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:62
 msgid "The data gathered is quantized over a 1 minute period, so should just be used as an estimate."
 msgstr "Собираемые данные округляются за 1-минутные промежутки, поэтому используйте эту информацию только для приблизительной оценки."
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:107
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:108
 msgid "frequency"
 msgstr "частота"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:141
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:142
 msgid "No lifetime events"
 msgstr "Счетчик lifetime событий пуст"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:153
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:154
 msgid "rate"
 msgstr "интервал"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:155
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:156
 msgid "avg value"
 msgstr "среднее значение"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:184
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:185
 msgid "events"
 msgstr "событий"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:190
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:191
 msgid "No events"
 msgstr "Нет событий"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:196
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:197
 msgid "lifetime average"
 msgstr "среднее за время работы"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:198
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:199
 msgid "peak average"
 msgstr "пиковое среднее"
 
-#: ../java/src/net/i2p/router/web/StatsGenerator.java:216
+#: ../java/src/net/i2p/router/web/StatsGenerator.java:217
 msgid "lifetime average value"
 msgstr "среднее значение за время работы"
 
@@ -3150,7 +3147,7 @@ msgstr "Чем выше доля транзитного трафика, тем �
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:375
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:343
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:323
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:356
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:364
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -4007,39 +4004,43 @@ msgstr "URL новостей"
 msgid "Refresh frequency"
 msgstr "Интервал проверки"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:322
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:324
 msgid "Update policy"
 msgstr "Режим обновления"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:326
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:328
 msgid "Update through the eepProxy?"
 msgstr "Обновлять через I2P-прокси?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:330
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:332
 msgid "eepProxy host"
 msgstr "Адрес I2P-прокси"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:334
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:336
 msgid "eepProxy port"
 msgstr "Порт I2P-прокси"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:338
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:340
 msgid "Update URLs"
 msgstr "URL обновлений"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:342
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:344
 msgid "Trusted keys"
 msgstr "Доверенные ключи"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:346
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:348
 msgid "Update with unsigned development builds?"
 msgstr "Обновлять до неподписанной тестовой сборки?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:352
 msgid "Unsigned Build URL"
 msgstr "URL неподписанной тестовой сборки"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:354
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:358
+msgid "I2P updates are disabled because you do not have write permission for the install directory."
+msgstr "Функция автообновления I2P недоступна: у Вас нет прав на запись в директорию I2P."
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:362
 msgid "Save"
 msgstr "Сохранить"
 
