@@ -323,8 +323,14 @@ public class TransportManager implements TransportEventListener {
         return TransportImpl.getIP(dest);
     }    
     
+    /**
+     *  This forces a rebuild
+     */
     public Map<String, RouterAddress> getAddresses() {
         Map<String, RouterAddress> rv = new HashMap(_transports.size());
+        // do this first since SSU may force a NTCP change
+        for (Transport t : _transports)
+            t.updateAddress();
         for (Transport t : _transports) {
             if (t.getCurrentAddress() != null)
                 rv.put(t.getStyle(), t.getCurrentAddress());

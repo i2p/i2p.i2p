@@ -1164,6 +1164,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (_context.getProperty(PROP_EXTERNAL_HOST) != null);
     }
     
+    /**
+     * Rebuild to get updated cost and introducers.
+     * Do not tell the router (he is the one calling this)
+     * @since 0.7.12
+     */
+    @Override
+    public RouterAddress updateAddress() {
+        rebuildExternalAddress(false);
+        return getCurrentAddress();
+    }
+
     void rebuildExternalAddress() { rebuildExternalAddress(true); }
     void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
         // if the external port is specified, we want to use that to bind to even
@@ -1216,7 +1227,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
 
             RouterAddress addr = new RouterAddress();
-            addr.setCost(DEFAULT_COST);
+            if (ADJUST_COST && !haveCapacity())
+                addr.setCost(DEFAULT_COST + 1);
+            else
+                addr.setCost(DEFAULT_COST);
             addr.setExpiration(null);
             addr.setTransportStyle(STYLE);
             addr.setOptions(options);
@@ -1239,6 +1253,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                            + introducersRequired + ")", new Exception("source"));
             _needsRebuild = true;
         }
+    }
+
+    /**
+     * Replace then tell NTCP that we changed.
+     */
+    @Override
+    protected void replaceAddress(RouterAddress address) {
+        super.replaceAddress(address);
+        _context.commSystem().notifyReplaceAddress(address);
     }
 
     protected void replaceAddress(RouterAddress address, RouterAddress oldAddress) {

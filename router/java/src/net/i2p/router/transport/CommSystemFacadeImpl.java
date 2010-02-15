@@ -256,7 +256,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
     @Override
-    public void notifyReplaceAddress(RouterAddress UDPAddr) {
+    public synchronized void notifyReplaceAddress(RouterAddress UDPAddr) {
         if (UDPAddr == null)
             return;
         NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
@@ -348,7 +348,21 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
 
         if (!changed) {
-            _log.warn("No change to NTCP Address");
+            if (oldAddr != null) {
+                int oldCost = oldAddr.getCost();
+                int newCost = NTCPAddress.DEFAULT_COST;
+                if (TransportImpl.ADJUST_COST && !t.haveCapacity())
+                    newCost++;
+                if (newCost != oldCost) {
+                    oldAddr.setCost(newCost);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Changing NTCP cost from " + oldCost + " to " + newCost);
+                } else {
+                    _log.warn("No change to NTCP Address");
+                }
+            } else {
+                _log.warn("No change to NTCP Address");
+            }
             return;
         }
 

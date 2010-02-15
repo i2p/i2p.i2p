@@ -547,6 +547,7 @@ public class NTCPTransport extends TransportImpl {
         if (ctx == null) {
             System.err.println("NIO transport has no context?");
         } else {
+            // this generally returns null -- see javadoc
             RouterAddress ra = CommSystemFacadeImpl.createNTCPAddress(ctx);
             if (ra != null) {
                 NTCPAddress addr = new NTCPAddress(ra);

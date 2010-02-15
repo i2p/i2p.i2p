@@ -32,6 +32,7 @@ import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.RouterVersion;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -420,10 +421,23 @@ public abstract class TransportImpl implements Transport {
         }
     }
 
+    /** To protect dev anonymity. Set to true after 0.7.12 is out */
+    public static final boolean ADJUST_COST = !RouterVersion.VERSION.equals("0.7.11");
+
     /** What addresses are we currently listening to? */
     public RouterAddress getCurrentAddress() {
         return _currentAddress;
     }
+
+    /**
+     * Ask the transport to update its address based on current information and return it
+     * Transports should override.
+     * @since 0.7.12
+     */
+    public RouterAddress updateAddress() {
+        return _currentAddress;
+    }
+
     /**
      * Replace any existing addresses for the current transport with the given
      * one.
@@ -433,8 +447,6 @@ public abstract class TransportImpl implements Transport {
         _currentAddress = address;
         if (_listener != null)
             _listener.transportAddressChanged();
-        if ("SSU".equals(getStyle()))
-            _context.commSystem().notifyReplaceAddress(address);
     }
 
     /**

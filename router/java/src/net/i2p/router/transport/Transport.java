@@ -35,6 +35,7 @@ public interface Transport {
     public RouterAddress startListening();
     public void stopListening();
     public RouterAddress getCurrentAddress();
+    public RouterAddress updateAddress();
     public static final String SOURCE_UPNP = "upnp";
     public static final String SOURCE_INTERFACE = "local";
     public static final String SOURCE_CONFIG = "config"; // unused
