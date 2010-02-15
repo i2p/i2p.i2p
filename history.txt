@@ -1,3 +1,69 @@
+2010-02-15 zzz
+    Propagate from 3 dev branches.
+
+    i2p.i2p.zzz.test:
+    * Clock:
+      - getFramedAveragePeerClockSkew() now returns a long (ms);
+        was a Long (s)
+      - Implement NTP-style clock slewing so the clock is adjusted
+        gradually
+      - Implement clock strata so we prefer better clocks
+      - Implement a timestamper in the transport so we will periodically
+        update the clock even if NTP is not working.
+        This allows the router to converge the clock instead of simply
+        hoping the first connected peer is correct.
+      - Slow down NTP attempts after several consecutive failures
+    * Console: refactor and tag update messages
+    * Streaming: MessageOutputStream logging tweaks
+    * Transport:
+      - Prepare for using address costs
+      - Adjust bids based on address cost, disabled until 0.7.12
+      - Clear the geoip negative cache periodically
+
+    i2p.i2p.zzz.plugin:
+    * Jrobin: Move from routerconsole.jar to its own jrobin.jar,
+      adjust classpath in routerconsole.jar manifest
+    * Plugins:
+      New plugin support, hidden for now, enable with router.enablePlugins=true
+      Configure and add plugins on configclients.jsp
+      Supports the following:
+      - Console webapps
+      - New translation bundles
+      - Link on console
+      - Anything that can be started in clients.config
+      - Additions to classpath for clients and webapps
+    * TrustedUpdate:
+      - Add method to check if we know about a key
+      - Add method to add a key
+      - Add method to extract without verifying
+      - Add method to get key signer name
+    * Webapps: Allow additions to a webapp classpath.
+      - Pull jstl.jar and standard.jar out of susidns.war
+      - Remove 100KB of duplicate classes from i2psnark.war
+
+    i2p.i2p.zzz.VTBM:
+    * I2NP: Add UnknownI2NPMessage so we can route unknown message types
+    * Tunnel Builds:
+      - Add getRecordCount() to TunnelBuildMessage and TunnelBuildReplyMessage so they can be extended.
+      - New I2NP Messages VariableTunnelBuildMessage and VariableTunnelBuildReplyMessage,
+        which contain the number of request slots in them.
+      - Convert all static assumptions of 8 slots to getRecordCount()
+      - Use the new VTBM if all hops in the tunnel and the OBEP or IBGW of the reply tunnel
+        support it, and the tunnel is 4 hops or shorter.
+      - Reply to a VTBM with a VTBRM of the same size
+      - Make BuildReplyHandler static
+      - Convert the currentlyBuilding List to a ConcurrentHashMap to speed reply lookups
+        and eliminate a global lock; don't put fallback tunnels in there
+      - Add new tunnel.corruptBuildReply stat
+      - Various cleanups and javadoc
+      - Fix first hop expiration for Build Messages, was way too long
+      - Randomize Build Message expiration to make it harder to guess hop position
+      - Save expired tunnel build configs for a while, so that we will still use the tunnel
+        and update peer stats if the reply comes in late
+      - Don't update our own profile for Tunnel Build Replies
+      - VTBM generation only through routers >= 0.1.12
+      - VTBM generation disabled for now
+
 * 2010-02-15  0.7.11 released
 
 2010-02-13 sponge
