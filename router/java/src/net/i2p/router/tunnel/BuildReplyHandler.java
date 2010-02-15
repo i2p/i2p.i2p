@@ -17,7 +17,6 @@ import net.i2p.util.Log;
  *
  */
 public class BuildReplyHandler {
-    public BuildReplyHandler() {}
 
     /**
      * Decrypt the tunnel build reply records.  This overwrites the contents of the reply
@@ -25,11 +24,16 @@ public class BuildReplyHandler {
      * @return status for the records (in record order), or null if the replies were not valid.  Fake records
      *         always have 0 as their value
      */
-    public int[] decrypt(I2PAppContext ctx, TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, List recordOrder) {
-        Log log = ctx.logManager().getLog(getClass());
-        int rv[] = new int[TunnelBuildReplyMessage.RECORD_COUNT];
+    public static int[] decrypt(I2PAppContext ctx, TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, List<Integer> recordOrder) {
+        Log log = ctx.logManager().getLog(BuildReplyHandler.class);
+        if (reply.getRecordCount() != recordOrder.size()) {
+            // somebody messed with us
+            log.error("Corrupted build reply, expected " + recordOrder.size() + " records, got " + reply.getRecordCount());
+            return null;
+        }
+        int rv[] = new int[reply.getRecordCount()];
         for (int i = 0; i < rv.length; i++) {
-            int hop = ((Integer)recordOrder.get(i)).intValue();
+            int hop = recordOrder.get(i).intValue();
             if (BuildMessageGenerator.isBlank(cfg, hop)) {
                 // self...
                 if (log.shouldLog(Log.DEBUG))
@@ -56,8 +60,8 @@ public class BuildReplyHandler {
      *
      * @return -1 on decrypt failure
      */
-    private int decryptRecord(I2PAppContext ctx, TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
-        Log log = ctx.logManager().getLog(getClass());
+    private static int decryptRecord(I2PAppContext ctx, TunnelBuildReplyMessage reply, TunnelCreatorConfig cfg, int recordNum, int hop) {
+        Log log = ctx.logManager().getLog(BuildReplyHandler.class);
         if (BuildMessageGenerator.isBlank(cfg, hop)) {
             if (log.shouldLog(Log.DEBUG))
                 log.debug(reply.getUniqueId() + ": Record " + recordNum + "/" + hop + " is fake, so consider it valid...");

@@ -11,6 +11,7 @@ import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
+import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -83,7 +84,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
              // as long as there's no reply token (FVSJ will never set a reply token but an attacker might)
              ((msg.getType() != DatabaseStoreMessage.MESSAGE_TYPE)  || (!_client.equals(((DatabaseStoreMessage)msg).getKey())) ||
               (((DatabaseStoreMessage)msg).getReplyToken() != 0)) &&
-             (msg.getType() != TunnelBuildReplyMessage.MESSAGE_TYPE)) {
+             (msg.getType() != TunnelBuildReplyMessage.MESSAGE_TYPE) &&
+             (msg.getType() != VariableTunnelBuildReplyMessage.MESSAGE_TYPE)) {
             // drop it, since we should only get tunnel test messages and garlic messages down
             // client tunnels
             _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, msg.getType());
@@ -204,6 +206,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                     return;
                 }
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
+                // Can we route UnknownI2NPMessages to a destination too?
                 if (!(data instanceof DataMessage)) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("cant send a " + data.getClass().getName() + " to a destination");

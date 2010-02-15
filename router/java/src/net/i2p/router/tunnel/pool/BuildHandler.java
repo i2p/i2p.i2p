@@ -16,6 +16,8 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.data.i2np.VariableTunnelBuildMessage;
+import net.i2p.data.i2np.VariableTunnelBuildReplyMessage;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -87,12 +89,18 @@ class BuildHandler {
         _context.statManager().createRateStat("tunnel.receiveRejectionTransient", "How often we are rejected due to transient overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionBandwidth", "How often we are rejected due to bandwidth overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.receiveRejectionCritical", "How often we are rejected due to critical failure?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+
+        _context.statManager().createRateStat("tunnel.corruptBuildReply", "", "Tunnels", new long[] { 24*60*60*1000l });
         
         _processor = new BuildMessageProcessor(ctx);
         _buildMessageHandlerJob = new TunnelBuildMessageHandlerJob(ctx);
         _buildReplyMessageHandlerJob = new TunnelBuildReplyMessageHandlerJob(ctx);
-        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildMessage.MESSAGE_TYPE, new TunnelBuildMessageHandlerJobBuilder());
-        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildReplyMessage.MESSAGE_TYPE, new TunnelBuildReplyMessageHandlerJobBuilder());
+        TunnelBuildMessageHandlerJobBuilder tbmhjb = new TunnelBuildMessageHandlerJobBuilder();
+        TunnelBuildReplyMessageHandlerJobBuilder tbrmhjb = new TunnelBuildReplyMessageHandlerJobBuilder();
+        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
+        ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
+        ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
+        ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
     }
     
     private static final int MAX_HANDLE_AT_ONCE = 2;
@@ -219,28 +227,13 @@ class BuildHandler {
     private void handleReply(BuildReplyMessageState state) {
         // search through the tunnels for a reply
         long replyMessageId = state.msg.getUniqueId();
-        PooledTunnelCreatorConfig cfg = null;
-        List building = _exec.locked_getCurrentlyBuilding();
+        PooledTunnelCreatorConfig cfg = _exec.removeFromBuilding(replyMessageId);
         StringBuilder buf = null;
-        synchronized (building) {
-            for (int i = 0; i < building.size(); i++) {
-                PooledTunnelCreatorConfig cur = (PooledTunnelCreatorConfig)building.get(i);
-                if (cur.getReplyMessageId() == replyMessageId) {
-                    building.remove(i);
-                    cfg = cur;
-                    break;
-                }
-            }
-            if ( (cfg == null) && (_log.shouldLog(Log.DEBUG)) )
-                buf = new StringBuilder(building.toString());
-        }
         
         if (cfg == null) {
             // cannot handle - not pending... took too long?
             if (_log.shouldLog(Log.WARN))
                 _log.warn("The reply " + replyMessageId + " did not match any pending tunnels");
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Pending tunnels: " + buf.toString());
             _context.statManager().addRateData("tunnel.buildReplyTooSlow", 1, 0);
         } else {
             handleReply(state.msg, cfg, System.currentTimeMillis()-state.recvTime);
@@ -253,14 +246,19 @@ class BuildHandler {
         if (_log.shouldLog(Log.INFO))
             _log.info(msg.getUniqueId() + ": Handling the reply after " + rtt + ", delayed " + delay + " waiting for " + cfg);
         
-        BuildReplyHandler handler = new BuildReplyHandler();
-        List order = cfg.getReplyOrder();
-        int statuses[] = handler.decrypt(_context, msg, cfg, order);
+        List<Integer> order = cfg.getReplyOrder();
+        int statuses[] = BuildReplyHandler.decrypt(_context, msg, cfg, order);
         if (statuses != null) {
             boolean allAgree = true;
             // For each peer in the tunnel
             for (int i = 0; i < cfg.getLength(); i++) {
                 Hash peer = cfg.getPeer(i);
+                // If this tunnel member is us, skip this record, don't update profile or stats
+                // for ourselves, we always agree
+                // Why must we save a slot for ourselves anyway?
+                if (peer.equals(_context.routerHash()))
+                    continue;
+
                 int record = order.indexOf(Integer.valueOf(i));
                 if (record < 0) {
                     _log.error("Bad status index " + i);
@@ -268,9 +266,9 @@ class BuildHandler {
                     _exec.buildComplete(cfg, cfg.getTunnelPool());
                     return;
                 }
+
                 int howBad = statuses[record];
-                // If this tunnel member isn't ourselves
-                if (!peer.toBase64().equals(_context.routerHash().toBase64())) {
+
                     // Look up routerInfo
                     RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
                     // Default and detect bandwidth tier
@@ -285,7 +283,6 @@ class BuildHandler {
                     }
                     if (_log.shouldLog(Log.INFO))
                         _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
-                }
 
                 if (howBad == 0) {
                     // w3wt
@@ -338,6 +335,7 @@ class BuildHandler {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(msg.getUniqueId() + ": Tunnel reply could not be decrypted for tunnel " + cfg);
+            _context.statManager().addRateData("tunnel.corruptBuildReply", 1, 0);
             // don't leak
             _exec.buildComplete(cfg, cfg.getTunnelPool());
         }
@@ -403,8 +401,13 @@ class BuildHandler {
      * This request is actually a reply, process it as such
      */
     private void handleRequestAsInboundEndpoint(BuildEndMessageState state) {
-        TunnelBuildReplyMessage msg = new TunnelBuildReplyMessage(_context);
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++)
+        int records = state.msg.getRecordCount();
+        TunnelBuildReplyMessage msg;
+        if (records == TunnelBuildMessage.MAX_RECORD_COUNT)
+            msg = new TunnelBuildReplyMessage(_context);
+        else
+            msg = new VariableTunnelBuildReplyMessage(_context, records);
+        for (int i = 0; i < records; i++)
             msg.setRecord(i, state.msg.getRecord(i));
         msg.setUniqueId(state.msg.getUniqueId());
         handleReply(msg, state.cfg, System.currentTimeMillis() - state.recvTime);
@@ -490,7 +493,6 @@ class BuildHandler {
      *  If we did credit the reply to the tunnel, it would
      *  prevent the classification of the tunnel as 'inactive' on tunnels.jsp.
      */
-    @SuppressWarnings("static-access")
     private void handleReq(RouterInfo nextPeerInfo, BuildMessageState state, BuildRequestRecord req, Hash nextPeer) {
         long ourId = req.readReceiveTunnelId();
         long nextId = req.readNextTunnelId();
@@ -613,7 +615,8 @@ class BuildHandler {
         }
 
         byte reply[] = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
-        for (int j = 0; j < TunnelBuildMessage.RECORD_COUNT; j++) {
+        int records = state.msg.getRecordCount();
+        for (int j = 0; j < records; j++) {
             if (state.msg.getRecord(j) == null) {
                 ourSlot = j;
                 state.msg.setRecord(j, new ByteArray(reply));
@@ -648,9 +651,12 @@ class BuildHandler {
         } else {
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
             // (enough layers jrandom?)
-            TunnelBuildReplyMessage replyMsg = new TunnelBuildReplyMessage(_context);
-            /* FIXME Accessing static field "RECORD_COUNT" FIXME */
-            for (int i = 0; i < state.msg.RECORD_COUNT; i++)
+            TunnelBuildReplyMessage replyMsg;
+            if (records == TunnelBuildMessage.MAX_RECORD_COUNT)
+                replyMsg = new TunnelBuildReplyMessage(_context);
+            else
+                replyMsg = new VariableTunnelBuildReplyMessage(_context, records);
+            for (int i = 0; i < records; i++)
                 replyMsg.setRecord(i, state.msg.getRecord(i));
             replyMsg.setUniqueId(req.readReplyMessageId());
             replyMsg.setMessageExpiration(_context.clock().now() + 10*1000);
@@ -693,28 +699,16 @@ class BuildHandler {
             // need to figure out if this is a reply to an inbound tunnel request (where we are the
             // endpoint, receiving the request at the last hop)
             long reqId = receivedMessage.getUniqueId();
-            PooledTunnelCreatorConfig cfg = null;
-            List building = _exec.locked_getCurrentlyBuilding();
-            List ids = new ArrayList();
-            synchronized (building) {
-                for (int i = 0; i < building.size(); i++) {
-                    PooledTunnelCreatorConfig cur = (PooledTunnelCreatorConfig)building.get(i);
-                    ids.add(new Long(cur.getReplyMessageId()));
-                    if ( (cur.isInbound()) && (cur.getReplyMessageId() == reqId) ) {
-                        building.remove(i);
-                        cfg = cur;
-                        break;
-                    } else if (cur.getReplyMessageId() == reqId) {
-                        _log.error("received it, but its not inbound? " + cur);
-                    }
-                }
-            }
+            PooledTunnelCreatorConfig cfg = _exec.removeFromBuilding(reqId);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive tunnel build message " + reqId + " from " 
                            + (from != null ? from.calculateHash().toBase64() : fromHash != null ? fromHash.toBase64() : "tunnels") 
-                           + ", waiting ids: " + ids + ", found matching tunnel? " + (cfg != null), 
-                           null);//new Exception("source"));
+                           + ", found matching tunnel? " + (cfg != null));
             if (cfg != null) {
+                if (!cfg.isInbound()) {
+                    // shouldnt happen - should we put it back?
+                    _log.error("received it, but its not inbound? " + cfg);
+                }
                 BuildEndMessageState state = new BuildEndMessageState(cfg, receivedMessage);
                 if (HANDLE_REPLIES_INLINE) {
                     handleRequestAsInboundEndpoint(state);

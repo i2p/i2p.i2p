@@ -3,9 +3,12 @@ package net.i2p.router.tunnel.pool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
@@ -28,17 +31,25 @@ class BuildExecutor implements Runnable {
     private Log _log;
     private TunnelPoolManager _manager;
     /** list of TunnelCreatorConfig elements of tunnels currently being built */
-    private final List<PooledTunnelCreatorConfig> _currentlyBuilding;
+    private final Object _currentlyBuilding;
+    /** indexed by ptcc.getReplyMessageId() */
+    private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _currentlyBuildingMap;
+    /** indexed by ptcc.getReplyMessageId() */
+    private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
     private boolean _isRunning;
     private BuildHandler _handler;
     private boolean _repoll;
     private static final int MAX_CONCURRENT_BUILDS = 10;
+    /** accept replies up to a minute after we gave up on them */
+    private static final long GRACE_PERIOD = 60*1000;
 
     public BuildExecutor(RouterContext ctx, TunnelPoolManager mgr) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _manager = mgr;
-        _currentlyBuilding = new ArrayList(MAX_CONCURRENT_BUILDS);
+        _currentlyBuilding = new Object();
+        _currentlyBuildingMap = new ConcurrentHashMap(MAX_CONCURRENT_BUILDS);
+        _recentlyBuildingMap = new ConcurrentHashMap(4 * MAX_CONCURRENT_BUILDS);
         _context.statManager().createRateStat("tunnel.concurrentBuilds", "How many builds are going at once", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.concurrentBuildsLagged", "How many builds are going at once when we reject further builds, due to job lag (period is lag)", "Tunnels", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("tunnel.buildExploratoryExpire", "How often an exploratory tunnel times out during creation", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
@@ -51,6 +62,7 @@ class BuildExecutor implements Runnable {
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildReplySlow", "Build reply late, but not too late", "Tunnels", new long[] { 10*60*1000 });
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
@@ -78,25 +90,33 @@ class BuildExecutor implements Runnable {
         if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
+        // expire any REALLY old requests
+        long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT - GRACE_PERIOD;
+        for (Iterator<PooledTunnelCreatorConfig> iter = _recentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
+            PooledTunnelCreatorConfig cfg = iter.next();
+            if (cfg.getExpiration() <= expireBefore) {
+                iter.remove();
+            }
+        }
+
+        // expire any old requests
         List<PooledTunnelCreatorConfig> expired = null;
         int concurrent = 0;
         // Todo: Make expiration variable
-        long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
-        synchronized (_currentlyBuilding) {
-            // expire any old requests
-            for (int i = 0; i < _currentlyBuilding.size(); i++) {
-                PooledTunnelCreatorConfig cfg = _currentlyBuilding.get(i);
-                if (cfg.getExpiration() <= expireBefore) {
-                    _currentlyBuilding.remove(i);
-                    i--;
-                    if (expired == null)
-                        expired = new ArrayList();
-                    expired.add(cfg);
-                }
+        expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;
+        for (Iterator<PooledTunnelCreatorConfig> iter = _currentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
+            PooledTunnelCreatorConfig cfg = iter.next();
+            if (cfg.getExpiration() <= expireBefore) {
+                // save them for another minute
+                _recentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg);
+                iter.remove();
+                if (expired == null)
+                    expired = new ArrayList();
+                expired.add(cfg);
             }
-            concurrent = _currentlyBuilding.size();
-            allowed -= concurrent;
         }
+        concurrent = _currentlyBuildingMap.size();
+        allowed -= concurrent;
         
         if (expired != null) {
             for (int i = 0; i < expired.size(); i++) {
@@ -111,7 +131,7 @@ class BuildExecutor implements Runnable {
                     // Look up peer
                     Hash peer = cfg.getPeer(iPeer);
                     // Avoid recording ourselves
-                    if (peer.toBase64().equals(_context.routerHash().toBase64()))
+                    if (peer.equals(_context.routerHash()))
                         continue;
                     // Look up routerInfo
                     RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
@@ -303,9 +323,6 @@ class BuildExecutor implements Runnable {
                                 }
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
-                                synchronized (_currentlyBuilding) {
-                                    _currentlyBuilding.add(cfg);
-                                }
                                 buildTunnel(pool, cfg);
                                 realBuilt++;
                                 
@@ -400,9 +417,6 @@ class BuildExecutor implements Runnable {
                 if (cfg != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Configuring short tunnel " + i + " for " + pool + ": " + cfg);
-                    synchronized (_currentlyBuilding) {
-                        _currentlyBuilding.add(cfg);
-                    }
                     buildTunnel(pool, cfg);
                     if (cfg.getLength() > 1) {
                         allowed--; // oops... shouldn't have done that, but hey, its not that bad...
@@ -422,6 +436,15 @@ class BuildExecutor implements Runnable {
     
     void buildTunnel(TunnelPool pool, PooledTunnelCreatorConfig cfg) {
         long beforeBuild = System.currentTimeMillis();
+        if (cfg.getLength() > 1) {
+            // should we allow an ID of 0?
+            cfg.setReplyMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+            if (addToBuilding(cfg)) {
+                _log.error("Dup reply ID: " + cfg.getReplyMessageId());
+                // fail
+                return;
+            }
+        }
         BuildRequestor.request(_context, pool, cfg, this);
         long buildTime = System.currentTimeMillis() - beforeBuild;
         if (cfg.getLength() <= 1)
@@ -445,8 +468,9 @@ class BuildExecutor implements Runnable {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Build complete for " + cfg);
         pool.buildComplete(cfg);
+        if (cfg.getLength() > 1)
+            removeFromBuilding(cfg.getReplyMessageId());
         synchronized (_currentlyBuilding) { 
-            _currentlyBuilding.remove(cfg);
             _currentlyBuilding.notifyAll();
         }
         
@@ -479,6 +503,41 @@ class BuildExecutor implements Runnable {
             _log.info(tunnel + ": Peer " + peer.toBase64() + " did not reply to the tunnel join request");
     }
     
-    List locked_getCurrentlyBuilding() { return _currentlyBuilding; }
+    /**
+     *  Only do this for non-fallback tunnels.
+     *  @return true if refused because of a duplicate key
+     */
+    private boolean addToBuilding(PooledTunnelCreatorConfig cfg) {
+        //_log.error("Adding ID: " + cfg.getReplyMessageId() + "; size was: " + _currentlyBuildingMap.size());
+        return _currentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg) != null;
+    }
+
+    /**
+     *  This returns the PTCC up to a minute after it 'expired', thus allowing us to
+     *  still use a tunnel if it was accepted, and to update peer stats.
+     *  This means that manager.buildComplete() could be called more than once, and
+     *  a build can be failed or successful after it was timed out,
+     *  which will affect the stats and profiles.
+     *  But that's ok. A peer that rejects slowly gets penalized twice, for example.
+     *
+     *  @return ptcc or null
+     */
+    PooledTunnelCreatorConfig removeFromBuilding(long id) {
+        //_log.error("Removing ID: " + id + "; size was: " + _currentlyBuildingMap.size());
+        Long key = Long.valueOf(id);
+        PooledTunnelCreatorConfig rv = _currentlyBuildingMap.remove(key);
+        if (rv != null)
+            return rv;
+        rv = _recentlyBuildingMap.remove(key);
+        if (rv != null) {
+            long requestedOn = rv.getExpiration() - 10*60*1000;
+            long rtt = _context.clock().now() - requestedOn;
+            _context.statManager().addRateData("tunnel.buildReplySlow", rtt, 0);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Got reply late (rtt = " + rtt + ") for: " + rv);
+        }
+        return rv;
+    }
+
     public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
 }
